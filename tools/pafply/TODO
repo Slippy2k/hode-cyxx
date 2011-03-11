@@ -1,0 +1,12 @@
+TODO:
+- releaser un "paf_decoder" a partir d'un .paf -> *.bmp/*.png + .wav pour chaque video (commenter le code), pas de version mais une date uniquement
+- _snd_unkVar44, paf_soundUnk1 -> structure a definir, fonction a commenter
+- documenter sur http://wiki.multimedia.cx
+- ffmpeg demuxer (si possible)
+  * commencer par coder le demuxer paf.c et voir si le systeme de buffering n'est pas genant, continuer avec pafav.c
+- faire un paf_split.py qui prend en parametre le numero de la video a extraire
+
+DOCS:
+- http://sourceforge.net/mailarchive/forum.php?forum_id=9050&max_rows=25&style=nested&viewmonth=200207
+- http://samples.mplayerhq.hu/game-formats/hod-paf/
+- http://wiki.xentax.com/index.php/Heart_Of_Darkness_PAF
