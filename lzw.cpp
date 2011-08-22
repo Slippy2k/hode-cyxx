@@ -5,7 +5,7 @@
 
 #include "intern.h"
 
-static const uint32 codeMask[] = { 0, 1, 3, 7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0xFFFFFFFF };
+static const uint32_t codeMask[] = { 0, 1, 3, 7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0xFFFFFFFF };
 
 enum {
 	kCodeWidth = 9
@@ -13,18 +13,18 @@ enum {
 
 struct LzwDecoder {
 
-	uint16 _prefix[4096];
-	uint32 _currentCode;
-	uint8 _stack[8192];
-	const uint8 *_buf;
-	uint32 _topSlot;
-	uint32 _currentByte;
-	uint32 _codeSize;
-	uint32 _currentSlot;
-	uint32 _bitsLeft;
+	uint16_t _prefix[4096];
+	uint32_t _currentCode;
+	uint8_t _stack[8192];
+	const uint8_t *_buf;
+	uint32_t _topSlot;
+	uint32_t _currentByte;
+	uint32_t _codeSize;
+	uint32_t _currentSlot;
+	uint32_t _bitsLeft;
 
 	void nextCode();
-	int decode(uint8 *dst);
+	int decode(uint8_t *dst);
 };
 
 static struct LzwDecoder _lzw;
@@ -45,17 +45,17 @@ void LzwDecoder::nextCode() {
 	_bitsLeft -= _codeSize;
 }
 
-int LzwDecoder::decode(uint8 *dst) {
-	uint8 *dst_ = dst;
+int LzwDecoder::decode(uint8_t *dst) {
+	uint8_t *dst_ = dst;
 	_codeSize = kCodeWidth;
 	_topSlot = 1 << kCodeWidth;
-	uint8 *stackPtr = &_stack[8191];
-	static const uint32 clearCode = 1 << (kCodeWidth - 1);
-	static const uint32 endCode = clearCode + 1;
-	static const uint32 newCodes = endCode + 1;
+	uint8_t *stackPtr = &_stack[8191];
+	static const uint32_t clearCode = 1 << (kCodeWidth - 1);
+	static const uint32_t endCode = clearCode + 1;
+	static const uint32_t newCodes = endCode + 1;
 	_currentSlot = newCodes;
-	uint32 previousCode = 0;
-	uint32 lastCode = 0;
+	uint32_t previousCode = 0;
+	uint32_t lastCode = 0;
 	_currentByte = _currentCode = *_buf++;
 	_bitsLeft = 8;
 	nextCode();
@@ -78,9 +78,9 @@ int LzwDecoder::decode(uint8 *dst) {
 			lastCode = _currentCode;
 			*dst_++ = (_currentCode & 255);
 		} else {
-			uint8 *currentStackPtr = stackPtr;
-			uint32 slot = _currentSlot;
-			uint32 code = _currentCode;
+			uint8_t *currentStackPtr = stackPtr;
+			uint32_t slot = _currentSlot;
+			uint32_t code = _currentCode;
 			if (_currentCode >= slot) {
 				code = lastCode;
 				currentStackPtr = &_stack[8190];
@@ -116,7 +116,7 @@ int LzwDecoder::decode(uint8 *dst) {
 	return dst_ - dst;
 }
 
-int decodeLZW(const uint8 *src, uint8 *dst) {
+int decodeLZW(const uint8_t *src, uint8_t *dst) {
 	memset(&_lzw, 0, sizeof(_lzw));
 	_lzw._buf = src;
 	return _lzw.decode(dst);

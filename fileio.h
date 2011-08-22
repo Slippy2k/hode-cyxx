@@ -26,10 +26,10 @@ struct File {
 	void close();
 	virtual void seekAlign(int pos);
 	virtual void seek(int pos, int whence);
-	virtual int read(uint8 *ptr, int size);
-	uint8 readByte();
-	uint16 readUint16();
-	uint32 readUint32();
+	virtual int read(uint8_t *ptr, int size);
+	uint8_t readByte();
+	uint16_t readUint16();
+	uint32_t readUint32();
 	int getSize();
 	virtual void flush();
 };
@@ -40,7 +40,7 @@ struct SectorFile : File {
 		kFioBufferSize = 2048
 	};
 
-	uint8 _buf[kFioBufferSize];
+	uint8_t _buf[kFioBufferSize];
 	int _bufPos;
 	int _bufLen;
 
@@ -49,7 +49,7 @@ struct SectorFile : File {
 	void refillBuffer();
 	virtual void seekAlign(int pos);
 	virtual void seek(int pos, int whence);
-	virtual int read(uint8 *ptr, int size);
+	virtual int read(uint8_t *ptr, int size);
 	virtual void flush();
 };
 

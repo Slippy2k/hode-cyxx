@@ -9,15 +9,15 @@
 #include "intern.h"
 
 struct Random {
-	uint32 _rndSeed;
-	uint8 _rndRandomTable[100];
+	uint32_t _rndSeed;
+	uint8_t _rndRandomTable[100];
 	int _rndRandomTableIndex;
 
 	void initTable();
 	void init();
-	uint32 update();
-	uint8 getNextNumber();
-	uint8 getSeed();
+	uint32_t update();
+	uint8_t getNextNumber();
+	uint8_t getSeed();
 };
 
 #endif // RANDOM_H__

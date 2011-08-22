@@ -38,10 +38,10 @@ struct SystemStub_SDL : SystemStub {
 		kDefaultScaler = 1
 	};
 
-	uint8 *_offscreenBase;
-	uint8 *_offscreen;
+	uint8_t *_offscreenBase;
+	uint8_t *_offscreen;
 	SDL_Surface *_screen;
-	uint16 _pal[256];
+	uint16_t _pal[256];
 	int _screenW, _screenH;
 	int _shakeDx, _shakeDy;
 	KeyMapping _keyMappings[kKeyMappingsSize];
@@ -51,16 +51,16 @@ struct SystemStub_SDL : SystemStub {
 	virtual ~SystemStub_SDL() {}
 	virtual void init(const char *title, int w, int h);
 	virtual void destroy();
-	virtual void setPalette(const uint8 *pal, int n, int depth);
-	virtual void copyRect(int x, int y, int w, int h, const uint8 *buf, int pitch);
-	virtual void fillRect(int x, int y, int w, int h, uint8 color);
+	virtual void setPalette(const uint8_t *pal, int n, int depth);
+	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch);
+	virtual void fillRect(int x, int y, int w, int h, uint8_t color);
 	virtual void shakeScreen(int dx, int dy);
 	virtual void updateScreen();
 	virtual void processEvents();
 	virtual void sleep(int duration);
-	virtual uint32 getTimeStamp();
+	virtual uint32_t getTimeStamp();
 
-	void addKeyMapping(int key, uint8 mask);
+	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
 	void updateKeys(PlayerInput *inp);
 	void prepareScaledGfx(int scaler);
@@ -82,7 +82,7 @@ void SystemStub_SDL::init(const char *title, int w, int h) {
 	_shakeDx = _shakeDy = 0;
 	memset(_pal, 0, sizeof(_pal));
 	const int offscreenSize = (w + 2) * (h + 2); // extra bytes for scalers accessing border pixels
-	_offscreenBase = (uint8 *)malloc(offscreenSize);
+	_offscreenBase = (uint8_t *)malloc(offscreenSize);
 	if (!_offscreenBase) {
 		error("SystemStub_SDL::init() Unable to allocate offscreen buffer");
 	}
@@ -100,7 +100,7 @@ void SystemStub_SDL::destroy() {
 	_offscreenBase = 0;
 }
 
-void SystemStub_SDL::setPalette(const uint8 *pal, int n, int depth) {
+void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 	assert(n <= 256);
 	assert(depth <= 8);
 	const int shift = 8 - depth;
@@ -117,7 +117,7 @@ void SystemStub_SDL::setPalette(const uint8 *pal, int n, int depth) {
 	}
 }
 
-void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8 *buf, int pitch) {
+void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
 	for (int i = 0; i < h; ++i) {
 		memcpy(_offscreen + y * _screenW + x, buf, w);
@@ -126,7 +126,7 @@ void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8 *buf, int 
 	}
 }
 
-void SystemStub_SDL::fillRect(int x, int y, int w, int h, uint8 color) {
+void SystemStub_SDL::fillRect(int x, int y, int w, int h, uint8_t color) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
 	for (int i = 0; i < h; ++i) {
 		memset(_offscreen + y * _screenW + x, color, w);
@@ -141,9 +141,9 @@ void SystemStub_SDL::shakeScreen(int dx, int dy) {
 
 void SystemStub_SDL::updateScreen() {
 	SDL_LockSurface(_screen);
-	uint16 *dst = (uint16 *)_screen->pixels;
+	uint16_t *dst = (uint16_t *)_screen->pixels;
 	const int dstPitch = _screen->pitch / 2;
-	const uint8 *src = _offscreen;
+	const uint8_t *src = _offscreen;
 	const int srcPitch = _screenW;
 	int w = _screenW;
 	int h = _screenH;
@@ -207,11 +207,11 @@ void SystemStub_SDL::sleep(int duration) {
 	SDL_Delay(duration);
 }
 
-uint32 SystemStub_SDL::getTimeStamp() {
+uint32_t SystemStub_SDL::getTimeStamp() {
 	return SDL_GetTicks();
 }
 
-void SystemStub_SDL::addKeyMapping(int key, uint8 mask) {
+void SystemStub_SDL::addKeyMapping(int key, uint8_t mask) {
 	if (_keyMappingsCount < kKeyMappingsSize) {
 		for (int i = 0; i < _keyMappingsCount; ++i) {
 			if (_keyMappings[i].keyCode == key) {
@@ -256,7 +256,7 @@ void SystemStub_SDL::setupDefaultKeyMappings() {
 
 void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	inp->prevMask = inp->mask;
-	uint8 *keyState = SDL_GetKeyState(NULL);
+	uint8_t *keyState = SDL_GetKeyState(NULL);
 	for (int i = 0; i < _keyMappingsCount; ++i) {
 		KeyMapping *keyMap = &_keyMappings[i];
 		if (keyState[keyMap->keyCode]) {

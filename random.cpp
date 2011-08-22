@@ -22,7 +22,7 @@ void Random::init() {
 	initTable();
 }
 
-uint32 Random::update() {
+uint32_t Random::update() {
 	bool overflow = (_rndSeed & (1 << 31)) != 0;
 	_rndSeed *= 2;
 	if (!overflow) {
@@ -31,8 +31,8 @@ uint32 Random::update() {
 	return _rndSeed;
 }
 
-uint8 Random::getNextNumber() {
-	uint8 num = _rndRandomTable[_rndRandomTableIndex];
+uint8_t Random::getNextNumber() {
+	uint8_t num = _rndRandomTable[_rndRandomTableIndex];
 	++_rndRandomTableIndex;
 	if (_rndRandomTableIndex == 100) {
 		_rndRandomTableIndex = 0;
@@ -40,6 +40,6 @@ uint8 Random::getNextNumber() {
 	return num;
 }
 
-uint8 Random::getSeed() {
+uint8_t Random::getSeed() {
 	return _rndSeed & 0xFF;
 }

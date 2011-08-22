@@ -5,7 +5,7 @@
 
 #include "scaler.h"
 
-void point1x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int srcPitch, int w, int h) {
+void point1x(uint16_t *dst, int dstPitch, const uint16_t *pal, const uint8_t *src, int srcPitch, int w, int h) {
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			dst[i] = pal[src[i]];
@@ -15,11 +15,11 @@ void point1x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int
 	}
 }
 
-void point2x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int srcPitch, int w, int h) {
+void point2x(uint16_t *dst, int dstPitch, const uint16_t *pal, const uint8_t *src, int srcPitch, int w, int h) {
 	while (h--) {
-		uint16 *p = dst;
+		uint16_t *p = dst;
 		for (int i = 0; i < w; ++i, p += 2) {
-			uint16 c = pal[*(src + i)];
+			uint16_t c = pal[*(src + i)];
 			*(p) = c;
 			*(p + 1) = c;
 			*(p + dstPitch) = c;
@@ -30,11 +30,11 @@ void point2x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int
 	}
 }
 
-void point3x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int srcPitch, int w, int h) {
+void point3x(uint16_t *dst, int dstPitch, const uint16_t *pal, const uint8_t *src, int srcPitch, int w, int h) {
 	while (h--) {
-		uint16 *p = dst;
+		uint16_t *p = dst;
 		for (int i = 0; i < w; ++i, p += 3) {
-			uint16 c = pal[*(src + i)];
+			uint16_t c = pal[*(src + i)];
 			*(p) = c;
 			*(p + 1) = c;
 			*(p + 2) = c;
@@ -50,15 +50,15 @@ void point3x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int
 	}
 }
 
-void scale2x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int srcPitch, int w, int h) {
+void scale2x(uint16_t *dst, int dstPitch, const uint16_t *pal, const uint8_t *src, int srcPitch, int w, int h) {
 	while (h--) {
-		uint16 *p = dst;
+		uint16_t *p = dst;
 		for (int i = 0; i < w; ++i, p += 2) {
-			uint16 B = pal[*(src + i - srcPitch)];
-			uint16 D = pal[*(src + i - 1)];
-			uint16 E = pal[*(src + i)];
-			uint16 F = pal[*(src + i + 1)];
-			uint16 H = pal[*(src + i + srcPitch)];
+			uint16_t B = pal[*(src + i - srcPitch)];
+			uint16_t D = pal[*(src + i - 1)];
+			uint16_t E = pal[*(src + i)];
+			uint16_t F = pal[*(src + i + 1)];
+			uint16_t H = pal[*(src + i + srcPitch)];
 			if (B != H && D != F) {
 				*(p) = D == B ? D : E;
 				*(p + 1) = B == F ? F : E;
@@ -76,19 +76,19 @@ void scale2x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int
 	}
 }
 
-void scale3x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int srcPitch, int w, int h) {
+void scale3x(uint16_t *dst, int dstPitch, const uint16_t *pal, const uint8_t *src, int srcPitch, int w, int h) {
 	while (h--) {
-		uint16 *p = dst;
+		uint16_t *p = dst;
 		for (int i = 0; i < w; ++i, p += 3) {
-			uint16 A = pal[*(src + i - srcPitch - 1)];
-			uint16 B = pal[*(src + i - srcPitch)];
-			uint16 C = pal[*(src + i - srcPitch + 1)];
-			uint16 D = pal[*(src + i - 1)];
-			uint16 E = pal[*(src + i)];
-			uint16 F = pal[*(src + i + 1)];
-			uint16 G = pal[*(src + i + srcPitch - 1)];
-			uint16 H = pal[*(src + i + srcPitch)];
-			uint16 I = pal[*(src + i + srcPitch + 1)];
+			uint16_t A = pal[*(src + i - srcPitch - 1)];
+			uint16_t B = pal[*(src + i - srcPitch)];
+			uint16_t C = pal[*(src + i - srcPitch + 1)];
+			uint16_t D = pal[*(src + i - 1)];
+			uint16_t E = pal[*(src + i)];
+			uint16_t F = pal[*(src + i + 1)];
+			uint16_t G = pal[*(src + i + srcPitch - 1)];
+			uint16_t H = pal[*(src + i + srcPitch)];
+			uint16_t I = pal[*(src + i + srcPitch + 1)];
 			if (B != H && D != F) {
 				*(p) = D == B ? D : E;
 				*(p + 1) = (D == B && E != C) || (B == F && E != A) ? B : E;
@@ -116,29 +116,29 @@ void scale3x(uint16 *dst, int dstPitch, const uint16 *pal, const uint8 *src, int
 	}
 }
 
-void clear1x(uint16 *dst, int dstPitch, int x, int y, int w, int h) {
-	uint16 *p = dst + y * dstPitch + x;
+void clear1x(uint16_t *dst, int dstPitch, int x, int y, int w, int h) {
+	uint16_t *p = dst + y * dstPitch + x;
 	for (; y < h; ++y) {
-		memset(p, 0, w * sizeof(uint16));
+		memset(p, 0, w * sizeof(uint16_t));
 		p += dstPitch;
 	}
 }
 
-void clear2x(uint16 *dst, int dstPitch, int x, int y, int w, int h) {
-	uint16 *p = dst + (y * dstPitch + x) * 2;
+void clear2x(uint16_t *dst, int dstPitch, int x, int y, int w, int h) {
+	uint16_t *p = dst + (y * dstPitch + x) * 2;
 	for (y = 0; y < h; ++y) {
 		for (int i = 0; i < 2; ++i) {
-			memset(p, 0, w * sizeof(uint16) * 2);
+			memset(p, 0, w * sizeof(uint16_t) * 2);
 			p += dstPitch;
 		}
 	}
 }
 
-void clear3x(uint16 *dst, int dstPitch, int x, int y, int w, int h) {
-	uint16 *p = dst + (y * dstPitch + x) * 3;
+void clear3x(uint16_t *dst, int dstPitch, int x, int y, int w, int h) {
+	uint16_t *p = dst + (y * dstPitch + x) * 3;
 	for (y = 0; y < h; ++y) {
 		for (int i = 0; i < 3; ++i) {
-			memset(p, 0, w * sizeof(uint16) * 3);
+			memset(p, 0, w * sizeof(uint16_t) * 3);
 			p += dstPitch;
 		}
 	}

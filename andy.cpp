@@ -6,7 +6,7 @@
 #include "game.h"
 #include "random.h"
 
-static const uint8 andyOp1LookupTable[] = {
+static const uint8_t andyOp1LookupTable[] = {
 	 0,  0,  0,  0,  1,  1,  2,  2,  3,  4,  3,  4,  2,  2,  1,  1,
 	 4,  3,  4,  3,  5,  6,  7,  8,  7,  8,  5,  6,  8,  7,  6,  5,
 	 6,  5,  8,  7,  9,  9,  9,  9, 10, 10, 11, 11, 12, 13, 12, 13,
@@ -1575,7 +1575,7 @@ void Game::updateAndyObject(LvlObject *ptr) {
 		ash = (LvlAnimSeqHeader *)(dat->animsInfoData + ah->seqOffset) + currentAnimFrame;
 		asfh = &asfh[count];
 
-		const uint8 *bitmap = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
+		const uint8_t *bitmap = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
 		int w = READ_LE_UINT16(bitmap + 2);
 		int h = READ_LE_UINT16(bitmap + 4);
 
@@ -1604,7 +1604,7 @@ void Game::updateAndyObject(LvlObject *ptr) {
 	} else {
 sameAnim:
 
-		const uint8 *frame1 = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
+		const uint8_t *frame1 = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
 
 		++currentAnimFrame;
 		if (currentAnimFrame >= ah->seqCount) {
@@ -1613,7 +1613,7 @@ sameAnim:
 
 		ash = (LvlAnimSeqHeader *)(dat->animsInfoData + ah->seqOffset) + currentAnimFrame;
 
-		const uint8 *frame2 = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
+		const uint8_t *frame2 = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
 
 		int dw = READ_LE_UINT16(frame2 + 2) - READ_LE_UINT16(frame1 + 2);
 		int dh = READ_LE_UINT16(frame2 + 4) - READ_LE_UINT16(frame1 + 4);

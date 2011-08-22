@@ -10,15 +10,15 @@
 
 struct DatHdr {
 	int _res_setupDatHeader0x40;
-	uint32 _setupImageOffsetTable[0x2E];
-	uint32 _setupImageSizeTable[0x2E];
+	uint32_t _setupImageOffsetTable[0x2E];
+	uint32_t _setupImageSizeTable[0x2E];
 };
 
 struct LvlHdr {
-	uint8 screensCount;
-	uint8 staticLvlObjectsCount;
-	uint8 extraLvlObjectsCount;
-	uint8 spritesCount;
+	uint8_t screensCount;
+	uint8_t staticLvlObjectsCount;
+	uint8_t extraLvlObjectsCount;
+	uint8_t spritesCount;
 };
 
 struct MstHdr {
@@ -54,22 +54,22 @@ struct Resource {
 	SssHdr _sssHdr;
 	File *_sssFile;
 
-	uint8 _currentScreenResourceNum;
+	uint8_t _currentScreenResourceNum;
 
-	uint8 _screensGrid[40 * 4];
+	uint8_t _screensGrid[40 * 4];
 	LvlScreenVector _screensBasePos[40];
 	LvlScreenState _screensState[40];
-	uint8 *_resLevelData0x470CTable;
-	uint8 *_resLevelData0x470CTablePtrHdr;
-	uint8 *_resLevelData0x470CTablePtrData;
-	uint8 *_resLvlScreenSpriteDataPtrTable[32];
-	uint32 _resLevelData0x2B88SizeTable[40];
-	uint32 _resLevelData0x2988SizeTable[32];
+	uint8_t *_resLevelData0x470CTable;
+	uint8_t *_resLevelData0x470CTablePtrHdr;
+	uint8_t *_resLevelData0x470CTablePtrData;
+	uint8_t *_resLvlScreenSpriteDataPtrTable[32];
+	uint32_t _resLevelData0x2B88SizeTable[40];
+	uint32_t _resLevelData0x2988SizeTable[32];
 	LvlObject *_resLvlData0x288PtrTable[40];
 	LvlObjectData _resLevelData0x2988Table[40];
 	LvlObjectData *_resLevelData0x2988PtrTable[32];
 	LvlBackgroundData _resLvlScreenBackgroundDataTable[40];
-	uint8 *_resLvlScreenBackgroundDataPtrTable[40];
+	uint8_t *_resLvlScreenBackgroundDataPtrTable[40];
 
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _lvlLinkObject;
@@ -102,8 +102,8 @@ struct Resource {
 	void loadLvlData(const char *levelName);
 	void loadLvlSpriteData(int num);
 
-	uint8 *getLevelData0x470CPtr0(int num);
-	uint8 *getLevelData0x470CPtr4(int num);
+	uint8_t *getLevelData0x470CPtr0(int num);
+	uint8_t *getLevelData0x470CPtr4(int num);
 
 	void loadLevelData0x470C();
 
@@ -116,15 +116,15 @@ struct Resource {
 	void incLevelData0x2988RefCounter(LvlObject *ptr);
 	void decLevelData0x2988RefCounter(LvlObject *ptr);
 
-	LvlObject *findLvlObject(uint8 type, uint8 num, int index);
+	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
 
-	void loadSetupImage(int num, uint8 *dst, uint8 *pal);
+	void loadSetupImage(int num, uint8_t *dst, uint8_t *pal);
 
-	uint8 *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
-	uint8 *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
+	uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
+	uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
 
 	void loadSssData(const char *levelName);
-	void checkSoundSize(const uint8 *buf, int size);
+	void checkSoundSize(const uint8_t *buf, int size);
 };
 
 #endif // RESOURCE_H__

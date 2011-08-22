@@ -52,7 +52,7 @@ void Resource::loadSetupDat() {
 	if (!_datFile) {
 		return;
 	}
-	uint8 hdr[512];
+	uint8_t hdr[512];
 	_datFile->open("SETUP.DAT");
 	_datFile->read(hdr, sizeof(hdr));
 	_datHdr._res_setupDatHeader0x40 = READ_LE_UINT32(hdr + 0x40);
@@ -102,7 +102,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->flags2 = _lvlFile->readUint16();
 	dat->stateValue = _lvlFile->readByte();
 	dat->stateCounter = _lvlFile->readByte();
-	const uint32 objRef = _lvlFile->readUint32();
+	const uint32_t objRef = _lvlFile->readUint32();
 	if (objRef) {
 		dat->linkObjPtr = &_lvlLinkObject;
 		printf("loadLvlObj num %d linkObjRef %d\n", num, (int)objRef);
@@ -127,8 +127,8 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->nextPtr = 0; _lvlFile->readUint32();
 }
 
-static void resFixPointersLevelData0x2988(uint8 *src, uint8 *ptr, LvlObjectData *dat) {
-	uint8 *base = src;
+static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectData *dat) {
+	uint8_t *base = src;
 
 	dat->unk0 = *src++;
 	dat->index = *src++;
@@ -142,12 +142,12 @@ static void resFixPointersLevelData0x2988(uint8 *src, uint8 *ptr, LvlObjectData 
 	dat->unkE = *src++;
 	dat->unkF = *src++;
 	src += 4; // 0x10
-	uint32 movesDataOffset = READ_LE_UINT32(src); src += 4; // 0x14
+	uint32_t movesDataOffset = READ_LE_UINT32(src); src += 4; // 0x14
 	src += 4; // 0x18
-	uint32 framesDataOffset = READ_LE_UINT32(src); src += 4; // 0x1C
+	uint32_t framesDataOffset = READ_LE_UINT32(src); src += 4; // 0x1C
 	src += 4; // 0x20
-	uint32 animsDataOffset = READ_LE_UINT32(src); src += 4; // 0x24
-	uint32 hotspotsDataOffset = READ_LE_UINT32(src); src += 4; // 0x28
+	uint32_t animsDataOffset = READ_LE_UINT32(src); src += 4; // 0x24
+	uint32_t hotspotsDataOffset = READ_LE_UINT32(src); src += 4; // 0x28
 
 	if (dat->refCount != 0) {
 		return;
@@ -211,10 +211,10 @@ static void resFixPointersLevelData0x2988(uint8 *src, uint8 *ptr, LvlObjectData 
 
 void Resource::loadLvlSpriteData(int num) {
 	_lvlFile->seekAlign(0x2988 + num * 16);
-	uint32 offs = _lvlFile->readUint32();
-	uint32 size = _lvlFile->readUint32();
-	uint32 readSize = _lvlFile->readUint32();
-	uint8 *ptr = (uint8 *)calloc(size, 1);
+	uint32_t offs = _lvlFile->readUint32();
+	uint32_t size = _lvlFile->readUint32();
+	uint32_t readSize = _lvlFile->readUint32();
+	uint8_t *ptr = (uint8_t *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
@@ -225,30 +225,30 @@ void Resource::loadLvlSpriteData(int num) {
 	_resLevelData0x2988SizeTable[num] = size;
 }
 
-uint8 *Resource::getLevelData0x470CPtr0(int num) {
+uint8_t *Resource::getLevelData0x470CPtr0(int num) {
 	assert(num >= 0 && num < 160);
-	const uint32 offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 0);
+	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 0);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
-uint8 *Resource::getLevelData0x470CPtr4(int num) {
+uint8_t *Resource::getLevelData0x470CPtr4(int num) {
 	assert(num >= 0 && num < 160);
-	const uint32 offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 4);
+	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 4);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
 void Resource::loadLevelData0x470C() {
 	_lvlFile->seekAlign(0x4708);
-	uint32 offs = _lvlFile->readUint32();
-	uint32 size = _lvlFile->readUint32();
-	_resLevelData0x470CTable = (uint8 *)calloc(size, 1);
+	uint32_t offs = _lvlFile->readUint32();
+	uint32_t size = _lvlFile->readUint32();
+	_resLevelData0x470CTable = (uint8_t *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
 	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + 1280;
 }
 
-static const uint32 lvlHdrTag = 0x484F4400;
+static const uint32_t lvlHdrTag = 0x484F4400;
 
 void Resource::loadLvlData(const char *levelName) {
 	_lvlFile->close();
@@ -259,7 +259,7 @@ void Resource::loadLvlData(const char *levelName) {
 		return;
 	}
 
-	const uint32 tag = _lvlFile->readUint32();
+	const uint32_t tag = _lvlFile->readUint32();
 	assert(tag == lvlHdrTag);
 
 	_lvlHdr.screensCount = _lvlFile->readByte();
@@ -294,8 +294,8 @@ void Resource::loadLvlData(const char *levelName) {
 //	loadLevelDataMst();
 }
 
-static void resFixPointersLevelData0x2B88(const uint8 *src, uint8 *ptr, LvlBackgroundData *dat) {
-	const uint8 *src_ = src;
+static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlBackgroundData *dat) {
+	const uint8_t *src_ = src;
 
 	dat->backgroundCount = *src++;
 	dat->currentBackgroundId = *src++;
@@ -312,35 +312,35 @@ static void resFixPointersLevelData0x2B88(const uint8 *src, uint8 *ptr, LvlBackg
 	dat->backgroundPaletteId = READ_LE_UINT16(src); src += 2;
 	dat->backgroundBitmapId  = READ_LE_UINT16(src); src += 2;
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundPaletteTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundBitmapTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->dataUnk0Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundMaskTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->dataUnk2Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundAnimationTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->dataUnk4Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		if (offs != 0) {
 			dat->dataUnk5Table[i] = (LvlObjectData *)malloc(sizeof(LvlObjectData));
 			resFixPointersLevelData0x2988(ptr + offs, 0, dat->dataUnk5Table[i]);
@@ -349,7 +349,7 @@ static void resFixPointersLevelData0x2B88(const uint8 *src, uint8 *ptr, LvlBackg
 		}
 	}
 	for (int i = 0; i < 4; ++i) {
-		const uint32 offs = READ_LE_UINT32(src); src += 4;
+		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->dataUnk6Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	assert((src - src_) == 160);
@@ -359,15 +359,15 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	assert(num >= 0 && num < 40);
 
 	_lvlFile->seekAlign(0x2B88 + num * 16);
-	const uint32 offs = _lvlFile->readUint32();
+	const uint32_t offs = _lvlFile->readUint32();
 	const int size = _lvlFile->readUint32();
 	const int readSize = _lvlFile->readUint32();
-	uint8 *ptr = (uint8 *)calloc(size, 1);
+	uint8_t *ptr = (uint8_t *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
 	_lvlFile->seekAlign(0x2E08 + num * 160);
-	uint8 buf[160];
+	uint8_t buf[160];
 	_lvlFile->read(buf, 160);
 	LvlBackgroundData *dat = &_resLvlScreenBackgroundDataTable[num];
 	resFixPointersLevelData0x2B88(buf, ptr, dat);
@@ -406,7 +406,7 @@ void Resource::decLevelData0x2988RefCounter(LvlObject *ptr) {
 	}
 }
 
-LvlObject *Resource::findLvlObject(uint8 type, uint8 num, int index) {
+LvlObject *Resource::findLvlObject(uint8_t type, uint8_t num, int index) {
 	LvlObject *ptr = _resLvlData0x288PtrTable[index];
 	while (ptr) {
 		if (ptr->type == type && ptr->data0x2988 == num) {
@@ -417,7 +417,7 @@ LvlObject *Resource::findLvlObject(uint8 type, uint8 num, int index) {
 	return ptr;
 }
 
-void Resource::loadSetupImage(int num, uint8 *dst, uint8 *pal) {
+void Resource::loadSetupImage(int num, uint8_t *dst, uint8_t *pal) {
 	if (!_datFile) {
 		return;
 	}
@@ -430,9 +430,9 @@ void Resource::loadSetupImage(int num, uint8 *dst, uint8 *pal) {
 	_datFile->read(pal, 768);
 }
 
-uint8 *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
+uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 	assert(frame < dat->framesCount);
-	uint8 *p = dat->framesData;
+	uint8_t *p = dat->framesData;
 	for (int i = 0; i < frame; ++i) {
 		const int size = READ_LE_UINT16(p);
 		p += size;
@@ -440,9 +440,9 @@ uint8 *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 	return p;
 }
 
-uint8 *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
+uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	assert(num < dat->animsCount);
-	uint8 *p = dat->coordsData;
+	uint8_t *p = dat->coordsData;
 	for (int i = 0; i < num; ++i) {
 		const int count = p[0];
 		p += count * 4 + 1;
@@ -491,8 +491,8 @@ printf("_sssHdr.unk1C %d _sssHdr.unk20 %d _sssHdr.unk24 %d\n", _sssHdr.unk1C, _s
 	_sssHdr.unk30 = _sssFile->readUint32(); // _edx
 }
 
-void Resource::checkSoundSize(const uint8 *buf, int size) {
-	const uint8 *end = buf + size;
+void Resource::checkSoundSize(const uint8_t *buf, int size) {
+	const uint8_t *end = buf + size;
 	while (buf < end) {
 		switch (*buf) {
 		case 0:

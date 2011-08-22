@@ -18,7 +18,7 @@
 #define SYS_INP_ESC   (1 << 7)
 
 struct PlayerInput {
-	uint8 prevMask, mask;
+	uint8_t prevMask, mask;
 	bool quit;
 
 	bool keyPressed(int keyMask) const {
@@ -37,15 +37,15 @@ struct SystemStub {
 	virtual void init(const char *title, int w, int h) = 0;
 	virtual void destroy() = 0;
 
-	virtual void setPalette(const uint8 *pal, int n, int depth = 8) = 0;
-	virtual void copyRect(int x, int y, int w, int h, const uint8 *buf, int pitch) = 0;
-	virtual void fillRect(int x, int y, int w, int h, uint8 color) = 0;
+	virtual void setPalette(const uint8_t *pal, int n, int depth = 8) = 0;
+	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) = 0;
+	virtual void fillRect(int x, int y, int w, int h, uint8_t color) = 0;
 	virtual void shakeScreen(int dx, int dy) = 0;
 	virtual void updateScreen() = 0;
 
 	virtual void processEvents() = 0;
 	virtual void sleep(int duration) = 0;
-	virtual uint32 getTimeStamp() = 0;
+	virtual uint32_t getTimeStamp() = 0;
 };
 
 extern SystemStub *SystemStub_SDL_create();

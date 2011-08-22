@@ -25,15 +25,15 @@ struct GameMstUnk2 {
 #define SIZEOF_GameMstUnk2 64
 
 struct Task {
-	const uint8 *codeData;
+	const uint8_t *codeData;
 	Task *prev, *next; // 4,8
-	uint8 *dataPtr;
+	uint8_t *dataPtr;
 	GameMstUnk2 *unk10;
-	int16 localVars[16];
-	uint8 flags;
-	uint8 runningState;
-	int16 delay;
-	uint32 unk0x38; // mstFlags
+	int16_t localVars[16];
+	uint8_t flags;
+	uint8_t runningState;
+	int16_t delay;
+	uint32_t unk0x38; // mstFlags
 	int (Game::*run)(Task *t);
 	Task *child;
 };
@@ -50,7 +50,7 @@ struct Task {
 	int _mstPosXmin, _mstPosXmax, _mstPosYmin, _mstPosYmax;
 	MovingOpcodeState _gameMstMovingState[8];
 	int _gameMstMovingStateCount;
-	uint8 _gameMstUnk9;
+	uint8_t _gameMstUnk9;
 	int _gameMstUnk27;
 	int _gameMstUnk3;
 	int _gameMstUnk4;
@@ -88,41 +88,41 @@ struct Task {
 	int _resMstHeader0x78;
 	int _resMstHeader0x7C;
 	int _resMstHeader0x80;
-	uint8 *_resMstReadBuffer;
-	const uint8 *_resMstPointsData;
-	uint8 *_resMstUnk34;
-	uint8 *_resMstUnk35;
-	uint8 *_resMstUnk36;
+	uint8_t *_resMstReadBuffer;
+	const uint8_t *_resMstPointsData;
+	uint8_t *_resMstUnk34;
+	uint8_t *_resMstUnk35;
+	uint8_t *_resMstUnk36;
 	MstScreenInitCode *_resMstUnk37; // screenInitCode
-	uint8 *_resMstCodeData_screenInit;
-	uint8 *_resMstUnk38; // MstScreenAreaCode[]
-	uint8 *_resMstUnk39;
-	uint8 *_resMstUnk40; // MstScreenAreaCode*[]
-	uint8 *_resMstUnk41;
-	uint8 *_resMstUnk42;
-	uint8 *_resMstUnk43;
-	uint8 *_resMstUnk44;
-	uint8 *_resMstUnk45;
-	uint8 *_resMstUnk46;
-	uint8 *_resMstUnk47;
-	uint8 *_resMstUnk48;
-	uint8 *_gameMstHeightMapData;
-	uint8 *_resMstUnk49;
-	uint8 *_resMstUnk50;
-	uint8 *_resMstUnk51;
-	uint8 *_resMstUnk52;
-	uint8 *_resMstUnk53;
-	uint8 *_resMstUnk63;
-	uint8 *_resMstUnk54;
-	uint8 *_resMstUnk55;
-	uint8 *_resMstUnk56;
-	uint8 *_resMstUnk57;
-	uint8 *_resMstUnk58;
-	uint8 *_resMstUnk59;
-	uint8 *_resMstUnk60;
-	uint8 *_resMstUnk61;
-	uint8 *_resMstOpcodeData;
-	uint8 *_resMstUnk62;
+	uint8_t *_resMstCodeData_screenInit;
+	uint8_t *_resMstUnk38; // MstScreenAreaCode[]
+	uint8_t *_resMstUnk39;
+	uint8_t *_resMstUnk40; // MstScreenAreaCode*[]
+	uint8_t *_resMstUnk41;
+	uint8_t *_resMstUnk42;
+	uint8_t *_resMstUnk43;
+	uint8_t *_resMstUnk44;
+	uint8_t *_resMstUnk45;
+	uint8_t *_resMstUnk46;
+	uint8_t *_resMstUnk47;
+	uint8_t *_resMstUnk48;
+	uint8_t *_gameMstHeightMapData;
+	uint8_t *_resMstUnk49;
+	uint8_t *_resMstUnk50;
+	uint8_t *_resMstUnk51;
+	uint8_t *_resMstUnk52;
+	uint8_t *_resMstUnk53;
+	uint8_t *_resMstUnk63;
+	uint8_t *_resMstUnk54;
+	uint8_t *_resMstUnk55;
+	uint8_t *_resMstUnk56;
+	uint8_t *_resMstUnk57;
+	uint8_t *_resMstUnk58;
+	uint8_t *_resMstUnk59;
+	uint8_t *_resMstUnk60;
+	uint8_t *_resMstUnk61;
+	uint8_t *_resMstOpcodeData;
+	uint8_t *_resMstUnk62;
 	Task _tasksTable[128];
 
 
@@ -177,7 +177,7 @@ void Game::loadLevelDataMst() {
 	sprintf(filename, "%s.MST", _resLevelNames[_currentLevel]);
 	f.open(filename);
 
-	uint8 hdr[132];
+	uint8_t hdr[132];
 	f.read(hdr, sizeof(hdr));
 
 	int dataSize = READ_LE_UINT32(hdr + 4);
@@ -213,15 +213,15 @@ void Game::loadLevelDataMst() {
 	_resMstHeader0x7C = READ_LE_UINT32(hdr + 0x7C);
 	_resMstHeader0x80 = READ_LE_UINT32(hdr + 0x80);
 
-	_resMstReadBuffer = (uint8 *)malloc(dataSize + 4);
+	_resMstReadBuffer = (uint8_t *)malloc(dataSize + 4);
 	f.flush();
 	f.read(_resMstReadBuffer, dataSize + 4);
 
 	_resMstPointsData = _resMstReadBuffer;
-	uint8 *p = _resMstReadBuffer; // sizeof == _resMstHeader0x80 * 8
+	uint8_t *p = _resMstReadBuffer; // sizeof == _resMstHeader0x80 * 8
 	_resMstUnk34 = p + _resMstHeader0x80 * 8;
 	_resMstUnk35 = _resMstUnk34 + _resMstHeader0x08 * 20;
-	uint8 *_ecx = _resMstUnk35 + _resMstHeader0x0C * 16;
+	uint8_t *_ecx = _resMstUnk35 + _resMstHeader0x0C * 16;
 //	int _eax = 0;
 //	_edi = _ecx;
 	for (int i = 0; i < _resMstHeader0x0C; ++i) {
@@ -387,7 +387,7 @@ void Game::loadLevelDataMst() {
 			}
 		}
 		m->offsetUnk12 = p - _resMstUnk48; // _resMstUnk48[i * 44 + 12] = p; // _eax[var8 + 12] = _edx;
-		uint8 *q = p;
+		uint8_t *q = p;
 		int count = m->countUnk12 = FROM_LE32(m->countUnk12);
 		p += count * 12;
 		for (int j = 0; j < count; ++j) { // _esi
@@ -485,7 +485,7 @@ void Game::loadLevelDataMst() {
 //	_ecx = *_esi;
 //	_eax = _esi - _resMstReadBuffer;
 //	assert(_eax == _ecx);
-	const uint8 *end = _resMstUnk62 + _resMstHeader0x7C * 4;
+	const uint8_t *end = _resMstUnk62 + _resMstHeader0x7C * 4;
 	assert(READ_LE_UINT32(end) == (uint32)(end - _resMstReadBuffer));
 
 #if 0
@@ -510,7 +510,7 @@ void Game::loadLevelDataMst() {
 	}
 #if 0
 	for (int i = 0; i < _resMstHeader0x70; ++i) {
-		uint32 codeIndex = READ_LE_UINT32(_resMstUnk60 + i * 4);
+		uint32_t codeIndex = READ_LE_UINT32(_resMstUnk60 + i * 4);
 		_resMstUnk60[i] = (codeIndex == 0xFFFFFFFF) ? 0 : _resMstUnk62 + codeIndex * 4;
 	}
 	for (int i = 0; i < _resMstHeader0x10; ++i) {
@@ -547,7 +547,7 @@ void Game::loadLevelDataMst() {
 	for (int i = 0; i < _resMstHeader0x20; ++i) {
 		int count = READ_LE_UINT32(_resMstUnk42 + i * 16 + 4);
 		for (int j = 0; j < count; ++j) {
-			uint8 *ptr = READ_LE_UINT32(resMstUnk42 + i * 16);
+			uint8_t *ptr = READ_LE_UINT32(resMstUnk42 + i * 16);
 			ptr[i] = _resMstUnk46 + ptr[i] * 8; // le32
 		}
 	}
@@ -555,7 +555,7 @@ void Game::loadLevelDataMst() {
 	for (int i = 0; i < _resMstHeader0x24; ++i) {
 		MstUnk43 *m = ((MstUnk43 *)_resMstUnk43) + i;
 		for (int j = 0; j < (int)m->count1; ++j) {
-//			uint8 *ptr = _resMstUnk43 + m->offset1;
+//			uint8_t *ptr = _resMstUnk43 + m->offset1;
 //			int index = READ_LE_UINT32(ptr + j * 4);
 //			printf("MstUnk43 index %d (%d/%d) MstUnk48 index %d (offset %d)\n", i, j, m->count1, index, m->offset1);
 //			WRITE_LE_UINT32(ptr + j * 4, _resMstUnk48 + ptr[i] * 44);
@@ -568,7 +568,7 @@ void Game::loadLevelDataMst() {
 //loc_416BDC:
 		int count = READ_LE_UINT32(_resMstUnk44 + i * 16 + 0xC);
 		for (int j = 0; count--; j += 104) {
-			uint8 *ptr = READ_LE_UINT32(_resMstUnk44 + i * 16);
+			uint8_t *ptr = READ_LE_UINT32(_resMstUnk44 + i * 16);
 			int index = READ_LE_UINT32(ptr + j + 16);
 			ptr[j + 16] = (index == 0xFFFFFFFF) ? 0 : _resMstUnk34 + index * 20;
 			index = READ_LE_UINT32(ptr + j + 20);
@@ -596,7 +596,7 @@ void Game::loadLevelDataMst() {
 		}
 //loc_416DFA:
 		for (int j = 0; j < _resMstHeader0x80; ++j) {
-			const uint8 *ptr = READ_LE_UINT32(_resMstUnk44 + i * 16 + 4);
+			const uint8_t *ptr = READ_LE_UINT32(_resMstUnk44 + i * 16 + 4);
 			ptr[j] = (ptr[j] == 0xFFFFFFFF) ? 0 : READ_LE_UINT32(_resMstUnk44 + i * 16) + ptr[j] * 104;
 		}
 	}
@@ -784,12 +784,12 @@ void Game::game_unk116(Task *t, int y1, int y2, int x1, int x2, int argC, int ar
 #if 0
 		_eax = 0;
 		if (t->dataPtr) {
-			_eax = *(uint32 *)(t->dataPtr + 16);
+			_eax = *(uint32_t *)(t->dataPtr + 16);
 		} else if (t->unk10) {
-			_eax = *(uint32 *)(t->unk10 + 4);
+			_eax = *(uint32_t *)(t->unk10 + 4);
 		}
 		if (_eax != 0) {
-			o_flags2 = *(uint16 *)(_eax + 0x14);
+			o_flags2 = *(uint16_t *)(_eax + 0x14);
 		} else {
 			o_flags2 = 0x3001;
 		}
@@ -1351,7 +1351,7 @@ void Game::GameMstUpdateMovingStateFromMainObject() {
 	if (_andyObject) {
 		_gameMstScreenRefPosX = _andyObject->xPos;
 		_gameMstScreenRefPosY = _andyObject->yPos;
-		const uint8 *p = _resMstPointsData + _gameResData0x2E08 * 8;
+		const uint8_t *p = _resMstPointsData + _gameResData0x2E08 * 8;
 		_gameMstMovingStatePosX = _gameMstScreenRefPosX + READ_LE_UINT32(p + 0);
 		_gameMstMovingStatePosY = _gameMstScreenRefPosY + READ_LE_UINT32(p + 4);
 		if (_gameMstUnk9) {
@@ -1639,7 +1639,7 @@ void Game::startMstCode() {
 		_gameMstHeightMapData[offset - 0x08] = _gameMstHeightMapData[offset - 0x0C] + _gameMstHeightMapData[offset - 0x34];
 	}
 	if (_currentScreenResourceState < _resMstHeader0x14) {
-		const uint8 *ptr = (const uint8 *)PTR<uint32>(_resMstUnk62, _resMstCodeData_screenInit, _currentScreenResourceState);
+		const uint8_t *ptr = (const uint8_t *)PTR<uint32>(_resMstUnk62, _resMstCodeData_screenInit, _currentScreenResourceState);
 		if (ptr) {
 			Task *t = createTask(ptr);
 			if (t) {
@@ -1681,7 +1681,7 @@ Task *Game::findFreeTask() {
 	return 0;
 }
 
-Task *Game::createTask(const uint8 *codeData) {
+Task *Game::createTask(const uint8_t *codeData) {
 	for (int i = 0; i < 128; ++i) {
 		Task *t = &_tasksTable[i];
 		if (!t->codeData) {
@@ -1699,7 +1699,7 @@ Task *Game::createTask(const uint8 *codeData) {
 	return 0;
 }
 
-void Game::resetTask(Task *t, const uint8 *codeData) {
+void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->runningState |= 2;
 	t->codeData = codeData;
 	t->run = &Game::runTask_main;
@@ -1707,7 +1707,7 @@ void Game::resetTask(Task *t, const uint8 *codeData) {
 #if 0
 	_eax = t->dataPtr;
 	if (_eax) {
-		uint8 mask = _eax->0xA5(byte);
+		uint8_t mask = _eax->0xA5(byte);
 		if ((mask & 0x88) != 0 && (mask & 0xF0) != 0) {
 			if ((mask & 8) != 0) {
 				t->flags2 = (t->flags2 & ~0x40) | 0x20;
@@ -1747,7 +1747,7 @@ void Game::removeTask(Task **tasksList, Task *t) {
 	}
 }
 
-Task *Game::createTaskIfNotPresent(Task *t, int num, const uint8 *codeData) {
+Task *Game::createTaskIfNotPresent(Task *t, int num, const uint8_t *codeData) {
 	Task *_eax = _tasksListTail;
 	int _ebx = 0;
 	if (_eax) {
@@ -1897,7 +1897,7 @@ int Game::getTaskVar(Task *t, int type, int index) {
 	case 5:
 		assert(0);
 #if 0
-		uint8 *p = t->0x10(le32);
+		uint8_t *p = t->0x10(le32);
 		if (p) {
 			_ecx = p->0x8(le32)
 		} else {
@@ -1951,14 +1951,14 @@ int Game::getSpecialTaskVar(int index, Task *t) const {
 int Game::runTask_main(Task *t) {
 	int ret = 0;
 	t->runningState &= ~2;
-	const uint8 *p = t->codeData; // _ebx
+	const uint8_t *p = t->codeData; // _ebx
 	do {
 //		printf("runTask_main opcode %d _runTaskOpcodesCount %d offset %d\n", *p, _runTaskOpcodesCount, p - _resMstUnk62);
 		assert(p >= _resMstUnk62 && p < _resMstUnk62 + _resMstHeader0x7C * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		switch (*p) {
 		case 0: {
-/*				uint8 *p = t->dataPtr;
+/*				uint8_t *p = t->dataPtr;
 				if (p) {
 					if ((p->0xA6(byte) & 2) == 0) {
 						p = p->0x10(le32)
@@ -1993,7 +1993,7 @@ int Game::runTask_main(Task *t) {
 			break;
 		case 2: { // 2
 				const int num = (int16)READ_LE_UINT16(p + 2);
-				const uint8 var = _resMstUnk56[num * 12 + 8];
+				const uint8_t var = _resMstUnk56[num * 12 + 8];
 //				_ecx = _resMstUnk56[num * 12];
 				switch ((var >> 4) & 0xF) {
 				default:
@@ -2086,7 +2086,7 @@ int Game::runTask_main(Task *t) {
 				memcpy(c, t, sizeof(Task));
 				c->codeData = p + 4;
 				const int index = READ_LE_UINT16(p + 2);
-				t->codeData = (const uint8 *)PTR<uint32>(_resMstUnk62, _resMstUnk60, index);
+				t->codeData = (const uint8_t *)PTR<uint32>(_resMstUnk62, _resMstUnk60, index);
 				assert(t->codeData != 0);
 				t->runningState &= ~2;
 				t->child = c;
@@ -2254,7 +2254,7 @@ assert(0); // code path check
 				int _esi = getTaskVar(t,  m->unk5       & 15, m->unk0);
 				int _eax = getTaskVar(t, (m->unk5 >> 4) & 15, m->unk2);
 				if (compareOp(m->unk4, _esi, _eax)) {
-					t->codeData = (const uint8 *)PTR_OFFS<uint32>(_resMstUnk62, m->codeIndex);
+					t->codeData = (const uint8_t *)PTR_OFFS<uint32>(_resMstUnk62, m->codeIndex);
 				}
 			}
 			break;
@@ -2266,7 +2266,7 @@ assert(0); // code path check
 			break;
 		case 239: { // 76
 				const int index = READ_LE_UINT16(p + 2);
-				const uint8 *codeData = (const uint8 *)PTR<uint32>(_resMstUnk62, _resMstUnk60, index);
+				const uint8_t *codeData = (const uint8_t *)PTR<uint32>(_resMstUnk62, _resMstUnk60, index);
 				assert(codeData != 0);
 				createTask(codeData);
 			}
@@ -2274,7 +2274,7 @@ assert(0); // code path check
 		case 240: { // 77
 				const int index = READ_LE_UINT16(p + 2);
 				MstUnk59 *m = ((MstUnk59 *)_resMstUnk59) + index;
-				createTaskIfNotPresent(t, m->unk0, (const uint8 *)PTR_OFFS<uint32>(_resMstUnk62, m->codeIndex));
+				createTaskIfNotPresent(t, m->unk0, (const uint8_t *)PTR_OFFS<uint32>(_resMstUnk62, m->codeIndex));
 			}
 			break;
 		case 242: // 78
@@ -2411,7 +2411,7 @@ loc_41E36E:
 	int i = 0; // _ebp
 	if (_esi->count2 > 0) {
 		do {
-			uint8 *t = _resMstUnk43 + _esi->offset2 + i;
+			uint8_t *t = _resMstUnk43 + _esi->offset2 + i;
 			if ((*t & 0x80) != 0) {
 				continue;
 			}
@@ -2596,7 +2596,7 @@ MstScreenAreaCode *Game::findMstCodeForPos(int num, int xPos, int yPos) {
 	return 0;
 }
 
-void Game::flagMstCodeForPos(int num, uint8 value) {
+void Game::flagMstCodeForPos(int num, uint8_t value) {
 	MstScreenAreaCode *p = PTR<MstScreenAreaCode>(_resMstUnk38, _resMstUnk39, num);
 	for (; p; p = (MstScreenAreaCode *)PTR_OFFS<MstScreenAreaCode>(_resMstUnk38, FROM_LE32(p->unk0x18))) {
 		p->unk0x1D = value;
@@ -2742,11 +2742,11 @@ void Game::prependTaskToList(Task **tasksList, Task *t) {
 	}
 }
 
-int Game::game_unk62(MstUnk48 *m, uint8 num) {
+int Game::game_unk62(MstUnk48 *m, uint8_t num) {
 //	_ebp = m;
 //	_ebx = num;
 	m->unk5 = num;
-	const uint8 *codeData = PTR_OFFS<uint32>(_resMstUnk62, m->codeData);
+	const uint8_t *codeData = PTR_OFFS<uint32>(_resMstUnk62, m->codeData);
 	if (codeData) {
 		Task *t = createTask(codeData); // _esi
 		if (!t) {

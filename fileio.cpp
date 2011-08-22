@@ -63,24 +63,24 @@ void File::seek(int pos, int whence) {
 	fseek(_fp, pos, whence);
 }
 
-int File::read(uint8 *ptr, int size) {
+int File::read(uint8_t *ptr, int size) {
 	return fread(ptr, 1, size, _fp);
 }
 
-uint8 File::readByte() {
-	uint8 buf;
+uint8_t File::readByte() {
+	uint8_t buf;
 	read(&buf, 1);
 	return buf;
 }
 
-uint16 File::readUint16() {
-	uint8 buf[2];
+uint16_t File::readUint16() {
+	uint8_t buf[2];
 	read(buf, 2);
 	return READ_LE_UINT16(buf);
 }
 
-uint32 File::readUint32() {
-	uint8 buf[4];
+uint32_t File::readUint32() {
+	uint8_t buf[4];
 	read(buf, 4);
 	return READ_LE_UINT32(buf);
 }
@@ -105,7 +105,7 @@ static int fioAlignSizeTo2048(int size) {
 	return ((size + 2043) / 2044) * 2048;
 }
 
-static uint32 fioUpdateCRC(uint32 sum, const uint8 *buf, uint32 size) {
+static uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size) {
 	assert((size & 3) == 0);
 	size >>= 2;
 	while (size--) {
@@ -117,7 +117,7 @@ static uint32 fioUpdateCRC(uint32 sum, const uint8 *buf, uint32 size) {
 void SectorFile::refillBuffer() {
 	int size = fread(_buf, 1, 2048, _fp);
 	if (size == 2048) {
-		uint32 crc = fioUpdateCRC(0, _buf, 2048);
+		uint32_t crc = fioUpdateCRC(0, _buf, 2048);
 		assert(crc == 0);
 		size -= 4;
 	}
@@ -141,7 +141,7 @@ void SectorFile::seek(int pos, int whence) {
 	File::seek(pos, whence);
 }
 
-int SectorFile::read(uint8 *ptr, int size) {
+int SectorFile::read(uint8_t *ptr, int size) {
 	if (size >= _bufLen) {
 		const int count = fioAlignSizeTo2048(size) / 2048;
 		for (int i = 0; i < count; ++i) {

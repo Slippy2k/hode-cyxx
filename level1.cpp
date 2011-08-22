@@ -136,13 +136,13 @@ void Game::level1OpStage0_screen9() {
 }
 
 void Game::level1OpHelper3(BoundingBox *box, int num) {
-	static uint8 byte_478C6C = 0;
+	static uint8_t byte_478C6C = 0;
 	BoundingBox objBox;
 	objBox.x1 = _andyObject->xPos;
 	objBox.x2 = _andyObject->xPos + _andyObject->posTable[3].x;
 	objBox.y1 = _andyObject->yPos;
 	objBox.y2 = _andyObject->yPos + _andyObject->posTable[3].y;
-	uint8 _bl = _andyObject->flags0 & 0x1F;
+	uint8_t _bl = _andyObject->flags0 & 0x1F;
 	if (clipBoundingBox(box, &objBox)) {
 		if ((_andyObject->actionKeyMask & 1) == 0) {
 			_andyObject->actionKeyMask |= 8;
@@ -150,7 +150,7 @@ void Game::level1OpHelper3(BoundingBox *box, int num) {
 		if (objBox.x2 < box->x1 + num || objBox.x2 > box->x2 - num) {
 			goto ret;
 		}
-		uint8 _al = 0;
+		uint8_t _al = 0;
 		if (_currentLevel != 0) {
 			if (_bl == 1) {
 				if (((_andyObject->flags0 >> 5) & 7) == 3) {
@@ -410,7 +410,7 @@ int Game::level1OpStage1_case0(LvlObject *o) {
 	return 1;
 }
 
-static const uint8 _level1OpHelper1KeyMaskTable[112] = {
+static const uint8_t _level1OpHelper1KeyMaskTable[112] = {
 	8, 0, 8, 0, 8, 0, 8, 0, 8, 4, 9, 0, 9, 0, 9, 4,
 	9, 0, 9, 0, 8, 4, 9, 0, 9, 4, 8, 0, 8, 4, 8, 4,
 	8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4,
@@ -420,7 +420,7 @@ static const uint8 _level1OpHelper1KeyMaskTable[112] = {
 	8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 8, 0, 4, 0
 };
 
-void Game::level1OpHelper1(LvlObject *ptr, uint8 *p) {
+void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 	const bool sameScreen = (_andyObject->data0x2E08 == ptr->data0x2E08);
 	int i = (_andyObject->width / 2 + _andyObject->xPos + (_andyObject->xPos & 7)) / 8;
 	if (i < 0 || ptr->data0x2E08 != _res->_currentScreenResourceNum) {
@@ -498,7 +498,7 @@ int Game::level1OpHelper2(LvlObject *ptr) {
 }
 
 int Game::level1OpStage1_case1(LvlObject *o) {
-	static uint8 data[68] = {
+	static uint8_t data[68] = {
 		0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
 		0x02, 0x02, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
@@ -516,7 +516,7 @@ int Game::level1OpStage1_case1(LvlObject *o) {
 }
 
 int Game::level1OpStage1_case2(LvlObject *o) {
-	static uint8 data[68] = {
+	static uint8_t data[68] = {
 		0x00, 0x00, 0x00, 0x00, 0x05, 0x05, 0x05, 0x05, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06,
 		0x06, 0x06, 0x06, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x04, 0x04, 0x04, 0x04, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
@@ -700,7 +700,7 @@ void Game::level1OpStage2_screen15() {
 }
 
 void Game::level1OpStage2_screen16() {
-	uint8 _al;
+	uint8_t _al;
 	switch (_res->_screensState[16].s0) {
 	case 0:
 		_al = 0;
@@ -728,7 +728,7 @@ void Game::level1OpStage2_screen17() {
 }
 
 void Game::level1OpStage2_screen18() {
-	uint8 _al;
+	uint8_t _al;
 	switch (_res->_screensState[18].s0) {
 	case 0:
 		_al = 0;
@@ -746,7 +746,7 @@ void Game::level1OpStage2_screen18() {
 }
 
 void Game::level1OpStage2_screen19() {
-	uint8 _al;
+	uint8_t _al;
 	switch (_res->_screensState[18].s0) {
 	case 0:
 		_al = 0;
