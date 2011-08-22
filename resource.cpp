@@ -9,6 +9,22 @@
 #include "util.h"
 
 Resource::Resource() {
+	memset(_screensGrid, 0, sizeof(_screensGrid));
+	memset(_screensBasePos, 0, sizeof(_screensBasePos));
+	memset(_screensState, 0, sizeof(_screensState));
+	_resLevelData0x470CTable = 0;
+	_resLevelData0x470CTablePtrHdr = 0;
+	_resLevelData0x470CTablePtrData = 0;
+	memset(_resLvlScreenSpriteDataPtrTable, 0, sizeof(_resLvlScreenSpriteDataPtrTable));
+	memset(_resLevelData0x2B88SizeTable, 0, sizeof(_resLevelData0x2B88SizeTable));
+	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
+	memset(_resLvlData0x288PtrTable, 0, sizeof(_resLvlData0x288PtrTable));
+	memset(_resLevelData0x2988Table, 0, sizeof(_resLevelData0x2988Table));
+	memset(_resLevelData0x2988PtrTable, 0, sizeof(_resLevelData0x2988PtrTable));
+	memset(_resLvlScreenBackgroundDataTable, 0, sizeof(_resLvlScreenBackgroundDataTable));
+	memset(_resLvlScreenBackgroundDataPtrTable, 0, sizeof(_resLvlScreenBackgroundDataPtrTable));
+	memset(_resLvlScreenObjectDataTable, 0, sizeof(_resLvlScreenObjectDataTable));
+	memset(&_lvlLinkObject, 0, sizeof(_lvlLinkObject));
 	memset(_ptr32Pool, 0, sizeof(_ptr32Pool));
 	_ptr32PoolSize = 0;
 	_isDemoData = detectGameData();
@@ -198,7 +214,7 @@ void Resource::loadLvlSpriteData(int num) {
 	uint32 offs = _lvlFile->readUint32();
 	uint32 size = _lvlFile->readUint32();
 	uint32 readSize = _lvlFile->readUint32();
-	uint8 *ptr = (uint8 *)malloc(size);
+	uint8 *ptr = (uint8 *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
@@ -210,13 +226,13 @@ void Resource::loadLvlSpriteData(int num) {
 }
 
 uint8 *Resource::getLevelData0x470CPtr0(int num) {
-	assert(num < 160);
+	assert(num >= 0 && num < 160);
 	const uint32 offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 0);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
 uint8 *Resource::getLevelData0x470CPtr4(int num) {
-	assert(num < 160);
+	assert(num >= 0 && num < 160);
 	const uint32 offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 4);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
@@ -225,7 +241,7 @@ void Resource::loadLevelData0x470C() {
 	_lvlFile->seekAlign(0x4708);
 	uint32 offs = _lvlFile->readUint32();
 	uint32 size = _lvlFile->readUint32();
-	_resLevelData0x470CTable = (uint8 *)malloc(size);
+	_resLevelData0x470CTable = (uint8 *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
@@ -346,7 +362,7 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	const uint32 offs = _lvlFile->readUint32();
 	const int size = _lvlFile->readUint32();
 	const int readSize = _lvlFile->readUint32();
-	uint8 *ptr = (uint8 *)malloc(size);
+	uint8 *ptr = (uint8 *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
@@ -461,12 +477,15 @@ void Resource::loadSssData(const char *levelName) {
 	_sssHdr.unk4 = _sssFile->readUint32(); // _edi
 	_sssHdr.unk8 = _sssFile->readUint32();
 	_sssHdr.unkC = _sssFile->readUint32();
+printf("_sssHdr.unk4 %d _sssHdr.unk8 %d _sssHdr.unkC %d\n", _sssHdr.unk4, _sssHdr.unk8, _sssHdr.unkC);
 	_sssHdr.unk10 = _sssFile->readUint32();
 	_sssHdr.unk14 = _sssFile->readUint32(); // _eax
 	_sssHdr.unk18 = _sssFile->readUint32(); // _ecx
+printf("_sssHdr.unk10 %d _sssHdr.unk14 %d _sssHdr.unk18 %d\n", _sssHdr.unk10, _sssHdr.unk14, _sssHdr.unk18);
 	_sssHdr.unk1C = _sssFile->readUint32();
 	_sssHdr.unk20 = _sssFile->readUint32();
 	_sssHdr.unk24 = _sssFile->readUint32() & 255;
+printf("_sssHdr.unk1C %d _sssHdr.unk20 %d _sssHdr.unk24 %d\n", _sssHdr.unk1C, _sssHdr.unk20, _sssHdr.unk24);
 	_sssHdr.unk28 = _sssFile->readUint32() & 255;
 	_sssHdr.unk2C = _sssFile->readUint32() & 255;
 	_sssHdr.unk30 = _sssFile->readUint32(); // _edx

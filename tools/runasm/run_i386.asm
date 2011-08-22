@@ -5,11 +5,14 @@ GLOBAL test_0x1485F0E1
 GLOBAL test_0xBA2E8BA3
 GLOBAL test_negsbb
 GLOBAL test_andnegsbb
+GLOBAL test_mullongintlongint
 
 SECTION .text
 
 arg0	equ 8
 arg1	equ 12
+arg2    equ 16
+arg3    equ 20
 
 test_eq_15:
 
@@ -111,3 +114,22 @@ test_andnegsbb:
    pop ebp
    ret
 
+test_mullongintlongint:
+
+   push ebp
+   mov ebp, esp
+
+       mov edx, [ebp + arg0]
+       mov eax, [ebp + arg1]
+       mov ebx, [ebp + arg2]
+       mov ecx, [ebp + arg3]
+
+       shl eax, 16
+       shrd eax, edx, 16
+       shl ecx, 16
+       shrd ecx, ebx, 16
+       imul ecx
+       shld edx, eax, 16
+
+   pop ebp
+   ret

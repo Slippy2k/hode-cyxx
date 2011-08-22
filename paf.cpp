@@ -12,7 +12,9 @@ PafPlayer::PafPlayer(SystemStub *system)
 		_file.open("HOD_DEMO.PAF");
 	}
 	_videoNum = -1;
+	memset(&_pafHdr, 0, sizeof(_pafHdr));
 	memset(_pageBuffers, 0, sizeof(_pageBuffers));
+	_demuxVideoFrameBlocks = 0;
 }
 
 PafPlayer::~PafPlayer() {
