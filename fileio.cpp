@@ -3,6 +3,7 @@
  * Copyright (C) 2009 Gregory Montoir
  */
 
+#include <sys/param.h>
 #include "fileio.h"
 
 const char *File::_dataPath = ".";
@@ -36,8 +37,8 @@ static void fioToUpperString(char *p) {
 }
 
 bool File::open(const char *filename) {
-	char filePath[kMaxFilePathLen];
-	sprintf(filePath, "%s/%s", _dataPath, filename);
+	char filePath[MAXPATHLEN];
+	snprintf(filePath, sizeof(filePath), "%s/%s", _dataPath, filename);
 	char *p = strrchr(filePath, '/');
 	fioToUpperString(p + 1);
 	_fp = fopen(filePath, "rb");

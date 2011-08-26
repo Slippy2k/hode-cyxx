@@ -10,10 +10,6 @@
 
 struct File {
 
-	enum {
-		kMaxFilePathLen = 512
-	};
-
 	static const char *_dataPath;
 
 	FILE *_fp;

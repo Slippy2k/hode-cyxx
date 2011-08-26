@@ -62,11 +62,13 @@ inline void WRITE_LE_UINT32(void *ptr, uint32_t v) {
 	}
 }
 
+#undef MIN
 template<typename T>
 inline T MIN(T v1, T v2) {
 	return (v1 < v2) ? v1 : v2;
 }
 
+#undef MAX
 template<typename T>
 inline T MAX(T v1, T v2) {
 	return (v1 > v2) ? v1 : v2;
