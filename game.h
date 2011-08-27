@@ -1,6 +1,6 @@
 /*
  * Heart Of Darkness engine rewrite
- * Copyright (C) 2009 Gregory Montoir
+ * Copyright (C) 2009-2011 Gregory Montoir
  */
 
 #ifndef GAME_H__
