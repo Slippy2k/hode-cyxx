@@ -33,7 +33,7 @@ struct SssHdr {
 	int unk14;
 	int unk18;
 	int unk1C;
-	int unk20;
+	int unk20; // codeSize
 	int unk24;
 	int unk28;
 	int unk2C;

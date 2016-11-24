@@ -228,6 +228,7 @@ void Game::level1OpStage0_screen16() {
 		}
 		break;
 	case 2:
+		++_screenCounterTable[16];
 		if (_screenCounterTable[16] == 5) {
 			_res->_resLvlScreenBackgroundDataTable[16].unk3 = 1;
 			setupScreenMask(16);

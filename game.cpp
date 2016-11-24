@@ -2310,7 +2310,7 @@ void Game::callLevelOpStage5() {
 		level1OpStage5();
 		break;
 	case 4:
-		level1OpStage4();
+		level4OpStage5();
 		break;
 	case 3:
 	case 5:
