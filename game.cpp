@@ -154,9 +154,9 @@ void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.unk10) {
 		// TODO
 //		fprintf(stderr, "playSound num %d/%d a=%d b=%d\n", num, _res->_sssHdr.unk10, a, b);
-//		_playSoundCurrentLvlObject = ptr;
-//		playSoundHelper(&_res->_sssUnk3[num * 8], a, b);
-//		_playSoundCurrentLvlObject = 0;
+		_currentSoundObject = ptr;
+//		playSoundHelper(&_res->_sssDataUnk1[num * 8], a, b);
+		_currentSoundObject = 0;
 	}
 }
 

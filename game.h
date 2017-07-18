@@ -68,6 +68,7 @@ struct Game {
 	LvlObject *_plasmaExplosionObject;
 	LvlObject *_plasmaCannonObject;
 	LvlObject *_currentMonsterObject;
+	LvlObject *_currentSoundObject;
 	int _currentLevel;
 	int _currentScreenResourceState; // _res->_currentScreenResourceState
 	bool _quit;

@@ -55,6 +55,7 @@ void Resource::loadSetupDat() {
 	uint8_t hdr[512];
 	_datFile->open("SETUP.DAT");
 	_datFile->read(hdr, sizeof(hdr));
+	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
 	_datHdr._res_setupDatHeader0x40 = READ_LE_UINT32(hdr + 0x40);
 //	printf("Quit Yes/No image index %d\n", _datHdr._res_setupDatHeader0x40);
 	for (int i = 0; i < 46; ++i) {
@@ -465,7 +466,7 @@ void Resource::loadSssData(const char *levelName) {
 			count = _sssHdr.unk8;
 		}
 		for (int i = 0; i < count; ++i) {
-			free(_res_sssUnkTable[i * 20].unk0);
+			free(_res_sssUnkTable[i * 20]);
 		}
 		free(_sssBuffer1);
 		_sssBuffer1 = 0;
@@ -478,17 +479,119 @@ void Resource::loadSssData(const char *levelName) {
 	_sssHdr.unk8 = _sssFile->readUint32();
 	_sssHdr.unkC = _sssFile->readUint32();
 printf("_sssHdr.unk4 %d _sssHdr.unk8 %d _sssHdr.unkC %d\n", _sssHdr.unk4, _sssHdr.unk8, _sssHdr.unkC);
-	_sssHdr.unk10 = _sssFile->readUint32();
-	_sssHdr.unk14 = _sssFile->readUint32(); // _eax
+	_sssHdr.unk10 = _sssFile->readUint32(); // _soundsCount
+	_sssHdr.unk14 = _sssFile->readUint32(); // _eax _channelsCount
 	_sssHdr.unk18 = _sssFile->readUint32(); // _ecx
 printf("_sssHdr.unk10 %d _sssHdr.unk14 %d _sssHdr.unk18 %d\n", _sssHdr.unk10, _sssHdr.unk14, _sssHdr.unk18);
 	_sssHdr.unk1C = _sssFile->readUint32();
-	_sssHdr.unk20 = _sssFile->readUint32();
+	_sssHdr.unk20 = _sssFile->readUint32(); // _sssCodeSize
 	_sssHdr.unk24 = _sssFile->readUint32() & 255;
 printf("_sssHdr.unk1C %d _sssHdr.unk20 %d _sssHdr.unk24 %d\n", _sssHdr.unk1C, _sssHdr.unk20, _sssHdr.unk24);
 	_sssHdr.unk28 = _sssFile->readUint32() & 255;
 	_sssHdr.unk2C = _sssFile->readUint32() & 255;
 	_sssHdr.unk30 = _sssFile->readUint32(); // _edx
+
+	// int bufferSize = _sssHdr.unk14 * 52 + _sssHdr.unk18 * 56;
+
+	_sssFile->flush();
+
+	// _sssBuffer1
+
+	// _sssDataUnk1
+	for (int i = 0; i < _sssHdr.unk10; ++i) {
+		int unk1 = _sssFile->readUint16(); // index _sssTriggers
+		int unk2 = _sssFile->readUint16();
+		int unk3 = _sssFile->readUint32();
+fprintf(stdout, "SssDataUnk1 #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
+	}
+	// _sssDataUnk2
+	for (int i = 0; i < _sssHdr.unk14; ++i) {
+		int unk1 = _sssFile->readUint32();
+fprintf(stdout, "SssDataUnk2 #%d 0x%x\n", i, unk1);
+	}
+	// _sssTriggers
+	for (int i = 0; i < _sssHdr.unk18; ++i) {
+		int unk1 = _sssFile->readUint16();
+		int unk2 = _sssFile->readUint16();
+		int unk3 = _sssFile->readUint32();
+fprintf(stdout, "SssTrigger #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
+	}
+	// _sssCodeOffsets
+	for (int i = 0; i < _sssHdr.unk1C; ++i) {
+		int unk1 = _sssFile->readUint32(); // 0x0
+		int unk2 = _sssFile->readUint32(); // 0x4
+		int unk3 = _sssFile->readUint32(); // 0x8
+		int unk4 = _sssFile->readUint32(); // 0xC offset to sssCodeData
+		int unk5 = _sssFile->readUint32(); // 0x10 offset to sssCodeData
+		int unk6 = _sssFile->readUint32(); // 0x14 offset to sssCodeData
+fprintf(stdout, "SssCodeOffset #%d 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3, unk4, unk5, unk6);
+	}
+	// _sssCodeData
+	for (int i = 0; i < _sssHdr.unk20; ++i) {
+		_sssFile->readByte();
+	}
+	// _sssDataUnk3
+	for (int i = 0; i < _sssHdr.unk24; ++i) {
+		int unk1 = _sssFile->readUint32();
+fprintf(stdout, "SssDataUnk3 #%d 0x%x\n", i, unk1);
+	}
+	// _sssDataUnk4
+	for (int i = 0; i < _sssHdr.unk28; ++i) {
+		int unk1 = _sssFile->readUint32();
+fprintf(stdout, "SssDataUnk4 #%d 0x%x\n", i, unk1);
+	}
+	// _sssDataUnk5
+	for (int i = 0; i < _sssHdr.unk2C; ++i) {
+		int unk1 = _sssFile->readUint32();
+fprintf(stdout, "SssDataUnk5 #%d 0x%x\n", i, unk1);
+	}
+
+	// overwite _sssDataUnk3, preloadLevelData 0x2988
+	for (int i = 0; i < _sssHdr.unk24; ++i) {
+		// _sssDataUnk3[i] = data
+		const int count = _sssFile->readByte();
+fprintf(stdout, "sssDataUnk3 #%d count %d\n", i, count);
+		uint8_t buf[256];
+		_sssFile->read(buf, count);
+	}
+	// overwite _sssDataUnk4, preloadLevelData 0x2988
+	for (int i = 0; i < _sssHdr.unk28; ++i) {
+		// _sssDataUnk4[i] = data
+		const int count = _sssFile->readByte();
+fprintf(stdout, "sssDataUnk4 #%d count %d\n", i, count);
+		uint8_t buf[256];
+		_sssFile->read(buf, count);
+	}
+	// overwite _sssDataUnk5, preloadLevelData 0x2988
+	for (int i = 0; i < _sssHdr.unk2C; ++i) {
+		// _sssDataUnk5[i] = data
+		const int count = _sssFile->readByte();
+fprintf(stdout, "sssDataUnk5 #%d count %d\n", i, count);
+		uint8_t buf[256];
+		_sssFile->read(buf, count);
+	}
+
+// loc_429A06:
+	{
+		const int count = _sssFile->readByte();
+		uint8_t buf[256];
+		_sssFile->read(buf, count);
+		// _sssDataUnk6 = data;
+	}
+	// data += _sssHdr.UnkC * 8;
+	for (int i = 0; i < _sssHdr.unkC; ++i) {
+		// _sssDataUnk6[i * 8 + 4] = data;
+		// TODO:
+
+	}
+// loc_429A78:
+
+	// _res_sssUnkTable = data;
+
+
+// loc_429AB8:
+	for (int i = 0; i < 3; ++i) {
+	}
 }
 
 void Resource::checkSoundSize(const uint8_t *buf, int size) {
