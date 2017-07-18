@@ -43,10 +43,6 @@ struct SssHdr {
 
 struct Resource {
 
-	enum {
-		kMaxPtr32Size = 64
-	};
-
 	DatHdr _datHdr;
 	File *_datFile;
 	LvlHdr _lvlHdr;
@@ -75,25 +71,11 @@ struct Resource {
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _lvlLinkObject;
 
-	void *_ptr32Pool[kMaxPtr32Size];
-	int _ptr32PoolSize;
-
 	bool _isDemoData;
 
 	Resource();
 
 	bool detectGameData();
-
-	int addPtr(void *p) {
-		assert(_ptr32PoolSize < kMaxPtr32Size);
-		const int i = _ptr32PoolSize++;
-		_ptr32Pool[i] = p;
-		return i;
-	}
-	void *derefPtr(int index) {
-		assert(index >= 0 && index < kMaxPtr32Size);
-		return _ptr32Pool[_ptr32PoolSize];
-	}
 
 	void loadSetupDat();
 	void loadLvlScreenMoveData(int num);

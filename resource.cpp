@@ -25,8 +25,6 @@ Resource::Resource() {
 	memset(_resLvlScreenBackgroundDataPtrTable, 0, sizeof(_resLvlScreenBackgroundDataPtrTable));
 	memset(_resLvlScreenObjectDataTable, 0, sizeof(_resLvlScreenObjectDataTable));
 	memset(&_lvlLinkObject, 0, sizeof(_lvlLinkObject));
-	memset(_ptr32Pool, 0, sizeof(_ptr32Pool));
-	_ptr32PoolSize = 0;
 	_isDemoData = detectGameData();
 	if (_isDemoData) {
 		_lvlFile = new SectorFile;

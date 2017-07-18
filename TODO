@@ -11,9 +11,6 @@ option pour demarrer un ecran/level donne ? voir comment c'est gere dans la conf
 
 game_unk74 / ResLoadOrUnloadPendingDataFromMstLogic
 
-utiliser Resource::_ptr32Pool
-supprimer les macros PTR_*
-
 replacer systemstub par libstub
 opengl
 
