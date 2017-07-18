@@ -322,17 +322,15 @@ void Game::level1OpStage0_screen19() {
 			_andyObject->directionKeyMask = 0;
 		}
 		fl = _andyObject->flags0 & 0x1F;
-		if (fl != 0 && fl != 2) {
-			break;
+		if (fl == 0 || fl == 2) {
+			fl = (_andyObject->flags0 >> 5) & 7;
+			if (fl == 7 || fl == 2) {
+				_res->_screensState[19].s0 = 4;
+			}
 		}
-		fl = (_andyObject->flags0 >> 5) & 7;
-		if (fl != 7 && fl != 2) {
-			break;
-		}
-		_res->_screensState[19].s0 = 4;
 		break;
 	case 2:
-		if (_andyObject->xPos < 1) {
+		if (_andyObject->yPos < 1) {
 			if (!_paf->_skipCutscenes) {
 				_paf->play(2);
 				_paf->unload(2);
