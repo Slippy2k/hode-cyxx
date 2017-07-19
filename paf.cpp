@@ -37,9 +37,9 @@ void PafPlayer::preload(int num) {
 	}
 	_videoNum = num;
 	for (int i = 0; i < 4; ++i) {
-		_pageBuffers[i] = (uint8_t *)malloc(kVideoWidth * 256); // 192 ?
+		_pageBuffers[i] = (uint8_t *)calloc(kVideoWidth * 256, 1); // 192 ?
 	}
-	_demuxVideoFrameBlocks = (uint8_t *)malloc(_pafHdr.maxVideoFrameBlocksCount * _pafHdr.readBufferSize);
+	_demuxVideoFrameBlocks = (uint8_t *)calloc(_pafHdr.maxVideoFrameBlocksCount * _pafHdr.readBufferSize, 1);
 }
 
 void PafPlayer::play(int num) {
