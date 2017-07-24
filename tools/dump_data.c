@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <assert.h>
 
@@ -12,28 +13,21 @@ enum DataDumpType {
 	SIGNED_32BITS   = 5
 };
 
-typedef unsigned char  uint8;
-typedef char            int8;
-typedef unsigned short uint16;
-typedef short           int16;
-typedef unsigned long  uint32;
-typedef long            int32;
-
-static uint32 freadUint32LE(FILE *fp) {
-	uint8 a = fgetc(fp);
-	uint8 b = fgetc(fp);
-	uint8 c = fgetc(fp);
-	uint8 d = fgetc(fp);
+static uint32_t freadUint32LE(FILE *fp) {
+	uint8_t a = fgetc(fp);
+	uint8_t b = fgetc(fp);
+	uint8_t c = fgetc(fp);
+	uint8_t d = fgetc(fp);
 	return (d << 24) | (c << 16) | (b << 8) | a;
 }
 
-static uint16 freadUint16LE(FILE *fp) {
-	uint8 a = fgetc(fp);
-	uint8 b = fgetc(fp);
+static uint16_t freadUint16LE(FILE *fp) {
+	uint8_t a = fgetc(fp);
+	uint8_t b = fgetc(fp);
 	return (b << 8) | a;
 }
 
-static void dumpInt(FILE *fp, const char *tableName, uint32 offset, int size, const char *fmt, enum DataDumpType type) {
+static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, const char *fmt, enum DataDumpType type) {
 	int i;
 
 	printf("%s[%d] = {", tableName, size);
@@ -45,13 +39,13 @@ static void dumpInt(FILE *fp, const char *tableName, uint32 offset, int size, co
 			num = fgetc(fp);
 			break;
 		case SIGNED_8BITS:
-			num = (int8)fgetc(fp);
+			num = (int8_t)fgetc(fp);
 			break;
 		case UNSIGNED_16BITS:
 			num = freadUint16LE(fp);
 			break;
 		case SIGNED_16BITS:
-			num = (int16)freadUint16LE(fp);
+			num = (int16_t)freadUint16LE(fp);
 			break;
 		default:
 			num = freadUint32LE(fp);
