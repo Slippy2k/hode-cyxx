@@ -1,0 +1,12 @@
+
+fastcall: _ecx, _edx, stack
+
+if (rcb)
+    rtb = rbb;
+else
+    rtb = rab;
+
+rt = (rb & rc) | (ra & ~rc);
+
+rt = ((ra ^ rb) & rc) ^ ra;
+
