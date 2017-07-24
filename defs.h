@@ -188,6 +188,32 @@ struct SssTrigger {
 
 #define SIZEOF_SssTrigger 8
 
+struct SssObject {
+	uint32_t unk0; // 0x0
+	uint16_t num; // 0x4
+	uint8_t unk9; // 0x9
+	uint8_t flags; // 0xA
+	uint32_t flags0; // 0xC
+	uint32_t flags1; // 0x10
+	int32_t volume; // 0x14
+	int32_t unk18; // 0x18
+	int32_t unk28; // 0x28
+	SssObject *prevPtr; // 0x30
+	SssObject *nextPtr; // 0x34
+	const uint8_t *codeDataStage1; // 0x38
+	const uint8_t *codeDataStage2; // 0x3C
+	const uint8_t *codeDataStage3; // 0x40
+	const uint8_t *codeDataStage4; // 0x44
+	int32_t counter; // 0x48
+	int32_t unk4C; // 0x4C
+	int32_t unk50; // 0x50
+	int32_t unk54; // 0x54
+	int32_t unk58; // 0x58
+	int32_t unk64; // 0x64
+	int32_t unk68; // 0x68
+	int32_t unk6C; // 0x6C
+};
+
 struct MstScreenAreaCode {
 	int32_t x1; // 0
 	int32_t x2; // 4

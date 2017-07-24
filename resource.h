@@ -71,6 +71,9 @@ struct Resource {
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _lvlLinkObject;
 
+	uint32_t _sssCodeSize;
+	uint8_t *_sssCodeData;
+
 	bool _isDemoData;
 
 	Resource();
@@ -107,7 +110,7 @@ struct Resource {
 	uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
 
 	void loadSssData(const char *levelName);
-	void checkSoundSize(const uint8_t *buf, int size);
+	void checkSssCode(const uint8_t *buf, int size);
 };
 
 #endif // RESOURCE_H__

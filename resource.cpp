@@ -482,7 +482,7 @@ printf("_sssHdr.unk4 %d _sssHdr.unk8 %d _sssHdr.unkC %d\n", _sssHdr.unk4, _sssHd
 	_sssHdr.unk18 = _sssFile->readUint32(); // _ecx
 printf("_sssHdr.unk10 %d _sssHdr.unk14 %d _sssHdr.unk18 %d\n", _sssHdr.unk10, _sssHdr.unk14, _sssHdr.unk18);
 	_sssHdr.unk1C = _sssFile->readUint32();
-	_sssHdr.unk20 = _sssFile->readUint32(); // _sssCodeSize
+	_sssCodeSize = _sssHdr.unk20 = _sssFile->readUint32(); // _sssCodeSize
 	_sssHdr.unk24 = _sssFile->readUint32() & 255;
 printf("_sssHdr.unk1C %d _sssHdr.unk20 %d _sssHdr.unk24 %d\n", _sssHdr.unk1C, _sssHdr.unk20, _sssHdr.unk24);
 	_sssHdr.unk28 = _sssFile->readUint32() & 255;
@@ -524,10 +524,8 @@ fprintf(stdout, "SssTrigger #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
 		int unk6 = _sssFile->readUint32(); // 0x14 offset to sssCodeData
 fprintf(stdout, "SssCodeOffset #%d 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3, unk4, unk5, unk6);
 	}
-	// _sssCodeData
-	for (int i = 0; i < _sssHdr.unk20; ++i) {
-		_sssFile->readByte();
-	}
+	_sssCodeData = (uint8_t *)malloc(_sssCodeSize);
+	_sssFile->read(_sssCodeData, _sssCodeSize);
 	// _sssDataUnk3
 	for (int i = 0; i < _sssHdr.unk24; ++i) {
 		int unk1 = _sssFile->readUint32();
@@ -590,9 +588,12 @@ fprintf(stdout, "sssDataUnk5 #%d count %d\n", i, count);
 // loc_429AB8:
 	for (int i = 0; i < 3; ++i) {
 	}
+
+// loc_429B9F:                             ; CODE XREF: loadSssData+41Fj
+	checkSssCode(_sssCodeData, _sssCodeSize);
 }
 
-void Resource::checkSoundSize(const uint8_t *buf, int size) {
+void Resource::checkSssCode(const uint8_t *buf, int size) {
 	const uint8_t *end = buf + size;
 	while (buf < end) {
 		switch (*buf) {
@@ -614,6 +615,11 @@ void Resource::checkSoundSize(const uint8_t *buf, int size) {
 			break;
 		case 6:
 		case 13:
+		case 17:
+		case 18:
+		case 22:
+		case 24:
+		case 26:
 		case 28:
 			buf += 8;
 			break;
@@ -622,13 +628,11 @@ void Resource::checkSoundSize(const uint8_t *buf, int size) {
 			buf += 12;
 			break;
 		case 8:
-		case 17:
-		case 18:
-		case 22:
-		case 24:
-		case 26:
 		case 27:
 			buf += 16;
+			break;
+		default:
+			error("Invalid .sss opcode %d", *buf);
 			break;
 		}
 	}

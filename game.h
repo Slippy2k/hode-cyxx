@@ -150,6 +150,13 @@ struct Game {
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
 
+	SssObject *_sssObjectsList1;
+	SssObject *_sssObjectsList2;
+	SssObject *_sssObjectsList3;
+	uint8_t _snd_usedFlagTable[32];
+	int _snd_volumeMin;
+	int _snd_fadeVolumeCounter;
+
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
 
@@ -339,6 +346,12 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+
+	// sound.cpp
+	void removeSoundObject(SssObject *so);
+	void updateSoundObject(SssObject *so);
+	const uint8_t *executeSoundCode(SssObject *so, const uint8_t *code);
+	void prepareSound(int a, int b, int c);
 
 	// andy.cpp
 
