@@ -77,20 +77,24 @@ static void fillInt(const char *tableName, int size, const char *fmt, int num) {
 int main(int argc, char* argv[]) {
 	FILE *fp;
 
-#if 0
-	fp = fopen("../DATA_demo/HODWin32_DEMO.exe", "rb");
+	const char *fn = argc > 1 ? argv[1] : "HODWin32_DEMO.exe";
+
+	fp = fopen(fn, "rb");
+
 	if (fp) {
+
+	// demo
+
+		dumpInt(fp, "_benchmarkData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS);
+		dumpInt(fp, "_benchmarkData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_byte_43E8F8", 0x3E8F8, 68, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_byte_43E940", 0x3E940, 68, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level1OpHelper1KeyMaskTable", 0x3E888, 112, "%d", UNSIGNED_8BITS);
 //		dumpInt(fp, "_andyMoveTable35", 0x40358, 48, "%3d", SIGNED_8BITS);
-		dumpInt(fp, "_actionDirectionKeyMaskTable", 0x3E3D4, 352, "0x%02X", UNSIGNED_8BITS);
-		fclose(fp);
-	}
-#endif
-#if 1
-	fp = fopen("../DATA_retail/HODWin32.exe", "rb");
-	if (fp) {
+//		dumpInt(fp, "_actionDirectionKeyMaskTable", 0x3E3D4, 352, "0x%02X", UNSIGNED_8BITS);
+
+	// retail
+
 //		dumpInt(fp, "_level1UpdateData1", 0x53060, 96, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level1UpdateData2", 0x530C0, 56, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level2UpdateData1", 0x4E940, 64, "0x%02X", UNSIGNED_8BITS);
@@ -109,10 +113,11 @@ int main(int argc, char* argv[]) {
 //		dumpInt(fp, "_level8UpdateData2", 0x58B28, 64, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level9UpdateData1", 0x4E850, 16, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level9UpdateData2", 0x58A40, 8, "0x%02X", UNSIGNED_8BITS);
-		dumpInt(fp, "_levelOpStage3ImageData1", 0x51DA8, 667, "0x%02X", UNSIGNED_8BITS);
-		dumpInt(fp, "_levelOpStage3ImageData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS); 
+//		dumpInt(fp, "_levelOpStage3ImageData1", 0x51DA8, 667, "0x%02X", UNSIGNED_8BITS);
+//		dumpInt(fp, "_levelOpStage3ImageData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS);
+
+
 		fclose(fp);
 	}
-#endif
 	return 0;
 }
