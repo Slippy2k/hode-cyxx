@@ -1,16 +1,15 @@
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 
-typedef unsigned int uint32;
-
-static uint32 freadUint32LE(FILE *fp) {
+static uint32_t freadUint32LE(FILE *fp) {
 	unsigned char b[4];
 	fread(b, 4, 1, fp);
 	return b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24);
 }
 
-static uint32 fileSize(FILE *fp) {
+static uint32_t fileSize(FILE *fp) {
 	int size, pos = ftell(fp);
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
@@ -23,7 +22,7 @@ int main(int argc, char *argv[]) {
 		FILE *fp = fopen(argv[1], "rb");
 		if (fp) {
 			FILE *fp_o;
-			uint32 offsTable[51];
+			uint32_t offsTable[51];
 			int i, j, offs;
 			for (j = 0, i = 0; i < 50; ++i) {
 				offs = freadUint32LE(fp);
