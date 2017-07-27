@@ -9,8 +9,9 @@
 #include "intern.h"
 
 enum {
-	DEBUG_GAME = 1 << 0,
-	DEBUG_RESOURCE = 1 << 1
+	kDebug_GAME     = 1 << 0,
+	kDebug_RESOURCE = 1 << 1,
+	kDebug_ANDY     = 1 << 2,
 };
 
 extern int g_debugMask;

@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "random.h"
+#include "util.h"
 
 static const uint8_t andyOp1LookupTable[] = {
 	 0,  0,  0,  0,  1,  1,  2,  2,  3,  4,  3,  4,  2,  2,  1,  1,
@@ -76,8 +77,7 @@ int Game::moveAndyObjectOp1(int op) {
 	case 27:
 		return _directionKeyMask & 10;
 	default:
-		printf("moveAndyObjectOp1 op %d\n", op);
-		assert(0);
+		error("moveAndyObjectOp1 op %d", op);
 		break;
 	}
 	return 0;
@@ -182,8 +182,7 @@ int Game::moveAndyObjectOp2(int op) {
 	case 47:
 		return ((_actionKeyMask & 6) == 4) ? 1 : 0;
 	default:
-		printf("moveAndyObjectOp2 op %d\n", op);
-		assert(0);
+		error("moveAndyObjectOp2 op %d", op);
 		break;
 	}
 	return 0;
@@ -1389,8 +1388,7 @@ int Game::moveAndyObjectOp3(int op) {
 		}
 		return 0;
 	default:
-		printf("moveAndyObjectOp3 op %d\n", op);
-		assert(0);
+		error("moveAndyObjectOp3 op %d", op);
 		break;
 	}
 	return 0;
@@ -1412,8 +1410,7 @@ int Game::moveAndyObjectOp4(int op) {
 		_andyUpdatePositionFlag = 1;
 		return 1;
 	default:
-		printf("moveAndyObjectOp4 op %d\n", op);
-		assert(0);
+		error("moveAndyObjectOp4 op %d", op);
 		break;
 	}
 	return 0;

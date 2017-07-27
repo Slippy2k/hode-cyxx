@@ -153,7 +153,7 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.unk10) {
 		// TODO
-		fprintf(stdout, "playSound num %d/%d a=%d b=%d\n", num, _res->_sssHdr.unk10, a, b);
+		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d\n", num, _res->_sssHdr.unk10, a, b);
 		_currentSoundLvlObject = ptr;
 		setupSound(&_res->_sssDataUnk1[num], a, b);
 		_currentSoundLvlObject = 0;
@@ -1191,13 +1191,13 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 			ptr->yPos -= 192;
 		}
 		if (ptr->data0x2E08 == 0xFF) {
-			debug(DEBUG_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
+			debug(kDebug_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
 			ptr->data0x2E08 = num;
 			ptr->xPos = xPosPrev;
 			ptr->yPos = yPosPrev;
 			ret = -1;
 		} else if (ptr->data0x2E08 != num) {
-			debug(DEBUG_GAME, "Changing screen from %d to %d, pos=%d,%d", num, ptr->data0x2E08, xPos, yPos);
+			debug(kDebug_GAME, "Changing screen from %d to %d, pos=%d,%d", num, ptr->data0x2E08, xPos, yPos);
 			ret = 1;
 			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 			data->boundingBox.x1 = ptr->xPos;
@@ -1337,7 +1337,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 }
 
 int Game::game_unk16(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2) {
-	printf("game_unk16() unimplemented\n");
+	warning("game_unk16() unimplemented");
 	return 0;
 }
 
@@ -1725,7 +1725,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	case 3:
 	case 2:
 	case 1:
-		printf("updateAnimatedLvlObjectType0 - TODO case %d\n", _dl);
+		warning("updateAnimatedLvlObjectType0 - TODO case %d", _dl);
 	case 0:
 		return ptr->nextPtr;
 	default:
@@ -1828,7 +1828,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		}
 		return o;
 	}
-	printf("updateAnimatedLvlObjectType2 TODO\n");
+	warning("updateAnimatedLvlObjectType2 TODO");
 #if 0
 	if (ptr->dataPtr < _gameMstUnkTable1_sizeof256 || ptr->dataPtr >= dword_464AA0) {
 		_eax = READ_LE_UINT32(_eax + 8);
@@ -2819,7 +2819,7 @@ void Game::initLvlObjects() {
 			memset(ptr->dataPtr, 0, sizeof(GameRect));
 			break;
 		case 1:
-			printf("Trying to free _resLvlScreenBackgroundDataTable.dataUnk2Table ; ignored (i=%d index=%d)\n", i, index);
+			debug(kDebug_GAME, "Trying to free _resLvlScreenBackgroundDataTable.dataUnk2Table ; ignored (i=%d index=%d)", i, index);
 #if 0
 			if (ptr->dataPtr) {
 				free(ptr->dataPtr);
