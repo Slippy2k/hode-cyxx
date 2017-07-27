@@ -18,7 +18,7 @@ struct DatHdr {
 struct LvlHdr {
 	uint8_t screensCount;
 	uint8_t staticLvlObjectsCount;
-	uint8_t extraLvlObjectsCount;
+	uint8_t extraLvlObjectsCount; // otherLvlObjectsCount
 	uint8_t spritesCount;
 };
 
