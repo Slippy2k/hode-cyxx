@@ -174,20 +174,6 @@ struct LvlBackgroundData {
 	uint8_t *dataUnk6Table[4]; /* unused ? */
 };
 
-struct SssUnk1 {
-	uint32_t unk1;
-	uint32_t unk2;
-} PACKED;
-
-#define SIZEOF_SssUnk1 8
-
-struct SssTrigger {
-	uint32_t unk1;
-	uint32_t unk2;
-} PACKED;
-
-#define SIZEOF_SssTrigger 8
-
 struct SssObject {
 	uint32_t unk0; // 0x0
 	uint16_t num; // 0x4
@@ -212,6 +198,9 @@ struct SssObject {
 	int32_t unk64; // 0x64
 	int32_t unk68; // 0x68
 	int32_t unk6C; // 0x6C
+	int32_t unk78; // 0x78
+	int32_t unk7C; // 0x7C
+	LvlObject *lvlObject; // 0x74
 };
 
 struct MstScreenAreaCode {

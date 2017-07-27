@@ -496,23 +496,25 @@ printf("_sssHdr.unk1C %d _sssHdr.unk20 %d _sssHdr.unk24 %d\n", _sssHdr.unk1C, _s
 	// _sssBuffer1
 
 	// _sssDataUnk1
+	_sssDataUnk1 = (SssUnk1 *)malloc(_sssHdr.unk10 * sizeof(SssUnk1));
 	for (int i = 0; i < _sssHdr.unk10; ++i) {
-		int unk1 = _sssFile->readUint16(); // index _sssTriggers
-		int unk2 = _sssFile->readUint16();
-		int unk3 = _sssFile->readUint32();
-fprintf(stdout, "SssDataUnk1 #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
+		_sssDataUnk1[i].unk1 = _sssFile->readUint16(); // index _sssTriggers
+		_sssDataUnk1[i].unk2 = _sssFile->readUint16();
+		_sssDataUnk1[i].unk3 = _sssFile->readUint32();
+//fprintf(stdout, "SssDataUnk1 #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
 	}
-	// _sssDataUnk2
+	// _sssDataUnk2, Unk1Offsets
 	for (int i = 0; i < _sssHdr.unk14; ++i) {
 		int unk1 = _sssFile->readUint32();
 fprintf(stdout, "SssDataUnk2 #%d 0x%x\n", i, unk1);
 	}
 	// _sssTriggers
+	_sssTriggers = (SssTrigger *)malloc(_sssHdr.unk18 * sizeof(SssTrigger));
 	for (int i = 0; i < _sssHdr.unk18; ++i) {
-		int unk1 = _sssFile->readUint16();
-		int unk2 = _sssFile->readUint16();
-		int unk3 = _sssFile->readUint32();
-fprintf(stdout, "SssTrigger #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
+		_sssTriggers[i].unk1 = _sssFile->readUint16();
+		_sssTriggers[i].sssUnk1 = _sssFile->readUint16();
+		_sssTriggers[i].unk3 = _sssFile->readUint32();
+//fprintf(stdout, "SssTrigger #%d 0x%x 0x%x 0x%x\n", i, unk1, unk2, unk3);
 	}
 	// _sssCodeOffsets
 	for (int i = 0; i < _sssHdr.unk1C; ++i) {
@@ -526,6 +528,7 @@ fprintf(stdout, "SssCodeOffset #%d 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n", i, unk1, un
 	}
 	_sssCodeData = (uint8_t *)malloc(_sssCodeSize);
 	_sssFile->read(_sssCodeData, _sssCodeSize);
+
 	// _sssDataUnk3
 	for (int i = 0; i < _sssHdr.unk24; ++i) {
 		int unk1 = _sssFile->readUint32();
@@ -541,7 +544,6 @@ fprintf(stdout, "SssDataUnk4 #%d 0x%x\n", i, unk1);
 		int unk1 = _sssFile->readUint32();
 fprintf(stdout, "SssDataUnk5 #%d 0x%x\n", i, unk1);
 	}
-
 	// overwite _sssDataUnk3, preloadLevelData 0x2988
 	for (int i = 0; i < _sssHdr.unk24; ++i) {
 		// _sssDataUnk3[i] = data
@@ -574,19 +576,74 @@ fprintf(stdout, "sssDataUnk5 #%d count %d\n", i, count);
 		_sssFile->read(buf, count);
 		// _sssDataUnk6 = data;
 	}
-	// data += _sssHdr.UnkC * 8;
+// 00429A20:
+	// data += _sssHdr.unkC * 8;
+	int dataUnk6Bytes = 0;
 	for (int i = 0; i < _sssHdr.unkC; ++i) {
+		int32_t count = _sssFile->readUint32();
+		int32_t offset = _sssFile->readUint32();
+		fprintf(stdout, "DataUnk6 #%d/%d count %d offset 0x%x\n", i, _sssHdr.unkC, count, offset);
+		dataUnk6Bytes += count * 32;
+	}
+	for (int i = 0; i < _sssHdr.unkC; ++i) {
+// 00429A25:
 		// _sssDataUnk6[i * 8 + 4] = data;
-		// TODO:
+/*
+		_esi = _sssDataUnk6;
+		_ebp = 0;
+		_ecx = *(uint32_t *)data;
+		data += _ecx * 32;
 
+		if (_ecx > 0) {
+			_edx = 0;
+			_ecx = _esi + i * 8 + 4;
+
+			do {
+				*(uint32_t *)(_edx + _ecx + 24) = _eax;
+				++_ebp;
+				_edx += 32;
+				_ecx = *(uint32_t *)(_esi + _edi * 8 + 4);
+				_ebx = *(uint32_t *)(_edx + _ecx - 4);
+				_eax += _ebx * 4;
+				_ebx = *(uint32_t *)(_esi + _edi * 8);
+			} while (_ebp < _ebx);
+		}
+		_ebx = 0;
+*/
 	}
 // loc_429A78:
+	// TEMP:
+	fprintf(stdout, "DataUnk6Bytes %d\n", dataUnk6Bytes);
+	for (int i = 0; i < dataUnk6Bytes; ++i) {
+		_sssFile->readByte();
+	}
 
-	// _res_sssUnkTable = data;
+	// _res_sssUnkTable = data; // size : sssHdr.unk30 * 20
+// loc_429AB8:
+	for (int i = 0; i < _sssHdr.unk30; ++i) {
+		int a = _sssFile->readUint32(); // ptr to PCM data
+		int b = _sssFile->readUint32(); // offset in .sss
+		int c = _sssFile->readUint32(); // size in .sss (256 int16_t words + followed with indexes)
+		int d = _sssFile->readUint32();
+		int e = _sssFile->readUint32();
+		fprintf(stdout, "sssUnkTable #%d/%d 0x%x offset 0x%x size %d %d 0x%x\n", i, _sssHdr.unk30, a, b, c, d, e);
+	}
+	// _res_sssUnk1 = data; // size : sssHdr.unk14 * 52
 
+	// _res_sssUnk12 = data; // size : sssHdr.unk30 * 20
 
 // loc_429AB8:
 	for (int i = 0; i < 3; ++i) {
+/*
+.text:00429AE3                 mov     _res_sssUnk13[edx], ecx
+.text:00429AE9                 add     ecx, esi
+.text:00429AEB                 mov     _res_sssFlagsTable2[edx], ecx
+.text:00429AF1                 add     ecx, esi
+.text:00429AF3                 mov     _res_sssFlagsTable1[edx], ecx
+.text:00429AF9                 add     edx, 4
+.text:00429AFC                 add     ecx, esi
+.text:00429AFE                 cmp     edx, 12
+*/
 	}
 
 // loc_429B9F:                             ; CODE XREF: loadSssData+41Fj

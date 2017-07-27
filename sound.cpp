@@ -134,10 +134,10 @@ flag_case0:
 		edi = so->flags0;
 		removeSoundObject(so);
 		if (ebp != -1) {
-			_ebx = _currentSoundObject;
-			_currentSoundObject = so->soundDataPtr;
+			LvlObject *tmp = _currentSoundLvlObject;
+			_currentSoundLvlObject = so->lvlObject;
 			prepareSound(ebp, var4);
-			_currentSoundObject = _ebx;
+			_currentSoundLvlObject = tmp;
 		} else {
 loc_42B29C:
 		_eax = (_edi >> 0x14) & 0xF;
@@ -208,10 +208,10 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 			return 0;
 		case 2:
 			if (so->unk50 >= -1) {
-				// _ebp = currentSoundObject;
-				// _currentSoundObject = so->soundDataPtr;
+				// _ebp = currentSoundLvlObject;
+				// _currentSoundLvlObject = so->lvlObject;
 				prepareSound(READ_LE_UINT16(code + 2), code[1], so->flags0);
-				// _currentSoundObject = _ebp;
+				// _currentSoundLvlObject = _ebp;
 				code += 4;
 				if (so->unk0 == 0) {
 					return code;
@@ -411,4 +411,76 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 }
 
 void Game::prepareSound(int a, int b, int c) {
+	if (a > 0) {
+		if ((_res->_sssTriggers[a].unk1 & 1) != 0) {
+			// int var8 = _res->_sssTriggers[a].sssUnk1
+			if ((_res->_sssTriggers[a].unk1 >> 8) < 0) {
+			}
+		}
+// 42B865:
+		// TODO:
+	} else {
+		SssObject *so = prepareSoundHelper(a, b, c);
+		if (so && (_res->_sssTriggers[a].unk1 & 4) != 0) {
+			so->unk7C = b;
+			so->unk78 = a;
+		}
+	}
+}
+
+SssObject *Game::prepareSoundHelper(int a, int b, int c) {
+	// TODO
+	return 0;
+}
+
+void Game::setupSound(SssUnk1 *s, int a, int b) {
+	fprintf(stdout, "setupSound triggerIndex %d a 0x%x b 0x%x\n", s->unk1, a, b);
+	// _res->_sssUnk1[_res->_sssTriggers[s->unk1].sssUnk1]
+	// TODO:
+	for (int i = 0; i < _sssObjectsCount; ++i) {
+		SssObject *so = &_sssObjectsTable[i];
+		// if (so->pcmDataPtr != 0 && so->sssUnk1Ptr == ) {
+		//	break; // already_in_list
+		//}
+	}
+}
+
+void Game::clearSoundObjects() {
+	memset(_sssObjectsTable, 0, sizeof(_sssObjectsTable));
+	_sssObjectsList1 = 0;
+	_sssObjectsList2 = 0;
+	_sssObjectsList3 = 0;
+	for (int i = 0; i < ARRAYSIZE(_sssObjectsTable); ++i) {
+		_sssObjectsTable[i].num = i;
+	}
+	_sssObjectsCount = 0;
+	_snd_fadeVolumeCounter = 0;
+	// _snd_mixingBufferSize = 0;
+	if (_res->_sssHdr.unk10 != 0) {
+		for (int i = 0; i < 3; ++i) {
+			// memset(_res_sssUnk13[i], 0, _res_sssTriggersCount * 4);
+			// memset(_sssObjectsTable[i].pcmDataPtr, 0, _res_sssTriggersCount * 4);
+			// memset(_res_sssFlagsTable1[i], 0, _res_sssTriggersCount * 4);
+		}
+	}
+	// TODO:
+}
+
+void Game::fadeSoundObject(SssObject *so) {
+	if ((so->flags & 2) == 0) {
+		_sssObjectsList3 = 0;
+		if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
+			so = 0;
+			SssObject *cur = _sssObjectsList1;
+			for (; cur; cur = cur->nextPtr) {
+				if (so) {
+					if (so->unk9 <= cur->unk9) {
+						continue;
+					}
+				}
+				so = cur;
+				_sssObjectsList2 = cur;
+			}
+		}
+	}
 }

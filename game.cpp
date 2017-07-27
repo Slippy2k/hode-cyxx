@@ -153,10 +153,10 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.unk10) {
 		// TODO
-//		fprintf(stderr, "playSound num %d/%d a=%d b=%d\n", num, _res->_sssHdr.unk10, a, b);
-		_currentSoundObject = ptr;
-//		playSoundHelper(&_res->_sssDataUnk1[num * 8], a, b);
-		_currentSoundObject = 0;
+		fprintf(stdout, "playSound num %d/%d a=%d b=%d\n", num, _res->_sssHdr.unk10, a, b);
+		_currentSoundLvlObject = ptr;
+		setupSound(&_res->_sssDataUnk1[num], a, b);
+		_currentSoundLvlObject = 0;
 	}
 }
 
@@ -1123,9 +1123,9 @@ void Game::restartLevel() {
 	} else {
 		_mstGlobalFlags = 0;
 	}
-//	if (_res_sssHeader0x10) {
+	if (_res->_sssHdr.unk10) {
 //		snd_restart();
-//	}
+	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 	ResPreloadLevelData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
@@ -1500,9 +1500,9 @@ int Game::updateAndyLvlObject() {
 	} else {
 		_mstGlobalFlags = 0;
 	}
-//	if (_res_sssHeader0x10) {
+	if (_res->_sssHdr.unk10) {
 //		snd_restart();
-//	}
+	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 	ResPreloadLevelData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
@@ -2089,9 +2089,9 @@ void Game::levelMainLoop() {
 		_paf->play(num);
 		_paf->unload(num);
 	}
-//	if (_res_sssUnk3 != 0) {
+	if (_res->_sssHdr.unk10 != 0) {
 //		snd_restart();
-//	}
+	}
 	_quit = false;
 	GameClearUnkList1();
 	callLevelOpStage3();
@@ -2104,9 +2104,9 @@ void Game::levelMainLoop() {
 	} else {
 		_mstGlobalFlags = 0;
 	}
-//	if (_res_sssUnk3 != 0) {
+	if (_res->_sssHdr.unk10 != 0) {
 //		snd_restart();
-//	}
+	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 	ResPreloadLevelData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
@@ -2142,9 +2142,9 @@ void Game::levelMainLoop() {
 			} else {
 				_mstGlobalFlags = 0;
 			}
-//			if (_res_sssUnk3 != 0) {
+			if (_res->_sssHdr.unk10 != 0) {
 //				snd_restart();
-//			}
+			}
 			const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 			ResPreloadLevelData(num, 0xFF);
 			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
@@ -2182,8 +2182,8 @@ void Game::levelMainLoop() {
 				updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
 			}
 		}
+		if (_res->_sssHdr.unk10 != 0) {
 #if 0
-		if (_res_sssUnk3 != 0) {
 			if (_snd_numberOfBuffers != 0) {
 				SetEvent(_snd_threadEvent1);
 				while (_snd_numberOfBuffers != 0) {
@@ -2191,14 +2191,14 @@ void Game::levelMainLoop() {
 				}
 			}
 			EnterCriticalSection(_snd_mutex);
-			snd_unk1();
-			if (_snd_unkVar12 == 0) {
+			snd_prepareDirectSoundBuffers();
+			if (_snd_numberOfBuffersMixed == 0) {
 				_snd_numberOfBuffers = 4;
 				_snd_syncTimeOut = 55;
 				LeaveCriticalSection(_snd_mutex);
 				SetEvent(_snd_threadEvent1);
 				game_unmuteSound();
-			} else if (_snd_unkVar12 - _snd_unkVar34 < 4) {
+			} else if (_snd_numberOfBuffersMixed - _snd_playbackDuration < 4) {
 				_snd_numberOfBuffers = 1;
 				LeaveCriticalSection(_snd_mutex);
 				SetEvent(_snd_threadEvent1);
@@ -2207,8 +2207,8 @@ void Game::levelMainLoop() {
 				LeaveCriticalSection(_snd_mutex);
 				game_unmuteSound();
 			}
-		}
 #endif
+		}
 		if (_video->_paletteNeedRefresh) {
 			_video->_paletteNeedRefresh = false;
 			_video->refreshGamePalette(_video->_displayPaletteBuffer);

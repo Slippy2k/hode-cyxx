@@ -30,7 +30,7 @@ struct SssHdr {
 	int unk4;
 	int unk8;
 	int unkC;
-	int unk10;
+	int unk10; // SssUnk1 count
 	int unk14;
 	int unk18;
 	int unk1C;
@@ -40,6 +40,23 @@ struct SssHdr {
 	int unk2C;
 	int unk30;
 };
+
+struct SssUnk1 {
+	uint16_t unk1;
+	uint16_t unk2;
+	uint32_t unk3;
+} PACKED;
+
+#define SIZEOF_SssUnk1 8
+
+struct SssTrigger {
+	uint16_t unk1;
+	uint16_t sssUnk1; // index to _sssUnk1
+	uint32_t unk3; // offset to init data
+} PACKED;
+
+#define SIZEOF_SssTrigger 8
+
 
 struct Resource {
 
@@ -70,6 +87,9 @@ struct Resource {
 
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _lvlLinkObject;
+
+	SssUnk1 *_sssDataUnk1;
+	SssTrigger *_sssTriggers;
 
 	uint32_t _sssCodeSize;
 	uint8_t *_sssCodeData;

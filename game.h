@@ -68,7 +68,7 @@ struct Game {
 	LvlObject *_plasmaExplosionObject;
 	LvlObject *_plasmaCannonObject;
 	LvlObject *_currentMonsterObject;
-	LvlObject *_currentSoundObject;
+	LvlObject *_currentSoundLvlObject;
 	int _currentLevel;
 	int _currentScreenResourceState; // _res->_currentScreenResourceState
 	bool _quit;
@@ -149,13 +149,6 @@ struct Game {
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
-
-	SssObject *_sssObjectsList1;
-	SssObject *_sssObjectsList2;
-	SssObject *_sssObjectsList3;
-	uint8_t _snd_usedFlagTable[32];
-	int _snd_volumeMin;
-	int _snd_fadeVolumeCounter;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -348,10 +341,23 @@ struct Game {
 	void executeMstCode();
 
 	// sound.cpp
+	SssObject _sssObjectsTable[32];
+	int _sssObjectsCount;
+	SssObject *_sssObjectsList1;
+	SssObject *_sssObjectsList2;
+	SssObject *_sssObjectsList3;
+	uint8_t _snd_usedFlagTable[32];
+	int _snd_volumeMin;
+	int _snd_fadeVolumeCounter;
+
 	void removeSoundObject(SssObject *so);
 	void updateSoundObject(SssObject *so);
 	const uint8_t *executeSoundCode(SssObject *so, const uint8_t *code);
 	void prepareSound(int a, int b, int c);
+	SssObject *prepareSoundHelper(int a, int b, int c);
+	void setupSound(SssUnk1 *s, int a, int b);
+	void clearSoundObjects();
+	void fadeSoundObject(SssObject *so);
 
 	// andy.cpp
 
