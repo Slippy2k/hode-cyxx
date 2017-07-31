@@ -174,8 +174,10 @@ struct LvlBackgroundData {
 	uint8_t *dataUnk6Table[4]; /* unused ? */
 };
 
+struct SssUnk4;
+
 struct SssObject {
-	uint32_t unk0; // 0x0
+	uint8_t *soundBits; // 0x0
 	uint16_t num; // 0x4
 	uint8_t unk9; // 0x9
 	uint8_t flags; // 0xA
@@ -198,9 +200,10 @@ struct SssObject {
 	int32_t unk64; // 0x64
 	int32_t unk68; // 0x68
 	int32_t unk6C; // 0x6C
+	LvlObject *lvlObject; // 0x74
 	int32_t unk78; // 0x78
 	int32_t unk7C; // 0x7C
-	LvlObject *lvlObject; // 0x74
+	SssUnk4 *sssUnk4Ptr;
 };
 
 struct MstScreenAreaCode {

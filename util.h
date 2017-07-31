@@ -12,6 +12,7 @@ enum {
 	kDebug_GAME     = 1 << 0,
 	kDebug_RESOURCE = 1 << 1,
 	kDebug_ANDY     = 1 << 2,
+	kDebug_SOUND    = 1 << 3,
 };
 
 extern int g_debugMask;

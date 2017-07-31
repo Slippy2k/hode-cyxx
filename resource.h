@@ -30,33 +30,62 @@ struct SssHdr {
 	int unk4;
 	int unk8;
 	int unkC;
-	int unk10; // SssUnk1 count
-	int unk14;
-	int unk18;
-	int unk1C;
-	int unk20; // codeSize
-	int unk24;
-	int unk28;
-	int unk2C;
-	int unk30;
+	int unk10; // sssDataUnk1Count
+	int unk14; // sssDataUnk2Count
+	int unk18; // sssDataUnk3Count
+	int unk1C; // sssCodeOffsetsCount
+	int unk20; // sssCodeSize
+	int unk24; // sssPreloadData1Count
+	int unk28; // sssPreloadData2Count
+	int unk2C; // sssPreloadData3Count
+	int dpcmCount; // 30
 };
 
 struct SssUnk1 {
-	uint16_t unk1;
-	uint16_t unk2;
-	uint32_t unk3;
+	uint16_t unk0; // 0 index to _sssDataUnk3
+	uint8_t unk2; // 2
+	uint8_t unk3;
+	uint8_t unk4; // 4
+	uint16_t unk5;
+	uint8_t unk7;
 } PACKED;
 
 #define SIZEOF_SssUnk1 8
 
-struct SssTrigger {
-	uint16_t unk1;
-	uint16_t sssUnk1; // index to _sssUnk1
-	uint32_t unk3; // offset to init data
+struct SssUnk3 {
+	uint8_t unk0; // 0
+	uint8_t unk1; // 1
+	uint16_t sssUnk4; // 2 index to _sssDataUnk4
+	uint32_t unk4; // 4 offset to init data
 } PACKED;
 
-#define SIZEOF_SssTrigger 8
+#define SIZEOF_SssUnk3 8
 
+struct SssUnk4 {
+	uint8_t data[52];
+} PACKED;
+
+#define SIZEOF_SssUnk4 52
+
+struct SssUnk5 {
+	uint8_t *ptr;    // 0 PCM data
+	uint32_t offset; // 4 offset in .sss
+	uint32_t size;   // 8 size in .sss (256 int16_t words + followed with indexes)
+	uint32_t unkC;
+	uint32_t unk10;
+} PACKED;
+
+#define SIZEOF_SssUnk5 20
+
+struct SssUnk6 {
+	uint32_t unk0;
+	uint32_t unk4;
+	uint32_t unk8;
+	uint32_t unkC;
+	uint32_t unk10;
+} PACKED;
+
+#define SIZEOF_SssUnk6
 
 struct Resource {
 
@@ -89,7 +118,9 @@ struct Resource {
 	LvlObject _lvlLinkObject;
 
 	SssUnk1 *_sssDataUnk1;
-	SssTrigger *_sssTriggers;
+	SssUnk3 *_sssDataUnk3;
+	SssUnk4 *_sssDataUnk4;
+	SssUnk5 *_sssDpcmTable;
 
 	uint32_t _sssCodeSize;
 	uint8_t *_sssCodeData;

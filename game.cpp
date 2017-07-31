@@ -152,8 +152,7 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.unk10) {
-		// TODO
-		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d\n", num, _res->_sssHdr.unk10, a, b);
+		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.unk10, a, b);
 		_currentSoundLvlObject = ptr;
 		setupSound(&_res->_sssDataUnk1[num], a, b);
 		_currentSoundLvlObject = 0;
@@ -161,7 +160,12 @@ void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 }
 
 void Game::removeSound(LvlObject *ptr) {
-	// TODO
+	for (int i = 0; i < _sssObjectsCount; ++i) {
+		if (_sssObjectsTable[i].lvlObject == ptr) {
+			_sssObjectsTable[i].lvlObject = 0;
+		}
+	}
+	ptr->unk34 = 0;
 }
 
 void Game::setupBackgroundBitmap() {

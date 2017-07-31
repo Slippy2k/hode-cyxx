@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	}
 	_system = SystemStub_SDL_create();
 	atexit(exitMain);
-	g_debugMask = kDebug_GAME | kDebug_RESOURCE;
+	g_debugMask = kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
 	Game *g = new Game(_system, dataPath);
 	g->mainLoop(initialLevel);
 	delete g;
