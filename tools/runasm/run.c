@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 
 extern int test_eq_15(int) __attribute__((stdcall));
@@ -9,6 +10,7 @@ extern int test_0xBA2E8BA3(int,int) __attribute__((stdcall));
 extern int test_negsbb(int) __attribute__((stdcall));
 extern int test_andnegsbb(int) __attribute__((stdcall));
 extern int test_mullongintlongint(int,int,int,int) __attribute__((stdcall));
+extern int test_cdq(int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -40,6 +42,9 @@ int main(int argc, char *argv[]) {
 	assert(test_andnegsbb(2) == -512);
 	assert(test_andnegsbb(1) ==  512);
 	i = test_mullongintlongint(1, 0, 0, 4);
-	printf("mul %d\n", i);
+	fprintf(stdout, "mul %d\n", i);
+	for (int i = -512; i < 512; ++i) {
+		assert(test_cdq(i) == i / 4);
+	}
 	return 0;
 }

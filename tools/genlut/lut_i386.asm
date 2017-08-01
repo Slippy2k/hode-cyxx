@@ -1,17 +1,17 @@
 
 
-GLOBAL _gen1
-GLOBAL _unkLookupTable1
-GLOBAL _gen4
-GLOBAL _unkLookupTable4
-GLOBAL _gen5
-GLOBAL _unkLookupTable5
+GLOBAL gen1
+GLOBAL unkLookupTable1
+GLOBAL gen4
+GLOBAL unkLookupTable4
+GLOBAL gen5
+GLOBAL unkLookupTable5
 
 SECTION .bss
 
-_unkLookupTable1: resb 16
-_unkLookupTable4: resb 18
-_unkLookupTable5: resb 32
+unkLookupTable1: resb 16
+unkLookupTable4: resb 18
+unkLookupTable5: resb 32
 
 SECTION .data
 
@@ -31,7 +31,7 @@ SECTION .text
 	ret
 %endmacro
 
-_gen1:
+gen1:
 	ENTER
 	xor     ecx, ecx
 loop1:
@@ -73,13 +73,13 @@ loc_41990F:
 	jz      short loc_419919
 	mov     eax, 6
 loc_419919:
-	mov     [_unkLookupTable1 + ecx], al
+	mov     [unkLookupTable1 + ecx], al
 	inc     ecx
 	cmp     ecx, 15
 	jbe     short loop1
 	LEAVE
 
-_gen4:
+gen4:
 	ENTER
 	xor     esi, esi
 loop4:
@@ -98,13 +98,13 @@ loop4:
 loc_419A1C:
 	shl     cl, 3
 	or      cl, dl
-	mov     [_unkLookupTable4 + esi], cl
+	mov     [unkLookupTable4 + esi], cl
 	inc     esi
 	cmp     esi, 18
 	jb      short loop4
 	LEAVE
 
-_gen5:
+gen5:
 	ENTER
 	xor     esi, esi
 loop5:
@@ -131,7 +131,7 @@ loc_419A54:
 	imul    dl
 	add     al, cl
 	dec     al
-	mov     [_unkLookupTable5 + esi], al
+	mov     [unkLookupTable5 + esi], al
 	inc     esi
 	cmp     esi, 32
 	jb      short loop5
