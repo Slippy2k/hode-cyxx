@@ -205,7 +205,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 
 		spr->num = (((ash->flags1 ^ ptr->flags1) & 0xFFF0) << 10) | (ptr->flags2 & 0x3FFF);
 
-		int index = ptr->data0x2E08;
+		int index = ptr->screenNum;
 		spr->xPos = ptr->xPos;
 		spr->yPos = ptr->yPos;
 		if (index == topScreenId) {
@@ -980,7 +980,7 @@ void Game::setupCurrentScreen() {
 	const uint8_t *dat = &_levelUpdateData1[_currentLevel][_currentScreenResourceState * 12];
 	_plasmaCannonFlags = 0;
 	_gameKeyPressedMaskIndex = 0;
-	_gameCurrentData0x2E08Num = ptr->data0x2E08;
+	_gameCurrentLevelScreenNum = ptr->screenNum;
 	if (dat[9] != ptr->data0x2988) {
 		switch (dat[9]) {
 		case 0:
@@ -1007,7 +1007,7 @@ void Game::setupCurrentScreen() {
 	ptr->flags2 = READ_LE_UINT16(dat + 4);
 	ptr->anim = READ_LE_UINT16(dat + 6);
 	ptr->flags1 = ((ptr->flags2 >> 10) & 0x30) | (ptr->flags1 & ~0x30);
-	ptr->data0x2E08 = dat[8];
+	ptr->screenNum = dat[8];
 	ptr->directionKeyMask = 0;
 	ptr->actionKeyMask = 0;
 	_gameResData0x2E08 = dat[8];
@@ -1156,10 +1156,10 @@ void Game::restartLevel() {
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
-	if (_andyObject->data0x2E08 != num) {
-		preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
+	if (_andyObject->screenNum != num) {
+		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
-	resetScreen(_andyObject->data0x2E08);
+	resetScreen(_andyObject->screenNum);
 }
 
 void Game::playAndyFallingCutscene(int type) {
@@ -1200,30 +1200,30 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 		int xPos = ptr->xPos + ptr->posTable[3].x;
 		int yPosPrev = ptr->yPos;
 		int yPos = ptr->yPos + ptr->posTable[3].y;
-		uint8_t num = ptr->data0x2E08;
+		uint8_t num = ptr->screenNum;
 		if (xPos < 0) {
-			ptr->data0x2E08 = _res->_screensGrid[num * 4 + kPosLeftScreen];
+			ptr->screenNum = _res->_screensGrid[num * 4 + kPosLeftScreen];
 			ptr->xPos += 256;
 		} else if (xPos > 256) {
-			ptr->data0x2E08 = _res->_screensGrid[num * 4 + kPosRightScreen];
+			ptr->screenNum = _res->_screensGrid[num * 4 + kPosRightScreen];
 			ptr->xPos -= 256;
 		}
-		if (yPos < 0 && ptr->data0x2E08 != 0xFF) {
-			ptr->data0x2E08 = _res->_screensGrid[ptr->data0x2E08 * 4 + kPosTopScreen];
+		if (yPos < 0 && ptr->screenNum != 0xFF) {
+			ptr->screenNum = _res->_screensGrid[ptr->screenNum * 4 + kPosTopScreen];
 			ptr->yPos += 192;
 		} else if (yPos > 192) {
-			assert(ptr->data0x2E08 != 0xFF);
-			ptr->data0x2E08 = _res->_screensGrid[ptr->data0x2E08 * 4 + kPosBottomScreen];
+			assert(ptr->screenNum != 0xFF);
+			ptr->screenNum = _res->_screensGrid[ptr->screenNum * 4 + kPosBottomScreen];
 			ptr->yPos -= 192;
 		}
-		if (ptr->data0x2E08 == 0xFF) {
+		if (ptr->screenNum == 0xFF) {
 			debug(kDebug_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
-			ptr->data0x2E08 = num;
+			ptr->screenNum = num;
 			ptr->xPos = xPosPrev;
 			ptr->yPos = yPosPrev;
 			ret = -1;
-		} else if (ptr->data0x2E08 != num) {
-			debug(kDebug_GAME, "Changing screen from %d to %d, pos=%d,%d", num, ptr->data0x2E08, xPos, yPos);
+		} else if (ptr->screenNum != num) {
+			debug(kDebug_GAME, "Changing screen from %d to %d, pos=%d,%d", num, ptr->screenNum, xPos, yPos);
 			ret = 1;
 			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 			data->boundingBox.x1 = ptr->xPos;
@@ -1232,7 +1232,7 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 			data->boundingBox.y2 = ptr->yPos + ptr->height - 1;
 		}
 	}
-	_gameResData0x2E08 = ptr->data0x2E08;
+	_gameResData0x2E08 = ptr->screenNum;
 	_currentLeftScreen = _res->_screensGrid[_gameResData0x2E08 * 4 + kPosLeftScreen];
 	_currentRightScreen = _res->_screensGrid[_gameResData0x2E08 * 4 + kPosRightScreen];
 	return ret;
@@ -1370,10 +1370,10 @@ int Game::game_unk16(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBo
 int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 	BoundingBox obj1, obj2;
 
-	obj1.x1 = o->xPos + _res->_screensBasePos[o->data0x2E08].u;
-	obj1.y1 = obj1.y2 = o->yPos + _res->_screensBasePos[o->data0x2E08].v;
-	obj2.x1 = ptr->xPos + _res->_screensBasePos[ptr->data0x2E08].u;
-	obj2.y1 = obj2.y2 = ptr->yPos + _res->_screensBasePos[ptr->data0x2E08].v;
+	obj1.x1 = o->xPos + _res->_screensBasePos[o->screenNum].u;
+	obj1.y1 = obj1.y2 = o->yPos + _res->_screensBasePos[o->screenNum].v;
+	obj2.x1 = ptr->xPos + _res->_screensBasePos[ptr->screenNum].u;
+	obj2.y1 = obj2.y2 = ptr->yPos + _res->_screensBasePos[ptr->screenNum].v;
 
 	switch (type - 17) {
 	case 1:
@@ -1504,7 +1504,7 @@ int Game::updateAndyLvlObject() {
 			return 0;
 		}
 		if (_plasmaExplosionObject) {
-			_plasmaExplosionObject->data0x2E08 = _andyObject->data0x2E08;
+			_plasmaExplosionObject->screenNum = _andyObject->screenNum;
 			lvlObjectType1Callback(_plasmaExplosionObject);
 			if (_andyObject->actionKeyMask & 4) {
 				addToSpriteList(_plasmaExplosionObject);
@@ -1533,10 +1533,10 @@ int Game::updateAndyLvlObject() {
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
-	if (_andyObject->data0x2E08 != num) {
-		preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
+	if (_andyObject->screenNum != num) {
+		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
-	resetScreen(_andyObject->data0x2E08);
+	resetScreen(_andyObject->screenNum);
 	return 1;
 }
 
@@ -1681,7 +1681,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	GameRect *_esi = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeRect);
 	assert(_esi);
 	_edi = _esi->ptr + 2;
-	if (_res->_currentScreenResourceNum == ptr->data0x2E08) {
+	if (_res->_currentScreenResourceNum == ptr->screenNum) {
 		if (ptr->soundToPlay != 0xFFFF) {
 			playSound(ptr->soundToPlay, ptr, 0, 3);
 			ptr->soundToPlay = 0xFFFF;
@@ -1776,7 +1776,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 }
 
 LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
-	if (ptr->data0x2E08 == _res->_currentScreenResourceNum) {
+	if (ptr->screenNum == _res->_currentScreenResourceNum) {
 		if (_res->_screensState[_res->_currentScreenResourceNum].s0 == ptr->screenState || ptr->screenState == 0xFF) {
 			if (ptr->soundToPlay != 0xFFFF) {
 				playSound(ptr->soundToPlay, 0, 0, 3);
@@ -1812,7 +1812,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		}
 		return o;
 	}
-	_al = ptr->data0x2E08;
+	_al = ptr->screenNum;
 	if (_gameResData0x2E08 != _al && _currentRightScreen != _al && _currentLeftScreen != _al) {
 		return o;
 	}
@@ -1821,12 +1821,12 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	}
 	if ((ptr->flags1 & 6) == 2) {
 		const int index = (15 < ptr->data0x2988) ? 5 : 7;
-		ptr->yPos += fixScreenPos(ptr->xPos + ptr->posTable[index].x, ptr->yPos + ptr->posTable[index].y, ptr->data0x2E08);
+		ptr->yPos += fixScreenPos(ptr->xPos + ptr->posTable[index].x, ptr->yPos + ptr->posTable[index].y, ptr->screenNum);
 	}
 	if (ptr->bitmapBits == 0) {
 		return o;
 	}
-	if (_gameResData0x2E08 == ptr->data0x2E08) {
+	if (_gameResData0x2E08 == ptr->screenNum) {
 		uint8_t *_edi = ptr->bitmapBits;
 
 		LvlObjectData *dat = ptr->levelData0x2988;
@@ -1972,7 +1972,7 @@ void Game::updatePlasmaCannonExplosionLvlObject(LvlObject *ptr) {
 			if ((_rnd._rndSeed & 1) != 0 && addLvlObjectToList3(1)) {
 				_lvlObjectsList3->flags0 = _andyObject->flags0;
 				_lvlObjectsList3->flags1 = _andyObject->flags1;
-				_lvlObjectsList3->data0x2E08 = _andyObject->data0x2E08;
+				_lvlObjectsList3->screenNum = _andyObject->screenNum;
 				_lvlObjectsList3->flags2 = _andyObject->flags2 & ~0x2000;
 				if ((ptr->directionKeyMask & 1) == 0) {
 					_lvlObjectsList3->anim = 12;
@@ -1987,7 +1987,7 @@ void Game::updatePlasmaCannonExplosionLvlObject(LvlObject *ptr) {
 		setLvlObjectPosRelativeToPoint(ptr, 0, _plasmaCannonXPointsTable1[_plasmaCannonLastIndex1], _plasmaCannonYPointsTable1[_plasmaCannonLastIndex1]);
 	}
 	updateAndyObject(ptr);
-	ptr->data0x2E08 = _andyObject->data0x2E08;
+	ptr->screenNum = _andyObject->screenNum;
 	ptr->flags2 = bitmask_set(ptr->flags2, _andyObject->flags2, 0x18);
 	ptr->flags2 = bitmask_set(ptr->flags2, _andyObject->flags2 + 1, 7);
 	addToSpriteList(ptr);
@@ -2024,7 +2024,7 @@ void Game::GameLevelMainLoopHelper3() {
 			_screen_dx += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_screen_dy += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 			ptr->linkObjPtr = _currentMonsterObject;
-			ptr->data0x2E08 = _currentMonsterObject->data0x2E08;
+			ptr->screenNum = _currentMonsterObject->screenNum;
 		} else {
 			ptr->linkObjPtr = 0;
 		}
@@ -2091,7 +2091,7 @@ void Game::initMstCode() {
 }
 
 void Game::levelMainLoop() {
-	_gameCurrentData0x2E08Num = -1;
+	_gameCurrentLevelScreenNum = -1;
 	initMstCode();
 //	res_initIO();
 	preloadLevelScreenData(_levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8], 0xFF);
@@ -2102,7 +2102,7 @@ void Game::levelMainLoop() {
 	for (int i = 0; i < _res->_lvlHdr.screensCount; ++i) {
 		_res->_screensState[i].s2 = 0;
 	}
-	_res->_currentScreenResourceNum = _andyObject->data0x2E08;
+	_res->_currentScreenResourceNum = _andyObject->screenNum;
 	_currentRightScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen]; /* right */
 	_currentLeftScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen]; /* left */
 	if (!_mstLogicDisabled) {
@@ -2137,10 +2137,10 @@ void Game::levelMainLoop() {
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
-	if (_andyObject->data0x2E08 != num) {
-		preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
+	if (_andyObject->screenNum != num) {
+		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
-	resetScreen(_andyObject->data0x2E08);
+	resetScreen(_andyObject->screenNum);
 	do {
 		int frameTimeStamp = _system->getTimeStamp() + kFrameTimeStamp;
 		memset(_gameSpriteListPtrTable, 0, sizeof(_gameSpriteListPtrTable));
@@ -2155,9 +2155,9 @@ void Game::levelMainLoop() {
 		_andyObject->directionKeyMask = _directionKeyMask;
 		_andyObject->actionKeyMask = _actionKeyMask;
 		_video->fillBackBuffer();
-		if (_andyObject->data0x2E08 != _res->_currentScreenResourceNum) {
-			preloadLevelScreenData(_andyObject->data0x2E08, _res->_currentScreenResourceNum);
-			resetScreen(_andyObject->data0x2E08);
+		if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
+			preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
+			resetScreen(_andyObject->screenNum);
 		} else if (_fadePalette != 0 && _fadePaletteCounter == 0) {
 			setupCurrentScreen();
 			clearLvlObjectsList2();
@@ -2175,10 +2175,10 @@ void Game::levelMainLoop() {
 			preloadLevelScreenData(num, 0xFF);
 			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 			resetLevel();
-			if (_andyObject->data0x2E08 != num) {
-				preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
+			if (_andyObject->screenNum != num) {
+				preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 			}
-			resetScreen(_andyObject->data0x2E08);
+			resetScreen(_andyObject->screenNum);
 		} else {
 			callLevelOpStage0(_res->_currentScreenResourceNum);
 			if (_currentLeftScreen != 0xFF) {
@@ -2414,7 +2414,7 @@ void Game::lvlObjectType0Init(LvlObject *ptr) {
 	assert(_andyObject);
 	_andyObject->xPos = ptr->xPos;
 	_andyObject->yPos = ptr->yPos;
-	_andyObject->data0x2E08 = ptr->data0x2E08;
+	_andyObject->screenNum = ptr->screenNum;
 	_andyObject->anim = ptr->anim;
 	_andyObject->frame = ptr->frame;
 	_andyObject->flags2 = ptr->flags2;
@@ -2433,7 +2433,7 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 	o->yPos = ptr->yPos;
 	o->anim = 13;
 	o->frame = 0;
-	o->data0x2E08 = ptr->data0x2E08;
+	o->screenNum = ptr->screenNum;
 	o->flags1 = bitmask_set(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
 	o->flags2 = ptr->flags2 & ~0x2000;
 	setupLvlObjectBitmap(o);
@@ -2446,7 +2446,7 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 	o->yPos = ptr->yPos;
 	o->anim = 5;
 	o->frame = 0;
-	o->data0x2E08 = ptr->data0x2E08;
+	o->screenNum = ptr->screenNum;
 	o->flags1 = bitmask_set(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
 	o->flags2 = ptr->flags2 & ~0x2000;
 	setupLvlObjectBitmap(o);
@@ -2574,11 +2574,11 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 			const int x = _res->_screensBasePos[_res->_currentScreenResourceNum].u + ptr->posTable[3].x + ptr->xPos;
 			ptr->xPos += lvlObjectType0CallbackHelper2(x, y, (ptr->flags1 >> 4) & 3);
 		} else if ((ptr->flags1 & 6) == 2) {
-			ptr->yPos += fixScreenPos(ptr->posTable[7].x + ptr->xPos, ptr->posTable[7].y + ptr->yPos, ptr->data0x2E08);
+			ptr->yPos += fixScreenPos(ptr->posTable[7].x + ptr->xPos, ptr->posTable[7].y + ptr->yPos, ptr->screenNum);
 		}
 	} else if (ptr->linkObjPtr) {
 		assert(_currentMonsterObject);
-		if (_currentMonsterObject->data0x2E08 != ptr->data0x2E08) {
+		if (_currentMonsterObject->screenNum != ptr->screenNum) {
 			setLvlObjectPosRelativeToObject(ptr, 3, _currentMonsterObject, 6);
 		}
 	}
@@ -2753,41 +2753,41 @@ LvlObject *Game::game_unk115(int type, int y, int x, int screen, int num, int o_
 	setupLvlObjectBitmap(ptr);
 	ptr->xPos = x - ptr->posTable[7].x;
 	ptr->yPos = y - ptr->posTable[7].y;
-	ptr->data0x2E08 = screen;
+	ptr->screenNum = screen;
 	return ptr;
 }
 
 int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int num) {
 	int ret = 0;
-	if (o->data0x2E08 < _res->_lvlHdr.screensCount) {
+	if (o->screenNum < _res->_lvlHdr.screensCount) {
 		int xPrev = o->xPos;
 		int x = o->xPos + o->posTable[num].x;
 		int yPrev = o->yPos;
 		int y = o->yPos + o->posTable[num].y;
-		int numPrev = o->data0x2E08;
+		int numPrev = o->screenNum;
 		if (x < 0) {
-			o->data0x2E08 = num = _res->_screensGrid[num * 4 + kPosLeftScreen];
+			o->screenNum = num = _res->_screensGrid[num * 4 + kPosLeftScreen];
 			x += 256;
 		} else if (x >= 256) {
-			o->data0x2E08 = num = _res->_screensGrid[num * 4 + kPosRightScreen];
+			o->screenNum = num = _res->_screensGrid[num * 4 + kPosRightScreen];
 			x -= 256;
 		}
 		o->xPos = x;
 		if (y < 0 && num != 0xFF) {
-			o->data0x2E08 = _res->_screensGrid[num * 4 + kPosTopScreen];
+			o->screenNum = _res->_screensGrid[num * 4 + kPosTopScreen];
 			y += 192;
 		} else if (y >= 192) {
 			assert(num != 0xFF);
-			o->data0x2E08 = _res->_screensGrid[num * 4 + kPosBottomScreen];
+			o->screenNum = _res->_screensGrid[num * 4 + kPosBottomScreen];
 			y -= 192;
 		}
 		o->yPos = y;
-		if (o->data0x2E08 == 0xFF) {
+		if (o->screenNum == 0xFF) {
 			o->xPos = xPrev;
 			o->yPos = yPrev;
-			o->data0x2E08 = numPrev;
+			o->screenNum = numPrev;
 			ret = -1;
-		} else if (o->data0x2E08 != num) {
+		} else if (o->screenNum != num) {
 			ret = 1;
 		}
 	}
@@ -2835,7 +2835,7 @@ void Game::initLvlObjects() {
 	LvlObject *prevLvlObj = 0;
 	for (int i = 0; i < _res->_lvlHdr.staticLvlObjectsCount; ++i) {
 		LvlObject *ptr = &_res->_resLvlScreenObjectDataTable[i];
-		int index = ptr->data0x2E08;
+		int index = ptr->screenNum;
 		ptr->nextPtr = _res->_resLvlData0x288PtrTable[index];
 		_res->_resLvlData0x288PtrTable[index] = ptr;
 		switch (ptr->type) {

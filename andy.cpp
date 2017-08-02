@@ -1419,8 +1419,8 @@ int Game::moveAndyObjectOp4(int op) {
 void Game::setupAndyObjectMoveData(LvlObject *ptr) {
 	_andyMoveData.xPos = ptr->xPos;
 	_andyMoveData.yPos = ptr->yPos;
-	_andyPosX = _res->_screensBasePos[ptr->data0x2E08].u + _andyMoveData.xPos;
-	_andyPosY = _res->_screensBasePos[ptr->data0x2E08].v + _andyMoveData.yPos;
+	_andyPosX = _res->_screensBasePos[ptr->screenNum].u + _andyMoveData.xPos;
+	_andyPosY = _res->_screensBasePos[ptr->screenNum].v + _andyMoveData.yPos;
 	_andyMoveData.anim = ptr->anim;
 	_andyMoveData.unkA = ptr->unk22;
 	_andyMoveData.frame = ptr->frame;

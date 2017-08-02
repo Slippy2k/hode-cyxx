@@ -96,7 +96,7 @@ struct Game {
 	uint8_t _screenPosTable[5][24 * 32];
 	uint8_t _screenTempMaskBuffer[24 * 32];
 	uint8_t _screenMaskBuffer[96 * 24 * 32];
-	int _gameCurrentData0x2E08Num;
+	int _gameCurrentLevelScreenNum;
 	uint8_t _shakeScreenDuration;
 	const uint8_t *_shakeScreenTable;
 	uint8_t _plasmaCannonDirection;

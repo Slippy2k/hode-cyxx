@@ -43,7 +43,7 @@ void Game::level1OpStage0_screen4() {
 				_res->_screensState[4].s0 = 2;
 			}
 			assert(_plasmaExplosionObject);
-			_plasmaExplosionObject->data0x2E08 = _res->_currentScreenResourceNum;
+			_plasmaExplosionObject->screenNum = _res->_currentScreenResourceNum;
 			_gameMainLoopFlag5 = 1;
 			if (_shakeScreenDuration == 0) {
 				setShakeScreen(3, 2);
@@ -125,7 +125,7 @@ void Game::level1OpStage0_screen9() {
 				_andyObject->anim = 232;
 				_andyObject->frame = 0;
 				setupLvlObjectBitmap(_andyObject);
-				resetScreen(_andyObject->data0x2E08);
+				resetScreen(_andyObject->screenNum);
 			}
 			break;
 		case 1:
@@ -420,9 +420,9 @@ static const uint8_t _level1OpHelper1KeyMaskTable[112] = {
 };
 
 void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
-	const bool sameScreen = (_andyObject->data0x2E08 == ptr->data0x2E08);
+	const bool sameScreen = (_andyObject->screenNum == ptr->screenNum);
 	int i = (_andyObject->width / 2 + _andyObject->xPos + (_andyObject->xPos & 7)) / 8;
-	if (i < 0 || ptr->data0x2E08 != _res->_currentScreenResourceNum) {
+	if (i < 0 || ptr->screenNum != _res->_currentScreenResourceNum) {
 		i = 0;
 	} else if (i > 31) {
 		i = 31;
@@ -478,11 +478,11 @@ int Game::level1OpHelper2(LvlObject *ptr) {
 	assert(ptr);
 	if (ptr->bitmapBits) {
 		int dx;
-		if (ptr->data0x2E08 == _currentLeftScreen) {
+		if (ptr->screenNum == _currentLeftScreen) {
 			dx = -256;
-		} else if (ptr->data0x2E08 == _currentRightScreen) {
+		} else if (ptr->screenNum == _currentRightScreen) {
 			dx = 256;
-		} else if (ptr->data0x2E08 == _gameResData0x2E08) {
+		} else if (ptr->screenNum == _gameResData0x2E08) {
 			dx = 0;
 		} else {
 			return 0;
@@ -491,7 +491,7 @@ int Game::level1OpHelper2(LvlObject *ptr) {
 			return 1;
 		}
 		assert(_plasmaExplosionObject);
-		_plasmaExplosionObject->data0x2E08 = ptr->data0x2E08;
+		_plasmaExplosionObject->screenNum = ptr->screenNum;
 	}
 	return 0;
 }

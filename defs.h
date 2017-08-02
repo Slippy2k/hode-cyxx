@@ -114,7 +114,7 @@ struct Game;
 struct LvlObject {
 	int32_t xPos;
 	int32_t yPos;
-	uint8_t data0x2E08; // screenNum
+	uint8_t screenNum;
 	uint8_t screenState;
 	uint8_t flags;
 	uint8_t frame;

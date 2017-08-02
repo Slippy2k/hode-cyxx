@@ -89,7 +89,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 
 	dat->xPos = _lvlFile->readUint32();
 	dat->yPos = _lvlFile->readUint32();
-	dat->data0x2E08 = _lvlFile->readByte();
+	dat->screenNum = _lvlFile->readByte();
 	dat->screenState = _lvlFile->readByte();
 	dat->flags = _lvlFile->readByte();
 	dat->frame = _lvlFile->readByte();
