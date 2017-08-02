@@ -659,7 +659,7 @@ void Resource::loadSssData(const char *levelName) {
 		_sssDpcmTable[i].size = c;
 		_sssDpcmTable[i].unkC = d;
 		_sssDpcmTable[i].unk10 = e;
-		debug(kDebug_RESOURCE, "sssUnkTable #%d/%d 0x%x offset 0x%x size %d %d 0x%x", i, _sssHdr.dpcmCount, a, b, c, d, e);
+		debug(kDebug_RESOURCE, "sssDpcmTable #%d/%d 0x%x offset 0x%x size %d %d 0x%x", i, _sssHdr.dpcmCount, a, b, c, d, e);
 		bytesRead += 20;
 	}
 	// _res_sssDataUnk4 = data; // size : sssHdr.unk14 * 52
@@ -667,10 +667,10 @@ void Resource::loadSssData(const char *levelName) {
 	for (int i = 0; i < _sssHdr.unk14; ++i) {
 		uint8_t *buf = _sssDataUnk4[i].data;
 		_sssFile->read(buf, SIZEOF_SssUnk4);
-		const int volume = READ_LE_UINT32(buf + 4) >> 0x10;
-		const int step = READ_LE_UINT32(buf + 0x24);
+		// const int volume = READ_LE_UINT32(buf + 4) >> 0x10;
+		// const int step = READ_LE_UINT32(buf + 0x24);
 		bytesRead += SIZEOF_SssUnk4;
-		debug(kDebug_RESOURCE, "sssUnk4 #%d/%d volume %d step %d", i, _sssHdr.unk14, volume, step);
+		// debug(kDebug_RESOURCE, "sssUnk4 #%d/%d volume %d step %d", i, _sssHdr.unk14, volume, step);
 	}
 
 	// _res_sssDataUnk6 = data; // size : sssHdr.unk18 * 20
@@ -678,7 +678,7 @@ void Resource::loadSssData(const char *levelName) {
 		uint8_t buf[20];
 		_sssFile->read(buf, sizeof(buf));
 		bytesRead += sizeof(buf);
-		debug(kDebug_RESOURCE, "sssUnk12 #%d/%d 0x%x", i, _sssHdr.unk18, READ_LE_UINT32(buf));
+		// debug(kDebug_RESOURCE, "sssUnk12 #%d/%d 0x%x", i, _sssHdr.unk18, READ_LE_UINT32(buf));
 	}
 
 // loc_429AB8:

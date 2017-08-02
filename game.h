@@ -350,6 +350,7 @@ struct Game {
 	uint8_t _snd_usedFlagTable[32];
 	int _snd_volumeMin;
 	int _snd_fadeVolumeCounter;
+	int _snd_masterVolume;
 
 	void removeSoundObject(SssObject *so);
 	void updateSoundObject(SssObject *so);

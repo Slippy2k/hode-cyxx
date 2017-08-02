@@ -22,6 +22,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_screen_dy = Video::kScreenHeight / 2;
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
 	_mstLogicDisabled = true;
+	_snd_masterVolume = 128;
 }
 
 Game::~Game() {
@@ -76,10 +77,10 @@ void Game::fadeScreenPalette() {
 		_fadePalette = 1;
 	} else {
 		if (_fadePaletteCounter != 0) {
-//			_snd_masterVolume -= _snd_masterVolume / _fadePaletteCounter;
-//			if (_snd_masterVolume < 0) {
-//				_snd_masterVolume = 0;
-//			}
+			_snd_masterVolume -= _snd_masterVolume / _fadePaletteCounter;
+			if (_snd_masterVolume < 0) {
+				_snd_masterVolume = 0;
+			}
 		}
 		--_fadePaletteCounter;
 	}
