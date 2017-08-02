@@ -435,7 +435,7 @@ SssObject *Game::startSoundObject(int a, int b, int c) {
 	return 0;
 }
 
-void Game::setupSound(SssUnk1 *s, int a, int b) {
+void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->unk0, a, b);
 	const int num = _res->_sssDataUnk3[s->unk0].sssUnk4;
 	debug(kDebug_SOUND, "sssUnk4 num %d", num);
@@ -448,23 +448,141 @@ void Game::setupSound(SssUnk1 *s, int a, int b) {
 			break;
 		}
 	}
-	const int _ecx = READ_LE_UINT32(sssUnk4Ptr->data + 4);
-	const int _eax = (s->unk3 << 16);
+	int _ecx = READ_LE_UINT32(sssUnk4Ptr->data + 4);
+	int _eax = ((int8_t)s->unk3) << 16;
 	if (_ecx != _eax) {
 		if (!found) {
-			// (sssUnk4Ptr->data + 4) = (s->unk3 << 16); // int32_t*
+			// (sssUnk4Ptr->data + 4) = _eax; // int32_t
 		} else {
 			// sssUnk4Ptr->data + 0xC = 4; // uint32_t
 			// sssUnk4Ptr->data + 0x30 = 1; // uint32_t
-			// eax = (s->unk3 << 16) - _ecx
-			// cdq; edx &= 3; eax += _edx; eax >>= 2;
+			// eax = ((s->unk3 << 16) - _ecx) / 4;
 			// ssUnk4Ptr->data + 8 = _eax; // uint32_t
 		}
 	}
 // 42B9FD
-
+	_eax = ((int8_t)s->unk5) << 16;
+	_ecx = READ_LE_UINT32(sssUnk4Ptr->data + 0x14);
+	if (_ecx != _eax) {
+		if (!found) {
+			// (sssUnk4Ptr->data + 0x14) = _eax; // int32_t
+		} else {
+			// sssUnk4Ptr->data + 0x1C = 4;
+			// sssUnk4Ptr->data + 0x30 = 1;
+			// eax = ((s->unk5 << 16) - ecx) / 4;
+			// sssUnk4Ptr->data + 0x18 = _eax;
+		}
+	}
+// 42BA37
+	_eax = (int8_t)s->unk4;
+	if (READ_LE_UINT32(sssUnk4Ptr->data + 0x24) != _eax) {
+		// sssUnk4Ptr->data + 0x24 = _eax;
+		for (int i = 0; i < _sssObjectsCount; ++i) {
+			SssObject *so = &_sssObjectsTable[i];
+			if (so->soundBits != 0 && so->sssUnk4Ptr == sssUnk4Ptr) {
+				int _al = sssUnk4Ptr->data[0x24];
+				_al += so->unk8;
+				so->unk9 = _al < 0 ? 0 : _al;
+				if (so->unk9 > 7) {
+					so->unk9 = 7;
+					fadeSoundObject(so);
+				}
+			}
+		}
+	}
+// 42BA9D
+	int _ebp = 0;
+#if 0
+	_edx = b << 4;
+	_al = s->unk6;
+	_ebp = (a & 0xF) | _edx;
+	_dl = s->unk2 & 0xF; // _edx ?
+	_cx = s->unk0;
+	_ebp <<= 4;
+	_ebp |= _edx;
+	_dl = _al;
+	_ebp <<= 4;
+	_edx &= 0xF;
+	_ebp |= _edx;
+	_edx = _ecx;
+	_ebp <<= 0xC;
+	_edx &= 0xFFF;
+	_ebp |= _edx;
+	if (_al & 2) {
+		_eax = (_ebp >> 20) & 15;
+		_edx = sssLookupTable3[_eax];
+		_esi = _edx + _ecx * 4;
+		_ecx = _ebp >> 24
+		_edi = *(uint32_t *)_esi;
+		_edx = 1 << _ecx;
+		_ecx = 0;
+		_edi |= _edx;
+		*(uint32_t *)_esi = _edi;
+		_cx = *(uint16_t *)_ebx;
+		_eax = sssLookupTable2[_eax];
+		_ecx = _eax + _ecx * 4;
+		_eax = *(uint32_t *)_ecx;
+		if ((_eax & _edx) != 0) {
+			return 0;
+		}
+		_eax |= _edx;
+		*(uint32_t *)_ecx = _eax;
+		goto 42BBDD
+// 42BB26
+	} else if ((_al & 1) != 0) {
+		_eax = _ebp;
+		_edx >>= 20;
+		_edx &= 15;
+		_eax = sssLookupTable1[_edx];
+		_edx = _eax + _ecx * 4;
+		_ecx =_ebp;
+		ecx >>= 24;
+		_eax = 1 << _ecx;
+		_ecx = *(uint32_t *)edx;
+		if ((_ecx & _eax) != 0) {
+			return 0;
+		}
+		_ecx |= _eax;
+		*(uint32_t *)_edx = _ecx;
+		goto 42BBDD
+// 42BB60
+	} else if ((_al & 4) != 0) {
+		_esi = (_ebp >> 20) & 15;
+		_edi = _ebp >> 24;
+		_eax = _sssObjectsList1;
+		while (_eax != 0) {
+			_edx = _eax->flags0;
+			_ebx = _edx & 0xFFF;
+			if (_ebx == _ecx) {
+				_ebx = (_edx >> 20) & 15;
+				if (_ebx == _esi) {
+					_edx >>= 24;
+					if (_edx == _edi) {
+						_ebx = s;
+						goto 42BBDD
+				}
+			}
+			_eax = _eax->nextPtr;
+		}
+		_ebx = s;
+		_eax = _sssObjectsList2;
+		while (_eax != 0) {
+			_edx = _eax->flags0;
+			_ebx = _edx & 0xFFF;
+			if (_ebx == _ecx) {
+				_ebx = (_edx >> 20) & 15;
+				if (_ebx == _esi) {
+					_edx >>= 24;
+					if (_edx == _edi) {
+						_ebx = s;
+						goto 42BBDD;
+				}
+			}
+			_eax = _eax->nextPtr;
+		}
+	}
+#endif
 // 42BBDD
-	int _ebp = 0; // TODO
 	prepareSoundObject(s->unk0, (int8_t)s->unk2, _ebp);
 }
 

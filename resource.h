@@ -52,6 +52,15 @@ struct SssUnk1 {
 
 #define SIZEOF_SssUnk1 8
 
+struct SssUnk2 {
+	uint8_t unk0;
+	int8_t unk1;
+	int8_t unk2;
+	uint8_t pad;
+} PACKED;
+
+#define SIZEOF_SssUnk2 4
+
 struct SssUnk3 {
 	uint8_t unk0; // 0
 	uint8_t unk1; // 1
@@ -87,6 +96,11 @@ struct SssUnk6 {
 
 #define SIZEOF_SssUnk6
 
+struct SssPreloadData {
+	uint8_t count;
+	uint8_t *ptr;
+};
+
 struct Resource {
 
 	DatHdr _datHdr;
@@ -118,9 +132,13 @@ struct Resource {
 	LvlObject _lvlLinkObject;
 
 	SssUnk1 *_sssDataUnk1;
+	SssUnk2 *_sssDataUnk2;
 	SssUnk3 *_sssDataUnk3;
 	SssUnk4 *_sssDataUnk4;
 	SssUnk5 *_sssDpcmTable;
+	SssPreloadData *_sssPreloadData1;
+	SssPreloadData *_sssPreloadData2;
+	SssPreloadData *_sssPreloadData3;
 
 	uint32_t _sssCodeSize;
 	uint8_t *_sssCodeData;

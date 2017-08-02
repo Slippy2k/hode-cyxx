@@ -177,7 +177,8 @@ struct Game {
 	void destroyLvlObject(LvlObject *o);
 	void setupPlasmaCannonPoints(LvlObject *ptr);
 	int testPlasmaCannonPointsDirection(int x1, int y1, int x2, int y2);
-	void ResPreloadLevelData(int num, int prev); // RENAME: Resource::preloadLevelData
+	void preloadLevelScreenData(int num, int prev);
+	void loadLevelScreenSounds(int num);
 	void setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2);
 	void setLvlObjectPosRelativeToPoint(LvlObject *ptr, int num, int x, int y);
 	void level1SetupLvlObjects_screen2();
@@ -355,7 +356,7 @@ struct Game {
 	const uint8_t *executeSoundCode(SssObject *so, const uint8_t *code);
 	void prepareSoundObject(int num, int b, int c);
 	SssObject *startSoundObject(int a, int b, int c);
-	void setupSound(SssUnk1 *s, int a, int b);
+	void setupSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
 	void fadeSoundObject(SssObject *so);
 

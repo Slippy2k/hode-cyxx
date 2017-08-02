@@ -179,6 +179,7 @@ struct SssUnk4;
 struct SssObject {
 	uint8_t *soundBits; // 0x0
 	uint16_t num; // 0x4
+	int8_t unk8; // 0x8
 	uint8_t unk9; // 0x9
 	uint8_t flags; // 0xA
 	uint32_t flags0; // 0xC

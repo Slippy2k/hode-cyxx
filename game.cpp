@@ -154,7 +154,7 @@ void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.unk10) {
 		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.unk10, a, b);
 		_currentSoundLvlObject = ptr;
-		setupSound(&_res->_sssDataUnk1[num], a, b);
+		setupSoundObject(&_res->_sssDataUnk1[num], a, b);
 		_currentSoundLvlObject = 0;
 	}
 }
@@ -711,8 +711,30 @@ endDir:
 	return 1;
 }
 
-void Game::ResPreloadLevelData(int num, int prev) {
+void Game::preloadLevelScreenData(int num, int prev) {
 	_res->loadLvlScreenBackgroundData(num);
+	loadLevelScreenSounds(num);
+}
+
+void Game::loadLevelScreenSounds(int num) {
+	if (_res->_sssHdr.dpcmCount > 0) {
+		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
+			const int j = _res->_sssPreloadData1[num].ptr[i];
+			debug(kDebug_GAME, "levelScreen preloadData1 #%d res %d", i, j);
+		}
+	}
+	if (_res->_lvlHdr.spritesCount > 0) {
+		for (size_t i = 0; i < _res->_sssPreloadData2[num].count; ++i) {
+			const int j = _res->_sssPreloadData2[num].ptr[i];
+			debug(kDebug_GAME, "levelScreen preloadData2 #%d res %d", i, j);
+		}
+	}
+	if (_res->_sssHdr.unkC > 0) {
+		for (size_t i = 0; i < _res->_sssPreloadData3[num].count; ++i) {
+			const int j = _res->_sssPreloadData3[num].ptr[i];
+			debug(kDebug_GAME, "levelScreen preloadData3 #%d res %d", i, j);
+		}
+	}
 }
 
 void Game::setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2) {
@@ -1131,11 +1153,11 @@ void Game::restartLevel() {
 //		snd_restart();
 	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
-	ResPreloadLevelData(num, 0xFF);
+	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
 	if (_andyObject->data0x2E08 != num) {
-		ResPreloadLevelData(_andyObject->data0x2E08, 0xFF);
+		preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
 	}
 	resetScreen(_andyObject->data0x2E08);
 }
@@ -1508,11 +1530,11 @@ int Game::updateAndyLvlObject() {
 //		snd_restart();
 	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
-	ResPreloadLevelData(num, 0xFF);
+	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
 	if (_andyObject->data0x2E08 != num) {
-		ResPreloadLevelData(_andyObject->data0x2E08, 0xFF);
+		preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
 	}
 	resetScreen(_andyObject->data0x2E08);
 	return 1;
@@ -2072,7 +2094,7 @@ void Game::levelMainLoop() {
 	_gameCurrentData0x2E08Num = -1;
 	initMstCode();
 //	res_initIO();
-	ResPreloadLevelData(_levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8], 0xFF);
+	preloadLevelScreenData(_levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8], 0xFF);
 	memset(_screenCounterTable, 0, 40);
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();
@@ -2112,11 +2134,11 @@ void Game::levelMainLoop() {
 //		snd_restart();
 	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
-	ResPreloadLevelData(num, 0xFF);
+	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
 	if (_andyObject->data0x2E08 != num) {
-		ResPreloadLevelData(_andyObject->data0x2E08, 0xFF);
+		preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
 	}
 	resetScreen(_andyObject->data0x2E08);
 	do {
@@ -2134,7 +2156,7 @@ void Game::levelMainLoop() {
 		_andyObject->actionKeyMask = _actionKeyMask;
 		_video->fillBackBuffer();
 		if (_andyObject->data0x2E08 != _res->_currentScreenResourceNum) {
-			ResPreloadLevelData(_andyObject->data0x2E08, _res->_currentScreenResourceNum);
+			preloadLevelScreenData(_andyObject->data0x2E08, _res->_currentScreenResourceNum);
 			resetScreen(_andyObject->data0x2E08);
 		} else if (_fadePalette != 0 && _fadePaletteCounter == 0) {
 			setupCurrentScreen();
@@ -2150,11 +2172,11 @@ void Game::levelMainLoop() {
 //				snd_restart();
 			}
 			const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
-			ResPreloadLevelData(num, 0xFF);
+			preloadLevelScreenData(num, 0xFF);
 			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 			resetLevel();
 			if (_andyObject->data0x2E08 != num) {
-				ResPreloadLevelData(_andyObject->data0x2E08, 0xFF);
+				preloadLevelScreenData(_andyObject->data0x2E08, 0xFF);
 			}
 			resetScreen(_andyObject->data0x2E08);
 		} else {

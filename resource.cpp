@@ -464,7 +464,7 @@ void Resource::loadSssData(const char *levelName) {
 			count = _sssHdr.unk8;
 		}
 		for (int i = 0; i < count; ++i) {
-			free(_res_sssDataUnk5[i * 20]);
+			free(_res_sssDpcmTable[i * 20]);
 		}
 		free(_sssBuffer1);
 		_sssBuffer1 = 0;
@@ -510,12 +510,13 @@ void Resource::loadSssData(const char *levelName) {
 		bytesRead += 8;
 	}
 	// _sssDataUnk2, indexes to _sssDataUnk4
+	_sssDataUnk2 = (SssUnk2 *)malloc(_sssHdr.unk14 * sizeof(SssUnk2));
 	for (int i = 0; i < _sssHdr.unk14; ++i) {
-		int unk0 = _sssFile->readByte();
-		int unk1 = (int8_t)_sssFile->readByte();
-		int unk2 = (int8_t)_sssFile->readByte();
+		_sssDataUnk2[i].unk0 = _sssFile->readByte();
+		_sssDataUnk2[i].unk1 = (int8_t)_sssFile->readByte();
+		_sssDataUnk2[i].unk2 = (int8_t)_sssFile->readByte();
 		_sssFile->readByte(); // padding
-		debug(kDebug_RESOURCE, "SssDataUnk2 #%d %d %d %d", i, unk0, unk1, unk2);
+		// debug(kDebug_RESOURCE, "SssDataUnk2 #%d %d %d %d", i, unk0, unk1, unk2);
 		bytesRead += 4;
 	}
 	// _sssDataUnk3
@@ -545,47 +546,53 @@ void Resource::loadSssData(const char *levelName) {
 
 	// _sssPreloadData1
 	for (int i = 0; i < _sssHdr.unk24; ++i) {
-		int unk1 = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "sssPreloadData1 #%d 0x%x", i, unk1);
+		int addr = _sssFile->readUint32();
+		debug(kDebug_RESOURCE, "sssPreloadData1 #%d 0x%x", i, addr);
 		bytesRead += 4;
 	}
 	// _sssPreloadData2
 	for (int i = 0; i < _sssHdr.unk28; ++i) {
-		int unk1 = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "sssPreloadData2 #%d 0x%x", i, unk1);
+		int addr = _sssFile->readUint32();
+		debug(kDebug_RESOURCE, "sssPreloadData2 #%d 0x%x", i, addr);
 		bytesRead += 4;
 	}
 	// _sssPreloadData3
 	for (int i = 0; i < _sssHdr.unk2C; ++i) {
-		int unk1 = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "sssPreloadData3 #%d 0x%x", i, unk1);
+		int addr = _sssFile->readUint32();
+		debug(kDebug_RESOURCE, "sssPreloadData3 #%d 0x%x", i, addr);
 		bytesRead += 4;
 	}
 	// overwite _sssPreloadData1, preloadLevelData 0x2988
+	_sssPreloadData1 = (SssPreloadData *)malloc(_sssHdr.unk24 * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.unk24; ++i) {
 		// _sssPreloadData1[i] = data
 		const int count = _sssFile->readByte();
+		_sssPreloadData1[i].count = count;
+		_sssPreloadData1[i].ptr = (uint8_t *)malloc(count);
 		debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
-		uint8_t buf[256];
-		_sssFile->read(buf, count);
+		_sssFile->read(_sssPreloadData1[i].ptr, count);
 		bytesRead += count + 1;
 	}
 	// overwite _sssPreloadData2, preloadLevelData 0x2988
+	_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.unk24 * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.unk28; ++i) {
 		// _sssPreloadData2[i] = data
 		const int count = _sssFile->readByte();
+		_sssPreloadData2[i].count = count;
+		_sssPreloadData2[i].ptr = (uint8_t *)malloc(count);
 		debug(kDebug_RESOURCE, "sssPreloadData2 #%d count %d", i, count);
-		uint8_t buf[256];
-		_sssFile->read(buf, count);
+		_sssFile->read(_sssPreloadData2[i].ptr, count);
 		bytesRead += count + 1;
 	}
 	// overwite _sssPreloadData3, preloadLevelData 0x2988
+	_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.unk24 * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.unk2C; ++i) {
 		// _sssPreloadData3[i] = data
 		const int count = _sssFile->readByte();
+		_sssPreloadData3[i].count = count;
+		_sssPreloadData3[i].ptr = (uint8_t *)malloc(count);
 		debug(kDebug_RESOURCE, "sssPreloadData3 #%d count %d", i, count);
-		uint8_t buf[256];
-		_sssFile->read(buf, count);
+		_sssFile->read(_sssPreloadData3[i].ptr, count);
 		bytesRead += count + 1;
 	}
 // loc_429A06:
@@ -614,11 +621,9 @@ void Resource::loadSssData(const char *levelName) {
 		_ebp = 0;
 		_ecx = *(uint32_t *)data;
 		data += _ecx * 32;
-
 		if (_ecx > 0) {
 			_edx = 0;
 			_ecx = _esi + i * 8 + 4;
-
 			do {
 				*(uint32_t *)(_edx + _ecx + 24) = _eax;
 				++_ebp;
@@ -640,7 +645,8 @@ void Resource::loadSssData(const char *levelName) {
 		++bytesRead;
 	}
 
-	// _res_sssDataUnk5 = data; // size : sssHdr.unk30 * 20
+	// _res_sssDpcmTable = data; // size : sssHdr.unk30 * 20
+	_sssDpcmTable = (SssUnk5 *)malloc(_sssHdr.dpcmCount * sizeof(SssUnk5));
 // loc_429AB8:
 	for (int i = 0; i < _sssHdr.dpcmCount; ++i) {
 		int a = _sssFile->readUint32(); // ptr to PCM data
@@ -648,6 +654,11 @@ void Resource::loadSssData(const char *levelName) {
 		int c = _sssFile->readUint32(); // size in .sss (256 int16_t words + followed with indexes)
 		int d = _sssFile->readUint32();
 		int e = _sssFile->readUint32();
+		_sssDpcmTable[i].ptr = 0;
+		_sssDpcmTable[i].offset = b;
+		_sssDpcmTable[i].size = c;
+		_sssDpcmTable[i].unkC = d;
+		_sssDpcmTable[i].unk10 = e;
 		debug(kDebug_RESOURCE, "sssUnkTable #%d/%d 0x%x offset 0x%x size %d %d 0x%x", i, _sssHdr.dpcmCount, a, b, c, d, e);
 		bytesRead += 20;
 	}
