@@ -57,6 +57,7 @@ struct Game {
 	static const OpStage1Proc _level1OpStage1[];
 	static const OpStage1Proc _level2OpStage1[];
 	static const OpStage1Proc _level3OpStage1[];
+	static const uint8_t _snd_volumeTable[129];
 
 	PafPlayer *_paf;
 	Random _rnd;
@@ -343,11 +344,12 @@ struct Game {
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
+	uint8_t _sssObjectsChanged;
 	int _sssObjectsCount;
 	SssObject *_sssObjectsList1;
 	SssObject *_sssObjectsList2;
 	SssObject *_sssObjectsList3;
-	uint8_t _snd_usedFlagTable[32];
+	uint8_t _channelMixingTable[32];
 	int _snd_volumeMin;
 	int _snd_fadeVolumeCounter;
 	int _snd_masterVolume;
@@ -356,10 +358,12 @@ struct Game {
 	void updateSoundObject(SssObject *so);
 	const uint8_t *executeSoundCode(SssObject *so, const uint8_t *code);
 	void prepareSoundObject(int num, int b, int c);
-	SssObject *startSoundObject(int a, int b, int c);
+	SssObject *startSoundObject(int num, int b, int repeat);
 	void setupSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
 	void fadeSoundObject(SssObject *so);
+	int getSoundObjectVolumeByPos(SssObject *so);
+	void setSoundObjectVolume(SssObject *so);
 
 	// andy.cpp
 

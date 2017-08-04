@@ -93,6 +93,8 @@ int main(int argc, char* argv[]) {
 //		dumpInt(fp, "_andyMoveTable35", 0x40358, 48, "%3d", SIGNED_8BITS);
 //		dumpInt(fp, "_actionDirectionKeyMaskTable", 0x3E3D4, 352, "0x%02X", UNSIGNED_8BITS);
 
+		dumpInt(fp, "_snd_volumeTable", 0x40010, 129, "0x%02X", UNSIGNED_8BITS);
+
 	// retail
 
 //		dumpInt(fp, "_level1UpdateData1", 0x53060, 96, "0x%02X", UNSIGNED_8BITS);

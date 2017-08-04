@@ -180,12 +180,15 @@ struct SssObject {
 	uint8_t *soundBits; // 0x0
 	uint16_t num; // 0x4
 	int8_t unk8; // 0x8
-	uint8_t unk9; // 0x9
+	int8_t unk9; // 0x9
 	uint8_t flags; // 0xA
 	uint32_t flags0; // 0xC
 	uint32_t flags1; // 0x10
 	int32_t volume; // 0x14
 	int32_t unk18; // 0x18
+	int panL; // 0x1C
+	int panR; // 0x20
+	int panType; // 0x24
 	int32_t unk28; // 0x28
 	SssObject *prevPtr; // 0x30
 	SssObject *nextPtr; // 0x34
@@ -201,6 +204,7 @@ struct SssObject {
 	int32_t unk64; // 0x64
 	int32_t unk68; // 0x68
 	int32_t unk6C; // 0x6C
+	int *volumePtr; // 0x70
 	LvlObject *lvlObject; // 0x74
 	int32_t unk78; // 0x78
 	int32_t unk7C; // 0x7C

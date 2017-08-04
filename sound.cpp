@@ -55,29 +55,28 @@ void Game::removeSoundObject(SssObject *so) {
 }
 
 void Game::updateSoundObject(SssObject *so) {
-#if 0
-	_snd_usedFlagTable[so->num] = 1;
-	_sssObjectsChanged = so->sssUnk1Ptr[0x30];
+	_channelMixingTable[so->num] = 1;
+	_sssObjectsChanged = so->sssUnk4Ptr->data[0x30];
 	if ((so->flags & 4) == 0) {
-loc_42B179:
+//42B179:
 		if (so->soundBits == 0) {
 			if (so->codeDataStage1) {
-				so->codeDataStage1 = executeSssCode(so);
+				so->codeDataStage1 = executeSoundCode(so, so->codeDataStage1);
 			}
 			if (so->soundBits == 0) {
 				return;
 			}
 			if (so->codeDataStage4) {
-				so->codeDataStage4 = executeSssCode(so);
+				so->codeDataStage4 = executeSoundCode(so, so->codeDataStage4);
 			}
 			if (so->soundBits == 0) {
 				return;
 			}
 			goto flag_case0;
 		} else {
-42B1B9:
+//42B1B9:
 			if (so->codeDataStage1) {
-				so->codeDataStage1 = executeSssCode(so);
+				so->codeDataStage1 = executeSoundCode(so, so->codeDataStage1);
 			}
 			if (so->soundBits == 0) {
 				return;
@@ -90,25 +89,26 @@ loc_42B179:
 				}
 			} else {
 				if (so->codeDataStage2) {
-					so->codeDataStage2 = executeSssCode(so);
+					so->codeDataStage2 = executeSoundCode(so, so->codeDataStage2);
 				}
 			}
 			if (so->soundBits == 0) {
 				return;
 			}
 			if (so->codeDataStage3) {
-				so->codeDataStage3 = executeSssCode(so);
+				so->codeDataStage3 = executeSoundCode(so, so->codeDataStage3);
 			}
 			if (so->codeDataStage4) {
-				so->codeDataStage4 = executeSssCode(so);
+				so->codeDataStage4 = executeSoundCode(so, so->codeDataStage4);
 			}
 			if (so->soundBits == 0) {
 				return;
 			}
-			if (_sssObjectsChanged == 0 || (sss->flags & 1) == 0) {
+			if (_sssObjectsChanged == 0 || (so->flags & 1) == 0) {
 				goto flag_case0;
 			}
 			goto flag_case1;
+		}
 	} else if ((so->flags & 1) == 0) {
 		goto flag_case0;
 	} else if (so->volumePtr) {
@@ -120,14 +120,17 @@ loc_42B179:
 		}
 	}
 	if (_sssObjectsChanged) {
-goto flag_case1:
+		goto flag_case1;
 	} else {
-goto flag_case0:
+		goto flag_case0;
 	}
 
 flag_case1:
-	updateSoundVolume(so);
+	setSoundObjectVolume(so);
 flag_case0:
+	; // TEMP
+
+#if 0
 	if (so->unk2C == 0) {
 		var4 = ecx = so->unk7C;
 		ebp = so->unk78;
@@ -230,7 +233,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 			// _ecx <<= 0x10;
 			// _eax |= _ecx;
 			// _eax |= _eax;
-			// executeSssCodeOp4(_ecx, _edx, _ebx);
+			// executeSoundCodeOp4(_ecx, _edx, _ebx);
 			code += 4;
 			break;
 		case 5: {
@@ -300,7 +303,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				// uint32_t _eax = _edx << 0x18;
 				// _edx = (_edx >> 0x14) & 0xF;
 				// uint16_t _ecx = READ_LE_UINT16(code + 2);
-				// executeSssCodeOp12(_ecx, _edx, _eax);
+				// executeSoundCodeOp12(_ecx, _edx, _eax);
 				code += 4;
 			}
 			break;
@@ -317,7 +320,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				if (so->unk4C >= 0) {
 					return code;
 				}
-				// executeSssCodeOp16(so);
+				// executeSoundCodeOp16(so);
 				code += 4;
 				if (so->soundBits == 0) {
 					return code;
@@ -326,7 +329,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 			}
 			break;
 		case 17: {
-				// executeSssCodeOp17(so);
+				// executeSoundCodeOp17(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
@@ -411,6 +414,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 }
 
 void Game::prepareSoundObject(int num, int b, int c) {
+	debug(kDebug_SOUND, "prepareSoundObject num %d b %d", num, b);
 	if (b > 0) {
 		if ((_res->_sssDataUnk3[num].unk1 & 1) != 0) {
 			// int var8 = _res->_sssDataUnk3[num].sssUnk4
@@ -430,7 +434,8 @@ void Game::prepareSoundObject(int num, int b, int c) {
 	}
 }
 
-SssObject *Game::startSoundObject(int a, int b, int c) {
+SssObject *Game::startSoundObject(int num, int b, int repeat) {
+	debug(kDebug_SOUND, "startSoundObject num %d b %d c %d", num, b, repeat);
 	// TODO
 	return 0;
 }
@@ -623,5 +628,131 @@ void Game::fadeSoundObject(SssObject *so) {
 				_sssObjectsList2 = cur;
 			}
 		}
+	}
+}
+
+int Game::getSoundObjectVolumeByPos(SssObject *so) {
+	LvlObject *obj = so->lvlObject;
+	if (obj) {
+		switch (obj->type) {
+		case 8:
+		case 2:
+		case 0:
+			if (obj->screenNum == _currentLeftScreen) {
+				return -1;
+			}
+			if (obj->screenNum == _currentRightScreen) {
+				return 129;
+			}
+			if (obj->screenNum == _gameResData0x2E08 || (_currentLevel == 7 && obj->data0x2988 == 0x1B) || (_currentLevel == 3 && obj->data0x2988 == 0x1A)) {
+				int dist = (obj->xPos + obj->width / 2) / 2;
+				if (dist < 0) {
+					return 0;
+				} else if (dist > 128) {
+					return 128;
+				} else {
+					return dist;
+				}
+			}
+			// fall-through
+		default:
+			return -2;
+		}
+	}
+	return so->volume;
+}
+
+void Game::setSoundObjectVolume(SssObject *so) {
+	if ((so->flags & 2) == 0 && so->unk18 != 0 && _snd_masterVolume != 0) {
+		int volume = READ_LE_UINT32(so->sssUnk4Ptr->data + 4);
+		volume = ((volume >> 16) * so->unk18) >> 7;
+		int _esi = 0;
+		if (so->volumePtr) {
+			int _eax = so->unk8;
+			_eax += READ_LE_UINT32(so->sssUnk4Ptr->data + 36);
+			_esi = so->volume;
+			if (_eax < 0) {
+				_eax = 0;
+			} else if (_eax > 7) {
+				_eax = 7;
+			}
+			if (_esi == -2) {
+				volume = 0;
+				_esi = 64;
+				_eax = 0;
+			} else {
+				if (_esi < 0) {
+					_esi = 0;
+				} else if (_esi < 128) {
+					_esi = 128;
+				}
+				volume >>= 2; // _edi
+				_eax /= 2;
+			}
+			if (so->unk9 != _eax) {
+				so->unk9 = _eax;
+				_sssObjectsList3 = 0;
+				if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
+					SssObject *o = _sssObjectsList1;
+					SssObject *_ebp = 0;
+					while (o) {
+						if (_ebp && _ebp->unk9 <= o->unk9) {
+							continue;
+						}
+						_ebp = o;
+						_sssObjectsList3 = o;
+						o = o->nextPtr;
+					}
+
+				}
+			}
+
+		} else {
+// 429076:
+			_esi = READ_LE_UINT32(so->sssUnk4Ptr->data + 0x14);
+			_esi = so->volume + (_esi >> 16);
+			if (_esi < 0) {
+				_esi = 0;
+			} else if (_esi > 128) {
+				_esi = 128;
+			}
+		}
+// 429094
+		if (so->soundBits == 0) {
+			return;
+		}
+		int _edx = _snd_volumeTable[volume]; // db, log ?
+		int _edi = _esi;
+		int _eax = _edx >> 7;
+		if (_edi == 0) {
+// 4290F0
+			so->panL = _eax;
+			so->panR = 0;
+			so->panType = 2;
+		} else if (_edi == 64) {
+// 4290DF
+			_eax /= 2;
+			so->panL = _eax;
+			so->panR = _eax;
+			so->panType = 3;
+		} else if (_edi == 128) {
+// 4290D0
+			so->panL = 0;
+			so->panR = _eax;
+			so->panType = 1;
+		} else {
+			_edx *= _esi;
+			_eax -= _edx;
+			so->panR = _edx;
+			so->panL = _eax;
+			so->panType = 4;
+		}
+// 4290F
+		so->panR = (so->panR * _snd_masterVolume + 64) >> 7;
+		so->panL = (so->panL * _snd_masterVolume + 64) >> 7;
+	} else {
+		so->panL = 0;
+		so->panR = 0;
+		so->panType = 0;
 	}
 }
