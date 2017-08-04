@@ -16,6 +16,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	File::setDataPath(dataPath);
 	_system = system;
 	_paf = new PafPlayer(system);
+	_paf->_skipCutscenes = true;
 	_res = new Resource();
 	_video = new Video(system);
 	_screen_dx = Video::kScreenWidth / 2;
