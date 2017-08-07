@@ -1152,7 +1152,7 @@ void Game::restartLevel() {
 		_mstGlobalFlags = 0;
 	}
 	if (_res->_sssHdr.unk10) {
-//		snd_restart();
+		resetSound();
 	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
@@ -1529,7 +1529,7 @@ int Game::updateAndyLvlObject() {
 		_mstGlobalFlags = 0;
 	}
 	if (_res->_sssHdr.unk10) {
-//		snd_restart();
+		resetSound();
 	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
@@ -2118,7 +2118,7 @@ void Game::levelMainLoop() {
 		_paf->unload(num);
 	}
 	if (_res->_sssHdr.unk10 != 0) {
-//		snd_restart();
+		resetSound();
 	}
 	_quit = false;
 	GameClearUnkList1();
@@ -2133,7 +2133,7 @@ void Game::levelMainLoop() {
 		_mstGlobalFlags = 0;
 	}
 	if (_res->_sssHdr.unk10 != 0) {
-//		snd_restart();
+		resetSound();
 	}
 	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
@@ -2171,7 +2171,7 @@ void Game::levelMainLoop() {
 				_mstGlobalFlags = 0;
 			}
 			if (_res->_sssHdr.unk10 != 0) {
-//				snd_restart();
+				resetSound();
 			}
 			const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
 			preloadLevelScreenData(num, 0xFF);

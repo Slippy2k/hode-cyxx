@@ -354,6 +354,7 @@ struct Game {
 	int _snd_fadeVolumeCounter;
 	int _snd_masterVolume;
 
+	void resetSound();
 	void removeSoundObject(SssObject *so);
 	void updateSoundObject(SssObject *so);
 	const uint8_t *executeSoundCode(SssObject *so, const uint8_t *code);

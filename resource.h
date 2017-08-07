@@ -139,6 +139,9 @@ struct Resource {
 	SssPreloadData *_sssPreloadData1;
 	SssPreloadData *_sssPreloadData2;
 	SssPreloadData *_sssPreloadData3;
+	uint8_t *_sssLookupTable1[3];
+	uint8_t *_sssLookupTable2[3];
+	uint8_t *_sssLookupTable3[3];
 
 	uint32_t _sssCodeSize;
 	uint8_t *_sssCodeData;

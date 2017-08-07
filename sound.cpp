@@ -3,6 +3,11 @@
 #include "resource.h"
 #include "util.h"
 
+void Game::resetSound() {
+	// TODO:
+	clearSoundObjects();
+}
+
 void Game::removeSoundObject(SssObject *so) {
 	so->soundBits = 0;
 	if ((so->flags & 1) != 0) {
@@ -209,7 +214,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 		switch (*code) {
 		case 0:
 			return 0;
-		case 2:
+		case 2: // start_sound
 			if (so->unk50 >= -1) {
 				LvlObject *tmp = _currentSoundLvlObject;
 				_currentSoundLvlObject = so->lvlObject;
@@ -250,7 +255,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				code += 12;
 			}
 			break;
-		case 6: {
+		case 6: { // jump_ge
 				--so->counter;
 				if (so->counter < 0) {
 					code += 8;
@@ -274,12 +279,12 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				}
 			}
 			break;
-		case 9: {
+		case 9: { // set_volume
 				so->unk64 += so->unk68;
 				const int volume = (so->unk64 + 0x8000) >> 16;
 				if (volume != so->volume) {
 					so->volume = volume;
-					// _sssObjectsChanged = 1;
+					_sssObjectsChanged = 1;
 				}
 				--so->unk58;
 				if (so->unk58 >= 0) {
@@ -294,7 +299,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 		case 11: {
 				if (so->unk18 != code[1]) {
 					so->unk18 = code[1];
-					// _sssObjectsChanged = 1;
+					_sssObjectsChanged = 1;
 				}
 			}
 			break;
@@ -325,7 +330,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				if (so->soundBits == 0) {
 					return code;
 				}
-				// _sssObjectsChanged = 1;
+				_sssObjectsChanged = 1;
 			}
 			break;
 		case 17: {
@@ -341,10 +346,10 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				code += 8;
 			}
 			break;
-		case 19: {
+		case 19: { // set_volume
 				if (so->volume != code[1]) {
 					so->volume = code[1];
-					// _sssObjectsChanged = 1;
+					_sssObjectsChanged = 1;
 				}
 			}
 			break;
@@ -353,7 +358,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-		case 21: {
+		case 21: { // dec_unk50
 				--so->unk50;
 				if (so->unk50 >= 0) {
 					return code;
@@ -361,12 +366,12 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-		case 22: {
+		case 22: { // load_unk50
 				so->unk50 = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 23: {
+		case 23: { // dec_unk54
 				--so->unk54;
 				if (so->unk54 >= 0) {
 					return code;
@@ -374,11 +379,11 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-		case 24: {
+		case 24: { // load_unk54
 				so->unk54 = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
-		case 25: {
+		case 25: { // dec_unk58
 				--so->unk58;
 				if (so->unk58 >= 0) {
 					return code;
@@ -386,7 +391,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-		case 26: {
+		case 26: { // load_unk58
 				so->unk58 = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
@@ -400,7 +405,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				// TODO: goto 42AF44
 			}
 			break;
-		case 28: {
+		case 28: { // jump
 				uint32_t offset = READ_LE_UINT32(code + 4);
 				code -= offset;
 			}
@@ -480,7 +485,8 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	}
 // 42BA37
 	_eax = (int8_t)s->unk4;
-	if (READ_LE_UINT32(sssUnk4Ptr->data + 0x24) != _eax) {
+	const int scale = READ_LE_UINT32(sssUnk4Ptr->data + 0x24);
+	if (scale != _eax) {
 		// sssUnk4Ptr->data + 0x24 = _eax;
 		for (int i = 0; i < _sssObjectsCount; ++i) {
 			SssObject *so = &_sssObjectsTable[i];
@@ -603,10 +609,11 @@ void Game::clearSoundObjects() {
 	_snd_fadeVolumeCounter = 0;
 	// _snd_mixingBufferSize = 0;
 	if (_res->_sssHdr.unk10 != 0) {
+		const int size = _res->_sssHdr.unk18 * 4;
 		for (int i = 0; i < 3; ++i) {
-			// memset(_sssLookupTable1[i], 0, _sssHdr.unk18 * 4);
-			// memset(_sssObjectsTable[i].soundBits, 0, _sssHdr.unk18 * 4);
-			// memset(_sssLookupTable3[i], 0, _sssHdr.unk18 * 4);
+			memset(_res->_sssLookupTable1[i], 0, size);
+			memset(_res->_sssLookupTable2[i], 0, size);
+			memset(_res->_sssLookupTable3[i], 0, size);
 		}
 	}
 	// TODO:

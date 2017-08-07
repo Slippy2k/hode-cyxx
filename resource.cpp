@@ -562,7 +562,6 @@ void Resource::loadSssData(const char *levelName) {
 		debug(kDebug_RESOURCE, "sssPreloadData3 #%d 0x%x", i, addr);
 		bytesRead += 4;
 	}
-	// overwite _sssPreloadData1, preloadLevelData 0x2988
 	_sssPreloadData1 = (SssPreloadData *)malloc(_sssHdr.unk24 * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.unk24; ++i) {
 		// _sssPreloadData1[i] = data
@@ -573,7 +572,6 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFile->read(_sssPreloadData1[i].ptr, count);
 		bytesRead += count + 1;
 	}
-	// overwite _sssPreloadData2, preloadLevelData 0x2988
 	_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.unk24 * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.unk28; ++i) {
 		// _sssPreloadData2[i] = data
@@ -584,7 +582,6 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFile->read(_sssPreloadData2[i].ptr, count);
 		bytesRead += count + 1;
 	}
-	// overwite _sssPreloadData3, preloadLevelData 0x2988
 	_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.unk24 * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.unk2C; ++i) {
 		// _sssPreloadData3[i] = data
@@ -682,22 +679,21 @@ void Resource::loadSssData(const char *levelName) {
 	}
 
 // loc_429AB8:
-	const int offset = _sssHdr.unk18 * 4;
+	const int lutSize = _sssHdr.unk18 * 4;
 	for (int i = 0; i < 3; ++i) {
-/*
-.text:00429AE3                 mov     _sssLookupTable1[edx], ecx
-.text:00429AE9                 add     ecx, esi
-.text:00429AEB                 mov     _sssLookupTable2[edx], ecx
-.text:00429AF1                 add     ecx, esi
-.text:00429AF3                 mov     _sssLookupTable3[edx], ecx
-.text:00429AF9                 add     edx, 4
-.text:00429AFC                 add     ecx, esi
-.text:00429AFE                 cmp     edx, 12
-*/
-		bytesRead += offset * 3;
+		_sssLookupTable1[i] = (uint8_t *)malloc(lutSize);
+		_sssFile->read(_sssLookupTable1[i], lutSize);
+		debug(kDebug_RESOURCE, "sssLookupTable1[%d] = 0x%x", i, READ_LE_UINT32(_sssLookupTable1[i]));
+		_sssLookupTable2[i] = (uint8_t *)malloc(lutSize);
+		_sssFile->read(_sssLookupTable2[i], lutSize);
+		debug(kDebug_RESOURCE, "sssLookupTable2[%d] = 0x%x", i, READ_LE_UINT32(_sssLookupTable2[i]));
+		_sssLookupTable3[i] = (uint8_t *)malloc(lutSize);
+		_sssFile->read(_sssLookupTable3[i], lutSize);
+		debug(kDebug_RESOURCE, "sssLookupTable3[%d] = 0x%x", i, READ_LE_UINT32(_sssLookupTable3[i]));
+		bytesRead += lutSize * 3;
 	}
 
-// loc_429B9F:                             ; CODE XREF: loadSssData+41Fj
+// loc_429B9F:
 	checkSssCode(_sssCodeData, _sssCodeSize);
 	for (int i = 0; i < _sssHdr.unk18; ++i) {
 		if (_sssDataUnk3[i].unk1 != 0) {
