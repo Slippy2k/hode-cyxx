@@ -57,7 +57,7 @@ struct Game {
 	static const OpStage1Proc _level1OpStage1[];
 	static const OpStage1Proc _level2OpStage1[];
 	static const OpStage1Proc _level3OpStage1[];
-	static const uint8_t _snd_volumeTable[129];
+	static const uint8_t _dbVolumeTable[129];
 
 	PafPlayer *_paf;
 	Random _rnd;
@@ -80,9 +80,9 @@ struct Game {
 	uint8_t *_shadowScreenMaskBuffer;
 	uint8_t _directionKeyMask;
 	uint8_t _actionKeyMask;
-	uint8_t _currentRightScreen; // _res->rightScreenResourceNum
-	uint8_t _currentLeftScreen; // _res->leftScreenResourceNum
-	uint8_t _gameResData0x2E08; // _res->nextScreenResourceNum
+	uint8_t _currentRightScreen;
+	uint8_t _currentLeftScreen;
+	uint8_t _currentScreen;
 	uint8_t _fadePaletteCounter;
 	uint8_t _fadePalette;
 	bool _hideAndyObjectSprite;
@@ -194,9 +194,9 @@ struct Game {
 	void removeLvlObject(LvlObject *ptr);
 	void removeLvlObjectNotType2List1(LvlObject *o);
 	void setupCurrentScreen();
-	void resetScreenHelper(int num);
+	void updateScreenHelper(int num);
 	void resetDisplay();
-	void resetScreen(uint8_t num);
+	void updateScreen(uint8_t num);
 	void resetLevel();
 	void restartLevel();
 	void playAndyFallingCutscene(int type);
@@ -362,7 +362,7 @@ struct Game {
 	void setupSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
 	void fadeSoundObject(SssObject *so);
-	int getSoundObjectVolumeByPos(SssObject *so);
+	int getSoundObjectVolumeByPos(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
 
 	// andy.cpp

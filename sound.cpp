@@ -631,7 +631,7 @@ void Game::fadeSoundObject(SssObject *so) {
 	}
 }
 
-int Game::getSoundObjectVolumeByPos(SssObject *so) {
+int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 	LvlObject *obj = so->lvlObject;
 	if (obj) {
 		switch (obj->type) {
@@ -644,7 +644,7 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) {
 			if (obj->screenNum == _currentRightScreen) {
 				return 129;
 			}
-			if (obj->screenNum == _gameResData0x2E08 || (_currentLevel == 7 && obj->data0x2988 == 0x1B) || (_currentLevel == 3 && obj->data0x2988 == 0x1A)) {
+			if (obj->screenNum == _currentScreen || (_currentLevel == 7 && obj->data0x2988 == 0x1B) || (_currentLevel == 3 && obj->data0x2988 == 0x1A)) {
 				int dist = (obj->xPos + obj->width / 2) / 2;
 				if (dist < 0) {
 					return 0;
@@ -721,7 +721,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 		if (so->soundBits == 0) {
 			return;
 		}
-		int _edx = _snd_volumeTable[volume]; // db, log ?
+		int _edx = _dbVolumeTable[volume];
 		int _edi = _esi;
 		int _eax = _edx >> 7;
 		if (_edi == 0) {

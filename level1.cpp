@@ -125,7 +125,7 @@ void Game::level1OpStage0_screen9() {
 				_andyObject->anim = 232;
 				_andyObject->frame = 0;
 				setupLvlObjectBitmap(_andyObject);
-				resetScreen(_andyObject->screenNum);
+				updateScreen(_andyObject->screenNum);
 			}
 			break;
 		case 1:
@@ -482,7 +482,7 @@ int Game::level1OpHelper2(LvlObject *ptr) {
 			dx = -256;
 		} else if (ptr->screenNum == _currentRightScreen) {
 			dx = 256;
-		} else if (ptr->screenNum == _gameResData0x2E08) {
+		} else if (ptr->screenNum == _currentScreen) {
 			dx = 0;
 		} else {
 			return 0;

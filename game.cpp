@@ -1012,9 +1012,9 @@ void Game::setupCurrentScreen() {
 	ptr->screenNum = dat[8];
 	ptr->directionKeyMask = 0;
 	ptr->actionKeyMask = 0;
-	_gameResData0x2E08 = dat[8];
-	_currentLeftScreen = _res->_screensGrid[dat[8] * 4 + kPosLeftScreen];
-	_currentRightScreen = _res->_screensGrid[dat[8] * 4 + kPosRightScreen];
+	_currentScreen = dat[8];
+	_currentLeftScreen = _res->_screensGrid[_currentScreen * 4 + kPosLeftScreen];
+	_currentRightScreen = _res->_screensGrid[_currentScreen * 4 + kPosRightScreen];
 	ptr->frame = 0;
 	setupLvlObjectBitmap(ptr);
 	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
@@ -1026,7 +1026,7 @@ void Game::setupCurrentScreen() {
 	}
 }
 
-void Game::resetScreenHelper(int num) {
+void Game::updateScreenHelper(int num) {
 	_res->_screensState[num].s2 = 1;
 	for (LvlObject *ptr = _res->_resLvlData0x288PtrTable[num]; ptr; ptr = ptr->nextPtr) {
 		switch (ptr->type) {
@@ -1075,7 +1075,7 @@ void Game::resetDisplay() {
 //	_snd_masterVolume = _plyConfigTable[_plyConfigNumber].soundVolume;
 }
 
-void Game::resetScreen(uint8_t num) {
+void Game::updateScreen(uint8_t num) {
 	uint8_t i, prev;
 
 	if (num == 0xFF) {
@@ -1083,7 +1083,7 @@ void Game::resetScreen(uint8_t num) {
 	}
 	prev = _res->_currentScreenResourceNum;
 	_res->_currentScreenResourceNum = num;
-	resetScreenHelper(num);
+	updateScreenHelper(num);
 	callLevelOpStage2(num);
 	if (_res->_screensState[num].s0 >= _res->_screensState[num].s1) {
 		--_res->_screensState[num].s1;
@@ -1097,7 +1097,7 @@ void Game::resetScreen(uint8_t num) {
 	}
 	i = _res->_screensGrid[num * 4 + kPosRightScreen];
 	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
-		resetScreenHelper(i);
+		updateScreenHelper(i);
 		callLevelOpStage2(i);
 		setupScreenMask(i);
 		callLevelOpStage0(i);
@@ -1110,7 +1110,7 @@ void Game::resetScreen(uint8_t num) {
 	}
 	i = _res->_screensGrid[num * 4 + kPosLeftScreen];
 	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
-		resetScreenHelper(i);
+		updateScreenHelper(i);
 		callLevelOpStage2(i);
 		setupScreenMask(i);
 		callLevelOpStage0(i);
@@ -1161,7 +1161,7 @@ void Game::restartLevel() {
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
-	resetScreen(_andyObject->screenNum);
+	updateScreen(_andyObject->screenNum);
 }
 
 void Game::playAndyFallingCutscene(int type) {
@@ -1234,9 +1234,9 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 			data->boundingBox.y2 = ptr->yPos + ptr->height - 1;
 		}
 	}
-	_gameResData0x2E08 = ptr->screenNum;
-	_currentLeftScreen = _res->_screensGrid[_gameResData0x2E08 * 4 + kPosLeftScreen];
-	_currentRightScreen = _res->_screensGrid[_gameResData0x2E08 * 4 + kPosRightScreen];
+	_currentScreen = ptr->screenNum;
+	_currentLeftScreen = _res->_screensGrid[_currentScreen * 4 + kPosLeftScreen];
+	_currentRightScreen = _res->_screensGrid[_currentScreen * 4 + kPosRightScreen];
 	return ret;
 }
 
@@ -1538,7 +1538,7 @@ int Game::updateAndyLvlObject() {
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
-	resetScreen(_andyObject->screenNum);
+	updateScreen(_andyObject->screenNum);
 	return 1;
 }
 
@@ -1815,7 +1815,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		return o;
 	}
 	_al = ptr->screenNum;
-	if (_gameResData0x2E08 != _al && _currentRightScreen != _al && _currentLeftScreen != _al) {
+	if (_currentScreen != _al && _currentRightScreen != _al && _currentLeftScreen != _al) {
 		return o;
 	}
 	if ((this->*(ptr->callbackFuncPtr))(ptr) == 0) {
@@ -1828,7 +1828,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	if (ptr->bitmapBits == 0) {
 		return o;
 	}
-	if (_gameResData0x2E08 == ptr->screenNum) {
+	if (_currentScreen == ptr->screenNum) {
 		uint8_t *_edi = ptr->bitmapBits;
 
 		LvlObjectData *dat = ptr->levelData0x2988;
@@ -2142,7 +2142,7 @@ void Game::levelMainLoop() {
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
-	resetScreen(_andyObject->screenNum);
+	updateScreen(_andyObject->screenNum);
 	do {
 		int frameTimeStamp = _system->getTimeStamp() + kFrameTimeStamp;
 		memset(_gameSpriteListPtrTable, 0, sizeof(_gameSpriteListPtrTable));
@@ -2159,7 +2159,7 @@ void Game::levelMainLoop() {
 		_video->fillBackBuffer();
 		if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 			preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
-			resetScreen(_andyObject->screenNum);
+			updateScreen(_andyObject->screenNum);
 		} else if (_fadePalette != 0 && _fadePaletteCounter == 0) {
 			setupCurrentScreen();
 			clearLvlObjectsList2();
@@ -2180,7 +2180,7 @@ void Game::levelMainLoop() {
 			if (_andyObject->screenNum != num) {
 				preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 			}
-			resetScreen(_andyObject->screenNum);
+			updateScreen(_andyObject->screenNum);
 		} else {
 			callLevelOpStage0(_res->_currentScreenResourceNum);
 			if (_currentLeftScreen != 0xFF) {
@@ -2733,7 +2733,7 @@ LvlObject *Game::game_unk115(int type, int y, int x, int screen, int num, int o_
 		ptr = _lvlObjectsList1;
 		break;
 	case 1:
-		if (screen != _gameResData0x2E08 && screen != _currentLeftScreen && screen != _currentRightScreen) {
+		if (screen != _currentScreen && screen != _currentLeftScreen && screen != _currentRightScreen) {
 			return 0;
 		}
 		ptr = findLvlObjectNoDataPtr(num, screen);
