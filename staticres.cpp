@@ -404,7 +404,7 @@ static const uint8_t _level9UpdateData2[8] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-const uint8_t *Game::_levelUpdateData1[] = {
+const uint8_t *Game::_levelCheckpointData[] = {
 	_level1UpdateData1,
 	_level2UpdateData1,
 	_level3UpdateData1,

@@ -112,8 +112,8 @@ void Game::level2OpStage0_screen16() {
 		} else {
 			++_screenCounterTable[16];
 			if (_screenCounterTable[16] == 5) {
-				if (_currentScreenResourceState == 3) {
-					_currentScreenResourceState = 4;
+				if (_levelCheckpoint == 3) {
+					_levelCheckpoint = 4;
 				}
 				if (!_paf->_skipCutscenes) {
 					_paf->play(3);
@@ -196,7 +196,7 @@ int Game::callLevelOpStage1_level2(int num, LvlObject *o) {
 }
 
 void Game::level2OpStage2_screen1() {
-	if (_res->_currentScreenResourceNum == 1 && _currentScreenResourceState >= 1) {
+	if (_res->_currentScreenResourceNum == 1 && _levelCheckpoint >= 1) {
 		_res->_screensState[1].s0 = 1;
 	}
 	const int num = _res->_screensState[1].s0 == 0 ? 0 : 1;
@@ -205,20 +205,20 @@ void Game::level2OpStage2_screen1() {
 }
 
 void Game::level2OpStage2_screen2() {
-	if (_res->_currentScreenResourceNum == 2 && _currentScreenResourceState == 0) {
-		_currentScreenResourceState = 1;
+	if (_res->_currentScreenResourceNum == 2 && _levelCheckpoint == 0) {
+		_levelCheckpoint = 1;
 	}
 }
 
 void Game::level2OpStage2_screen6() {
-	if (_res->_currentScreenResourceNum == 6 && _currentScreenResourceState == 1) {
-		_currentScreenResourceState = 2;
+	if (_res->_currentScreenResourceNum == 6 && _levelCheckpoint == 1) {
+		_levelCheckpoint = 2;
 	}
 }
 
 void Game::level2OpStage2_screen9() {
-	if (_res->_currentScreenResourceNum == 9 && _currentScreenResourceState == 2) {
-		_currentScreenResourceState = 3;
+	if (_res->_currentScreenResourceNum == 9 && _levelCheckpoint == 2) {
+		_levelCheckpoint = 3;
 	}
 }
 

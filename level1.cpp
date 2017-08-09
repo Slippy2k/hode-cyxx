@@ -115,8 +115,8 @@ void Game::level1OpStage0_screen9() {
 					_res->_resLvlScreenBackgroundDataTable[9].currentBackgroundId = 1;
 					_video->_paletteNeedRefresh = true;
 				}
-				if (_currentScreenResourceState == 4) {
-					_currentScreenResourceState = 5;
+				if (_levelCheckpoint == 4) {
+					_levelCheckpoint = 5;
 				}
 				_res->_screensState[9].s0 = 1;
 				level1OpStage0_screen9Helper(2);
@@ -568,15 +568,15 @@ void Game::level1OpStage2_screen0() {
 }
 
 void Game::level1OpStage2_screen1() {
-	if (_currentScreenResourceState != 0) {
+	if (_levelCheckpoint != 0) {
 		_res->_screensState[0].s0 = 1;
 	}
 }
 
 void Game::level1OpStage2_screen2() {
-	if (_res->_currentScreenResourceNum == 2 && _currentScreenResourceState == 0) {
-		_currentScreenResourceState = 1;
-	} else if (_currentScreenResourceState > 1) {
+	if (_res->_currentScreenResourceNum == 2 && _levelCheckpoint == 0) {
+		_levelCheckpoint = 1;
+	} else if (_levelCheckpoint > 1) {
 		LvlObject *ptr = _res->findLvlObject(2, 0, 2);
 		if (ptr) {
 			ptr->anim = 0;
@@ -593,7 +593,7 @@ void Game::level1OpStage2_screen2() {
 }
 
 void Game::level1OpStage2_screen3() {
-	if (_currentScreenResourceState > 1) {
+	if (_levelCheckpoint > 1) {
 		LvlObject *ptr = _res->findLvlObject(2, 0, 3);
 		if (ptr) {
 			ptr->anim = 0;
@@ -626,20 +626,20 @@ void Game::level1OpStage2_screen4() {
 	_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentDataUnk1Id = num;
 	_res->_resLvlScreenBackgroundDataTable[4].unk3 = num;
-	if (_res->_currentScreenResourceNum == 4 && _currentScreenResourceState == 1) {
-		_currentScreenResourceState = 2;
+	if (_res->_currentScreenResourceNum == 4 && _levelCheckpoint == 1) {
+		_levelCheckpoint = 2;
 	}
 }
 
 void Game::level1OpStage2_screen5() {
-	if (_res->_currentScreenResourceNum == 5 && _currentScreenResourceState == 2) {
-		_currentScreenResourceState = 3;
+	if (_res->_currentScreenResourceNum == 5 && _levelCheckpoint == 2) {
+		_levelCheckpoint = 3;
 	}
 }
 
 void Game::level1OpStage2_screen7() {
-	if (_res->_currentScreenResourceNum == 7 && _currentScreenResourceState == 3) {
-		_currentScreenResourceState = 4;
+	if (_res->_currentScreenResourceNum == 7 && _levelCheckpoint == 3) {
+		_levelCheckpoint = 4;
 	}
 }
 
@@ -660,8 +660,8 @@ void Game::level1OpStage2_screen9() {
 
 void Game::level1OpStage2_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
-		if (_currentScreenResourceState == 4) {
-			_currentScreenResourceState = 5;
+		if (_levelCheckpoint == 4) {
+			_levelCheckpoint = 5;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->unload(22);
@@ -672,8 +672,8 @@ void Game::level1OpStage2_screen10() {
 
 void Game::level1OpStage2_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		if (_currentScreenResourceState == 5) {
-			_currentScreenResourceState = 6;
+		if (_levelCheckpoint == 5) {
+			_levelCheckpoint = 6;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->unload(1);
@@ -719,8 +719,8 @@ void Game::level1OpStage2_screen16() {
 
 void Game::level1OpStage2_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
-		if (_currentScreenResourceState == 6) {
-			_currentScreenResourceState = 7;
+		if (_levelCheckpoint == 6) {
+			_levelCheckpoint = 7;
 		}
 		playAndyFallingCutscene(1);
 	}
@@ -746,7 +746,7 @@ void Game::level1OpStage2_screen18() {
 
 void Game::level1OpStage2_screen19() {
 	uint8_t _al;
-	switch (_res->_screensState[18].s0) {
+	switch (_res->_screensState[19].s0) {
 	case 0:
 		_al = 0;
 		break;

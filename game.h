@@ -52,7 +52,7 @@ struct Game {
 	static const char *_resLevelNames[];
 	static const uint8_t _levelOpStage3ImageData1[];
 	static const uint8_t _levelOpStage3ImageData2[];
-	static const uint8_t *_levelUpdateData1[];
+	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelUpdateData2[];
 	static const OpStage1Proc _level1OpStage1[];
 	static const OpStage1Proc _level2OpStage1[];
@@ -71,7 +71,7 @@ struct Game {
 	LvlObject *_currentMonsterObject;
 	LvlObject *_currentSoundLvlObject;
 	int _currentLevel;
-	int _currentScreenResourceState; // _res->_currentScreenResourceState
+	int _levelCheckpoint;
 	bool _quit;
 	Sprite _gameSpriteListTable[128];
 	Sprite *_gameSpriteListHead;
@@ -359,7 +359,7 @@ struct Game {
 	void updateSoundObject(SssObject *so);
 	const uint8_t *executeSoundCode(SssObject *so, const uint8_t *code);
 	void prepareSoundObject(int num, int b, int c);
-	SssObject *startSoundObject(int num, int b, int repeat);
+	SssObject *startSoundObject(int num, int b, int flags);
 	void setupSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
 	void fadeSoundObject(SssObject *so);

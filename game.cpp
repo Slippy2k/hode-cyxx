@@ -979,7 +979,7 @@ void Game::setupCurrentScreen() {
 	_hideAndyObjectSprite = false;
 	_resUpdateLevelDataType0Flag = 0;
 
-	const uint8_t *dat = &_levelUpdateData1[_currentLevel][_currentScreenResourceState * 12];
+	const uint8_t *dat = &_levelCheckpointData[_currentLevel][_levelCheckpoint * 12];
 	_plasmaCannonFlags = 0;
 	_gameKeyPressedMaskIndex = 0;
 	_gameCurrentLevelScreenNum = ptr->screenNum;
@@ -1128,7 +1128,7 @@ void Game::resetLevel() {
 		_screenCounterTable[i] = 0;
 	}
 	const uint8_t *dat2 = _levelUpdateData2[_currentLevel];
-	const int n = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
+	const int n = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	for (int i = 0; i < n; ++i) {
 		_res->_screensState[i].s0 = *dat2++;
 		_screenCounterTable[i] = *dat2++;
@@ -1154,7 +1154,7 @@ void Game::restartLevel() {
 	if (_res->_sssHdr.unk10) {
 		resetSound();
 	}
-	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
+	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
@@ -1531,7 +1531,7 @@ int Game::updateAndyLvlObject() {
 	if (_res->_sssHdr.unk10) {
 		resetSound();
 	}
-	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
+	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
@@ -2096,7 +2096,7 @@ void Game::levelMainLoop() {
 	_gameCurrentLevelScreenNum = -1;
 	initMstCode();
 //	res_initIO();
-	preloadLevelScreenData(_levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8], 0xFF);
+	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8], 0xFF);
 	memset(_screenCounterTable, 0, 40);
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();
@@ -2111,7 +2111,7 @@ void Game::levelMainLoop() {
 		startMstCode();
 	}
 //	snd_setupResampleFunc(_ecx = 1);
-	if (!_paf->_skipCutscenes && _currentScreenResourceState == 0) {
+	if (!_paf->_skipCutscenes && _levelCheckpoint == 0) {
 		uint8_t num = _gameLevelStartingCutscene[_currentLevel];
 		_paf->preload(num);
 		_paf->play(num);
@@ -2135,7 +2135,7 @@ void Game::levelMainLoop() {
 	if (_res->_sssHdr.unk10 != 0) {
 		resetSound();
 	}
-	const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
+	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 	resetLevel();
@@ -2173,7 +2173,7 @@ void Game::levelMainLoop() {
 			if (_res->_sssHdr.unk10 != 0) {
 				resetSound();
 			}
-			const int num = _levelUpdateData1[_currentLevel][_currentScreenResourceState * 12 + 8];
+			const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 			preloadLevelScreenData(num, 0xFF);
 			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
 			resetLevel();
@@ -2409,7 +2409,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 
 void Game::lvlObjectType0Init(LvlObject *ptr) {
 	uint8_t num = ptr->data0x2988;
-	if (_currentLevel == 0 && _currentScreenResourceState >= 5) {
+	if (_currentLevel == 0 && _levelCheckpoint >= 5) {
 		num = 2;
 	}
 	_andyObject = declareLvlObject(ptr->type, num);
