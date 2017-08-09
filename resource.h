@@ -46,7 +46,8 @@ struct SssUnk1 {
 	uint8_t unk2; // 2
 	uint8_t unk3;
 	uint8_t unk4; // 4
-	uint16_t unk5;
+	uint8_t unk5;
+	uint8_t unk6;
 	uint8_t unk7;
 } PACKED;
 

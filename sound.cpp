@@ -211,6 +211,7 @@ loc_42B357:
 
 const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 	while (1) {
+		debug(kDebug_SOUND, "executeSoundCode() code %d", *code);
 		switch (*code) {
 		case 0:
 			return 0;
@@ -238,7 +239,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 			// _ecx <<= 0x10;
 			// _eax |= _ecx;
 			// _eax |= _eax;
-			// executeSoundCodeOp4(_ecx, _edx, _ebx);
+			// executeSssCodeOp4(_ecx, _edx, _ebx);
 			code += 4;
 			break;
 		case 5: {
@@ -305,10 +306,10 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 			break;
 		case 12: {
 				// uint32_t _edx = so->flags1;
-				// uint32_t _eax = _edx << 0x18;
-				// _edx = (_edx >> 0x14) & 0xF;
+				// uint32_t _eax = _edx << 24;
+				// _edx = (_edx >> 20) & 0xF;
 				// uint16_t _ecx = READ_LE_UINT16(code + 2);
-				// executeSoundCodeOp12(_ecx, _edx, _eax);
+				// executeSssCodeOp12(_ecx, _edx, _eax);
 				code += 4;
 			}
 			break;
@@ -320,12 +321,12 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				// TODO:
 			}
 			break;
-		case 16: {
+		case 16: { // stop_sound
 				--so->unk4C;
 				if (so->unk4C >= 0) {
 					return code;
 				}
-				// executeSoundCodeOp16(so);
+				// executeSssCodeOp16(so);
 				code += 4;
 				if (so->soundBits == 0) {
 					return code;
@@ -333,8 +334,8 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 				_sssObjectsChanged = 1;
 			}
 			break;
-		case 17: {
-				// executeSoundCodeOp17(so);
+		case 17: { // fade_sound
+				// executeSssCodeOp17(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
@@ -419,7 +420,7 @@ const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
 }
 
 void Game::prepareSoundObject(int num, int b, int c) {
-	debug(kDebug_SOUND, "prepareSoundObject num %d b %d", num, b);
+	debug(kDebug_SOUND, "prepareSoundObject num %d b %d c 0x%x", num, b, c);
 	if (b > 0) {
 		if ((_res->_sssDataUnk3[num].unk1 & 1) != 0) {
 			// int var8 = _res->_sssDataUnk3[num].sssUnk4
@@ -439,9 +440,53 @@ void Game::prepareSoundObject(int num, int b, int c) {
 	}
 }
 
-SssObject *Game::startSoundObject(int num, int b, int repeat) {
-	debug(kDebug_SOUND, "startSoundObject num %d b %d c %d", num, b, repeat);
+SssObject *Game::startSoundObject(int num, int b, int flags) {
+	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 	// TODO
+
+	SssObject tmpObj;
+	memset(&tmpObj, 0, sizeof(tmpObj));
+	tmpObj.flags0 = flags;
+	tmpObj.flags1 = flags;
+	tmpObj.unk6 = num;
+	tmpObj.counter = -1;
+	tmpObj.unk4C = -1;
+	tmpObj.lvlObject = _currentSoundLvlObject;
+	tmpObj.volumePtr = 0;
+	// executeSssCode(&tmpObj, );
+
+	int _edx = (flags >> 20) & 0xF;
+	int _ebx = (flags & 0xFFF);
+	int _ecx = (flags >> 24);
+	const uint8_t *_eax = _res->_sssLookupTable2[_edx] + _ebx * 4;
+	debug(kDebug_SOUND, "_edx %d _ebx %d _ecx %d mask 0x%x", _edx, _ebx, _ecx, READ_LE_UINT32(_eax));
+#if 0
+	int _ebp = 1 << _ecx;
+	// var88 = _eax;
+	_ecx = READ_LE_UINT32(_eax);
+	if ((_ecx & _ebp) != 0) {
+		SssObject *so = _sssObjectsList1;
+		while (so) {
+			int _edi = so->flags0;
+			int _ecx = _edi & 0xFFF;
+			if (_ecx == _ebx) {
+				_ecx = (_edi >> 20) & 0xF;
+				if (_ecx == _edx) {
+					_edi >>= 24;
+					if (_edi == _esi) {
+// 42B62F
+						if (_eax != 0) {
+							*(uint32_t *)var88 &= ~_ebp;
+						}
+						return _eax;
+					}
+				}
+			}
+			so = so->nextPtr;
+		}
+	}
+#endif
+// loop2
 	return 0;
 }
 
@@ -503,15 +548,14 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	}
 // 42BA9D
 	int _ebp = 0;
-#if 0
-	_edx = b << 4;
-	_al = s->unk6;
+	int _edx = b << 4;
+	int _al = s->unk6;
 	_ebp = (a & 0xF) | _edx;
-	_dl = s->unk2 & 0xF; // _edx ?
-	_cx = s->unk0;
+	_edx = s->unk2 & 0xF;
+	_ecx = s->unk0;
 	_ebp <<= 4;
 	_ebp |= _edx;
-	_dl = _al;
+	_edx = _al;
 	_ebp <<= 4;
 	_edx &= 0xF;
 	_ebp |= _edx;
@@ -519,6 +563,7 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	_ebp <<= 0xC;
 	_edx &= 0xFFF;
 	_ebp |= _edx;
+#if 0
 	if (_al & 2) {
 		_eax = (_ebp >> 20) & 15;
 		_edx = sssLookupTable3[_eax];

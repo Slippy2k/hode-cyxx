@@ -504,7 +504,8 @@ void Resource::loadSssData(const char *levelName) {
 		_sssDataUnk1[i].unk2 = _sssFile->readByte();
 		_sssDataUnk1[i].unk3 = _sssFile->readByte();
 		_sssDataUnk1[i].unk4 = _sssFile->readByte();
-		_sssDataUnk1[i].unk5 = _sssFile->readUint16();
+		_sssDataUnk1[i].unk5 = _sssFile->readByte();
+		_sssDataUnk1[i].unk6 = _sssFile->readByte();
 		_sssDataUnk1[i].unk7 = _sssFile->readByte();
 		// debug(kDebug_RESOURCE, "SssDataUnk1 #%d 0x%x 0x%x 0x%x", i, unk1, unk2, unk3);
 		bytesRead += 8;
