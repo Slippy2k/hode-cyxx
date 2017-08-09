@@ -5,6 +5,7 @@
 
 #include "paf.h"
 #include "systemstub.h"
+#include "util.h"
 
 PafPlayer::PafPlayer(SystemStub *system)
 	: _skipCutscenes(false), _system(system) {
@@ -23,6 +24,7 @@ PafPlayer::~PafPlayer() {
 }
 
 void PafPlayer::preload(int num) {
+	debug(kDebug_PAF, "preload %d", num);
 	assert(num >= 0 && num < kMaxVideosCount);
 	if (_videoNum != num) {
 		unload(_videoNum);
@@ -43,6 +45,7 @@ void PafPlayer::preload(int num) {
 }
 
 void PafPlayer::play(int num) {
+	debug(kDebug_PAF, "play %d", num);
 	if (_videoNum != num) {
 		preload(num);
 	}
