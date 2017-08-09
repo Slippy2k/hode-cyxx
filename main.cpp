@@ -3,33 +3,19 @@
  * Copyright (C) 2009-2011 Gregory Montoir
  */
 
+#include <getopt.h>
+
 #include "game.h"
 #include "util.h"
 #include "systemstub.h"
 
-static const char *_usage =
+static const char *USAGE =
 	"HODe - Heart Of Darkness Interpreter\n"
 	"Usage: %s [OPTIONS]...\n"
-	"  --datapath=PATH   Path to data files (default 'DATA')\n";
-
-static bool parseOption(const char *arg, const char *longCmd, const char **opt) {
-	if (strncmp(arg, "--", 2) == 0) {
-		if (strncmp(arg + 2, longCmd, strlen(longCmd)) == 0) {
-			*opt = arg + 2 + strlen(longCmd);
-			return true;
-		}
-	}
-	return false;
-}
-
-static bool parseOptionInt(const char *arg, const char *longCmd, int *opt) {
-	const char *level;
-	if (parseOption(arg, longCmd, &level)) {
-		*opt = strtol(level, 0, 10);
-		return true;
-	}
-	return false;
-}
+	"  --datapath=PATH   Path to data files (default 'DATA')\n"
+	"  --level=NUM       Start at level NUM\n"
+	"  --checkpoint=NUM  Start at checkpoint NUM\n"
+;
 
 static SystemStub *_system = 0;
 
@@ -43,24 +29,42 @@ static void exitMain() {
 
 #undef main
 int main(int argc, char *argv[]) {
-	const char *dataPath = "DATA";
-	int initialLevel = 0;
-	for (int i = 1; i < argc; ++i) {
-		bool opt = false;
-		if (strlen(argv[i]) >= 2) {
-			opt |= parseOption(argv[i], "datapath=", &dataPath);
-			opt |= parseOptionInt(argv[i], "level=", &initialLevel);
+	char *dataPath = 0;
+	int level = 0;
+	int checkpoint = 0;
+	while (1) {
+		static struct option options[] = {
+			{ "datapath",   required_argument, 0, 1 },
+			{ "level",      required_argument, 0, 2 },
+			{ "checkpoint", required_argument, 0, 3 },
+			{ 0, 0, 0, 0 },
+		};
+		int index;
+		const int c = getopt_long(argc, argv, "", options, &index);
+		if (c == -1) {
+			break;
 		}
-		if (!opt) {
-			printf(_usage, argv[0]);
-			return 0;
+		switch (c) {
+		case 1:
+			dataPath = strdup(optarg);
+			break;
+		case 2:
+			level = atoi(optarg);
+			break;
+		case 3:
+			checkpoint = atoi(optarg);
+			break;
+		default:
+			fprintf(stdout, "%s\n", USAGE);
+			return -1;
 		}
 	}
 	_system = SystemStub_SDL_create();
 	atexit(exitMain);
 	g_debugMask = kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
-	Game *g = new Game(_system, dataPath);
-	g->mainLoop(initialLevel);
+	Game *g = new Game(_system, dataPath ? dataPath : "DATA");
+	g->mainLoop(level, checkpoint);
 	delete g;
+	free(dataPath);
 	return 0;
 }

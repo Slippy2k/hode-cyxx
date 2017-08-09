@@ -154,7 +154,7 @@ struct Game {
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
 
-	void mainLoop(int level = 0);
+	void mainLoop(int level, int checkpoint);
 	void GameClearUnkList1();
 	void GameRemoveGameUnkList1ElementFromLevelScreenData(LvlObject *ptr);
 	void setShakeScreen(int type, int counter);

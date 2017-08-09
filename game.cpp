@@ -1651,8 +1651,10 @@ void Game::redrawObjects() {
 	}
 }
 
-void Game::mainLoop(int level) {
+void Game::mainLoop(int level, int checkpoint) {
+	// TODO: check bounds
 	_currentLevel = level;
+	_levelCheckpoint = checkpoint;
 	_system->init("Heart of Darkness", Video::kScreenWidth, Video::kScreenHeight);
 	_res->loadSetupDat();
 	_res->loadLvlData(_resLevelNames[_currentLevel]);
