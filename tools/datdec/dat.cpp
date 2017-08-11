@@ -78,8 +78,8 @@ static void res_seekAndReadCurrentFile3(File *_ecx, uint8 *_edx, int size, int o
 }
 
 /*
-0000 MenuList        struc ; (sizeof=0x10)   ; XREF: menu_addToUnkListr
-0000                                         ; menu_addToUnkList+3r ...
+0000 MenuList        struc ; (sizeof=0x10)   ; XREF: menu_addToUnkList
+0000                                         ; menu_addToUnkList+3 ...
 0000 ptr1            dd ? // picture data ?
 0004 ptr2            dd ? // palette data ?
 0008 size            dd ?
@@ -88,8 +88,8 @@ static void res_seekAndReadCurrentFile3(File *_ecx, uint8 *_edx, int size, int o
 0010 MenuList        ends
 */
 /*
-.text:004221E0 menu_addToUnkList proc near             ; CODE XREF: menu_loadData+609p
-.text:004221E0                                         ; menu_loadData+618p ...
+.text:004221E0 menu_addToUnkList proc near             ; CODE XREF: menu_loadData+609
+.text:004221E0                                         ; menu_loadData+618 ...
 .text:004221E0                 mov     eax, [ecx+MenuList.size]
 .text:004221E3                 and     [ecx+MenuList.num], 0
 .text:004221E8                 mov     [ecx+MenuList.ptr1], edx
