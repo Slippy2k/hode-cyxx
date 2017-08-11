@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "paf.h"
+#include "util.h"
 #include "video.h"
 
 void Game::level1OpStage0_screen0() {
@@ -346,7 +347,8 @@ void Game::level1OpStage0_screen19() {
 		++_screenCounterTable[19];
 		if (_screenCounterTable[19] == 1) {
 			_res->_resLvlScreenBackgroundDataTable[19].unk3 = 1;
-			setupScreenMask(19);
+			warning("Workaround Andy position in Level 1 Screen 19");
+			/// setupScreenMask(19);
 			game_unk27(18);
 		} else if (_screenCounterTable[19] > 12) {
 			_res->_screensState[19].s0 = 1;
