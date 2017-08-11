@@ -25,7 +25,7 @@ struct Point8_t {
 struct Point16_t {
 	int16_t x;
 	int16_t y;
-} PACKED;
+};
 
 /* LvlBackgroundAnim */
 struct GameRect {
@@ -148,32 +148,6 @@ struct LvlObject {
 	LvlObject *nextPtr;
 };
 
-struct LvlBackgroundData {
-	uint8_t backgroundCount;
-	uint8_t currentBackgroundId;
-	uint8_t dataUnk0Count;
-	uint8_t unk3; /* movingMask */
-	uint8_t dataUnk1Count;
-	uint8_t currentDataUnk1Id;
-	uint8_t dataUnk2Count;
-	uint8_t unk7;
-	uint8_t dataUnk3Count;
-	uint8_t unk9;
-	uint8_t dataUnk45Count;
-	uint8_t unkB;
-	uint16_t backgroundPaletteId;
-	uint16_t backgroundBitmapId;
-	uint8_t *backgroundPaletteTable[4];
-	uint8_t *backgroundBitmapTable[4];
-	uint8_t *dataUnk0Table[4];
-	uint8_t *backgroundMaskTable[4];
-	uint8_t *dataUnk2Table[4];
-	uint8_t *backgroundAnimationTable[4];
-	uint8_t *dataUnk4Table[4]; /* unused ? */
-	LvlObjectData *dataUnk5Table[4]; /* LevelData0x2988 */
-	uint8_t *dataUnk6Table[4]; /* unused ? */
-};
-
 struct SssUnk4;
 
 struct SssObject {
@@ -197,14 +171,14 @@ struct SssObject {
 	const uint8_t *codeDataStage2; // 0x3C
 	const uint8_t *codeDataStage3; // 0x40
 	const uint8_t *codeDataStage4; // 0x44
-	int32_t counter; // 0x48
-	int32_t unk4C; // 0x4C
-	int32_t unk50; // 0x50
-	int32_t unk54; // 0x54
-	int32_t unk58; // 0x58
-	int32_t unk64; // 0x64
-	int32_t unk68; // 0x68
-	int32_t unk6C; // 0x6C
+	int32_t counter; // 0x48 counter0, counters[8]
+	int32_t unk4C; // 0x4C counter1
+	int32_t unk50; // 0x50 counter2
+	int32_t unk54; // 0x54 counter3
+	int32_t unk58; // 0x58 counter4
+	int32_t unk64; // 0x64 counter5
+	int32_t unk68; // 0x68 counter6
+	int32_t unk6C; // 0x6C counter7
 	int *volumePtr; // 0x70
 	LvlObject *lvlObject; // 0x74
 	int32_t unk78; // 0x78
@@ -354,18 +328,6 @@ struct Sprite {
 	Sprite *nextPtr;
 	uint16_t num;
 	uint16_t flags;
-};
-
-struct LvlScreenVector {
-	int32_t u;
-	int32_t v;
-};
-
-struct LvlScreenState {
-	uint8_t s0;
-	uint8_t s1;
-	uint8_t s2;
-	uint8_t s3;
 };
 
 struct BoundingBox {

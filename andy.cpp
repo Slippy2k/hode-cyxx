@@ -675,28 +675,26 @@ int Game::moveAndyObjectOp3(int op) {
 			}
 		}
 		return 0;
-	case 39: {
-			for (int i = 0; i < 3; ++i) {
-				if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos5] & 1) == 0) {
-					continue;
-				}
-				if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos4] & 1) == 0) {
-					continue;
-				}
-				return 1;
+	case 39:
+		for (int i = 0; i < 3; ++i) {
+			if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos5] & 1) == 0) {
+				continue;
 			}
+			if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos4] & 1) == 0) {
+				continue;
+			}
+			return 1;
 		}
 		return 0;
-	case 40: {
-			for (int i = 0; i < 3; ++i) {
-				if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos5] & 1) == 0) {
-					continue;
-				}
-				if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos4] & 1) == 0) {
-					continue;
-				}
-				return 0;
+	case 40:
+		for (int i = 0; i < 3; ++i) {
+			if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos5] & 1) == 0) {
+				continue;
 			}
+			if ((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos4] & 1) == 0) {
+				continue;
+			}
+			return 0;
 		}
 		return 1;
 	case 41: {
@@ -896,11 +894,10 @@ int Game::moveAndyObjectOp3(int op) {
 			}
 		}
 		return 1;
-	case 50: {
-			for (int i = 0; i < 3; ++i) {
-				if (((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos4] | _screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos5]) & 1) != 0) {
-					return 1;
-				}
+	case 50:
+		for (int i = 0; i < 3; ++i) {
+			if (((_screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos4] | _screenMaskBuffer[_andyMoveTable8[i] + _andyMaskBufferPos5]) & 1) != 0) {
+				return 1;
 			}
 		}
 		return 0;
@@ -1258,19 +1255,17 @@ int Game::moveAndyObjectOp3(int op) {
 			}
 		}
 		return 0;
-	case 96: {
-			for (int i = 0; i < 2; ++i) {
-				if ((_screenMaskBuffer[_andyMoveTable43[i] + _andyMaskBufferPos0] & 9) == 0) {
-					return 1;
-				}
+	case 96:
+		for (int i = 0; i < 2; ++i) {
+			if ((_screenMaskBuffer[_andyMoveTable43[i] + _andyMaskBufferPos0] & 9) == 0) {
+				return 1;
 			}
 		}
 		return 0;
-	case 97: {
-			for (int i = 0; i < 4; ++i) {
-				if ((_screenMaskBuffer[_andyMoveTable43[2 + i] + _andyMaskBufferPos0] & 9) == 0) {
-					return 1;
-				}
+	case 97:
+		for (int i = 0; i < 4; ++i) {
+			if ((_screenMaskBuffer[_andyMoveTable43[2 + i] + _andyMaskBufferPos0] & 9) == 0) {
+				return 1;
 			}
 		}
 		return 0;

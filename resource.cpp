@@ -661,13 +661,14 @@ void Resource::loadSssData(const char *levelName) {
 		bytesRead += 20;
 	}
 	// _res_sssDataUnk4 = data; // size : sssHdr.unk14 * 52
+	static const int kSizeOfDataUnk4 = 52;
 	_sssDataUnk4 = (SssUnk4 *)malloc(_sssHdr.unk14 * sizeof(SssUnk4));
 	for (int i = 0; i < _sssHdr.unk14; ++i) {
 		uint8_t *buf = _sssDataUnk4[i].data;
-		_sssFile->read(buf, SIZEOF_SssUnk4);
+		_sssFile->read(buf, kSizeOfDataUnk4);
 		// const int volume = READ_LE_UINT32(buf + 4) >> 0x10;
 		// const int step = READ_LE_UINT32(buf + 0x24);
-		bytesRead += SIZEOF_SssUnk4;
+		bytesRead += kSizeOfDataUnk4;
 		// debug(kDebug_RESOURCE, "sssUnk4 #%d/%d volume %d step %d", i, _sssHdr.unk14, volume, step);
 	}
 

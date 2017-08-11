@@ -319,10 +319,11 @@ void Game::setupScreenMask(uint8_t num) {
 	if (num == 0xFF) {
 		return;
 	}
-	int i = _res->_resLvlScreenBackgroundDataTable[num].unk3;
-	if (_res->_screensState[num].s3 != i) {
-		const int index = _res->_screensState[num].s3 = i;
-		uint8_t *p = _res->getLevelData0x470CPtr0(num * 4 + index);
+	int mask = _res->_resLvlScreenBackgroundDataTable[num].unk3;
+	if (_res->_screensState[num].s3 != mask) {
+		debug(kDebug_GAME, "setupScreenMask num %d mask %d", num, mask);
+		_res->_screensState[num].s3 = mask;
+		uint8_t *p = _res->getLevelData0x470CPtr0(num * 4 + mask);
 		if (p) {
 			Video::decodeRLE(p, _screenTempMaskBuffer, 768);
 		} else {
@@ -330,7 +331,7 @@ void Game::setupScreenMask(uint8_t num) {
 		}
 		const int offs = ((_res->_screensBasePos[num].v & ~7) << 6) + (_res->_screensBasePos[num].u >> 3);
 		p = _screenMaskBuffer + offs;
-		for (i = 0; i < 24; ++i) {
+		for (int i = 0; i < 24; ++i) {
 			memcpy(p, _screenTempMaskBuffer + i * 32, 32);
 			p += 512;
 		}

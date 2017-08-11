@@ -10,3 +10,4 @@ rt = (rb & rc) | (ra & ~rc);
 
 rt = ((ra ^ rb) & rc) ^ ra;
 
+https://en.wikipedia.org/wiki/Anaglyph_3D

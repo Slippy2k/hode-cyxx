@@ -22,6 +22,44 @@ struct LvlHdr {
 	uint8_t spritesCount;
 };
 
+struct LvlScreenVector {
+	int32_t u;
+	int32_t v;
+};
+
+struct LvlScreenState {
+	uint8_t s0;
+	uint8_t s1;
+	uint8_t s2;
+	uint8_t s3; // maskData
+};
+
+struct LvlBackgroundData {
+	uint8_t backgroundCount;
+	uint8_t currentBackgroundId;
+	uint8_t dataUnk0Count;
+	uint8_t unk3; /* movingMask */
+	uint8_t dataUnk1Count;
+	uint8_t currentDataUnk1Id;
+	uint8_t dataUnk2Count;
+	uint8_t unk7;
+	uint8_t dataUnk3Count;
+	uint8_t unk9;
+	uint8_t dataUnk45Count;
+	uint8_t unkB;
+	uint16_t backgroundPaletteId;
+	uint16_t backgroundBitmapId;
+	uint8_t *backgroundPaletteTable[4];
+	uint8_t *backgroundBitmapTable[4];
+	uint8_t *dataUnk0Table[4];
+	uint8_t *backgroundMaskTable[4];
+	uint8_t *dataUnk2Table[4];
+	uint8_t *backgroundAnimationTable[4];
+	uint8_t *dataUnk4Table[4]; /* unused ? */
+	LvlObjectData *dataUnk5Table[4];
+	uint8_t *dataUnk6Table[4]; /* unused ? */
+};
+
 struct MstHdr {
 };
 
@@ -49,33 +87,25 @@ struct SssUnk1 {
 	uint8_t unk5;
 	uint8_t unk6;
 	uint8_t unk7;
-} PACKED;
-
-#define SIZEOF_SssUnk1 8
+};
 
 struct SssUnk2 {
 	uint8_t unk0;
 	int8_t unk1;
 	int8_t unk2;
 	uint8_t pad;
-} PACKED;
-
-#define SIZEOF_SssUnk2 4
+};
 
 struct SssUnk3 {
 	uint8_t unk0; // 0
 	uint8_t unk1; // 1
 	uint16_t sssUnk4; // 2 index to _sssDataUnk4
 	uint32_t unk4; // 4 offset to init data
-} PACKED;
-
-#define SIZEOF_SssUnk3 8
+};
 
 struct SssUnk4 {
 	uint8_t data[52];
-} PACKED;
-
-#define SIZEOF_SssUnk4 52
+};
 
 struct SssUnk5 {
 	uint8_t *ptr;    // 0 PCM data
@@ -83,9 +113,7 @@ struct SssUnk5 {
 	uint32_t size;   // 8 size in .sss (256 int16_t words + followed with indexes)
 	uint32_t unkC;
 	uint32_t unk10;
-} PACKED;
-
-#define SIZEOF_SssUnk5 20
+};
 
 struct SssUnk6 {
 	uint32_t unk0;
@@ -93,9 +121,7 @@ struct SssUnk6 {
 	uint32_t unk8;
 	uint32_t unkC;
 	uint32_t unk10;
-} PACKED;
-
-#define SIZEOF_SssUnk6
+};
 
 struct SssPreloadData {
 	uint8_t count;
@@ -161,9 +187,8 @@ struct Resource {
 	void loadLvlData(const char *levelName);
 	void loadLvlSpriteData(int num);
 
-	uint8_t *getLevelData0x470CPtr0(int num);
-	uint8_t *getLevelData0x470CPtr4(int num);
-
+	uint8_t *getLevelData0x470CPtr0(int num); // getLvlScreenMaskDataPtr
+	uint8_t *getLevelData0x470CPtr4(int num); // getLvlScreenPosDataPtr
 	void loadLevelData0x470C();
 
 	void loadLvlScreenBackgroundData(int num);
