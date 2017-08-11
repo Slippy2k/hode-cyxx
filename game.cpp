@@ -228,8 +228,9 @@ void Game::addToSpriteList(LvlObject *ptr) {
 			return;
 		}
 		if (_currentLevel == 3 && ptr->data0x2988 == 2) {
-assert(0); // code path check
-			spr->xPos += ((GameUnkList1 *)ptr->dataPtr)->dxPos;
+			const int dxPos = ((GameUnkList1 *)ptr->dataPtr)->dxPos;
+			warning("ptr->dataPtr to GameUnkList1 dxPos %d", dxPos);
+			spr->xPos += dxPos;
 		}
 		if (READ_LE_UINT16(ptr->bitmapBits) > 8) {
 			spr->bitmapBits = ptr->bitmapBits;
@@ -720,19 +721,19 @@ void Game::preloadLevelScreenData(int num, int prev) {
 }
 
 void Game::loadLevelScreenSounds(int num) {
-	if (_res->_sssHdr.dpcmCount > 0) {
+	if (_res->_sssHdr.dpcmCount > 0 && _res->_sssPreloadData1) {
 		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
 			const int j = _res->_sssPreloadData1[num].ptr[i];
 			debug(kDebug_GAME, "levelScreen preloadData1 #%d res %d", i, j);
 		}
 	}
-	if (_res->_lvlHdr.spritesCount > 0) {
+	if (_res->_lvlHdr.spritesCount > 0 && _res->_sssPreloadData2) {
 		for (size_t i = 0; i < _res->_sssPreloadData2[num].count; ++i) {
 			const int j = _res->_sssPreloadData2[num].ptr[i];
 			debug(kDebug_GAME, "levelScreen preloadData2 #%d res %d", i, j);
 		}
 	}
-	if (_res->_sssHdr.unkC > 0) {
+	if (_res->_sssHdr.unkC > 0 && _res->_sssPreloadData3) {
 		for (size_t i = 0; i < _res->_sssPreloadData3[num].count; ++i) {
 			const int j = _res->_sssPreloadData3[num].ptr[i];
 			debug(kDebug_GAME, "levelScreen preloadData3 #%d res %d", i, j);
@@ -1821,8 +1822,12 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	if (_currentScreen != _al && _currentRightScreen != _al && _currentLeftScreen != _al) {
 		return o;
 	}
-	if ((this->*(ptr->callbackFuncPtr))(ptr) == 0) {
-		return o;
+	if (!ptr->callbackFuncPtr) {
+		warning("updateAnimatedLvlObjectType2: no callback ptr");
+	} else {
+		if ((this->*(ptr->callbackFuncPtr))(ptr) == 0) {
+			return o;
+		}
 	}
 	if ((ptr->flags1 & 6) == 2) {
 		const int index = (15 < ptr->data0x2988) ? 5 : 7;
