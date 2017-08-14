@@ -77,7 +77,7 @@ void Game::removeSoundObject(SssObject *so) {
 
 void Game::updateSoundObject(SssObject *so) {
 	_channelMixingTable[so->num] = 1;
-	_sssObjectsChanged = so->sssUnk4Ptr->data[0x30];
+	_sssObjectsChanged = so->sssUnk4Ptr->unk30;
 	if ((so->flags & 4) == 0) {
 //42B179:
 		if (so->soundBits == 0) {
@@ -522,40 +522,40 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 			break;
 		}
 	}
-	int _ecx = READ_LE_UINT32(sssUnk4Ptr->data + 4);
+	int _ecx = sssUnk4Ptr->unk4;
 	int _eax = ((int8_t)s->unk3) << 16;
 	if (_ecx != _eax) {
 		if (!found) {
-			// (sssUnk4Ptr->data + 4) = _eax; // int32_t
+			sssUnk4Ptr->unk4 = _eax; // int32_t
 		} else {
-			// sssUnk4Ptr->data + 0xC = 4; // uint32_t
-			// sssUnk4Ptr->data + 0x30 = 1; // uint32_t
-			// eax = ((s->unk3 << 16) - _ecx) / 4;
-			// ssUnk4Ptr->data + 8 = _eax; // uint32_t
+			sssUnk4Ptr->unkC = 4; // uint32_t
+			sssUnk4Ptr->unk30 = 1; // uint32_t
+			_eax = ((s->unk3 << 16) - _ecx) / 4;
+			sssUnk4Ptr->unk8 = _eax; // uint32_t
 		}
 	}
 // 42B9FD
 	_eax = ((int8_t)s->unk5) << 16;
-	_ecx = READ_LE_UINT32(sssUnk4Ptr->data + 0x14);
+	_ecx = sssUnk4Ptr->unk14;
 	if (_ecx != _eax) {
 		if (!found) {
-			// (sssUnk4Ptr->data + 0x14) = _eax; // int32_t
+			sssUnk4Ptr->unk14 = _eax; // int32_t
 		} else {
-			// sssUnk4Ptr->data + 0x1C = 4;
-			// sssUnk4Ptr->data + 0x30 = 1;
-			// eax = ((s->unk5 << 16) - ecx) / 4;
-			// sssUnk4Ptr->data + 0x18 = _eax;
+			sssUnk4Ptr->unk1C = 4;
+			sssUnk4Ptr->unk30 = 1;
+			_eax = ((s->unk5 << 16) - _ecx) / 4;
+			sssUnk4Ptr->unk18 = _eax;
 		}
 	}
 // 42BA37
 	_eax = (int8_t)s->unk4;
-	const int scale = READ_LE_UINT32(sssUnk4Ptr->data + 0x24);
+	const int scale = sssUnk4Ptr->unk24;
 	if (scale != _eax) {
-		// sssUnk4Ptr->data + 0x24 = _eax;
+		sssUnk4Ptr->unk24 = _eax;
 		for (int i = 0; i < _sssObjectsCount; ++i) {
 			SssObject *so = &_sssObjectsTable[i];
 			if (so->soundBits != 0 && so->sssUnk4Ptr == sssUnk4Ptr) {
-				int _al = sssUnk4Ptr->data[0x24];
+				int _al = sssUnk4Ptr->unk24 & 255;
 				_al += so->unk8;
 				so->unk9 = _al < 0 ? 0 : _al;
 				if (so->unk9 > 7) {
@@ -735,12 +735,12 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 
 void Game::setSoundObjectVolume(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->unk18 != 0 && _snd_masterVolume != 0) {
-		int volume = READ_LE_UINT32(so->sssUnk4Ptr->data + 4);
+		int volume = so->sssUnk4Ptr->unk4;
 		volume = ((volume >> 16) * so->unk18) >> 7;
 		int _esi = 0;
 		if (so->volumePtr) {
 			int _eax = so->unk8;
-			_eax += READ_LE_UINT32(so->sssUnk4Ptr->data + 36);
+			_eax += so->sssUnk4Ptr->unk24;
 			_esi = so->volume;
 			if (_eax < 0) {
 				_eax = 0;
@@ -780,7 +780,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 
 		} else {
 // 429076:
-			_esi = READ_LE_UINT32(so->sssUnk4Ptr->data + 0x14);
+			_esi = so->sssUnk4Ptr->unk14;
 			_esi = so->volume + (_esi >> 16);
 			if (_esi < 0) {
 				_esi = 0;

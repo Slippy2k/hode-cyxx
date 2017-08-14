@@ -664,12 +664,18 @@ void Resource::loadSssData(const char *levelName) {
 	static const int kSizeOfDataUnk4 = 52;
 	_sssDataUnk4 = (SssUnk4 *)malloc(_sssHdr.unk14 * sizeof(SssUnk4));
 	for (int i = 0; i < _sssHdr.unk14; ++i) {
-		uint8_t *buf = _sssDataUnk4[i].data;
+		uint8_t buf[kSizeOfDataUnk4];
 		_sssFile->read(buf, kSizeOfDataUnk4);
-		// const int volume = READ_LE_UINT32(buf + 4) >> 0x10;
-		// const int step = READ_LE_UINT32(buf + 0x24);
+		_sssDataUnk4[i].unk4 = READ_LE_UINT32(buf + 4);
+		_sssDataUnk4[i].unk8 = READ_LE_UINT32(buf + 8);
+		_sssDataUnk4[i].unkC = READ_LE_UINT32(buf + 0xC);
+		_sssDataUnk4[i].unk14 = READ_LE_UINT32(buf + 0x14);
+		_sssDataUnk4[i].unk18 = READ_LE_UINT32(buf + 0x18);
+		_sssDataUnk4[i].unk1C = READ_LE_UINT32(buf + 0x1C);
+		_sssDataUnk4[i].unk24 = READ_LE_UINT32(buf + 0x24);
+		_sssDataUnk4[i].unk30 = READ_LE_UINT32(buf + 0x30);
 		bytesRead += kSizeOfDataUnk4;
-		// debug(kDebug_RESOURCE, "sssUnk4 #%d/%d volume %d step %d", i, _sssHdr.unk14, volume, step);
+		// debug(kDebug_RESOURCE, "sssUnk4 #%d/%d", i, _sssHdr.unk14);
 	}
 
 	// _res_sssDataUnk6 = data; // size : sssHdr.unk18 * 20

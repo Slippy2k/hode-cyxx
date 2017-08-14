@@ -104,7 +104,14 @@ struct SssUnk3 {
 };
 
 struct SssUnk4 {
-	uint8_t data[52];
+	int32_t unk4;
+	int32_t unk8;
+	int32_t unkC;
+	int32_t unk14;
+	int32_t unk18;
+	int32_t unk1C;
+	int32_t unk24;
+	int32_t unk30;
 };
 
 struct SssUnk5 {
