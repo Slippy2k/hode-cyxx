@@ -10,6 +10,12 @@ static uint32_t maskSssLut(const uint8_t *const sssLookupTable[], uint32_t flags
 	return READ_LE_UINT32(sssLookupTable[_eax] + _edx * 4) & _esi;
 }
 
+static uint8_t *getLookupSss(uint8_t *sssLookupTable[], uint32_t flags) {
+	const uint32_t _eax = (flags >> 20) & 0xF;
+	const uint32_t _edx = flags & 0xFFF;
+	return sssLookupTable[_eax] + _edx * 4;
+}
+
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) {
 		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) {
@@ -828,6 +834,44 @@ void Game::setSoundObjectVolume(SssObject *so) {
 	}
 }
 
+void Game::expireSoundObjects(int flags) {
+	const uint32_t mask = 1 << (flags >> 24);
+	uint8_t *sssLut1 = getLookupSss(_res->_sssLookupTable1, flags);
+	WRITE_LE_UINT32(sssLut1, READ_LE_UINT32(sssLut1) & ~mask);
+	uint8_t *sssLut2 = getLookupSss(_res->_sssLookupTable2, flags);
+	WRITE_LE_UINT32(sssLut2, READ_LE_UINT32(sssLut2) & ~mask);
+	SssObject *so = _sssObjectsList1;
+	while (so) {
+		if ((so->flags & 0xFFFF0FFF) == 0) {
+			so->codeDataStage3 = 0;
+			if (so->codeDataStage4 == 0) {
+				removeSoundObject(so);
+			}
+			so->unk78 = -1;
+			so->unk50 = -2;
+		}
+		so = so->nextPtr;
+	}
+	so = _sssObjectsList2;
+	while (so) {
+		if ((so->flags & 0xFFFF0FFF) == 0) {
+			so->codeDataStage3 = 0;
+			if (so->codeDataStage4 == 0) {
+				removeSoundObject(so);
+			}
+			so->unk78 = -1;
+			so->unk50 = -2;
+		}
+		so = so->nextPtr;
+	}
+	while (_sssObjectsCount > 0) {
+		if (_sssObjectsTable[_sssObjectsCount - 1].soundBits != 0) {
+			break;
+		}
+		--_sssObjectsCount;
+	}
+}
+
 void Game::mixSoundObjects17640(bool flag) {
 	for (int i = 0; i < _res->_sssHdr.unk14; ++i) {
 		// TODO:
@@ -842,7 +886,7 @@ void Game::mixSoundObjects17640(bool flag) {
 			if (flag) {
 				if (maskSssLut(_res->_sssLookupTable2, so->flags1) != 0) {
 					if (maskSssLut(_res->_sssLookupTable3, so->flags1) == 0) {
-//						snd_unk14(so->flags1);
+						expireSoundObjects(so->flags1);
 					}
 				}
 			}

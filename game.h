@@ -365,6 +365,7 @@ struct Game {
 	void fadeSoundObject(SssObject *so);
 	int getSoundObjectVolumeByPos(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
+	void expireSoundObjects(int flags);
 	void mixSoundObjects17640(bool flag);
 
 	// andy.cpp
