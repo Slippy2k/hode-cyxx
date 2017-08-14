@@ -3,6 +3,22 @@
 #include "resource.h"
 #include "util.h"
 
+static uint32_t maskSssLut(const uint8_t *const sssLookupTable[], uint32_t flags) {
+	const uint32_t _eax = (flags >> 20) & 0xF;
+	const uint32_t _edx = flags & 0xFFF;
+	const uint32_t _esi = 1 << (flags >> 24);
+	return READ_LE_UINT32(sssLookupTable[_eax] + _edx * 4) & _esi;
+}
+
+static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
+	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) {
+		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) {
+			return (flags_a >> 24) == (flags_b >> 24);
+		}
+	}
+	return false;
+}
+
 void Game::resetSound() {
 	// TODO:
 	clearSoundObjects();
@@ -455,18 +471,21 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.volumePtr = 0;
 	// executeSssCode(&tmpObj, );
 
-	int _edx = (flags >> 20) & 0xF;
-	int _ebx = (flags & 0xFFF);
-	int _ecx = (flags >> 24);
-	const uint8_t *_eax = _res->_sssLookupTable2[_edx] + _ebx * 4;
-	debug(kDebug_SOUND, "_edx %d _ebx %d _ecx %d mask 0x%x", _edx, _ebx, _ecx, READ_LE_UINT32(_eax));
-#if 0
-	int _ebp = 1 << _ecx;
+//	int _edx = (flags >> 20) & 0xF;
+//	int _ebx = (flags & 0xFFF);
+//	int _ecx = (flags >> 24);
+//	const uint8_t *_eax = _res->_sssLookupTable2[_edx] + _ebx * 4;
+//	debug(kDebug_SOUND, "_edx %d _ebx %d _ecx %d mask 0x%x", _edx, _ebx, _ecx, READ_LE_UINT32(_eax));
+//	int _ebp = 1 << _ecx;
 	// var88 = _eax;
-	_ecx = READ_LE_UINT32(_eax);
-	if ((_ecx & _ebp) != 0) {
+//	_ecx = READ_LE_UINT32(_eax);
+//	if ((_ecx & _ebp) != 0) {
+	if (maskSssLut(_res->_sssLookupTable2, flags) != 0) {
 		SssObject *so = _sssObjectsList1;
 		while (so) {
+			if (compareSssLut(so->flags0, flags)) {
+			}
+#if 0
 			int _edi = so->flags0;
 			int _ecx = _edi & 0xFFF;
 			if (_ecx == _ebx) {
@@ -482,10 +501,10 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 					}
 				}
 			}
+#endif
 			so = so->nextPtr;
 		}
 	}
-#endif
 // loop2
 	return 0;
 }
@@ -807,4 +826,33 @@ void Game::setSoundObjectVolume(SssObject *so) {
 		so->panR = 0;
 		so->panType = 0;
 	}
+}
+
+void Game::mixSoundObjects17640(bool flag) {
+	for (int i = 0; i < _res->_sssHdr.unk14; ++i) {
+		// TODO:
+	}
+// 42B426
+	for (int i = 0; i < _sssObjectsCount; ++i) {
+		SssObject *so = &_sssObjectsTable[i];
+		if (so->soundBits) {
+			if (_channelMixingTable[0] != 0) {
+				continue;
+			}
+			if (flag) {
+				if (maskSssLut(_res->_sssLookupTable2, so->flags1) != 0) {
+					if (maskSssLut(_res->_sssLookupTable3, so->flags1) == 0) {
+//						snd_unk14(so->flags1);
+					}
+				}
+			}
+			updateSoundObject(so);
+		}
+	}
+// 42B4B2
+	memset(_channelMixingTable, 0, sizeof(_channelMixingTable));
+	if (flag) {
+//		clearSssBuffer2();
+	}
+//	mixSoundObjects();
 }
