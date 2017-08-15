@@ -100,7 +100,7 @@ struct SssUnk3 {
 	uint8_t unk0; // 0
 	uint8_t unk1; // 1
 	uint16_t sssUnk4; // 2 index to _sssDataUnk4
-	uint32_t unk4; // 4 offset to init data
+	uint32_t unk4; // 4 offset to _codeOffset
 };
 
 struct SssUnk4 {
@@ -173,9 +173,9 @@ struct Resource {
 	SssPreloadData *_sssPreloadData1;
 	SssPreloadData *_sssPreloadData2;
 	SssPreloadData *_sssPreloadData3;
-	uint8_t *_sssLookupTable1[3];
-	uint8_t *_sssLookupTable2[3];
-	uint8_t *_sssLookupTable3[3];
+	uint32_t *_sssLookupTable1[3];
+	uint32_t *_sssLookupTable2[3];
+	uint32_t *_sssLookupTable3[3];
 
 	uint32_t _sssCodeSize;
 	uint8_t *_sssCodeData;
@@ -216,6 +216,20 @@ struct Resource {
 
 	void loadSssData(const char *levelName);
 	void checkSssCode(const uint8_t *buf, int size);
+
+	uint32_t *getSssLutPtr(int lut, uint32_t flags) {
+		const uint32_t a = (flags >> 20) & 0xF;
+		const uint32_t b = flags & 0xFFF;
+		switch (lut) {
+		case 1:
+			return _sssLookupTable1[a] + b;
+		case 2:
+			return _sssLookupTable2[a] + b;
+		case 3:
+			return _sssLookupTable3[a] + b;
+		}
+		return 0;
+	}
 };
 
 #endif // RESOURCE_H__

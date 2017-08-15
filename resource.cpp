@@ -687,17 +687,23 @@ void Resource::loadSssData(const char *levelName) {
 	}
 
 // loc_429AB8:
-	const int lutSize = _sssHdr.unk18 * 4;
+	const int lutSize = _sssHdr.unk18 * sizeof(uint32_t);
 	for (int i = 0; i < 3; ++i) {
-		_sssLookupTable1[i] = (uint8_t *)malloc(lutSize);
-		_sssFile->read(_sssLookupTable1[i], lutSize);
-		debug(kDebug_RESOURCE, "sssLookupTable1[%d] = 0x%x", i, READ_LE_UINT32(_sssLookupTable1[i]));
-		_sssLookupTable2[i] = (uint8_t *)malloc(lutSize);
-		_sssFile->read(_sssLookupTable2[i], lutSize);
-		debug(kDebug_RESOURCE, "sssLookupTable2[%d] = 0x%x", i, READ_LE_UINT32(_sssLookupTable2[i]));
-		_sssLookupTable3[i] = (uint8_t *)malloc(lutSize);
-		_sssFile->read(_sssLookupTable3[i], lutSize);
-		debug(kDebug_RESOURCE, "sssLookupTable3[%d] = 0x%x", i, READ_LE_UINT32(_sssLookupTable3[i]));
+		_sssLookupTable1[i] = (uint32_t *)malloc(lutSize);
+		for (int j = 0; j < _sssHdr.unk18; ++j) {
+			_sssLookupTable1[i][j] = _sssFile->readUint32();
+		}
+		debug(kDebug_RESOURCE, "sssLookupTable1[%d] = 0x%x", i, _sssLookupTable1[i][0]);
+		_sssLookupTable2[i] = (uint32_t *)malloc(lutSize);
+		for (int j = 0; j < _sssHdr.unk18; ++j) {
+			_sssLookupTable2[i][j] = _sssFile->readUint32();
+		}
+		debug(kDebug_RESOURCE, "sssLookupTable2[%d] = 0x%x", i, _sssLookupTable2[i][0]);
+		_sssLookupTable3[i] = (uint32_t *)malloc(lutSize);
+		for (int j = 0; j < _sssHdr.unk18; ++j) {
+			_sssLookupTable3[i][j] = _sssFile->readUint32();
+		}
+		debug(kDebug_RESOURCE, "sssLookupTable3[%d] = 0x%x", i, _sssLookupTable3[i][0]);
 		bytesRead += lutSize * 3;
 	}
 
@@ -705,7 +711,7 @@ void Resource::loadSssData(const char *levelName) {
 	checkSssCode(_sssCodeData, _sssCodeSize);
 	for (int i = 0; i < _sssHdr.unk18; ++i) {
 		if (_sssDataUnk3[i].unk1 != 0) {
-			// const int num = _sssDataUnk3[i].unk1;
+			// const int num = _sssDataUnk3[i].unk4;
 			// _sssDataUnk3[i].unk4 = &_sssCodeOffsets[num];
 		} else {
 			_sssDataUnk3[i].unk4 = 0;

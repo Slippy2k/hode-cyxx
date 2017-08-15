@@ -3,19 +3,6 @@
 #include "resource.h"
 #include "util.h"
 
-static uint32_t maskSssLut(const uint8_t *const sssLookupTable[], uint32_t flags) {
-	const uint32_t _eax = (flags >> 20) & 0xF;
-	const uint32_t _edx = flags & 0xFFF;
-	const uint32_t _esi = 1 << (flags >> 24);
-	return READ_LE_UINT32(sssLookupTable[_eax] + _edx * 4) & _esi;
-}
-
-static uint8_t *getLookupSss(uint8_t *sssLookupTable[], uint32_t flags) {
-	const uint32_t _eax = (flags >> 20) & 0xF;
-	const uint32_t _edx = flags & 0xFFF;
-	return sssLookupTable[_eax] + _edx * 4;
-}
-
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) {
 		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) {
@@ -464,7 +451,10 @@ void Game::prepareSoundObject(int num, int b, int c) {
 
 SssObject *Game::startSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
+
 	// TODO
+	// _esi = _sssDataUnk3[num].unk4
+	// READ_LE_UINT16(_esi + num * 24 + 2) != 0
 
 	SssObject tmpObj;
 	memset(&tmpObj, 0, sizeof(tmpObj));
@@ -477,41 +467,27 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.volumePtr = 0;
 	// executeSssCode(&tmpObj, );
 
-//	int _edx = (flags >> 20) & 0xF;
-//	int _ebx = (flags & 0xFFF);
-//	int _ecx = (flags >> 24);
-//	const uint8_t *_eax = _res->_sssLookupTable2[_edx] + _ebx * 4;
-//	debug(kDebug_SOUND, "_edx %d _ebx %d _ecx %d mask 0x%x", _edx, _ebx, _ecx, READ_LE_UINT32(_eax));
-//	int _ebp = 1 << _ecx;
-	// var88 = _eax;
-//	_ecx = READ_LE_UINT32(_eax);
-//	if ((_ecx & _ebp) != 0) {
-	if (maskSssLut(_res->_sssLookupTable2, flags) != 0) {
+	const uint32_t mask = 1 << (flags >> 24);
+	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
+	if ((*sssLut2 & mask) != 0) {
 		SssObject *so = _sssObjectsList1;
 		while (so) {
 			if (compareSssLut(so->flags0, flags)) {
+				*sssLut2 &= ~mask;
+				return 0;
 			}
-#if 0
-			int _edi = so->flags0;
-			int _ecx = _edi & 0xFFF;
-			if (_ecx == _ebx) {
-				_ecx = (_edi >> 20) & 0xF;
-				if (_ecx == _edx) {
-					_edi >>= 24;
-					if (_edi == _esi) {
-// 42B62F
-						if (_eax != 0) {
-							*(uint32_t *)var88 &= ~_ebp;
-						}
-						return _eax;
-					}
-				}
-			}
-#endif
 			so = so->nextPtr;
 		}
+		so = _sssObjectsList2;
+		while (so) {
+			if (compareSssLut(so->flags, flags)) {
+				*sssLut2 &= ~mask;
+				return 0;
+			}
+			so = so->nextPtr;
+		}
+		*sssLut2 &= ~mask;
 	}
-// loop2
 	return 0;
 }
 
@@ -836,10 +812,10 @@ void Game::setSoundObjectVolume(SssObject *so) {
 
 void Game::expireSoundObjects(int flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	uint8_t *sssLut1 = getLookupSss(_res->_sssLookupTable1, flags);
-	WRITE_LE_UINT32(sssLut1, READ_LE_UINT32(sssLut1) & ~mask);
-	uint8_t *sssLut2 = getLookupSss(_res->_sssLookupTable2, flags);
-	WRITE_LE_UINT32(sssLut2, READ_LE_UINT32(sssLut2) & ~mask);
+	uint32_t *sssLut1 = _res->getSssLutPtr(1, flags);
+	*sssLut1 &= ~mask;
+	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
+	*sssLut2 &= ~mask;
 	SssObject *so = _sssObjectsList1;
 	while (so) {
 		if ((so->flags & 0xFFFF0FFF) == 0) {
@@ -884,8 +860,9 @@ void Game::mixSoundObjects17640(bool flag) {
 				continue;
 			}
 			if (flag) {
-				if (maskSssLut(_res->_sssLookupTable2, so->flags1) != 0) {
-					if (maskSssLut(_res->_sssLookupTable3, so->flags1) == 0) {
+				const int mask = 1 << (so->flags1 >> 24);
+				if ((*_res->getSssLutPtr(2, so->flags1) & mask) != 0) {
+					if ((*_res->getSssLutPtr(3, so->flags1) & mask) == 0) {
 						expireSoundObjects(so->flags1);
 					}
 				}
