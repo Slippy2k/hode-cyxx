@@ -75,13 +75,13 @@ void Game::updateSoundObject(SssObject *so) {
 //42B179:
 		if (so->soundBits == 0) {
 			if (so->codeDataStage1) {
-				so->codeDataStage1 = executeSoundCode(so, so->codeDataStage1);
+				so->codeDataStage1 = executeSssCode(so, so->codeDataStage1);
 			}
 			if (so->soundBits == 0) {
 				return;
 			}
 			if (so->codeDataStage4) {
-				so->codeDataStage4 = executeSoundCode(so, so->codeDataStage4);
+				so->codeDataStage4 = executeSssCode(so, so->codeDataStage4);
 			}
 			if (so->soundBits == 0) {
 				return;
@@ -90,7 +90,7 @@ void Game::updateSoundObject(SssObject *so) {
 		} else {
 //42B1B9:
 			if (so->codeDataStage1) {
-				so->codeDataStage1 = executeSoundCode(so, so->codeDataStage1);
+				so->codeDataStage1 = executeSssCode(so, so->codeDataStage1);
 			}
 			if (so->soundBits == 0) {
 				return;
@@ -103,17 +103,17 @@ void Game::updateSoundObject(SssObject *so) {
 				}
 			} else {
 				if (so->codeDataStage2) {
-					so->codeDataStage2 = executeSoundCode(so, so->codeDataStage2);
+					so->codeDataStage2 = executeSssCode(so, so->codeDataStage2);
 				}
 			}
 			if (so->soundBits == 0) {
 				return;
 			}
 			if (so->codeDataStage3) {
-				so->codeDataStage3 = executeSoundCode(so, so->codeDataStage3);
+				so->codeDataStage3 = executeSssCode(so, so->codeDataStage3);
 			}
 			if (so->codeDataStage4) {
-				so->codeDataStage4 = executeSoundCode(so, so->codeDataStage4);
+				so->codeDataStage4 = executeSssCode(so, so->codeDataStage4);
 			}
 			if (so->soundBits == 0) {
 				return;
@@ -142,85 +142,48 @@ void Game::updateSoundObject(SssObject *so) {
 flag_case1:
 	setSoundObjectVolume(so);
 flag_case0:
-	; // TEMP
-
-#if 0
-	if (so->unk2C == 0) {
-		var4 = ecx = so->unk7C;
-		ebp = so->unk78;
-		edi = so->flags0;
+	if (so->unk2C != 0) {
+		--so->unk2C;
+		if ((so->flags & 2) == 0) {
+			++so->unk6C;
+		}
+	} else {
+		const int _edi = so->flags0;
 		removeSoundObject(so);
-		if (ebp != -1) {
+		if (so->unk78 != -1) {
 			LvlObject *tmp = _currentSoundLvlObject;
 			_currentSoundLvlObject = so->lvlObject;
-			prepareSoundObject(ebp, var4);
+			prepareSoundObject(so->unk78, so->unk7C, _edi);
 			_currentSoundLvlObject = tmp;
-		} else {
-loc_42B29C:
-		_eax = (_edi >> 0x14) & 0xF;
-		_ebp = (_edi & 0xFFF);
-
-		_ecx = _sssFlagsTable[_eax * 4];
-		_edx = _ecx + _ebp * 4;
-
-		_ecx = _edi >> 0x18;
-
-		_esi = *(uint32_t *)_edx:
-		_edi = _ebx >> (_ecx & 255);
-		var4 = _edx;
-
-		if ((_esi & _edi) == 0) {
 			return;
 		}
-		_edx = _sssObjectsList1;
-		while (_edx) {
-			_esi = _edx->flags0;
-			_ebx = _esi & 0xFFF;
-			if (_ebx == _ebp) {
-				_ebx = (_esi >> 0x14) & 0xF;
-				if (_ebx == _eax) {
-					_esi >>= 0x18;
-					if (_esi == _ecx) {
-						goto 42B343;
-					}
-				}
+		const uint32_t mask = 1 << (_edi >> 24);
+		uint32_t *sssLut2 = _res->getSssLutPtr(2, _edi);
+		if ((*sssLut2 & mask) == 0) {
+			return;
+		}
+		SssObject *so = _sssObjectsList1;
+		while (so) {
+			if (compareSssLut(so->flags0, _edi)) {
+                                *sssLut2 &= ~mask;
+                                return;
 			}
-			_edx = _edx->nextPtr;
+			so = so->nextPtr;
 		}
-		_edx = _sssObjectsList2;
-		while (_edx) {
-			_esi = _edx->flags0;
-			_ebx = _esi & 0xFFF;
-			if (_ebx == _ebp) {
-				_ebx = (_esi >> 0x14) & 0xF;
-				if (_ebx == _eax) {
-					_esi >>= 0x18;
-					if (_esi == _ecx) {
-						goto 42B343;
-					}
-				}
+		so = _sssObjectsList2;
+		while (so) {
+			if (compareSssLut(so->flags0, _edi)) {
+                                *sssLut2 &= ~mask;
+                                return;
 			}
-			_edx = _edx->nextPtr;
+			so = so->nextPtr;
 		}
-		*(uint32_t *)eax = (*(uint32_t *)var4) & ~_edi;
-		return;
-loc_42B343:
-		if (_edx) {
-			*(uint32_t *)eax = (*(uint32_t *)var4) & ~_edi;
-		}
-		return;
 	}
-loc_42B357:
-	_esi->unk2C = _eax - 1;
-	if ((_esi->flags & 2) == 0) {
-		++_esi->unk6C;
-	}
-#endif
 }
 
-const uint8_t *Game::executeSoundCode(SssObject *so, const uint8_t *code) {
+const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 	while (1) {
-		debug(kDebug_SOUND, "executeSoundCode() code %d", *code);
+		debug(kDebug_SOUND, "executeSssCode() code %d", *code);
 		switch (*code) {
 		case 0:
 			return 0;
@@ -452,9 +415,13 @@ void Game::prepareSoundObject(int num, int b, int c) {
 SssObject *Game::startSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 
-	// TODO
-	// _esi = _sssDataUnk3[num].unk4
-	// READ_LE_UINT16(_esi + num * 24 + 2) != 0
+	int codeOffset = _res->_sssDataUnk3[num].firstCodeOffset + num;
+	debug(kDebug_RESOURCE, "startSoundObject codeOffset %d", codeOffset);
+	assert(codeOffset < _res->_sssHdr.unk1C);
+//	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
+// 42B64C
+//		return 0;
+//	}
 
 	SssObject tmpObj;
 	memset(&tmpObj, 0, sizeof(tmpObj));
@@ -465,7 +432,12 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.unk4C = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
-	// executeSssCode(&tmpObj, );
+	// tmpObj.soundBits = _res->_sssDpcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
+	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, _res->_sssCodeOffsets[codeOffset].unk8);
+	debug(kDebug_SOUND, "code %p", code);
+	if (code) {
+		executeSssCode(&tmpObj, code);
+	}
 
 	const uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
@@ -492,8 +464,8 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 }
 
 void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
-	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->unk0, a, b);
-	const int num = _res->_sssDataUnk3[s->unk0].sssUnk4;
+	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->sssUnk3, a, b);
+	const int num = _res->_sssDataUnk3[s->sssUnk3].sssUnk4;
 	debug(kDebug_SOUND, "sssUnk4 num %d", num);
 	SssUnk4 *sssUnk4Ptr = &_res->_sssDataUnk4[num];
 	bool found = false;
@@ -553,7 +525,7 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	int _al = s->unk6;
 	_ebp = (a & 0xF) | _edx;
 	_edx = s->unk2 & 0xF;
-	_ecx = s->unk0;
+	_ecx = s->sssUnk3;
 	_ebp <<= 4;
 	_ebp |= _edx;
 	_edx = _al;
@@ -640,7 +612,7 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	}
 #endif
 // 42BBDD
-	prepareSoundObject(s->unk0, (int8_t)s->unk2, _ebp);
+	prepareSoundObject(s->sssUnk3, (int8_t)s->unk2, _ebp);
 }
 
 void Game::clearSoundObjects() {

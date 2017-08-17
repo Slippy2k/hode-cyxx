@@ -500,7 +500,7 @@ void Resource::loadSssData(const char *levelName) {
 	// _sssDataUnk1
 	_sssDataUnk1 = (SssUnk1 *)malloc(_sssHdr.unk10 * sizeof(SssUnk1));
 	for (int i = 0; i < _sssHdr.unk10; ++i) {
-		_sssDataUnk1[i].unk0 = _sssFile->readUint16(); // index _sssDataUnk3
+		_sssDataUnk1[i].sssUnk3 = _sssFile->readUint16(); // index _sssDataUnk3
 		_sssDataUnk1[i].unk2 = _sssFile->readByte();
 		_sssDataUnk1[i].unk3 = _sssFile->readByte();
 		_sssDataUnk1[i].unk4 = _sssFile->readByte();
@@ -526,19 +526,23 @@ void Resource::loadSssData(const char *levelName) {
 		_sssDataUnk3[i].unk0 = _sssFile->readByte();
 		_sssDataUnk3[i].unk1 = _sssFile->readByte();
 		_sssDataUnk3[i].sssUnk4 = _sssFile->readUint16();
-		_sssDataUnk3[i].unk4 = _sssFile->readUint32();
-		// debug(kDebug_RESOURCE, "SssDataUnk3 #%d 0x%x 0x%x 0x%x", i, unk1, unk2, unk3);
+		_sssDataUnk3[i].firstCodeOffset = _sssFile->readUint32();
+		debug(kDebug_RESOURCE, "SssDataUnk3 #%d unk1 %d codeOffset 0x%x", i, _sssDataUnk3[i].unk1, _sssDataUnk3[i].firstCodeOffset);
 		bytesRead += 8;
 	}
 	// _sssCodeOffsets
+	_sssCodeOffsets = (SssCodeOffset *)malloc(_sssHdr.unk1C * sizeof(SssCodeOffset));
 	for (int i = 0; i < _sssHdr.unk1C; ++i) {
-		int unk1 = _sssFile->readUint32(); // 0x0
-		int unk2 = _sssFile->readUint32(); // 0x4
-		int unk3 = _sssFile->readUint32(); // 0x8 offset to sssCodeData
-		int unk4 = _sssFile->readUint32(); // 0xC offset to sssCodeData
-		int unk5 = _sssFile->readUint32(); // 0x10 offset to sssCodeData
-		int unk6 = _sssFile->readUint32(); // 0x14 offset to sssCodeData
-		debug(kDebug_RESOURCE, "SssCodeOffset #%d 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", i, unk1, unk2, unk3, unk4, unk5, unk6);
+		_sssCodeOffsets[i].unk0 = _sssFile->readUint16(); // 0x0
+		_sssCodeOffsets[i].unk2 = _sssFile->readUint16(); // 0x0
+		_sssCodeOffsets[i].unk4 = _sssFile->readUint16(); // 0x4
+		_sssCodeOffsets[i].unk6 = _sssFile->readByte(); // 0x6
+		_sssCodeOffsets[i].unk7 = _sssFile->readByte(); // 0x7
+		_sssCodeOffsets[i].unk8 = _sssFile->readUint32(); // 0x8 offset to sssCodeData
+		_sssCodeOffsets[i].unkC = _sssFile->readUint32(); // 0xC offset to sssCodeData
+		_sssCodeOffsets[i].unk10 = _sssFile->readUint32(); // 0x10 offset to sssCodeData
+		_sssCodeOffsets[i].unk14 = _sssFile->readUint32(); // 0x14 offset to sssCodeData
+		debug(kDebug_RESOURCE, "SssCodeOffset #%d unk0 %d unk2 %d", i, _sssCodeOffsets[i].unk0, _sssCodeOffsets[i].unk2);
 		bytesRead += 24;
 	}
 	_sssCodeData = (uint8_t *)malloc(_sssCodeSize);
@@ -711,10 +715,11 @@ void Resource::loadSssData(const char *levelName) {
 	checkSssCode(_sssCodeData, _sssCodeSize);
 	for (int i = 0; i < _sssHdr.unk18; ++i) {
 		if (_sssDataUnk3[i].unk1 != 0) {
-			// const int num = _sssDataUnk3[i].unk4;
-			// _sssDataUnk3[i].unk4 = &_sssCodeOffsets[num];
+			const int num = _sssDataUnk3[i].firstCodeOffset;
+			// _sssDataUnk3[i].codeOffset = &_sssCodeOffsets[num];
+			debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
 		} else {
-			_sssDataUnk3[i].unk4 = 0;
+			_sssDataUnk3[i].firstCodeOffset = 0;
 		}
 	}
 // loc_429C00:

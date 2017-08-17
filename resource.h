@@ -80,7 +80,7 @@ struct SssHdr {
 };
 
 struct SssUnk1 {
-	uint16_t unk0; // 0 index to _sssDataUnk3
+	uint16_t sssUnk3; // 0 index to _sssDataUnk3
 	uint8_t unk2; // 2
 	uint8_t unk3;
 	uint8_t unk4; // 4
@@ -100,7 +100,19 @@ struct SssUnk3 {
 	uint8_t unk0; // 0
 	uint8_t unk1; // 1
 	uint16_t sssUnk4; // 2 index to _sssDataUnk4
-	uint32_t unk4; // 4 offset to _codeOffset
+	uint32_t firstCodeOffset; // 4 offset to _sssCodeOffsets
+};
+
+struct SssCodeOffset {
+	uint16_t unk0; // index to _sssDpcmTable
+	uint16_t unk2;
+	uint16_t unk4;
+	uint8_t unk6;
+	uint8_t unk7;
+	uint32_t unk8; // offset to _sssCodeData
+	uint32_t unkC; // offset to _sssCodeData
+	uint32_t unk10; // offset to _sssCodeData
+	uint32_t unk14; // offset to _sssCodeData
 };
 
 struct SssUnk4 {
@@ -168,6 +180,7 @@ struct Resource {
 	SssUnk1 *_sssDataUnk1;
 	SssUnk2 *_sssDataUnk2;
 	SssUnk3 *_sssDataUnk3;
+	SssCodeOffset *_sssCodeOffsets;
 	SssUnk4 *_sssDataUnk4;
 	SssUnk5 *_sssDpcmTable;
 	SssPreloadData *_sssPreloadData1;

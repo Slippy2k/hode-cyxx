@@ -165,6 +165,7 @@ struct SssObject {
 	int panR; // 0x20
 	int panType; // 0x24
 	int32_t unk28; // 0x28
+	int32_t unk2C; // 0x2C
 	SssObject *prevPtr; // 0x30
 	SssObject *nextPtr; // 0x34
 	const uint8_t *codeDataStage1; // 0x38
