@@ -2360,19 +2360,42 @@ void Game::callLevelOpStage5() {
 }
 
 int Game::displayHintScreen(int num, int pause) {
+	static const int kQuitYes = 0;
+	static const int kQuitNo = 1;
+	int quit = kQuitYes;
+	bool confirmQuit = false;
+	uint8_t *quitBuffers[] = {
+		_video->_frontLayer,
+		_video->_shadowLayer,
+	};
 	if (num == -1) {
-		num = _res->_datHdr._res_setupDatHeader0x40;
+		num = _res->_datHdr._res_setupDatHeader0x40; // 'Yes'
+		_res->loadSetupImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
+		confirmQuit = true;
 	}
 	_res->loadSetupImage(num, _video->_frontLayer, _video->_palette);
 	_system->setPalette(_video->_palette, 256, 6);
-	_system->copyRect(0, 0, 256, 192, _video->_frontLayer, 256);
+	_system->copyRect(0, 0, Video::kScreenWidth, Video::kScreenHeight, _video->_frontLayer, 256);
 	_system->updateScreen();
 	do {
 		_system->processEvents();
+		if (confirmQuit) {
+			const int currentQuit = quit;
+			if (_system->inp.keyReleased(SYS_INP_LEFT)) {
+				quit = kQuitNo;
+			}
+			if (_system->inp.keyReleased(SYS_INP_RIGHT)) {
+				quit = kQuitYes;
+			}
+			if (currentQuit != quit) {
+				_system->copyRect(0, 0, Video::kScreenWidth, Video::kScreenHeight, quitBuffers[quit], 256);
+				_system->updateScreen();
+			}
+		}
 		_system->sleep(30);
-	} while (!_system->inp.keyPressed(SYS_INP_JUMP));
+	} while (!_system->inp.quit && !_system->inp.keyReleased(SYS_INP_JUMP));
 	_video->_paletteNeedRefresh = true;
-	return 0;
+	return confirmQuit && quit == kQuitYes;
 }
 
 void Game::prependLvlObjectToList(LvlObject **list, LvlObject *ptr) {
