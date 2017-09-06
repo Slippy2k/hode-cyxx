@@ -224,12 +224,12 @@ struct Game {
 	void updateInput();
 	void initMstCode();
 	void levelMainLoop();
-	void callLevelOpStage0(int num);
+	void callLevelOpStage0(int num); // callLevel_preScreenUpdate
 	int callLevelOpStage1(int num, LvlObject *o);
-	void callLevelOpStage2(int num);
-	void callLevelOpStage3();
-	void callLevelOpStage4();
-	void callLevelOpStage5();
+	void callLevelOpStage2(int num); // callLevel_postScreenUpdate
+	void callLevelOpStage3(); // callLevel_preTick
+	void callLevelOpStage4(); // callLevel_postTick
+	void callLevelOpStage5(); // callLevel_terminate
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
 	void removeLvlObjectFromList(LvlObject **list, LvlObject *ptr);
