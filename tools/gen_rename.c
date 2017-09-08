@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int get_tokens(char *buf, char **token1, char **token2) {

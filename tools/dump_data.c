@@ -55,7 +55,11 @@ static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, 
 			printf("\n\t");
 		}
 		printf(fmt, num);
-		printf(", ");
+		if ((i % 16) == 15) {
+			printf(",");
+		} else {
+			printf(", ");
+		}
 	}
 	printf("\n};\n");
 }
@@ -93,7 +97,7 @@ int main(int argc, char* argv[]) {
 //		dumpInt(fp, "_andyMoveTable35", 0x40358, 48, "%3d", SIGNED_8BITS);
 //		dumpInt(fp, "_actionDirectionKeyMaskTable", 0x3E3D4, 352, "0x%02X", UNSIGNED_8BITS);
 
-		dumpInt(fp, "_dbVolumeTable", 0x40010, 129, "0x%02X", UNSIGNED_8BITS);
+//		dumpInt(fp, "_dbVolumeTable", 0x40010, 129, "0x%02X", UNSIGNED_8BITS);
 
 	// retail
 
