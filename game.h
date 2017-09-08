@@ -58,6 +58,8 @@ struct Game {
 	static const OpStage1Proc _level2OpStage1[];
 	static const OpStage1Proc _level3OpStage1[];
 	static const uint8_t _dbVolumeTable[129];
+	static const uint8_t _benchmarkData1[];
+	static const uint8_t _benchmarkData2[];
 
 	PafPlayer *_paf;
 	Random _rnd;
@@ -153,6 +155,12 @@ struct Game {
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
+
+	// benchmark.cpp
+	uint32_t benchmarkLoop(const uint8_t *p, int count);
+	uint32_t benchmarkCpu();
+
+	// game.cpp
 
 	void mainLoop(int level, int checkpoint);
 	void GameClearUnkList1();
@@ -334,7 +342,7 @@ struct Game {
 
 	void level4OpStage3();
 	void level4OpStage4();
-	void level4OpStage5();	
+	void level4OpStage5();
 
 	// mst.cpp
 
