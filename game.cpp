@@ -1657,6 +1657,7 @@ void Game::mainLoop(int level, int checkpoint) {
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
 	_system->init("Heart of Darkness", Video::kScreenWidth, Video::kScreenHeight);
+	benchmarkCpu();
 	_res->loadSetupDat();
 	_res->loadLvlData(_resLevelNames[_currentLevel]);
 	_res->loadSssData(_resLevelNames[_currentLevel]);

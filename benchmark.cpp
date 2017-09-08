@@ -2,6 +2,7 @@
 #include "game.h"
 #include "lzw.h"
 #include "systemstub.h"
+#include "util.h"
 #include "video.h"
 
 uint32_t Game::benchmarkLoop(const uint8_t *p, int count) {
@@ -28,8 +29,9 @@ uint32_t Game::benchmarkCpu() {
 		decodeLZW(_benchmarkData2, p);
 		_video->updateGameDisplay(p);
 	} while (--count != 0);
-	// _util_cpuUsage = GetTickCount() - _ebp;
-	// _cfg_slowCpu = !(_util_cpuUsage < 1100);
-	const uint32_t t1 = _system->getTimeStamp();
-	return t1 - t0;
+	const uint32_t score = _system->getTimeStamp() - t0;
+	// The original engine flags the CPU as 'slow'
+	// if the GetTickCount difference is >= 1100ms
+	warning("benchmark CPU %d", score);
+	return score;
 }
