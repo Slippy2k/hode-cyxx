@@ -5,6 +5,7 @@
 struct File_impl {
 	bool _ioErr;
 	File_impl() : _ioErr(false) {}
+	virtual ~File_impl() {}
 	virtual bool open(const char *path, const char *mode) = 0;
 	virtual void close() = 0;
 	virtual uint32 size() = 0;
