@@ -23,10 +23,10 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 		}
 
 		for (int i = 0; i < 4; ++i) {
-			m_videoPages[i] = (uint8 *)malloc(kVideoWidth * 256);
+			m_videoPages[i] = (uint8 *)calloc(1, kVideoWidth * 256);
 		}
-		m_demuxVideoFrameBlocks = (uint8 *)malloc(m_pafHdr.maxVideoFrameBlocksCount * m_pafHdr.readBufferSize);
-		m_demuxAudioFrameBlocks = (uint8 *)malloc(m_pafHdr.maxAudioFrameBlocksCount * m_pafHdr.readBufferSize);
+		m_demuxVideoFrameBlocks = (uint8 *)calloc(m_pafHdr.maxVideoFrameBlocksCount, m_pafHdr.readBufferSize);
+		m_demuxAudioFrameBlocks = (uint8 *)calloc(m_pafHdr.maxAudioFrameBlocksCount, m_pafHdr.readBufferSize);
 	}
 	return m_opened;
 }
