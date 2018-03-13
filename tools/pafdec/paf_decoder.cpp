@@ -104,7 +104,8 @@ void PafDecoder::Decode() {
 		m_currentVideoPage &= 3;
 	}
 
-	// XXX flush sound data decoding
+	// flush sound data decoding
+	m_soundWriter->Close();
 
 	delete m_imageWriter;
 	m_imageWriter = 0;
