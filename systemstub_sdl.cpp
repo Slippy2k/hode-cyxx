@@ -9,22 +9,7 @@
 #include "systemstub.h"
 #include "util.h"
 
-struct Scaler {
-	const char *name;
-	ScaleProc scaleProc;
-	ClearProc clearProc;
-	int multiplier;
-};
-
-static Scaler _scalers[] = {
-	{ "point1x", &point1x, &clear1x, 1 },
-	{ "point2x", &point2x, &clear2x, 2 },
-	{ "scale2x", &scale2x, &clear2x, 2 },
-	{ "point3x", &point3x, &clear3x, 3 },
-	{ "scale3x", &scale3x, &clear3x, 3 }
-};
-
-static int _scalersCount = ARRAYSIZE(_scalers);
+static int _scalerMultiplier = 3;
 
 struct KeyMapping {
 	int keyCode;
@@ -35,18 +20,16 @@ struct SystemStub_SDL : SystemStub {
 	enum {
 		kCopyRectsSize = 200,
 		kKeyMappingsSize = 20,
-		kDefaultScaler = 1
 	};
 
-	uint8_t *_offscreenBase;
-	uint8_t *_offscreen;
+	uint8_t *_offscreenLut;
+	uint32_t *_offscreenRgb;
 	SDL_Surface *_screen;
-	uint16_t _pal[256];
+	uint32_t _pal[256];
 	int _screenW, _screenH;
 	int _shakeDx, _shakeDy;
 	KeyMapping _keyMappings[kKeyMappingsSize];
 	int _keyMappingsCount;
-	int _scaler;
 
 	virtual ~SystemStub_SDL() {}
 	virtual void init(const char *title, int w, int h);
@@ -63,8 +46,7 @@ struct SystemStub_SDL : SystemStub {
 	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
 	void updateKeys(PlayerInput *inp);
-	void prepareScaledGfx(int scaler);
-	void switchScaledGfx(int scaler);
+	void prepareScaledGfx();
 };
 
 SystemStub *SystemStub_SDL_create() {
@@ -81,14 +63,17 @@ void SystemStub_SDL::init(const char *title, int w, int h) {
 	_screenH = h;
 	_shakeDx = _shakeDy = 0;
 	memset(_pal, 0, sizeof(_pal));
-	const int offscreenSize = (w + 2) * (h + 2); // extra bytes for scalers accessing border pixels
-	_offscreenBase = (uint8_t *)malloc(offscreenSize);
-	if (!_offscreenBase) {
+	const int offscreenSize = w * h;
+	_offscreenLut = (uint8_t *)malloc(offscreenSize);
+	if (!_offscreenLut) {
 		error("SystemStub_SDL::init() Unable to allocate offscreen buffer");
 	}
-	memset(_offscreenBase, 0, offscreenSize);
-	_offscreen = _offscreenBase + (w + 2) + 1;
-	prepareScaledGfx(kDefaultScaler);
+	_offscreenRgb = (uint32_t *)malloc(offscreenSize * sizeof(uint32_t));
+	if (!_offscreenRgb) {
+		error("SystemStub_SDL::init() Unable to allocate RGB offscreen buffer");
+	}
+	memset(_offscreenLut, 0, offscreenSize);
+	prepareScaledGfx();
 }
 
 void SystemStub_SDL::destroy() {
@@ -96,8 +81,10 @@ void SystemStub_SDL::destroy() {
 		// free()'ed in SDL_Quit()
 		_screen = 0;
 	}
-	free(_offscreenBase);
-	_offscreenBase = 0;
+	free(_offscreenLut);
+	_offscreenLut = 0;
+	free(_offscreenRgb);
+	_offscreenRgb = 0;
 }
 
 void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
@@ -120,7 +107,7 @@ void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
 	for (int i = 0; i < h; ++i) {
-		memcpy(_offscreen + y * _screenW + x, buf, w);
+		memcpy(_offscreenLut + y * _screenW + x, buf, w);
 		buf += pitch;
 		++y;
 	}
@@ -129,7 +116,7 @@ void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8_t *buf, in
 void SystemStub_SDL::fillRect(int x, int y, int w, int h, uint8_t color) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
 	for (int i = 0; i < h; ++i) {
-		memset(_offscreen + y * _screenW + x, color, w);
+		memset(_offscreenLut + y * _screenW + x, color, w);
 		++y;
 	}
 }
@@ -139,36 +126,54 @@ void SystemStub_SDL::shakeScreen(int dx, int dy) {
 	_shakeDy = dy;
 }
 
+static void clearScreen(uint32_t *dst, int dstPitch, int x, int y, int w, int h) {
+	uint32_t *p = dst + (y * dstPitch + x) * 3;
+	for (int j = 0; j < h; ++j) {
+		for (int i = 0; i < 3; ++i) {
+			memset(p, 0, w * sizeof(uint32_t) * 3);
+			p += dstPitch;
+		}
+	}
+}
+
 void SystemStub_SDL::updateScreen() {
 	SDL_LockSurface(_screen);
-	uint16_t *dst = (uint16_t *)_screen->pixels;
-	const int dstPitch = _screen->pitch / 2;
-	const uint8_t *src = _offscreen;
+	uint32_t *dst = (uint32_t *)_screen->pixels;
+	const int dstPitch = _screen->pitch / sizeof(uint32_t);
+	const uint8_t *src = _offscreenLut;
 	const int srcPitch = _screenW;
 	int w = _screenW;
 	int h = _screenH;
 	if (_shakeDy > 0) {
-		_scalers[_scaler].clearProc(dst, dstPitch, 0, 0, w, _shakeDy);
+		clearScreen(dst, dstPitch, 0, 0, w, _shakeDy);
 		h -= _shakeDy;
 		dst += _shakeDy * dstPitch;
 	} else if (_shakeDy < 0) {
-		_scalers[_scaler].clearProc(dst, dstPitch, 0, h + _shakeDy, w, -_shakeDy);
+		clearScreen(dst, dstPitch, 0, h + _shakeDy, w, -_shakeDy);
 		h += _shakeDy;
 		src -= _shakeDy * srcPitch;
 	}
+/* // xbrz assumes pitch == w
 	if (_shakeDx > 0) {
-		_scalers[_scaler].clearProc(dst, dstPitch, 0, 0, _shakeDx, h);
+		clearScreen(dst, dstPitch, 0, 0, _shakeDx, h);
 		w -= _shakeDx;
 		dst += _shakeDx;
 	} else if (_shakeDx < 0) {
-		_scalers[_scaler].clearProc(dst, dstPitch, w + _shakeDx, 0, -_shakeDx, h);
+		clearScreen(dst, dstPitch, w + _shakeDx, 0, -_shakeDx, h);
 		w += _shakeDx;
 		src -= _shakeDx;
 	}
-	_scalers[_scaler].scaleProc(dst, dstPitch, _pal, src, srcPitch, w, h);
+*/
+	uint32_t *p = _offscreenRgb;
+	for (int y = 0; y < h; ++y) {
+		for (int x = 0; x < w; ++x) {
+			p[x] = _pal[src[y * w + x]];
+		}
+		p += w;
+	}
+	scaler_xbrz.scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
 	SDL_UnlockSurface(_screen);
-	const int multiplier = _scalers[_scaler].multiplier;
-	SDL_UpdateRect(_screen, 0, 0, _screenW * multiplier, _screenH * multiplier);
+	SDL_UpdateRect(_screen, 0, 0, _screenW * _scalerMultiplier, _screenH * _scalerMultiplier);
 	_shakeDx = _shakeDy = 0;
 }
 
@@ -180,14 +185,8 @@ void SystemStub_SDL::processEvents() {
 			if (ev.key.keysym.mod & KMOD_ALT) {
 				switch (ev.key.keysym.sym) {
 				case SDLK_KP_PLUS:
-					if (_scaler < _scalersCount - 1) {
-						switchScaledGfx(_scaler + 1);
-					}
 					break;
 				case SDLK_KP_MINUS:
-					if (_scaler > 0) {
-						switchScaledGfx(_scaler - 1);
-					}
 					break;
 				default:
 					break;
@@ -267,20 +266,9 @@ void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	}
 }
 
-void SystemStub_SDL::prepareScaledGfx(int scaler) {
-        const int multiplier = _scalers[scaler].multiplier;
-        _screen = SDL_SetVideoMode(_screenW * multiplier, _screenH * multiplier, 16, SDL_SWSURFACE);
+void SystemStub_SDL::prepareScaledGfx() {
+        _screen = SDL_SetVideoMode(_screenW * _scalerMultiplier, _screenH * _scalerMultiplier, 32, SDL_SWSURFACE);
 	if (!_screen) {
-		error("SystemStub_SDL::prepareScaledGfx() Unable to allocate _screen buffer, scaler %d", scaler);
-	}
-	_scaler = scaler;
-}
-
-void SystemStub_SDL::switchScaledGfx(int scaler) {
-	if (_scaler != scaler) {
-		SDL_FreeSurface(_screen);
-		_screen = 0;
-		prepareScaledGfx(scaler);
+		error("SystemStub_SDL::prepareScaledGfx() Unable to allocate _screen buffer");
 	}
 }
-
