@@ -10,7 +10,7 @@ public:
 	virtual ~PngFileWriter() {}
 	virtual bool Open(const char *filename, int width, int height);
 	virtual void Close();
-	virtual void Write(const uint8 *src, int pitch, const uint8 *palette);
+	virtual void Write(const uint8_t *src, int pitch, const uint8_t *palette);
 
 private:
 
@@ -38,7 +38,7 @@ void PngFileWriter::Close() {
 	}
 }
 
-void PngFileWriter::Write(const uint8 *src, int pitch, const uint8 *palette) {
+void PngFileWriter::Write(const uint8_t *src, int pitch, const uint8_t *palette) {
 
 	if (m_fp) {
 

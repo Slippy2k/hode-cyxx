@@ -23,10 +23,10 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 			return false;
 		}
 		for (int i = 0; i < 4; ++i) {
-			m_videoPages[i] = (uint8 *)calloc(1, kVideoWidth * 256);
+			m_videoPages[i] = (uint8_t *)calloc(1, kVideoWidth * 256);
 		}
-		m_demuxVideoFrameBlocks = (uint8 *)calloc(m_pafHdr.maxVideoFrameBlocksCount, m_pafHdr.readBufferSize);
-		m_demuxAudioFrameBlocks = (uint8 *)calloc(m_pafHdr.maxAudioFrameBlocksCount, m_pafHdr.readBufferSize);
+		m_demuxVideoFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxVideoFrameBlocksCount, m_pafHdr.readBufferSize);
+		m_demuxAudioFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxAudioFrameBlocksCount, m_pafHdr.readBufferSize);
 	}
 	return m_opened;
 }
@@ -63,15 +63,15 @@ void PafDecoder::Decode() {
 	m_soundWriter->Open(buf, 22050, 16, 2, true);
 
 	int currentFrameBlock = 0;
-	for (uint32 i = 0; i < m_pafHdr.framesCount; ++i) {
+	for (uint32_t i = 0; i < m_pafHdr.framesCount; ++i) {
 
 		printf("Decoding frame %d/%d... ", i, m_pafHdr.framesCount);
 
 		// read buffering blocks
-		uint32 blocksCountForFrame = (i == 0) ? m_pafHdr.preloadFrameBlocksCount : m_pafHdr.frameBlocksCountTable[i - 1];
+		uint32_t blocksCountForFrame = (i == 0) ? m_pafHdr.preloadFrameBlocksCount : m_pafHdr.frameBlocksCountTable[i - 1];
 		while (blocksCountForFrame != 0) {
 			m_file.read(m_bufferBlock, m_pafHdr.readBufferSize);
-			uint32 dstOffset = m_pafHdr.frameBlocksOffsetTable[currentFrameBlock] & ~(1 << 31);
+			uint32_t dstOffset = m_pafHdr.frameBlocksOffsetTable[currentFrameBlock] & ~(1 << 31);
 			if (m_pafHdr.frameBlocksOffsetTable[currentFrameBlock] & (1 << 31)) {
 				assert(dstOffset + m_pafHdr.readBufferSize <= m_pafHdr.maxAudioFrameBlocksCount * m_pafHdr.readBufferSize);
 				memcpy(m_demuxAudioFrameBlocks + dstOffset, m_bufferBlock, m_pafHdr.readBufferSize);
@@ -117,7 +117,7 @@ void PafDecoder::SeekToVideo(int videoNum) {
 	m_file.seek(m_videoOffset);
 }
 
-void PafDecoder::AlignReadHeaderTable(uint32 *dst, int count) {
+void PafDecoder::AlignReadHeaderTable(uint32_t *dst, int count) {
 	assert((count & 3) == 0);
 	for (int i = 0; i < count / 4; ++i) {
 		dst[i] = m_file.readUint32LE();
@@ -149,21 +149,21 @@ bool PafDecoder::ReadPafHeader() {
 
 	assert(m_pafHdr.readBufferSize <= sizeof(m_bufferBlock));
 
-	m_pafHdr.frameBlocksCountTable = (uint32 *)malloc(m_pafHdr.framesCount * sizeof(uint32));
-	AlignReadHeaderTable(m_pafHdr.frameBlocksCountTable, m_pafHdr.framesCount * sizeof(uint32));
+	m_pafHdr.frameBlocksCountTable = (uint32_t *)malloc(m_pafHdr.framesCount * sizeof(uint32_t));
+	AlignReadHeaderTable(m_pafHdr.frameBlocksCountTable, m_pafHdr.framesCount * sizeof(uint32_t));
 
-	m_pafHdr.framesOffsetTable = (uint32 *)malloc(m_pafHdr.framesCount * sizeof(uint32));
-	AlignReadHeaderTable(m_pafHdr.framesOffsetTable, m_pafHdr.framesCount * sizeof(uint32));
+	m_pafHdr.framesOffsetTable = (uint32_t *)malloc(m_pafHdr.framesCount * sizeof(uint32_t));
+	AlignReadHeaderTable(m_pafHdr.framesOffsetTable, m_pafHdr.framesCount * sizeof(uint32_t));
 
-	m_pafHdr.frameBlocksOffsetTable = (uint32 *)malloc(m_pafHdr.frameBlocksCount * sizeof(uint32));
-	AlignReadHeaderTable(m_pafHdr.frameBlocksOffsetTable, m_pafHdr.frameBlocksCount * sizeof(uint32));
+	m_pafHdr.frameBlocksOffsetTable = (uint32_t *)malloc(m_pafHdr.frameBlocksCount * sizeof(uint32_t));
+	AlignReadHeaderTable(m_pafHdr.frameBlocksOffsetTable, m_pafHdr.frameBlocksCount * sizeof(uint32_t));
 
 	return true;
 }
 
-void PafDecoder::DecodeAudioFrame(const uint8 *src, uint32 offset) {
+void PafDecoder::DecodeAudioFrame(const uint8_t *src, uint32_t offset) {
 	assert(m_pafHdr.maxAudioFrameBlocksCount > 2);
-	uint32 endOffset = (m_pafHdr.maxAudioFrameBlocksCount - 2) * m_pafHdr.readBufferSize;
+	uint32_t endOffset = (m_pafHdr.maxAudioFrameBlocksCount - 2) * m_pafHdr.readBufferSize;
 	if (offset == endOffset) {
 		int soundBuffersCount = (endOffset + m_pafHdr.readBufferSize) / kSoundBufferSize;
 		while (soundBuffersCount--) {
@@ -173,22 +173,22 @@ void PafDecoder::DecodeAudioFrame(const uint8 *src, uint32 offset) {
 	}
 }
 
-void PafDecoder::DecodeAudioFrame2205(const uint8 *src) {
+void PafDecoder::DecodeAudioFrame2205(const uint8_t *src) {
 	int count = 2205;
-	const uint8 *t = src;
-	src += 256 * sizeof(uint16);
+	const uint8_t *t = src;
+	src += 256 * sizeof(uint16_t);
 	while (count--) {
 		for (int channel = 0; channel < 2; ++channel) {
 			int index = *src++;
-			int16 pcm = (int16)READ_LE_UINT16(t + index * 2);
-			m_soundWriter->Write((const uint8 *)&pcm, 2);
+			int16_t pcm = (int16_t)READ_LE_UINT16(t + index * 2);
+			m_soundWriter->Write((const uint8_t *)&pcm, 2);
 		}
 	}
 }
 
-void PafDecoder::DecodeVideoFrame(const uint8 *src) {
-	const uint8 *base = src;
-	uint8 code = *src++;
+void PafDecoder::DecodeVideoFrame(const uint8_t *src) {
+	const uint8_t *base = src;
+	uint8_t code = *src++;
 	if (code & 0x20) {
 		for (int i = 0; i < 4; ++i) {
 			memset(m_videoPages[i], 0, kVideoWidth * 256);
@@ -222,7 +222,7 @@ void PafDecoder::DecodeVideoFrame(const uint8 *src) {
 	}
 }
 
-static void pafCopy4x4h(uint8 *dst, const uint8 *src) {
+static void pafCopy4x4h(uint8_t *dst, const uint8_t *src) {
 	for (int i = 0; i < 4; ++i) {
 		memcpy(dst, src, 4);
 		src += 4;
@@ -230,7 +230,7 @@ static void pafCopy4x4h(uint8 *dst, const uint8 *src) {
 	}
 }
 
-static void pafCopy4x4v(uint8 *dst, const uint8 *src) {
+static void pafCopy4x4v(uint8_t *dst, const uint8_t *src) {
 	for (int i = 0; i < 4; ++i) {
 		memcpy(dst, src, 4);
 		src += 256;
@@ -238,7 +238,7 @@ static void pafCopy4x4v(uint8 *dst, const uint8 *src) {
 	}
 }
 
-static void pafCopySrcMask(uint8 mask, uint8 *dst, const uint8 *src) {
+static void pafCopySrcMask(uint8_t mask, uint8_t *dst, const uint8_t *src) {
 	for (int i = 0; i < 4; ++i) {
 		if (mask & (1 << (3 - i))) {
 			dst[i] = src[i];
@@ -246,7 +246,7 @@ static void pafCopySrcMask(uint8 mask, uint8 *dst, const uint8 *src) {
 	}
 }
 
-static void pafCopyColorMask(uint8 mask, uint8 *dst, uint8 color) {
+static void pafCopyColorMask(uint8_t mask, uint8_t *dst, uint8_t color) {
 	for (int i = 0; i < 4; ++i) {
 		if (mask & (1 << (3 - i))) {
 			dst[i] = color;
@@ -254,7 +254,7 @@ static void pafCopyColorMask(uint8 mask, uint8 *dst, uint8 color) {
 	}
 }
 
-static const uint8 updateBlockSequences[] = {
+static const uint8_t updateBlockSequences[] = {
 	0, 0, 0, 0, 0, 0, 0, 0,
 	2, 0, 0, 0, 0, 0, 0, 0,
 	5, 7, 0, 0, 0, 0, 0, 0,
@@ -273,14 +273,14 @@ static const uint8 updateBlockSequences[] = {
 	2, 4, 5, 7, 5, 7, 0, 0
 };
 
-uint8 *PafDecoder::GetVideoPageOffset(uint8 a, uint8 b) {
+uint8_t *PafDecoder::GetVideoPageOffset(uint8_t a, uint8_t b) {
 	int x = b & 0x7F;
 	int y = ((a & 0x3F) << 1) | ((b >> 7) & 1);
 	int page = (a & 0xC0) >> 6;
 	return m_videoPages[page] + y * 2 * 256 + x * 2;
 }
 
-void PafDecoder::DecodeVideoFrameOp0(const uint8 *base, const uint8 *src, uint8 code) {
+void PafDecoder::DecodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, uint8_t code) {
 	int count = *src++;
 	if (count != 0) {
 		if ((code & 0x10) != 0) {
@@ -291,9 +291,9 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8 *base, const uint8 *src, uint8 
 			}
 		}
 		do {
-			uint8 *dst = GetVideoPageOffset(src[0], src[1]);
-			uint32 offset = (src[1] & 0x7F) * 2;
-			uint32 end = READ_LE_UINT16(src + 2); src += 4;
+			uint8_t *dst = GetVideoPageOffset(src[0], src[1]);
+			uint32_t offset = (src[1] & 0x7F) * 2;
+			uint32_t end = READ_LE_UINT16(src + 2); src += 4;
 			end += offset;
 			do {
 				++offset;
@@ -307,10 +307,10 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8 *base, const uint8 *src, uint8 
 		} while (--count != 0);
 	}
 
-	uint8 *dst = m_videoPages[m_currentVideoPage];
+	uint8_t *dst = m_videoPages[m_currentVideoPage];
 	count = 0;
 	do {
-		const uint8 *src2 = GetVideoPageOffset(src[0], src[1]); src += 2;
+		const uint8_t *src2 = GetVideoPageOffset(src[0], src[1]); src += 2;
 		pafCopy4x4v(dst, src2);
 		++count;
 		if ((count & 0x3F) == 0) {
@@ -319,22 +319,22 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8 *base, const uint8 *src, uint8 
 		dst += 4;
 	} while (count < 256 * 192 / 16);
 
-	uint32 opcodesSize = READ_LE_UINT16(src); src += 4;
+	uint32_t opcodesSize = READ_LE_UINT16(src); src += 4;
 
-	const uint8 *opcodes;
-	const uint8 *opcodesData = src;
+	const uint8_t *opcodes;
+	const uint8_t *opcodesData = src;
 	src += opcodesSize;
 
-	uint8 mask = 0;
-	uint8 color = 0;
-	uint32 offset = 0;
-	const uint8 *src2 = 0;
+	uint8_t mask = 0;
+	uint8_t color = 0;
+	uint32_t offset = 0;
+	const uint8_t *src2 = 0;
 
 	dst = m_videoPages[m_currentVideoPage];
 
-	uint8 h = 192 / 4;
+	uint8_t h = 192 / 4;
 	do {
-		uint8 w = 256 / 4;
+		uint8_t w = 256 / 4;
 		do {
 			if ((w & 1) == 0) {
 				opcodes = &updateBlockSequences[(*opcodesData >> 4) * 8];
@@ -344,7 +344,7 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8 *base, const uint8 *src, uint8 
 			}
 			while (*opcodes) {
 				offset = 256 * 2;
-				uint8 code = *opcodes++;
+				uint8_t code = *opcodes++;
 				switch (code) {
 				case 2:
 					offset = 0;
@@ -374,27 +374,27 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8 *base, const uint8 *src, uint8 
 	} while (--h != 0);
 }
 
-void PafDecoder::DecodeVideoFrameOp1(const uint8 *src) {
-	uint8 *dst = m_videoPages[m_currentVideoPage];
+void PafDecoder::DecodeVideoFrameOp1(const uint8_t *src) {
+	uint8_t *dst = m_videoPages[m_currentVideoPage];
 	memcpy(dst, src + 2, kVideoWidth * kVideoHeight);
 }
 
-void PafDecoder::DecodeVideoFrameOp2(const uint8 *src) {
+void PafDecoder::DecodeVideoFrameOp2(const uint8_t *src) {
 	int page = *src++;
 	if (page != m_currentVideoPage) {
 		memcpy(m_videoPages[m_currentVideoPage], m_videoPages[page], kVideoWidth * kVideoHeight);
 	}
 }
 
-void PafDecoder::DecodeVideoFrameOp4(const uint8 *src) {
-	uint8 *dst = m_videoPages[m_currentVideoPage];
+void PafDecoder::DecodeVideoFrameOp4(const uint8_t *src) {
+	uint8_t *dst = m_videoPages[m_currentVideoPage];
 	src += 2;
 	int size = kVideoWidth * kVideoHeight;
 	while (size != 0) {
-		int8 code = *src++;
+		int8_t code = *src++;
 		const int count = ABS(code) + 1;
 		if (code < 0) {
-			uint8 color = *src++;
+			uint8_t color = *src++;
 			memset(dst, color, count);
 		} else {
 			memcpy(dst, src, count);

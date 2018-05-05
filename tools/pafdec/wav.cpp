@@ -2,10 +2,10 @@
 #include "file.h"
 #include "writer.h"
 
-static const uint32 TAG_RIFF = 0x52494646;
-static const uint32 TAG_WAVE = 0x57415645;
-static const uint32 TAG_fmt  = 0x666d7420;
-static const uint32 TAG_data = 0x64617461;
+static const uint32_t TAG_RIFF = 0x52494646;
+static const uint32_t TAG_WAVE = 0x57415645;
+static const uint32_t TAG_fmt  = 0x666d7420;
+static const uint32_t TAG_data = 0x64617461;
 
 class WavFileWriter : public SoundWriter {
 public:
@@ -13,7 +13,7 @@ public:
 	virtual ~WavFileWriter() {}
 	virtual bool Open(const char *filename, int sampleRate, int bitsPerSample, int numChannels, bool isLittleEndian);
 	virtual void Close();
-	virtual void Write(const uint8 *src, int len);
+	virtual void Write(const uint8_t *src, int len);
 
 private:
 
@@ -68,13 +68,13 @@ void WavFileWriter::Close() {
 	}
 }
 
-void WavFileWriter::Write(const uint8 *src, int len) {
+void WavFileWriter::Write(const uint8_t *src, int len) {
 	assert(m_bitsPerSample == 8 || m_bitsPerSample == 16);
 
 	if (m_bitsPerSample == 16) {
 		assert((len & 1) == 0);
 		for (int i = 0; i < len; i += 2) {
-			int16 pcm = *(int16 *)src; src += 2;
+			int16_t pcm = *(int16_t *)src; src += 2;
 			if (m_isLittleEndian) {
 				m_file.writeUint16LE(pcm);
 			} else {
@@ -89,7 +89,7 @@ void WavFileWriter::Write(const uint8 *src, int len) {
 }
 
 void WavFileWriter::WriteHeader() {
-	static const uint32 invalidChunkSize = 0x12345678;
+	static const uint32_t invalidChunkSize = 0x12345678;
 
 	// Write RIFF chunk descriptor
 	m_file.writeUint32BE(TAG_RIFF);

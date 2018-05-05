@@ -2,7 +2,7 @@
 #include "file.h"
 #include "writer.h"
 
-static const uint16 TAG_BM = 0x4D42;
+static const uint16_t TAG_BM = 0x4D42;
 
 class BmpFileWriter : public ImageWriter {
 public:
@@ -10,7 +10,7 @@ public:
 	virtual ~BmpFileWriter() {}
 	virtual bool Open(const char *filename, int width, int height);
 	virtual void Close();
-	virtual void Write(const uint8 *src, int pitch, const uint8 *palette);
+	virtual void Write(const uint8_t *src, int pitch, const uint8_t *palette);
 
 private:
 
@@ -41,7 +41,7 @@ void BmpFileWriter::Close() {
 	}
 }
 
-void BmpFileWriter::Write(const uint8 *src, int pitch, const uint8 *palette) {
+void BmpFileWriter::Write(const uint8_t *src, int pitch, const uint8_t *palette) {
 
 	if (m_isOpened) {
 		int imageSize = m_alignWidth * m_height;
