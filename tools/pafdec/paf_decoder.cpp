@@ -15,13 +15,13 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 			SeekToVideo(videoNum);
 			m_videoNum = videoNum;
 		} else {
+			m_videoOffset = 0;
 			m_videoNum = 99;
 		}
 		if (!ReadPafHeader()) {
 			printf("Unable to read .PAF file header");
 			return false;
 		}
-
 		for (int i = 0; i < 4; ++i) {
 			m_videoPages[i] = (uint8 *)calloc(1, kVideoWidth * 256);
 		}
@@ -52,9 +52,6 @@ void PafDecoder::Close() {
 void PafDecoder::Decode() {
 	m_file.seek(m_videoOffset + m_pafHdr.startOffset);
 
-	for (int i = 0; i < 4; ++i) {
-		memset(m_videoPages[i], 0, kVideoWidth * kVideoHeight);
-	}
 	memset(m_paletteBuffer, 0, sizeof(m_paletteBuffer));
 	m_currentVideoPage = 0;
 
@@ -194,14 +191,14 @@ void PafDecoder::DecodeVideoFrame(const uint8 *src) {
 	uint8 code = *src++;
 	if (code & 0x20) {
 		for (int i = 0; i < 4; ++i) {
-			memset(m_videoPages[i], 0, kVideoWidth * kVideoHeight);
+			memset(m_videoPages[i], 0, kVideoWidth * 256);
 		}
 		memset(m_paletteBuffer, 0, sizeof(m_paletteBuffer));
 		m_currentVideoPage = 0;
 	}
 	if (code & 0x40) {
-		uint8 index = src[0];
-		int count = (src[1] + 1) * 3;
+		const int index = src[0];
+		const int count = (src[1] + 1) * 3;
 		assert(index * 3 + count <= 768);
 		src += 2;
 		memcpy(&m_paletteBuffer[index * 3], src, count);
@@ -395,13 +392,11 @@ void PafDecoder::DecodeVideoFrameOp4(const uint8 *src) {
 	int size = kVideoWidth * kVideoHeight;
 	while (size != 0) {
 		int8 code = *src++;
-		int count;
+		const int count = ABS(code) + 1;
 		if (code < 0) {
-			count = 1 - code;
 			uint8 color = *src++;
 			memset(dst, color, count);
 		} else {
-			count = code + 1;
 			memcpy(dst, src, count);
 			src += count;
 		}
