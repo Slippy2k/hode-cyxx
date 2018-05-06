@@ -9,6 +9,8 @@ int main(int argc, char *argv[]) {
 			d.Decode();
 			d.Close();
 		}
+	} else {
+		fprintf(stdout, "%s hod.paf [video num]\n", argv[0]);
 	}
 	return 0;
 }
