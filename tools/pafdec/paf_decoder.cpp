@@ -26,7 +26,11 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 			m_videoPages[i] = (uint8_t *)calloc(1, kVideoWidth * 256);
 		}
 		m_demuxVideoFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxVideoFrameBlocksCount, m_pafHdr.readBufferSize);
-		m_demuxAudioFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxAudioFrameBlocksCount, m_pafHdr.readBufferSize);
+		if (m_pafHdr.maxAudioFrameBlocksCount != 0) {
+			m_demuxAudioFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxAudioFrameBlocksCount, m_pafHdr.readBufferSize);
+		} else {
+			m_demuxAudioFrameBlocks = 0;
+		}
 	}
 	return m_opened;
 }
@@ -55,12 +59,14 @@ void PafDecoder::Decode() {
 	memset(m_paletteBuffer, 0, sizeof(m_paletteBuffer));
 	m_currentVideoPage = 0;
 
-	m_imageWriter = createPngImageWriter();
+	m_imageWriter = createBmpImageWriter();
 	m_soundWriter = createWavSoundWriter();
 
-	char buf[512];
-	sprintf(buf, "s_%02d", m_videoNum);
-	m_soundWriter->Open(buf, 22050, 16, 2, true);
+	if (m_demuxAudioFrameBlocks) {
+		char buf[512];
+		sprintf(buf, "s_%02d", m_videoNum);
+		m_soundWriter->Open(buf, 22050, 16, 2, true);
+	}
 
 	int currentFrameBlock = 0;
 	for (uint32_t i = 0; i < m_pafHdr.framesCount; ++i) {
@@ -88,6 +94,7 @@ void PafDecoder::Decode() {
 		DecodeVideoFrame(m_demuxVideoFrameBlocks + m_pafHdr.framesOffsetTable[i]);
 
 		// write image
+		char buf[512];
 		sprintf(buf, "i_%02d_%04d", m_videoNum, i);
 		if (m_imageWriter->Open(buf, kVideoWidth, kVideoHeight)) {
 			m_imageWriter->Write(m_videoPages[m_currentVideoPage], kVideoWidth, m_paletteBuffer);
@@ -101,13 +108,16 @@ void PafDecoder::Decode() {
 		m_currentVideoPage &= 3;
 	}
 
-	// flush sound data decoding
-	m_soundWriter->Close();
-
 	delete m_imageWriter;
 	m_imageWriter = 0;
-	delete m_soundWriter;
-	m_soundWriter = 0;
+
+	if (m_soundWriter) {
+		// flush sound data decoding
+		m_soundWriter->Close();
+
+		delete m_soundWriter;
+		m_soundWriter = 0;
+	}
 }
 
 void PafDecoder::SeekToVideo(int videoNum) {
@@ -174,6 +184,7 @@ void PafDecoder::DecodeAudioFrame(const uint8_t *src, uint32_t offset) {
 }
 
 void PafDecoder::DecodeAudioFrame2205(const uint8_t *src) {
+	assert(m_soundWriter);
 	int count = 2205;
 	const uint8_t *t = src;
 	src += 256 * sizeof(uint16_t);
