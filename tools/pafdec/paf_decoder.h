@@ -55,6 +55,7 @@ private:
 	bool m_opened;
 	File m_file;
 	int m_videoNum;
+	const char *m_videoName;
 	uint32_t m_videoOffset;
 	PafHeader m_pafHdr;
 	int m_currentVideoPage;

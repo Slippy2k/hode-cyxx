@@ -7,6 +7,73 @@
 #include "paf_decoder.h"
 #include "writer.h"
 
+static const char *_names[] = {
+	// 0
+	"intro",
+	"cine14l",
+	"rapt",
+	"glisse",
+	// 4
+	"meeting",
+	"island",
+	"islefall",
+	"vicious",
+	// 8
+	"together",
+	"power",
+	"back",
+	"dogfree1",
+	// 12
+	"dogfree2",
+	"meteor",
+	"cookie",
+	"plot",
+	// 16
+	"puzzle",
+	"lstpiece",
+	"dogfall",
+	"lastfall",
+	// 20
+	"end",
+	"cinema",
+	"gcht",
+	"chute",
+	// 24
+	"chute_i",
+	"chahaut2",
+	"charbas2",
+	"magn_a_2",
+	// 28
+	"magr_a_2",
+	"ordi_a_2",
+	"ordi_r_2",
+	"proj_a_2",
+	// 32
+	"proj_r_2",
+	"quit2",
+	"sauv_a_2",
+	"sauv_r_2",
+	// 36
+	"stlina2r",
+	"stlinb2r",
+	"stlinc2r",
+	"stlin2dr",
+	// 40
+	"stline2r",
+	"stlinf2r",
+	"stlinka2",
+	"stlinkb2",
+	// 44
+	"stlinkc2",
+	"stlinkd2",
+	"stlinke2",
+	"stlinkf2",
+	// 48
+	"stpcoff2",
+	"stpvais2",
+	"trailer2",
+	"teaser"
+};
 
 bool PafDecoder::Open(const char *filename, int videoNum) {
 	m_opened = m_file.open(filename, "rb");
@@ -14,9 +81,11 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 		if (videoNum >= 0 && videoNum < kMaxVideosCount) {
 			SeekToVideo(videoNum);
 			m_videoNum = videoNum;
+			m_videoName = _names[videoNum];
 		} else {
 			m_videoOffset = 0;
 			m_videoNum = 99;
+			m_videoName = "";
 		}
 		if (!ReadPafHeader()) {
 			printf("Unable to read .PAF file header");
@@ -64,7 +133,7 @@ void PafDecoder::Decode() {
 
 	if (m_demuxAudioFrameBlocks) {
 		char buf[512];
-		sprintf(buf, "s_%02d", m_videoNum);
+		snprintf(buf, sizeof(buf), "%02d_%s", m_videoNum, m_videoName);
 		m_soundWriter->Open(buf, 22050, 16, 2, true);
 	}
 
@@ -95,7 +164,7 @@ void PafDecoder::Decode() {
 
 		// write image
 		char buf[512];
-		sprintf(buf, "i_%02d_%04d", m_videoNum, i);
+		snprintf(buf, sizeof(buf), "%02d_%s_%04d", m_videoNum, m_videoName, i);
 		if (m_imageWriter->Open(buf, kVideoWidth, kVideoHeight)) {
 			m_imageWriter->Write(m_videoPages[m_currentVideoPage], kVideoWidth, m_paletteBuffer);
 			m_imageWriter->Close();
