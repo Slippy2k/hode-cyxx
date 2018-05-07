@@ -2,15 +2,15 @@
 #include "file.h"
 
 extern int raw2png_6bits_color;
-extern void raw2png(FILE *fp, const uint8 *src, int width, int height, const uint8 *palette);
-extern int UnpackData(int type, const uint8 *src, uint8 *dst);
+extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette);
+extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
 
-static uint8 _paf_buffer0x800[0x800];
-static uint8 *_res_setupDatLoadingPicture;
+static uint8_t _paf_buffer0x800[0x800];
+static uint8_t *_res_setupDatLoadingPicture;
 static int _res_setupDatFontSize;
-static uint8 *_res_setupDatFontData;
-static uint8 dword_4622A0[0x2E * 4];
-static uint8 dword_462160[0x2E * 4];
+static uint8_t *_res_setupDatFontData;
+static uint8_t dword_4622A0[0x2E * 4];
+static uint8_t dword_462160[0x2E * 4];
 static int _res_setupDatHeader0x40;
 
 
@@ -18,10 +18,10 @@ static int res_roundTo2048(int pos) {
 	return ((pos + 2043) / 2044) * 2048;
 }
 
-/*static void res_seekAndReadCurrentFile3(File *_ecx, uint8 *_edx, int count, int offset) {
+/*static void res_seekAndReadCurrentFile3(File *_ecx, uint8_t *_edx, int count, int offset) {
 	int _util_currentFileCount = count;
 	File *_util_currentFileHandle = _ecx;
-	uint8 *_util_currentFileBuffer = _edx;
+	uint8_t *_util_currentFileBuffer = _edx;
 	int _util_currentFileOffset = _eax;
 	
 	_ecx->seek(offset, SEEK_SET);
@@ -35,7 +35,7 @@ static int res_roundTo2048(int pos) {
 		_edx >>= 2;
 		if (_edx == 0) break;
 		do {
-			_edi = *(uint32 *)_ecx;
+			_edi = *(uint32_t *)_ecx;
 			_ecx += 4;
 			_eax ^= _edi;
 			--_edx;
@@ -54,7 +54,7 @@ static int res_roundTo2048(int pos) {
 	}
 }*/
 
-static uint32 UpdateCRC(uint32 &sum, const uint8 *buf, uint32 size) {
+static uint32_t UpdateCRC(uint32_t &sum, const uint8_t *buf, uint32_t size) {
 	assert((size & 3) == 0);
 	size >>= 2;
 	while (size--) {
@@ -63,11 +63,11 @@ static uint32 UpdateCRC(uint32 &sum, const uint8 *buf, uint32 size) {
 	return sum;
 }
 
-static void res_seekAndReadCurrentFile3(File *_ecx, uint8 *_edx, int size, int offset) {
+static void res_seekAndReadCurrentFile3(File *_ecx, uint8_t *_edx, int size, int offset) {
 	_ecx->seek(offset, SEEK_SET);
-	uint8 *fillPtr = _edx;
+	uint8_t *fillPtr = _edx;
 	assert((size & 3) == 0);
-	uint32 crc = 0;
+	uint32_t crc = 0;
 	for (int i = 0; i < size / 0x800; ++i) {
 		_ecx->read(fillPtr, 0x800);
 		UpdateCRC(crc, fillPtr, 0x800);
@@ -99,7 +99,7 @@ static void res_seekAndReadCurrentFile3(File *_ecx, uint8 *_edx, int size, int o
 .text:004221EF menu_addToUnkList endp
 */
 
-static uint8 *menu_addToUnkList(uint8 *_ecx, uint8 *_edx) {
+static uint8_t *menu_addToUnkList(uint8_t *_ecx, uint8_t *_edx) {
 	return _edx + READ_LE_UINT32(_ecx + 8);
 }
 
@@ -109,7 +109,7 @@ static void ReadSetupDat(File *f) {
 	printf("size %d\n", size);
 	
 	res_seekAndReadCurrentFile3(f, _paf_buffer0x800, size, 0);
-	const uint8 *_esi = _paf_buffer0x800;
+	const uint8_t *_esi = _paf_buffer0x800;
 
 	int _ebx = READ_LE_UINT32(_esi);
 	int _res_setupDatHeader0x08 = READ_LE_UINT32(_esi + 0x08);
@@ -138,14 +138,14 @@ static void ReadSetupDat(File *f) {
 	
 	size = res_roundTo2048(_res_setupDatHeader0x48);
 	printf("size %d/%d\n", size, _res_setupDatHeader0x48);
-	uint8 *_res_setupDatUnk1 = (uint8 *)malloc(size);
+	uint8_t *_res_setupDatUnk1 = (uint8_t *)malloc(size);
 	int pos = res_roundTo2048(76);
 	size = res_roundTo2048(_res_setupDatHeader0x48);
 	res_seekAndReadCurrentFile3(f, _res_setupDatUnk1, size, pos);
 	
 //	_res_setupDatUnk1 = mem_realloc(_res_setupDatUnk1, _res_setupDatHeader0x48);
 	_res_setupDatLoadingPicture = _res_setupDatUnk1;
-	uint8 *_ecx = _res_setupDatLoadingPicture;
+	uint8_t *_ecx = _res_setupDatLoadingPicture;
 
 	// loading screen
 	int _edx = READ_LE_UINT32(_res_setupDatLoadingPicture); // picture size
@@ -156,8 +156,8 @@ static void ReadSetupDat(File *f) {
 	_ecx += 768;
 //	_res_setupDatMenuList = _ecx;
 	
-	uint8 *_edx_p = _ecx + 16;
-	uint8 *_eax = menu_addToUnkList(_ecx, _edx_p);
+	uint8_t *_edx_p = _ecx + 16;
+	uint8_t *_eax = menu_addToUnkList(_ecx, _edx_p);
 
 	_res_setupDatFontSize = READ_LE_UINT32(_eax);
 	_eax += 4;
@@ -165,7 +165,7 @@ static void ReadSetupDat(File *f) {
 //	_res_setupDatUnk5 = READ_LE_UINT32(dword_4622A0 + (2 + _res_setupDatHeader0x40) * 4);*/
 }
 
-static uint8 decodeBuffer[256 * 192 * 4];
+static uint8_t decodeBuffer[256 * 192 * 4];
 
 /* res_loadFont */
 static void LoadFont() {
@@ -174,7 +174,7 @@ static void LoadFont() {
 	if (size == 16 * 16 * 64) {
 		FILE *fp = fopen("setupDatFont.png", "wb");
 		if (fp) {
-			uint8 greyPal[256 * 3];
+			uint8_t greyPal[256 * 3];
 			for (int i = 0; i < 256; ++i) { greyPal[i * 3] = greyPal[i * 3 + 1] = greyPal[i * 3 + 2] = i << 4; }
 			raw2png(fp, decodeBuffer + 30 * 256, 16, 16, greyPal);
 			fclose(fp);
@@ -202,13 +202,13 @@ static void DecodeMainScreen() {
 }
 
 #define PADDING 4096
-static uint8 tmpBuf[256 * 192 + PADDING];
-static uint8 pal[768 + PADDING];
+static uint8_t tmpBuf[256 * 192 + PADDING];
+static uint8_t pal[768 + PADDING];
 
 static void DecodeHintScreen(File *f) {
 	for (int i = 0; i < 0x2E; ++i) {
-		uint32 offs = READ_LE_UINT32(dword_4622A0 + i * 4);
-		uint32 size = READ_LE_UINT32(dword_462160 + i * 4);
+		uint32_t offs = READ_LE_UINT32(dword_4622A0 + i * 4);
+		uint32_t size = READ_LE_UINT32(dword_462160 + i * 4);
 		printf("%02d offs 0x%X size %d\n", i, offs, size);
 		if (size == 256 * 192) {
 			int size_img = res_roundTo2048(size);

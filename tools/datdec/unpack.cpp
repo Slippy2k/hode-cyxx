@@ -2,28 +2,28 @@
 #include "intern.h"
 #include "staticdata.h"
 
-static const uint32 _res_unpackBitmaskTable[] = { 0, 1, 3, 7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0xFFFFFFFF };
+static const uint32_t _res_unpackBitmaskTable[] = { 0, 1, 3, 7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0xFFFFFFFF };
 
 
-static uint32 _res_unpackUnkVar5;
-static uint16 _res_unpackUnkVar11[4096];
-static uint32 _res_unpackUnkVar4;
-static uint8 _res_unpackUnkVar12[8192];
-static uint32 _res_unpackUnkVar13;
-static const uint8 *_res_unpackBitsData;
-static uint32 _res_unpackUnkVar9;
-static uint32 _res_unpackBitsMask;
-static uint32 _res_unpackUnkVar15;
-static uint32 _res_unpackUnkVar7;
-static uint32 _res_unpackUnkVar10;
-static uint32 _res_unpackBitsCount;
+static uint32_t _res_unpackUnkVar5;
+static uint16_t _res_unpackUnkVar11[4096];
+static uint32_t _res_unpackUnkVar4;
+static uint8_t _res_unpackUnkVar12[8192];
+static uint32_t _res_unpackUnkVar13;
+static const uint8_t *_res_unpackBitsData;
+static uint32_t _res_unpackUnkVar9;
+static uint32_t _res_unpackBitsMask;
+static uint32_t _res_unpackUnkVar15;
+static uint32_t _res_unpackUnkVar7;
+static uint32_t _res_unpackUnkVar10;
+static uint32_t _res_unpackBitsCount;
 
 // lzw_decode
 
-int UnpackData(int type, const uint8 *src, uint8 *dst) {
-	uint32 _esi, _eax, _ebx, _ecx, _edx, _edi, var8, var10, _ebp_i;
-	const uint8 *_ebp;
-	uint8 *dst_, *varC, *_ecx_p, *_esi_p, *_edi_p, *_eax_p;
+int UnpackData(int type, const uint8_t *src, uint8_t *dst) {
+	uint32_t _esi, _eax, _ebx, _ecx, _edx, _edi, var8, var10, _ebp_i;
+	const uint8_t *_ebp;
+	uint8_t *dst_, *varC, *_ecx_p, *_esi_p, *_edi_p, *_eax_p;
 
 	_esi = type - 1;
 	_ebp = src;
@@ -294,7 +294,7 @@ end:
 	return dst_ - dst;
 }
 
-void writeFile(const char *filename, const uint8 *buf, int bufSize) {
+void writeFile(const char *filename, const uint8_t *buf, int bufSize) {
 	FILE *fp = fopen(filename, "wb");
 	if (fp) {
 		fwrite(buf, bufSize, 1, fp);
@@ -303,12 +303,12 @@ void writeFile(const char *filename, const uint8 *buf, int bufSize) {
 }
 
 #if 0
-static void fix(uint8 *buf, int bufSize) {
+static void fix(uint8_t *buf, int bufSize) {
 	for (int i = 0; i < bufSize; ++i) {
 		buf[i] <<= 4;
 	}
 }
-static uint8 decodeBuffer[256 * 192 * 10];
+static uint8_t decodeBuffer[256 * 192 * 10];
 int main(int argc, char *argv[]) {
 	int sz1 = UnpackData(9, byte_43D960, decodeBuffer);
 	printf("sz1 %d\n", sz1);

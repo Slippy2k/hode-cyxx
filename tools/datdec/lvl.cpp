@@ -2,10 +2,10 @@
 #include "file.h"
 
 
-/*static uint32 ComputeChecksum(const uint8 *buf, uint32 size) {
+/*static uint32_t ComputeChecksum(const uint8_t *buf, uint32_t size) {
 	assert((size & 3) == 0);
 	size >>= 2;
-	uint32 crc = 0;
+	uint32_t crc = 0;
 	while (size--) {
 		crc ^= READ_LE_UINT32(buf); buf += 4;
 	}
@@ -13,10 +13,10 @@
 }*/
 
 extern int raw2png_6bits_color;
-extern void raw2png(FILE *fp, const uint8 *src, int width, int height, const uint8 *palette);
-extern int UnpackData(int type, const uint8 *src, uint8 *dst);
+extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette);
+extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
 
-static uint32 UpdateCRC(uint32 &sum, const uint8 *buf, uint32 size) {
+static uint32_t UpdateCRC(uint32_t &sum, const uint8_t *buf, uint32_t size) {
 	assert((size & 3) == 0);
 	size >>= 2;
 	while (size--) {
@@ -31,37 +31,37 @@ static int ResRoundTo2048(int pos) {
 
 static char basePath[40];
 
-static uint8 _res_lvlFileHeader[0x7FC * 9];
-static uint8 _res_lvlLayerMoveTable[0xA0];
-static uint8 _res_lvlPalData[0x140];
-static uint8 _res_lvlLgcData[0xA0]; /* _res_levelData0x1E8 */
-static uint8 *_res_lvlBmpData; // _levelDescription / sizeof == 160
+static uint8_t _res_lvlFileHeader[0x7FC * 9];
+static uint8_t _res_lvlLayerMoveTable[0xA0];
+static uint8_t _res_lvlPalData[0x140];
+static uint8_t _res_lvlLgcData[0xA0]; /* _res_levelData0x1E8 */
+static uint8_t *_res_lvlBmpData; // _levelDescription / sizeof == 160
 
-static uint8 tmpBuf[256 * 192 * 2];
+static uint8_t tmpBuf[256 * 192 * 2];
 
-static uint8 currentPalette[768 + 2];
-static uint8 spritePalette[768];
+static uint8_t currentPalette[768 + 2];
+static uint8_t spritePalette[768];
 int spritePaletteInitDone = 0;
 
-static uint8 *pLevelData0x2B88 = 0;
+static uint8_t *pLevelData0x2B88 = 0;
 
-static void LoadLevelData0x2B88(File *f, const uint8 *LevelData0x2B88) {
-	uint32 offs = READ_LE_UINT32(LevelData0x2B88);
-	uint32 size = READ_LE_UINT32(LevelData0x2B88 + 4);
-	uint32 alignedSize = READ_LE_UINT32(LevelData0x2B88 + 4);
+static void LoadLevelData0x2B88(File *f, const uint8_t *LevelData0x2B88) {
+	uint32_t offs = READ_LE_UINT32(LevelData0x2B88);
+	uint32_t size = READ_LE_UINT32(LevelData0x2B88 + 4);
+	uint32_t alignedSize = READ_LE_UINT32(LevelData0x2B88 + 4);
 	
 	assert(size <= alignedSize);
 	
 	printf("LoadLevelData0x2B88 offs 0x%X %d %d\n", offs, size, alignedSize);
 	free(pLevelData0x2B88);
-	pLevelData0x2B88 = (uint8 *)malloc(size);
+	pLevelData0x2B88 = (uint8_t *)malloc(size);
 //	assert((alignedSize & 3) == 0);
 	f->seek(offs, SEEK_SET);
 #if 0
 	f->read(pLevelData0x2B88, alignedSize);
 #else
-	uint32 crc = 0;
-	uint8 *fillPtr = pLevelData0x2B88;
+	uint32_t crc = 0;
+	uint8_t *fillPtr = pLevelData0x2B88;
 	for (int i = 0; i < alignedSize / 0x800; ++i) {
 		f->read(fillPtr, 0x800);
 		UpdateCRC(crc, fillPtr, 0x800);
@@ -72,11 +72,11 @@ static void LoadLevelData0x2B88(File *f, const uint8 *LevelData0x2B88) {
 #endif
 }
 
-uint8 DecodeSprBuffer[256 * 192];
+uint8_t DecodeSprBuffer[256 * 192];
 
-/*const uint8 *spr_src;
-uint8 *spr_dst;
-uint8 spr_cl;
+/*const uint8_t *spr_src;
+uint8_t *spr_dst;
+uint8_t spr_cl;
 
 static void loc_42F828() { // flags == 0
 //	_ebx = _edi;
@@ -94,8 +94,8 @@ static void loc_42F828() { // flags == 0
 */
 
 #if 0
-void DecodeSPR_FLAG0(const uint8 *src, uint8 *dst, int MUL320) {
-	uint8 *_ebx = dst; // dstStart
+void DecodeSPR_FLAG0(const uint8_t *src, uint8_t *dst, int MUL320) {
+	uint8_t *_ebx = dst; // dstStart
 	src += 6; // src
 //	int count = 0x3F; // count
 	while (1) { // goto off_440C50[_al];
@@ -137,8 +137,8 @@ void DecodeSPR_FLAG0(const uint8 *src, uint8 *dst, int MUL320) {
 }
 #endif
 
-void DecodeSPR_FLAG0(const uint8 *src, uint8 *dst, int MUL320) {
-	uint8 *dstLine = dst;
+void DecodeSPR_FLAG0(const uint8_t *src, uint8_t *dst, int MUL320) {
+	uint8_t *dstLine = dst;
 	src += 6;
 	while (1) {
 		int code = *src++;
@@ -174,7 +174,7 @@ void DecodeSPR_FLAG0(const uint8 *src, uint8 *dst, int MUL320) {
 
 static int sprite_counter = 0;
 
-static void DecodeSprite(int i, const uint8 *src, int x, int pitch, uint8 *dst) {
+static void DecodeSprite(int i, const uint8_t *src, int x, int pitch, uint8_t *dst) {
 	int size = READ_LE_UINT16(src);
 	int w = READ_LE_UINT16(src + 2);
 	int h = READ_LE_UINT16(src + 4);
@@ -183,17 +183,17 @@ static void DecodeSprite(int i, const uint8 *src, int x, int pitch, uint8 *dst) 
 	DecodeSPR_FLAG0(src, dst + x, pitch);
 }
 
-static uint8 *pLevelData0x2988 = 0;
+static uint8_t *pLevelData0x2988 = 0;
 
-static void LoadLevelData0x2988(File *f, const uint8 *LevelData0x2988) {
-	uint32 offs = READ_LE_UINT32(LevelData0x2988);
-	uint32 size = READ_LE_UINT32(LevelData0x2988 + 4);
-	uint32 alignedSize = READ_LE_UINT32(LevelData0x2988 + 4);
+static void LoadLevelData0x2988(File *f, const uint8_t *LevelData0x2988) {
+	uint32_t offs = READ_LE_UINT32(LevelData0x2988);
+	uint32_t size = READ_LE_UINT32(LevelData0x2988 + 4);
+	uint32_t alignedSize = READ_LE_UINT32(LevelData0x2988 + 4);
 
-	pLevelData0x2988 = (uint8 *)malloc(ResRoundTo2048(size));
+	pLevelData0x2988 = (uint8_t *)malloc(ResRoundTo2048(size));
 	f->seek(offs, SEEK_SET);
-	uint32 crc = 0;
-	uint8 *fillPtr = pLevelData0x2988;
+	uint32_t crc = 0;
+	uint8_t *fillPtr = pLevelData0x2988;
 	for (int i = 0; i < ResRoundTo2048(alignedSize) / 0x800; ++i) {
 		f->read(fillPtr, 0x800);
 		UpdateCRC(crc, fillPtr, 0x800);
@@ -201,11 +201,11 @@ static void LoadLevelData0x2988(File *f, const uint8 *LevelData0x2988) {
 		assert(crc == 0);
 	}
 	
-	uint8 *_ecx0x18 = pLevelData0x2988 + READ_LE_UINT32(pLevelData0x2988 + 0x1C);
+	uint8_t *_ecx0x18 = pLevelData0x2988 + READ_LE_UINT32(pLevelData0x2988 + 0x1C);
 	int count = READ_LE_UINT16(pLevelData0x2988 + 2);
 	int img_h = 0;
 	int img_w = 0;
-	uint8 *_eax0x18 = _ecx0x18;
+	uint8_t *_eax0x18 = _ecx0x18;
 	for (int i = 0; i < count; ++i) {
 		int bitmapSize = READ_LE_UINT16(_eax0x18);
 		int w = READ_LE_UINT16(_eax0x18 + 2);
@@ -215,7 +215,7 @@ static void LoadLevelData0x2988(File *f, const uint8 *LevelData0x2988) {
 		_eax0x18 += bitmapSize;
 	}
 	
-	uint8 *picBuf = (uint8 *)malloc(img_w * img_h);
+	uint8_t *picBuf = (uint8_t *)malloc(img_w * img_h);
 	assert(picBuf);
 	memset(picBuf, 0, img_w * img_h);
 	
@@ -247,21 +247,21 @@ static void LoadLevelData0x2988(File *f, const uint8 *LevelData0x2988) {
 }
 
 
-static void DumpBitmap(File *f, int i, int j, uint32 subOffs) {
-/*	uint32 baseOffs = READ_LE_UINT32(LevelData0x2B88);
-	uint32 baseSize = READ_LE_UINT32(LevelData0x2B88 + 4);
+static void DumpBitmap(File *f, int i, int j, uint32_t subOffs) {
+/*	uint32_t baseOffs = READ_LE_UINT32(LevelData0x2B88);
+	uint32_t baseSize = READ_LE_UINT32(LevelData0x2B88 + 4);
 	printf("   %02d baseOffs 0x%X subOffs 0x%X (0x%X) size %d\n", i, baseOffs, subOffs, baseOffs + subOffs, baseSize);
 	f->seek(baseOffs, SEEK_SET);
 	
-	uint8 *p = (uint8 *)malloc(baseSize);
+	uint8_t *p = (uint8_t *)malloc(baseSize);
 	if (!p) return;
 		
 	f->read(p, baseSize);
-	uint8 *data = p + subOffs;*/
-	uint8 *data = pLevelData0x2B88 + subOffs;
+	uint8_t *data = p + subOffs;*/
+	uint8_t *data = pLevelData0x2B88 + subOffs;
 	printf("   BMP LE16 %04X ", READ_LE_UINT16(data));
 	
-	uint32 outputSize = UnpackData(9, data + 2, tmpBuf);
+	uint32_t outputSize = UnpackData(9, data + 2, tmpBuf);
 	printf("outputSize %d\n", outputSize);
 
 	if (outputSize == 49152) {
@@ -279,12 +279,12 @@ static void DumpBitmap(File *f, int i, int j, uint32 subOffs) {
 /*	free(p);*/
 }
 
-static void DumpPalette(File *f, int i, int j, const uint8 *LevelData0x2B88, uint32 subOffs) {
-/*	uint32 baseOffs = READ_LE_UINT32(LevelData0x2B88);
+static void DumpPalette(File *f, int i, int j, const uint8_t *LevelData0x2B88, uint32_t subOffs) {
+/*	uint32_t baseOffs = READ_LE_UINT32(LevelData0x2B88);
 	f->seek(baseOffs + subOffs, SEEK_SET);
 	f->read(palette, 768 + 2);*/
 	
-	uint8 *data = pLevelData0x2B88 + subOffs;
+	uint8_t *data = pLevelData0x2B88 + subOffs;
 	printf("   PAL LE16 %04X ", READ_LE_UINT16(data));
 	memcpy(currentPalette, data + 2, 768);
 	if (spritePaletteInitDone == 0) {
@@ -296,7 +296,7 @@ static void DumpPalette(File *f, int i, int j, const uint8 *LevelData0x2B88, uin
 	sprintf(filename, "pal_%d_%d.png", i, j);
 	FILE *fp = fopen(filename, "wb");
 	if (fp) {
-		uint8 *dat = (uint8 *)malloc(128 * 256);
+		uint8_t *dat = (uint8_t *)malloc(128 * 256);
 		if (dat) {
 			for (int i = 0; i < 256; ++i) {
 				memset(dat + i * 128, i, 128);
@@ -310,8 +310,8 @@ static void DumpPalette(File *f, int i, int j, const uint8 *LevelData0x2B88, uin
 
 static void ResLoadLevelData(File *f) {
 
-	uint8 *fillPtr = _res_lvlFileHeader;
-	uint32 crc = 0;
+	uint8_t *fillPtr = _res_lvlFileHeader;
+	uint32_t crc = 0;
 	for (int i = 0; i < 9; ++i) {
 		f->read(fillPtr, 0x800);
 		UpdateCRC(crc, fillPtr, 0x800);
@@ -333,18 +333,18 @@ static void ResLoadLevelData(File *f) {
 	memcpy(_res_lvlLgcData, _res_lvlFileHeader + 0x1E8, _res_lvlUnk2 * 4);
 	for (int i = 0; i < _res_lvlUnk2; ++i) printf("%2d - 0x%X\n", i, READ_LE_UINT32(&_res_lvlLgcData[i * 4]));
 
-/*	const uint8 *p0 = _res_lvlFileHeader + 0x288; // sizeof == 96
+/*	const uint8_t *p0 = _res_lvlFileHeader + 0x288; // sizeof == 96
 	for (int i = 0; i < (0x2988 - 0x288) / 96; ++i) { // _res_lvlGraphicsDataTable
 		printf("base 0x288 %d w %d h %d 0x2E08 %d 0x2988 %d layer %d\n", i, READ_LE_UINT16(p0 + 0x1C), READ_LE_UINT16(p0 + 0x1E), p0[8], p0[15], READ_LE_UINT16(p0 + 0x14));
 		p0 += 96;
 	}*/
 
-	const uint8 *q = _res_lvlFileHeader + 0x2B88;
+	const uint8_t *q = _res_lvlFileHeader + 0x2B88;
 	for (int i = 0; i < (0x2E08 - 0x2B88) / 16; ++i) {
-		uint32 a = READ_LE_UINT32(q); q += 4;
-		uint32 b = READ_LE_UINT32(q); q += 4;
-		uint32 c = READ_LE_UINT32(q); q += 4;
-		uint32 d = READ_LE_UINT32(q); q += 4;
+		uint32_t a = READ_LE_UINT32(q); q += 4;
+		uint32_t b = READ_LE_UINT32(q); q += 4;
+		uint32_t c = READ_LE_UINT32(q); q += 4;
+		uint32_t d = READ_LE_UINT32(q); q += 4;
 		printf("base 0x2B88 %02d / offs 0x%X size 0x%X 0x%X ptr %d\n", i, a, b, c, d);
 	}
 
@@ -362,15 +362,15 @@ printf("0x%X\n", READ_LE_UINT32(_res_lvlFileHeader + 0x2B88 + i * 16));
 		LoadLevelData0x2B88(f, _res_lvlFileHeader + 0x2B88 + i * 16);
 
 		for (int j = 0; j < 4; ++j) {
-			uint32 palOffs = READ_LE_UINT32(_res_lvlBmpData + 0x10 + j * 4);
+			uint32_t palOffs = READ_LE_UINT32(_res_lvlBmpData + 0x10 + j * 4);
 			if (palOffs != 0) {
 				DumpPalette(f, i, j, _res_lvlFileHeader + 0x2B88 + i * 16, palOffs);
 			}
-			uint32 bitmapOffs = READ_LE_UINT32(_res_lvlBmpData + 0x20 + j * 4);
+			uint32_t bitmapOffs = READ_LE_UINT32(_res_lvlBmpData + 0x20 + j * 4);
 			if (bitmapOffs != 0) {
 				DumpBitmap(f, i, j, bitmapOffs);
 			}
-/*			uint32 unk1Offs = READ_LE_UINT32(_res_lvlBmpData + 0x40 + j * 4);
+/*			uint32_t unk1Offs = READ_LE_UINT32(_res_lvlBmpData + 0x40 + j * 4);
 			if (unk1Offs != 0) {
 				DumpData(f, i, 40 + j, _res_lvlFileHeader + 0x2B88 + i * 16, unk1Offs);
 			}*/
@@ -379,12 +379,12 @@ printf("0x%X\n", READ_LE_UINT32(_res_lvlFileHeader + 0x2B88 + i * 16));
 		_res_lvlBmpData += 160;
 	}
 
-	const uint8 *q0 = _res_lvlFileHeader + 0x2988;
+	const uint8_t *q0 = _res_lvlFileHeader + 0x2988;
 	for (int i = 0; i < (0x2B88 - 0x2988) / 16; ++i) {
-		uint32 a = READ_LE_UINT32(q0); q0 += 4;
-		uint32 b = READ_LE_UINT32(q0); q0 += 4;
-		uint32 c = READ_LE_UINT32(q0); q0 += 4;
-		uint32 d = READ_LE_UINT32(q0); q0 += 4;
+		uint32_t a = READ_LE_UINT32(q0); q0 += 4;
+		uint32_t b = READ_LE_UINT32(q0); q0 += 4;
+		uint32_t c = READ_LE_UINT32(q0); q0 += 4;
+		uint32_t d = READ_LE_UINT32(q0); q0 += 4;
 		printf("base 0x2988 %02d / offs 0x%X size 0x%X 0x%X ptr %d\n", i, a, b, c, d);
 		if (b != 0) {
 			LoadLevelData0x2988(f, _res_lvlFileHeader + 0x2988 + i * 16);

@@ -4,7 +4,7 @@
 
 static void DumpData(FILE *fp, int offset, int size, const char *name) {
 	fseek(fp, offset, SEEK_SET);
-	printf("static const uint8 %s[] = {", name);
+	printf("static const uint8_t %s[] = {", name);
 	for (int i = 0; i < size; ++i) {
 		if (i % 16 == 0) {
 			printf("\n\t");
