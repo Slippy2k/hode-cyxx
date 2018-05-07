@@ -39,7 +39,7 @@ void PafPlayer::preload(int num) {
 	}
 	_videoNum = num;
 	for (int i = 0; i < 4; ++i) {
-		_pageBuffers[i] = (uint8_t *)calloc(kVideoWidth * 256, 1); // 192 ?
+		_pageBuffers[i] = (uint8_t *)calloc(kPageBufferSize, 1);
 	}
 	_demuxVideoFrameBlocks = (uint8_t *)calloc(_pafHdr.maxVideoFrameBlocksCount * _pafHdr.readBufferSize, 1);
 }
@@ -105,7 +105,7 @@ void PafPlayer::decodeVideoFrame(const uint8_t *src) {
 	const int code = *src++;
 	if (code & 0x20) {
 		for (int i = 0; i < 4; ++i) {
-			memset(_pageBuffers[i], 0, kVideoWidth * kVideoHeight);
+			memset(_pageBuffers[i], 0, kPageBufferSize);
 		}
 		memset(_paletteBuffer, 0, sizeof(_paletteBuffer));
 		_currentPageBuffer = 0;

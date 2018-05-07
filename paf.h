@@ -30,7 +30,8 @@ struct PafPlayer {
 		kMaxVideosCount = 50,
 		kBufferBlockSize = 2048,
 		kVideoWidth = 256,
-		kVideoHeight = 192
+		kVideoHeight = 192,
+		kPageBufferSize = 256 * 256,
 	};
 
 	bool _skipCutscenes;
