@@ -76,8 +76,8 @@ static const char *_names[] = {
 };
 
 bool PafDecoder::Open(const char *filename, int videoNum) {
-	m_opened = m_file.open(filename, "rb");
-	if (m_opened) {
+	m_fileOpen = m_file.open(filename, "rb");
+	if (m_fileOpen) {
 		if (videoNum >= 0 && videoNum < kMaxVideosCount) {
 			SeekToVideo(videoNum);
 			m_videoNum = videoNum;
@@ -101,12 +101,12 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 			m_demuxAudioFrameBlocks = 0;
 		}
 	}
-	return m_opened;
+	return m_fileOpen;
 }
 
 void PafDecoder::Close() {
-	if (m_opened) {
-		m_opened = false;
+	if (m_fileOpen) {
+		m_fileOpen = false;
 
 		m_file.close();
 
@@ -302,23 +302,15 @@ void PafDecoder::DecodeVideoFrame(const uint8_t *src) {
 	}
 }
 
-static void pafCopy4x4h(uint8_t *dst, const uint8_t *src) {
+static void pafCopy4x4(uint8_t *dst, const uint8_t *src, int pitch) {
 	for (int i = 0; i < 4; ++i) {
 		memcpy(dst, src, 4);
-		src += 4;
+		src += pitch;
 		dst += 256;
 	}
 }
 
-static void pafCopy4x4v(uint8_t *dst, const uint8_t *src) {
-	for (int i = 0; i < 4; ++i) {
-		memcpy(dst, src, 4);
-		src += 256;
-		dst += 256;
-	}
-}
-
-static void pafCopySrcMask(uint8_t mask, uint8_t *dst, const uint8_t *src) {
+static void pafMaskSetColor4(uint8_t mask, uint8_t *dst, const uint8_t *src) {
 	for (int i = 0; i < 4; ++i) {
 		if (mask & (1 << (3 - i))) {
 			dst[i] = src[i];
@@ -326,7 +318,7 @@ static void pafCopySrcMask(uint8_t mask, uint8_t *dst, const uint8_t *src) {
 	}
 }
 
-static void pafCopyColorMask(uint8_t mask, uint8_t *dst, uint8_t color) {
+static void pafMaskCopy4(uint8_t mask, uint8_t *dst, uint8_t color) {
 	for (int i = 0; i < 4; ++i) {
 		if (mask & (1 << (3 - i))) {
 			dst[i] = color;
@@ -334,24 +326,25 @@ static void pafCopyColorMask(uint8_t mask, uint8_t *dst, uint8_t color) {
 	}
 }
 
-static const uint8_t updateBlockSequences[] = {
-	0, 0, 0, 0, 0, 0, 0, 0,
-	2, 0, 0, 0, 0, 0, 0, 0,
-	5, 7, 0, 0, 0, 0, 0, 0,
-	5, 0, 0, 0, 0, 0, 0, 0,
-	6, 0, 0, 0, 0, 0, 0, 0,
-	5, 7, 5, 7, 0, 0, 0, 0,
-	5, 7, 5, 0, 0, 0, 0, 0,
-	5, 7, 6, 0, 0, 0, 0, 0,
-	5, 5, 0, 0, 0, 0, 0, 0,
-	3, 0, 0, 0, 0, 0, 0, 0,
-	6, 6, 0, 0, 0, 0, 0, 0,
-	2, 4, 0, 0, 0, 0, 0, 0,
-	2, 4, 5, 7, 0, 0, 0, 0,
-	2, 4, 5, 0, 0, 0, 0, 0,
-	2, 4, 6, 0, 0, 0, 0, 0,
-	2, 4, 5, 7, 5, 7, 0, 0
+static const char *updateSequences[] = {
+	"",
+	"\x02",
+	"\x05\x07",
+	"\x05",
+	"\x06",
+	"\x05\x07\x05\x07",
+	"\x05\x07\x05",
+	"\x05\x07\x06",
+	"\x05\x05",
+	"\x03",
+	"\x06\x06",
+	"\x02\x04",
+	"\x02\x04\x05\x07",
+	"\x02\x04\x05",
+	"\x02\x04\x06",
+	"\x02\x04\x05\x07\x05\x07"
 };
+
 
 uint8_t *PafDecoder::GetVideoPageOffset(uint8_t a, uint8_t b) {
 	int x = b & 0x7F;
@@ -377,7 +370,7 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, ui
 			end += offset;
 			do {
 				++offset;
-				pafCopy4x4h(dst, src);
+				pafCopy4x4(dst, src, 4);
 				src += 16;
 				if ((offset & 0x3F) == 0) {
 					dst += 256 * 3;
@@ -391,17 +384,17 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, ui
 	count = 0;
 	do {
 		const uint8_t *src2 = GetVideoPageOffset(src[0], src[1]); src += 2;
-		pafCopy4x4v(dst, src2);
+		pafCopy4x4(dst, src2, 256);
 		++count;
 		if ((count & 0x3F) == 0) {
 			dst += 256 * 3;
 		}
 		dst += 4;
-	} while (count < 256 * 192 / 16);
+	} while (count < kVideoWidth * kVideoHeight / 16);
 
-	uint32_t opcodesSize = READ_LE_UINT16(src); src += 4;
+	const uint32_t opcodesSize = READ_LE_UINT16(src); src += 4;
 
-	const uint8_t *opcodes;
+	const char *opcodes;
 	const uint8_t *opcodesData = src;
 	src += opcodesSize;
 
@@ -412,14 +405,14 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, ui
 
 	dst = m_videoPages[m_currentVideoPage];
 
-	uint8_t h = 192 / 4;
+	uint8_t h = kVideoHeight / 4;
 	do {
-		uint8_t w = 256 / 4;
+		uint8_t w = kVideoWidth / 4;
 		do {
 			if ((w & 1) == 0) {
-				opcodes = &updateBlockSequences[(*opcodesData >> 4) * 8];
+				opcodes = updateSequences[*opcodesData >> 4];
 			} else {
-				opcodes = &updateBlockSequences[(*opcodesData & 15) * 8];
+				opcodes = updateSequences[*opcodesData & 15];
 				++opcodesData;
 			}
 			while (*opcodes) {
@@ -432,9 +425,9 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, ui
 					color = *src++;
 				case 4:
 					mask = *src++;
-					pafCopyColorMask(mask >> 4, dst + offset, color);
+					pafMaskCopy4(mask >> 4, dst + offset, color);
 					offset += 256;
-					pafCopyColorMask(mask & 15, dst + offset, color);
+					pafMaskCopy4(mask & 15, dst + offset, color);
 					break;
 				case 5:
 					offset = 0;
@@ -442,9 +435,9 @@ void PafDecoder::DecodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, ui
 					src2 = GetVideoPageOffset(src[0], src[1]); src += 2;
 				case 7:
 					mask = *src++;
-					pafCopySrcMask(mask >> 4, dst + offset, src2 + offset);
+					pafMaskSetColor4(mask >> 4, dst + offset, src2 + offset);
 					offset += 256;
-					pafCopySrcMask(mask & 15, dst + offset, src2 + offset);
+					pafMaskSetColor4(mask & 15, dst + offset, src2 + offset);
 					break;
 				}
 			}

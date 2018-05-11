@@ -52,7 +52,7 @@ private:
 	void DecodeVideoFrameOp2(const uint8_t *src);
 	void DecodeVideoFrameOp4(const uint8_t *src);
 
-	bool m_opened;
+	bool m_fileOpen;
 	File m_file;
 	int m_videoNum;
 	const char *m_videoName;
