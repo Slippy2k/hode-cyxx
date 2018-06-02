@@ -149,8 +149,15 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 			const int size = w * h;
 			src = _shadowScreenMasksTable[i].projectionDataPtr + 2;
 			for (int j = 1; j < size; ++j) {
-				const uint16_t offset = READ_LE_UINT16(src - 2) + READ_LE_UINT16(src);
+				uint16_t offset = READ_LE_UINT16(src - 2) + READ_LE_UINT16(src);
 				// fprintf(stdout, "shadow #%d offset #%d 0x%x 0x%x\n", i, j, READ_LE_UINT16(src), offset);
+
+				if (offset >= Video::kScreenWidth * Video::kScreenHeight) {
+					warning("Invalid offset %d for shadowLayer", offset);
+					// Not sure if this is an issue in the original or in the rewrite
+					offset = Video::kScreenWidth * Video::kScreenHeight - 1;
+				}
+
 				WRITE_LE_UINT16(src, offset);
 				src += 2;
 			}
@@ -164,7 +171,6 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 			}
 
 			_video->buildShadowColorLookupTable(_shadowScreenMasksTable[i].shadowPalettePtr, _video->_shadowColorLookupTable);
-//			dst += size * 2;
 			dst += decodedSize;
 		}
 	}
