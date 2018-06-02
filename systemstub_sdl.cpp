@@ -20,6 +20,7 @@ struct SystemStub_SDL : SystemStub {
 	enum {
 		kCopyRectsSize = 200,
 		kKeyMappingsSize = 20,
+		kAudioHz = 22050,
 	};
 
 	uint8_t *_offscreenLut;
@@ -30,6 +31,8 @@ struct SystemStub_SDL : SystemStub {
 	int _shakeDx, _shakeDy;
 	KeyMapping _keyMappings[kKeyMappingsSize];
 	int _keyMappingsCount;
+	void (*_audioCbProc)(void *, int16_t *, int);
+	void *_audioCbData;
 
 	virtual ~SystemStub_SDL() {}
 	virtual void init(const char *title, int w, int h);
@@ -43,6 +46,12 @@ struct SystemStub_SDL : SystemStub {
 	virtual void sleep(int duration);
 	virtual uint32_t getTimeStamp();
 
+	virtual void startAudio(AudioCallback callback, void *param);
+	virtual void stopAudio();
+	virtual uint32_t getOutputSampleRate();
+	virtual void lockAudio();
+	virtual void unlockAudio();
+
 	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
 	void updateKeys(PlayerInput *inp);
@@ -54,7 +63,7 @@ SystemStub *SystemStub_SDL_create() {
 }
 
 void SystemStub_SDL::init(const char *title, int w, int h) {
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_WM_SetCaption(title, NULL);
 	setupDefaultKeyMappings();
@@ -208,6 +217,46 @@ void SystemStub_SDL::sleep(int duration) {
 
 uint32_t SystemStub_SDL::getTimeStamp() {
 	return SDL_GetTicks();
+}
+
+static void mixAudioS16(void *param, uint8_t *buf, int len) {
+	SystemStub_SDL *stub = (SystemStub_SDL *)param;
+	memset(buf, 0, len);
+	stub->_audioCbProc(stub->_audioCbData, (int16_t *)buf, len / 2);
+}
+
+void SystemStub_SDL::startAudio(AudioCallback callback, void *param) {
+	SDL_AudioSpec desired;
+	memset(&desired, 0, sizeof(desired));
+	desired.freq = kAudioHz;
+	desired.format = AUDIO_S16SYS;
+	desired.channels = 1;
+	desired.samples = 2048;
+	desired.callback = mixAudioS16;
+	desired.userdata = this;
+	if (SDL_OpenAudio(&desired, 0) == 0) {
+		_audioCbProc = callback;
+		_audioCbData = param;
+		SDL_PauseAudio(0);
+	} else {
+		error("SystemStub_SDL::startAudio() Unable to open sound device");
+	}
+}
+
+void SystemStub_SDL::stopAudio() {
+	SDL_CloseAudio();
+}
+
+uint32_t SystemStub_SDL::getOutputSampleRate() {
+	return kAudioHz;
+}
+
+void SystemStub_SDL::lockAudio() {
+	SDL_LockAudio();
+}
+
+void SystemStub_SDL::unlockAudio() {
+	SDL_UnlockAudio();
 }
 
 void SystemStub_SDL::addKeyMapping(int key, uint8_t mask) {
