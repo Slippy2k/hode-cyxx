@@ -7,7 +7,14 @@ else
     rtb = rab;
 
 rt = (rb & rc) | (ra & ~rc);
-
 rt = ((ra ^ rb) & rc) ^ ra;
 
 https://en.wikipedia.org/wiki/Anaglyph_3D
+
+Saturn
+	Inside 'SmpPlaySingleSample', we will play an empty sample ( Sample #=%d )!!
+	NbStarters is > MAX_STARTER !!
+	Init Luciole No %ld, X=%3ld, Y=%3ld
+	!! ERROR !! : Luciole index (%ld) is greater than MAX_LUCIOLES !
+	!! ERROR !! : Luciole No %d, ix = %ld, iy = %ld !
+	Luciole No %ld, X=%3ld, Y=%3ld
