@@ -80,6 +80,17 @@ inline T ABS(T t) {
 }
 
 template<typename T>
+inline T CLIP(T t, T tmin, T tmax) {
+	if (t < tmin) {
+		return tmin;
+	} else if (t > tmax) {
+		return tmax;
+	} else {
+		return t;
+	}
+}
+
+template<typename T>
 inline void SWAP(T &a, T &b) {
 	T tmp = a; a = b; b = tmp;
 }

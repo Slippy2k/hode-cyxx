@@ -127,7 +127,7 @@ struct SssUnk4 {
 };
 
 struct SssUnk5 {
-	uint8_t *ptr;    // 0 PCM data
+	int16_t *ptr;    // 0 PCM data
 	uint32_t offset; // 4 offset in .sss
 	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed with indexes)
 	uint32_t strideSize;
@@ -230,6 +230,8 @@ struct Resource {
 
 	void loadSssData(const char *levelName);
 	void checkSssCode(const uint8_t *buf, int size);
+	void loadSssDpcm(int num);
+	uint32_t getSssDpcmSize(int num) const;
 
 	uint32_t *getSssLutPtr(int lut, uint32_t flags) {
 		const uint32_t a = (flags >> 20) & 0xF;

@@ -1,6 +1,7 @@
 
 #include "game.h"
 #include "resource.h"
+#include "systemstub.h"
 #include "util.h"
 
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
@@ -466,6 +467,32 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 
 void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->sssUnk3, a, b);
+	// TEMP: mixSounds
+		_res->loadSssDpcm(s->sssUnk3);
+		const int16_t *pcm = _res->_sssDpcmTable[s->sssUnk3].ptr;
+		if (pcm) {
+			_system->lockAudio();
+			bool found = false;
+			for (int i = 0; i < kMixerChannelsCount; ++i) {
+				if (_mixerChannels[i].pcm == pcm) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				for (int i = 0; i < kMixerChannelsCount; ++i) {
+					if (!_mixerChannels[i].pcm) {
+						_mixerChannels[i].pcm = pcm;
+						_mixerChannels[i].size = _res->getSssDpcmSize(s->sssUnk3);
+						_mixerChannels[i].offset = 0;
+						debug(kDebug_SOUND, "Adding PCM %d to channel %d size %d", s->sssUnk3, i, _mixerChannels[i].size);
+						break;
+					}
+				}
+			}
+			_system->unlockAudio();
+		}
+	//
 	const int num = _res->_sssDataUnk3[s->sssUnk3].sssUnk4;
 	debug(kDebug_SOUND, "sssUnk4 num %d", num);
 	SssUnk4 *sssUnk4Ptr = &_res->_sssDataUnk4[num];
@@ -849,4 +876,26 @@ void Game::mixSoundObjects17640(bool flag) {
 //		clearSssBuffer2();
 	}
 //	mixSoundObjects();
+}
+
+static int clipS16(int sample) {
+	return CLIP(sample, -32768, 32767);
+}
+
+void Game::mixSoundsCb(int16_t *buf, int len) {
+	for (int offset = 0; offset < len; ++offset) {
+		for (int i = 0; i < kMixerChannelsCount; ++i) {
+			MixerChannel *ch = &_mixerChannels[i];
+			if (ch->pcm) {
+				if (ch->offset < ch->size) {
+					buf[offset] = clipS16((int)buf[offset] + ch->pcm[ch->offset]);
+					ch->offset++;
+				} else {
+					memset(ch, 0, sizeof(MixerChannel));
+					debug(kDebug_SOUND, "PCM sample finished size %d", ch->size);
+					break;
+				}
+			}
+		}
+	}
 }

@@ -29,6 +29,12 @@ inline const uint8_t *PTR_OFFS(const uint8_t *base, uint32_t index) {
 	return index == 0xFFFFFFFF ? 0 : (const uint8_t *)base + index * sizeof(T);
 }
 
+struct MixerChannel {
+	const int16_t *pcm;
+	uint32_t size;
+	uint32_t offset;
+};
+
 struct Game {
 	typedef void (Game::*OpStage0_2Proc)();
 	typedef int (Game::*OpStage1Proc)(LvlObject *o);
@@ -40,6 +46,7 @@ struct Game {
 		kObjectDataTypeUnk1
 	};
 	enum {
+		kMixerChannelsCount = 16,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -66,6 +73,7 @@ struct Game {
 	Resource *_res;
 	Video *_video;
 	SystemStub *_system;
+	MixerChannel _mixerChannels[kMixerChannelsCount];
 
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
@@ -375,6 +383,7 @@ struct Game {
 	void setSoundObjectVolume(SssObject *so);
 	void expireSoundObjects(int flags);
 	void mixSoundObjects17640(bool flag);
+	void mixSoundsCb(int16_t *buf, int len);
 
 	// andy.cpp
 

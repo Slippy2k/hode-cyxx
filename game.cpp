@@ -23,6 +23,8 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
 	_mstLogicDisabled = true;
 	_snd_masterVolume = 128;
+	// TEMP: mixSounds
+	memset(_mixerChannels, 0, sizeof(_mixerChannels));
 }
 
 Game::~Game() {
@@ -1669,6 +1671,10 @@ void Game::redrawObjects() {
 	}
 }
 
+static void mixCb(void *p, int16_t *stream, int len) {
+	((Game *)p)->mixSoundsCb(stream, len);
+}
+
 void Game::mainLoop(int level, int checkpoint) {
 	// TODO: check bounds
 	_currentLevel = level;
@@ -1678,6 +1684,7 @@ void Game::mainLoop(int level, int checkpoint) {
 	_res->loadSetupDat();
 	_res->loadLvlData(_resLevelNames[_currentLevel]);
 	_res->loadSssData(_resLevelNames[_currentLevel]);
+	_system->startAudio(mixCb, this);
 	levelMainLoop();
 }
 

@@ -481,20 +481,18 @@ void Resource::loadSssData(const char *levelName) {
 		error("Unable to open '%s'", filename);
 		return;
 	}
-#if 0
-	if (_sssBuffer1) {
+	// if (_sssBuffer1) {
 		int count = _sssHdr.dpcmCount;
 		if (count > _sssHdr.unk8) {
 			count = _sssHdr.unk8;
 		}
 		for (int i = 0; i < count; ++i) {
-			free(_res_sssDpcmTable[i * 20]);
+			free(_sssDpcmTable[i].ptr);
 		}
-		free(_sssBuffer1);
-		_sssBuffer1 = 0;
+		// free(_sssBuffer1);
+		// _sssBuffer1 = 0;
 		_sssHdr.unk10 = 0;
-	}
-#endif
+	// }
 	_sssHdr.unk0 = _sssFile->readUint32();
 	assert(_sssHdr.unk0 == 10);
 	_sssHdr.unk4 = _sssFile->readUint32(); // _edi
@@ -843,3 +841,30 @@ void Resource::checkSssCode(const uint8_t *buf, int size) {
 	}
 }
 
+uint32_t Resource::getSssDpcmSize(int num) const {
+	if (num >= 0 && num < _sssHdr.dpcmCount) {
+		return (_sssDpcmTable[num].strideSize - 256 * sizeof(int16_t)) * _sssDpcmTable[num].strideCount * sizeof(int16_t);
+	}
+	return 0;
+}
+
+void Resource::loadSssDpcm(int num) {
+	uint32_t decompressedSize = getSssDpcmSize(num);
+	if (decompressedSize != 0 && !_sssDpcmTable[num].ptr) {
+		debug(kDebug_SOUND, "Loading PCM %d decompressedSize %d", num, decompressedSize);
+		int16_t *p = (int16_t *)malloc(decompressedSize);
+		if (p) {
+			_sssDpcmTable[num].ptr = p;
+			_sssFile->seek(_sssDpcmTable[num].offset, SEEK_SET);
+			for (int i = 0; i < _sssDpcmTable[num].strideCount; ++i) {
+				int16_t lut[256];
+				for (int j = 0; j < 256; ++j) {
+					lut[j] = _sssFile->readUint16();
+				}
+				for (uint32_t j = 256 * sizeof(int16_t); j < _sssDpcmTable[num].strideSize; ++j) {
+					*p++ = lut[_sssFile->readByte()];
+				}
+			}
+		}
+	}
+}
