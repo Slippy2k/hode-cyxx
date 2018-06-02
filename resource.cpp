@@ -865,6 +865,7 @@ void Resource::loadSssDpcm(int num) {
 					*p++ = lut[_sssFile->readByte()];
 				}
 			}
+			assert((p - _sssDpcmTable[num].ptr) * sizeof(int16_t) == decompressedSize);
 		}
 	}
 }

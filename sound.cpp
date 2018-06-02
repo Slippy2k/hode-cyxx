@@ -471,10 +471,14 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 		_res->loadSssDpcm(s->sssUnk3);
 		const int16_t *pcm = _res->_sssDpcmTable[s->sssUnk3].ptr;
 		if (pcm) {
+			uint32_t size = _res->getSssDpcmSize(s->sssUnk3);
+			assert((size & 1) == 0);
+			size /= sizeof(int16_t);
 			_system->lockAudio();
 			bool found = false;
 			for (int i = 0; i < kMixerChannelsCount; ++i) {
 				if (_mixerChannels[i].pcm == pcm) {
+					assert(_mixerChannels[i].size == size);
 					found = true;
 					break;
 				}
@@ -483,7 +487,7 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 				for (int i = 0; i < kMixerChannelsCount; ++i) {
 					if (!_mixerChannels[i].pcm) {
 						_mixerChannels[i].pcm = pcm;
-						_mixerChannels[i].size = _res->getSssDpcmSize(s->sssUnk3);
+						_mixerChannels[i].size = size;
 						_mixerChannels[i].offset = 0;
 						debug(kDebug_SOUND, "Adding PCM %d to channel %d size %d", s->sssUnk3, i, _mixerChannels[i].size);
 						break;
@@ -883,16 +887,16 @@ static int clipS16(int sample) {
 }
 
 void Game::mixSoundsCb(int16_t *buf, int len) {
-	for (int offset = 0; offset < len; ++offset) {
-		for (int i = 0; i < kMixerChannelsCount; ++i) {
-			MixerChannel *ch = &_mixerChannels[i];
-			if (ch->pcm) {
+	for (int i = 0; i < kMixerChannelsCount; ++i) {
+		MixerChannel *ch = &_mixerChannels[i];
+		if (ch->pcm) {
+			for (int offset = 0; offset < len; ++offset) {
 				if (ch->offset < ch->size) {
 					buf[offset] = clipS16((int)buf[offset] + ch->pcm[ch->offset]);
 					ch->offset++;
 				} else {
-					memset(ch, 0, sizeof(MixerChannel));
 					debug(kDebug_SOUND, "PCM sample finished size %d", ch->size);
+					memset(ch, 0, sizeof(MixerChannel));
 					break;
 				}
 			}
