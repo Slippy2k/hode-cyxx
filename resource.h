@@ -129,9 +129,10 @@ struct SssUnk4 {
 struct SssUnk5 {
 	uint8_t *ptr;    // 0 PCM data
 	uint32_t offset; // 4 offset in .sss
-	uint32_t size;   // 8 size in .sss (256 int16_t words + followed with indexes)
-	uint32_t unkC;
-	uint32_t unk10;
+	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed with indexes)
+	uint32_t strideSize;
+	uint16_t strideCount;
+	uint16_t flag;
 };
 
 struct SssUnk6 {

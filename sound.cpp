@@ -416,12 +416,12 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 
 	int codeOffset = _res->_sssDataUnk3[num].firstCodeOffset + num;
-	debug(kDebug_RESOURCE, "startSoundObject codeOffset %d", codeOffset);
+	debug(kDebug_SOUND, "startSoundObject codeOffset %d", codeOffset);
 	assert(codeOffset < _res->_sssHdr.unk1C);
-//	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
+	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
 // 42B64C
-//		return 0;
-//	}
+		return 0;
+	}
 
 	SssObject tmpObj;
 	memset(&tmpObj, 0, sizeof(tmpObj));
@@ -432,6 +432,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.unk4C = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
+	debug(kDebug_SOUND, "startSoundObject dpcm %d", _res->_sssCodeOffsets[codeOffset].unk0);
 	// tmpObj.soundBits = _res->_sssDpcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
 	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, _res->_sssCodeOffsets[codeOffset].unk8);
 	debug(kDebug_SOUND, "code %p", code);

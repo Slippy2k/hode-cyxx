@@ -449,6 +449,30 @@ uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	return p;
 }
 
+static void dumpPcm(File *fp, const SssUnk5 *dpcmTable, int dpcmCount) {
+	for (int i = 0; i < dpcmCount; ++i) {
+		if (dpcmTable[i].totalSize != 0) {
+			char name[32];
+			snprintf(name, sizeof(name), "/tmp/%03d.raw", i);
+			FILE *out = fopen(name, "wb");
+			if (out) {
+				fp->seek(dpcmTable[i].offset, SEEK_SET);
+				for (uint32_t offset = 0; offset < dpcmTable[i].totalSize; offset += dpcmTable[i].strideSize) {
+					int16_t lut[256];
+					for (int j = 0; j < 256; ++j) {
+						lut[j] = fp->readUint16();
+					}
+					for (uint32_t j = 256 * sizeof(int16_t); j < dpcmTable[i].strideSize; ++j) {
+						int16_t sample = lut[fp->readByte()];
+						fwrite(&sample, 1, sizeof(int16_t), out);
+					}
+				}
+				fclose(out);
+			}
+		}
+	}
+}
+
 void Resource::loadSssData(const char *levelName) {
 	if (!_sssFile) return;
 	char filename[32];
@@ -653,15 +677,21 @@ void Resource::loadSssData(const char *levelName) {
 	for (int i = 0; i < _sssHdr.dpcmCount; ++i) {
 		int a = _sssFile->readUint32(); // ptr to PCM data
 		int b = _sssFile->readUint32(); // offset in .sss
-		int c = _sssFile->readUint32(); // size in .sss (256 int16_t words + followed with indexes)
+		int c = _sssFile->readUint32(); // size in .sss
 		int d = _sssFile->readUint32();
-		int e = _sssFile->readUint32();
+		int e = _sssFile->readUint16();
+		int f = _sssFile->readUint16();
 		_sssDpcmTable[i].ptr = 0;
 		_sssDpcmTable[i].offset = b;
-		_sssDpcmTable[i].size = c;
-		_sssDpcmTable[i].unkC = d;
-		_sssDpcmTable[i].unk10 = e;
-		debug(kDebug_RESOURCE, "sssDpcmTable #%d/%d 0x%x offset 0x%x size %d %d 0x%x", i, _sssHdr.dpcmCount, a, b, c, d, e);
+		_sssDpcmTable[i].totalSize = c;
+		_sssDpcmTable[i].strideSize = d;
+		_sssDpcmTable[i].strideCount = e;
+		_sssDpcmTable[i].flag = f;
+		debug(kDebug_RESOURCE, "sssDpcmTable #%d/%d 0x%x offset 0x%x size %d stride %d %d flag %d", i, _sssHdr.dpcmCount, a, b, c, d, e, f);
+		if (c != 0) {
+			assert((c % d) == 0); // total size must be multiple of stride
+			assert(c == d * e); // total size is stride size * count
+		}
 		bytesRead += 20;
 	}
 	// _res_sssDataUnk4 = data; // size : sssHdr.unk14 * 52
@@ -763,6 +793,9 @@ void Resource::loadSssData(const char *levelName) {
 
 // loc_429F38:
 	// clearSssData();
+	if (0) {
+		dumpPcm(_sssFile, _sssDpcmTable, _sssHdr.dpcmCount);
+	}
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {
