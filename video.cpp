@@ -329,20 +329,49 @@ void Video::drawLine(int x1, int y1, int x2, int y2) {
 	}
 }
 
+static uint8_t lookupColor(uint8_t a, uint8_t b, const uint8_t *lut) {
+	// if (a < 144) return b;
+	// else if (b < 144) return lut[b];
+	// else return b;
+	return (a < 144) ? b : lut[b];
+}
+
 void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch, int src_pitch, uint8_t *dst1, uint8_t *dst2, uint8_t *src1, uint8_t *src2) {
+	assert(dst1 == _shadowLayer);
+	assert(dst2 == _frontLayer);
+	// src1 == projectionData
+	// src2 == shadowPalette
+	const uint8_t *shadowLut = src2;
+
 	dst2 += y * dst_pitch + x;
 	src2 = _shadowColorLookupTable;
 	while (src_h-- != 0) {
 		for (int i = 0; i < src_w; ++i) {
-			int offset = READ_LE_UINT16(src1); src1 += 2;
-			offset = (dst1[offset] << 8) | dst2[i];
-			dst2[i] = src2[offset];
+			if (1) { // no LUT
+				const int offset = READ_LE_UINT16(src1); src1 += 2;
+				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], shadowLut);
+			} else {
+				// build lookup offset
+				//   msb : _shadowLayer[ _projectionData[ (x, y) ] ]
+				//   lsb : _frontLayer[ (x, y) ]
+				int offset = READ_LE_UINT16(src1); src1 += 2;
+				offset = (dst1[offset] << 8) | dst2[i];
+
+				// lookup color matrix
+				//   if msb < 144 : _frontLayer.color
+				//   if msb >= 144 : if _frontLayer.color < 144 ? shadowPalette[ _frontLayer.color ] : _frontLayer.color
+				dst2[i] = src2[offset];
+			}
 		}
 		dst2 += dst_pitch;
 	}
 }
 
 void Video::buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst) {
+	assert(dst == _shadowColorLookupTable);
+	// 256x256
+	//   0..143 : 0..255
+	// 144..255 : src[0..143] 144..255
         for (int i = 0; i < 144; ++i) {
                 for (int j = 0; j < 256; ++j) {
                         *dst++ = j;

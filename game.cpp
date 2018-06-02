@@ -130,20 +130,37 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 			const int decodedSize = decodeLZW(src + 2, dst);
 
 			_shadowScreenMasksTable[i].dataSize = READ_LE_UINT32(dst);
+
+			// header : 20 bytes
+			// projectionData : w * h * sizeof(uint16_t) - for a given (x, y) returns the casted (x, y)
+			// paletteData : 256 (only the first 144 bytes are read)
+
 			_shadowScreenMasksTable[i].projectionDataPtr = dst + 0x14 + READ_LE_UINT32(dst + 4);
 			_shadowScreenMasksTable[i].shadowPalettePtr = dst + 0x14 + READ_LE_UINT32(dst + 8);
-			_shadowScreenMasksTable[i].x = READ_LE_UINT16(dst + 0xC);
-			_shadowScreenMasksTable[i].y = READ_LE_UINT16(dst + 0xE);
-			int w = _shadowScreenMasksTable[i].w = READ_LE_UINT16(dst + 0x10);
-			int h = _shadowScreenMasksTable[i].h = READ_LE_UINT16(dst + 0x12);
+			const int x = _shadowScreenMasksTable[i].x = READ_LE_UINT16(dst + 0xC);
+			const int y = _shadowScreenMasksTable[i].y = READ_LE_UINT16(dst + 0xE);
+			const int w = _shadowScreenMasksTable[i].w = READ_LE_UINT16(dst + 0x10);
+			const int h = _shadowScreenMasksTable[i].h = READ_LE_UINT16(dst + 0x12);
+
+			fprintf(stdout, "shadow screen mask #%d pos %d,%d dim %d,%d size %d\n", i, x, y, w, h, decodedSize);
 
 			const int size = w * h;
 			src = _shadowScreenMasksTable[i].projectionDataPtr + 2;
 			for (int j = 1; j < size; ++j) {
-				const int offset = READ_LE_UINT16(src - 2) + READ_LE_UINT16(src);
+				const uint16_t offset = READ_LE_UINT16(src - 2) + READ_LE_UINT16(src);
+				// fprintf(stdout, "shadow #%d offset #%d 0x%x 0x%x\n", i, j, READ_LE_UINT16(src), offset);
 				WRITE_LE_UINT16(src, offset);
 				src += 2;
 			}
+
+			const int shadowPaletteSize = decodedSize - 20 - w * h * sizeof(uint16_t);
+			assert(shadowPaletteSize == 256);
+			uint8_t *shadowLut = _shadowScreenMasksTable[i].shadowPalettePtr;
+			for (int j = 144; j < 256; ++j) {
+				assert(shadowLut[j] == 0);
+				shadowLut[j] = j;
+			}
+
 			_video->buildShadowColorLookupTable(_shadowScreenMasksTable[i].shadowPalettePtr, _video->_shadowColorLookupTable);
 //			dst += size * 2;
 			dst += decodedSize;
