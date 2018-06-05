@@ -22,7 +22,7 @@ Video::Video(SystemStub *system)
 	_spr.y = 0;
 	_spr.w = kScreenWidth;
 	_spr.h = kScreenHeight;
-	_shadowColorLookupTable = (uint8_t *)malloc(256 * 256);
+	_shadowColorLookupTable = 0; //(uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
 	_fillColor = 0xC4;
 	_blackColor = 255;
 	_findBlackColor = true;
@@ -341,7 +341,6 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 	assert(dst2 == _frontLayer);
 	// src1 == projectionData
 	// src2 == shadowPalette
-	const uint8_t *shadowLut = src2;
 
 	dst2 += y * dst_pitch + x;
 	src2 = _shadowColorLookupTable;
@@ -349,7 +348,7 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 		for (int i = 0; i < src_w; ++i) {
 			if (1) { // no LUT
 				const int offset = READ_LE_UINT16(src1); src1 += 2;
-				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], shadowLut);
+				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], _shadowColorLut);
 			} else {
 				// build lookup offset
 				//   msb : _shadowLayer[ _projectionData[ (x, y) ] ]
@@ -369,21 +368,27 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 
 void Video::buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst) {
 	assert(dst == _shadowColorLookupTable);
-	// 256x256
-	//   0..143 : 0..255
-	// 144..255 : src[0..143] 144..255
-        for (int i = 0; i < 144; ++i) {
-                for (int j = 0; j < 256; ++j) {
-                        *dst++ = j;
-                }
-        }
-        for (int i = 0; i < 112; ++i) {
-                memcpy(dst, src, 144);
-                dst += 144;
-                for (int j = 0; j < 112; ++j) {
-                        *dst++ = 144 + j;
-                }
-        }
+	if (0) {
+		// 256x256
+		//   0..143 : 0..255
+		// 144..255 : src[0..143] 144..255
+		for (int i = 0; i < 144; ++i) {
+			for (int j = 0; j < 256; ++j) {
+				*dst++ = j;
+			}
+		}
+		for (int i = 0; i < 112; ++i) {
+			memcpy(dst, src, 144);
+			dst += 144;
+			for (int j = 0; j < 112; ++j) {
+				*dst++ = 144 + j;
+			}
+		}
+	}
+	memcpy(_shadowColorLut, src, 144);
+	for (int i = 144; i < 256; ++i) {
+		_shadowColorLut[i] = i;
+	}
 #if 0
         // lookup[a * 256 + b]
         //
