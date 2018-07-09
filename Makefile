@@ -1,6 +1,6 @@
 
-SDL_CFLAGS = `sdl-config --cflags`
-SDL_LIBS = `sdl-config --libs`
+SDL_CFLAGS = `sdl2-config --cflags`
+SDL_LIBS = `sdl2-config --libs`
 
 CXXFLAGS = -g -O -Wall $(SDL_CFLAGS) $(DEFINES)
 

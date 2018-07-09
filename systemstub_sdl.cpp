@@ -11,6 +11,8 @@
 
 static int _scalerMultiplier = 3;
 
+static const int _pixelFormat = SDL_PIXELFORMAT_RGB888;
+
 struct KeyMapping {
 	int keyCode;
 	int mask;
@@ -25,7 +27,11 @@ struct SystemStub_SDL : SystemStub {
 
 	uint8_t *_offscreenLut;
 	uint32_t *_offscreenRgb;
-	SDL_Surface *_screen;
+	SDL_Window *_window;
+	SDL_Renderer *_renderer;
+	SDL_Texture *_texture;
+	int _texW, _texH;
+	SDL_PixelFormat *_fmt;
 	uint32_t _pal[256];
 	int _screenW, _screenH;
 	int _shakeDx, _shakeDy;
@@ -55,7 +61,7 @@ struct SystemStub_SDL : SystemStub {
 	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
 	void updateKeys(PlayerInput *inp);
-	void prepareScaledGfx();
+	void prepareScaledGfx(const char *caption);
 };
 
 SystemStub *SystemStub_SDL_create() {
@@ -65,7 +71,6 @@ SystemStub *SystemStub_SDL_create() {
 void SystemStub_SDL::init(const char *title, int w, int h) {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	SDL_ShowCursor(SDL_DISABLE);
-	SDL_WM_SetCaption(title, NULL);
 	setupDefaultKeyMappings();
 	memset(&inp, 0, sizeof(inp));
 	_screenW = w;
@@ -82,14 +87,10 @@ void SystemStub_SDL::init(const char *title, int w, int h) {
 		error("SystemStub_SDL::init() Unable to allocate RGB offscreen buffer");
 	}
 	memset(_offscreenLut, 0, offscreenSize);
-	prepareScaledGfx();
+	prepareScaledGfx(title);
 }
 
 void SystemStub_SDL::destroy() {
-	if (_screen) {
-		// free()'ed in SDL_Quit()
-		_screen = 0;
-	}
 	free(_offscreenLut);
 	_offscreenLut = 0;
 	free(_offscreenRgb);
@@ -109,7 +110,7 @@ void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 			g = (g << shift) | (g >> depth);
 			b = (b << shift) | (b >> depth);
 		}
-		_pal[i] = SDL_MapRGB(_screen->format, r, g, b);
+		_pal[i] = SDL_MapRGB(_fmt, r, g, b);
 	}
 }
 
@@ -146,9 +147,14 @@ static void clearScreen(uint32_t *dst, int dstPitch, int x, int y, int w, int h)
 }
 
 void SystemStub_SDL::updateScreen() {
-	SDL_LockSurface(_screen);
-	uint32_t *dst = (uint32_t *)_screen->pixels;
-	const int dstPitch = _screen->pitch / sizeof(uint32_t);
+	void *texturePtr = 0;
+	int texturePitch = 0;
+	if (SDL_LockTexture(_texture, 0, &texturePtr, &texturePitch) != 0) {
+		return;
+	}
+	uint32_t *dst = (uint32_t *)texturePtr;
+	assert((texturePitch & 3) == 0);
+	const int dstPitch = texturePitch / sizeof(uint32_t);
 	const uint8_t *src = _offscreenLut;
 	const int srcPitch = _screenW;
 	int w = _screenW;
@@ -181,8 +187,17 @@ void SystemStub_SDL::updateScreen() {
 		p += w;
 	}
 	scaler_xbrz.scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
-	SDL_UnlockSurface(_screen);
-	SDL_UpdateRect(_screen, 0, 0, _screenW * _scalerMultiplier, _screenH * _scalerMultiplier);
+	SDL_UnlockTexture(_texture);
+
+	//SDL_UpdateTexture(_texture, 0, _screenBuffer, _screenW * sizeof(uint32_t));
+	SDL_RenderClear(_renderer);
+	SDL_Rect r;
+	r.x = 0;
+	r.y = 0;
+	r.w = _screenW * _scalerMultiplier;
+	r.h = _screenH * _scalerMultiplier;
+	SDL_RenderCopy(_renderer, _texture, 0, &r);
+        SDL_RenderPresent(_renderer);
 	_shakeDx = _shakeDy = 0;
 }
 
@@ -193,9 +208,9 @@ void SystemStub_SDL::processEvents() {
 		case SDL_KEYUP:
 			if (ev.key.keysym.mod & KMOD_ALT) {
 				switch (ev.key.keysym.sym) {
-				case SDLK_KP_PLUS:
+				case SDL_SCANCODE_KP_PLUS:
 					break;
-				case SDLK_KP_MINUS:
+				case SDL_SCANCODE_KP_MINUS:
 					break;
 				default:
 					break;
@@ -281,30 +296,30 @@ void SystemStub_SDL::setupDefaultKeyMappings() {
 
 	/* original key mappings of the PC version */
 
-	addKeyMapping(SDLK_LEFT,     SYS_INP_LEFT);
-	addKeyMapping(SDLK_UP,       SYS_INP_UP);
-	addKeyMapping(SDLK_RIGHT,    SYS_INP_RIGHT);
-	addKeyMapping(SDLK_DOWN,     SYS_INP_DOWN);
-//	addKeyMapping(SDLK_PAGEUP,   SYS_INP_UP | SYS_INP_RIGHT);
-//	addKeyMapping(SDLK_HOME,     SYS_INP_UP | SYS_INP_LEFT);
-//	addKeyMapping(SDLK_END,      SYS_INP_DOWN | SYS_INP_LEFT);
-//	addKeyMapping(SDLK_PAGEDOWN, SYS_INP_DOWN | SYS_INP_RIGHT);
+	addKeyMapping(SDL_SCANCODE_LEFT,     SYS_INP_LEFT);
+	addKeyMapping(SDL_SCANCODE_UP,       SYS_INP_UP);
+	addKeyMapping(SDL_SCANCODE_RIGHT,    SYS_INP_RIGHT);
+	addKeyMapping(SDL_SCANCODE_DOWN,     SYS_INP_DOWN);
+//	addKeyMapping(SDL_SCANCODE_PAGEUP,   SYS_INP_UP | SYS_INP_RIGHT);
+//	addKeyMapping(SDL_SCANCODE_HOME,     SYS_INP_UP | SYS_INP_LEFT);
+//	addKeyMapping(SDL_SCANCODE_END,      SYS_INP_DOWN | SYS_INP_LEFT);
+//	addKeyMapping(SDL_SCANCODE_PAGEDOWN, SYS_INP_DOWN | SYS_INP_RIGHT);
 
-	addKeyMapping(SDLK_RETURN,   SYS_INP_JUMP);
-	addKeyMapping(SDLK_LCTRL,    SYS_INP_RUN);
-//	addKeyMapping(SDLK_f,        SYS_INP_RUN);
-//	addKeyMapping(SDLK_LALT,     SYS_INP_JUMP);
-//	addKeyMapping(SDLK_g,        SYS_INP_JUMP);
-	addKeyMapping(SDLK_LSHIFT,   SYS_INP_SHOOT);
-//	addKeyMapping(SDLK_h,        SYS_INP_SHOOT);
-//	addKeyMapping(SDLK_d,        SYS_INP_SHOOT | SYS_INP_RUN);
-//	addKeyMapping(SDLK_SPACE,    SYS_INP_SHOOT | SYS_INP_RUN);
-	addKeyMapping(SDLK_ESCAPE,   SYS_INP_ESC);
+	addKeyMapping(SDL_SCANCODE_RETURN,   SYS_INP_JUMP);
+	addKeyMapping(SDL_SCANCODE_LCTRL,    SYS_INP_RUN);
+//	addKeyMapping(SDL_SCANCODE_f,        SYS_INP_RUN);
+//	addKeyMapping(SDL_SCANCODE_LALT,     SYS_INP_JUMP);
+//	addKeyMapping(SDL_SCANCODE_g,        SYS_INP_JUMP);
+	addKeyMapping(SDL_SCANCODE_LSHIFT,   SYS_INP_SHOOT);
+//	addKeyMapping(SDL_SCANCODE_h,        SYS_INP_SHOOT);
+//	addKeyMapping(SDL_SCANCODE_d,        SYS_INP_SHOOT | SYS_INP_RUN);
+//	addKeyMapping(SDL_SCANCODE_SPACE,    SYS_INP_SHOOT | SYS_INP_RUN);
+	addKeyMapping(SDL_SCANCODE_ESCAPE,   SYS_INP_ESC);
 }
 
 void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	inp->prevMask = inp->mask;
-	uint8_t *keyState = SDL_GetKeyState(NULL);
+	const uint8_t *keyState = SDL_GetKeyboardState(NULL);
 	for (int i = 0; i < _keyMappingsCount; ++i) {
 		KeyMapping *keyMap = &_keyMappings[i];
 		if (keyState[keyMap->keyCode]) {
@@ -315,9 +330,11 @@ void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	}
 }
 
-void SystemStub_SDL::prepareScaledGfx() {
-        _screen = SDL_SetVideoMode(_screenW * _scalerMultiplier, _screenH * _scalerMultiplier, 32, SDL_SWSURFACE);
-	if (!_screen) {
-		error("SystemStub_SDL::prepareScaledGfx() Unable to allocate _screen buffer");
-	}
+void SystemStub_SDL::prepareScaledGfx(const char *caption) {
+	_texW = _screenW * _scalerMultiplier;
+	_texH = _screenH * _scalerMultiplier;
+	_window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _texW, _texH, 0);
+	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
+	_texture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _texW, _texH);
+	_fmt = SDL_AllocFormat(_pixelFormat);
 }
