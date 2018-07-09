@@ -1,5 +1,6 @@
 
 #include "file.h"
+#include "staticdata.h"
 
 extern int raw2png_6bits_color;
 extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette);
@@ -230,7 +231,39 @@ static void DecodeHintScreen(File *f) {
 	}
 }
 
-#undef main
+static void writeStaticData(const char *filename, const uint8_t *buf) {
+	for (int i = 0; i < 256; ++i) {
+		const int j = i * 3;
+		pal[j] = pal[j + 1] = pal[j + 2] = i;
+	}
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		raw2png_6bits_color = 1;
+		raw2png(fp, buf, 256, 192, pal);
+		fclose(fp);
+	}
+}
+
+static void writeFile(const char *filename, const uint8_t *buf, int bufSize) {
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		fwrite(buf, bufSize, 1, fp);
+		fclose(fp);
+	}
+}
+
+static void DecodeStaticData() {
+	int sz1 = UnpackData(9, byte_43D960, decodeBuffer);
+	assert(sz1 == 256 * 192);
+	writeFile("data_43D960.bin", decodeBuffer, sz1);
+	writeStaticData("data_43D960.png", decodeBuffer);
+
+	int sz2 = UnpackData(9, byte_43EA78, decodeBuffer);
+	assert(sz2 == 256 * 192);
+	writeFile("data_43EA78.bin", decodeBuffer, sz2);
+	writeStaticData("data_43EA78.png", decodeBuffer);
+}
+
 int main(int argc, char *argv[]) {
 	if (argc == 2) {
 		File f;
@@ -241,5 +274,6 @@ int main(int argc, char *argv[]) {
 			LoadFont();
 		}
 	}
+	DecodeStaticData();
 	return 0;
 }

@@ -1,6 +1,5 @@
 
 #include "intern.h"
-#include "staticdata.h"
 
 static const uint32_t _res_unpackBitmaskTable[] = { 0, 1, 3, 7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0xFFFFFFFF };
 
@@ -293,33 +292,3 @@ end:
 //	return _eax;
 	return dst_ - dst;
 }
-
-void writeFile(const char *filename, const uint8_t *buf, int bufSize) {
-	FILE *fp = fopen(filename, "wb");
-	if (fp) {
-		fwrite(buf, bufSize, 1, fp);
-		fclose(fp);
-	}
-}
-
-#if 0
-static void fix(uint8_t *buf, int bufSize) {
-	for (int i = 0; i < bufSize; ++i) {
-		buf[i] <<= 4;
-	}
-}
-static uint8_t decodeBuffer[256 * 192 * 10];
-int main(int argc, char *argv[]) {
-	int sz1 = UnpackData(9, byte_43D960, decodeBuffer);
-	printf("sz1 %d\n", sz1);
-	fix(decodeBuffer, sz1);
-	writeFile("data_43D960.bin", decodeBuffer, sz1);
-
-	int sz2 = UnpackData(9, byte_43EA78, decodeBuffer);
-	printf("sz2 %d\n", sz2);
-	fix(decodeBuffer, sz2);
-	writeFile("data_43EA78.bin", decodeBuffer, sz2);
-
-	return 0;
-}
-#endif
