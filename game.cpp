@@ -7,9 +7,10 @@
 #include "fileio.h"
 #include "lzw.h"
 #include "paf.h"
+#include "screenshot.h"
+#include "systemstub.h"
 #include "util.h"
 #include "video.h"
-#include "systemstub.h"
 
 Game::Game(SystemStub *system, const char *dataPath) {
 	memset(this, 0, sizeof(Game)); // TODO: proper init
@@ -2275,6 +2276,10 @@ void Game::levelMainLoop() {
 			_video->refreshGamePalette(_video->_displayPaletteBuffer);
 		}
 		redrawObjects();
+		if (_system->inp.screenshot) {
+			_system->inp.screenshot = false;
+			captureScreenshot();
+		}
 		if (_shakeScreenDuration != 0 || _fadePaletteCounter != 0 || _video->_displayShadowLayer) {
 			shakeScreen();
 			uint8_t *p = _video->_shadowLayer;
@@ -2939,3 +2944,30 @@ void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) 
 	}
 }
 
+void Game::captureScreenshot() {
+	static int screenshot = 1;
+	char name[64];
+
+	snprintf(name, sizeof(name), "screenshot-%03d-front.bmp", screenshot);
+	saveBMP(name, _video->_frontLayer, _video->_palette, Video::kScreenWidth, Video::kScreenHeight);
+
+	snprintf(name, sizeof(name), "screenshot-%03d-background.bmp", screenshot);
+	saveBMP(name, _video->_backgroundLayer, _video->_palette, Video::kScreenWidth, Video::kScreenHeight);
+
+	snprintf(name, sizeof(name), "screenshot-%03d-shadow.bmp", screenshot);
+	saveBMP(name, _video->_shadowLayer, _video->_palette, Video::kScreenWidth, Video::kScreenHeight);
+
+	static const int kPaletteRectSize = 8;
+	uint8_t paletteBuffer[8 * 256 * 8];
+	for (int x = 0; x < 256; ++x) {
+		const int xOffset = x * kPaletteRectSize;
+		for (int y = 0; y < kPaletteRectSize; ++y) {
+			memset(paletteBuffer + xOffset + y * 256 * kPaletteRectSize, x, kPaletteRectSize);
+		}
+	}
+
+	snprintf(name, sizeof(name), "screenshot-%03d-palette.bmp", screenshot);
+	saveBMP(name, paletteBuffer, _video->_palette, 256 * kPaletteRectSize, kPaletteRectSize);
+
+	++screenshot;
+}

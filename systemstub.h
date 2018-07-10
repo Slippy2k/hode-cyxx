@@ -20,6 +20,7 @@
 struct PlayerInput {
 	uint8_t prevMask, mask;
 	bool quit;
+	bool screenshot;
 
 	bool keyPressed(int keyMask) const {
 		return (prevMask & keyMask) == 0 && (mask & keyMask) == keyMask;

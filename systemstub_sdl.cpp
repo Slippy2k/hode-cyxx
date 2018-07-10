@@ -206,15 +206,8 @@ void SystemStub_SDL::processEvents() {
 	while (SDL_PollEvent(&ev)) {
 		switch (ev.type) {
 		case SDL_KEYUP:
-			if (ev.key.keysym.mod & KMOD_ALT) {
-				switch (ev.key.keysym.sym) {
-				case SDL_SCANCODE_KP_PLUS:
-					break;
-				case SDL_SCANCODE_KP_MINUS:
-					break;
-				default:
-					break;
-				}
+			if (ev.key.keysym.sym == SDLK_s) {
+				inp.screenshot = true;
 			}
 			break;
 		case SDL_QUIT:

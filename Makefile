@@ -8,7 +8,7 @@ OBJDIR = obj
 
 SRCS = andy.cpp benchmark.cpp fileio.cpp game.cpp level1.cpp level2.cpp level3.cpp level4.cpp \
 	lzw.cpp main.cpp monsters.cpp paf.cpp random.cpp resource.cpp \
-	scaler.cpp sound.cpp staticres.cpp systemstub_sdl.cpp \
+	scaler.cpp screenshot.cpp sound.cpp staticres.cpp systemstub_sdl.cpp \
 	util.cpp video.cpp
 
 SCALERS := scaler_nearest.cpp scaler_xbrz.cpp xbrz/xbrz.cpp

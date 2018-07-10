@@ -241,7 +241,7 @@ struct Game {
 	void initMstCode();
 	void levelMainLoop();
 	void callLevelOpStage0(int num); // callLevel_preScreenUpdate
-	int callLevelOpStage1(int num, LvlObject *o);
+	int callLevelOpStage1(int num, LvlObject *o); // callLevel_objectUpdate
 	void callLevelOpStage2(int num); // callLevel_postScreenUpdate
 	void callLevelOpStage3(); // callLevel_preTick
 	void callLevelOpStage4(); // callLevel_postTick
@@ -267,6 +267,7 @@ struct Game {
 	void clearDeclaredLvlObjectsList();
 	void initLvlObjects();
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
+	void captureScreenshot();
 
 	// level1.cpp
 
