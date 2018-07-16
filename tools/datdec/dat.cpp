@@ -170,17 +170,17 @@ static uint8_t decodeBuffer[256 * 192 * 4];
 
 /* res_loadFont */
 static void LoadFont() {
-/*	int size = UnpackData(9, _res_setupDatFontData, decodeBuffer);
+	int size = UnpackData(9, _res_setupDatFontData, decodeBuffer);
 	printf("LoadFont size %d\n", size);
 	if (size == 16 * 16 * 64) {
 		FILE *fp = fopen("setupDatFont.png", "wb");
 		if (fp) {
 			uint8_t greyPal[256 * 3];
 			for (int i = 0; i < 256; ++i) { greyPal[i * 3] = greyPal[i * 3 + 1] = greyPal[i * 3 + 2] = i << 4; }
-			raw2png(fp, decodeBuffer + 30 * 256, 16, 16, greyPal);
+			raw2png(fp, decodeBuffer, 16, 16 * 64, greyPal);
 			fclose(fp);
 		}
-	}*/
+	}
 }
 
 /*menu_readSetupDat*/

@@ -22,7 +22,7 @@ static uint32_t _res_unpackBitsCount;
 int UnpackData(int type, const uint8_t *src, uint8_t *dst) {
 	uint32_t _esi, _eax, _ebx, _ecx, _edx, _edi, var8, var10, _ebp_i;
 	const uint8_t *_ebp;
-	uint8_t *dst_, *varC, *_ecx_p, *_esi_p, *_edi_p, *_eax_p;
+	uint8_t *dst_, *varC, *_ecx_p, *_esi_p, *_edi_p;
 
 	_esi = type - 1;
 	_ebp = src;

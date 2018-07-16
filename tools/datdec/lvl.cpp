@@ -1,17 +1,6 @@
 
 #include "file.h"
 
-
-/*static uint32_t ComputeChecksum(const uint8_t *buf, uint32_t size) {
-	assert((size & 3) == 0);
-	size >>= 2;
-	uint32_t crc = 0;
-	while (size--) {
-		crc ^= READ_LE_UINT32(buf); buf += 4;
-	}
-	return crc;
-}*/
-
 extern int raw2png_6bits_color;
 extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette);
 extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
@@ -71,8 +60,6 @@ static void LoadLevelData0x2B88(File *f, const uint8_t *LevelData0x2B88) {
 	}
 #endif
 }
-
-uint8_t DecodeSprBuffer[256 * 192];
 
 /*const uint8_t *spr_src;
 uint8_t *spr_dst;
@@ -178,8 +165,7 @@ static void DecodeSprite(int i, const uint8_t *src, int x, int pitch, uint8_t *d
 	int size = READ_LE_UINT16(src);
 	int w = READ_LE_UINT16(src + 2);
 	int h = READ_LE_UINT16(src + 4);
-//	printf("bitmap %d size %d/%d w %d h %d\n", i, size, w * h, w, h);
-	memset(DecodeSprBuffer, 0, 256 * 192);
+	printf("bitmap %d size %d/%d w %d h %d\n", i, size, w * h, w, h);
 	DecodeSPR_FLAG0(src, dst + x, pitch);
 }
 

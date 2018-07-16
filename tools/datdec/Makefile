@@ -1,5 +1,5 @@
 
-CPPFLAGS = -g -O -Wuninitialized -Wno-multichar
+CPPFLAGS = -g -O -Wuninitialized -Wno-multichar -Wall
 
 SRCS_LVL = file.cpp lvl.cpp unpack.cpp raw2png.cpp
 OBJS_LVL = $(SRCS_LVL:.cpp=.o)
