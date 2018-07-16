@@ -8,7 +8,6 @@ extern "C" {
 #include <stdlib.h>
 
 #include "screenshot.h"
-#include "libbs/bs.h"
 
 // CD CD BC 00 00 00 20 33 00 38 01 00 02 00
 
@@ -43,7 +42,6 @@ inline uint32_t READ_LE_UINT32(const void *ptr) {
 static uint8_t _sectorBuf[2048];
 static int _sectorBufPos;
 static int _sectorBufLen;
-
 
 static int fioAlignSizeTo2048(int size) {
 	return ((size + 2043) / 2044) * 2048;
@@ -179,16 +177,6 @@ static const uint32_t offsets[] = {
 	0x1a330c,
 	0x29530c,
 	0x3aab0c,
-
-	0xd2230c,
-	0xdecb0c,
-	0xdf330c,
-	0xe30b0c,
-	0xe3b30c,
-	0xe8f30c,
-	0xe95b0c,
-	0xef0610,
-	0xef4b28,
 */
 	0
 };
@@ -201,51 +189,44 @@ int main(int argc, char *argv[]) {
 	FILE *fp = fopen("a0.bss", "rb");
 	if (fp) {
 		const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
-		fprintf(stdout, "Read %d bytes at 0x%x from 'a0'\n", count);
+		fprintf(stdout, "Read %d bytes from 'a0'\n", count);
 		decodeMdec(tempBuffer, count, "a0.tga");
 		fclose(fp);
 	}
-	assert(argc == 2);
-	fp = fopen(argv[1], "rb"); // rock_hod.lvl
-	if (fp) {
-		for (int i = 0; offsets[i] != 0; ++i) {
-#if 0
-			fseek(fp, offsets[i], SEEK_SET);
-			const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
-#else
-			fioSeekAlign(fp, offsets[i]);
-			const int count = W * H * 4;
-			fioRead(fp, tempBuffer, count);
-#endif
-			fprintf(stdout, "Read %d bytes at 0x%x\n", count, offsets[i]);
-			char name[16];
-			snprintf(name, sizeof(name), "%08x.tga", offsets[i]);
-			decodeMdec(tempBuffer, count, name);
-			// int len = READ_LE_UINT16(tempBuffer) * sizeof(uint16_t) + 8;
-			snprintf(name, sizeof(name), "%08x.bss", offsets[i]);
-			FILE *out = fopen(name, "wb");
-			if (out) {
-				fwrite(tempBuffer, 1, count, out);
-				fclose(out);
-			}
-/*
-			uint8_t *rgb = (uint8_t *)malloc(W * H * 3);
-			if (rgb) {
-				unsigned char *iq = 0;
-				bs_decode_rgb24(rgb, (bs_header_t *)tempBuffer, W, H, iq);
-				snprintf(name, sizeof(name), "%08x.tga", offsets[i]);
-				saveTGA(name, rgb, W, H);
-				free(rgb);
-			}
-*/
+	for (int i = 1; i < argc; ++i) {
+		const char *ext = strrchr(argv[i], '.');
+		if (!ext || strcasecmp(ext, ".lvl") != 0) {
+			continue;
 		}
+		fp = fopen(argv[i], "rb");
+		if (fp) {
+			// rock_hod.lvl
+			for (int i = 0; offsets[i] != 0; ++i) {
+#if 0
+				fseek(fp, offsets[i], SEEK_SET);
+				const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
+#else
+				fioSeekAlign(fp, offsets[i]);
+				const int count = W * H * 4;
+				fioRead(fp, tempBuffer, count);
+#endif
+				fprintf(stdout, "Read %d bytes at 0x%x\n", count, offsets[i]);
+				char name[16];
+				snprintf(name, sizeof(name), "%08x.tga", offsets[i]);
+				decodeMdec(tempBuffer, count, name);
+				snprintf(name, sizeof(name), "%08x.bss", offsets[i]);
+				FILE *out = fopen(name, "wb");
+				if (out) {
+					fwrite(tempBuffer, 1, count, out);
+					fclose(out);
+				}
+			}
 
-#define MAX_OFFSETS 4096
-		uint32_t offsetsTable[MAX_OFFSETS];
-		int offsetsCount = 0;
+#define MAX_OFFSETS 512
+			uint32_t offsetsTable[MAX_OFFSETS];
+			int offsetsCount = 0;
 
-		// scan
-		if (1) {
+			// scan
 			fseek(fp, 0, SEEK_SET);
 			do {
 				const int count = fread(tempBuffer, 1, 4, fp);
@@ -283,9 +264,9 @@ int main(int argc, char *argv[]) {
 					fclose(out);
 				}
 			}
-		}
 
-		fclose(fp);
+			fclose(fp);
+		}
 	}
 	return 0;
 }
