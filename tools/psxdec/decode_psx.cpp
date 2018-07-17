@@ -13,22 +13,6 @@ extern "C" {
 
 #include "screenshot.h"
 
-// CD CD BC 00 00 00 20 33 00 38 01 00 02 00
-
-/*
-  0 . . . 2 . . little . Unknown^M
-                           Number of run length codes in the frame?^M
-                           Size of data (in bytes) following this header?^M
-  2 . . . 2 . . little . Always 0x3800^M
-  4 . . . 2 . . little . Frame's quantization scale^M
-  6 . . . 2 . . little . Version of the frame^M
-  8  . . . . . . . . . . Compressed macro blocks^M
-                           Stream of 2 byte little-endian values^M
-                           Number of macro blocks =^M
-                             (width+15)/16 * (height+15)/16^M
-
-*/
-
 static uint16_t BSWAP_16(uint16_t n) {
 	return (n >> 8) | (n << 8);
 }
@@ -42,6 +26,8 @@ inline uint32_t READ_LE_UINT32(const void *ptr) {
 	const uint8_t *b = (const uint8_t *)ptr;
 	return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
 }
+
+static const bool _fioReadCrc = true;
 
 static uint8_t _sectorBuf[2048];
 static int _sectorBufPos;
@@ -108,26 +94,21 @@ static void fioFlush(FILE *fp) {
 	_sectorBufLen = _sectorBufPos = 0;
 }
 
+static int clipColorByte(float color) {
+	if (color < 0) {
+		return 0;
+	} else if (color > 255) {
+		return 255;
+	} else {
+		return (int)color;
+	}
+}
+
 static uint32_t yuv420_to_argb(int Y, int U, int V) {
-        float R = Y + 1.402 * (V - 128);
-        if (R < 0) {
-                R = 0;
-        } else if (R > 255) {
-                R = 255;
-        }
-        float G = Y - 0.344 * (U - 128) - 0.714 * (V - 128);
-        if (G < 0) {
-                G = 0;
-        } else if (G > 255) {
-                G = 255;
-        }
-        float B = Y + 1.772 * (U - 128);
-        if (B < 0) {
-                B = 0;
-        } else if (B > 255) {
-                B = 255;
-        }
-        return 0xFF000000 | (((uint8_t)R) << 16) | (((uint8_t)G) << 8) | ((uint8_t)B);
+	const int r = clipColorByte(Y + 1.402 * (V - 128));
+	const int g = clipColorByte(Y - 0.344 * (U - 128) - 0.714 * (V - 128));
+	const int b = clipColorByte(Y + 1.772 * (U - 128));
+	return (r << 16) | (g << 8) | b;
 }
 
 static const int W = 256;
@@ -214,28 +195,11 @@ static void extractStr(CdIo_t *image, const char *directory = "") {
 	}
 }
 
-// rock_hod.lvl
-static const uint32_t offsets[] = {
-/*
-	0x1a330c,
-	0x29530c,
-	0x3aab0c,
-*/
-	0
-};
-
 static uint8_t tempBuffer[0x100000];
 
 int main(int argc, char *argv[]) {
 	avcodec_register_all();
 
-	FILE *fp = fopen("a0.bss", "rb");
-	if (fp) {
-		const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
-		fprintf(stdout, "Read %d bytes from 'a0'\n", count);
-		decodeMdec(tempBuffer, count, "a0.tga");
-		fclose(fp);
-	}
 	for (int i = 1; i < argc; ++i) {
 		const char *ext = strrchr(argv[i], '.');
 		if (ext) {
@@ -247,78 +211,57 @@ int main(int argc, char *argv[]) {
 				}
 				continue;
 			}
-		}
-		if (!ext || strcasecmp(ext, ".lvl") != 0) {
-			continue;
-		}
-		fp = fopen(argv[i], "rb");
-		if (fp) {
-			// rock_hod.lvl
-			for (int i = 0; offsets[i] != 0; ++i) {
-#if 0
-				fseek(fp, offsets[i], SEEK_SET);
-				const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
-#else
-				fioSeekAlign(fp, offsets[i]);
-				const int count = W * H * 4;
-				fioRead(fp, tempBuffer, count);
-#endif
-				fprintf(stdout, "Read %d bytes at 0x%x\n", count, offsets[i]);
-				char name[16];
-				snprintf(name, sizeof(name), "%08x.tga", offsets[i]);
-				decodeMdec(tempBuffer, count, name);
-				snprintf(name, sizeof(name), "%08x.bss", offsets[i]);
-				FILE *out = fopen(name, "wb");
-				if (out) {
-					fwrite(tempBuffer, 1, count, out);
-					fclose(out);
-				}
-			}
-
-#define MAX_OFFSETS 512
-			uint32_t offsetsTable[MAX_OFFSETS];
-			int offsetsCount = 0;
-
-			// scan
-			fseek(fp, 0, SEEK_SET);
-			do {
-				const int count = fread(tempBuffer, 1, 4, fp);
-				if (READ_LE_UINT16(tempBuffer + 2) == 0x3800) {
-					const int size = READ_LE_UINT16(tempBuffer);
-					fread(tempBuffer, 1, 4, fp);
-					if (READ_LE_UINT16(tempBuffer + 2) == 2 || READ_LE_UINT16(tempBuffer + 2) == 3) {
-						fprintf(stdout, "Found possible MDEC frame at 0x%lx qscale %d len %d\n", ftell(fp) - 8, READ_LE_UINT16(tempBuffer), size);
-						if (size > 8192) {
-							assert(offsetsCount < MAX_OFFSETS);
-							offsetsTable[offsetsCount] = ftell(fp) - 8;
-							++offsetsCount;
+			if (strcasecmp(ext, ".lvl") == 0 || strcasecmp(ext, ".dax") == 0) {
+				FILE *fp = fopen(argv[i], "rb");
+				if (fp) {
+#define MAX_OFFSETS 256
+					uint32_t offsetsTable[MAX_OFFSETS];
+					int offsetsCount = 0;
+					// scan
+					fseek(fp, 0, SEEK_SET);
+					do {
+						const int count = fread(tempBuffer, 1, 4, fp);
+						if (READ_LE_UINT16(tempBuffer + 2) == 0x3800) {
+							const int size = READ_LE_UINT16(tempBuffer);
+							fread(tempBuffer, 1, 4, fp);
+							if (READ_LE_UINT16(tempBuffer + 2) == 2 || READ_LE_UINT16(tempBuffer + 2) == 3) {
+							fprintf(stdout, "Found possible MDEC frame at 0x%lx qscale %d len %d\n", ftell(fp) - 8, READ_LE_UINT16(tempBuffer), size);
+							if (size > 8192) {
+								assert(offsetsCount < MAX_OFFSETS);
+								offsetsTable[offsetsCount] = ftell(fp) - 8;
+								++offsetsCount;
+							}
 						}
 					}
+					} while (!feof(fp));
+					for (int i = 0; i < offsetsCount; ++i) {
+						int count;
+						if (_fioReadCrc) {
+							fioSeekAlign(fp, offsetsTable[i]);
+							count = W * H * 4;
+							fioRead(fp, tempBuffer, count);
+						} else {
+							fseek(fp, offsetsTable[i], SEEK_SET);
+							count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
+						}
+						fprintf(stdout, "Read %d bytes at 0x%x\n", count, offsetsTable[i]);
+						if (_fioReadCrc) {
+							fioFlush(fp);
+						}
+						char name[16];
+						snprintf(name, sizeof(name), "%08x.tga", offsetsTable[i]);
+						decodeMdec(tempBuffer, count, name);
+						snprintf(name, sizeof(name), "%08x.bss", offsetsTable[i]);
+						FILE *out = fopen(name, "wb");
+						if (out) {
+							fwrite(tempBuffer, 1, count, out);
+							fclose(out);
+						}
+					}
+					fclose(fp);
 				}
-			} while (!feof(fp));
-			for (int i = 0; i < offsetsCount; ++i) {
-#if 1
-				fioSeekAlign(fp, offsetsTable[i]);
-				const int count = W * H * 4;
-				fioRead(fp, tempBuffer, count);
-#else
-				fseek(fp, offsetsTable[i], SEEK_SET);
-				const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
-#endif
-				fprintf(stdout, "Read %d bytes at 0x%x\n", count, offsetsTable[i]);
-				fioFlush(fp);
-				char name[16];
-				snprintf(name, sizeof(name), "%08x.tga", offsetsTable[i]);
-				decodeMdec(tempBuffer, count, name);
-				snprintf(name, sizeof(name), "%08x.bss", offsetsTable[i]);
-				FILE *out = fopen(name, "wb");
-				if (out) {
-					fwrite(tempBuffer, 1, count, out);
-					fclose(out);
-				}
+				continue;
 			}
-
-			fclose(fp);
 		}
 	}
 	return 0;
