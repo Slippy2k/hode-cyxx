@@ -6,6 +6,10 @@ extern "C" {
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/param.h>
+
+#include <cdio/cdio.h>
+#include <cdio/iso9660.h>
 
 #include "screenshot.h"
 
@@ -171,6 +175,45 @@ static void decodeMdec(const uint8_t *src, int len, const char *fname) {
 	av_frame_free(&frame);
 }
 
+static void extractStr(CdIo_t *image, const char *directory = "") {
+	CdioList_t *entries = iso9660_fs_readdir(image, directory, false);
+	if (entries) {
+		CdioListNode_t *node = _cdio_list_begin(entries);
+		for (; node; node = _cdio_list_node_next(node)) {
+			const iso9660_stat_t *st = (const iso9660_stat_t *)_cdio_list_node_data(node);
+			if (st->type == iso9660_stat_t::_STAT_FILE) {
+				const char *ext = strchr(st->filename, '.');
+				if (ext && strcmp(ext, ".STR;1") == 0) {
+					char name[MAXPATHLEN];
+					snprintf(name, sizeof(name), "%s", st->filename);
+					char *p = strrchr(name, ';');
+					if (p) {
+						*p = 0;
+					}
+					FILE *out = fopen(name, "wb");
+					if (out) {
+						uint8_t buffer[CDIO_CD_FRAMESIZE_RAW];
+						for (lsn_t sector = 0; sector < st->secsize; ++sector) {
+							driver_return_code_t r = cdio_read_audio_sector(image, buffer, st->lsn + sector);
+							if (r != DRIVER_OP_SUCCESS) {
+								fprintf(stderr, "Error reading sector %d of image file: %s\n", (st->lsn + sector), cdio_driver_errmsg(r));
+								break;
+							}
+							fwrite(buffer, 1, sizeof(buffer), out);
+						}
+						fclose(out);
+					}
+				}
+			} else if (st->type == iso9660_stat_t::_STAT_DIR) {
+				if (st->filename[0] != '.') {
+					extractStr(image, st->filename);
+				}
+			}
+		}
+		_cdio_list_free(entries, true);
+	}
+}
+
 // rock_hod.lvl
 static const uint32_t offsets[] = {
 /*
@@ -195,6 +238,16 @@ int main(int argc, char *argv[]) {
 	}
 	for (int i = 1; i < argc; ++i) {
 		const char *ext = strrchr(argv[i], '.');
+		if (ext) {
+			if (strcasecmp(ext, ".bin") == 0 || strcasecmp(ext, ".cue") == 0) {
+				CdIo_t *image = cdio_open(argv[i], DRIVER_BINCUE);
+				if (image) {
+					extractStr(image);
+					cdio_destroy(image);
+				}
+				continue;
+			}
+		}
 		if (!ext || strcasecmp(ext, ".lvl") != 0) {
 			continue;
 		}
