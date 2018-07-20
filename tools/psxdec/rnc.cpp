@@ -3,10 +3,6 @@
 #include <string.h>
 #include "rnc.h"
 
-static uint16_t READ_LE_UINT16(const uint8_t *p) {
-	return p[0] | (p[1] << 8);
-}
-
 static uint16_t READ_BE_UINT16(const uint8_t *p) {
 	return (p[0] << 8) | p[1];
 }
@@ -15,197 +11,115 @@ static uint32_t READ_BE_UINT32(const uint8_t *p) {
 	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
-//return codes
-#define NOT_PACKED  0
-#define PACKED_CRC  -1
-#define UNPACKED_CRC    -2
-
-//other defines
-#define HEADER_LEN  18
+static const uint16_t _crcTable[] = {
+	0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241, 0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
+	0xcc01, 0x0cc0, 0x0d80, 0xcd41, 0x0f00, 0xcfc1, 0xce81, 0x0e40, 0x0a00, 0xcac1, 0xcb81, 0x0b40, 0xc901, 0x09c0, 0x0880, 0xc841,
+	0xd801, 0x18c0, 0x1980, 0xd941, 0x1b00, 0xdbc1, 0xda81, 0x1a40, 0x1e00, 0xdec1, 0xdf81, 0x1f40, 0xdd01, 0x1dc0, 0x1c80, 0xdc41,
+	0x1400, 0xd4c1, 0xd581, 0x1540, 0xd701, 0x17c0, 0x1680, 0xd641, 0xd201, 0x12c0, 0x1380, 0xd341, 0x1100, 0xd1c1, 0xd081, 0x1040,
+	0xf001, 0x30c0, 0x3180, 0xf141, 0x3300, 0xf3c1, 0xf281, 0x3240, 0x3600, 0xf6c1, 0xf781, 0x3740, 0xf501, 0x35c0, 0x3480, 0xf441,
+	0x3c00, 0xfcc1, 0xfd81, 0x3d40, 0xff01, 0x3fc0, 0x3e80, 0xfe41, 0xfa01, 0x3ac0, 0x3b80, 0xfb41, 0x3900, 0xf9c1, 0xf881, 0x3840,
+	0x2800, 0xe8c1, 0xe981, 0x2940, 0xeb01, 0x2bc0, 0x2a80, 0xea41, 0xee01, 0x2ec0, 0x2f80, 0xef41, 0x2d00, 0xedc1, 0xec81, 0x2c40,
+	0xe401, 0x24c0, 0x2580, 0xe541, 0x2700, 0xe7c1, 0xe681, 0x2640, 0x2200, 0xe2c1, 0xe381, 0x2340, 0xe101, 0x21c0, 0x2080, 0xe041,
+	0xa001, 0x60c0, 0x6180, 0xa141, 0x6300, 0xa3c1, 0xa281, 0x6240, 0x6600, 0xa6c1, 0xa781, 0x6740, 0xa501, 0x65c0, 0x6480, 0xa441,
+	0x6c00, 0xacc1, 0xad81, 0x6d40, 0xaf01, 0x6fc0, 0x6e80, 0xae41, 0xaa01, 0x6ac0, 0x6b80, 0xab41, 0x6900, 0xa9c1, 0xa881, 0x6840,
+	0x7800, 0xb8c1, 0xb981, 0x7940, 0xbb01, 0x7bc0, 0x7a80, 0xba41, 0xbe01, 0x7ec0, 0x7f80, 0xbf41, 0x7d00, 0xbdc1, 0xbc81, 0x7c40,
+	0xb401, 0x74c0, 0x7580, 0xb541, 0x7700, 0xb7c1, 0xb681, 0x7640, 0x7200, 0xb2c1, 0xb381, 0x7340, 0xb101, 0x71c0, 0x7080, 0xb041,
+	0x5000, 0x90c1, 0x9181, 0x5140, 0x9301, 0x53c0, 0x5280, 0x9241, 0x9601, 0x56c0, 0x5780, 0x9741, 0x5500, 0x95c1, 0x9481, 0x5440,
+	0x9c01, 0x5cc0, 0x5d80, 0x9d41, 0x5f00, 0x9fc1, 0x9e81, 0x5e40, 0x5a00, 0x9ac1, 0x9b81, 0x5b40, 0x9901, 0x59c0, 0x5880, 0x9841,
+	0x8801, 0x48c0, 0x4980, 0x8941, 0x4b00, 0x8bc1, 0x8a81, 0x4a40, 0x4e00, 0x8ec1, 0x8f81, 0x4f40, 0x8d01, 0x4dc0, 0x4c80, 0x8c41,
+	0x4400, 0x84c1, 0x8581, 0x4540, 0x8701, 0x47c0, 0x4680, 0x8641, 0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040
+};
 
 RncDecoder::RncDecoder() {
-	initCrc();
-
-	_bitBuffl = 0;
-	_bitBuffh = 0;
+	_bits = 0;
 	_bitCount = 0;
 	_srcPtr = 0;
 	_dstPtr = 0;
-	_inputByteLeft = 0;
 }
 
-void RncDecoder::initCrc() {
-
-	uint16_t cnt = 0;
-	uint16_t tmp1 = 0;
-	uint16_t tmp2 = 0;
-
-	for (tmp2 = 0; tmp2 < 0x100; tmp2++) {
-		tmp1 = tmp2;
-		for (cnt = 8; cnt > 0; cnt--) {
-			if (tmp1 % 2) {
-				tmp1 >>= 1;
-				tmp1 ^= 0x0a001;
-			} else
-				tmp1 >>= 1;
-		}
-		_crcTable[tmp2] = tmp1;
-	}
-}
-
-//calculate 16 bit crc of a block of memory
-uint16_t RncDecoder::crcBlock(const uint8_t *block, uint32_t size) {
-
+uint16_t RncDecoder::crc16(const uint8_t *block, uint32_t size) const {
 	uint16_t crc = 0;
-	uint8_t *crcTable8 = (uint8_t *)_crcTable; //make a uint8* to crc_table
-	uint8_t tmp;
-	uint32_t i;
-
-	for (i = 0; i < size; i++) {
-		tmp = *block++;
-		crc ^= tmp;
-		tmp = (uint8_t)((crc >> 8) & 0x00FF);
-		crc &= 0x00FF;
-		crc = *(uint16_t *)&crcTable8[crc << 1];
-		crc ^= tmp;
+	for (uint32_t i = 0; i < size; i++) {
+		crc ^= block[i];
+		crc = _crcTable[crc & 0xFF] ^ (crc >> 8);
 	}
-
 	return crc;
 }
 
-uint16_t RncDecoder::inputBits(uint8_t amount) {
-
-	uint16_t newBitBuffh = _bitBuffh;
-	uint16_t newBitBuffl = _bitBuffl;
-	int16_t newBitCount = _bitCount;
-	uint16_t remBits, returnVal;
-
-	returnVal = ((1 << amount) - 1) & newBitBuffl;
-	newBitCount -= amount;
-
-	if (newBitCount < 0) {
-		newBitCount += amount;
-		remBits = (newBitBuffh << (16 - newBitCount));
-		newBitBuffh >>= newBitCount;
-		newBitBuffl >>= newBitCount;
-		newBitBuffl |= remBits;
-		_srcPtr += 2;
-
-		// added some more check here to prevent reading in the buffer
-		// if there are no bytes anymore.
-		_inputByteLeft -= 2;
-		if (_inputByteLeft <= 0)
-			newBitBuffh = 0;
-		else if (_inputByteLeft == 1)
-			newBitBuffh = *_srcPtr;
-		else
-			newBitBuffh = READ_LE_UINT16(_srcPtr);
-		amount -= newBitCount;
-		newBitCount = 16 - amount;
-	}
-	remBits = (newBitBuffh << (16 - amount));
-	_bitBuffh = newBitBuffh >> amount;
-	_bitBuffl = (newBitBuffl >> amount) | remBits;
-	_bitCount = (uint8_t)newBitCount;
-
-	return returnVal;
-}
-
-int RncDecoder::getbit() {
-
+int RncDecoder::nextBit() {
 	if (_bitCount == 0) {
-		_bitBuffl = *_srcPtr++;
+		_bits = *_srcPtr++;
 		_bitCount = 8;
 	}
-	uint8_t temp = (_bitBuffl & 0x80) >> 7;
-	_bitBuffl <<= 1;
-	_bitCount--;
-	return temp;
+	--_bitCount;
+	return (_bits >> _bitCount) & 1;
 }
 
-int32_t RncDecoder::unpackM2(const void *input, void *output) {
+int RncDecoder::unpackM2(const uint8_t *input, uint8_t *output) {
 
-	const uint8_t *inputptr = (const uint8_t *)input;
-
-	uint32_t unpackLen = 0;
-	uint32_t packLen = 0;
-	uint16_t crcUnpacked = 0;
-	uint16_t crcPacked = 0;
-
-	_bitBuffl = 0;
+	_bits = 0;
 	_bitCount = 0;
 
-	//Check for "RNC "
-	if (READ_BE_UINT32(inputptr) != RNC2_SIGNATURE)
-		return NOT_PACKED;
+	if (READ_BE_UINT32(input) != RNC2_SIGNATURE) {
+		return 0;
+	}
+	input += 4;
+	const uint32_t unpackLen = READ_BE_UINT32(input);
+	input += 4;
+	const uint32_t packLen = READ_BE_UINT32(input);
+	input += 4;
+	const uint32_t crcUnpacked = READ_BE_UINT16(input);
+	input += 2;
+	const uint32_t crcPacked = READ_BE_UINT16(input);
+	input += 2;
 
-	inputptr += 4;
+	input += 2;
+	if (crc16(input, packLen) != crcPacked) {
+		return -1;
+	}
 
-	// read unpacked/packed file length
-	unpackLen = READ_BE_UINT32(inputptr);
-	inputptr += 4;
-	packLen = READ_BE_UINT32(inputptr);
-	inputptr += 4;
+	_srcPtr = input;
+	_dstPtr = output;
 
-	//read CRC's
-	crcUnpacked = READ_BE_UINT16(inputptr);
-	inputptr += 2;
-	crcPacked = READ_BE_UINT16(inputptr);
-	inputptr += 2;
-	inputptr = (inputptr + HEADER_LEN - 16);
-
-	if (crcBlock(inputptr, packLen) != crcPacked)
-		return PACKED_CRC;
-
-	inputptr = (((const uint8_t *)input) + HEADER_LEN);
-	_srcPtr = inputptr;
-	_dstPtr = (uint8_t *)output;
-
-	uint16_t ofs, len;
-	uint8_t ofs_hi, ofs_lo;
-
-	len = 0;
-	ofs_hi = 0;
-	ofs_lo = 0;
-
-	getbit();
-	getbit();
+	nextBit();
+	nextBit();
 
 	while (1) {
-
 		bool loadVal = false;
-
-		while (getbit() == 0)
+		while (nextBit() == 0) {
 			*_dstPtr++ = *_srcPtr++;
-
-		len = 2;
-		ofs_hi = 0;
-		if (getbit() == 0) {
-			len = (len << 1) | getbit();
-			if (getbit() == 1) {
-				len--;
-				len = (len << 1) | getbit();
+		}
+		int len = 2;
+		uint8_t offsetHi = 0;
+		if (nextBit() == 0) {
+			len = (len << 1) | nextBit();
+			if (nextBit() == 1) {
+				--len;
+				len = (len << 1) | nextBit();
 				if (len == 9) {
 					len = 4;
-					while (len--)
-						ofs_hi = (ofs_hi << 1) | getbit();
-					len = (ofs_hi + 3) * 4;
-					while (len--)
+					while (len--) {
+						offsetHi = (offsetHi << 1) | nextBit();
+					}
+					len = (offsetHi + 3) * 4;
+					while (len--) {
 						*_dstPtr++ = *_srcPtr++;
+					}
 					continue;
 				}
 			}
 			loadVal = true;
 		} else {
-			if (getbit() == 1) {
-				len++;
-				if (getbit() == 1) {
+			if (nextBit() == 1) {
+				++len;
+				if (nextBit() == 1) {
 					len = *_srcPtr++;
 					if (len == 0) {
-						if (getbit() == 1)
+						if (nextBit() == 1) {
 							continue;
-						else
+						} else {
 							break;
+						}
 					}
 					len += 8;
 				}
@@ -214,33 +128,29 @@ int32_t RncDecoder::unpackM2(const void *input, void *output) {
 				loadVal = false;
 			}
 		}
-
 		if (loadVal) {
-			if (getbit() == 1) {
-				ofs_hi = (ofs_hi << 1) | getbit();
-				if (getbit() == 1) {
-					ofs_hi = ((ofs_hi << 1) | getbit()) | 4;
-					if (getbit() == 0)
-						ofs_hi = (ofs_hi << 1) | getbit();
-				} else if (ofs_hi == 0) {
-					ofs_hi = 2 | getbit();
+			if (nextBit() == 1) {
+				offsetHi = (offsetHi << 1) | nextBit();
+				if (nextBit() == 1) {
+					offsetHi = ((offsetHi << 1) | nextBit()) | 4;
+					if (nextBit() == 0) {
+						offsetHi = (offsetHi << 1) | nextBit();
+					}
+				} else if (offsetHi == 0) {
+					offsetHi = 2 | nextBit();
 				}
 			}
 		}
-
-		ofs_lo = *_srcPtr++;
-		ofs = (ofs_hi << 8) | ofs_lo;
+		const uint8_t offsetLo = *_srcPtr++;
+		const uint16_t baseOffset = (offsetHi << 8) | offsetLo;
 		while (len--) {
-			*_dstPtr = *(uint8_t *)(_dstPtr - ofs - 1);
+			*_dstPtr = *(uint8_t *)(_dstPtr - baseOffset - 1);
 			_dstPtr++;
 		}
-
 	}
-
-	if (crcBlock((uint8_t *)output, unpackLen) != crcUnpacked)
-		return UNPACKED_CRC;
-
-	// all is done..return the amount of unpacked bytes
+	if (crc16(output, unpackLen) != crcUnpacked) {
+		return -1;
+	}
 	return unpackLen;
 }
 

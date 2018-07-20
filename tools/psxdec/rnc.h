@@ -8,24 +8,17 @@
 
 struct RncDecoder {
 
-	uint16_t _crcTable[256];
-
-	uint16_t _bitBuffl;
-	uint16_t _bitBuffh;
+	uint16_t _bits;
 	uint8_t _bitCount;
 
 	const uint8_t *_srcPtr;
 	uint8_t *_dstPtr;
 
-	int16_t _inputByteLeft;
-
 	RncDecoder();
-	int32_t unpackM2(const void *input, void *output);
+	int unpackM2(const uint8_t *input, uint8_t *output);
 
-	void initCrc();
-	uint16_t crcBlock(const uint8_t *block, uint32_t size);
-	uint16_t inputBits(uint8_t amount);
-	int getbit();
+	uint16_t crc16(const uint8_t *block, uint32_t size) const;
+	int nextBit();
 };
 
 #endif // RNC_H__
