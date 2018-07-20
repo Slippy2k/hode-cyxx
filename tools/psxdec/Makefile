@@ -1,7 +1,7 @@
 
 CPPFLAGS += -g
 
-decode_psx: decode_psx.o screenshot.o
+decode_psx: decode_psx.o rnc.o screenshot.o
 	$(CXX) -o $@ $^ -lavcodec -lavutil -lcdio -liso9660
 
 clean:

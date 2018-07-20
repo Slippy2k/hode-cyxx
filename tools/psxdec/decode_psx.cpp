@@ -11,11 +11,8 @@ extern "C" {
 #include <cdio/cdio.h>
 #include <cdio/iso9660.h>
 
+#include "rnc.h"
 #include "screenshot.h"
-
-static uint16_t BSWAP_16(uint16_t n) {
-	return (n >> 8) | (n << 8);
-}
 
 static uint16_t READ_LE_UINT16(const void *ptr) {
 	const uint8_t *b = (const uint8_t *)ptr;
@@ -25,6 +22,10 @@ static uint16_t READ_LE_UINT16(const void *ptr) {
 inline uint32_t READ_LE_UINT32(const void *ptr) {
 	const uint8_t *b = (const uint8_t *)ptr;
 	return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
+}
+
+static uint32_t READ_BE_UINT32(const uint8_t *p) {
+	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
 static const bool _fioReadCrc = true;
@@ -197,6 +198,54 @@ static void extractStr(CdIo_t *image, const char *directory = "") {
 
 static uint8_t tempBuffer[0x100000];
 
+#define TIM_HEADER_SIZE 20
+
+static void rgb555_to_argb(const uint8_t *p, int size, uint32_t *argb) {
+        assert((size & 1) == 0);
+	int j = 0;
+        for (int i = 0; i < size; i += 2) {
+                uint16_t color = READ_LE_UINT16(p + i);
+
+                //assert((color & 0x8000) == 0);
+                int b = (color >> 10) & 31;
+                int g = (color >>  5) & 31;
+                int r =  color        & 31;
+
+		b <<= 3;
+		g <<= 3;
+		r <<= 3;
+
+		argb[j] = (r << 16) | (g << 8) | b;
+		++j;
+	}
+}
+
+static void decodeTim(FILE *fp) {
+	int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
+	fprintf(stdout, "Read %d bytes from TIM\n", count);
+	if (memcmp(tempBuffer, "RNC", 3) == 0) {
+		const uint32_t uncompressedSize = READ_BE_UINT32(tempBuffer + 4);
+		uint8_t *timBuffer = (uint8_t *)malloc(uncompressedSize);
+		if (timBuffer) {
+			RncDecoder decoder;
+			count = decoder.unpackM2(tempBuffer, timBuffer);
+			fprintf(stdout, "rnc %d %d\n", count, uncompressedSize);
+			assert(READ_LE_UINT32(timBuffer) == 16);
+			const int bpp = READ_LE_UINT32(timBuffer + 4);
+			const int w = READ_LE_UINT16(timBuffer + 16);
+			const int h = READ_LE_UINT16(timBuffer + 18);
+			assert(bpp == 2);
+			uint32_t *rgba = (uint32_t *)malloc(w * h * sizeof(uint32_t));
+			if (rgba) {
+				rgb555_to_argb(timBuffer + TIM_HEADER_SIZE, count - TIM_HEADER_SIZE, rgba);
+				saveTGA("tim.tga", (const uint8_t *)rgba, w, h);
+				free(rgba);
+			}
+			free(timBuffer);
+		}
+	}
+}
+
 int main(int argc, char *argv[]) {
 	avcodec_register_all();
 
@@ -258,6 +307,14 @@ int main(int argc, char *argv[]) {
 							fclose(out);
 						}
 					}
+					fclose(fp);
+				}
+				continue;
+			}
+			if (strcasecmp(ext, ".tim") == 0) {
+				FILE *fp = fopen(argv[i], "rb");
+				if (fp) {
+					decodeTim(fp);
 					fclose(fp);
 				}
 				continue;
