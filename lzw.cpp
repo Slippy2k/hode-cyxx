@@ -5,8 +5,6 @@
 
 #include "intern.h"
 
-static const uint32_t kCodeMasks[] = { 0, 1, 3, 7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0xFFFFFFFF };
-
 enum {
 	kCodeWidth = 9,
 	kClearCode = 1 << (kCodeWidth - 1),
@@ -17,10 +15,10 @@ enum {
 struct LzwDecoder {
 
 	uint16_t _prefix[4096];
-	uint32_t _currentCode;
 	uint8_t _stack[8192];
 	const uint8_t *_buf;
 	uint8_t _currentByte;
+	uint32_t _currentCode;
 	uint8_t _codeSize;
 	uint8_t _bitsLeft;
 
@@ -41,8 +39,7 @@ void LzwDecoder::nextCode() {
 		_currentCode |= _currentByte << _bitsLeft;
 		_bitsLeft += 8;
 	}
-	assert(_codeSize <= 12);
-	_currentCode &= kCodeMasks[_codeSize];
+	_currentCode &= (1 << _codeSize) - 1;
 	_bitsLeft -= _codeSize;
 }
 
@@ -72,8 +69,7 @@ int LzwDecoder::decode(uint8_t *dst) {
 			if (_currentCode >= kNewCodes) {
 				_currentCode = 0;
 			}
-			previousCode = _currentCode;
-			lastCode = _currentCode;
+			previousCode = lastCode = _currentCode;
 			*p++ = (_currentCode & 255);
 		} else {
 			uint8_t *currentStackPtr = stackPtr;
@@ -107,7 +103,7 @@ int LzwDecoder::decode(uint8_t *dst) {
 			const int count = stackPtr - currentStackPtr;
 			memcpy(p, currentStackPtr, count);
 			p += count;
-			currentStackPtr += count;
+			currentStackPtr = stackPtr;
 		}
 		nextCode();
 	}
