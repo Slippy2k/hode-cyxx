@@ -9,12 +9,31 @@ else
 rt = (rb & rc) | (ra & ~rc);
 rt = ((ra ^ rb) & rc) ^ ra;
 
+
 https://en.wikipedia.org/wiki/Anaglyph_3D
 
+
 Saturn
-	Inside 'SmpPlaySingleSample', we will play an empty sample ( Sample #=%d )!!
-	NbStarters is > MAX_STARTER !!
-	Init Luciole No %ld, X=%3ld, Y=%3ld
-	!! ERROR !! : Luciole index (%ld) is greater than MAX_LUCIOLES !
-	!! ERROR !! : Luciole No %d, ix = %ld, iy = %ld !
-	Luciole No %ld, X=%3ld, Y=%3ld
+	file00 code ? contains the splash screen
+		Inside 'SmpPlaySingleSample', we will play an empty sample ( Sample #=%d )!!
+		NbStarters is > MAX_STARTER !!
+		Init Luciole No %ld, X=%3ld, Y=%3ld
+		!! ERROR !! : Luciole index (%ld) is greater than MAX_LUCIOLES !
+		!! ERROR !! : Luciole No %d, ix = %ld, iy = %ld !
+		Luciole No %ld, X=%3ld, Y=%3ld
+		AmzAlloc : Memory allocation list is corrupted !
+		AmzFree : Memory allocation list is corrupted !
+		AmzRealloc : Memory allocation list is corrupted !
+		TEASER.PAF
+		RESINFO1.001
+		RESTABLE.001
+	file01 'DCD'
+	file02 'DHD'
+	file03 ?
+	file04 paf
+	file05 paf
+	file06 paf
+	file07 paf
+	file09 paf
+	file10 paf
+	file11 paf
