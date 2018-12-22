@@ -21,10 +21,11 @@ static int ResRoundTo2048(int pos) {
 static char basePath[40];
 
 static uint8_t _res_lvlFileHeader[0x7FC * 9];
-static uint8_t _res_lvlLayerMoveTable[0xA0];
+static uint8_t _res_screensGrid[0xA0];
 static uint8_t _res_lvlPalData[0x140];
 static uint8_t _res_lvlLgcData[0xA0]; /* _res_levelData0x1E8 */
 static uint8_t *_res_lvlBmpData; // _levelDescription / sizeof == 160
+static int _res_screensCount;
 
 static uint8_t tmpBuf[256 * 192 * 2];
 
@@ -305,19 +306,19 @@ static void ResLoadLevelData(File *f) {
 		printf("CRC %d = 0x%X\n", i, crc);
 	}
 	int _res_lvlUnk6 = _res_lvlFileHeader[6]; // _cl, _dl
-	int _res_lvlUnk2 = _res_lvlFileHeader[4]; // _al
+	_res_screensCount = _res_lvlFileHeader[4]; // _al
 	int _res_lvlUnk1 = _res_lvlFileHeader[5]; // _ah, _cl
 	int _res_lvlUnk3 = _res_lvlUnk6 + _res_lvlUnk1; // _dl + _cl
 	int _res_lvlUnk4 = _res_lvlFileHeader[7]; // _dl
 
-	printf("%d %d %d %d\n", _res_lvlUnk2, _res_lvlUnk1, _res_lvlUnk6, _res_lvlUnk4);
+	printf("%d %d %d %d\n", _res_screensCount, _res_lvlUnk1, _res_lvlUnk6, _res_lvlUnk4);
 
-	memcpy(_res_lvlLayerMoveTable, _res_lvlFileHeader + 8, _res_lvlUnk2 * 4);
-	for (int i = 0; i < _res_lvlUnk2; ++i) printf("%2d - 0x%08X\n", i, READ_LE_UINT32(&_res_lvlLayerMoveTable[i * 4]));
-	memcpy(_res_lvlPalData, _res_lvlFileHeader + 0xA8, _res_lvlUnk2 * 8);
-	for (int i = 0; i < _res_lvlUnk2; ++i) printf("%2d - 0x%X 0x%X\n", i, READ_LE_UINT32(&_res_lvlPalData[i * 8]), READ_LE_UINT32(&_res_lvlPalData[i * 8 + 4]));
-	memcpy(_res_lvlLgcData, _res_lvlFileHeader + 0x1E8, _res_lvlUnk2 * 4);
-	for (int i = 0; i < _res_lvlUnk2; ++i) printf("%2d - 0x%X\n", i, READ_LE_UINT32(&_res_lvlLgcData[i * 4]));
+	memcpy(_res_screensGrid, _res_lvlFileHeader + 8, _res_screensCount * 4);
+	for (int i = 0; i < _res_screensCount; ++i) printf("%2d - 0x%08X\n", i, READ_LE_UINT32(&_res_screensGrid[i * 4]));
+	memcpy(_res_lvlPalData, _res_lvlFileHeader + 0xA8, _res_screensCount * 8);
+	for (int i = 0; i < _res_screensCount; ++i) printf("%2d - 0x%X 0x%X\n", i, READ_LE_UINT32(&_res_lvlPalData[i * 8]), READ_LE_UINT32(&_res_lvlPalData[i * 8 + 4]));
+	memcpy(_res_lvlLgcData, _res_lvlFileHeader + 0x1E8, _res_screensCount * 4);
+	for (int i = 0; i < _res_screensCount; ++i) printf("%2d - 0x%X\n", i, READ_LE_UINT32(&_res_lvlLgcData[i * 4]));
 
 /*	const uint8_t *p0 = _res_lvlFileHeader + 0x288; // sizeof == 96
 	for (int i = 0; i < (0x2988 - 0x288) / 96; ++i) { // _res_lvlGraphicsDataTable
@@ -382,11 +383,117 @@ printf("0x%X\n", READ_LE_UINT32(_res_lvlFileHeader + 0x2B88 + i * 16));
 	printf("shadow palettes offs 0x%X size %d\n", READ_LE_UINT32(_res_lvlFileHeader + 0x4708), READ_LE_UINT32(_res_lvlFileHeader + 0x470C));
 
 	if (memcmp(_res_lvlFileHeader, "\0DOH", 4) == 0) {
-		printf("signature ok");
+		printf("signature ok\n");
 	}
 }
 
-#undef main
+enum {
+	kPosTopScreen    = 0,
+	kPosRightScreen  = 1,
+	kPosBottomScreen = 2,
+	kPosLeftScreen   = 3
+};
+
+struct LevelScreen {
+	uint8_t num;
+	int x, y;
+};
+
+static const int kLevelMapMaxW = 128;
+static const int kLevelMapMaxH = 128;
+
+static const int kMaxScreens = 40;
+
+static void GenerateLevelMap() {
+	assert(_res_screensCount <= kMaxScreens);
+	bool visited[kMaxScreens];
+	for (int i = 0; i < _res_screensCount; ++i) {
+		visited[i] = false;
+	}
+
+	LevelScreen queue[kMaxScreens];
+	int queueSize = 0;
+
+	uint8_t levelMap[kLevelMapMaxH][kLevelMapMaxW];
+	memset(levelMap, 255, sizeof(levelMap));
+
+	int xmin, xmax;
+	int ymin, ymax;
+
+	queue[0].num = 0;
+	queue[0].x = xmin = xmax = kLevelMapMaxW / 2;
+	queue[0].y = ymin = ymax = kLevelMapMaxH / 2;
+	queueSize = 1;
+
+	while (queueSize > 0) {
+		const int screenNum = queue[0].num;
+		const int x = queue[0].x;
+		const int y = queue[0].y;
+		--queueSize;
+		if (queueSize != 0) {
+			memmove(&queue[0], &queue[1], queueSize * sizeof(LevelScreen));
+		}
+		if (x < xmin) {
+			xmin = x;
+		} else if (x > xmax) {
+			xmax = x;
+		}
+		if (y < ymin) {
+			ymin = y;
+		} else if (y > ymax) {
+			ymax = y;
+		}
+		if (visited[screenNum]) {
+			continue;
+		}
+		levelMap[y][x] = screenNum;
+		visited[screenNum] = true;
+		const int top    = _res_screensGrid[screenNum * 4 + kPosTopScreen];
+		const int right  = _res_screensGrid[screenNum * 4 + kPosRightScreen];
+		const int bottom = _res_screensGrid[screenNum * 4 + kPosBottomScreen];
+		const int left   = _res_screensGrid[screenNum * 4 + kPosLeftScreen];
+		if (top != 255) {
+			assert(y >= 0);
+			queue[queueSize].num = top;
+			queue[queueSize].x = x;
+			queue[queueSize].y = y - 1;
+			++queueSize;
+		}
+		if (bottom != 255) {
+			assert(y < kLevelMapMaxH);
+			queue[queueSize].num = bottom;
+			queue[queueSize].x = x;
+			queue[queueSize].y = y + 1;
+			++queueSize;
+		}
+		if (left != 255) {
+			assert(x >= 0);
+			queue[queueSize].num = left;
+			queue[queueSize].x = x - 1;
+			queue[queueSize].y = y;
+			++queueSize;
+		}
+		if (right != 255) {
+			assert(x < kLevelMapMaxW);
+			queue[queueSize].num = right;
+			queue[queueSize].x = x + 1;
+			queue[queueSize].y = y;
+			++queueSize;
+		}
+	}
+	fprintf(stdout, "levelMap y %d,%d (%d) x %d,%d (%d)\n", ymin, ymax, (ymax - ymin + 1), xmin, xmax, (xmax - xmin + 1));
+	for (int y = ymin; y <= ymax; ++y) {
+		for (int x = xmin; x <= xmax; ++x) {
+			if (levelMap[y][x] == 255) {
+				fprintf(stdout, "    ");
+			} else {
+				fprintf(stdout, " %02x ", levelMap[y][x]);
+			}
+		}
+		fprintf(stdout, "\n");
+	}
+}
+
 int main(int argc, char *argv[]) {
 	if (argc == 2) {
 
@@ -399,6 +506,7 @@ int main(int argc, char *argv[]) {
 		File f;
 		if (f.open(argv[1], "rb")) {
 			ResLoadLevelData(&f);
+			GenerateLevelMap();
 		}
 	}
 	return 0;
