@@ -2,8 +2,7 @@
 #include "file.h"
 #include "staticdata.h"
 
-extern int raw2png_6bits_color;
-extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette);
+extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette, int raw2png_6bits_color);
 extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
 
 static uint8_t _paf_buffer0x800[0x800];
@@ -177,7 +176,7 @@ static void LoadFont() {
 		if (fp) {
 			uint8_t greyPal[256 * 3];
 			for (int i = 0; i < 256; ++i) { greyPal[i * 3] = greyPal[i * 3 + 1] = greyPal[i * 3 + 2] = i << 4; }
-			raw2png(fp, decodeBuffer, 16, 16 * 64, greyPal);
+			raw2png(fp, decodeBuffer, 16, 16 * 64, greyPal, 0);
 			fclose(fp);
 		}
 	}
@@ -195,8 +194,7 @@ static void DecodeMainScreen() {
 	if (size == 256 * 192) {
 		FILE *fp = fopen("setupDatUnk8.png", "wb");
 		if (fp) {
-			raw2png_6bits_color = 1;
-			raw2png(fp, decodeBuffer, 256, 192, _res_setupDatLoadingPicture + 8 + src_size_1);
+			raw2png(fp, decodeBuffer, 256, 192, _res_setupDatLoadingPicture + 8 + src_size_1, 1);
 			fclose(fp);
 		}
 	}
@@ -223,8 +221,7 @@ static void DecodeHintScreen(File *f) {
 			sprintf(filename, "HOD_HINT_%02d.png", i);
 			FILE *fp = fopen(filename, "wb");
 			if (fp) {
-				raw2png_6bits_color = 1;
-				raw2png(fp, tmpBuf, 256, 192, pal);
+				raw2png(fp, tmpBuf, 256, 192, pal, 1);
 				fclose(fp);
 			}
 		}
@@ -238,8 +235,7 @@ static void writeStaticData(const char *filename, const uint8_t *buf) {
 	}
 	FILE *fp = fopen(filename, "wb");
 	if (fp) {
-		raw2png_6bits_color = 1;
-		raw2png(fp, buf, 256, 192, pal);
+		raw2png(fp, buf, 256, 192, pal, 1);
 		fclose(fp);
 	}
 }

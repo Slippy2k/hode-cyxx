@@ -1,8 +1,7 @@
 
 #include "file.h"
 
-extern int raw2png_6bits_color;
-extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette);
+extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette, int raw2png_6bits_color);
 extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
 
 static uint32_t UpdateCRC(uint32_t &sum, const uint8_t *buf, uint32_t size) {
@@ -224,8 +223,7 @@ static void LoadLevelData0x2988(File *f, const uint8_t *LevelData0x2988) {
 	sprintf(filename, "%s_SPR_%d.png", basePath, sprite_counter++);
 	FILE *fp = fopen(filename, "wb");
 	if (fp) {
-		raw2png_6bits_color = 0;
-		raw2png(fp, picBuf, img_w, img_h, spritePalette);
+		raw2png(fp, picBuf, img_w, img_h, spritePalette, 0);
 		fclose(fp);
 	}	
 	
@@ -256,8 +254,7 @@ static void DumpBitmap(File *f, int i, int j, uint32_t subOffs) {
 		sprintf(filename, "%s_%02d_%d.png", basePath, i, j);
 		FILE *fp = fopen(filename, "wb");
 		if (fp) {
-			raw2png_6bits_color = 0;
-			raw2png(fp, tmpBuf, 256, 192, currentPalette);
+			raw2png(fp, tmpBuf, 256, 192, currentPalette, 0);
 /*			fwrite(tmpBuf, outputSize, 1, fp);*/
 			fclose(fp);
 		}		

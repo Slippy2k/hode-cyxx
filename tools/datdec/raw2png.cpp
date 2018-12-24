@@ -3,9 +3,7 @@
 #include <png.h>
 #include "file.h"
 
-int raw2png_6bits_color = 1;
-
-void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette) {
+void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette, int raw2png_6bits_color) {
 	png_struct *png = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 	if (!png)
 		return;
