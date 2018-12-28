@@ -168,7 +168,6 @@ void SystemStub_SDL::updateScreen() {
 		h += _shakeDy;
 		src -= _shakeDy * srcPitch;
 	}
-/* // xbrz assumes pitch == w
 	if (_shakeDx > 0) {
 		clearScreen(dst, dstPitch, 0, 0, _shakeDx, h);
 		w -= _shakeDx;
@@ -178,7 +177,6 @@ void SystemStub_SDL::updateScreen() {
 		w += _shakeDx;
 		src -= _shakeDx;
 	}
-*/
 	uint32_t *p = _offscreenRgb;
 	for (int y = 0; y < h; ++y) {
 		for (int x = 0; x < w; ++x) {
@@ -186,7 +184,7 @@ void SystemStub_SDL::updateScreen() {
 		}
 		p += w;
 	}
-	scaler_xbrz.scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
+	scaler_xbr.scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
 	SDL_UnlockTexture(_texture);
 
 	//SDL_UpdateTexture(_texture, 0, _screenBuffer, _screenW * sizeof(uint32_t));

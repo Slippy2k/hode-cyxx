@@ -32,6 +32,6 @@ struct Scaler {
 };
 
 extern const Scaler scaler_nearest;
-extern const Scaler scaler_xbrz;
+extern const Scaler scaler_xbr;
 
 #endif // SCALER_H__
