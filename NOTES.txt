@@ -1,4 +1,3 @@
-
 fastcall: _ecx, _edx, stack
 
 if (rcb)
@@ -9,6 +8,25 @@ else
 rt = (rb & rc) | (ra & ~rc);
 rt = ((ra ^ rb) & rc) ^ ra;
 
+https://graphics.stanford.edu/~seander/bithacks.html#ConditionalSetOrClearBitsWithoutBranching
+
+// Merge bits from two values according to a mask
+  unsigned int a;    // value to merge in non-masked bits
+  unsigned int b;    // value to merge in masked bits
+  unsigned int mask; // 1 where bits from b should be selected; 0 where from a.
+  unsigned int r;    // result of (a & ~mask) | (b & mask) goes here
+  r = a ^ ((a ^ b) & mask);
+
+.text:0040A34C      mov     dx, [ecx+LvlObject.flags1]
+.text:0040A350      mov     bl, byte ptr [esi+LvlAnimSeqHeader.flags1]
+.text:0040A353      mov     al, dl
+.text:0040A355      xor     al, bl
+.text:0040A357      and     eax, 6
+.text:0040A35A      xor     eax, edx
+.text:0040A35C      mov     [ecx+LvlObject.flags1], ax
+
+LvlObject.flags1 = LvlObject.flags1 ^ ((LvlObject.flags1 ^ LvlAnimSeqHeader.flags1) & 6);
+LvlObject.flags1 = (LvlObject.flags1 & ~6) | (LvlAnimSeqHeader.flags1 & 6);
 
 https://en.wikipedia.org/wiki/Anaglyph_3D
 
