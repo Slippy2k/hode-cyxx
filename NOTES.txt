@@ -55,3 +55,7 @@ Saturn
 	file09 paf
 	file10 paf
 	file11 paf
+
+ハート ha-to
+オブ obu
+ダークネス da-kunesu
