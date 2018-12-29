@@ -110,6 +110,9 @@ void Video::decodeSPR(const uint8_t *src, uint8_t *dst, int x, int y, uint8_t fl
 	if (flags & kSprHorizFlip) {
 		x = x2;
 	}
+	if (flags & kSprVertFlip) {
+		y = y2;
+	}
 	const int xOrig = x;
 	while (1) {
 		uint8_t *p = dst + y * _spr.pitch + x;
@@ -179,7 +182,11 @@ void Video::decodeSPR(const uint8_t *src, uint8_t *dst, int x, int y, uint8_t fl
 					return;
 				}
 			}
-			y += count;
+			if (flags & kSprVertFlip) {
+				y -= count;
+			} else {
+				y += count;
+			}
 			if (flags & kSprHorizFlip) {
 				x = xOrig - *src++;
 			} else {
@@ -347,7 +354,11 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 	while (src_h-- != 0) {
 		for (int i = 0; i < src_w; ++i) {
 			if (1) { // no LUT
-				const int offset = READ_LE_UINT16(src1); src1 += 2;
+				int offset = READ_LE_UINT16(src1); src1 += 2;
+				// Not sure if this is an issue in the original or in the rewrite
+				if (offset >= kScreenWidth * kScreenHeight) {
+					offset = kScreenWidth * kScreenWidth - 1;
+				}
 				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], _shadowColorLut);
 			} else {
 				// build lookup offset

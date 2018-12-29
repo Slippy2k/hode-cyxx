@@ -152,13 +152,6 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 			for (int j = 1; j < size; ++j) {
 				uint16_t offset = (int16_t)READ_LE_UINT16(src - 2) + (int16_t)READ_LE_UINT16(src);
 				// fprintf(stdout, "shadow #%d offset #%d 0x%x 0x%x\n", i, j, READ_LE_UINT16(src), offset);
-
-				if (offset >= Video::kScreenWidth * Video::kScreenHeight) {
-					warning("Invalid offset %d for shadowLayer", offset);
-					// Not sure if this is an issue in the original or in the rewrite
-					offset = Video::kScreenWidth * Video::kScreenHeight - 1;
-				}
-
 				WRITE_LE_UINT16(src, offset);
 				src += 2;
 			}

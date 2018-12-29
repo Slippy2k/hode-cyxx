@@ -11,7 +11,8 @@
 struct SystemStub;
 
 enum {
-	kSprHorizFlip  = 1 << 0,
+	kSprHorizFlip  = 1 << 0, // left-right
+	kSprVertFlip   = 1 << 1, // up-down
 	kSprClipTop    = 1 << 2,
 	kSprClipBottom = 1 << 3,
 	kSprClipLeft   = 1 << 4,
