@@ -22,7 +22,7 @@ Video::Video(SystemStub *system)
 	_spr.y = 0;
 	_spr.w = kScreenWidth;
 	_spr.h = kScreenHeight;
-	_shadowColorLookupTable = 0; //(uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
+	_shadowColorLookupTable = (uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
 	_fillColor = 0xC4;
 	_blackColor = 255;
 	_findBlackColor = true;
@@ -353,7 +353,7 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 	src2 = _shadowColorLookupTable;
 	while (src_h-- != 0) {
 		for (int i = 0; i < src_w; ++i) {
-			if (1) { // no LUT
+			if (!src2) { // no LUT
 				int offset = READ_LE_UINT16(src1); src1 += 2;
 				// Not sure if this is an issue in the original or in the rewrite
 				if (offset >= kScreenWidth * kScreenHeight) {
@@ -379,7 +379,7 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 
 void Video::buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst) {
 	assert(dst == _shadowColorLookupTable);
-	if (0) {
+	if (_shadowColorLookupTable) {
 		// 256x256
 		//   0..143 : 0..255
 		// 144..255 : src[0..143] 144..255
