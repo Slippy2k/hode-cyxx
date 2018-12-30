@@ -244,7 +244,7 @@ static void DumpBitmap(File *f, int i, int j, uint32_t subOffs) {
 	f->read(p, baseSize);
 	uint8_t *data = p + subOffs;*/
 	uint8_t *data = pLevelData0x2B88 + subOffs;
-	printf("   BMP LE16 %04X ", READ_LE_UINT16(data));
+	printf("   BMP %02x %02x %02x %02x %02x", data[2], data[3], data[4], data[5], data[6]);
 	
 	uint32_t outputSize = UnpackData(9, data + 2, tmpBuf);
 	printf("outputSize %d\n", outputSize);

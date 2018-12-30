@@ -46,7 +46,9 @@ Saturn
 		RESINFO1.001
 		RESTABLE.001
 	file01 'DCD'
+		contains palette (6 bits) and bitmaps (LZW)
 	file02 'DHD'
+		at offset 5, contains screenGrid
 	file03 ?
 	file04 paf
 	file05 paf
