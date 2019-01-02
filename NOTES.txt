@@ -48,7 +48,8 @@ Saturn
 	file01 'DCD'
 		contains palette (6 bits) and bitmaps (LZW)
 	file02 'DHD'
-		at offset 5, contains screenGrid
+		at offset 4, byte screens count
+		at offset 5, contains screenGrid (4 * sizeof(screens count))
 	file03 ?
 	file04 paf
 	file05 paf
@@ -57,6 +58,17 @@ Saturn
 	file09 paf
 	file10 paf
 	file11 paf
+
+00000004: Cinematic of Andy (with hat) falling off the canyon
+00000005: Cinematic of Mefudoka stealing the Plasma Cannon
+00000006: Cinematic of Andy (with helmet) falling off the canyon
+00000007: Opening cinematic including the opening credits
+00000008: Cinematic where Vicious mistakenly presents Whisky to the Master of Darkness
+00000009: Cinematic of Andy (with hat) falling off the canyon (again)
+00000010: Cinematic of Mefudoka stealing the Plasma Cannon (again)
+00000011: Cinematic of Andy (with helmet) falling off the canyon (again)
+00000012: Opening cinematic including the opening credits (again)
+00000013: Cinematic where Vicious mistakenly presents Whisky to the Master of Darkness (again)
 
 ハート ha-to
 オブ obu
