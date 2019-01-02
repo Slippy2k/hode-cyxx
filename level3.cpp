@@ -7,6 +7,7 @@
 
 #include "game.h"
 #include "paf.h"
+#include "util.h"
 #include "video.h"
 
 void Game::callLevelOpStage0_level3(int num) {
@@ -42,10 +43,11 @@ void Game::callLevelOpStage2_level3(int num) {
 }
 
 void Game::level3OpStage3() {
+	warning("level3OpStage3 unimplemented");
 #if 0
-	_levelOpStage3ImageBuf = malloc(49408);
+	_levelOpStage3ImageBuf = malloc(256 * 192 + 256);
 	decodeLZW(_levelOpStage3ImageData1, _levelOpStage3ImageBuf);
-	memcpy(_levelOpStage3ImageBuf + 49152, _levelOpStage3ImageBuf);
+	memcpy(_levelOpStage3ImageBuf + 256 * 192, _levelOpStage3ImageBuf);
 	// TODO:
 #endif
 }

@@ -855,7 +855,19 @@ void Game::expireSoundObjects(int flags) {
 
 void Game::mixSoundObjects17640(bool flag) {
 	for (int i = 0; i < _res->_sssHdr.unk14; ++i) {
-		// TODO:
+		_res->_sssDataUnk4[i].unk30 = 0;
+		int counter1 = _res->_sssDataUnk4[i].unkC;
+		if (counter1 != 0) {
+			_res->_sssDataUnk4[i].unkC = counter1 - 1;
+		}
+		_res->_sssDataUnk4[i].unk4 += _res->_sssDataUnk4[i].unk8;
+		_res->_sssDataUnk4[i].unk30 = 1;
+		int counter2 = _res->_sssDataUnk4[i].unk1C;
+		if (counter2 != 0) {
+			_res->_sssDataUnk4[i].unk1C = counter2 - 1;
+		}
+		_res->_sssDataUnk4[i].unk14 += _res->_sssDataUnk4[i].unk18;
+		_res->_sssDataUnk4[i].unk30 = 1;
 	}
 // 42B426
 	for (int i = 0; i < _sssObjectsCount; ++i) {
