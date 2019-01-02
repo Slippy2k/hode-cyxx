@@ -165,7 +165,9 @@ int main(int argc, char *argv[]) {
 		fseek(fp, 0, SEEK_SET);
 		do {
 			if (fgetc(fp) == 0) {
-				if (fgetc(fp) == 0xAD && fgetc(fp) == 0) {
+				uint8_t code1 = fgetc(fp);
+				uint8_t code2 = fgetc(fp);
+				if ((code1 == 0xAD || code1 == 0xBD) && code2 == 0) {
 					assert(count < MAX_OFFSETS);
 					offsets[count++] = ftell(fp) - 1;
 				}
