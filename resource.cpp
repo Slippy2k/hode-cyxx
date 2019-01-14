@@ -62,7 +62,7 @@ void Resource::loadSetupDat() {
 	}
 }
 
-void Resource::loadLvlScreenMoveData(int num) {
+void Resource::loadLvlScreenMoveData(int num) { // GridData
 	_lvlFile->seekAlign(0x8 + num * 4);
 	_lvlFile->read(&_screensGrid[num * 4], 4);
 }
@@ -302,8 +302,8 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 	dat->unk3 = *src++;
 	dat->dataUnk1Count = *src++;
 	dat->currentDataUnk1Id = *src++;
-	dat->dataUnk2Count = *src++;
-	dat->unk7 = *src++;
+	dat->dataUnk2Count = *src++; // soundsCount
+	dat->unk7 = *src++; // currentSoundId
 	dat->dataUnk3Count = *src++;
 	dat->unk9 = *src++;
 	dat->dataUnk45Count = *src++;
@@ -328,7 +328,7 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 	}
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
-		dat->dataUnk2Table[i] = (offs != 0) ? ptr + offs : 0;
+		dat->dataUnk2Table[i] = (offs != 0) ? ptr + offs : 0; // backgroundSoundTable
 	}
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
