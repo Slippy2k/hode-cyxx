@@ -2316,6 +2316,9 @@ void Game::callLevelOpStage0(int num) {
 	case 1:
 		callLevelOpStage0_level2(num);
 		break;
+	case 2:
+		callLevelOpStage0_level3(num);
+		break;
 	}
 }
 
@@ -2325,6 +2328,8 @@ int Game::callLevelOpStage1(int num, LvlObject *o) {
 		return callLevelOpStage1_level1(num, o);
 	case 1:
 		return callLevelOpStage1_level2(num, o);
+	case 2:
+		return callLevelOpStage1_level3(num, o);
 	}
 	return 0;
 }
@@ -2336,6 +2341,9 @@ void Game::callLevelOpStage2(int num) {
 		break;
 	case 1:
 		callLevelOpStage2_level2(num);
+		break;
+	case 2:
+		callLevelOpStage2_level3(num);
 		break;
 	}
 }
