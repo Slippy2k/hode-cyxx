@@ -88,6 +88,7 @@ struct Game {
 	Sprite *_gameSpriteListPtrTable[32];
 	uint16_t _fadePaletteBuffer[256 * 3];
 	uint8_t *_shadowScreenMaskBuffer;
+	uint8_t *_shakeShadowBuffer;
 	uint8_t _directionKeyMask;
 	uint8_t _actionKeyMask;
 	uint8_t _currentRightScreen;

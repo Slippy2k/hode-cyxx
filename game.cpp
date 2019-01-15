@@ -22,6 +22,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_screen_dx = Video::kScreenWidth / 2;
 	_screen_dy = Video::kScreenHeight / 2;
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
+	_shakeShadowBuffer = 0;
 	_mstLogicDisabled = true;
 	_snd_masterVolume = 128;
 	// TEMP: mixSounds
@@ -101,7 +102,7 @@ void Game::shakeScreen() {
 	if (_video->_displayShadowLayer) {
 #if 0
 		const int _cl = (_currentLevel == 4 || _currentLevel == 6) ? 1 : 4;
-		GamePrepareScreenEffect();
+		shakeShadowLayer();
 #endif
 	}
 	if (_shakeScreenDuration != 0) {
@@ -2344,10 +2345,10 @@ void Game::callLevelOpStage3() {
 	case 0:
 		level1OpStage3();
 		break;
-	case 3:
+	case 2:
 		level3OpStage3();
 		break;
-	case 4:
+	case 3:
 		level4OpStage3();
 		break;
 	}
@@ -2358,7 +2359,7 @@ void Game::callLevelOpStage4() {
 	case 0:
 		level1OpStage4();
 		break;
-	case 4:
+	case 3:
 		level4OpStage4();
 		break;
 	}
@@ -2369,15 +2370,16 @@ void Game::callLevelOpStage5() {
 	case 0:
 		level1OpStage5();
 		break;
-	case 4:
+	case 3:
 		level4OpStage5();
 		break;
-	case 3:
+	case 2:
+	case 4:
 	case 5:
 	case 6:
-	case 7:
 		if (_video->_displayShadowLayer) {
-			// TODO:
+			free(_shakeShadowBuffer);
+			_shakeShadowBuffer = 0;
 		}
 		break;
 	}
