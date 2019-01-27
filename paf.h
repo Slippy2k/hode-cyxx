@@ -22,6 +22,11 @@ struct PafHeader {
 	uint32_t maxAudioFrameBlocksCount;
 };
 
+enum {
+	kPafAnimation_AndyFallingCannon = 22,
+	kPafAnimation_AndyFailling = 23,
+};
+
 struct SystemStub;
 
 struct PafPlayer {

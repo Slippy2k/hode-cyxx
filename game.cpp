@@ -1193,7 +1193,11 @@ void Game::playAndyFallingCutscene(int type) {
 	if (!_paf->_skipCutscenes && play) {
 		switch (_currentLevel) {
 		case 0:
-			_paf->play((_andyObject->data0x2988 == 0) ? 22 : 23);
+			if (_andyObject->data0x2988 == 0) {
+				_paf->play(22); // Andy falls with cannon
+			} else {
+				_paf->play(23); // Andy falls without cannon
+			}
 			break;
 		case 1:
 			if (_res->_currentScreenResourceNum == 0) {
