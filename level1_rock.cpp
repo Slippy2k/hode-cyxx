@@ -10,7 +10,7 @@
 #include "util.h"
 #include "video.h"
 
-void Game::level1OpStage0_screen0() {
+void Game::postScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:
 		if ((_andyObject->flags0 & 0x1F) == 0 && ((_andyObject->flags0 >> 5) & 7) == 6) {
@@ -29,7 +29,7 @@ void Game::level1OpStage0_screen0() {
 	}
 }
 
-void Game::level1OpStage0_screen4() {
+void Game::postScreenUpdate_rock_screen4() {
 	switch (_res->_screensState[4].s0) {
 	case 0:
 		if (_plasmaCannonDirection != 0 && _res->_currentScreenResourceNum == 4) {
@@ -70,7 +70,7 @@ void Game::level1OpStage0_screen4() {
 	}
 }
 
-void Game::level1OpStage0_screen8() {
+void Game::postScreenUpdate_rock_screen8() {
 	if (_res->_currentScreenResourceNum == 8) {
 		if ((_andyObject->flags0 & 0x1F) == 3) {
 			_andyObject->flags2 = 0x3008;
@@ -82,7 +82,7 @@ void Game::level1OpStage0_screen8() {
 	}
 }
 
-void Game::level1OpStage0_screen9Helper(int num) {
+void Game::postScreenUpdate_rock_screen9Helper(int num) {
 	switch (num) {
 	case 0:
 		removeLvlObject(_andyObject);
@@ -103,7 +103,7 @@ void Game::level1OpStage0_screen9Helper(int num) {
 	_andyObject->frame = 0;
 }
 
-void Game::level1OpStage0_screen9() {
+void Game::postScreenUpdate_rock_screen9() {
 	int xPos;
 	if (_res->_currentScreenResourceNum == 9) {
 		switch (_res->_screensState[9].s0) {
@@ -122,7 +122,7 @@ void Game::level1OpStage0_screen9() {
 					_levelCheckpoint = 5;
 				}
 				_res->_screensState[9].s0 = 1;
-				level1OpStage0_screen9Helper(2);
+				postScreenUpdate_rock_screen9Helper(2);
 				_andyObject->xPos = 105;
 				_andyObject->yPos = 52;
 				_andyObject->anim = 232;
@@ -184,34 +184,34 @@ ret:
 	byte_478C6C = _bl;
 }
 
-void Game::level1OpStage0_screen10() {
+void Game::postScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		BoundingBox box = { 64, 0, 267, 191 };
 		level1OpHelper3(&box, 12);
 	}
 }
 
-void Game::level1OpStage0_screen11() {
+void Game::postScreenUpdate_rock_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		BoundingBox box = { -12, 0, 162, 191 };
 		level1OpHelper3(&box, 12);
 	}
 }
 
-void Game::level1OpStage0_screen13() {
+void Game::postScreenUpdate_rock_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
 		_plasmaCannonFlags &= ~1;
 	}
 }
 
-void Game::level1OpStage0_screen15() {
+void Game::postScreenUpdate_rock_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
 		_plasmaCannonFlags &= ~1;
-		level1OpStage0_screen16();
+		postScreenUpdate_rock_screen16();
 	}
 }
 
-void Game::level1OpStage0_screen16() {
+void Game::postScreenUpdate_rock_screen16() {
 	switch (_res->_screensState[16].s0) {
 	case 0:
 		if (_screenCounterTable[16] < 2) {
@@ -256,7 +256,7 @@ void Game::level1OpStage0_screen16() {
 	}
 }
 
-void Game::level1OpStage0_screen18() {
+void Game::postScreenUpdate_rock_screen18() {
 	LvlObject *o;
 	switch (_res->_screensState[18].s0) {
 	case 0:
@@ -307,7 +307,7 @@ void Game::level1OpStage0_screen18() {
 	}
 }
 
-void Game::level1OpStage0_screen19() {
+void Game::postScreenUpdate_rock_screen19() {
 	int fl;
 	switch (_res->_screensState[19].s0) {
 	case 0: {
@@ -371,40 +371,40 @@ void Game::level1OpStage0_screen19() {
 	}
 }
 
-void Game::callLevelOpStage0_level1(int num) {
+void Game::callLevel_postScreenUpdate_level1(int num) {
 	switch (num) {
 	case 0:
-		level1OpStage0_screen0();
+		postScreenUpdate_rock_screen0();
 		break;
 	case 4:
-		level1OpStage0_screen4();
+		postScreenUpdate_rock_screen4();
 		break;
 	case 8:
-		level1OpStage0_screen8();
+		postScreenUpdate_rock_screen8();
 		break;
 	case 9:
-		level1OpStage0_screen9();
+		postScreenUpdate_rock_screen9();
 		break;
 	case 10:
-		level1OpStage0_screen10();
+		postScreenUpdate_rock_screen10();
 		break;
 	case 11:
-		level1OpStage0_screen11();
+		postScreenUpdate_rock_screen11();
 		break;
 	case 13:
-		level1OpStage0_screen13();
+		postScreenUpdate_rock_screen13();
 		break;
 	case 15:
-		level1OpStage0_screen15();
+		postScreenUpdate_rock_screen15();
 		break;
 	case 16:
-		level1OpStage0_screen16();
+		postScreenUpdate_rock_screen16();
 		break;
 	case 18:
-		level1OpStage0_screen18();
+		postScreenUpdate_rock_screen18();
 		break;
 	case 19:
-		level1OpStage0_screen19();
+		postScreenUpdate_rock_screen19();
 		break;
 	}
 }

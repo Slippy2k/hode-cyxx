@@ -1104,34 +1104,34 @@ void Game::updateScreen(uint8_t num) {
 	if (_res->_screensState[num].s0 >= _res->_screensState[num].s1) {
 		--_res->_screensState[num].s1;
 	}
-	callLevelOpStage0(num);
+	callLevel_postScreenUpdate(num);
 	i = _res->_screensGrid[num * 4 + kPosTopScreen];
 	if (i != 0xFF && prev != i) {
 		callLevelOpStage2(i);
 		setupScreenMask(i);
-		callLevelOpStage0(i);
+		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num * 4 + kPosRightScreen];
 	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
 		updateScreenHelper(i);
 		callLevelOpStage2(i);
 		setupScreenMask(i);
-		callLevelOpStage0(i);
+		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num * 4 + kPosBottomScreen];
 	if (i != 0xFF && prev != i) {
 		callLevelOpStage2(i);
 		setupScreenMask(i);
-		callLevelOpStage0(i);
+		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num * 4 + kPosLeftScreen];
 	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
 		updateScreenHelper(i);
 		callLevelOpStage2(i);
 		setupScreenMask(i);
-		callLevelOpStage0(i);
+		callLevel_postScreenUpdate(i);
 	}
-	callLevelOpStage0(num);
+	callLevel_postScreenUpdate(num);
 	setupBackgroundBitmap();
 	setupScreenMask(num);
 	resetDisplay();
@@ -2210,12 +2210,12 @@ void Game::levelMainLoop() {
 			}
 			updateScreen(_andyObject->screenNum);
 		} else {
-			callLevelOpStage0(_res->_currentScreenResourceNum);
+			callLevel_postScreenUpdate(_res->_currentScreenResourceNum);
 			if (_currentLeftScreen != 0xFF) {
-				callLevelOpStage0(_currentLeftScreen);
+				callLevel_postScreenUpdate(_currentLeftScreen);
 			}
 			if (_currentRightScreen != 0xFF) {
-				callLevelOpStage0(_currentRightScreen);
+				callLevel_postScreenUpdate(_currentRightScreen);
 			}
 		}
 		if (updateAndyLvlObject() != 0) {
@@ -2308,16 +2308,16 @@ void Game::levelMainLoop() {
 	callLevelOpStage5();
 }
 
-void Game::callLevelOpStage0(int num) {
+void Game::callLevel_postScreenUpdate(int num) {
 	switch (_currentLevel) {
 	case 0:
-		callLevelOpStage0_level1(num);
+		callLevel_postScreenUpdate_level1(num);
 		break;
 	case 1:
-		callLevelOpStage0_level2(num);
+		callLevel_postScreenUpdate_level2(num);
 		break;
 	case 2:
-		callLevelOpStage0_level3(num);
+		callLevel_postScreenUpdate_level3(num);
 		break;
 	}
 }

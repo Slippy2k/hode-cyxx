@@ -11,7 +11,7 @@
 #include "util.h"
 #include "video.h"
 
-void Game::callLevelOpStage0_level3(int num) {
+void Game::callLevel_postScreenUpdate_level3(int num) {
 	switch (num) {
 	case 6:
 	case 10:
@@ -22,7 +22,7 @@ void Game::callLevelOpStage0_level3(int num) {
 	case 23:
 	case 27:
 	case 35:
-		warning("callLevelOpStage0_level3 %d unimplemented", num);
+		warning("callLevel_postScreenUpdate_level3 %d unimplemented", num);
 		break;
 	}
 }

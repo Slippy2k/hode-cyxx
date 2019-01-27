@@ -9,7 +9,7 @@
 #include "paf.h"
 #include "video.h"
 
-void Game::level2OpStage0_screen1() {
+void Game::postScreenUpdate_fort_screen1() {
 	if (_res->_screensState[1].s0 == 2) {
 		LvlObject *o = _res->findLvlObject(2, 0, 1);
 		if (o) {
@@ -26,7 +26,7 @@ void Game::level2OpStage0_screen1() {
 	}
 }
 
-void Game::level2OpStage0_screen6() {
+void Game::postScreenUpdate_fort_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
 		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 0, 43, 191 };
@@ -51,7 +51,7 @@ void Game::level2OpStage0_screen6() {
 	}
 }
 
-void Game::level2OpStage0_screen7() {
+void Game::postScreenUpdate_fort_screen7() {
 	if (_res->_currentScreenResourceNum == 7) {
 		_andyObject->actionKeyMask &= ~3;
 		_andyObject->actionKeyMask |= 8;
@@ -72,7 +72,7 @@ void Game::level2OpStage0_screen7() {
 	}
 }
 
-void Game::level2OpStage0_screen8() {
+void Game::postScreenUpdate_fort_screen8() {
 	if (_res->_currentScreenResourceNum == 8) {
 		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 138, 0, 255, 191 };
@@ -97,7 +97,7 @@ void Game::level2OpStage0_screen8() {
 	}
 }
 
-void Game::level2OpStage0_screen16() {
+void Game::postScreenUpdate_fort_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
 		if (_res->_screensState[16].s0 == 1) {
 			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
@@ -128,7 +128,7 @@ void Game::level2OpStage0_screen16() {
 	}
 }
 
-void Game::level2OpStage0_screen17() {
+void Game::postScreenUpdate_fort_screen17() {
 	if (_res->_screensState[17].s0 == 1) {
 		++_screenCounterTable[17];
 		if (_screenCounterTable[17] == 68) {
@@ -137,7 +137,7 @@ void Game::level2OpStage0_screen17() {
 	}
 }
 
-void Game::level2OpStage0_screen21() {
+void Game::postScreenUpdate_fort_screen21() {
 	if (_res->_currentScreenResourceNum == 21) {
 		switch (_res->_screensState[21].s0) {
 		case 1:
@@ -158,28 +158,28 @@ void Game::level2OpStage0_screen21() {
 	}
 }
 
-void Game::callLevelOpStage0_level2(int num) {
+void Game::callLevel_postScreenUpdate_level2(int num) {
 	switch (num) {
 	case 1:
-		level2OpStage0_screen1();
+		postScreenUpdate_fort_screen1();
 		break;
 	case 6:
-		level2OpStage0_screen6();
+		postScreenUpdate_fort_screen6();
 		break;
 	case 7:
-		level2OpStage0_screen7();
+		postScreenUpdate_fort_screen7();
 		break;
 	case 8:
-		level2OpStage0_screen8();
+		postScreenUpdate_fort_screen8();
 		break;
 	case 16:
-		level2OpStage0_screen16();
+		postScreenUpdate_fort_screen16();
 		break;
 	case 17:
-		level2OpStage0_screen17();
+		postScreenUpdate_fort_screen17();
 		break;
 	case 21:
-		level2OpStage0_screen21();
+		postScreenUpdate_fort_screen21();
 		break;
 	}
 }
