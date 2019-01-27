@@ -270,7 +270,7 @@ struct Game {
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
 	void captureScreenshot();
 
-	// level1.cpp
+	// level1_rock.cpp
 
 	void level1OpStage0_screen0();
 	void level1OpStage0_screen4();
@@ -316,7 +316,7 @@ struct Game {
 	void level1OpStage5();
 	void level1SetupLvlObjects(int num);
 
-	// level2.cpp
+	// level2_fort.cpp
 
 	void level2OpStage0_screen1();
 	void level2OpStage0_screen6();
@@ -339,7 +339,7 @@ struct Game {
 	void level2OpStage2_screen21();
 	void callLevelOpStage2_level2(int num);
 
-	// level3.cpp
+	// level3_pwr1.cpp
 
 	void callLevelOpStage0_level3(int num);
 	int level3OpStage1_case0(LvlObject *o);
@@ -348,13 +348,13 @@ struct Game {
 	void callLevelOpStage2_level3(int num);
 	void level3OpStage3();
 
-	// level4.cpp
+	// level4_isld.cpp
 
 	void level4OpStage3();
 	void level4OpStage4();
 	void level4OpStage5();
 
-	// mst.cpp
+	// monsters.cpp
 
 	void resetMstCode();
 	void startMstCode();
