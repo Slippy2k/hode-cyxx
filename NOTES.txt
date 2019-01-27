@@ -73,3 +73,15 @@ Saturn
 ハート ha-to
 オブ obu
 ダークネス da-kunesu
+
+Levels :
+	"rock_hod" /* 0 */
+	"fort_hod"
+	"pwr1_hod"
+	"isld_hod"
+	"lava_hod" /* 4 */
+	"pwr2_hod"
+	"lar1_hod"
+	"lar2_hod"
+	"dark_hod" /* 8 */
+	"test_hod"
