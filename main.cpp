@@ -27,7 +27,19 @@ static void exitMain() {
 	}
 }
 
-#undef main
+static const char *kLevelNames[] = {
+	"rock",
+	"fort",
+	"pwr1",
+	"isld",
+	"lava",
+	"pwr2",
+	"lar1",
+	"lar2",
+	"dark",
+	0
+};
+
 int main(int argc, char *argv[]) {
 	char *dataPath = 0;
 	int level = 0;
@@ -49,7 +61,16 @@ int main(int argc, char *argv[]) {
 			dataPath = strdup(optarg);
 			break;
 		case 2:
-			level = atoi(optarg);
+			if (optarg[0] >= '0' && optarg[0] <= '9') {
+				level = atoi(optarg);
+			} else {
+				for (int i = 0; kLevelNames[i]; ++i) {
+					if (strcmp(kLevelNames[i], optarg) == 0) {
+						level = i;
+						break;
+					}
+				}
+			}
 			break;
 		case 3:
 			checkpoint = atoi(optarg);
