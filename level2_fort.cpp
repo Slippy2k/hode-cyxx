@@ -256,7 +256,7 @@ void Game::level2OpStage2_screen21() {
 	}
 }
 
-void Game::callLevelOpStage2_level2(int num) {
+void Game::callLevel_preScreenUpdate_level2(int num) {
 	switch (num) {
 	case 1:
 		level2OpStage2_screen1();

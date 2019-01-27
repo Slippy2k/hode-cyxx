@@ -243,7 +243,7 @@ struct Game {
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);
 	int callLevelOpStage1(int num, LvlObject *o); // callLevel_objectUpdate
-	void callLevelOpStage2(int num); // callLevel_preScreenUpdate
+	void callLevel_preScreenUpdate(int num);
 	void callLevelOpStage3(); // callLevel_preTick
 	void callLevelOpStage4(); // callLevel_postTick
 	void callLevelOpStage5(); // callLevel_terminate
@@ -285,7 +285,7 @@ struct Game {
 	void postScreenUpdate_rock_screen16();
 	void postScreenUpdate_rock_screen18();
 	void postScreenUpdate_rock_screen19();
-	void callLevel_postScreenUpdate_level1(int num);
+	void callLevel_postScreenUpdate_rock(int num);
 	int level1OpStage1_case0(LvlObject *o);
 	void level1OpHelper1(LvlObject *ptr, uint8_t *p);
 	int level1OpHelper2(LvlObject *ptr);
@@ -294,23 +294,23 @@ struct Game {
 	int level1OpStage1_case3(LvlObject *o);
 	int level1OpStage1_case4(LvlObject *o);
 	int callLevelOpStage1_level1(int num, LvlObject *o);
-	void level1OpStage2_screen0();
-	void level1OpStage2_screen1();
-	void level1OpStage2_screen2();
-	void level1OpStage2_screen3();
-	void level1OpStage2_screen4();
-	void level1OpStage2_screen5();
-	void level1OpStage2_screen7();
-	void level1OpStage2_screen9();
-	void level1OpStage2_screen10();
-	void level1OpStage2_screen13();
-	void level1OpStage2_screen14();
-	void level1OpStage2_screen15();
-	void level1OpStage2_screen16();
-	void level1OpStage2_screen17();
-	void level1OpStage2_screen18();
-	void level1OpStage2_screen19();
-	void callLevelOpStage2_level1(int num);
+	void preScreenUpdate_rock_screen0();
+	void preScreenUpdate_rock_screen1();
+	void preScreenUpdate_rock_screen2();
+	void preScreenUpdate_rock_screen3();
+	void preScreenUpdate_rock_screen4();
+	void preScreenUpdate_rock_screen5();
+	void preScreenUpdate_rock_screen7();
+	void preScreenUpdate_rock_screen9();
+	void preScreenUpdate_rock_screen10();
+	void preScreenUpdate_rock_screen13();
+	void preScreenUpdate_rock_screen14();
+	void preScreenUpdate_rock_screen15();
+	void preScreenUpdate_rock_screen16();
+	void preScreenUpdate_rock_screen17();
+	void preScreenUpdate_rock_screen18();
+	void preScreenUpdate_rock_screen19();
+	void callLevel_preScreenUpdate_rock(int num);
 	void level1OpStage3();
 	void level1OpStage4();
 	void level1OpStage5();
@@ -337,7 +337,7 @@ struct Game {
 	void level2OpStage2_screen16();
 	void level2OpStage2_screen17();
 	void level2OpStage2_screen21();
-	void callLevelOpStage2_level2(int num);
+	void callLevel_preScreenUpdate_level2(int num);
 
 	// level3_pwr1.cpp
 
@@ -345,7 +345,7 @@ struct Game {
 	int level3OpStage1_case0(LvlObject *o);
 	int level3OpStage1_case1(LvlObject *o);
 	int callLevelOpStage1_level3(int num, LvlObject *o);
-	void callLevelOpStage2_level3(int num);
+	void callLevel_preScreenUpdate_level3(int num);
 	void level3OpStage3();
 
 	// level4_isld.cpp

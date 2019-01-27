@@ -1100,34 +1100,34 @@ void Game::updateScreen(uint8_t num) {
 	prev = _res->_currentScreenResourceNum;
 	_res->_currentScreenResourceNum = num;
 	updateScreenHelper(num);
-	callLevelOpStage2(num);
+	callLevel_preScreenUpdate(num);
 	if (_res->_screensState[num].s0 >= _res->_screensState[num].s1) {
 		--_res->_screensState[num].s1;
 	}
 	callLevel_postScreenUpdate(num);
 	i = _res->_screensGrid[num * 4 + kPosTopScreen];
 	if (i != 0xFF && prev != i) {
-		callLevelOpStage2(i);
+		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num * 4 + kPosRightScreen];
 	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
 		updateScreenHelper(i);
-		callLevelOpStage2(i);
+		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num * 4 + kPosBottomScreen];
 	if (i != 0xFF && prev != i) {
-		callLevelOpStage2(i);
+		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num * 4 + kPosLeftScreen];
 	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
 		updateScreenHelper(i);
-		callLevelOpStage2(i);
+		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
@@ -2311,7 +2311,7 @@ void Game::levelMainLoop() {
 void Game::callLevel_postScreenUpdate(int num) {
 	switch (_currentLevel) {
 	case 0:
-		callLevel_postScreenUpdate_level1(num);
+		callLevel_postScreenUpdate_rock(num);
 		break;
 	case 1:
 		callLevel_postScreenUpdate_level2(num);
@@ -2334,16 +2334,16 @@ int Game::callLevelOpStage1(int num, LvlObject *o) {
 	return 0;
 }
 
-void Game::callLevelOpStage2(int num) {
+void Game::callLevel_preScreenUpdate(int num) {
 	switch (_currentLevel) {
 	case 0:
-		callLevelOpStage2_level1(num);
+		callLevel_preScreenUpdate_rock(num);
 		break;
 	case 1:
-		callLevelOpStage2_level2(num);
+		callLevel_preScreenUpdate_level2(num);
 		break;
 	case 2:
-		callLevelOpStage2_level3(num);
+		callLevel_preScreenUpdate_level3(num);
 		break;
 	}
 }

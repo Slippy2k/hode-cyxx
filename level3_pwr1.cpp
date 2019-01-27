@@ -40,7 +40,7 @@ int Game::callLevelOpStage1_level3(int num, LvlObject *o) {
 	return (this->*_level3OpStage1[num])(o);
 }
 
-void Game::callLevelOpStage2_level3(int num) {
+void Game::callLevel_preScreenUpdate_level3(int num) {
 	switch (num) {
 	case 4:
 	case 6:
@@ -54,7 +54,7 @@ void Game::callLevelOpStage2_level3(int num) {
 	case 29:
 	case 31:
 	case 35:
-		warning("callLevelOpStage2_level3 %d unimplemented", num);
+		warning("callLevel_preScreenUpdate_level3 %d unimplemented", num);
 		break;
 	}
 }

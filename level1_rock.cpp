@@ -371,7 +371,7 @@ void Game::postScreenUpdate_rock_screen19() {
 	}
 }
 
-void Game::callLevel_postScreenUpdate_level1(int num) {
+void Game::callLevel_postScreenUpdate_rock(int num) {
 	switch (num) {
 	case 0:
 		postScreenUpdate_rock_screen0();
@@ -559,7 +559,7 @@ int Game::callLevelOpStage1_level1(int num, LvlObject *o) {
 	return (this->*_level1OpStage1[num])(o);
 }
 
-void Game::level1OpStage2_screen0() {
+void Game::preScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:
 		_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 0;
@@ -571,13 +571,13 @@ void Game::level1OpStage2_screen0() {
 	}
 }
 
-void Game::level1OpStage2_screen1() {
+void Game::preScreenUpdate_rock_screen1() {
 	if (_levelCheckpoint != 0) {
 		_res->_screensState[0].s0 = 1;
 	}
 }
 
-void Game::level1OpStage2_screen2() {
+void Game::preScreenUpdate_rock_screen2() {
 	if (_res->_currentScreenResourceNum == 2 && _levelCheckpoint == 0) {
 		_levelCheckpoint = 1;
 	} else if (_levelCheckpoint > 1) {
@@ -596,7 +596,7 @@ void Game::level1OpStage2_screen2() {
 	}
 }
 
-void Game::level1OpStage2_screen3() {
+void Game::preScreenUpdate_rock_screen3() {
 	if (_levelCheckpoint > 1) {
 		LvlObject *ptr = _res->findLvlObject(2, 0, 3);
 		if (ptr) {
@@ -613,7 +613,7 @@ void Game::level1OpStage2_screen3() {
 	}
 }
 
-void Game::level1OpStage2_screen4() {
+void Game::preScreenUpdate_rock_screen4() {
 	int num;
 	switch (_res->_screensState[4].s0) {
 	case 0:
@@ -635,19 +635,19 @@ void Game::level1OpStage2_screen4() {
 	}
 }
 
-void Game::level1OpStage2_screen5() {
+void Game::preScreenUpdate_rock_screen5() {
 	if (_res->_currentScreenResourceNum == 5 && _levelCheckpoint == 2) {
 		_levelCheckpoint = 3;
 	}
 }
 
-void Game::level1OpStage2_screen7() {
+void Game::preScreenUpdate_rock_screen7() {
 	if (_res->_currentScreenResourceNum == 7 && _levelCheckpoint == 3) {
 		_levelCheckpoint = 4;
 	}
 }
 
-void Game::level1OpStage2_screen9() {
+void Game::preScreenUpdate_rock_screen9() {
 	switch (_res->_screensState[9].s0) {
 	case 0:
 		if (!_paf->_skipCutscenes) {
@@ -662,7 +662,7 @@ void Game::level1OpStage2_screen9() {
 	}
 }
 
-void Game::level1OpStage2_screen10() {
+void Game::preScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		if (_levelCheckpoint == 4) {
 			_levelCheckpoint = 5;
@@ -674,7 +674,7 @@ void Game::level1OpStage2_screen10() {
 	}
 }
 
-void Game::level1OpStage2_screen13() {
+void Game::preScreenUpdate_rock_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
 		if (_levelCheckpoint == 5) {
 			_levelCheckpoint = 6;
@@ -685,14 +685,14 @@ void Game::level1OpStage2_screen13() {
 	}
 }
 
-void Game::level1OpStage2_screen14() {
+void Game::preScreenUpdate_rock_screen14() {
 	if (_res->_currentScreenResourceNum == 14) {
 		_res->_screensState[16].s0 = 0;
 		_screenCounterTable[16] = 0;
 	}
 }
 
-void Game::level1OpStage2_screen15() {
+void Game::preScreenUpdate_rock_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
 		if (_res->_screensState[16].s0 != 0) {
 			_gameResType0CallbackFlag2 = 2;
@@ -702,7 +702,7 @@ void Game::level1OpStage2_screen15() {
 	}
 }
 
-void Game::level1OpStage2_screen16() {
+void Game::preScreenUpdate_rock_screen16() {
 	uint8_t _al;
 	switch (_res->_screensState[16].s0) {
 	case 0:
@@ -721,7 +721,7 @@ void Game::level1OpStage2_screen16() {
 	}
 }
 
-void Game::level1OpStage2_screen17() {
+void Game::preScreenUpdate_rock_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
 		if (_levelCheckpoint == 6) {
 			_levelCheckpoint = 7;
@@ -730,7 +730,7 @@ void Game::level1OpStage2_screen17() {
 	}
 }
 
-void Game::level1OpStage2_screen18() {
+void Game::preScreenUpdate_rock_screen18() {
 	uint8_t _al;
 	switch (_res->_screensState[18].s0) {
 	case 0:
@@ -748,7 +748,7 @@ void Game::level1OpStage2_screen18() {
 	}
 }
 
-void Game::level1OpStage2_screen19() {
+void Game::preScreenUpdate_rock_screen19() {
 	uint8_t _al;
 	switch (_res->_screensState[19].s0) {
 	case 0:
@@ -771,55 +771,55 @@ void Game::level1OpStage2_screen19() {
 	}
 }
 
-void Game::callLevelOpStage2_level1(int num) {
+void Game::callLevel_preScreenUpdate_rock(int num) {
 	switch (num) {
 	case 0:
-		level1OpStage2_screen0();
+		preScreenUpdate_rock_screen0();
 		break;
 	case 1:
-		level1OpStage2_screen1();
+		preScreenUpdate_rock_screen1();
 		break;
 	case 2:
-		level1OpStage2_screen2();
+		preScreenUpdate_rock_screen2();
 		break;
 	case 3:
-		level1OpStage2_screen3();
+		preScreenUpdate_rock_screen3();
 		break;
 	case 4:
-		level1OpStage2_screen4();
+		preScreenUpdate_rock_screen4();
 		break;
 	case 5:
-		level1OpStage2_screen5();
+		preScreenUpdate_rock_screen5();
 		break;
 	case 7:
-		level1OpStage2_screen7();
+		preScreenUpdate_rock_screen7();
 		break;
 	case 9:
-		level1OpStage2_screen9();
+		preScreenUpdate_rock_screen9();
 		break;
 	case 10:
-		level1OpStage2_screen10();
+		preScreenUpdate_rock_screen10();
 		break;
 	case 13:
-		level1OpStage2_screen13();
+		preScreenUpdate_rock_screen13();
 		break;
 	case 14:
-		level1OpStage2_screen14();
+		preScreenUpdate_rock_screen14();
 		break;
 	case 15:
-		level1OpStage2_screen15();
+		preScreenUpdate_rock_screen15();
 		break;
 	case 16:
-		level1OpStage2_screen16();
+		preScreenUpdate_rock_screen16();
 		break;
 	case 17:
-		level1OpStage2_screen17();
+		preScreenUpdate_rock_screen17();
 		break;
 	case 18:
-		level1OpStage2_screen18();
+		preScreenUpdate_rock_screen18();
 		break;
 	case 19:
-		level1OpStage2_screen19();
+		preScreenUpdate_rock_screen19();
 		break;
 	}
 }
