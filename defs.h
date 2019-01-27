@@ -120,7 +120,7 @@ struct LvlObject {
 	uint8_t frame;
 	uint16_t anim;
 	uint8_t type;
-	uint8_t data0x2988;
+	uint8_t data0x2988; /* shootType */
 	uint16_t flags0;
 	uint16_t flags1;
 	uint16_t flags2; /* spriteType */

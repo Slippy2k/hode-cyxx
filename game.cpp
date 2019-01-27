@@ -2319,6 +2319,9 @@ void Game::callLevel_postScreenUpdate(int num) {
 	case 2:
 		callLevel_postScreenUpdate_level3(num);
 		break;
+	default:
+		warning("callLevel_postScreenUpdate unimplemented for level %d", num);
+		break;
 	}
 }
 
@@ -2330,6 +2333,8 @@ int Game::callLevelOpStage1(int num, LvlObject *o) {
 		return callLevelOpStage1_level2(num, o);
 	case 2:
 		return callLevelOpStage1_level3(num, o);
+	default:
+		warning("callLevelOpStage1 unimplemented for level %d", _currentLevel);
 	}
 	return 0;
 }
@@ -2345,6 +2350,9 @@ void Game::callLevel_preScreenUpdate(int num) {
 	case 2:
 		callLevel_preScreenUpdate_level3(num);
 		break;
+	default:
+		warning("callLevel_preScreenUpdate unimplemented for level %d", _currentLevel);
+		break;
 	}
 }
 
@@ -2358,6 +2366,9 @@ void Game::callLevelOpStage3() {
 		break;
 	case 3:
 		level4OpStage3();
+		break;
+	default:
+		warning("callLevelOpStage3 unimplemented for level %d", _currentLevel);
 		break;
 	}
 }
