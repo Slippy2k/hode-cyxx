@@ -840,7 +840,7 @@ void Game::level1OpStage4() {
 	}
 }
 
-void Game::level1OpStage5() {
+void Game::callLevel_terminate_rock() {
 	if (!_paf->_skipCutscenes) {
 		if (_andyObject->data0x2988 == 0) {
 			_paf->unload(22);

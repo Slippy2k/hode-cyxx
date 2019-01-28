@@ -15,7 +15,7 @@ void Game::level4OpStage4() {
 	// TODO:
 }
 
-void Game::level4OpStage5() {
+void Game::callLevel_terminate_isld() {
 	if (!_paf->_skipCutscenes) {
 		_paf->preload(24);
 	}

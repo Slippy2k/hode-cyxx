@@ -245,7 +245,7 @@ struct Game {
 	void callLevel_preScreenUpdate(int num);
 	void callLevelOpStage3(); // callLevel_preTick
 	void callLevelOpStage4(); // callLevel_postTick
-	void callLevelOpStage5(); // callLevel_terminate
+	void callLevel_terminate();
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
 	void removeLvlObjectFromList(LvlObject **list, LvlObject *ptr);
@@ -285,6 +285,7 @@ struct Game {
 	void postScreenUpdate_rock_screen18();
 	void postScreenUpdate_rock_screen19();
 	void callLevel_postScreenUpdate_rock(int num);
+
 	int level1OpStage1_case0(LvlObject *o);
 	void level1OpHelper1(LvlObject *ptr, uint8_t *p);
 	int level1OpHelper2(LvlObject *ptr);
@@ -293,6 +294,7 @@ struct Game {
 	int level1OpStage1_case3(LvlObject *o);
 	int level1OpStage1_case4(LvlObject *o);
 	int callLevelOpStage1_level1(int num, LvlObject *o);
+
 	void preScreenUpdate_rock_screen0();
 	void preScreenUpdate_rock_screen1();
 	void preScreenUpdate_rock_screen2();
@@ -310,9 +312,11 @@ struct Game {
 	void preScreenUpdate_rock_screen18();
 	void preScreenUpdate_rock_screen19();
 	void callLevel_preScreenUpdate_rock(int num);
+
 	void level1OpStage3();
 	void level1OpStage4();
-	void level1OpStage5();
+
+	void callLevel_terminate_rock();
 	void level1SetupLvlObjects(int num);
 
 	// level2_fort.cpp
@@ -351,7 +355,7 @@ struct Game {
 
 	void level4OpStage3();
 	void level4OpStage4();
-	void level4OpStage5();
+	void callLevel_terminate_isld();
 
 	// monsters.cpp
 

@@ -2301,7 +2301,7 @@ void Game::levelMainLoop() {
 		}
 		_system->sleep(diff);
 	} while (!_system->inp.quit && !_quit);
-	callLevelOpStage5();
+	callLevel_terminate();
 }
 
 void Game::callLevel_postScreenUpdate(int num) {
@@ -2380,13 +2380,13 @@ void Game::callLevelOpStage4() {
 	}
 }
 
-void Game::callLevelOpStage5() {
+void Game::callLevel_terminate() {
 	switch (_currentLevel) {
 	case 0:
-		level1OpStage5();
+		callLevel_terminate_rock();
 		break;
 	case 3:
-		level4OpStage5();
+		callLevel_terminate_isld();
 		break;
 	case 2:
 	case 4:
