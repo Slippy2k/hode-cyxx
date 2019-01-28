@@ -131,8 +131,6 @@ void PafPlayer::decodeVideoFrame(const uint8_t *src) {
 	case 4:
 		decodeVideoFrameOp4(src);
 		break;
-	default:
-		assert(0);
 	}
 }
 

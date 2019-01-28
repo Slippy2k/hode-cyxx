@@ -45,11 +45,13 @@ void Game::GameClearUnkList1() {
 }
 
 void Game::GameRemoveGameUnkList1ElementFromLevelScreenData(LvlObject *ptr) {
-assert(0); // code path check
+	warning("GameRemoveGameUnkList1ElementFromLevelScreenData unimplemented");
+/*
 	GameUnkList1 *dat = (GameUnkList1 *)getLvlObjectDataPtr(ptr, kObjectDataTypeUnk1);
 	dat->nextPtr = _gameUnkList1Head;
 	_gameUnkList1Head = dat;
 	ptr->dataPtr = 0;
+*/
 }
 
 void Game::setShakeScreen(int type, int counter) {
@@ -1936,7 +1938,7 @@ LvlObject *Game::updateAnimatedLvlObject(LvlObject *o) {
 		o = updateAnimatedLvlObjectTypeDefault(o);
 		break;
 	default:
-		assert(0);
+		error("updateAnimatedLvlObject unhandled type %d", o->type);
 		break;
 	}
 	return o;
@@ -2535,7 +2537,7 @@ void Game::lvlObjectTypeInit(LvlObject *o) {
 		lvlObjectType1Init(o);
 		break;
 	default:
-		assert(0);
+		error("lvlObjectTypeInit unhandled case %d", o->data0x2988);
 		break;
 	}
 }
@@ -2616,11 +2618,11 @@ int Game::lvlObjectType0CallbackHelper2(int x, int y, int num) {
 }
 
 void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
-	// TODO
+	warning("lvlObjectType0CallbackHelper3 unimplemented");
 }
 
 void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
-	// TODO
+	warning("lvlObjectType0CallbackHelper4 unimplemented");
 }
 
 int Game::lvlObjectType0Callback(LvlObject *ptr) {
@@ -2791,7 +2793,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 		o->callbackFuncPtr = &Game::lvlObjectType1Callback;
 		break;
 	default:
-		assert(0);
+		error("lvlObjectTypeCallback unhandled case %d", o->data0x2988);
 		break;
 	}
 }

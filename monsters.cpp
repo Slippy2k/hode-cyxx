@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "resource.h"
+#include "util.h"
 
 void Game::initMstCode() {
 	memset(_globalVars, 0, sizeof(_globalVars));
@@ -48,8 +49,7 @@ static bool compareOp(int op, T num1, T num2) {
 	case 8:
 		return (num1 ^ num2) == 0;
 	default:
-		printf("compareOp unhandled op %d\n", op);
-		assert(0);
+		error("compareOp unhandled op %d", op);
 		break;
 	}
 	return false;
@@ -91,8 +91,7 @@ static void arithOp(int op, T *p, int num) {
 		*p ^= num;
 		break;
 	default:
-		printf("arithOp unhandled op %d\n", op);
-		assert(0);
+		error("arithOp unhandled op %d", op);
 		break;
 	}
 }
