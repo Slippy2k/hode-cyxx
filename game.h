@@ -36,9 +36,11 @@ struct MixerChannel {
 };
 
 struct Game {
-	typedef void (Game::*OpStage0_2Proc)();
 	typedef int (Game::*OpStage1Proc)(LvlObject *o);
-	typedef void (Game::*OpStage3_4_5Proc)();
+
+	typedef void (Game::*CallLevelProc1)(int);
+	typedef int (Game::*CallLevelProc2)(int, LvlObject *);
+	typedef void (Game::*CallLevelProc0)();
 
 	enum {
 		kObjectDataTypeAndy,
@@ -74,6 +76,13 @@ struct Game {
 	Video *_video;
 	SystemStub *_system;
 	MixerChannel _mixerChannels[kMixerChannelsCount];
+
+	CallLevelProc1 _levelPreScreenUpdate;
+	CallLevelProc1 _levelPostScreenUpdate;
+	CallLevelProc2 _levelObjectScreenUpdate;
+	CallLevelProc0 _levelPreTick;
+	CallLevelProc0 _levelPostTick;
+	CallLevelProc0 _levelTerminate;
 
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
@@ -241,7 +250,7 @@ struct Game {
 	void updateInput();
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);
-	int callLevelOpStage1(int num, LvlObject *o); // callLevel_objectUpdate
+	int callLevelOpStage1(int num, LvlObject *o); // callLevel_objectScreenUpdate
 	void callLevel_preScreenUpdate(int num);
 	void callLevelOpStage3(); // callLevel_preTick
 	void callLevelOpStage4(); // callLevel_postTick

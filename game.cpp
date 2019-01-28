@@ -1679,6 +1679,19 @@ static void mixCb(void *p, int16_t *stream, int len) {
 void Game::mainLoop(int level, int checkpoint) {
 	// TODO: check bounds
 	_currentLevel = level;
+	switch (_currentLevel) {
+	case 0:
+		_levelPreScreenUpdate = &Game::callLevel_preScreenUpdate_rock;
+		_levelPostScreenUpdate = &Game::callLevel_postScreenUpdate_rock;
+		_levelObjectScreenUpdate = &Game::callLevelOpStage1;
+		_levelPreTick = &Game::callLevelOpStage3;
+		_levelPostTick = &Game::callLevelOpStage4;
+		_levelTerminate = &Game::callLevel_terminate;
+		break;
+	default:
+		warning("Level callbacks not set for level %d", level);
+		break;
+	}
 	_levelCheckpoint = checkpoint;
 	_system->init("Heart of Darkness", Video::kScreenWidth, Video::kScreenHeight);
 	benchmarkCpu();
