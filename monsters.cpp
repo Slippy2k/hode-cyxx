@@ -6,6 +6,15 @@
 #include "game.h"
 #include "resource.h"
 
+void Game::initMstCode() {
+	memset(_globalVars, 0, sizeof(_globalVars));
+	if (_mstLogicDisabled) {
+		return;
+	}
+	// TODO
+	resetMstCode();
+}
+
 void Game::resetMstCode() {
 	if (_mstLogicDisabled) {
 		return;

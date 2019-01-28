@@ -1406,7 +1406,6 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		return clipBoundingBox(&obj1, &obj2);
-		break;
 	case 17:
 		obj1.x2 = obj1.x1 + o->posTable[1].x;
 		obj1.x1 += o->posTable[0].x;
@@ -2093,7 +2092,7 @@ void Game::GameLevelMainLoopHelper3() {
 }
 
 void Game::updateInput() {
-	uint8_t inputMask = _system->inp.mask;
+	const uint8_t inputMask = _system->inp.mask;
 	if (inputMask & SYS_INP_RUN) {
 		_actionKeyMask |= 1;
 	}
@@ -2113,15 +2112,6 @@ void Game::updateInput() {
 	} else if (inputMask & SYS_INP_LEFT) {
 		_directionKeyMask |= 8;
 	}
-}
-
-void Game::initMstCode() {
-	memset(_globalVars, 0, sizeof(_globalVars));
-	if (_mstLogicDisabled) {
-		return;
-	}
-	// TODO
-	resetMstCode();
 }
 
 void Game::levelMainLoop() {

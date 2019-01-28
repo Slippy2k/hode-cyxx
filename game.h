@@ -239,7 +239,6 @@ struct Game {
 	void resetPlasmaCannonState();
 	void GameLevelMainLoopHelper3();
 	void updateInput();
-	void initMstCode();
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);
 	int callLevelOpStage1(int num, LvlObject *o); // callLevel_objectUpdate
@@ -356,6 +355,7 @@ struct Game {
 
 	// monsters.cpp
 
+	void initMstCode();
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
