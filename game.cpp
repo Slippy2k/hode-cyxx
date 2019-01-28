@@ -1069,13 +1069,16 @@ void Game::updateScreenHelper(int num) {
 			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->flags & 0xFF];
 			switch (_currentLevel) {
 			case 0:
-				ptr->callbackFuncPtr = _level1OpStage1[ptr->stateValue];
+				ptr->callbackFuncPtr = _callLevel_objectUpdate_rock[ptr->stateValue];
 				break;
 			case 1:
-				ptr->callbackFuncPtr = _level2OpStage1[ptr->stateValue];
+				ptr->callbackFuncPtr = _callLevel_objectUpdate_fort[ptr->stateValue];
 				break;
 			case 2:
-				ptr->callbackFuncPtr = _level3OpStage1[ptr->stateValue];
+				ptr->callbackFuncPtr = _callLevel_objectUpdate_pwr1[ptr->stateValue];
+				break;
+			default:
+				warning("updateScreenHelper unimplemented for level %d", _currentLevel);
 				break;
 			}
 			setupLvlObjectBitmap(ptr);
@@ -1683,10 +1686,10 @@ void Game::mainLoop(int level, int checkpoint) {
 	case 0:
 		_levelPreScreenUpdate = &Game::callLevel_preScreenUpdate_rock;
 		_levelPostScreenUpdate = &Game::callLevel_postScreenUpdate_rock;
-		_levelObjectScreenUpdate = &Game::callLevelOpStage1;
-		_levelPreTick = &Game::callLevelOpStage3;
-		_levelPostTick = &Game::callLevelOpStage4;
-		_levelTerminate = &Game::callLevel_terminate;
+		_levelObjectScreenUpdate = &Game::callLevel_objectUpdate_rock;
+		_levelPreTick = &Game::level1OpStage3;
+		_levelPostTick = &Game::level1OpStage4;
+		_levelTerminate = &Game::callLevel_terminate_rock;
 		break;
 	default:
 		warning("Level callbacks not set for level %d", level);
@@ -2323,29 +2326,15 @@ void Game::callLevel_postScreenUpdate(int num) {
 		callLevel_postScreenUpdate_rock(num);
 		break;
 	case 1:
-		callLevel_postScreenUpdate_level2(num);
+		callLevel_postScreenUpdate_fort(num);
 		break;
 	case 2:
-		callLevel_postScreenUpdate_level3(num);
+		callLevel_postScreenUpdate_pwr1(num);
 		break;
 	default:
 		warning("callLevel_postScreenUpdate unimplemented for level %d", num);
 		break;
 	}
-}
-
-int Game::callLevelOpStage1(int num, LvlObject *o) {
-	switch (_currentLevel) {
-	case 0:
-		return callLevelOpStage1_level1(num, o);
-	case 1:
-		return callLevelOpStage1_level2(num, o);
-	case 2:
-		return callLevelOpStage1_level3(num, o);
-	default:
-		warning("callLevelOpStage1 unimplemented for level %d", _currentLevel);
-	}
-	return 0;
 }
 
 void Game::callLevel_preScreenUpdate(int num) {
@@ -2354,10 +2343,10 @@ void Game::callLevel_preScreenUpdate(int num) {
 		callLevel_preScreenUpdate_rock(num);
 		break;
 	case 1:
-		callLevel_preScreenUpdate_level2(num);
+		callLevel_preScreenUpdate_fort(num);
 		break;
 	case 2:
-		callLevel_preScreenUpdate_level3(num);
+		callLevel_preScreenUpdate_pwr1(num);
 		break;
 	default:
 		warning("callLevel_preScreenUpdate unimplemented for level %d", _currentLevel);

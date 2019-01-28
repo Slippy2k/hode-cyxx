@@ -11,7 +11,12 @@
 #include "util.h"
 #include "video.h"
 
-void Game::callLevel_postScreenUpdate_level3(int num) {
+const Game::OpStage1Proc Game::_callLevel_objectUpdate_pwr1[] = {
+	&Game::objectUpdate_pwr1_case0,
+	&Game::objectUpdate_pwr1_case1
+};
+
+void Game::callLevel_postScreenUpdate_pwr1(int num) {
 	switch (num) {
 	case 6:
 	case 10:
@@ -22,25 +27,25 @@ void Game::callLevel_postScreenUpdate_level3(int num) {
 	case 23:
 	case 27:
 	case 35:
-		warning("callLevel_postScreenUpdate_level3 %d unimplemented", num);
+		warning("callLevel_postScreenUpdate_pwr1 %d unimplemented", num);
 		break;
 	}
 }
 
-int Game::level3OpStage1_case0(LvlObject *o) {
+int Game::objectUpdate_pwr1_case0(LvlObject *o) {
 	return 1;
 }
 
-int Game::level3OpStage1_case1(LvlObject *o) {
+int Game::objectUpdate_pwr1_case1(LvlObject *o) {
 	updateAndyObject(o);
 	return 1;
 }
 
-int Game::callLevelOpStage1_level3(int num, LvlObject *o) {
-	return (this->*_level3OpStage1[num])(o);
+int Game::callLevel_objectUpdate_pwr1(int num, LvlObject *o) {
+	return (this->*_callLevel_objectUpdate_pwr1[num])(o);
 }
 
-void Game::callLevel_preScreenUpdate_level3(int num) {
+void Game::callLevel_preScreenUpdate_pwr1(int num) {
 	switch (num) {
 	case 4:
 	case 6:

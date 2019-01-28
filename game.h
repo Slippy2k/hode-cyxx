@@ -63,9 +63,6 @@ struct Game {
 	static const uint8_t _levelOpStage3ImageData2[];
 	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelUpdateData2[];
-	static const OpStage1Proc _level1OpStage1[];
-	static const OpStage1Proc _level2OpStage1[];
-	static const OpStage1Proc _level3OpStage1[];
 	static const uint8_t _dbVolumeTable[129];
 	static const uint8_t _benchmarkData1[];
 	static const uint8_t _benchmarkData2[];
@@ -250,7 +247,6 @@ struct Game {
 	void updateInput();
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);
-	int callLevelOpStage1(int num, LvlObject *o); // callLevel_objectScreenUpdate
 	void callLevel_preScreenUpdate(int num);
 	void callLevelOpStage3(); // callLevel_preTick
 	void callLevelOpStage4(); // callLevel_postTick
@@ -279,6 +275,7 @@ struct Game {
 	void captureScreenshot();
 
 	// level1_rock.cpp
+	static const OpStage1Proc _callLevel_objectUpdate_rock[];
 
 	void postScreenUpdate_rock_screen0();
 	void postScreenUpdate_rock_screen4();
@@ -295,14 +292,14 @@ struct Game {
 	void postScreenUpdate_rock_screen19();
 	void callLevel_postScreenUpdate_rock(int num);
 
-	int level1OpStage1_case0(LvlObject *o);
+	int objectUpdate_rock_case0(LvlObject *o);
 	void level1OpHelper1(LvlObject *ptr, uint8_t *p);
 	int level1OpHelper2(LvlObject *ptr);
-	int level1OpStage1_case1(LvlObject *o);
-	int level1OpStage1_case2(LvlObject *o);
-	int level1OpStage1_case3(LvlObject *o);
-	int level1OpStage1_case4(LvlObject *o);
-	int callLevelOpStage1_level1(int num, LvlObject *o);
+	int objectUpdate_rock_case1(LvlObject *o);
+	int objectUpdate_rock_case2(LvlObject *o);
+	int objectUpdate_rock_case3(LvlObject *o);
+	int objectUpdate_rock_case4(LvlObject *o);
+	int callLevel_objectUpdate_rock(int num, LvlObject *o);
 
 	void preScreenUpdate_rock_screen0();
 	void preScreenUpdate_rock_screen1();
@@ -329,6 +326,7 @@ struct Game {
 	void level1SetupLvlObjects(int num);
 
 	// level2_fort.cpp
+	static const OpStage1Proc _callLevel_objectUpdate_fort[];
 
 	void postScreenUpdate_fort_screen1();
 	void postScreenUpdate_fort_screen6();
@@ -337,10 +335,10 @@ struct Game {
 	void postScreenUpdate_fort_screen16();
 	void postScreenUpdate_fort_screen17();
 	void postScreenUpdate_fort_screen21();
-	void callLevel_postScreenUpdate_level2(int num);
-	int level2OpStage1_case0(LvlObject *o);
-	int level2OpStage1_case1(LvlObject *o);
-	int callLevelOpStage1_level2(int num, LvlObject *o);
+	void callLevel_postScreenUpdate_fort(int num);
+	int objectUpdate_fort_case0(LvlObject *o);
+	int objectUpdate_fort_case1(LvlObject *o);
+	int callLevel_objectUpdate_fort(int num, LvlObject *o);
 	void level2OpStage2_screen1();
 	void level2OpStage2_screen2();
 	void level2OpStage2_screen6();
@@ -349,15 +347,16 @@ struct Game {
 	void level2OpStage2_screen16();
 	void level2OpStage2_screen17();
 	void level2OpStage2_screen21();
-	void callLevel_preScreenUpdate_level2(int num);
+	void callLevel_preScreenUpdate_fort(int num);
 
 	// level3_pwr1.cpp
+	static const OpStage1Proc _callLevel_objectUpdate_pwr1[];
 
-	void callLevel_postScreenUpdate_level3(int num);
-	int level3OpStage1_case0(LvlObject *o);
-	int level3OpStage1_case1(LvlObject *o);
-	int callLevelOpStage1_level3(int num, LvlObject *o);
-	void callLevel_preScreenUpdate_level3(int num);
+	void callLevel_postScreenUpdate_pwr1(int num);
+	int objectUpdate_pwr1_case0(LvlObject *o);
+	int objectUpdate_pwr1_case1(LvlObject *o);
+	int callLevel_objectUpdate_pwr1(int num, LvlObject *o);
+	void callLevel_preScreenUpdate_pwr1(int num);
 	void level3OpStage3();
 
 	// level4_isld.cpp

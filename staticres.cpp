@@ -428,25 +428,6 @@ const uint8_t *Game::_levelUpdateData2[] = {
 	_level9UpdateData2
 };
 
-const Game::OpStage1Proc Game::_level1OpStage1[] = {
-	&Game::level1OpStage1_case0,
-	&Game::level1OpStage1_case1,
-	&Game::level1OpStage1_case2,
-	&Game::level1OpStage1_case3,
-	&Game::level1OpStage1_case4,
-	&Game::level1OpStage1_case0
-};
-
-const Game::OpStage1Proc Game::_level2OpStage1[] = {
-	&Game::level2OpStage1_case0,
-	&Game::level2OpStage1_case1
-};
-
-const Game::OpStage1Proc Game::_level3OpStage1[] = {
-	&Game::level3OpStage1_case0,
-	&Game::level3OpStage1_case1
-};
-
 const uint8_t Game::_dbVolumeTable[129] = {
 	0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06,
 	0x06, 0x07, 0x07, 0x07, 0x08, 0x08, 0x09, 0x09, 0x09, 0x0A, 0x0A, 0x0B, 0x0B, 0x0C, 0x0C, 0x0C,

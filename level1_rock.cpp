@@ -10,6 +10,15 @@
 #include "util.h"
 #include "video.h"
 
+const Game::OpStage1Proc Game::_callLevel_objectUpdate_rock[] = {
+	&Game::objectUpdate_rock_case0,
+	&Game::objectUpdate_rock_case1,
+	&Game::objectUpdate_rock_case2,
+	&Game::objectUpdate_rock_case3,
+	&Game::objectUpdate_rock_case4,
+	&Game::objectUpdate_rock_case0
+};
+
 void Game::postScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:
@@ -409,7 +418,7 @@ void Game::callLevel_postScreenUpdate_rock(int num) {
 	}
 }
 
-int Game::level1OpStage1_case0(LvlObject *o) {
+int Game::objectUpdate_rock_case0(LvlObject *o) {
 	return 1;
 }
 
@@ -500,7 +509,7 @@ int Game::level1OpHelper2(LvlObject *ptr) {
 	return 0;
 }
 
-int Game::level1OpStage1_case1(LvlObject *o) {
+int Game::objectUpdate_rock_case1(LvlObject *o) {
 	static uint8_t data[68] = {
 		0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
 		0x02, 0x02, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -518,7 +527,7 @@ int Game::level1OpStage1_case1(LvlObject *o) {
 	return 0;
 }
 
-int Game::level1OpStage1_case2(LvlObject *o) {
+int Game::objectUpdate_rock_case2(LvlObject *o) {
 	static uint8_t data[68] = {
 		0x00, 0x00, 0x00, 0x00, 0x05, 0x05, 0x05, 0x05, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06,
 		0x06, 0x06, 0x06, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -544,19 +553,19 @@ int Game::level1OpStage1_case2(LvlObject *o) {
 	return 1;
 }
 
-int Game::level1OpStage1_case3(LvlObject *o) {
+int Game::objectUpdate_rock_case3(LvlObject *o) {
 	updateAndyObject(o);
 	return 1;
 }
 
-int Game::level1OpStage1_case4(LvlObject *o) {
+int Game::objectUpdate_rock_case4(LvlObject *o) {
 	updateAndyObject(o);
 	updateAndyObject(o->linkObjPtr);
 	return 1;
 }
 
-int Game::callLevelOpStage1_level1(int num, LvlObject *o) {
-	return (this->*_level1OpStage1[num])(o);
+int Game::callLevel_objectUpdate_rock(int num, LvlObject *o) {
+	return (this->*_callLevel_objectUpdate_rock[num])(o);
 }
 
 void Game::preScreenUpdate_rock_screen0() {

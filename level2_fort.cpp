@@ -9,6 +9,11 @@
 #include "paf.h"
 #include "video.h"
 
+const Game::OpStage1Proc Game::_callLevel_objectUpdate_fort[] = {
+	&Game::objectUpdate_fort_case0,
+	&Game::objectUpdate_fort_case1
+};
+
 void Game::postScreenUpdate_fort_screen1() {
 	if (_res->_screensState[1].s0 == 2) {
 		LvlObject *o = _res->findLvlObject(2, 0, 1);
@@ -158,7 +163,7 @@ void Game::postScreenUpdate_fort_screen21() {
 	}
 }
 
-void Game::callLevel_postScreenUpdate_level2(int num) {
+void Game::callLevel_postScreenUpdate_fort(int num) {
 	switch (num) {
 	case 1:
 		postScreenUpdate_fort_screen1();
@@ -184,17 +189,17 @@ void Game::callLevel_postScreenUpdate_level2(int num) {
 	}
 }
 
-int Game::level2OpStage1_case0(LvlObject *o) {
+int Game::objectUpdate_fort_case0(LvlObject *o) {
 	return 1;
 }
 
-int Game::level2OpStage1_case1(LvlObject *o) {
+int Game::objectUpdate_fort_case1(LvlObject *o) {
 	updateAndyObject(o);
 	return 1;
 }
 
-int Game::callLevelOpStage1_level2(int num, LvlObject *o) {
-	return (this->*_level2OpStage1[num])(o);
+int Game::callLevel_objectUpdate_fort(int num, LvlObject *o) {
+	return (this->*_callLevel_objectUpdate_fort[num])(o);
 }
 
 void Game::level2OpStage2_screen1() {
@@ -256,7 +261,7 @@ void Game::level2OpStage2_screen21() {
 	}
 }
 
-void Game::callLevel_preScreenUpdate_level2(int num) {
+void Game::callLevel_preScreenUpdate_fort(int num) {
 	switch (num) {
 	case 1:
 		level2OpStage2_screen1();
