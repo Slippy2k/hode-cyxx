@@ -12,8 +12,8 @@ SRCS = andy.cpp benchmark.cpp fileio.cpp game.cpp \
 
 SCALERS := scaler_nearest.cpp scaler_xbr.cpp
 
-OBJS = $(SRCS:.cpp=.o) $(SCALERS:.cpp=.o) libxbr-standalone/xbr.o
-DEPS = $(SRCS:.cpp=.d) $(SCALERS:.cpp=.d) libxbr-standalone/xbr.d
+OBJS = $(SRCS:.cpp=.o) $(SCALERS:.cpp=.o) 3p/libxbr-standalone/xbr.o
+DEPS = $(SRCS:.cpp=.d) $(SCALERS:.cpp=.d) 3p/libxbr-standalone/xbr.d
 
 all: hode
 
