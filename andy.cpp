@@ -1635,7 +1635,7 @@ sameAnim:
 	ptr->frame = currentAnimFrame;
 
 	ptr->soundToPlay = ash->sound;
-	if (ptr->soundToPlay != 0xFFFF && ptr->type == 8 && ptr->data0x2988 >= 5) {
+	if (ptr->soundToPlay != 0xFFFF && ptr->type == 8 && ptr->data0x2988 < 5) {
 		playSound(ptr->soundToPlay, ptr, 0, 0);
 	}
 
