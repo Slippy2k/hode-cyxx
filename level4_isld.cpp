@@ -9,7 +9,7 @@ const Game::OpStage1Proc Game::_callLevel_objectUpdate_isld[] = {
 	&Game::objectUpdate_rock_case3
 };
 
-void Game::level4OpStage3() {
+void Game::callLevel_initialize_isld() {
 	if (!_paf->_skipCutscenes) {
 		_paf->preload(24);
 	}

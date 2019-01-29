@@ -832,7 +832,7 @@ void Game::callLevel_preScreenUpdate_rock(int num) {
 	}
 }
 
-void Game::level1OpStage3() {
+void Game::callLevel_initialize_rock() {
 	if (!_paf->_skipCutscenes) {
 		if (_andyObject->data0x2988 == 0) {
 			_paf->preload(22);

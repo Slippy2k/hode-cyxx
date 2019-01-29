@@ -1692,10 +1692,7 @@ void Game::mainLoop(int level, int checkpoint) {
 	case 0:
 		_levelPreScreenUpdate = &Game::callLevel_preScreenUpdate_rock;
 		_levelPostScreenUpdate = &Game::callLevel_postScreenUpdate_rock;
-		_levelObjectScreenUpdate = &Game::callLevel_objectUpdate_rock;
-		_levelPreTick = &Game::level1OpStage3;
-		_levelPostTick = &Game::level1OpStage4;
-		_levelTerminate = &Game::callLevel_terminate_rock;
+		_levelTick = &Game::level1OpStage4;
 		break;
 	default:
 		warning("Level callbacks not set for level %d", level);
@@ -2168,7 +2165,7 @@ void Game::levelMainLoop() {
 	}
 	_quit = false;
 	GameClearUnkList1();
-	callLevelOpStage3();
+	callLevel_initialize();
 	setupCurrentScreen();
 	clearLvlObjectsList2();
 	clearLvlObjectsList3();
@@ -2360,19 +2357,19 @@ void Game::callLevel_preScreenUpdate(int num) {
 	}
 }
 
-void Game::callLevelOpStage3() {
+void Game::callLevel_initialize() {
 	switch (_currentLevel) {
 	case 0:
-		level1OpStage3();
+		callLevel_initialize_rock();
 		break;
 	case 2:
-		level3OpStage3();
+		callLevel_initialize_pwr1();
 		break;
 	case 3:
-		level4OpStage3();
+		callLevel_initialize_isld();
 		break;
 	default:
-		warning("callLevelOpStage3 unimplemented for level %d", _currentLevel);
+		warning("callLevel_initialize unimplemented for level %d", _currentLevel);
 		break;
 	}
 }

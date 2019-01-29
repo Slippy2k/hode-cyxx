@@ -37,9 +37,7 @@ struct MixerChannel {
 
 struct Game {
 	typedef int (Game::*OpStage1Proc)(LvlObject *o);
-
 	typedef void (Game::*CallLevelProc1)(int);
-	typedef int (Game::*CallLevelProc2)(int, LvlObject *);
 	typedef void (Game::*CallLevelProc0)();
 
 	enum {
@@ -76,10 +74,7 @@ struct Game {
 
 	CallLevelProc1 _levelPreScreenUpdate;
 	CallLevelProc1 _levelPostScreenUpdate;
-	CallLevelProc2 _levelObjectScreenUpdate;
-	CallLevelProc0 _levelPreTick;
-	CallLevelProc0 _levelPostTick;
-	CallLevelProc0 _levelTerminate;
+	CallLevelProc0 _levelTick;
 
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
@@ -248,8 +243,8 @@ struct Game {
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);
 	void callLevel_preScreenUpdate(int num);
-	void callLevelOpStage3(); // callLevel_preTick
-	void callLevelOpStage4(); // callLevel_postTick
+	void callLevel_initialize(); // callLevel_initialize
+	void callLevelOpStage4(); // callLevel_tick
 	void callLevel_terminate();
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
@@ -319,7 +314,7 @@ struct Game {
 	void preScreenUpdate_rock_screen19();
 	void callLevel_preScreenUpdate_rock(int num);
 
-	void level1OpStage3();
+	void callLevel_initialize_rock();
 	void level1OpStage4();
 
 	void callLevel_terminate_rock();
@@ -357,12 +352,12 @@ struct Game {
 	int objectUpdate_pwr1_case1(LvlObject *o);
 	int callLevel_objectUpdate_pwr1(int num, LvlObject *o);
 	void callLevel_preScreenUpdate_pwr1(int num);
-	void level3OpStage3();
+	void callLevel_initialize_pwr1();
 
 	// level4_isld.cpp
 	static const OpStage1Proc _callLevel_objectUpdate_isld[];
 
-	void level4OpStage3();
+	void callLevel_initialize_isld();
 	void level4OpStage4();
 	void callLevel_terminate_isld();
 

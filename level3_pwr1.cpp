@@ -64,7 +64,7 @@ void Game::callLevel_preScreenUpdate_pwr1(int num) {
 	}
 }
 
-void Game::level3OpStage3() {
+void Game::callLevel_initialize_pwr1() {
 	_shakeShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
 	decodeLZW(_levelOpStage3ImageData1, _shakeShadowBuffer);
 	memcpy(_shakeShadowBuffer + 256 * 192, _shakeShadowBuffer, 256);
