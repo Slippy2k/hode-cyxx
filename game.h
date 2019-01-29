@@ -360,10 +360,17 @@ struct Game {
 	void level3OpStage3();
 
 	// level4_isld.cpp
+	static const OpStage1Proc _callLevel_objectUpdate_isld[];
 
 	void level4OpStage3();
 	void level4OpStage4();
 	void callLevel_terminate_isld();
+
+	// level9_dark.cpp
+	static const OpStage1Proc _callLevel_objectUpdate_dark[];
+
+	void postScreenUpdate_dark_screen0();
+	void preScreenUpdate_dark_screen0();
 
 	// monsters.cpp
 

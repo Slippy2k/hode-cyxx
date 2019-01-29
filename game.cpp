@@ -1077,6 +1077,12 @@ void Game::updateScreenHelper(int num) {
 			case 2:
 				ptr->callbackFuncPtr = _callLevel_objectUpdate_pwr1[ptr->stateValue];
 				break;
+			case 3:
+				ptr->callbackFuncPtr = _callLevel_objectUpdate_isld[ptr->stateValue];
+				break;
+			case 9:
+				ptr->callbackFuncPtr = _callLevel_objectUpdate_dark[ptr->stateValue];
+				break;
 			default:
 				warning("updateScreenHelper unimplemented for level %d", _currentLevel);
 				break;
@@ -2332,7 +2338,7 @@ void Game::callLevel_postScreenUpdate(int num) {
 		callLevel_postScreenUpdate_pwr1(num);
 		break;
 	default:
-		warning("callLevel_postScreenUpdate unimplemented for level %d", num);
+		warning("callLevel_postScreenUpdate unimplemented for screen %d", num);
 		break;
 	}
 }
@@ -2349,7 +2355,7 @@ void Game::callLevel_preScreenUpdate(int num) {
 		callLevel_preScreenUpdate_pwr1(num);
 		break;
 	default:
-		warning("callLevel_preScreenUpdate unimplemented for level %d", _currentLevel);
+		warning("callLevel_preScreenUpdate unimplemented for screen %d", _currentLevel);
 		break;
 	}
 }

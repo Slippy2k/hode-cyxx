@@ -5,7 +5,7 @@ SDL_LIBS = `sdl2-config --libs`
 CPPFLAGS += -g -O -Wall $(SDL_CFLAGS) $(DEFINES) -MMD
 
 SRCS = andy.cpp benchmark.cpp fileio.cpp game.cpp \
-	level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \
+	level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp level9_dark.cpp \
 	lzw.cpp main.cpp monsters.cpp paf.cpp random.cpp resource.cpp \
 	scaler.cpp screenshot.cpp sound.cpp staticres.cpp systemstub_sdl.cpp \
 	util.cpp video.cpp
