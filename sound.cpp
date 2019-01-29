@@ -250,6 +250,10 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				} else {
 					so->unk6C = READ_LE_UINT32(code + 8);
 					// TODO: 42AF44
+					if (so->soundBits) {
+						warning("executeSssCode case 8 unimplemented");
+					}
+					return code;
 				}
 			}
 			break;
@@ -268,6 +272,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			}
 		case 10: {
 				// TODO:
+				warning("executeSssCode case 10 unimplemented");
 			}
 			break;
 		case 11: {
@@ -288,10 +293,12 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			break;
 		case 13: {
 				// TODO:
+				warning("executeSssCode case 13 unimplemented");
 			}
 			break;
 		case 14: {
 				// TODO:
+				warning("executeSssCode case 14 unimplemented");
 			}
 			break;
 		case 16: { // stop_sound
@@ -376,7 +383,11 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					return code;
 				}
 				so->unk6C = _eax;
-				// TODO: goto 42AF44
+				if (so->soundBits) {
+					// TODO: goto 42AF44
+					warning("executeSssCode case 27 unimplemented");
+				}
+				return code;
 			}
 			break;
 		case 28: { // jump
@@ -703,7 +714,7 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 				return 129;
 			}
 			if (obj->screenNum == _currentScreen || (_currentLevel == 7 && obj->data0x2988 == 0x1B) || (_currentLevel == 3 && obj->data0x2988 == 0x1A)) {
-				int dist = (obj->xPos + obj->width / 2) / 2;
+				const int dist = (obj->xPos + obj->width / 2) / 2;
 				if (dist < 0) {
 					return 0;
 				} else if (dist > 128) {
@@ -856,13 +867,13 @@ void Game::expireSoundObjects(int flags) {
 void Game::mixSoundObjects17640(bool flag) {
 	for (int i = 0; i < _res->_sssHdr.unk14; ++i) {
 		_res->_sssDataUnk4[i].unk30 = 0;
-		int counter1 = _res->_sssDataUnk4[i].unkC;
+		const int counter1 = _res->_sssDataUnk4[i].unkC;
 		if (counter1 != 0) {
 			_res->_sssDataUnk4[i].unkC = counter1 - 1;
 		}
 		_res->_sssDataUnk4[i].unk4 += _res->_sssDataUnk4[i].unk8;
 		_res->_sssDataUnk4[i].unk30 = 1;
-		int counter2 = _res->_sssDataUnk4[i].unk1C;
+		const int counter2 = _res->_sssDataUnk4[i].unk1C;
 		if (counter2 != 0) {
 			_res->_sssDataUnk4[i].unk1C = counter2 - 1;
 		}

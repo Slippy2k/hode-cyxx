@@ -442,7 +442,6 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 	}
 	LvlObject *o = ptr->linkObjPtr;
 	assert(o);
-	assert(o);
 	ptr->directionKeyMask = p[0x20 + i];
 	if (ptr->directionKeyMask != 0x80) {
 		p[0x43] = 0;
