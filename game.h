@@ -113,7 +113,7 @@ struct Game {
 	uint8_t _plasmaCannonPointsSetupCounter;
 	uint8_t _plasmaCannonLastIndex1;
 	uint8_t _gameMainLoopFlag5;
-	uint8_t _gameMainLoopFlag6;
+	uint8_t _plasmaCannonPointsMask;
 	uint8_t _plasmaCannonFirstIndex;
 	uint8_t _plasmaCannonLastIndex2;
 	uint8_t _plasmaCannonFlags;
@@ -213,7 +213,7 @@ struct Game {
 	void playAndyFallingCutscene(int type);
 	int8_t updateLvlObjectScreen(LvlObject *ptr);
 	void setAndyLvlObjectPlasmaCannonKeyMask();
-	int game_unk27(uint8_t mask);
+	int resetAndyLvlObjectPlasmaCannonKeyMask(uint8_t mask);
 	int clipBoundingBox(BoundingBox *coords, BoundingBox *box);
 	int updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, const uint8_t *coords, int direction);
 	int game_unk16(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2);
@@ -236,8 +236,8 @@ struct Game {
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);
 	void callLevel_preScreenUpdate(int num);
-	void callLevel_initialize(); // callLevel_initialize
-	void callLevel_tick(); // callLevel_tick
+	void callLevel_initialize();
+	void callLevel_tick();
 	void callLevel_terminate();
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);

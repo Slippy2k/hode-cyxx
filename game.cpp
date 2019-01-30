@@ -530,11 +530,11 @@ void Game::setupPlasmaCannonPointsHelper() {
 	}
 	_plasmaCannonLastIndex2 = 128;
 	if (_plasmaCannonDirection == 0) {
-		_plasmaCannonLastIndex1 = _gameMainLoopFlag6 = 0;
+		_plasmaCannonLastIndex1 = _plasmaCannonPointsMask = 0;
 		_plasmaCannonFirstIndex = 128;
 	} else {
 		_plasmaCannonFirstIndex = 0;
-		_gameMainLoopFlag6 = fixPlasmaCannonPointsScreenMask(_res->_currentScreenResourceNum);
+		_plasmaCannonPointsMask = fixPlasmaCannonPointsScreenMask(_res->_currentScreenResourceNum);
 	}
 }
 
@@ -727,7 +727,7 @@ int Game::testPlasmaCannonPointsDirection(int x1, int y1, int x2, int y2) {
 	}
 endDir:
 	_plasmaCannonLastIndex1 = index1;
-	_gameMainLoopFlag6 = 0;
+	_plasmaCannonPointsMask = 0;
 	return 1;
 }
 
@@ -1014,7 +1014,7 @@ void Game::setupCurrentScreen() {
 			_plasmaCannonDirection = 0;
 			_plasmaCannonLastIndex1 = 0;
 			_gameMainLoopFlag5 = 0;
-			_gameMainLoopFlag6 = 0;
+			_plasmaCannonPointsMask = 0;
 			_plasmaCannonObject = 0;
 			ptr->anim = 232;
 			break;
@@ -1315,7 +1315,7 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 	}
 }
 
-int Game::game_unk27(uint8_t mask) {
+int Game::resetAndyLvlObjectPlasmaCannonKeyMask(uint8_t mask) {
 	if (mask > _gameKeyPressedMaskIndex) {
 		_gameKeyPressedMaskIndex = mask;
 		_plasmaCannonKeyMaskCounter = 0;
@@ -1531,7 +1531,7 @@ int Game::updateAndyLvlObject() {
 			removeLvlObject(_andyObject);
 		}
 		if ((_andyObject->flags0 & ~0x1F) == 0x40) {
-			game_unk27(0xA4);
+			resetAndyLvlObjectPlasmaCannonKeyMask(0xA4);
 		}
 	}
 	int8_t _al = updateLvlObjectScreen(_andyObject);
@@ -1605,7 +1605,7 @@ void Game::drawPlasmaCannon() {
 		index += 4;
 	} while (index <= lastIndex);
 	_plasmaCannonLastIndex1 = 0;
-	_gameMainLoopFlag6 = 0;
+	_plasmaCannonPointsMask = 0;
 	_gameMainLoopFlag5 = 0;
 	_plasmaCannonObject = 0;
 }
@@ -2006,8 +2006,8 @@ void Game::updatePlasmaCannonExplosionLvlObject(LvlObject *ptr) {
 			}
 		} else {
 			ptr->directionKeyMask = 2;
-			if (_gameMainLoopFlag6 != 0) {
-				if ((_gameMainLoopFlag6 & 1) != 0 || (_plasmaCannonDirection & 4) != 0) {
+			if (_plasmaCannonPointsMask != 0) {
+				if ((_plasmaCannonPointsMask & 1) != 0 || (_plasmaCannonDirection & 4) != 0) {
 					ptr->directionKeyMask = 4;
 				} else if ((_plasmaCannonDirection & 8) != 0) {
 					ptr->directionKeyMask = 8;
@@ -2049,7 +2049,7 @@ void Game::resetPlasmaCannonState() {
 	_plasmaCannonPointsSetupCounter = 0;
 	_plasmaCannonLastIndex1 = 0;
 	_gameMainLoopFlag5 = 0;
-	_gameMainLoopFlag6 = 0;
+	_plasmaCannonPointsMask = 0;
 	_plasmaCannonFirstIndex = 16;
 	_plasmaCannonLastIndex2 = 16;
 }
@@ -2420,7 +2420,7 @@ int Game::displayHintScreen(int num, int pause) {
 		_video->_shadowLayer,
 	};
 	if (num == -1) {
-		num = _res->_datHdr._res_setupDatHeader0x40; // 'Yes'
+		num = _res->_datHdr.yesNoQuitImageOffset; // 'Yes'
 		_res->loadSetupImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
 		confirmQuit = true;
 	}

@@ -10,9 +10,9 @@
 
 struct DatHdr {
 	uint32_t sssOffset; // 0xC
-	int _res_setupDatHeader0x40; // yesNoQuitImageOffset;
-	uint32_t _setupImageOffsetTable[0x2E]; // hintsImageOffsetTable
-	uint32_t _setupImageSizeTable[0x2E]; // hintsImageSizeTable
+	int yesNoQuitImageOffset;
+	uint32_t hintsImageOffsetTable[0x2E];
+	uint32_t hintsImageSizeTable[0x2E];
 };
 
 struct LvlHdr {

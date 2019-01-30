@@ -54,11 +54,11 @@ void Resource::loadSetupDat() {
 	_datFile->open("SETUP.DAT");
 	_datFile->read(hdr, sizeof(hdr));
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
-	_datHdr._res_setupDatHeader0x40 = READ_LE_UINT32(hdr + 0x40);
-	debug(kDebug_RESOURCE, "Quit Yes/No image index %d", _datHdr._res_setupDatHeader0x40);
+	_datHdr.yesNoQuitImageOffset = READ_LE_UINT32(hdr + 0x40);
+	debug(kDebug_RESOURCE, "Quit Yes/No image index %d", _datHdr.yesNoQuitImageOffset);
 	for (int i = 0; i < 46; ++i) {
-		_datHdr._setupImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x04C + i * 4);
-		_datHdr._setupImageSizeTable[i] = READ_LE_UINT32(hdr + 0x104 + i * 4);
+		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x04C + i * 4);
+		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x104 + i * 4);
 	}
 }
 
@@ -420,8 +420,8 @@ void Resource::loadSetupImage(int num, uint8_t *dst, uint8_t *pal) {
 	if (!_datFile) {
 		return;
 	}
-	const int offset = _datHdr._setupImageOffsetTable[num];
-	const int size = _datHdr._setupImageSizeTable[num];
+	const int offset = _datHdr.hintsImageOffsetTable[num];
+	const int size = _datHdr.hintsImageSizeTable[num];
 	assert(size == 256 * 192);
 	_datFile->seek(offset, SEEK_SET);
 	_datFile->read(dst, size);
