@@ -1,10 +1,13 @@
 
-ALL = bitop dump_data gen_rename hod_extract opcode_map split_paf
+ALL = bitop decode_sss dump_data gen_rename hod_extract opcode_map split_paf
 
 all: $(ALL)
 
 bitop: bitop.o
 	$(CC) $^ -o $@
+
+decode_sss: decode_sss.o
+	$(CXX) $^ -o $@
 
 dump_data: dump_data.o
 	$(CC) $^ -o $@

@@ -258,7 +258,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 			}
 			break;
-		case 9: { // set_volume
+		case 9: { // adjust_volume
 				so->unk64 += so->unk68;
 				const int volume = (so->unk64 + 0x8000) >> 16;
 				if (volume != so->volume) {
@@ -274,6 +274,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		case 10: {
 				// TODO:
 				warning("executeSssCode case 10 unimplemented");
+				code += 4;
 			}
 			break;
 		case 11: {
@@ -281,6 +282,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					so->unk18 = code[1];
 					_sssObjectsChanged = 1;
 				}
+				code += 4;
 			}
 			break;
 		case 12: {
@@ -295,11 +297,13 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		case 13: {
 				// TODO:
 				warning("executeSssCode case 13 unimplemented");
+				code += 8;
 			}
 			break;
 		case 14: {
 				// TODO:
 				warning("executeSssCode case 14 unimplemented");
+				code += 12;
 			}
 			break;
 		case 16: { // stop_sound
@@ -333,6 +337,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					so->volume = code[1];
 					_sssObjectsChanged = 1;
 				}
+				code += 4;
 			}
 			break;
 		case 20: {

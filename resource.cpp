@@ -740,6 +740,13 @@ void Resource::loadSssData(const char *levelName) {
 
 // loc_429B9F:
 	checkSssCode(_sssCodeData, _sssCodeSize);
+	if (0) {
+		FILE *fp = fopen("code.sss", "wb");
+		if (fp) {
+			fwrite(_sssCodeData, 1, _sssCodeSize, fp);
+			fclose(fp);
+		}
+	}
 	for (int i = 0; i < _sssHdr.unk18; ++i) {
 		if (_sssDataUnk3[i].unk1 != 0) {
 			const int num = _sssDataUnk3[i].firstCodeOffset;
