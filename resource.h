@@ -155,6 +155,7 @@ struct Resource {
 	LvlHdr _lvlHdr;
 	File *_lvlFile;
 	MstHdr _mstHdr;
+	File *_mstFile;
 	SssHdr _sssHdr;
 	File *_sssFile;
 
@@ -246,6 +247,8 @@ struct Resource {
 		}
 		return 0;
 	}
+
+	void loadMstData(const char *levelName);
 };
 
 #endif // RESOURCE_H__

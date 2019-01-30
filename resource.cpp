@@ -27,13 +27,15 @@ Resource::Resource() {
 	memset(&_lvlLinkObject, 0, sizeof(_lvlLinkObject));
 	_isDemoData = detectGameData();
 	if (_isDemoData) {
-		_lvlFile = new SectorFile;
-		_sssFile = new SectorFile;
 		_datFile = new SectorFile;
+		_lvlFile = new SectorFile;
+		_mstFile = 0;
+		_sssFile = new SectorFile;
 	} else {
-		_lvlFile = new File;
-		_sssFile = 0;
 		_datFile = new File;
+		_lvlFile = new File;
+		_mstFile = 0;
+		_sssFile = 0;
 	}
 }
 
@@ -469,7 +471,9 @@ static void dumpPcm(File *fp, const SssUnk5 *dpcmTable, int dpcmCount) {
 }
 
 void Resource::loadSssData(const char *levelName) {
-	if (!_sssFile) return;
+	if (!_sssFile) {
+		return;
+	}
 	char filename[32];
 	snprintf(filename, sizeof(filename), "%s.SSS", levelName);
 	if (!_sssFile->open(filename)) {
@@ -863,4 +867,17 @@ void Resource::loadSssDpcm(int num) {
 			assert((p - _sssDpcmTable[num].ptr) * sizeof(int16_t) == decompressedSize);
 		}
 	}
+}
+
+void Resource::loadMstData(const char *levelName) {
+	if (!_mstFile) {
+		return;
+	}
+	char filename[32];
+	snprintf(filename, sizeof(filename), "%s.MST", levelName);
+	if (!_mstFile->open(filename)) {
+		error("Unable to open '%s'", filename);
+		return;
+	}
+	// TODO:
 }
