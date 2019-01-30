@@ -72,10 +72,6 @@ struct Game {
 	SystemStub *_system;
 	MixerChannel _mixerChannels[kMixerChannelsCount];
 
-	CallLevelProc1 _levelPreScreenUpdate;
-	CallLevelProc1 _levelPostScreenUpdate;
-	CallLevelProc0 _levelTick;
-
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
 	LvlObject *_plasmaCannonObject;
@@ -244,7 +240,7 @@ struct Game {
 	void callLevel_postScreenUpdate(int num);
 	void callLevel_preScreenUpdate(int num);
 	void callLevel_initialize(); // callLevel_initialize
-	void callLevelOpStage4(); // callLevel_tick
+	void callLevel_tick(); // callLevel_tick
 	void callLevel_terminate();
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
@@ -315,8 +311,7 @@ struct Game {
 	void callLevel_preScreenUpdate_rock(int num);
 
 	void callLevel_initialize_rock();
-	void level1OpStage4();
-
+	void callLevel_tick_rock();
 	void callLevel_terminate_rock();
 	void level1SetupLvlObjects(int num);
 
@@ -358,7 +353,7 @@ struct Game {
 	static const OpStage1Proc _callLevel_objectUpdate_isld[];
 
 	void callLevel_initialize_isld();
-	void level4OpStage4();
+	void callLevel_tick_isld();
 	void callLevel_terminate_isld();
 
 	// level9_dark.cpp

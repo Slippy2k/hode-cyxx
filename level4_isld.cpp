@@ -16,7 +16,7 @@ void Game::callLevel_initialize_isld() {
 	// TODO:
 }
 
-void Game::level4OpStage4() {
+void Game::callLevel_tick_isld() {
 	// TODO:
 }
 

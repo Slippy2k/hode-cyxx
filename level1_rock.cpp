@@ -842,7 +842,7 @@ void Game::callLevel_initialize_rock() {
 	}
 }
 
-void Game::level1OpStage4() {
+void Game::callLevel_tick_rock() {
 	if (_res->_currentScreenResourceNum > 9) {
 		_plasmaCannonFlags |= 2;
 	}

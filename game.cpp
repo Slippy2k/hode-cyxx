@@ -1688,16 +1688,6 @@ static void mixCb(void *p, int16_t *stream, int len) {
 void Game::mainLoop(int level, int checkpoint) {
 	// TODO: check bounds
 	_currentLevel = level;
-	switch (_currentLevel) {
-	case 0:
-		_levelPreScreenUpdate = &Game::callLevel_preScreenUpdate_rock;
-		_levelPostScreenUpdate = &Game::callLevel_postScreenUpdate_rock;
-		_levelTick = &Game::level1OpStage4;
-		break;
-	default:
-		warning("Level callbacks not set for level %d", level);
-		break;
-	}
 	_levelCheckpoint = checkpoint;
 	_system->init("Heart of Darkness", Video::kScreenWidth, Video::kScreenHeight);
 	benchmarkCpu();
@@ -2234,13 +2224,13 @@ void Game::levelMainLoop() {
 			}
 		}
 		if (updateAndyLvlObject() != 0) {
-			callLevelOpStage4();
+			callLevel_tick();
 //			_time_counter1 -= _time_counter2;
 			continue;
 		}
 		executeMstCode();
 		updateLvlObjectLists();
-		callLevelOpStage4();
+		callLevel_tick();
 		GameLevelMainLoopHelper3();
 		if (!_hideAndyObjectSprite) {
 			addToSpriteList(_andyObject);
@@ -2374,13 +2364,13 @@ void Game::callLevel_initialize() {
 	}
 }
 
-void Game::callLevelOpStage4() {
+void Game::callLevel_tick() {
 	switch (_currentLevel) {
 	case 0:
-		level1OpStage4();
+		callLevel_tick_rock();
 		break;
 	case 3:
-		level4OpStage4();
+		callLevel_tick_isld();
 		break;
 	}
 }
