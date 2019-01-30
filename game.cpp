@@ -1149,7 +1149,7 @@ void Game::updateScreen(uint8_t num) {
 //	_time_counter1 = GetTickCount();
 }
 
-void Game::resetLevel() {
+void Game::resetScreen() {
 	for (int i = 0; i < _res->_lvlHdr.screensCount; ++i) {
 		_res->_screensState[i].s0 = 0;
 		_screenCounterTable[i] = 0;
@@ -1162,7 +1162,14 @@ void Game::resetLevel() {
 	}
 	resetScreenMask();
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
-		level1SetupLvlObjects(i);
+		switch (_currentLevel) {
+		case 0:
+			callLevel_setupLvlObjects_rock(i);
+			break;
+		default:
+			warning("SetupLvlObjects not implemented for level %d", _currentLevel);
+			break;
+		}
 	}
 //	memset(byte_472400, 0, 66 * 4);
 //	byte_47309C = 0;
@@ -1184,7 +1191,7 @@ void Game::restartLevel() {
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
-	resetLevel();
+	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
@@ -1564,7 +1571,7 @@ int Game::updateAndyLvlObject() {
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
-	resetLevel();
+	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
@@ -2171,7 +2178,7 @@ void Game::levelMainLoop() {
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
-	resetLevel();
+	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
@@ -2209,7 +2216,7 @@ void Game::levelMainLoop() {
 			const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 			preloadLevelScreenData(num, 0xFF);
 			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
-			resetLevel();
+			resetScreen();
 			if (_andyObject->screenNum != num) {
 				preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 			}
@@ -2792,6 +2799,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 		break;
 	}
 }
+
 LvlObject *Game::game_unk115(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask) {
 	LvlObject *ptr = 0;
 	switch (type) {

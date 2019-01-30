@@ -858,7 +858,7 @@ void Game::callLevel_terminate_rock() {
 	}
 }
 
-void Game::level1SetupLvlObjects_screen2() {
+void Game::setupLvlObjects_rock_screen2() {
 	LvlObject *ptr = _res->findLvlObject(2, 0, 2);
 	if (ptr) {
 		ptr->xPos = 146;
@@ -879,7 +879,7 @@ void Game::level1SetupLvlObjects_screen2() {
 	}
 }
 
-void Game::level1SetupLvlObjects_screen3() {
+void Game::setupLvlObjects_rock_screen3() {
 	LvlObject *ptr = _res->findLvlObject(2, 0, 3);
 	if (ptr) {
 		ptr->xPos = 198;
@@ -900,7 +900,7 @@ void Game::level1SetupLvlObjects_screen3() {
 	}
 }
 
-void Game::level1SetupLvlObjects_screen18() {
+void Game::setupLvlObjects_rock_screen18() {
 	LvlObject *ptr = _res->findLvlObject(2, 0, 18);
 	if (ptr) {
 		ptr->xPos = 16;
@@ -912,16 +912,16 @@ void Game::level1SetupLvlObjects_screen18() {
 	}
 }
 
-void Game::level1SetupLvlObjects(int num) {
+void Game::callLevel_setupLvlObjects_rock(int num) {
 	switch (num) {
 	case 2:
-		level1SetupLvlObjects_screen2();
+		setupLvlObjects_rock_screen2();
 		break;
 	case 3:
-		level1SetupLvlObjects_screen3();
+		setupLvlObjects_rock_screen3();
 		break;
 	case 18:
-		level1SetupLvlObjects_screen18();
+		setupLvlObjects_rock_screen18();
 		break;
 	}
 }

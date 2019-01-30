@@ -196,9 +196,6 @@ struct Game {
 	void loadLevelScreenSounds(int num);
 	void setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2);
 	void setLvlObjectPosRelativeToPoint(LvlObject *ptr, int num, int x, int y);
-	void level1SetupLvlObjects_screen2();
-	void level1SetupLvlObjects_screen3();
-	void level1SetupLvlObjects_screen18();
 	void clearLvlObjectsList1();
 	void clearLvlObjectsList2();
 	void clearLvlObjectsList3();
@@ -211,7 +208,7 @@ struct Game {
 	void updateScreenHelper(int num);
 	void resetDisplay();
 	void updateScreen(uint8_t num);
-	void resetLevel();
+	void resetScreen();
 	void restartLevel();
 	void playAndyFallingCutscene(int type);
 	int8_t updateLvlObjectScreen(LvlObject *ptr);
@@ -313,7 +310,11 @@ struct Game {
 	void callLevel_initialize_rock();
 	void callLevel_tick_rock();
 	void callLevel_terminate_rock();
-	void level1SetupLvlObjects(int num);
+
+	void setupLvlObjects_rock_screen2();
+	void setupLvlObjects_rock_screen3();
+	void setupLvlObjects_rock_screen18();
+	void callLevel_setupLvlObjects_rock(int hum);
 
 	// level2_fort.cpp
 	static const OpStage1Proc _callLevel_objectUpdate_fort[];
