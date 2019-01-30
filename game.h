@@ -287,7 +287,6 @@ struct Game {
 	int objectUpdate_rock_case2(LvlObject *o);
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
-	int callLevel_objectUpdate_rock(int num, LvlObject *o);
 
 	void preScreenUpdate_rock_screen0();
 	void preScreenUpdate_rock_screen1();
@@ -317,8 +316,6 @@ struct Game {
 	void callLevel_setupLvlObjects_rock(int hum);
 
 	// level2_fort.cpp
-	static const OpStage1Proc _callLevel_objectUpdate_fort[];
-
 	void postScreenUpdate_fort_screen1();
 	void postScreenUpdate_fort_screen6();
 	void postScreenUpdate_fort_screen7();
@@ -327,9 +324,10 @@ struct Game {
 	void postScreenUpdate_fort_screen17();
 	void postScreenUpdate_fort_screen21();
 	void callLevel_postScreenUpdate_fort(int num);
+
 	int objectUpdate_fort_case0(LvlObject *o);
 	int objectUpdate_fort_case1(LvlObject *o);
-	int callLevel_objectUpdate_fort(int num, LvlObject *o);
+
 	void level2OpStage2_screen1();
 	void level2OpStage2_screen2();
 	void level2OpStage2_screen6();
@@ -340,26 +338,31 @@ struct Game {
 	void level2OpStage2_screen21();
 	void callLevel_preScreenUpdate_fort(int num);
 
-	// level3_pwr1.cpp
-	static const OpStage1Proc _callLevel_objectUpdate_pwr1[];
+	void setupLvlObjects_fort_screen1();
+	void callLevel_setupLvlObjects_fort(int num);
 
+	// level3_pwr1.cpp
 	void callLevel_postScreenUpdate_pwr1(int num);
 	int objectUpdate_pwr1_case0(LvlObject *o);
 	int objectUpdate_pwr1_case1(LvlObject *o);
-	int callLevel_objectUpdate_pwr1(int num, LvlObject *o);
 	void callLevel_preScreenUpdate_pwr1(int num);
 	void callLevel_initialize_pwr1();
 
 	// level4_isld.cpp
-	static const OpStage1Proc _callLevel_objectUpdate_isld[];
-
 	void callLevel_initialize_isld();
 	void callLevel_tick_isld();
 	void callLevel_terminate_isld();
 
-	// level9_dark.cpp
-	static const OpStage1Proc _callLevel_objectUpdate_dark[];
+	// level5_lava.cpp
+	void callLevel_initialize_lava();
 
+	// level6_pwr2.cpp
+	void callLevel_initialize_pwr2();
+
+	// level7_lar1.cpp
+	void callLevel_initialize_lar1();
+
+	// level9_dark.cpp
 	void postScreenUpdate_dark_screen0();
 	void preScreenUpdate_dark_screen0();
 

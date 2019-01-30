@@ -563,10 +563,6 @@ int Game::objectUpdate_rock_case4(LvlObject *o) {
 	return 1;
 }
 
-int Game::callLevel_objectUpdate_rock(int num, LvlObject *o) {
-	return (this->*_callLevel_objectUpdate_rock[num])(o);
-}
-
 void Game::preScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:
@@ -925,4 +921,3 @@ void Game::callLevel_setupLvlObjects_rock(int num) {
 		break;
 	}
 }
-

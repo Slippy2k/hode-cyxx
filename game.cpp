@@ -1067,25 +1067,21 @@ void Game::updateScreenHelper(int num) {
 			break;
 		case 2:
 			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->flags & 0xFF];
-			switch (_currentLevel) {
-			case 0:
+			if (_currentLevel == 0) {
 				ptr->callbackFuncPtr = _callLevel_objectUpdate_rock[ptr->stateValue];
-				break;
-			case 1:
-				ptr->callbackFuncPtr = _callLevel_objectUpdate_fort[ptr->stateValue];
-				break;
-			case 2:
-				ptr->callbackFuncPtr = _callLevel_objectUpdate_pwr1[ptr->stateValue];
-				break;
-			case 3:
-				ptr->callbackFuncPtr = _callLevel_objectUpdate_isld[ptr->stateValue];
-				break;
-			case 9:
-				ptr->callbackFuncPtr = _callLevel_objectUpdate_dark[ptr->stateValue];
-				break;
-			default:
-				warning("updateScreenHelper unimplemented for level %d", _currentLevel);
-				break;
+			} else {
+				// other levels use two callbacks
+				switch (ptr->stateValue) {
+				case 0:
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case0;
+					break;
+				case 1:
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case3;
+					break;
+				default:
+					warning("updateScreenHelper unimplemented for level %d, state %d", _currentLevel, ptr->stateValue);
+					break;
+				}
 			}
 			setupLvlObjectBitmap(ptr);
 			break;
@@ -1165,6 +1161,9 @@ void Game::resetScreen() {
 		switch (_currentLevel) {
 		case 0:
 			callLevel_setupLvlObjects_rock(i);
+			break;
+		case 1:
+			callLevel_setupLvlObjects_fort(i);
 			break;
 		default:
 			warning("SetupLvlObjects not implemented for level %d", _currentLevel);
@@ -2365,8 +2364,14 @@ void Game::callLevel_initialize() {
 	case 3:
 		callLevel_initialize_isld();
 		break;
-	default:
-		warning("callLevel_initialize unimplemented for level %d", _currentLevel);
+	case 4:
+		callLevel_initialize_lava();
+		break;
+	case 5:
+		callLevel_initialize_pwr2();
+		break;
+	case 6:
+		callLevel_initialize_lar1();
 		break;
 	}
 }
@@ -2378,6 +2383,9 @@ void Game::callLevel_tick() {
 		break;
 	case 3:
 		callLevel_tick_isld();
+		break;
+	default:
+		warning("callLevel_tick unimplemented for screen %d", _currentLevel);
 		break;
 	}
 }

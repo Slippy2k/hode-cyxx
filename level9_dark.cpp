@@ -5,11 +5,6 @@
 #include "paf.h"
 #include "video.h"
 
-const Game::OpStage1Proc Game::_callLevel_objectUpdate_dark[] = {
-	&Game::objectUpdate_rock_case0,
-	&Game::objectUpdate_rock_case3
-};
-
 void Game::postScreenUpdate_dark_screen0() {
 	if (_res->_screensState[0].s0 != 0) {
 		++_screenCounterTable[0];
