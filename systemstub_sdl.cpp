@@ -9,6 +9,8 @@
 #include "systemstub.h"
 #include "util.h"
 
+static const char *kIconBmp = "icon.bmp";
+
 static int _scalerMultiplier = 3;
 
 static const int _pixelFormat = SDL_PIXELFORMAT_RGB888;
@@ -325,6 +327,11 @@ void SystemStub_SDL::prepareScaledGfx(const char *caption) {
 	_texW = _screenW * _scalerMultiplier;
 	_texH = _screenH * _scalerMultiplier;
 	_window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _texW, _texH, 0);
+	SDL_Surface *icon = SDL_LoadBMP(kIconBmp);
+	if (icon) {
+		SDL_SetWindowIcon(_window, icon);
+		SDL_FreeSurface(icon);
+	}
 	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 	_texture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _texW, _texH);
 	_fmt = SDL_AllocFormat(_pixelFormat);
