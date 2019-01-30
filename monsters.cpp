@@ -8,7 +8,7 @@
 #include "util.h"
 
 void Game::initMstCode() {
-	memset(_globalVars, 0, sizeof(_globalVars));
+	memset(_mstGlobalVars, 0, sizeof(_mstGlobalVars));
 	if (_mstLogicDisabled) {
 		return;
 	}

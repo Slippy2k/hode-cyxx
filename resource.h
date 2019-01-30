@@ -10,15 +10,15 @@
 
 struct DatHdr {
 	uint32_t sssOffset; // 0xC
-	int yesNoQuitImageOffset;
-	uint32_t hintsImageOffsetTable[0x2E];
-	uint32_t hintsImageSizeTable[0x2E];
+	int yesNoQuitImage; // 0x40
+	uint32_t hintsImageOffsetTable[46];
+	uint32_t hintsImageSizeTable[46];
 };
 
 struct LvlHdr {
 	uint8_t screensCount;
 	uint8_t staticLvlObjectsCount;
-	uint8_t extraLvlObjectsCount; // otherLvlObjectsCount
+	uint8_t otherLvlObjectsCount;
 	uint8_t spritesCount;
 };
 

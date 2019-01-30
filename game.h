@@ -96,7 +96,7 @@ struct Game {
 	bool _hideAndyObjectSprite;
 	GameUnkList1 _gameUnkList1Table[32];
 	GameUnkList1 *_gameUnkList1Head;
-	int32_t _globalVars[40];
+	int32_t _mstGlobalVars[40];
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;

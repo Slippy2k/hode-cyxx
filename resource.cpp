@@ -33,7 +33,7 @@ Resource::Resource() {
 	} else {
 		_lvlFile = new File;
 		_sssFile = 0;
-		_datFile = 0;
+		_datFile = new File;
 	}
 }
 
@@ -47,18 +47,16 @@ bool Resource::detectGameData() {
 }
 
 void Resource::loadSetupDat() {
-	if (!_datFile) {
-		return;
-	}
 	uint8_t hdr[512];
 	_datFile->open("SETUP.DAT");
 	_datFile->read(hdr, sizeof(hdr));
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
-	_datHdr.yesNoQuitImageOffset = READ_LE_UINT32(hdr + 0x40);
-	debug(kDebug_RESOURCE, "Quit Yes/No image index %d", _datHdr.yesNoQuitImageOffset);
-	for (int i = 0; i < 46; ++i) {
-		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x04C + i * 4);
-		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x104 + i * 4);
+	_datHdr.yesNoQuitImage = READ_LE_UINT32(hdr + 0x40);
+	debug(kDebug_RESOURCE, "Quit Yes/No image index %d", _datHdr.yesNoQuitImage);
+	const int hintsCount = _isDemoData ? 46 : 20;
+	for (int i = 0; i < hintsCount; ++i) {
+		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x4C + i * 4);
+		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x4C + (hintsCount + i) * 4);
 	}
 }
 
@@ -263,9 +261,9 @@ void Resource::loadLvlData(const char *levelName) {
 
 	_lvlHdr.screensCount = _lvlFile->readByte();
 	_lvlHdr.staticLvlObjectsCount = _lvlFile->readByte();
-	_lvlHdr.extraLvlObjectsCount = _lvlFile->readByte();
+	_lvlHdr.otherLvlObjectsCount = _lvlFile->readByte();
 	_lvlHdr.spritesCount = _lvlFile->readByte();
-	debug(kDebug_RESOURCE, "Resource::loadLvlData() %d %d %d %d", _lvlHdr.screensCount, _lvlHdr.staticLvlObjectsCount, _lvlHdr.extraLvlObjectsCount, _lvlHdr.spritesCount);
+	debug(kDebug_RESOURCE, "Resource::loadLvlData() %d %d %d %d", _lvlHdr.screensCount, _lvlHdr.staticLvlObjectsCount, _lvlHdr.otherLvlObjectsCount, _lvlHdr.spritesCount);
 
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
 		loadLvlScreenMoveData(i);
@@ -417,9 +415,6 @@ LvlObject *Resource::findLvlObject(uint8_t type, uint8_t num, int index) {
 }
 
 void Resource::loadSetupImage(int num, uint8_t *dst, uint8_t *pal) {
-	if (!_datFile) {
-		return;
-	}
 	const int offset = _datHdr.hintsImageOffsetTable[num];
 	const int size = _datHdr.hintsImageSizeTable[num];
 	assert(size == 256 * 192);

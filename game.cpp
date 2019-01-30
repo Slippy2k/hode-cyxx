@@ -2420,7 +2420,7 @@ int Game::displayHintScreen(int num, int pause) {
 		_video->_shadowLayer,
 	};
 	if (num == -1) {
-		num = _res->_datHdr.yesNoQuitImageOffset; // 'Yes'
+		num = _res->_datHdr.yesNoQuitImage; // 'Yes'
 		_res->loadSetupImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
 		confirmQuit = true;
 	}
@@ -2950,7 +2950,7 @@ void Game::initLvlObjects() {
 			break;
 		}
 	}
-	for (int i = _res->_lvlHdr.staticLvlObjectsCount; i < _res->_lvlHdr.staticLvlObjectsCount + _res->_lvlHdr.extraLvlObjectsCount; ++i) {
+	for (int i = _res->_lvlHdr.staticLvlObjectsCount; i < _res->_lvlHdr.staticLvlObjectsCount + _res->_lvlHdr.otherLvlObjectsCount; ++i) {
 		LvlObject *ptr = &_res->_resLvlScreenObjectDataTable[i];
 		lvlObjectTypeInit(ptr);
 	}
