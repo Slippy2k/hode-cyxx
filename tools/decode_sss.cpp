@@ -29,24 +29,24 @@ enum {
 	op_startSound,
 	op_invalid0x03,
 	/* 0x04 */
-	op_unk0x04,
-	op_unk0x05,
+	op_killSound,
+	op_loopSound,
 	op_jge,
 	op_invalid0x07,
 	/* 0x08 */
 	op_unk0x08,
 	op_adjustVolume,
-	op_unk0x0A,
+	op_testVar0x54,
 	op_unk0x0B,
 	/* 0x0C */
-	op_unk0x0C,
+	op_fadeInSound,
 	op_unk0x0D,
 	op_unk0x0E,
 	op_unk0x0F,
 	/* 0x10 */
 	op_stopSound,
-	op_fadeSound,
-	op_unk0x12,
+	op_fadeOutSound,
+	op_setCounter,
 	op_setVolume,
 	/* 0x14 */
 	op_unk0x14,
@@ -60,8 +60,12 @@ enum {
 	op_unk0x1B,
 	/* 0x1C */
 	op_jmp,
-	op_unk0x1D
+	op_unk0x1D,
+
+	op_count
 };
+
+static int _histogram[op_count];
 
 static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	fprintf(_out, "%04X: ", addr);
@@ -72,11 +76,11 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	case op_startSound:
 		fprintf(_out, "op_startSound %d", args[0]);
 		break;
-	case op_unk0x04:
-		fprintf(_out, "op_unk0x04 %d %d", args[0], args[1]);
+	case op_killSound:
+		fprintf(_out, "op_killSound %d %d", args[0], args[1]);
 		break;
-	case op_unk0x05:
-		fprintf(_out, "op_unk0x05 %d %d", args[0], args[1]);
+	case op_loopSound:
+		fprintf(_out, "op_loopSound %d %d", args[0], args[1]);
 		break;
 	case op_jge:
 		fprintf(_out, "op_jge %d", args[0]);
@@ -87,14 +91,14 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	case op_adjustVolume:
 		fprintf(_out, "op_adjustVolume");
 		break;
-	case op_unk0x0A:
-		fprintf(_out, "op_unk0x0A");
+	case op_testVar0x54:
+		fprintf(_out, "op_testVar0x54");
 		break;
 	case op_unk0x0B:
-		fprintf(_out, "op_unk0x0B %d", args[0]);
+		fprintf(_out, "op_unk0x0B %d %d", args[0], args[1]);
 		break;
-	case op_unk0x0C:
-		fprintf(_out, "op_unk0x0C %d", args[0]);
+	case op_fadeInSound:
+		fprintf(_out, "op_fadeInSound %d", args[0]);
 		break;
 	case op_unk0x0D:
 		fprintf(_out, "op_unk0x0D");
@@ -105,11 +109,11 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	case op_stopSound:
 		fprintf(_out, "op_startSound %d", args[0]);
 		break;
-	case op_fadeSound:
-		fprintf(_out, "op_fadeSound %d", args[0]);
+	case op_fadeOutSound:
+		fprintf(_out, "op_fadeOutSound %d", args[0]);
 		break;
-	case op_unk0x12:
-		fprintf(_out, "op_unk0x12 %d", args[0]);
+	case op_setCounter:
+		fprintf(_out, "op_setCounter %d", args[0]);
 		break;
 	case op_setVolume:
 		fprintf(_out, "op_adjustVolume %d", args[0]);
@@ -156,6 +160,7 @@ static int parse(const uint8_t *buf, uint32_t size) {
 		const uint32_t addr = p - buf;
 		int a, b, c, d;
 		const uint8_t op = *p;
+		++_histogram[op];
 		a = b = c = d = 0;
 		switch (op) {
 		case op_end:
@@ -165,11 +170,11 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op_unk0x04:
+		case op_killSound:
 			a = p[1]; p += 2;
 			b = read16(p); p += 2;
 			break;
-		case op_unk0x05:
+		case op_loopSound:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
@@ -187,14 +192,14 @@ static int parse(const uint8_t *buf, uint32_t size) {
 		case op_adjustVolume:
 			p += 4;
 			break;
-		case op_unk0x0A:
+		case op_testVar0x54:
 			p += 4;
 			break;
 		case op_unk0x0B:
-			p += 2;
-			a = read16(p); p += 2;
+			a = p[1]; p += 2;
+			b = read16(p); p += 2;
 			break;
-		case op_unk0x0C:
+		case op_fadeInSound:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
@@ -208,11 +213,11 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op_fadeSound:
+		case op_fadeOutSound:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op_unk0x12:
+		case op_setCounter:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
@@ -294,10 +299,21 @@ int main(int argc, char *argv[]) {
 			if (size != 0) {
 				visitOpcode = printOpcode;
 				parse(_fileBuf, size);
+				for (int i = 0; i < op_count; ++i) {
+					if (_histogram[i] == 0) {
+						switch (i) {
+						case op_invalid0x01:
+						case op_invalid0x03:
+						case op_invalid0x07:
+							break;
+						default:
+							fprintf(stdout, "Opcode %d not referenced\n", i);
+							break;
+						}
+					}
+				}
 			}
 		}
-	} else {
-		fprintf(stdout, "Usage: %s .sss\n", argv[0]);
 	}
 	return 0;
 }
