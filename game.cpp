@@ -102,10 +102,8 @@ void Game::fadeScreenPalette() {
 
 void Game::shakeScreen() {
 	if (_video->_displayShadowLayer) {
-#if 0
-		const int _cl = (_currentLevel == 4 || _currentLevel == 6) ? 1 : 4;
-		shakeShadowLayer();
-#endif
+		const int num = (_currentLevel == 4 || _currentLevel == 6) ? 1 : 4;
+		shakeShadowLayer(num);
 	}
 	if (_shakeScreenDuration != 0) {
 		--_shakeScreenDuration;
@@ -126,6 +124,10 @@ void Game::shakeScreen() {
 	if (_fadePaletteCounter != 0) {
 		fadeScreenPalette();
 	}
+}
+
+void Game::shakeShadowLayer(int num) {
+	warning("Game::shakeShadowLayer unimplemented");
 }
 
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
@@ -2054,7 +2056,7 @@ void Game::resetPlasmaCannonState() {
 	_plasmaCannonLastIndex2 = 16;
 }
 
-void Game::GameLevelMainLoopHelper3() {
+void Game::updateAndyMonsterObjects() {
 	uint8_t _dl = 3;
 	LvlObject *ptr = _andyObject;
 	switch (_gameKeyPressedMaskIndex >> 4) {
@@ -2237,7 +2239,7 @@ void Game::levelMainLoop() {
 		executeMstCode();
 		updateLvlObjectLists();
 		callLevel_tick();
-		GameLevelMainLoopHelper3();
+		updateAndyMonsterObjects();
 		if (!_hideAndyObjectSprite) {
 			addToSpriteList(_andyObject);
 		}

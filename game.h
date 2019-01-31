@@ -96,7 +96,6 @@ struct Game {
 	bool _hideAndyObjectSprite;
 	GameUnkList1 _gameUnkList1Table[32];
 	GameUnkList1 *_gameUnkList1Head;
-	int32_t _mstGlobalVars[40];
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -139,6 +138,7 @@ struct Game {
 	uint32_t _gameMstLogicHelper1TestMask;
 	Task *_tasksListTail;
 	int _runTaskOpcodesCount;
+	int32_t _mstGlobalVars[40];
 	uint32_t _mstGlobalFlags;
 	int _clipBoxOffsetX, _clipBoxOffsetY;
 	Task *_gameMstResToLoad1Pri, *_gameMstResToLoad2Pri;
@@ -158,6 +158,7 @@ struct Game {
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
+	uint8_t _mstLookupTable5[32];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -174,6 +175,7 @@ struct Game {
 	void setShakeScreen(int type, int counter);
 	void fadeScreenPalette();
 	void shakeScreen();
+	void shakeShadowLayer(int num);
 	void decodeShadowScreenMask(LvlBackgroundData *lvl);
 	void playSound(int num, LvlObject *ptr, int a, int b);
 	void removeSound(LvlObject *ptr);
@@ -231,7 +233,7 @@ struct Game {
 	void updateAnimatedLvlObjectsLeftRightCurrentScreens();
 	void updatePlasmaCannonExplosionLvlObject(LvlObject *ptr);
 	void resetPlasmaCannonState();
-	void GameLevelMainLoopHelper3();
+	void updateAndyMonsterObjects();
 	void updateInput();
 	void levelMainLoop();
 	void callLevel_postScreenUpdate(int num);

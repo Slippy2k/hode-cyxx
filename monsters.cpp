@@ -13,6 +13,16 @@ void Game::initMstCode() {
 		return;
 	}
 	// TODO
+	for (int i = 0; i < 32; ++i) {
+		const int a = i & 24;
+		int b = i & 7;
+		if (b == 0) {
+			b = 1;
+		} else if (b > 4) {
+			--b;
+		}
+		_mstLookupTable5[i] = (a >> 3) * 6 + b - 1;
+	}
 	resetMstCode();
 }
 

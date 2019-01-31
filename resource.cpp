@@ -503,7 +503,7 @@ void Resource::loadSssData(const char *levelName) {
 	_sssHdr.dataUnk3Count = _sssFile->readUint32(); // _ecx _dataUnk3Count
 	debug(kDebug_RESOURCE, "_sssHdr.dataUnk1Count %d _sssHdr.dataUnk2Count %d _sssHdr.dataUnk3Count %d", _sssHdr.dataUnk1Count, _sssHdr.dataUnk2Count, _sssHdr.dataUnk3Count);
 	_sssHdr.codeOffsetsCount = _sssFile->readUint32(); // _sssCodeOffsetsCount
-	_sssHdr.codeSize = _sssFile->readUint32(); // _sssHdr.codeSize
+	_sssHdr.codeSize = _sssFile->readUint32();
 	_sssHdr.preloadData1Count = _sssFile->readUint32() & 255;
 	debug(kDebug_RESOURCE, "_sssHdr.codeOffsetsCount %d _sssHdr.codeSize %d", _sssHdr.codeOffsetsCount, _sssHdr.codeSize);
 	_sssHdr.preloadData2Count = _sssFile->readUint32() & 255;
@@ -779,21 +779,18 @@ void Resource::loadSssData(const char *levelName) {
 	// TODO:
 
 // loc_429E64:
-/*
 	for (int i = 0; i < _sssHdr.dataUnk2Count; ++i) {
-		_dl = _res_sssDataUnk2[i].unk0;
-		_res_sssFilters[+ 4] = dl << 16;
-		_res_sssFilters[+ 0] = _dl;
-
-		_dl = (int8_t)_res_sssDataUnk2[i].unk2;
-		_res_sssFilters[+ 0x14] = _dl << 16;
-		_res_sssFilters[+ 0x10] = _dl;
-
-		_dl = (int8_t)_res_sssDataUnk2[i].unk1;
-		 _res_sssFilters[+ 0x24] = _dl;
-		 _res_sssFilters[+ 0x20] = dl;
+		const uint8_t a = _sssDataUnk2[i].unk0;
+		_sssFilters[i].unk4 = a << 16;
+		_sssFilters[i].unk0 = a;
+		const int8_t b = (int8_t)_sssDataUnk2[i].unk2;
+		_sssFilters[i].unk14 = b << 16;
+		_sssFilters[i].unk10 = b;
+		const int8_t c = (int8_t)_sssDataUnk2[i].unk1;
+		_sssFilters[i].unk24 = c;
+		_sssFilters[i].unk20 = c;
 	}
-*/
+// loc_429EFA:
 
 // loc_429F38:
 	// clearSssData();
