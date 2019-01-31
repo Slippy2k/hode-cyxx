@@ -72,7 +72,7 @@ void Game::removeSoundObject(SssObject *so) {
 
 void Game::updateSoundObject(SssObject *so) {
 	_channelMixingTable[so->num] = 1;
-	_sssObjectsChanged = so->sssUnk4Ptr->unk30;
+	_sssObjectsChanged = so->filter->unk30;
 	if ((so->flags & 4) == 0) {
 //42B179:
 		if (so->soundBits == 0) {
@@ -285,7 +285,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-		case 12: {
+		case 12: { // fade_out_sound
 				// uint32_t _edx = so->flags1;
 				// uint32_t _eax = _edx << 24;
 				// _edx = (_edx >> 20) & 0xF;
@@ -319,7 +319,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				_sssObjectsChanged = 1;
 			}
 			break;
-		case 17: { // fade_sound
+		case 17: { // fade_in_sound
 				// executeSssCodeOp17(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
@@ -401,6 +401,9 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code -= offset;
 			}
 			break;
+		case 29:
+			so->unk2C = 0;
+			return 0;
 		default:
 			error("Invalid .sss opcode %d", *code);
 			break;
@@ -413,7 +416,7 @@ void Game::prepareSoundObject(int num, int b, int c) {
 	debug(kDebug_SOUND, "prepareSoundObject num %d b %d c 0x%x", num, b, c);
 	if (b > 0) {
 		if ((_res->_sssDataUnk3[num].unk1 & 1) != 0) {
-			// int var8 = _res->_sssDataUnk3[num].sssUnk4
+			// int var8 = _res->_sssDataUnk3[num].sssFilter
 			if (_res->_sssDataUnk3[num].unk0 <= 0) {
 				return; // 0;
 			}
@@ -435,7 +438,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 
 	int codeOffset = _res->_sssDataUnk3[num].firstCodeOffset;
 	debug(kDebug_SOUND, "startSoundObject codeOffset %d", codeOffset);
-	assert(codeOffset < _res->_sssHdr.unk1C);
+	assert(codeOffset < _res->_sssHdr.codeOffsetsCount);
 //	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
 // 42B64C
 //		return 0;
@@ -451,11 +454,11 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", _res->_sssCodeOffsets[codeOffset].unk0);
-	// tmpObj.soundBits = _res->_sssDpcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
+	// tmpObj.soundBits = _res->_sssPcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
 	// TEMP: mixSounds
 		const int dpcm = _res->_sssCodeOffsets[codeOffset].unk0;
 		_res->loadSssDpcm(dpcm);
-		const int16_t *pcm = _res->_sssDpcmTable[dpcm].ptr;
+		const int16_t *pcm = _res->_sssPcmTable[dpcm].ptr;
 		if (pcm) {
 			uint32_t size = _res->getSssDpcmSize(dpcm);
 			assert((size & 1) == 0);
@@ -515,51 +518,51 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 
 void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->sssUnk3, a, b);
-	const int num = _res->_sssDataUnk3[s->sssUnk3].sssUnk4;
-	debug(kDebug_SOUND, "sssUnk4 num %d", num);
-	SssUnk4 *sssUnk4Ptr = &_res->_sssDataUnk4[num];
+	const int num = _res->_sssDataUnk3[s->sssUnk3].sssFilter;
+	debug(kDebug_SOUND, "sssFilter num %d", num);
+	SssFilter *filter = &_res->_sssFilters[num];
 	bool found = false;
 	for (int i = 0; i < _sssObjectsCount; ++i) {
 		SssObject *so = &_sssObjectsTable[i];
-		if (so->soundBits != 0 && so->sssUnk4Ptr == sssUnk4Ptr) {
+		if (so->soundBits != 0 && so->filter == filter) {
 			found = true;
 			break;
 		}
 	}
-	int _ecx = sssUnk4Ptr->unk4;
+	int _ecx = filter->unk4;
 	int _eax = ((int8_t)s->unk3) << 16;
 	if (_ecx != _eax) {
 		if (!found) {
-			sssUnk4Ptr->unk4 = _eax; // int32_t
+			filter->unk4 = _eax; // int32_t
 		} else {
-			sssUnk4Ptr->unkC = 4; // uint32_t
-			sssUnk4Ptr->unk30 = 1; // uint32_t
+			filter->unkC = 4; // uint32_t
+			filter->unk30 = 1; // uint32_t
 			_eax = ((s->unk3 << 16) - _ecx) / 4;
-			sssUnk4Ptr->unk8 = _eax; // uint32_t
+			filter->unk8 = _eax; // uint32_t
 		}
 	}
 // 42B9FD
 	_eax = ((int8_t)s->unk5) << 16;
-	_ecx = sssUnk4Ptr->unk14;
+	_ecx = filter->unk14;
 	if (_ecx != _eax) {
 		if (!found) {
-			sssUnk4Ptr->unk14 = _eax; // int32_t
+			filter->unk14 = _eax; // int32_t
 		} else {
-			sssUnk4Ptr->unk1C = 4;
-			sssUnk4Ptr->unk30 = 1;
+			filter->unk1C = 4;
+			filter->unk30 = 1;
 			_eax = ((s->unk5 << 16) - _ecx) / 4;
-			sssUnk4Ptr->unk18 = _eax;
+			filter->unk18 = _eax;
 		}
 	}
 // 42BA37
 	_eax = (int8_t)s->unk4;
-	const int scale = sssUnk4Ptr->unk24;
+	const int scale = filter->unk24;
 	if (scale != _eax) {
-		sssUnk4Ptr->unk24 = _eax;
+		filter->unk24 = _eax;
 		for (int i = 0; i < _sssObjectsCount; ++i) {
 			SssObject *so = &_sssObjectsTable[i];
-			if (so->soundBits != 0 && so->sssUnk4Ptr == sssUnk4Ptr) {
-				int _al = sssUnk4Ptr->unk24 & 255;
+			if (so->soundBits != 0 && so->filter == filter) {
+				int _al = filter->unk24 & 255;
 				_al += so->unk8;
 				so->unk9 = _al < 0 ? 0 : _al;
 				if (so->unk9 > 7) {
@@ -676,8 +679,8 @@ void Game::clearSoundObjects() {
 	_sssObjectsCount = 0;
 	_snd_fadeVolumeCounter = 0;
 	// _snd_mixingBufferSize = 0;
-	if (_res->_sssHdr.unk10 != 0) {
-		const int size = _res->_sssHdr.unk18 * 4;
+	if (_res->_sssHdr.dataUnk1Count != 0) {
+		const int size = _res->_sssHdr.dataUnk3Count * 4;
 		for (int i = 0; i < 3; ++i) {
 			memset(_res->_sssLookupTable1[i], 0, size);
 			memset(_res->_sssLookupTable2[i], 0, size);
@@ -739,12 +742,12 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 
 void Game::setSoundObjectVolume(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->unk18 != 0 && _snd_masterVolume != 0) {
-		int volume = so->sssUnk4Ptr->unk4;
+		int volume = so->filter->unk4;
 		volume = ((volume >> 16) * so->unk18) >> 7;
 		int _esi = 0;
 		if (so->volumePtr) {
 			int _eax = so->unk8;
-			_eax += so->sssUnk4Ptr->unk24;
+			_eax += so->filter->unk24;
 			_esi = so->volume;
 			if (_eax < 0) {
 				_eax = 0;
@@ -778,13 +781,12 @@ void Game::setSoundObjectVolume(SssObject *so) {
 						_sssObjectsList3 = o;
 						o = o->nextPtr;
 					}
-
 				}
 			}
 
 		} else {
 // 429076:
-			_esi = so->sssUnk4Ptr->unk14;
+			_esi = so->filter->unk14;
 			_esi = so->volume + (_esi >> 16);
 			if (_esi < 0) {
 				_esi = 0;
@@ -871,20 +873,20 @@ void Game::expireSoundObjects(int flags) {
 }
 
 void Game::mixSoundObjects17640(bool flag) {
-	for (int i = 0; i < _res->_sssHdr.unk14; ++i) {
-		_res->_sssDataUnk4[i].unk30 = 0;
-		const int counter1 = _res->_sssDataUnk4[i].unkC;
+	for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
+		_res->_sssFilters[i].unk30 = 0;
+		const int counter1 = _res->_sssFilters[i].unkC;
 		if (counter1 != 0) {
-			_res->_sssDataUnk4[i].unkC = counter1 - 1;
+			_res->_sssFilters[i].unkC = counter1 - 1;
 		}
-		_res->_sssDataUnk4[i].unk4 += _res->_sssDataUnk4[i].unk8;
-		_res->_sssDataUnk4[i].unk30 = 1;
-		const int counter2 = _res->_sssDataUnk4[i].unk1C;
+		_res->_sssFilters[i].unk4 += _res->_sssFilters[i].unk8;
+		_res->_sssFilters[i].unk30 = 1;
+		const int counter2 = _res->_sssFilters[i].unk1C;
 		if (counter2 != 0) {
-			_res->_sssDataUnk4[i].unk1C = counter2 - 1;
+			_res->_sssFilters[i].unk1C = counter2 - 1;
 		}
-		_res->_sssDataUnk4[i].unk14 += _res->_sssDataUnk4[i].unk18;
-		_res->_sssDataUnk4[i].unk30 = 1;
+		_res->_sssFilters[i].unk14 += _res->_sssFilters[i].unk18;
+		_res->_sssFilters[i].unk30 = 1;
 	}
 // 42B426
 	for (int i = 0; i < _sssObjectsCount; ++i) {

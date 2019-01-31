@@ -56,7 +56,7 @@ void Game::postScreenUpdate_rock_screen4() {
 			}
 			assert(_plasmaExplosionObject);
 			_plasmaExplosionObject->screenNum = _res->_currentScreenResourceNum;
-			_gameMainLoopFlag5 = 1;
+			_plasmaCannonExplodeFlag = 1;
 			if (_shakeScreenDuration == 0) {
 				setShakeScreen(3, 2);
 			} else {
@@ -91,7 +91,7 @@ void Game::postScreenUpdate_rock_screen8() {
 	}
 }
 
-void Game::postScreenUpdate_rock_screen9Helper(int num) {
+void Game::postScreenUpdate_rock_helper1(int num) {
 	switch (num) {
 	case 0:
 		removeLvlObject(_andyObject);
@@ -102,7 +102,7 @@ void Game::postScreenUpdate_rock_screen9Helper(int num) {
 		destroyLvlObjectUnk(_andyObject);
 		_plasmaCannonDirection = 0;
 		_plasmaCannonLastIndex1 = 0;
-		_gameMainLoopFlag5 = 0;
+		_plasmaCannonExplodeFlag = 0;
 		_plasmaCannonPointsMask = 0;
 		_plasmaCannonObject = 0;
 		setLvlObjectType8Resource(_andyObject, 8, 2);
@@ -131,7 +131,7 @@ void Game::postScreenUpdate_rock_screen9() {
 					_levelCheckpoint = 5;
 				}
 				_res->_screensState[9].s0 = 1;
-				postScreenUpdate_rock_screen9Helper(2);
+				postScreenUpdate_rock_helper1(2);
 				_andyObject->xPos = 105;
 				_andyObject->yPos = 52;
 				_andyObject->anim = 232;
@@ -147,7 +147,7 @@ void Game::postScreenUpdate_rock_screen9() {
 	}
 }
 
-void Game::level1OpHelper3(BoundingBox *box, int num) {
+void Game::postScreenUpdate_rock_helper2(BoundingBox *box, int num) {
 	static uint8_t byte_478C6C = 0;
 	BoundingBox objBox;
 	objBox.x1 = _andyObject->xPos;
@@ -196,14 +196,14 @@ ret:
 void Game::postScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		BoundingBox box = { 64, 0, 267, 191 };
-		level1OpHelper3(&box, 12);
+		postScreenUpdate_rock_helper2(&box, 12);
 	}
 }
 
 void Game::postScreenUpdate_rock_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		BoundingBox box = { -12, 0, 162, 191 };
-		level1OpHelper3(&box, 12);
+		postScreenUpdate_rock_helper2(&box, 12);
 	}
 }
 
@@ -476,7 +476,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 				ptr->stateCounter = 0;
 				ptr->actionKeyMask |= 7;
 			}
-			_gameMainLoopFlag5 = 1;
+			_plasmaCannonExplodeFlag = 1;
 			_plasmaCannonObject = ptr->linkObjPtr;
 		}
 	}

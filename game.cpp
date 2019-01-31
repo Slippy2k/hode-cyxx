@@ -169,8 +169,8 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 }
 
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
-	if (num < _res->_sssHdr.unk10) {
-		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.unk10, a, b);
+	if (num < _res->_sssHdr.dataUnk1Count) {
+		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.dataUnk1Count, a, b);
 		_currentSoundLvlObject = ptr;
 		setupSoundObject(&_res->_sssDataUnk1[num], a, b);
 		_currentSoundLvlObject = 0;
@@ -737,7 +737,7 @@ void Game::preloadLevelScreenData(int num, int prev) {
 }
 
 void Game::loadLevelScreenSounds(int num) {
-	if (_res->_sssHdr.dpcmCount > 0 && _res->_sssPreloadData1) {
+	if (_res->_sssHdr.pcmCount > 0 && _res->_sssPreloadData1) {
 		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
 			const int j = _res->_sssPreloadData1[num].ptr[i];
 			debug(kDebug_GAME, "levelScreen preloadData1 #%d res %d", i, j);
@@ -1013,7 +1013,7 @@ void Game::setupCurrentScreen() {
 			setLvlObjectType8Resource(ptr, 8, 2);
 			_plasmaCannonDirection = 0;
 			_plasmaCannonLastIndex1 = 0;
-			_gameMainLoopFlag5 = 0;
+			_plasmaCannonExplodeFlag = 0;
 			_plasmaCannonPointsMask = 0;
 			_plasmaCannonObject = 0;
 			ptr->anim = 232;
@@ -1184,7 +1184,7 @@ void Game::restartLevel() {
 	} else {
 		_mstGlobalFlags = 0;
 	}
-	if (_res->_sssHdr.unk10) {
+	if (_res->_sssHdr.dataUnk1Count) {
 		resetSound();
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
@@ -1564,7 +1564,7 @@ int Game::updateAndyLvlObject() {
 	} else {
 		_mstGlobalFlags = 0;
 	}
-	if (_res->_sssHdr.unk10) {
+	if (_res->_sssHdr.dataUnk1Count) {
 		resetSound();
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
@@ -1606,7 +1606,7 @@ void Game::drawPlasmaCannon() {
 	} while (index <= lastIndex);
 	_plasmaCannonLastIndex1 = 0;
 	_plasmaCannonPointsMask = 0;
-	_gameMainLoopFlag5 = 0;
+	_plasmaCannonExplodeFlag = 0;
 	_plasmaCannonObject = 0;
 }
 
@@ -2017,7 +2017,7 @@ void Game::updatePlasmaCannonExplosionLvlObject(LvlObject *ptr) {
 		if ((_andyObject->flags0 & 0x1F) == 4 && (_andyObject->flags0 & 0xE0) == 0xC0) {
 			ptr->directionKeyMask = 1;
 		}
-		if (_gameMainLoopFlag5 == 1) {
+		if (_plasmaCannonExplodeFlag == 1) {
 			ptr->actionKeyMask = 4;
 			if ((_rnd._rndSeed & 1) != 0 && addLvlObjectToList3(1)) {
 				_lvlObjectsList3->flags0 = _andyObject->flags0;
@@ -2048,7 +2048,7 @@ void Game::resetPlasmaCannonState() {
 	_plasmaCannonPrevDirection = 0;
 	_plasmaCannonPointsSetupCounter = 0;
 	_plasmaCannonLastIndex1 = 0;
-	_gameMainLoopFlag5 = 0;
+	_plasmaCannonExplodeFlag = 0;
 	_plasmaCannonPointsMask = 0;
 	_plasmaCannonFirstIndex = 16;
 	_plasmaCannonLastIndex2 = 16;
@@ -2156,7 +2156,7 @@ void Game::levelMainLoop() {
 		_paf->play(num);
 		_paf->unload(num);
 	}
-	if (_res->_sssHdr.unk10 != 0) {
+	if (_res->_sssHdr.dataUnk1Count != 0) {
 		resetSound();
 	}
 	_quit = false;
@@ -2171,7 +2171,7 @@ void Game::levelMainLoop() {
 	} else {
 		_mstGlobalFlags = 0;
 	}
-	if (_res->_sssHdr.unk10 != 0) {
+	if (_res->_sssHdr.dataUnk1Count != 0) {
 		resetSound();
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
@@ -2209,7 +2209,7 @@ void Game::levelMainLoop() {
 			} else {
 				_mstGlobalFlags = 0;
 			}
-			if (_res->_sssHdr.unk10 != 0) {
+			if (_res->_sssHdr.dataUnk1Count != 0) {
 				resetSound();
 			}
 			const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
@@ -2249,7 +2249,7 @@ void Game::levelMainLoop() {
 				updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
 			}
 		}
-		if (_res->_sssHdr.unk10 != 0) {
+		if (_res->_sssHdr.dataUnk1Count != 0) {
 #if 0
 			if (_snd_numberOfBuffers != 0) {
 				SetEvent(_snd_threadEvent1);

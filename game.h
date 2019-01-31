@@ -112,7 +112,7 @@ struct Game {
 	uint8_t _plasmaCannonPrevDirection;
 	uint8_t _plasmaCannonPointsSetupCounter;
 	uint8_t _plasmaCannonLastIndex1;
-	uint8_t _gameMainLoopFlag5;
+	uint8_t _plasmaCannonExplodeFlag;
 	uint8_t _plasmaCannonPointsMask;
 	uint8_t _plasmaCannonFirstIndex;
 	uint8_t _plasmaCannonLastIndex2;
@@ -268,9 +268,9 @@ struct Game {
 	void postScreenUpdate_rock_screen0();
 	void postScreenUpdate_rock_screen4();
 	void postScreenUpdate_rock_screen8();
-	void postScreenUpdate_rock_screen9Helper(int num);
+	void postScreenUpdate_rock_helper1(int num);
 	void postScreenUpdate_rock_screen9();
-	void level1OpHelper3(BoundingBox *box, int num);
+	void postScreenUpdate_rock_helper2(BoundingBox *box, int num);
 	void postScreenUpdate_rock_screen10();
 	void postScreenUpdate_rock_screen11();
 	void postScreenUpdate_rock_screen13();

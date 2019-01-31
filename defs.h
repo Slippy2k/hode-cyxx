@@ -148,7 +148,7 @@ struct LvlObject {
 	LvlObject *nextPtr;
 };
 
-struct SssUnk4;
+struct SssFilter;
 
 struct SssObject {
 	uint8_t *soundBits; // 0x0
@@ -184,7 +184,7 @@ struct SssObject {
 	LvlObject *lvlObject; // 0x74
 	int32_t unk78; // 0x78
 	int32_t unk7C; // 0x7C
-	SssUnk4 *sssUnk4Ptr;
+	SssFilter *filter;
 };
 
 struct MstScreenAreaCode {

@@ -68,15 +68,15 @@ struct SssHdr {
 	int unk4;
 	int unk8;
 	int unkC;
-	int unk10; // sssDataUnk1Count
-	int unk14; // sssDataUnk2Count
-	int unk18; // sssDataUnk3Count
-	int unk1C; // sssCodeOffsetsCount
-	int unk20; // sssCodeSize
-	int unk24; // sssPreloadData1Count
-	int unk28; // sssPreloadData2Count
-	int unk2C; // sssPreloadData3Count
-	int dpcmCount; // 30
+	int dataUnk1Count;
+	int dataUnk2Count;
+	int dataUnk3Count;
+	int codeOffsetsCount;
+	int codeSize;
+	int preloadData1Count; // 24
+	int preloadData2Count; // 28
+	int preloadData3Count; // 2C
+	int pcmCount; // 30
 };
 
 struct SssUnk1 {
@@ -97,14 +97,14 @@ struct SssUnk2 {
 };
 
 struct SssUnk3 {
-	uint8_t unk0; // 0
-	uint8_t unk1; // 1
-	uint16_t sssUnk4; // 2 index to _sssDataUnk4
+	uint8_t unk0; // 0 flags0
+	uint8_t unk1; // 1 flags1
+	uint16_t sssFilter; // 2 index to _sssFilters
 	uint32_t firstCodeOffset; // 4 offset to _sssCodeOffsets
 };
 
 struct SssCodeOffset {
-	uint16_t unk0; // index to _sssDpcmTable
+	uint16_t unk0; // index to _sssPcmTable
 	uint16_t unk2;
 	uint16_t unk4;
 	uint8_t unk6;
@@ -115,18 +115,18 @@ struct SssCodeOffset {
 	uint32_t unk14; // offset to _sssCodeData
 };
 
-struct SssUnk4 {
-	int32_t unk4;
-	int32_t unk8;
-	int32_t unkC;
-	int32_t unk14;
-	int32_t unk18;
-	int32_t unk1C;
+struct SssFilter {
+	int32_t unk4; // priority (0,7)
+	int32_t unk8; // priorityDelta
+	int32_t unkC; // priorityCounter
+	int32_t unk14; // volume (0,127)
+	int32_t unk18; // volumeDelta
+	int32_t unk1C; // volumeCounter
 	int32_t unk24;
-	int32_t unk30;
+	int32_t unk30; // flag
 };
 
-struct SssUnk5 {
+struct SssPcm {
 	int16_t *ptr;    // 0 PCM data
 	uint32_t offset; // 4 offset in .sss
 	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed with indexes)
@@ -183,8 +183,8 @@ struct Resource {
 	SssUnk2 *_sssDataUnk2;
 	SssUnk3 *_sssDataUnk3;
 	SssCodeOffset *_sssCodeOffsets;
-	SssUnk4 *_sssDataUnk4;
-	SssUnk5 *_sssDpcmTable;
+	SssFilter *_sssFilters;
+	SssPcm *_sssPcmTable;
 	SssPreloadData *_sssPreloadData1;
 	SssPreloadData *_sssPreloadData2;
 	SssPreloadData *_sssPreloadData3;
@@ -192,7 +192,6 @@ struct Resource {
 	uint32_t *_sssLookupTable2[3];
 	uint32_t *_sssLookupTable3[3];
 
-	uint32_t _sssCodeSize;
 	uint8_t *_sssCodeData;
 
 	bool _isDemoData;

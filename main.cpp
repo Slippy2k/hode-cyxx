@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 	}
 	_system = SystemStub_SDL_create();
 	atexit(exitMain);
-	g_debugMask = kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
+	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
 	Game *g = new Game(_system, dataPath ? dataPath : "DATA");
 	g->mainLoop(level, checkpoint);
 	delete g;
