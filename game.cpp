@@ -2253,7 +2253,10 @@ void Game::levelMainLoop() {
 			}
 		}
 		if (_res->_sssHdr.dataUnk1Count != 0) {
-#if 0
+#if 1
+			/* original code had a dedicated thread for sound, that main thread/loop was signaling */
+			mixSoundObjects17640(true);
+#else
 			if (_snd_numberOfBuffers != 0) {
 				SetEvent(_snd_threadEvent1);
 				while (_snd_numberOfBuffers != 0) {

@@ -149,9 +149,10 @@ struct LvlObject {
 };
 
 struct SssFilter;
+struct SssPcm;
 
 struct SssObject {
-	uint8_t *soundBits; // 0x0
+	SssPcm *pcm; // 0x0
 	uint16_t num; // 0x4
 	uint16_t unk6; // 0x6
 	int8_t unk8; // 0x8
@@ -164,7 +165,7 @@ struct SssObject {
 	int panL; // 0x1C
 	int panR; // 0x20
 	int panType; // 0x24
-	int32_t unk28; // 0x28
+	const int16_t *currentPcmPtr; // 0x28
 	int32_t unk2C; // 0x2C
 	SssObject *prevPtr; // 0x30
 	SssObject *nextPtr; // 0x34

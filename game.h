@@ -400,6 +400,7 @@ struct Game {
 	void setSoundObjectVolume(SssObject *so);
 	void expireSoundObjects(int flags);
 	void mixSoundObjects17640(bool flag);
+	void mixSoundObjects();
 	void mixSoundsCb(int16_t *buf, int len);
 
 	// andy.cpp

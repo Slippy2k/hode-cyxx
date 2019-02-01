@@ -20,7 +20,7 @@ void Game::resetSound() {
 }
 
 void Game::removeSoundObject(SssObject *so) {
-	so->soundBits = 0;
+	so->pcm = 0;
 	if ((so->flags & 1) != 0) {
 		SssObject *next = so->nextPtr;
 		SssObject *prev = so->prevPtr;
@@ -75,17 +75,17 @@ void Game::updateSoundObject(SssObject *so) {
 	_sssObjectsChanged = so->filter->unk30;
 	if ((so->flags & 4) == 0) {
 //42B179:
-		if (so->soundBits == 0) {
+		if (so->pcm == 0) {
 			if (so->codeDataStage1) {
 				so->codeDataStage1 = executeSssCode(so, so->codeDataStage1);
 			}
-			if (so->soundBits == 0) {
+			if (so->pcm == 0) {
 				return;
 			}
 			if (so->codeDataStage4) {
 				so->codeDataStage4 = executeSssCode(so, so->codeDataStage4);
 			}
-			if (so->soundBits == 0) {
+			if (so->pcm == 0) {
 				return;
 			}
 			goto flag_case0;
@@ -94,7 +94,7 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->codeDataStage1) {
 				so->codeDataStage1 = executeSssCode(so, so->codeDataStage1);
 			}
-			if (so->soundBits == 0) {
+			if (so->pcm == 0) {
 				return;
 			}
 			if (so->volumePtr) {
@@ -108,7 +108,7 @@ void Game::updateSoundObject(SssObject *so) {
 					so->codeDataStage2 = executeSssCode(so, so->codeDataStage2);
 				}
 			}
-			if (so->soundBits == 0) {
+			if (so->pcm == 0) {
 				return;
 			}
 			if (so->codeDataStage3) {
@@ -117,7 +117,7 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->codeDataStage4) {
 				so->codeDataStage4 = executeSssCode(so, so->codeDataStage4);
 			}
-			if (so->soundBits == 0) {
+			if (so->pcm == 0) {
 				return;
 			}
 			if (_sssObjectsChanged == 0 || (so->flags & 1) == 0) {
@@ -212,7 +212,7 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 		}
 		so = so->nextPtr;
 	}
-	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].soundBits == 0) {
+	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
 		--_sssObjectsCount;
 	}
 }
@@ -231,7 +231,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				_currentSoundLvlObject = tmp;
 			}
 			code += 4;
-			if (so->soundBits == 0) {
+			if (so->pcm == 0) {
 				return code;
 			}
 			break;
@@ -255,10 +255,10 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				int32_t _eax = READ_LE_UINT32(code + 4);
 				if (so->unk6C < _eax) {
 					so->unk6C = _eax;
-					if (so->soundBits) {
-						const uint32_t n = READ_LE_UINT32(so->soundBits);
-						if (n != 0) {
-							so->unk28 = n + READ_LE_UINT32(code + 8);
+					if (so->pcm) {
+						const int16_t *ptr = so->pcm->ptr;
+						if (ptr) {
+							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 8);
 						}
 					}
 				}
@@ -286,10 +286,10 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					code += 16;
 				} else {
 					so->unk6C = READ_LE_UINT32(code + 8);
-					if (so->soundBits) {
-						const uint32_t n = READ_LE_UINT32(so->soundBits);
-						if (n != 0) {
-							so->unk28 = n + READ_LE_UINT32(code + 4);
+					if (so->pcm) {
+						const int16_t *ptr = so->pcm->ptr;
+						if (ptr) {
+							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4);
 						}
 					}
 					return code;
@@ -353,7 +353,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 				// executeSssCodeOp16(so);
 				code += 4;
-				if (so->soundBits == 0) {
+				if (so->pcm == 0) {
 					return code;
 				}
 				_sssObjectsChanged = 1;
@@ -431,7 +431,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					return code;
 				}
 				so->unk6C = _eax;
-				if (so->soundBits) {
+				if (so->pcm) {
 					// TODO: goto 42AF44
 					warning("executeSssCode case 27 unimplemented");
 				}
@@ -498,7 +498,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", _res->_sssCodeOffsets[codeOffset].unk0);
-	// tmpObj.soundBits = _res->_sssPcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
+	tmpObj.pcm = &_res->_sssPcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
 	// TEMP: mixSounds
 		const int dpcm = _res->_sssCodeOffsets[codeOffset].unk0;
 		_res->loadSssDpcm(dpcm);
@@ -568,7 +568,7 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	bool found = false;
 	for (int i = 0; i < _sssObjectsCount; ++i) {
 		SssObject *so = &_sssObjectsTable[i];
-		if (so->soundBits != 0 && so->filter == filter) {
+		if (so->pcm != 0 && so->filter == filter) {
 			found = true;
 			break;
 		}
@@ -605,7 +605,7 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 		filter->unk24 = _eax;
 		for (int i = 0; i < _sssObjectsCount; ++i) {
 			SssObject *so = &_sssObjectsTable[i];
-			if (so->soundBits != 0 && so->filter == filter) {
+			if (so->pcm != 0 && so->filter == filter) {
 				int _al = filter->unk24 & 255;
 				_al += so->unk8;
 				so->unk9 = _al < 0 ? 0 : _al;
@@ -722,7 +722,7 @@ void Game::clearSoundObjects() {
 	}
 	_sssObjectsCount = 0;
 	_snd_fadeVolumeCounter = 0;
-	// _snd_mixingBufferSize = 0;
+	// _snd_mixingQueueSize = 0;
 	if (_res->_sssHdr.dataUnk1Count != 0) {
 		const int size = _res->_sssHdr.dataUnk3Count * 4;
 		for (int i = 0; i < 3; ++i) {
@@ -828,7 +828,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 			_esi = CLIP(so->volume + (_esi >> 16), 0, 128);
 		}
 // 429094
-		if (so->soundBits == 0) {
+		if (so->pcm == 0) {
 			return;
 		}
 		int _edx = _dbVolumeTable[volume];
@@ -897,7 +897,7 @@ void Game::expireSoundObjects(int flags) {
 		}
 		so = so->nextPtr;
 	}
-	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].soundBits == 0) {
+	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
 		--_sssObjectsCount;
 	}
 }
@@ -921,8 +921,8 @@ void Game::mixSoundObjects17640(bool flag) {
 // 42B426
 	for (int i = 0; i < _sssObjectsCount; ++i) {
 		SssObject *so = &_sssObjectsTable[i];
-		if (so->soundBits) {
-			if (_channelMixingTable[0] != 0) {
+		if (so->pcm) {
+			if (_channelMixingTable[i] != 0) {
 				continue;
 			}
 			if (flag) {
@@ -941,7 +941,20 @@ void Game::mixSoundObjects17640(bool flag) {
 	if (flag) {
 //		clearSssBuffer2();
 	}
-//	mixSoundObjects();
+	mixSoundObjects();
+}
+
+void Game::mixSoundObjects() {
+	SssObject *so = _sssObjectsList1;
+	while (so) {
+		if (so->pcm != 0) {
+			const int16_t *ptr = so->pcm->ptr;
+			if (ptr && so->currentPcmPtr >= ptr) {
+				// TODO: append to mixingQueue
+			}
+		}
+		so = so->nextPtr;
+	}
 }
 
 static int clipS16(int sample) {
@@ -949,6 +962,7 @@ static int clipS16(int sample) {
 }
 
 void Game::mixSoundsCb(int16_t *buf, int len) {
+	// TODO: pull from mixingQueue
 	for (int i = 0; i < kMixerChannelsCount; ++i) {
 		MixerChannel *ch = &_mixerChannels[i];
 		if (ch->pcm) {
