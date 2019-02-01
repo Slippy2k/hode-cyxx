@@ -24,6 +24,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
 	_shakeShadowBuffer = 0;
 	_mstLogicDisabled = true;
+	_snd_volumeMin = 10;
 	_snd_masterVolume = 128;
 	// TEMP: mixSounds
 	memset(_mixerChannels, 0, sizeof(_mixerChannels));
@@ -145,12 +146,12 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 
 			_shadowScreenMasksTable[i].projectionDataPtr = dst + 0x14 + READ_LE_UINT32(dst + 4);
 			_shadowScreenMasksTable[i].shadowPalettePtr = dst + 0x14 + READ_LE_UINT32(dst + 8);
-			const int x = _shadowScreenMasksTable[i].x = READ_LE_UINT16(dst + 0xC);
-			const int y = _shadowScreenMasksTable[i].y = READ_LE_UINT16(dst + 0xE);
+			// const int x = _shadowScreenMasksTable[i].x = READ_LE_UINT16(dst + 0xC);
+			// const int y = _shadowScreenMasksTable[i].y = READ_LE_UINT16(dst + 0xE);
 			const int w = _shadowScreenMasksTable[i].w = READ_LE_UINT16(dst + 0x10);
 			const int h = _shadowScreenMasksTable[i].h = READ_LE_UINT16(dst + 0x12);
 
-			fprintf(stdout, "shadow screen mask #%d pos %d,%d dim %d,%d size %d\n", i, x, y, w, h, decodedSize);
+			// fprintf(stdout, "shadow screen mask #%d pos %d,%d dim %d,%d size %d\n", i, x, y, w, h, decodedSize);
 
 			const int size = w * h;
 			src = _shadowScreenMasksTable[i].projectionDataPtr + 2;

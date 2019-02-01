@@ -183,6 +183,40 @@ flag_case0:
 	}
 }
 
+void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundObjects
+	const uint32_t mask = (1 << c);
+	_res->_sssLookupTable1[lut][num] &= ~mask;
+	SssObject *so = _sssObjectsList1;
+	while (so) {
+		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == lut) {
+			so->codeDataStage3 = 0;
+			if (so->codeDataStage4 == 0) {
+				removeSoundObject(so);
+			} else {
+				so->unk78 = -1;
+				so->unk50 = -2;
+			}
+		}
+		so = so->nextPtr;
+	}
+	so = _sssObjectsList2;
+	while (so) {
+		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == lut) {
+			so->codeDataStage3 = 0;
+			if (so->codeDataStage4 == 0) {
+				removeSoundObject(so);
+			} else {
+				so->unk78 = -1;
+				so->unk50 = -2;
+			}
+		}
+		so = so->nextPtr;
+	}
+	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].soundBits == 0) {
+		--_sssObjectsCount;
+	}
+}
+
 const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 	while (1) {
 		debug(kDebug_SOUND, "executeSssCode() code %d", *code);
@@ -195,12 +229,13 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				_currentSoundLvlObject = so->lvlObject;
 				prepareSoundObject(READ_LE_UINT16(code + 2), code[1], so->flags0);
 				_currentSoundLvlObject = tmp;
-				code += 4;
-				if (so->soundBits == 0) {
-					return code;
-				}
+			}
+			code += 4;
+			if (so->soundBits == 0) {
+				return code;
 			}
 			break;
+#if 0
 		case 4:
 			// _cl = code[1] & 0xF;
 			// _eax = so->flags0 & 0xFF00F000;
@@ -221,9 +256,9 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				if (so->unk6C < _eax) {
 					so->unk6C = _eax;
 					if (so->soundBits) {
-						_eax = READ_LE_UINT32(code);
-						if (_eax != 0) {
-							so->unk28 = _eax + READ_LE_UINT32(code + 8);
+						const uint32_t n = READ_LE_UINT32(so->soundBits);
+						if (n != 0) {
+							so->unk28 = n + READ_LE_UINT32(code + 8);
 						}
 					}
 				}
@@ -240,7 +275,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 			}
 			break;
-		case 8: {
+#endif
+		case 8: { // seek_sound
 				int _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
 					return code;
@@ -250,14 +286,17 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					code += 16;
 				} else {
 					so->unk6C = READ_LE_UINT32(code + 8);
-					// TODO: 42AF44
 					if (so->soundBits) {
-						warning("executeSssCode case 8 unimplemented");
+						const uint32_t n = READ_LE_UINT32(so->soundBits);
+						if (n != 0) {
+							so->unk28 = n + READ_LE_UINT32(code + 4);
+						}
 					}
 					return code;
 				}
 			}
 			break;
+#if 0
 		case 9: { // adjust_volume
 				so->unk64 += so->unk68;
 				const int volume = (so->unk64 + 0x8000) >> 16;
@@ -285,15 +324,16 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
+#endif
 		case 12: { // fade_out_sound
-				// uint32_t _edx = so->flags1;
-				// uint32_t _eax = _edx << 24;
-				// _edx = (_edx >> 20) & 0xF;
-				// uint16_t _ecx = READ_LE_UINT16(code + 2);
-				// executeSssCodeOp12(_ecx, _edx, _eax);
+				uint32_t _eax =  so->flags1 >> 24;
+				uint32_t _edx = (so->flags1 >> 20) & 0xF;
+				uint16_t _ecx = READ_LE_UINT16(code + 2);
+				executeSssCodeOp12(_ecx, _edx, _eax);
 				code += 4;
 			}
 			break;
+#if 0
 		case 13: {
 				// TODO:
 				warning("executeSssCode case 13 unimplemented");
@@ -340,11 +380,13 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
+#endif
 		case 20: {
 				so->unk4C = READ_LE_UINT16(code + 2);
 				code += 4;
 			}
 			break;
+#if 0
 		case 21: { // dec_unk50
 				--so->unk50;
 				if (so->unk50 >= 0) {
@@ -404,6 +446,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		case 29:
 			so->unk2C = 0;
 			return 0;
+#endif
 		default:
 			error("Invalid .sss opcode %d", *code);
 			break;
@@ -424,6 +467,7 @@ void Game::prepareSoundObject(int num, int b, int c) {
 		}
 // 42B865:
 		// TODO:
+		warning("prepareSoundObject b %d unimplemented", b);
 	} else {
 		SssObject *so = startSoundObject(num, b, c);
 		if (so && (_res->_sssDataUnk3[num].unk0 & 4) != 0) {
@@ -439,10 +483,10 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	int codeOffset = _res->_sssDataUnk3[num].firstCodeOffset;
 	debug(kDebug_SOUND, "startSoundObject codeOffset %d", codeOffset);
 	assert(codeOffset < _res->_sssHdr.codeOffsetsCount);
-//	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
+	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
 // 42B64C
 //		return 0;
-//	}
+	}
 
 	SssObject tmpObj;
 	memset(&tmpObj, 0, sizeof(tmpObj));
@@ -724,13 +768,7 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 			}
 			if (obj->screenNum == _currentScreen || (_currentLevel == 7 && obj->data0x2988 == 0x1B) || (_currentLevel == 3 && obj->data0x2988 == 0x1A)) {
 				const int dist = (obj->xPos + obj->width / 2) / 2;
-				if (dist < 0) {
-					return 0;
-				} else if (dist > 128) {
-					return 128;
-				} else {
-					return dist;
-				}
+				return CLIP(dist, 0, 128);
 			}
 			// fall-through
 		default:
@@ -761,7 +799,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 			} else {
 				if (_esi < 0) {
 					_esi = 0;
-				} else if (_esi < 128) {
+				} else if (_esi > 128) {
 					_esi = 128;
 				}
 				volume >>= 2; // _edi
@@ -787,12 +825,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 		} else {
 // 429076:
 			_esi = so->filter->unk14;
-			_esi = so->volume + (_esi >> 16);
-			if (_esi < 0) {
-				_esi = 0;
-			} else if (_esi > 128) {
-				_esi = 128;
-			}
+			_esi = CLIP(so->volume + (_esi >> 16), 0, 128);
 		}
 // 429094
 		if (so->soundBits == 0) {
@@ -864,10 +897,7 @@ void Game::expireSoundObjects(int flags) {
 		}
 		so = so->nextPtr;
 	}
-	while (_sssObjectsCount > 0) {
-		if (_sssObjectsTable[_sssObjectsCount - 1].soundBits != 0) {
-			break;
-		}
+	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].soundBits == 0) {
 		--_sssObjectsCount;
 	}
 }

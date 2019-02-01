@@ -34,7 +34,7 @@ enum {
 	op_jge,
 	op_invalid0x07,
 	/* 0x08 */
-	op_unk0x08,
+	op_seekSound,
 	op_adjustVolume,
 	op_testVar0x54,
 	op_unk0x0B,
@@ -85,8 +85,8 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	case op_jge:
 		fprintf(_out, "op_jge %d", args[0]);
 		break;
-	case op_unk0x08:
-		fprintf(_out, "op_unk0x08 %d %d %d", args[0], args[1], args[2]);
+	case op_seekSound:
+		fprintf(_out, "op_seekSound %d %d %d", args[0], args[1], args[2]);
 		break;
 	case op_adjustVolume:
 		fprintf(_out, "op_adjustVolume");
@@ -183,7 +183,7 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op_unk0x08:
+		case op_seekSound:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;

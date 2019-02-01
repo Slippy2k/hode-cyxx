@@ -158,7 +158,6 @@ struct Game {
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
-	uint8_t _mstLookupTable5[32];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -390,6 +389,7 @@ struct Game {
 	void resetSound();
 	void removeSoundObject(SssObject *so);
 	void updateSoundObject(SssObject *so);
+	void executeSssCodeOp12(int num, uint8_t lut, uint8_t c);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code);
 	void prepareSoundObject(int num, int b, int c);
 	SssObject *startSoundObject(int num, int b, int flags);

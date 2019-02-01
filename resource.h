@@ -247,6 +247,7 @@ struct Resource {
 		case 3:
 			return _sssLookupTable3[a] + b;
 		}
+		assert(0);
 		return 0;
 	}
 
