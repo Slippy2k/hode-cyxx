@@ -192,10 +192,9 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObject(so);
-			} else {
-				so->unk78 = -1;
-				so->unk50 = -2;
 			}
+			so->unk78 = -1;
+			so->unk50 = -2;
 		}
 		so = so->nextPtr;
 	}
@@ -205,10 +204,41 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObject(so);
-			} else {
-				so->unk78 = -1;
-				so->unk50 = -2;
 			}
+			so->unk78 = -1;
+			so->unk50 = -2;
+		}
+		so = so->nextPtr;
+	}
+	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
+		--_sssObjectsCount;
+	}
+}
+
+void Game::executeSssCodeOp4(uint32_t flags) {
+	const uint32_t mask = 1 << (flags >> 24);
+	*_res->getSssLutPtr(1, flags) &= ~mask;
+	SssObject *so = _sssObjectsList1;
+	while (so) {
+		if ((so->flags1 & 0xFFFF0FFF) == 0) {
+			so->codeDataStage3 = 0;
+			if (so->codeDataStage4 == 0) {
+				removeSoundObject(so);
+			}
+			so->unk78 = -1;
+			so->unk50 = -2;
+		}
+		so = so->nextPtr;
+	}
+	so = _sssObjectsList2;
+	while (so) {
+		if ((so->flags1 & 0xFFFF0FFF) == 0) {
+			so->codeDataStage3 = 0;
+			if (so->codeDataStage4 == 0) {
+				removeSoundObject(so);
+			}
+			so->unk78 = -1;
+			so->unk50 = -2;
 		}
 		so = so->nextPtr;
 	}
@@ -235,22 +265,26 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code;
 			}
 			break;
-#if 0
-		case 4:
-			// _cl = code[1] & 0xF;
+		case 4: {
+			// TODO: _ebx is (un)initialized with var4...
+				const uint8_t _cl = code[1] & 0xF;
 			// _eax = so->flags0 & 0xFF00F000;
 			// _edx = (so->flags0 ^ _ebx) & 0x00F00000;
 			// _ebx ^= _edx;
-			// _dx = READ_LE_UINT16(code + 2);
+				const uint16_t _dx = READ_LE_UINT16(code + 2);
 			// _ebx &= 0xF00000;
 			// _edx &= 0xFFF;
 			// _eax ^= _ebx;
-			// _ecx <<= 0x10;
-			// _eax |= _ecx;
-			// _eax |= _eax;
-			// executeSssCodeOp4(_ecx, _edx, _ebx);
-			code += 4;
+			// _eax |= _ecx << 16;
+			// _eax |= _edx;
+
+				uint32_t flags = (so->flags0 & 0xFFF0F000);
+				flags |= (_cl << 16) | (_dx & 0xFFF);
+				executeSssCodeOp4(flags);
+				code += 4;
+			}
 			break;
+#if 0
 		case 5: {
 				int32_t _eax = READ_LE_UINT32(code + 4);
 				if (so->unk6C < _eax) {
@@ -425,6 +459,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code + 8;
 			}
 			break;
+#endif
 		case 27: {
 				int _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
@@ -432,12 +467,15 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 				so->unk6C = _eax;
 				if (so->pcm) {
-					// TODO: goto 42AF44
-					warning("executeSssCode case 27 unimplemented");
+					const int16_t *ptr = so->pcm->ptr;
+					if (ptr) {
+						so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4);
+					}
 				}
 				return code;
 			}
 			break;
+#if 0
 		case 28: { // jump
 				uint32_t offset = READ_LE_UINT32(code + 4);
 				code -= offset;

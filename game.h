@@ -389,6 +389,7 @@ struct Game {
 	void resetSound();
 	void removeSoundObject(SssObject *so);
 	void updateSoundObject(SssObject *so);
+	void executeSssCodeOp4(uint32_t flags);
 	void executeSssCodeOp12(int num, uint8_t lut, uint8_t c);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code);
 	void prepareSoundObject(int num, int b, int c);
