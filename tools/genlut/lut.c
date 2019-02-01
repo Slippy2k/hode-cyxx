@@ -2,11 +2,11 @@
 #include <stdio.h>
 
 extern void gen1(void);
-extern unsigned char unkLookupTable1[];
+extern unsigned char mstLookupTable1[];
 extern void gen4(void);
-extern unsigned char unkLookupTable4[];
+extern unsigned char mstLookupTable4[];
 extern void gen5(void);
-extern unsigned char unkLookupTable5[];
+extern unsigned char mstLookupTable5[];
 
 static void dump(const unsigned char *p, int sz) {
 	int i;
@@ -46,7 +46,7 @@ void gen1_C() {
 				}
 			}
 		}
-		unkLookupTable1[i] = _eax & 255;
+		mstLookupTable1[i] = _eax & 255;
 	}
 }
 
@@ -55,22 +55,22 @@ int main(int argc, char *argv[]) {
 
 	printf("LUT1\n");
 	gen1();
-	dump(unkLookupTable1, 16);
+	dump(mstLookupTable1, 16);
 	printf("\n");
 //	gen1_C();
-//	dump(unkLookupTable1, 16);
+//	dump(mstLookupTable1, 16);
 //	printf("\n");
 
 	// LUT2&3 not used
 
 	printf("LUT4\n");
 	gen4();
-	dump(unkLookupTable4, 18);
+	dump(mstLookupTable4, 18);
 	printf("\n");
 
 	printf("LUT5\n");
 	gen5();
-	dump(unkLookupTable5, 32);
+	dump(mstLookupTable5, 32);
 	printf("\n");
 	return 0;
 }

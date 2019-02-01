@@ -1,17 +1,22 @@
 
 
 GLOBAL gen1
-GLOBAL unkLookupTable1
+GLOBAL mstLookupTable1
+GLOBAL gen2
+GLOBAL mstLookupTable2
+GLOBAL mstLookupTable3
 GLOBAL gen4
-GLOBAL unkLookupTable4
+GLOBAL mstLookupTable4
 GLOBAL gen5
-GLOBAL unkLookupTable5
+GLOBAL mstLookupTable5
 
 SECTION .bss
 
-unkLookupTable1: resb 16
-unkLookupTable4: resb 18
-unkLookupTable5: resb 32
+mstLookupTable1: resb 16
+mstLookupTable2: resb 12
+mstLookupTable3: resb 39
+mstLookupTable4: resb 18
+mstLookupTable5: resb 32
 
 SECTION .data
 
@@ -73,10 +78,14 @@ loc_41990F:
 	jz      short loc_419919
 	mov     eax, 6
 loc_419919:
-	mov     [unkLookupTable1 + ecx], al
+	mov     [mstLookupTable1 + ecx], al
 	inc     ecx
 	cmp     ecx, 15
 	jbe     short loop1
+	LEAVE
+
+gen2:
+	ENTER
 	LEAVE
 
 gen4:
@@ -98,7 +107,7 @@ loop4:
 loc_419A1C:
 	shl     cl, 3
 	or      cl, dl
-	mov     [unkLookupTable4 + esi], cl
+	mov     [mstLookupTable4 + esi], cl
 	inc     esi
 	cmp     esi, 18
 	jb      short loop4
@@ -131,7 +140,7 @@ loc_419A54:
 	imul    dl
 	add     al, cl
 	dec     al
-	mov     [unkLookupTable5 + esi], al
+	mov     [mstLookupTable5 + esi], al
 	inc     esi
 	cmp     esi, 32
 	jb      short loop5
