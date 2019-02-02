@@ -329,14 +329,14 @@ struct Game {
 	int objectUpdate_fort_case0(LvlObject *o);
 	int objectUpdate_fort_case1(LvlObject *o);
 
-	void level2OpStage2_screen1();
-	void level2OpStage2_screen2();
-	void level2OpStage2_screen6();
-	void level2OpStage2_screen9();
-	void level2OpStage2_screen14();
-	void level2OpStage2_screen16();
-	void level2OpStage2_screen17();
-	void level2OpStage2_screen21();
+	void preScreenUpdate_fort_screen1();
+	void preScreenUpdate_fort_screen2();
+	void preScreenUpdate_fort_screen6();
+	void preScreenUpdate_fort_screen9();
+	void preScreenUpdate_fort_screen14();
+	void preScreenUpdate_fort_screen16();
+	void preScreenUpdate_fort_screen17();
+	void preScreenUpdate_fort_screen21();
 	void callLevel_preScreenUpdate_fort(int num);
 
 	void setupLvlObjects_fort_screen1();

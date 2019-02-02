@@ -184,7 +184,7 @@ void Game::callLevel_postScreenUpdate_fort(int num) {
 	}
 }
 
-void Game::level2OpStage2_screen1() {
+void Game::preScreenUpdate_fort_screen1() {
 	if (_res->_currentScreenResourceNum == 1 && _levelCheckpoint >= 1) {
 		_res->_screensState[1].s0 = 1;
 	}
@@ -193,31 +193,31 @@ void Game::level2OpStage2_screen1() {
 	_res->_resLvlScreenBackgroundDataTable[1].unk3 = num;
 }
 
-void Game::level2OpStage2_screen2() {
+void Game::preScreenUpdate_fort_screen2() {
 	if (_res->_currentScreenResourceNum == 2 && _levelCheckpoint == 0) {
 		_levelCheckpoint = 1;
 	}
 }
 
-void Game::level2OpStage2_screen6() {
+void Game::preScreenUpdate_fort_screen6() {
 	if (_res->_currentScreenResourceNum == 6 && _levelCheckpoint == 1) {
 		_levelCheckpoint = 2;
 	}
 }
 
-void Game::level2OpStage2_screen9() {
+void Game::preScreenUpdate_fort_screen9() {
 	if (_res->_currentScreenResourceNum == 9 && _levelCheckpoint == 2) {
 		_levelCheckpoint = 3;
 	}
 }
 
-void Game::level2OpStage2_screen14() {
+void Game::preScreenUpdate_fort_screen14() {
 	if (_res->_currentScreenResourceNum == 14) {
 		_res->_resLvlScreenBackgroundDataTable[14].currentBackgroundId = _res->_screensState[14].s0 != 0 ? 1 : 0;
 	}
 }
 
-void Game::level2OpStage2_screen16() {
+void Game::preScreenUpdate_fort_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
 		_res->_screensState[16].s0 = 0;
 		_andyObject->xPos += 9;
@@ -227,14 +227,14 @@ void Game::level2OpStage2_screen16() {
 	}
 }
 
-void Game::level2OpStage2_screen17() {
+void Game::preScreenUpdate_fort_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
 		// TODO
 		_res->_screensState[17].s0 = _screenCounterTable[17] == 0 ? 1 : 0;
 	}
 }
 
-void Game::level2OpStage2_screen21() {
+void Game::preScreenUpdate_fort_screen21() {
 	if (_res->_currentScreenResourceNum == 21) {
 		_res->_screensState[21].s0 = 0;
 		if (!_paf->_skipCutscenes) {
@@ -246,28 +246,28 @@ void Game::level2OpStage2_screen21() {
 void Game::callLevel_preScreenUpdate_fort(int num) {
 	switch (num) {
 	case 1:
-		level2OpStage2_screen1();
+		preScreenUpdate_fort_screen1();
 		break;
 	case 2:
-		level2OpStage2_screen2();
+		preScreenUpdate_fort_screen2();
 		break;
 	case 6:
-		level2OpStage2_screen6();
+		preScreenUpdate_fort_screen6();
 		break;
 	case 9:
-		level2OpStage2_screen9();
+		preScreenUpdate_fort_screen9();
 		break;
 	case 14:
-		level2OpStage2_screen14();
+		preScreenUpdate_fort_screen14();
 		break;
 	case 16:
-		level2OpStage2_screen16();
+		preScreenUpdate_fort_screen16();
 		break;
 	case 17:
-		level2OpStage2_screen17();
+		preScreenUpdate_fort_screen17();
 		break;
 	case 21:
-		level2OpStage2_screen21();
+		preScreenUpdate_fort_screen21();
 		break;
 	}
 }
