@@ -215,6 +215,50 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 	}
 }
 
+void Game::executeSssCodeOp17(SssObject *so) {
+	if ((so->flags & 2) == 0) {
+		SssPcm *pcm = so->pcm;
+		SssObject *prev = so; // _edx
+		SssObject *next = so; // _eax
+		so->pcm = 0;
+		if ((so->flags & 1) != 0) {
+			if (next) {
+				next->prevPtr = prev;
+			}
+			if (prev) {
+				prev->nextPtr = next;
+			}
+			_sssObjectsList1 = next;
+			--_snd_fadeVolumeCounter;
+			if (so == _sssObjectsList3 || (_snd_fadeVolumeCounter < _snd_volumeMin && _sssObjectsList3)) {
+				SssObject *prev3 = 0; // _esi
+				_sssObjectsList3 = 0;
+				if (_snd_fadeVolumeCounter >= _snd_volumeMin && _sssObjectsList1) {
+					for (SssObject *cur = _sssObjectsList1; cur; cur = cur->nextPtr) {
+						if (prev3 && prev3->unk9 <= cur->unk9) {
+							continue;
+						}
+						prev3 = cur;
+						_sssObjectsList2 = prev3;
+					}
+				}
+			}
+		} else {
+			if (next) {
+				next->prevPtr = prev;
+			}
+			if (prev) {
+				prev->nextPtr = next;
+			} else {
+				_sssObjectsList2 = next;
+			}
+		}
+		so->pcm = pcm;
+		so->flags = (so->flags & ~1) | 2;
+		duplicateSoundObject(so);
+	}
+}
+
 void Game::executeSssCodeOp4(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	*_res->getSssLutPtr(1, flags) &= ~mask;
@@ -393,12 +437,14 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				_sssObjectsChanged = 1;
 			}
 			break;
+#endif
 		case 17: { // fade_in_sound
-				// executeSssCodeOp17(so);
+				executeSssCodeOp17(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
+#if 0
 		case 18: {
 				if (so->counter < 0) {
 					so->counter = READ_LE_UINT32(code + 4);
@@ -491,6 +537,100 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		}
 	}
 	return code;
+}
+
+void Game::duplicateSoundObject(SssObject *so) {
+	if (so->pcm && so->pcm->ptr) {
+		so->flags = (so->flags & ~1) | 2;
+	}
+	if (so->flags & 2) {
+		so->prevPtr = 0;
+		so->nextPtr = _sssObjectsList2;
+		if (_sssObjectsList2) {
+			_sssObjectsList2->prevPtr = so;
+		}
+		_sssObjectsList2 = so;
+	} else {
+// 429185
+		SssObject *so2 = so; // _edi
+		if (so->pcm && so->pcm->ptr) {
+			if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
+				SssObject *cur = _sssObjectsList3; // _eax
+				if (so->unk9 > cur->unk9) {
+					so2 = cur;
+					so->nextPtr = cur->nextPtr;
+					so->prevPtr = _sssObjectsList3->prevPtr;
+					if (so->nextPtr) {
+						so->nextPtr->prevPtr = so;
+					}
+					if (so->prevPtr) {
+						so->prevPtr->nextPtr = so;
+// 429281
+// TODO
+					} else {
+						_sssObjectsList1 = so;
+// 42927B
+// TODO
+					}
+				}
+			} else {
+// 4291E8
+				++_snd_fadeVolumeCounter;
+				so->nextPtr = _sssObjectsList1;
+				so->prevPtr = 0;
+				if (_sssObjectsList1) {
+					_sssObjectsList1->prevPtr = so;
+				}
+				_sssObjectsList1 = so;
+
+				if (_snd_fadeVolumeCounter < _snd_volumeMin) {
+					_sssObjectsList3 = 0;
+				} else {
+					if (_sssObjectsList3 == 0) {
+						_sssObjectsList3 = 0;
+						// if (so == 0) goto 4292BE
+					}
+// 429269
+
+				}
+
+// 4292BE
+			}
+		}
+// 4292C2
+		if (so2) {
+			so2->flags &= ~1;
+			so2->pcm = 0;
+			killSoundObject(so2->flags0);
+		}
+	}
+// 4292DF
+	if (so->num >= _sssObjectsCount) {
+		_sssObjectsCount = so->num + 1;
+	}
+}
+
+void Game::killSoundObject(uint32_t flags) {
+	uint32_t mask = 1 << (flags >> 24);
+	uint32_t *sssLut = _res->getSssLutPtr(2, flags);
+	if ((*sssLut & mask) != 0) {
+		SssObject *so = _sssObjectsList1;
+		while (so) {
+			if (compareSssLut(so->flags0, flags)) {
+				return;
+			}
+			so = so->nextPtr;
+		}
+		so = _sssObjectsList2;
+		while (so) {
+			if (compareSssLut(so->flags0, flags)) {
+				return;
+			}
+			so = so->nextPtr;
+		}
+// 42AC87
+		*sssLut &= ~mask;
+	}
 }
 
 void Game::prepareSoundObject(int num, int b, int c) {
