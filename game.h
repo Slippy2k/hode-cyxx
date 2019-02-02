@@ -344,9 +344,17 @@ struct Game {
 
 	// level3_pwr1.cpp
 	void callLevel_postScreenUpdate_pwr1(int num);
-	int objectUpdate_pwr1_case0(LvlObject *o);
-	int objectUpdate_pwr1_case1(LvlObject *o);
+
+	void preScreenUpdate_pwr1_screen4();
+	void preScreenUpdate_pwr1_screen6();
+	void preScreenUpdate_pwr1_screen9();
+	void preScreenUpdate_pwr1_screen15();
+	void preScreenUpdate_pwr1_screen21();
+	void preScreenUpdate_pwr1_screen23();
+	void preScreenUpdate_pwr1_screen24();
+	void preScreenUpdate_pwr1_screen26();
 	void callLevel_preScreenUpdate_pwr1(int num);
+
 	void callLevel_initialize_pwr1();
 
 	// level4_isld.cpp
