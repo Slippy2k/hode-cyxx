@@ -711,7 +711,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, _res->_sssCodeOffsets[codeOffset].unk8);
 	debug(kDebug_SOUND, "code %p", code);
 	if (code) {
-		executeSssCode(&tmpObj, code);
+		// executeSssCode(&tmpObj, code);
 	}
 
 	const uint32_t mask = 1 << (flags >> 24);
