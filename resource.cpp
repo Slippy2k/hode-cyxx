@@ -472,6 +472,7 @@ static void dumpPcm(File *fp, const SssPcm *dpcmTable, int pcmCount) {
 
 void Resource::loadSssData(const char *levelName) {
 	if (!_sssFile) {
+		memset(&_sssHdr, 0, sizeof(_sssHdr));
 		return;
 	}
 	char filename[32];

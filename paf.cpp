@@ -10,7 +10,9 @@
 PafPlayer::PafPlayer(SystemStub *system)
 	: _skipCutscenes(false), _system(system) {
 	if (!_file.open("HOD.PAF")) {
-		_file.open("HOD_DEMO.PAF");
+		if (!_file.open("HOD_DEMO.PAF")) {
+			_skipCutscenes = true;
+		}
 	}
 	_videoNum = -1;
 	memset(&_pafHdr, 0, sizeof(_pafHdr));
