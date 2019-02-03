@@ -243,6 +243,10 @@ void Game::preScreenUpdate_fort_screen21() {
 	}
 }
 
+void Game::callLevel_tick_fort() {
+	_plasmaCannonFlags |= 2;
+}
+
 void Game::callLevel_preScreenUpdate_fort(int num) {
 	switch (num) {
 	case 1:

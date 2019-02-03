@@ -2353,6 +2353,12 @@ void Game::callLevel_preScreenUpdate(int num) {
 	case 2:
 		callLevel_preScreenUpdate_pwr1(num);
 		break;
+	case 6:
+		callLevel_preScreenUpdate_lar1(num);
+		break;
+	case 7:
+		callLevel_preScreenUpdate_lar2(num);
+		break;
 	default:
 		warning("callLevel_preScreenUpdate unimplemented for screen %d", _currentLevel);
 		break;
@@ -2387,8 +2393,14 @@ void Game::callLevel_tick() {
 	case 0:
 		callLevel_tick_rock();
 		break;
+	case 1:
+		callLevel_tick_fort();
+		break;
 	case 3:
 		callLevel_tick_isld();
+		break;
+	case 6:
+		callLevel_tick_lar1();
 		break;
 	default:
 		warning("callLevel_tick unimplemented for screen %d", _currentLevel);

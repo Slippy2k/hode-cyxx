@@ -326,9 +326,6 @@ struct Game {
 	void postScreenUpdate_fort_screen21();
 	void callLevel_postScreenUpdate_fort(int num);
 
-	int objectUpdate_fort_case0(LvlObject *o);
-	int objectUpdate_fort_case1(LvlObject *o);
-
 	void preScreenUpdate_fort_screen1();
 	void preScreenUpdate_fort_screen2();
 	void preScreenUpdate_fort_screen6();
@@ -338,6 +335,8 @@ struct Game {
 	void preScreenUpdate_fort_screen17();
 	void preScreenUpdate_fort_screen21();
 	void callLevel_preScreenUpdate_fort(int num);
+
+	void callLevel_tick_fort();
 
 	void setupLvlObjects_fort_screen1();
 	void callLevel_setupLvlObjects_fort(int num);
@@ -369,7 +368,22 @@ struct Game {
 	void callLevel_initialize_pwr2();
 
 	// level7_lar1.cpp
+	void preScreenUpdate_lar1_screen0();
+	void preScreenUpdate_lar1_screen2();
+	void preScreenUpdate_lar1_screen13();
+	void preScreenUpdate_lar1_screen16();
+	void preScreenUpdate_lar1_screen20();
+	void preScreenUpdate_lar1_screen24();
+	void callLevel_preScreenUpdate_lar1(int num);
+
 	void callLevel_initialize_lar1();
+	void callLevel_tick_lar1();
+
+	// level8_lar2.cpp
+	void preScreenUpdate_lar2_screen6();
+	void preScreenUpdate_lar2_screen15();
+	void preScreenUpdate_lar2_screen19();
+	void callLevel_preScreenUpdate_lar2(int num);
 
 	// level9_dark.cpp
 	void postScreenUpdate_dark_screen0();
