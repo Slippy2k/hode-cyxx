@@ -995,7 +995,7 @@ void Game::removeLvlObjectNotType2List1(LvlObject *o) {
 
 void Game::setupCurrentScreen() {
 	LvlObject *ptr = _andyObject;
-	_gameResType0CallbackFlag1 = 0;
+	_fallingAndyFlag = false;
 	_resUpdateLevelDataType0Flag = 0;
 	_hideAndyObjectSprite = false;
 	_resUpdateLevelDataType0Flag = 0;
@@ -1204,9 +1204,9 @@ void Game::playAndyFallingCutscene(int type) {
 	bool play = false;
 	if (type == 0) {
 		play = true;
-	} else if (_gameResType0CallbackFlag1 != 0) {
-		++_gameResType0CallbackFlag2;
-		if (_gameResType0CallbackFlag2 >= 2) {
+	} else if (_fallingAndyFlag) {
+		++_fallingAndyCounter;
+		if (_fallingAndyCounter >= 2) {
 			play = true;
 		}
 	}
@@ -2662,10 +2662,10 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 		lvlObjectType0CallbackHelper1();
 		updateAndyObject(ptr);
 		if (_edi->unk4 == (ptr->flags0 & 0x1F) && _edi->unk4 == 5) {
-			_gameResType0CallbackFlag1 = 1;
+			_fallingAndyFlag = true;
 		} else {
-			_gameResType0CallbackFlag1 = 0;
-			_gameResType0CallbackFlag2 = 0;
+			_fallingAndyFlag = false;
+			_fallingAndyCounter = 0;
 		}
 		_edi->boundingBox.x1 = ptr->xPos;
 		_edi->boundingBox.x2 = ptr->xPos + ptr->width - 1;

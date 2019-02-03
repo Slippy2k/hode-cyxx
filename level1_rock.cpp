@@ -699,8 +699,8 @@ void Game::preScreenUpdate_rock_screen14() {
 void Game::preScreenUpdate_rock_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
 		if (_res->_screensState[16].s0 != 0) {
-			_gameResType0CallbackFlag2 = 2;
-			_gameResType0CallbackFlag1 = 1;
+			_fallingAndyCounter = 2;
+			_fallingAndyFlag = true;
 		}
 		playAndyFallingCutscene(1);
 	}

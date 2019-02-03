@@ -121,8 +121,8 @@ struct Game {
 	uint8_t _plasmaCannonLastIndex2;
 	uint8_t _plasmaCannonFlags;
 	uint8_t _plasmaCannonKeyMaskCounter;
-	uint8_t _gameResType0CallbackFlag1;
-	uint8_t _gameResType0CallbackFlag2;
+	bool _fallingAndyFlag;
+	uint8_t _fallingAndyCounter;
 	uint8_t _gameKeyPressedMaskIndex;
 	uint8_t _andyActionKeyMaskAnd, _andyActionKeyMaskOr;
 	uint8_t _andyDirectionKeyMaskAnd, _andyDirectionKeyMaskOr;
