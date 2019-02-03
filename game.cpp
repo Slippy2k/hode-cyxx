@@ -1052,7 +1052,7 @@ void Game::updateScreenHelper(int num) {
 	for (LvlObject *ptr = _res->_resLvlData0x288PtrTable[num]; ptr; ptr = ptr->nextPtr) {
 		switch (ptr->type) {
 		case 0: {
-				GameRect *p = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeRect);
+				GameRect *p = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeGameRect);
 				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->flags & 0xFF];
 				assert(data);
 				p->unkC = READ_LE_UINT16(data); data += 2;
@@ -1727,7 +1727,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	uint8_t *_edi, *_edx, *_eax;
 	int _cx;
 
-	GameRect *_esi = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeRect);
+	GameRect *_esi = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeGameRect);
 	assert(_esi);
 	_edi = _esi->ptr + 2;
 	if (_res->_currentScreenResourceNum == ptr->screenNum) {
@@ -2497,7 +2497,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 		assert(o == _andyObject);
 		assert(o->dataPtr == &_andyObjectScreenData);
 		break;
-	case kObjectDataTypeRect:
+	case kObjectDataTypeGameRect:
 		assert(o->dataPtr >= &_gameRectsListTable[0] && o->dataPtr < &_gameRectsListTable[64]);
 		break;
 	case kObjectDataTypeUnk1:

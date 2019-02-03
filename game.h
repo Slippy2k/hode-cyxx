@@ -42,8 +42,12 @@ struct Game {
 
 	enum {
 		kObjectDataTypeAndy,
-		kObjectDataTypeRect,
-		kObjectDataTypeUnk1
+		// LvlObject.type == 0
+		kObjectDataTypeGameRect,
+		// LvlObject.type == 8
+		kObjectDataTypeUnk1,
+		// LvlObject.type == 1
+		kObjectDataTypeLvlBackgroundSound
 	};
 	enum {
 		kMixerChannelsCount = 16,

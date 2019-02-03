@@ -126,7 +126,7 @@ struct LvlObject {
 	uint16_t flags2; /* spriteType */
 	uint8_t stateValue;
 	uint8_t stateCounter;
-	LvlObject *linkObjPtr; // plasma cannon object in case of _andyObject
+	LvlObject *linkObjPtr; /* plasma cannon object (_andyObject) */
 	uint16_t width;
 	uint16_t height;
 	uint8_t actionKeyMask;
