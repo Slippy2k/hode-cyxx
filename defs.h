@@ -140,7 +140,7 @@ struct LvlObject {
 	void *dataPtr;
 // ptr->data0x2988==0:AndyObjectScreenData
 // ptr->type==0: GameRect * / _gameRectsListTable
-// ptr->type==1: _resLvlScreenBackgroundDataTable[num].dataUnk2Table[ptr->flags & 0xFF];
+// ptr->type==1: _resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
 // ptr->type==8(_andyObject): &_gameUnkList1Element
 	uint32_t unk34; // removeSound
 	LvlObjectData *levelData0x2988;

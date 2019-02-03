@@ -53,7 +53,7 @@ struct LvlBackgroundData {
 	uint8_t *backgroundBitmapTable[4];
 	uint8_t *dataUnk0Table[4];
 	uint8_t *backgroundMaskTable[4];
-	uint8_t *dataUnk2Table[4];
+	uint8_t *backgroundSoundTable[4];
 	uint8_t *backgroundAnimationTable[4];
 	uint8_t *dataUnk4Table[4]; /* unused ? */
 	LvlObjectData *dataUnk5Table[4];

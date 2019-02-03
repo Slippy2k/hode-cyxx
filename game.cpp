@@ -1063,7 +1063,7 @@ void Game::updateScreenHelper(int num) {
 			}
 			break;
 		case 1: {
-				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].dataUnk2Table[ptr->flags & 0xFF];
+				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
 				ptr->soundToPlay = READ_LE_UINT16(data); data += 2;
 				ptr->dataPtr = data;
 			}
@@ -2948,7 +2948,7 @@ void Game::initLvlObjects() {
 			memset(ptr->dataPtr, 0, sizeof(GameRect));
 			break;
 		case 1:
-			debug(kDebug_GAME, "Trying to free _resLvlScreenBackgroundDataTable.dataUnk2Table ; ignored (i=%d index=%d)", i, index);
+			debug(kDebug_GAME, "Trying to free _resLvlScreenBackgroundDataTable.backgroundSoundTable ; ignored (i=%d index=%d)", i, index);
 #if 0
 			if (ptr->dataPtr) {
 				free(ptr->dataPtr);

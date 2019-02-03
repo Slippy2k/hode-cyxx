@@ -328,7 +328,7 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 	}
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
-		dat->dataUnk2Table[i] = (offs != 0) ? ptr + offs : 0; // backgroundSoundTable
+		dat->backgroundSoundTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
