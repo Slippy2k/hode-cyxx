@@ -5,6 +5,7 @@
 
 #include "fileio.h"
 #include "game.h"
+#include "lzw.h"
 #include "resource.h"
 #include "util.h"
 
@@ -37,6 +38,7 @@ Resource::Resource() {
 		_mstFile = 0;
 		_sssFile = 0;
 	}
+	_loadingImageBuffer = 0;
 }
 
 bool Resource::detectGameData() {
@@ -52,13 +54,21 @@ void Resource::loadSetupDat() {
 	uint8_t hdr[512];
 	_datFile->open("SETUP.DAT");
 	_datFile->read(hdr, sizeof(hdr));
+	const int version = READ_LE_UINT32(hdr);
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
 	_datHdr.yesNoQuitImage = READ_LE_UINT32(hdr + 0x40);
-	debug(kDebug_RESOURCE, "Quit Yes/No image index %d", _datHdr.yesNoQuitImage);
+	_datHdr.loadingImageSize = READ_LE_UINT32(hdr + 0x48);
 	const int hintsCount = _isDemoData ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
 		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x4C + i * 4);
 		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x4C + (hintsCount + i) * 4);
+	}
+	if (version == 11) {
+		_datFile->seek(2048, SEEK_SET); // fioAlignSizeTo2048(76)
+		_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
+		if (_loadingImageBuffer) {
+			_datFile->read(_loadingImageBuffer, _datHdr.loadingImageSize);
+		}
 	}
 }
 
@@ -416,7 +426,7 @@ LvlObject *Resource::findLvlObject(uint8_t type, uint8_t num, int index) {
 	return ptr;
 }
 
-void Resource::loadSetupImage(int num, uint8_t *dst, uint8_t *pal) {
+void Resource::loadHintImage(int num, uint8_t *dst, uint8_t *pal) {
 	const int offset = _datHdr.hintsImageOffsetTable[num];
 	const int size = _datHdr.hintsImageSizeTable[num];
 	assert(size == 256 * 192);
@@ -424,6 +434,16 @@ void Resource::loadSetupImage(int num, uint8_t *dst, uint8_t *pal) {
 	_datFile->read(dst, size);
 	_datFile->flush();
 	_datFile->read(pal, 768);
+}
+
+void Resource::loadLoadingImage(uint8_t *dst, uint8_t *pal) {
+	if (_loadingImageBuffer) {
+		const uint32_t bufferSize = READ_LE_UINT32(_loadingImageBuffer);
+		const int size = decodeLZW(_loadingImageBuffer + 8, dst);
+		assert(size == 256 * 192);
+		// palette follows compressed bitmap (and uses 8 bits per color)
+		memcpy(pal, _loadingImageBuffer + 8 + bufferSize, 256 * 3);
+	}
 }
 
 uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {

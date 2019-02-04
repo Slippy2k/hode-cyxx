@@ -11,6 +11,7 @@
 struct DatHdr {
 	uint32_t sssOffset; // 0xC
 	int yesNoQuitImage; // 0x40
+	int loadingImageSize; // 0x48
 	uint32_t hintsImageOffsetTable[46];
 	uint32_t hintsImageSizeTable[46];
 };
@@ -162,6 +163,8 @@ struct Resource {
 	SssHdr _sssHdr;
 	File *_sssFile;
 
+	uint8_t *_loadingImageBuffer;
+
 	uint8_t _currentScreenResourceNum;
 
 	uint8_t _screensGrid[40 * 4];
@@ -194,7 +197,6 @@ struct Resource {
 	uint32_t *_sssLookupTable1[3];
 	uint32_t *_sssLookupTable2[3];
 	uint32_t *_sssLookupTable3[3];
-
 	uint8_t *_sssCodeData;
 
 	bool _isDemoData;
@@ -226,7 +228,9 @@ struct Resource {
 
 	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
 
-	void loadSetupImage(int num, uint8_t *dst, uint8_t *pal);
+	void loadHintImage(int num, uint8_t *dst, uint8_t *pal);
+
+	void loadLoadingImage(uint8_t *dst, uint8_t *pal);
 
 	uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
 	uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);

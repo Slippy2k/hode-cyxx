@@ -2445,10 +2445,10 @@ int Game::displayHintScreen(int num, int pause) {
 	};
 	if (num == -1) {
 		num = _res->_datHdr.yesNoQuitImage; // 'Yes'
-		_res->loadSetupImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
+		_res->loadHintImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
 		confirmQuit = true;
 	}
-	_res->loadSetupImage(num, _video->_frontLayer, _video->_palette);
+	_res->loadHintImage(num, _video->_frontLayer, _video->_palette);
 	_system->setPalette(_video->_palette, 256, 6);
 	_system->copyRect(0, 0, Video::kScreenWidth, Video::kScreenHeight, _video->_frontLayer, 256);
 	_system->updateScreen();
