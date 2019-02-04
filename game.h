@@ -370,6 +370,14 @@ struct Game {
 	void postScreenUpdate_lava_screen15();
 	void callLevel_postScreenUpdate_lava(int num);
 
+	void preScreenUpdate_lava_screen0();
+	void preScreenUpdate_lava_screen3();
+	void preScreenUpdate_lava_screen6();
+	void preScreenUpdate_lava_screen10();
+	void preScreenUpdate_lava_screen13();
+	void preScreenUpdate_lava_screen15();
+	void callLevel_preScreenUpdate_lava(int num);
+
 	void callLevel_initialize_lava();
 
 	void setupLvlObjects_lava_screen3();

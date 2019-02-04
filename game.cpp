@@ -2359,6 +2359,9 @@ void Game::callLevel_preScreenUpdate(int num) {
 	case 2:
 		callLevel_preScreenUpdate_pwr1(num);
 		break;
+	case 4:
+		callLevel_preScreenUpdate_lava(num);
+		break;
 	case 6:
 		callLevel_preScreenUpdate_lar1(num);
 		break;

@@ -44,6 +44,80 @@ void Game::callLevel_postScreenUpdate_lava(int num) {
 	}
 }
 
+void Game::preScreenUpdate_lava_screen0() {
+	if (_res->_screensState[0].s0 != 0) {
+		_res->_screensState[0].s0 = 1;
+	}
+}
+
+void Game::preScreenUpdate_lava_screen3() {
+	if (_res->_currentScreenResourceNum == 3) {
+		if (_levelCheckpoint == 0) {
+			_levelCheckpoint = 1;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lava_screen6() {
+	if (_res->_currentScreenResourceNum == 6) {
+		if (_levelCheckpoint == 1) {
+			_levelCheckpoint = 2;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lava_screen10() {
+	const int num = (_res->_screensState[10].s0 == 0) ? 0 : 1;
+	if (_res->_screensState[10].s0 != 0 && _res->_screensState[10].s0 != 1) {
+		_res->_screensState[10].s0 = 1;
+	}
+	if (_res->_currentScreenResourceNum == 10) {
+		_res->_resLvlScreenBackgroundDataTable[10].unk3 = num;
+		if (!_paf->_skipCutscenes) {
+			_paf->preload(7);
+		}
+	}
+}
+
+void Game::preScreenUpdate_lava_screen13() {
+	if (_res->_currentScreenResourceNum == 13) {
+		if (_levelCheckpoint == 4) {
+			_levelCheckpoint = 5;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lava_screen15() {
+	if (_res->_screensState[15].s0 == 0) {
+		if (!_paf->_skipCutscenes) {
+			_paf->preload(8);
+		}
+	}
+}
+
+void Game::callLevel_preScreenUpdate_lava(int num) {
+	switch (num) {
+	case 1:
+		preScreenUpdate_lava_screen0();
+		break;
+	case 3:
+		preScreenUpdate_lava_screen3();
+		break;
+	case 6:
+		preScreenUpdate_lava_screen6();
+		break;
+	case 10:
+		preScreenUpdate_lava_screen10();
+		break;
+	case 13:
+		preScreenUpdate_lava_screen13();
+		break;
+	case 15:
+		preScreenUpdate_lava_screen15();
+		break;
+	}
+}
+
 static LvlObject *findLvlObject_lava(LvlObject *o) {
 	LvlObject *cur = o->nextPtr;
 	while (cur) {
