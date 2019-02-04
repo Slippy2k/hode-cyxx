@@ -9,9 +9,16 @@ static uint8_t _paf_buffer0x800[0x800];
 static uint8_t *_res_setupDatLoadingPicture;
 static int _res_setupDatFontSize;
 static uint8_t *_res_setupDatFontData;
-static uint8_t dword_4622A0[0x2E * 4];
-static uint8_t dword_462160[0x2E * 4];
+static uint8_t _datHdr_setupImageOffsetTable[0x2E * 4];
+static uint8_t _datHdr_setupImageSizeTable[0x2E * 4];
+static int _res_setupDatHeader0x04;
+static int _res_setupDatHeader0x08;
+static int _res_setupDatHeader0x1C;
+static int _res_setupDatHeader0x20;
+static int _res_setupDatHeader0x24;
+static int _res_setupDatHeader0x28;
 static int _res_setupDatHeader0x40;
+static int _res_setupDatBaseOffset;
 
 
 static int res_roundTo2048(int pos) {
@@ -112,16 +119,16 @@ static void ReadSetupDat(File *f) {
 	const uint8_t *_esi = _paf_buffer0x800;
 
 	int _ebx = READ_LE_UINT32(_esi);
-	int _res_setupDatHeader0x08 = READ_LE_UINT32(_esi + 0x08);
-	int _res_setupDatHeader0x04 = READ_LE_UINT32(_esi + 0x04);
+	_res_setupDatHeader0x08 = READ_LE_UINT32(_esi + 0x08); // offset (from _res_setupDatBaseOffset)
+	_res_setupDatHeader0x04 = READ_LE_UINT32(_esi + 0x04); // size
 	int _res_setupDatHeader0x0C = READ_LE_UINT32(_esi + 0x0C);
 	int _res_setupDatHeader0x10 = READ_LE_UINT32(_esi + 0x10);
 	int _res_setupDatHeader0x14 = READ_LE_UINT32(_esi + 0x14);
 	int _res_setupDatHeader0x18 = READ_LE_UINT32(_esi + 0x18);
-	int _res_setupDatHeader0x1C = READ_LE_UINT32(_esi + 0x1C);
-	int _res_setupDatHeader0x20 = READ_LE_UINT32(_esi + 0x20);
-	int _res_setupDatHeader0x24 = READ_LE_UINT32(_esi + 0x24);
-	int _res_setupDatHeader0x28 = READ_LE_UINT32(_esi + 0x28);
+	_res_setupDatHeader0x1C = READ_LE_UINT32(_esi + 0x1C);
+	_res_setupDatHeader0x20 = READ_LE_UINT32(_esi + 0x20);
+	_res_setupDatHeader0x24 = READ_LE_UINT32(_esi + 0x24);
+	_res_setupDatHeader0x28 = READ_LE_UINT32(_esi + 0x28);
 	int _res_setupDatHeader0x2C = READ_LE_UINT32(_esi + 0x2C);
 	int _res_setupDatHeader0x30 = READ_LE_UINT32(_esi + 0x30);
 	int _res_setupDatHeader0x34 = READ_LE_UINT32(_esi + 0x34);
@@ -131,9 +138,10 @@ static void ReadSetupDat(File *f) {
 	printf("Quit Yes/No image index %d\n", _res_setupDatHeader0x40);
 	int _res_setupDatHeader0x44 = READ_LE_UINT32(_esi + 0x44);
 	int _res_setupDatHeader0x48 = READ_LE_UINT32(_esi + 0x48);
+	printf("Loading image size %d\n", _res_setupDatHeader0x48);
 
-	memcpy(dword_4622A0, _paf_buffer0x800 + 0x4C, 0x2E * 4);
-	memcpy(dword_462160, _paf_buffer0x800 + 0x4C + 0xB8, 0x2E * 4);
+	memcpy(_datHdr_setupImageOffsetTable, _paf_buffer0x800 + 0x4C, 0x2E * 4);
+	memcpy(_datHdr_setupImageSizeTable, _paf_buffer0x800 + 0x4C + 0xB8, 0x2E * 4);
 	assert(_ebx == 11);
 	
 	size = res_roundTo2048(_res_setupDatHeader0x48);
@@ -162,7 +170,8 @@ static void ReadSetupDat(File *f) {
 	_res_setupDatFontSize = READ_LE_UINT32(_eax);
 	_eax += 4;
 	_res_setupDatFontData = _eax;
-//	_res_setupDatUnk5 = READ_LE_UINT32(dword_4622A0 + (2 + _res_setupDatHeader0x40) * 4);*/
+	_res_setupDatBaseOffset = _datHdr_setupImageOffsetTable[2 + _res_setupDatHeader0x40];
+	printf("setupDatBaseOffset is 0x%x\n", _res_setupDatBaseOffset);
 }
 
 static uint8_t decodeBuffer[256 * 192 * 4];
@@ -185,14 +194,14 @@ static void LoadFont() {
 /*menu_readSetupDat*/
 /*menu_loadData*/
 
-static void DecodeMainScreen() {
+static void DecodeLoadingScreen() {
 	int src_size_1 = READ_LE_UINT32(_res_setupDatLoadingPicture + 0);
 	int src_size_2 = READ_LE_UINT32(_res_setupDatLoadingPicture + 4);
 	printf("_res_setupDatLoadingPicture LE32 %d LE32 %d\n", src_size_1, src_size_2);
 	int size = UnpackData(9, _res_setupDatLoadingPicture + 8, decodeBuffer);
-	printf("DecodeMainScreen size %d\n", size);
+	printf("DecodeLoadingScreen size %d\n", size);
 	if (size == 256 * 192) {
-		FILE *fp = fopen("setupDatUnk8.png", "wb");
+		FILE *fp = fopen("loading.png", "wb");
 		if (fp) {
 			raw2png(fp, decodeBuffer, 256, 192, _res_setupDatLoadingPicture + 8 + src_size_1, 1);
 			fclose(fp);
@@ -206,8 +215,8 @@ static uint8_t pal[768 + PADDING];
 
 static void DecodeHintScreen(File *f) {
 	for (int i = 0; i < 0x2E; ++i) {
-		uint32_t offs = READ_LE_UINT32(dword_4622A0 + i * 4);
-		uint32_t size = READ_LE_UINT32(dword_462160 + i * 4);
+		uint32_t offs = READ_LE_UINT32(_datHdr_setupImageOffsetTable + i * 4);
+		uint32_t size = READ_LE_UINT32(_datHdr_setupImageSizeTable + i * 4);
 		printf("%02d offs 0x%X size %d\n", i, offs, size);
 		if (size == 256 * 192) {
 			int size_img = res_roundTo2048(size);
@@ -228,7 +237,22 @@ static void DecodeHintScreen(File *f) {
 	}
 }
 
-static void writeStaticData(const char *filename, const uint8_t *buf) {
+static void DecodeOtherScreens(File *f) {
+	const int size = res_roundTo2048(_res_setupDatHeader0x08);
+	const int offset = res_roundTo2048(_res_setupDatBaseOffset + size);
+	uint8_t *p = (uint8_t *)malloc(size);
+	if (p) {
+		res_seekAndReadCurrentFile3(f, p, size, offset);
+		for (int i = 0; i < 8; ++i) {
+			fprintf(stdout, "DecodeOtherScreens 0x%x\n", READ_LE_UINT32(p + i * 4));
+		}
+		const int decodedSize = UnpackData(9, p, decodeBuffer);
+		fprintf(stdout, "DecodeOtherScreens output %d\n", decodedSize);
+		free(p);
+	}
+}
+
+static void writeBenchmarkData(const char *filename, const uint8_t *buf) {
 	for (int i = 0; i < 256; ++i) {
 		const int j = i * 3;
 		pal[j] = pal[j + 1] = pal[j + 2] = i;
@@ -248,16 +272,16 @@ static void writeFile(const char *filename, const uint8_t *buf, int bufSize) {
 	}
 }
 
-static void DecodeStaticData() {
+static void DecodeBenchmarkData() {
 	int sz1 = UnpackData(9, byte_43D960, decodeBuffer);
 	assert(sz1 == 256 * 192);
 	writeFile("data_43D960.bin", decodeBuffer, sz1);
-	writeStaticData("data_43D960.png", decodeBuffer);
+	writeBenchmarkData("data_43D960.png", decodeBuffer);
 
 	int sz2 = UnpackData(9, byte_43EA78, decodeBuffer);
 	assert(sz2 == 256 * 192);
 	writeFile("data_43EA78.bin", decodeBuffer, sz2);
-	writeStaticData("data_43EA78.png", decodeBuffer);
+	writeBenchmarkData("data_43EA78.png", decodeBuffer);
 }
 
 int main(int argc, char *argv[]) {
@@ -265,11 +289,12 @@ int main(int argc, char *argv[]) {
 		File f;
 		if (f.open(argv[1], "rb")) {
 			ReadSetupDat(&f);
-			DecodeMainScreen();
+			DecodeLoadingScreen();
 			DecodeHintScreen(&f);
+			DecodeOtherScreens(&f);
 			LoadFont();
 		}
 	}
-	DecodeStaticData();
+	DecodeBenchmarkData();
 	return 0;
 }
