@@ -368,6 +368,9 @@ struct Game {
 	// level5_lava.cpp
 	void callLevel_initialize_lava();
 
+	void setupLvlObjects_lava_screen3();
+	void callLevel_setupLvlObjects_lava(int num);
+
 	// level6_pwr2.cpp
 	void callLevel_initialize_pwr2();
 

@@ -1168,6 +1168,9 @@ void Game::resetScreen() {
 		case 1:
 			callLevel_setupLvlObjects_fort(i);
 			break;
+		case 4:
+			callLevel_setupLvlObjects_lava(i);
+			break;
 		default:
 			warning("SetupLvlObjects not implemented for level %d", _currentLevel);
 			break;
