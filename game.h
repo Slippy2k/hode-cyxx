@@ -366,6 +366,10 @@ struct Game {
 	void callLevel_terminate_isld();
 
 	// level5_lava.cpp
+	void postScreenUpdate_lava_screen0();
+	void postScreenUpdate_lava_screen15();
+	void callLevel_postScreenUpdate_lava(int num);
+
 	void callLevel_initialize_lava();
 
 	void setupLvlObjects_lava_screen3();

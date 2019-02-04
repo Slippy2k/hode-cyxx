@@ -3,7 +3,46 @@
 
 #include "game.h"
 #include "lzw.h"
+#include "paf.h"
 #include "video.h"
+
+void Game::postScreenUpdate_lava_screen0() {
+	switch (_res->_screensState[0].s0) {
+	case 2:
+		++_screenCounterTable[0];
+		if (_screenCounterTable[0] >= 11) {
+			_res->_screensState[0].s0 = 1;
+		}
+		break;
+	case 0:
+		if (_andyObject->anim == 2 && _andyObject->frame > 2) {
+			_res->_screensState[0].s0 = 2;
+		}
+		break;
+	}
+}
+
+void Game::postScreenUpdate_lava_screen15() {
+	if (_res->_screensState[0].s0 != 0) {
+		if (!_paf->_skipCutscenes) {
+			_paf->play(8);
+			_paf->unload(8);
+		}
+		_video->clearPalette();
+		_quit = true;
+	}
+}
+
+void Game::callLevel_postScreenUpdate_lava(int num) {
+	switch (num) {
+	case 0:
+		postScreenUpdate_lava_screen0();
+		break;
+	case 15:
+		postScreenUpdate_lava_screen15();
+		break;
+	}
+}
 
 static LvlObject *findLvlObject_lava(LvlObject *o) {
 	LvlObject *cur = o->nextPtr;

@@ -2339,6 +2339,9 @@ void Game::callLevel_postScreenUpdate(int num) {
 	case 2:
 		callLevel_postScreenUpdate_pwr1(num);
 		break;
+	case 4:
+		callLevel_postScreenUpdate_lava(num);
+		break;
 	default:
 		warning("callLevel_postScreenUpdate unimplemented for screen %d", num);
 		break;
