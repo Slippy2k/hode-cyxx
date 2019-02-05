@@ -95,8 +95,7 @@ static void res_seekAndReadCurrentFile3(File *_ecx, uint8_t *_edx, int size, int
 }
 
 /*
-0000 MenuList        struc ; (sizeof=0x10)   ; XREF: menu_addToUnkList
-0000                                         ; menu_addToUnkList+3 ...
+0000 MenuList        struc ; (sizeof=0x10)   ; XREF: menu_addToSpriteList
 0000 ptr1            dd ? // picture data ?
 0004 ptr2            dd ? // palette data ?
 0008 size            dd ?
@@ -105,18 +104,17 @@ static void res_seekAndReadCurrentFile3(File *_ecx, uint8_t *_edx, int size, int
 0010 MenuList        ends
 */
 /*
-.text:004221E0 menu_addToUnkList proc near             ; CODE XREF: menu_loadData+609
-.text:004221E0                                         ; menu_loadData+618 ...
+.text:004221E0 menu_addToSpriteList proc near
 .text:004221E0                 mov     eax, [ecx+MenuList.size]
 .text:004221E3                 and     [ecx+MenuList.num], 0
 .text:004221E8                 mov     [ecx+MenuList.ptr1], edx
 .text:004221EA                 mov     [ecx+MenuList.ptr2], edx
 .text:004221ED                 add     eax, edx
 .text:004221EF                 retn
-.text:004221EF menu_addToUnkList endp
+.text:004221EF menu_addToSpriteList endp
 */
 
-static uint8_t *menu_addToUnkList(uint8_t *_ecx, uint8_t *_edx) {
+static uint8_t *menu_addToSpriteList(uint8_t *_ecx, uint8_t *_edx) {
 	return _edx + READ_LE_UINT32(_ecx + 8);
 }
 
@@ -175,7 +173,7 @@ static void ReadSetupDat(File *f) {
 //	_res_setupDatMenuList = _ecx;
 	
 	uint8_t *_edx_p = _ecx + 16;
-	uint8_t *_eax = menu_addToUnkList(_ecx, _edx_p);
+	uint8_t *_eax = menu_addToSpriteList(_ecx, _edx_p);
 
 	_res_setupDatFontSize = READ_LE_UINT32(_eax);
 	_eax += 4;
@@ -185,24 +183,30 @@ static void ReadSetupDat(File *f) {
 }
 
 static uint8_t decodeBuffer[256 * 192 * 4];
+static uint8_t fontBuffer[64 * 16 * 16];
 
-/* res_loadFont */
-static void LoadFont() {
-	int size = UnpackData(9, _res_setupDatFontData, decodeBuffer);
-	printf("LoadFont size %d\n", size);
+static void res_loadFont() {
+	const int size = UnpackData(9, _res_setupDatFontData, decodeBuffer);
 	if (size == 16 * 16 * 64) {
-		FILE *fp = fopen("setupDatFont.png", "wb");
+		int offset = 0;
+		for (int i = 0; i < 64; ++i) {
+			const uint8_t chr = i;
+			const uint8_t *p = decodeBuffer + ((chr & 15) + (chr >> 4) * 256) * 16;
+			for (int y = 0; y < 16; ++y) {
+				memcpy(fontBuffer + offset, p, 16);
+				p += 16 * 16;
+				offset += 16;
+			}
+		}
+		FILE *fp = fopen("font.png", "wb");
 		if (fp) {
 			uint8_t greyPal[256 * 3];
 			for (int i = 0; i < 256; ++i) { greyPal[i * 3] = greyPal[i * 3 + 1] = greyPal[i * 3 + 2] = i << 4; }
-			raw2png(fp, decodeBuffer, 16, 16 * 64, greyPal, 0);
+			raw2png(fp, fontBuffer, 16, 16 * 64, greyPal, 0);
 			fclose(fp);
 		}
 	}
 }
-
-/*menu_readSetupDat*/
-/*menu_loadData*/
 
 static void DecodeLoadingScreen() {
 	int src_size_1 = READ_LE_UINT32(_res_setupDatLoadingPicture + 0);
@@ -271,15 +275,19 @@ static uint8_t *DecodeMenuBitmap(const char *filename, const uint8_t *data, int 
 	for (int i = 0; i < count; ++i) {
 		const int w = data[0];
 		const int h = data[1];
-		const int size1 = READ_LE_UINT32(data + 4);
-		const int size2 = READ_LE_UINT32(data + 8);
-		fprintf(stdout, "menuBitmap %d width %d height %d size 0x%x,0x%x\n", i, w, h, size1, size2);
+		const uint16_t unk = READ_LE_UINT16(data + 2);
+		const uint32_t ptr1 = READ_LE_UINT32(data + 4);
+		const uint32_t ptr2 = READ_LE_UINT32(data + 8);
+		fprintf(stdout, "menuBitmap %d width %d height %d unk %d size 0x%x,0x%x\n", i, w, h, unk, ptr1, ptr2);
 		data += 12;
 
-		// TODO: palettes are wrong, there is probably a remapping
-		// TODO: histogram
-		// uint8_t *palette = p + w * h;
+		//uint8_t *palette = p + w * h;
+
+		uint8_t *src = p + w * h;
+
 		uint8_t *palette = paletteBuffer;
+
+		memcpy(paletteBuffer + (unk & 255) * 3, src, 150);
 
 		char name[32];
 		snprintf(name, sizeof(name), filename, i);
@@ -295,19 +303,20 @@ static uint8_t *DecodeMenuBitmap(const char *filename, const uint8_t *data, int 
 }
 
 static void DecodeMenuData(File *f) {
+	// bitmaps
 	const int size = _res_setupDatHeader0x08;
 	const int offset = _res_setupDatBaseOffset; //res_roundTo2048(_res_setupDatBaseOffset);
-	fprintf(stdout, "menuData 0x%x 0x%x (offset 0x%x)\n", _res_setupDatHeader0x08, _res_setupDatBaseOffset, offset);
-	uint8_t *menu_dataBuffer = (uint8_t *)malloc(size);
-	if (menu_dataBuffer) {
-		res_seekAndReadCurrentFile3(f, menu_dataBuffer, size, offset);
+	fprintf(stdout, "menuBitmaps 0x%x 0x%x (offset 0x%x)\n", _res_setupDatHeader0x08, _res_setupDatBaseOffset, offset);
+	uint8_t *menu_bitmapsBuffer = (uint8_t *)malloc(size);
+	if (menu_bitmapsBuffer) {
+		res_seekAndReadCurrentFile3(f, menu_bitmapsBuffer, size, offset);
 
-		uint8_t *menu_backgroundBitmap = menu_dataBuffer + 4;
-		uint8_t *menu_playerBitmap = menu_dataBuffer + 12;
+		uint8_t *menu_backgroundBitmap = menu_bitmapsBuffer + 4;
+		uint8_t *menu_playerBitmap = menu_bitmapsBuffer + 12;
 
-		uint8_t *menu_optionBitmaps = menu_dataBuffer + 20;
+		uint8_t *menu_optionBitmaps = menu_bitmapsBuffer + 20;
 
-		uint8_t *p = menu_dataBuffer + 172;
+		uint8_t *p = menu_bitmapsBuffer + 172;
 
 		uint8_t *menu_cutsceneBitmaps = p;
 		p += _res_setupDatHeader0x18 * 12;
@@ -370,7 +379,26 @@ static void DecodeMenuData(File *f) {
 		p = DecodeMenuBitmap("level8_checkpoints%02d.png", menu_dataPtr9, _res_setupDatHeader0x3C, p);
 		p = DecodeMenuBitmap("levels%02d.png", menu_dataPtr10, _res_setupDatHeader0x1C, p);
 
-		free(menu_dataBuffer);
+		free(menu_bitmapsBuffer);
+	}
+
+	// sprites
+	const int sizeSpr = res_roundTo2048(_res_setupDatHeader0x04);
+	const int offsetSpr = _res_setupDatBaseOffset + res_roundTo2048(_res_setupDatHeader0x08);
+	fprintf(stdout, "menuSprites 0x%x (offset 0x%x)\n", _res_setupDatHeader0x04, offsetSpr);
+	uint8_t *menu_spritesBuffer = (uint8_t *)malloc(sizeSpr);
+	if (menu_spritesBuffer) {
+		res_seekAndReadCurrentFile3(f, menu_spritesBuffer, sizeSpr, offsetSpr);
+
+		uint8_t *_eax = menu_spritesBuffer;
+
+		uint8_t *menu_spritesList1 = _eax;
+		_eax = menu_addToSpriteList(_eax, _eax + 16);
+		uint8_t *menu_spritesList2 = _eax;
+		_eax = menu_addToSpriteList(_eax, _eax + 16);
+		uint8_t *menu_spritesList3 = _eax;
+
+		free(menu_spritesBuffer);
 	}
 }
 
@@ -414,7 +442,7 @@ int main(int argc, char *argv[]) {
 			DecodeLoadingScreen();
 			DecodeHintScreen(&f);
 			DecodeMenuData(&f);
-			LoadFont();
+			res_loadFont();
 		}
 	}
 	DecodeBenchmarkData();
