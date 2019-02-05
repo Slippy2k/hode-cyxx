@@ -384,6 +384,12 @@ struct Game {
 	void callLevel_setupLvlObjects_lava(int num);
 
 	// level6_pwr2.cpp
+	void preScreenUpdate_pwr2_screen2();
+	void preScreenUpdate_pwr2_screen3();
+	void preScreenUpdate_pwr2_screen5();
+	void preScreenUpdate_pwr2_screen7();
+	void callLevel_preScreenUpdate_pwr2(int num);
+
 	void callLevel_initialize_pwr2();
 
 	// level7_lar1.cpp
