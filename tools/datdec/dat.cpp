@@ -13,13 +13,23 @@ static uint8_t _datHdr_setupImageOffsetTable[0x2E * 4];
 static uint8_t _datHdr_setupImageSizeTable[0x2E * 4];
 static int _res_setupDatHeader0x04;
 static int _res_setupDatHeader0x08;
+static int _res_setupDatHeader0x0C;
+static int _res_setupDatHeader0x10;
+static int _res_setupDatHeader0x14;
+static int _res_setupDatHeader0x18;
 static int _res_setupDatHeader0x1C;
 static int _res_setupDatHeader0x20;
 static int _res_setupDatHeader0x24;
 static int _res_setupDatHeader0x28;
+static int _res_setupDatHeader0x2C;
+static int _res_setupDatHeader0x30;
+static int _res_setupDatHeader0x34;
+static int _res_setupDatHeader0x38;
+static int _res_setupDatHeader0x3C;
 static int _res_setupDatHeader0x40;
+static int _res_setupDatHeader0x44;
+static int _res_setupDatHeader0x48;
 static int _res_setupDatBaseOffset;
-
 
 static int res_roundTo2048(int pos) {
 	return ((pos + 2043) / 2044) * 2048;
@@ -121,23 +131,23 @@ static void ReadSetupDat(File *f) {
 	int _ebx = READ_LE_UINT32(_esi);
 	_res_setupDatHeader0x08 = READ_LE_UINT32(_esi + 0x08); // offset (from _res_setupDatBaseOffset)
 	_res_setupDatHeader0x04 = READ_LE_UINT32(_esi + 0x04); // size
-	int _res_setupDatHeader0x0C = READ_LE_UINT32(_esi + 0x0C);
-	int _res_setupDatHeader0x10 = READ_LE_UINT32(_esi + 0x10);
-	int _res_setupDatHeader0x14 = READ_LE_UINT32(_esi + 0x14);
-	int _res_setupDatHeader0x18 = READ_LE_UINT32(_esi + 0x18);
+	_res_setupDatHeader0x0C = READ_LE_UINT32(_esi + 0x0C);
+	_res_setupDatHeader0x10 = READ_LE_UINT32(_esi + 0x10);
+	_res_setupDatHeader0x14 = READ_LE_UINT32(_esi + 0x14);
+	_res_setupDatHeader0x18 = READ_LE_UINT32(_esi + 0x18);
 	_res_setupDatHeader0x1C = READ_LE_UINT32(_esi + 0x1C);
 	_res_setupDatHeader0x20 = READ_LE_UINT32(_esi + 0x20);
 	_res_setupDatHeader0x24 = READ_LE_UINT32(_esi + 0x24);
 	_res_setupDatHeader0x28 = READ_LE_UINT32(_esi + 0x28);
-	int _res_setupDatHeader0x2C = READ_LE_UINT32(_esi + 0x2C);
-	int _res_setupDatHeader0x30 = READ_LE_UINT32(_esi + 0x30);
-	int _res_setupDatHeader0x34 = READ_LE_UINT32(_esi + 0x34);
-	int _res_setupDatHeader0x38 = READ_LE_UINT32(_esi + 0x38);
-	int _res_setupDatHeader0x3C = READ_LE_UINT32(_esi + 0x3C);
+	_res_setupDatHeader0x2C = READ_LE_UINT32(_esi + 0x2C);
+	_res_setupDatHeader0x30 = READ_LE_UINT32(_esi + 0x30);
+	_res_setupDatHeader0x34 = READ_LE_UINT32(_esi + 0x34);
+	_res_setupDatHeader0x38 = READ_LE_UINT32(_esi + 0x38);
+	_res_setupDatHeader0x3C = READ_LE_UINT32(_esi + 0x3C);
 	_res_setupDatHeader0x40 = READ_LE_UINT32(_esi + 0x40);
 	printf("Quit Yes/No image index %d\n", _res_setupDatHeader0x40);
-	int _res_setupDatHeader0x44 = READ_LE_UINT32(_esi + 0x44);
-	int _res_setupDatHeader0x48 = READ_LE_UINT32(_esi + 0x48);
+	_res_setupDatHeader0x44 = READ_LE_UINT32(_esi + 0x44);
+	_res_setupDatHeader0x48 = READ_LE_UINT32(_esi + 0x48);
 	printf("Loading image size %d\n", _res_setupDatHeader0x48);
 
 	memcpy(_datHdr_setupImageOffsetTable, _paf_buffer0x800 + 0x4C, 0x2E * 4);
@@ -170,8 +180,8 @@ static void ReadSetupDat(File *f) {
 	_res_setupDatFontSize = READ_LE_UINT32(_eax);
 	_eax += 4;
 	_res_setupDatFontData = _eax;
-	_res_setupDatBaseOffset = _datHdr_setupImageOffsetTable[2 + _res_setupDatHeader0x40];
-	printf("setupDatBaseOffset is 0x%x\n", _res_setupDatBaseOffset);
+	_res_setupDatBaseOffset = READ_LE_UINT32(_datHdr_setupImageOffsetTable + 4 * (2 + _res_setupDatHeader0x40));
+	printf("setupDatBaseOffset is 0x%x (index %d)\n", _res_setupDatBaseOffset, 2 + _res_setupDatHeader0x40);
 }
 
 static uint8_t decodeBuffer[256 * 192 * 4];
@@ -226,7 +236,7 @@ static void DecodeHintScreen(File *f) {
 			} else {
 				res_seekAndReadCurrentFile3(f, pal, 0x800, offs + size_img);
 			}
-			char filename[30];
+			char filename[32];
 			sprintf(filename, "HOD_HINT_%02d.png", i);
 			FILE *fp = fopen(filename, "wb");
 			if (fp) {
@@ -237,18 +247,130 @@ static void DecodeHintScreen(File *f) {
 	}
 }
 
-static void DecodeOtherScreens(File *f) {
-	const int size = res_roundTo2048(_res_setupDatHeader0x08);
-	const int offset = res_roundTo2048(_res_setupDatBaseOffset + size);
-	uint8_t *p = (uint8_t *)malloc(size);
-	if (p) {
-		res_seekAndReadCurrentFile3(f, p, size, offset);
-		for (int i = 0; i < 8; ++i) {
-			fprintf(stdout, "DecodeOtherScreens 0x%x\n", READ_LE_UINT32(p + i * 4));
+static void DecodeMenuBitmap256x192(const char *filename, int compressedSize, const uint8_t *p) {
+	const int decompressedSize = UnpackData(9, p, decodeBuffer);
+	fprintf(stdout, "bitmap %d %d\n", compressedSize, decompressedSize);
+	if (decompressedSize == 256 * 192) {
+		const uint8_t *palette = p + compressedSize;
+		FILE *fp = fopen(filename, "wb");
+		if (fp) {
+			raw2png(fp, decodeBuffer, 256, 192, palette, 1);
+			fclose(fp);
 		}
-		const int decodedSize = UnpackData(9, p, decodeBuffer);
-		fprintf(stdout, "DecodeOtherScreens output %d\n", decodedSize);
-		free(p);
+	}
+}
+
+static uint8_t *DecodeMenuBitmap(const char *filename, const uint8_t *data, int count, uint8_t *p) {
+	uint8_t paletteBuffer[256 * 3];
+	for (int i = 0; i < 256; ++i) {
+		const int color = i * 63 / 255;
+		for (int j = 0; j < 3; ++j) {
+			paletteBuffer[3 * i + j] = color;
+		}
+	}
+	for (int i = 0; i < count; ++i) {
+		const int w = data[0];
+		const int h = data[1];
+		const int size1 = READ_LE_UINT32(data + 4);
+		const int size2 = READ_LE_UINT32(data + 8);
+		fprintf(stdout, "menuBitmap %d width %d height %d size 0x%x,0x%x\n", i, w, h, size1, size2);
+		data += 12;
+
+		// TODO: palettes are wrong, there is probably a remapping
+		// TODO: histogram
+		// uint8_t *palette = p + w * h;
+		uint8_t *palette = paletteBuffer;
+
+		char name[32];
+		snprintf(name, sizeof(name), filename, i);
+		FILE *fp = fopen(name, "wb");
+		if (fp) {
+			raw2png(fp, p, w, h, palette, 1);
+			fclose(fp);
+		}
+
+		p += w * h + 768;
+	}
+	return p;
+}
+
+static void DecodeMenuData(File *f) {
+	const int size = _res_setupDatHeader0x08;
+	const int offset = _res_setupDatBaseOffset; //res_roundTo2048(_res_setupDatBaseOffset);
+	fprintf(stdout, "menuData 0x%x 0x%x (offset 0x%x)\n", _res_setupDatHeader0x08, _res_setupDatBaseOffset, offset);
+	uint8_t *menu_dataBuffer = (uint8_t *)malloc(size);
+	if (menu_dataBuffer) {
+		res_seekAndReadCurrentFile3(f, menu_dataBuffer, size, offset);
+
+		uint8_t *menu_backgroundBitmap = menu_dataBuffer + 4;
+		uint8_t *menu_playerBitmap = menu_dataBuffer + 12;
+
+		uint8_t *menu_optionBitmaps = menu_dataBuffer + 20;
+
+		uint8_t *p = menu_dataBuffer + 172;
+
+		uint8_t *menu_cutsceneBitmaps = p;
+		p += _res_setupDatHeader0x18 * 12;
+
+		uint8_t *menu_dataPtr2 = p;
+		p += _res_setupDatHeader0x20 * 12;
+
+		uint8_t *menu_dataPtr3 = p;
+		p += _res_setupDatHeader0x24 * 12;
+
+		uint8_t *menu_dataPtr4 = p;
+		p += _res_setupDatHeader0x28 * 12;
+
+		uint8_t *menu_dataPtr5 = p;
+		p += _res_setupDatHeader0x2C * 12;
+
+		uint8_t *menu_dataPtr6 = p;
+		p += _res_setupDatHeader0x30 * 12;
+
+		uint8_t *menu_dataPtr7 = p;
+		p += _res_setupDatHeader0x34 * 12;
+
+		uint8_t *menu_dataPtr8 = p;
+		p += _res_setupDatHeader0x38 * 12;
+
+		uint8_t *menu_dataPtr9 = p;
+		p += _res_setupDatHeader0x3C * 12;
+
+		uint8_t *menu_dataPtr10 = p;
+		p += _res_setupDatHeader0x1C * 12;
+
+		int compressedSize = READ_LE_UINT32(menu_backgroundBitmap);
+		if (compressedSize != 0) {
+			DecodeMenuBitmap256x192("menu.png", compressedSize, p);
+			p += compressedSize + 768;
+		}
+		compressedSize = READ_LE_UINT32(menu_playerBitmap);
+		if (compressedSize != 0) {
+			DecodeMenuBitmap256x192("other.png", compressedSize, p);
+			p += compressedSize + 768;
+		}
+		for (int i = 0; i < 152 / 8; ++i) {
+			compressedSize = READ_LE_UINT32(menu_optionBitmaps + i * 8);
+			if (compressedSize != 0) {
+				char name[16];
+				snprintf(name, sizeof(name), "options%02d.png", i);
+				DecodeMenuBitmap256x192(name, compressedSize, p);
+				p += compressedSize + 768;
+			}
+		}
+
+		p = DecodeMenuBitmap("cutscenes%02d.png", menu_cutsceneBitmaps, _res_setupDatHeader0x18, p);
+		p = DecodeMenuBitmap("level1_checkpoints%02d.png", menu_dataPtr2, _res_setupDatHeader0x20, p);
+		p = DecodeMenuBitmap("level2_checkpoints%02d.png", menu_dataPtr3, _res_setupDatHeader0x24, p);
+		p = DecodeMenuBitmap("level3_checkpoints%02d.png", menu_dataPtr4, _res_setupDatHeader0x28, p);
+		p = DecodeMenuBitmap("level4_checkpoints%02d.png", menu_dataPtr5, _res_setupDatHeader0x2C, p);
+		p = DecodeMenuBitmap("level5_checkpoints%02d.png", menu_dataPtr6, _res_setupDatHeader0x30, p);
+		p = DecodeMenuBitmap("level6_checkpoints%02d.png", menu_dataPtr7, _res_setupDatHeader0x34, p);
+		p = DecodeMenuBitmap("level7_checkpoints%02d.png", menu_dataPtr8, _res_setupDatHeader0x38, p);
+		p = DecodeMenuBitmap("level8_checkpoints%02d.png", menu_dataPtr9, _res_setupDatHeader0x3C, p);
+		p = DecodeMenuBitmap("levels%02d.png", menu_dataPtr10, _res_setupDatHeader0x1C, p);
+
+		free(menu_dataBuffer);
 	}
 }
 
@@ -291,7 +413,7 @@ int main(int argc, char *argv[]) {
 			ReadSetupDat(&f);
 			DecodeLoadingScreen();
 			DecodeHintScreen(&f);
-			DecodeOtherScreens(&f);
+			DecodeMenuData(&f);
 			LoadFont();
 		}
 	}
