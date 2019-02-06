@@ -3,6 +3,29 @@
 #include "paf.h"
 #include "video.h"
 
+void Game::postScreenUpdate_lar2_screen7() {
+	if (_res->_currentScreenResourceNum == 7) {
+		if (!_paf->_skipCutscenes) {
+			const uint8_t state = _res->_screensState[7].s0;
+			if (state != 0 && _levelCheckpoint == 5 && state > 1) {
+				_paf->play(16);
+				_paf->unload(16);
+				_video->clearPalette();
+				_res->_screensState[7].s0 = 1;
+				updateScreen(_andyObject->screenNum);
+			}
+		}
+	}
+}
+
+void Game::callLevel_postScreenUpdate_lar2(int num) {
+	switch (num) {
+	case 7:
+		postScreenUpdate_lar2_screen7();
+		break;
+	}
+}
+
 void Game::preScreenUpdate_lar2_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
 		if (_levelCheckpoint == 2) {

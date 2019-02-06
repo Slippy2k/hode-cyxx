@@ -414,6 +414,9 @@ struct Game {
 	void callLevel_tick_lar1();
 
 	// level8_lar2.cpp
+	void postScreenUpdate_lar2_screen7();
+	void callLevel_postScreenUpdate_lar2(int num);
+
 	void preScreenUpdate_lar2_screen6();
 	void preScreenUpdate_lar2_screen15();
 	void preScreenUpdate_lar2_screen19();
