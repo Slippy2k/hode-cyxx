@@ -347,6 +347,7 @@ struct Game {
 	void callLevel_setupLvlObjects_fort(int num);
 
 	// level3_pwr1.cpp
+	void postScreenUpdate_pwr1_screen35();
 	void callLevel_postScreenUpdate_pwr1(int num);
 
 	void preScreenUpdate_pwr1_screen4();
@@ -387,6 +388,11 @@ struct Game {
 	void callLevel_setupLvlObjects_lava(int num);
 
 	// level6_pwr2.cpp
+	void postScreenUpdate_pwr2_screen2();
+	void postScreenUpdate_pwr2_screen5();
+	void postScreenUpdate_pwr2_screen8();
+	void callLevel_postScreenUpdate_pwr2(int num);
+
 	void preScreenUpdate_pwr2_screen2();
 	void preScreenUpdate_pwr2_screen3();
 	void preScreenUpdate_pwr2_screen5();

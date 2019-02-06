@@ -11,6 +11,29 @@
 #include "util.h"
 #include "video.h"
 
+void Game::postScreenUpdate_pwr1_screen35() {
+	if (_res->_currentScreenResourceNum == 35) {
+		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		BoundingBox b = { 0, 0, 193, 88 };
+		if (clipBoundingBox(&b, &data->boundingBox)) {
+			_andyObject->actionKeyMask &= ~3;
+			_andyObject->directionKeyMask &= ~4;
+			_andyObject->actionKeyMask |= 8;
+		}
+		if (_res->_screensState[35].s0 != 0) {
+			++_screenCounterTable[35];
+			if (_screenCounterTable[35] == 46) {
+				if (!_paf->_skipCutscenes) {
+					_paf->play(5);
+					_paf->unload(5);
+				}
+				_video->clearPalette();
+				_quit = true;
+			}
+		}
+	}
+}
+
 void Game::callLevel_postScreenUpdate_pwr1(int num) {
 	switch (num) {
 	case 6:
@@ -21,8 +44,10 @@ void Game::callLevel_postScreenUpdate_pwr1(int num) {
 	case 18:
 	case 23:
 	case 27:
-	case 35:
 		warning("callLevel_postScreenUpdate_pwr1 %d unimplemented", num);
+		break;
+	case 35:
+		postScreenUpdate_pwr1_screen35();
 		break;
 	}
 }
