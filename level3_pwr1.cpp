@@ -147,10 +147,15 @@ void Game::callLevel_preScreenUpdate_pwr1(int num) {
 }
 
 void Game::callLevel_initialize_pwr1() {
-	_shakeShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	decodeLZW(_levelOpStage3ImageData1, _shakeShadowBuffer);
-	memcpy(_shakeShadowBuffer + 256 * 192, _shakeShadowBuffer, 256);
+	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	decodeLZW(_levelOpStage3ImageData1, _transformShadowBuffer);
+	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
 	// TODO:
-	warning("level3OpStage3 unimplemented");
+	warning("callLevel_initialize_pwr1 unimplemented");
 }
 
+void Game::callLevel_tick_pwr1() {
+	// TODO:
+	_video->_displayShadowLayer = true;
+	warning("callLevel_tick_pwr1 unimplemented");
+}

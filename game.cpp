@@ -22,7 +22,8 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_screen_dx = Video::kScreenWidth / 2;
 	_screen_dy = Video::kScreenHeight / 2;
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
-	_shakeShadowBuffer = 0;
+	_transformShadowBuffer = 0;
+	_transformShadowLayerDelta = 0;
 	_mstLogicDisabled = true;
 	_snd_volumeMin = 10;
 	_snd_masterVolume = 128;
@@ -104,7 +105,7 @@ void Game::fadeScreenPalette() {
 void Game::shakeScreen() {
 	if (_video->_displayShadowLayer) {
 		const int num = (_currentLevel == 4 || _currentLevel == 6) ? 1 : 4;
-		shakeShadowLayer(num);
+		transformShadowLayer(num);
 	}
 	if (_shakeScreenDuration != 0) {
 		--_shakeScreenDuration;
@@ -127,8 +128,23 @@ void Game::shakeScreen() {
 	}
 }
 
-void Game::shakeShadowLayer(int num) {
-	warning("Game::shakeShadowLayer unimplemented");
+void Game::transformShadowLayer(int delta) {
+	const uint8_t *src = _transformShadowBuffer + _transformShadowLayerDelta; // _esi
+	uint8_t *dst = _video->_shadowLayer; // _eax
+	_transformShadowLayerDelta += delta;
+	int y = 0;
+	if (_currentLevel == 2 || _currentLevel == 5) {
+		warning("transformShadowLayer unimplemented for level %d", _currentLevel);
+		// TODO
+	}
+	for (; y < 192; ++y) {
+		for (int x = 0; x < 250; ++x) {
+			const int offset = x + *src++;
+			*dst++ = _video->_frontLayer[y * 256 + offset];
+		}
+		memset(dst, 0xC4, 6); dst += 6
+		src += 6;
+	}
 }
 
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
@@ -2408,8 +2424,14 @@ void Game::callLevel_tick() {
 	case 1:
 		callLevel_tick_fort();
 		break;
+	case 2:
+		callLevel_tick_pwr1();
+		break;
 	case 3:
 		callLevel_tick_isld();
+		break;
+	case 4:
+		callLevel_tick_lava();
 		break;
 	case 6:
 		callLevel_tick_lar1();
@@ -2433,8 +2455,8 @@ void Game::callLevel_terminate() {
 	case 5:
 	case 6:
 		if (_video->_displayShadowLayer) {
-			free(_shakeShadowBuffer);
-			_shakeShadowBuffer = 0;
+			free(_transformShadowBuffer);
+			_transformShadowBuffer = 0;
 		}
 		break;
 	}

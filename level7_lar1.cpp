@@ -37,9 +37,9 @@ void Game::preScreenUpdate_lar1_screen2() {
 
 void Game::preScreenUpdate_lar1_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		if (_shakeShadowBuffer) {
-			free(_shakeShadowBuffer);
-			_shakeShadowBuffer = 0;
+		if (_transformShadowBuffer) {
+			free(_transformShadowBuffer);
+			_transformShadowBuffer = 0;
 		}
 		_video->_displayShadowLayer = false;
 	}

@@ -89,7 +89,8 @@ struct Game {
 	Sprite *_gameSpriteListPtrTable[32];
 	uint16_t _fadePaletteBuffer[256 * 3];
 	uint8_t *_shadowScreenMaskBuffer;
-	uint8_t *_shakeShadowBuffer;
+	uint8_t *_transformShadowBuffer;
+	uint8_t _transformShadowLayerDelta;
 	uint8_t _directionKeyMask;
 	uint8_t _actionKeyMask;
 	uint8_t _currentRightScreen;
@@ -178,7 +179,7 @@ struct Game {
 	void setShakeScreen(int type, int counter);
 	void fadeScreenPalette();
 	void shakeScreen();
-	void shakeShadowLayer(int num);
+	void transformShadowLayer(int delta);
 	void decodeShadowScreenMask(LvlBackgroundData *lvl);
 	void playSound(int num, LvlObject *ptr, int a, int b);
 	void removeSound(LvlObject *ptr);
@@ -359,6 +360,7 @@ struct Game {
 	void callLevel_preScreenUpdate_pwr1(int num);
 
 	void callLevel_initialize_pwr1();
+	void callLevel_tick_pwr1();
 
 	// level4_isld.cpp
 	void callLevel_initialize_isld();
@@ -379,6 +381,7 @@ struct Game {
 	void callLevel_preScreenUpdate_lava(int num);
 
 	void callLevel_initialize_lava();
+	void callLevel_tick_lava();
 
 	void setupLvlObjects_lava_screen3();
 	void callLevel_setupLvlObjects_lava(int num);

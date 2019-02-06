@@ -4,6 +4,7 @@
 #include "game.h"
 #include "lzw.h"
 #include "paf.h"
+#include "util.h"
 #include "video.h"
 
 void Game::postScreenUpdate_lava_screen0() {
@@ -130,9 +131,18 @@ static LvlObject *findLvlObject_lava(LvlObject *o) {
 }
 
 void Game::callLevel_initialize_lava() {
-	_shakeShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	decodeLZW(_levelOpStage3ImageData1, _shakeShadowBuffer);
-	memcpy(_shakeShadowBuffer + 256 * 192, _shakeShadowBuffer, 256);
+	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	decodeLZW(_levelOpStage3ImageData1, _transformShadowBuffer);
+	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
+}
+
+static const uint8_t byte_452CD8[] = {
+	0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+void Game::callLevel_tick_lava() {
+	_video->_displayShadowLayer = byte_452CD8[_res->_currentScreenResourceNum * 2];
+	warning("callLevel_tick_lava unimplemented");
 }
 
 void Game::setupLvlObjects_lava_screen3() {
