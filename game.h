@@ -364,6 +364,12 @@ struct Game {
 	void callLevel_tick_pwr1();
 
 	// level4_isld.cpp
+	void postScreenUpdate_isld_screen0();
+	void postScreenUpdate_isld_screen1();
+	void postScreenUpdate_isld_screen8();
+	void postScreenUpdate_isld_screen9();
+	void callLevel_postScreenUpdate_isld(int num);
+
 	void callLevel_initialize_isld();
 	void callLevel_tick_isld();
 	void callLevel_terminate_isld();

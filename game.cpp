@@ -2356,6 +2356,9 @@ void Game::callLevel_postScreenUpdate(int num) {
 	case 2:
 		callLevel_postScreenUpdate_pwr1(num);
 		break;
+	case 3:
+		callLevel_postScreenUpdate_isld(num);
+		break;
 	case 4:
 		callLevel_postScreenUpdate_lava(num);
 		break;
