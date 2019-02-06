@@ -27,7 +27,7 @@ static uint16_t freadUint16LE(FILE *fp) {
 	return (b << 8) | a;
 }
 
-static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, const char *fmt, enum DataDumpType type) {
+static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, const char *fmt, enum DataDumpType type, uint32_t addr) {
 	int i;
 
 	printf("%s[%d] = {", tableName, size);
@@ -62,6 +62,24 @@ static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, 
 		}
 	}
 	printf("\n};\n");
+	if (addr) {
+		char name[32];
+		snprintf(name, sizeof(name), "%08x.bin", addr);
+
+		FILE *out = fopen(name, "wb");
+		if (out) {
+			uint8_t buf[4096];
+			int count;
+
+			fseek(fp, offset, SEEK_SET);
+			while (size > 0 && (count = fread(buf, 1, size > sizeof(buf) ? sizeof(buf) : size, fp)) > 0) {
+				fwrite(buf, 1, count, out);
+				size -= count;
+			}
+
+			fclose(out);
+		}
+	}
 }
 
 static void fillInt(const char *tableName, int size, const char *fmt, int num) {
@@ -89,8 +107,8 @@ int main(int argc, char* argv[]) {
 
 	// demo
 
-		dumpInt(fp, "_benchmarkData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS);
-		dumpInt(fp, "_benchmarkData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS);
+//		dumpInt(fp, "_benchmarkData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS);
+//		dumpInt(fp, "_benchmarkData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_byte_43E8F8", 0x3E8F8, 68, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_byte_43E940", 0x3E940, 68, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level1OpHelper1KeyMaskTable", 0x3E888, 112, "%d", UNSIGNED_8BITS);
@@ -119,9 +137,8 @@ int main(int argc, char* argv[]) {
 //		dumpInt(fp, "_level8UpdateData2", 0x58B28, 64, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level9UpdateData1", 0x4E850, 16, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level9UpdateData2", 0x58A40, 8, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_levelOpStage3ImageData1", 0x51DA8, 667, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_levelOpStage3ImageData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS);
-
+		dumpInt(fp, "Game::_transformBufferData1", 0x51DA8, 4536, "0x%02X", UNSIGNED_8BITS, 0x4545A8);
+		dumpInt(fp, "Game::_transformBufferData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS, 0x452D00);
 
 		fclose(fp);
 	}

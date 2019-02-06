@@ -131,7 +131,7 @@ void Game::shakeScreen() {
 void Game::transformShadowLayer(int delta) {
 	const uint8_t *src = _transformShadowBuffer + _transformShadowLayerDelta; // _esi
 	uint8_t *dst = _video->_shadowLayer; // _eax
-	_transformShadowLayerDelta += delta;
+	_transformShadowLayerDelta += delta; // overflow/wrap at 255
 	int y = 0;
 	if (_currentLevel == 2 || _currentLevel == 5) {
 		warning("transformShadowLayer unimplemented for level %d", _currentLevel);
@@ -142,7 +142,8 @@ void Game::transformShadowLayer(int delta) {
 			const int offset = x + *src++;
 			*dst++ = _video->_frontLayer[y * 256 + offset];
 		}
-		memset(dst, 0xC4, 6); dst += 6
+		memset(dst, 0xC4, 6);
+		dst += 6;
 		src += 6;
 	}
 }

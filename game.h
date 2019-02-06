@@ -61,13 +61,13 @@ struct Game {
 	static const uint8_t _pointSrcIndex1Table[];
 	static const uint8_t _actionDirectionKeyMaskTable[];
 	static const char *_resLevelNames[];
-	static const uint8_t _levelOpStage3ImageData1[];
-	static const uint8_t _levelOpStage3ImageData2[];
 	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelUpdateData2[];
 	static const uint8_t _dbVolumeTable[129];
 	static const uint8_t _benchmarkData1[];
 	static const uint8_t _benchmarkData2[];
+	static const uint8_t _transformBufferData1[];
+	static const uint8_t _transformBufferData2[];
 
 	PafPlayer *_paf;
 	Random _rnd;

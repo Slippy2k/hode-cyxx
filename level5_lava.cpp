@@ -132,7 +132,8 @@ static LvlObject *findLvlObject_lava(LvlObject *o) {
 
 void Game::callLevel_initialize_lava() {
 	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	decodeLZW(_levelOpStage3ImageData1, _transformShadowBuffer);
+	const int size = decodeLZW(_transformBufferData2, _transformShadowBuffer);
+	assert(size == 256 * 192);
 	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
 }
 
