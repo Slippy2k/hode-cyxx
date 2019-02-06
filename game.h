@@ -421,7 +421,10 @@ struct Game {
 
 	// level9_dark.cpp
 	void postScreenUpdate_dark_screen0();
+	void callLevel_postScreenUpdate_dark(int num);
+
 	void preScreenUpdate_dark_screen0();
+	void callLevel_preScreenUpdate_dark(int num);
 
 	// monsters.cpp
 

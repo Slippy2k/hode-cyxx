@@ -2362,6 +2362,9 @@ void Game::callLevel_postScreenUpdate(int num) {
 	case 5:
 		callLevel_postScreenUpdate_pwr2(num);
 		break;
+	case 8:
+		callLevel_postScreenUpdate_dark(num);
+		break;
 	default:
 		warning("callLevel_postScreenUpdate unimplemented for screen %d", num);
 		break;
@@ -2390,6 +2393,9 @@ void Game::callLevel_preScreenUpdate(int num) {
 		break;
 	case 7:
 		callLevel_preScreenUpdate_lar2(num);
+		break;
+	case 8:
+		callLevel_preScreenUpdate_dark(num);
 		break;
 	default:
 		warning("callLevel_preScreenUpdate unimplemented for screen %d", _currentLevel);
