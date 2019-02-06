@@ -5,6 +5,10 @@
 extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette, int raw2png_6bits_color);
 extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
 
+static uint8_t decodeBuffer[256 * 192 * 4];
+static uint8_t fontBuffer[64 * 16 * 16];
+static uint8_t defaultPalette[256 * 3];
+
 static uint8_t _paf_buffer0x800[0x800];
 static uint8_t *_res_setupDatLoadingPicture;
 static int _res_setupDatFontSize;
@@ -30,6 +34,41 @@ static int _res_setupDatHeader0x40;
 static int _res_setupDatHeader0x44;
 static int _res_setupDatHeader0x48;
 static int _res_setupDatBaseOffset;
+
+void DecodeSPR_FLAG0(const uint8_t *src, uint8_t *dst, int dstPitch) {
+	uint8_t *dstLine = dst;
+	src += 6;
+	while (1) {
+		int code = *src++;
+		int count = code & 0x3F;
+		switch (code >> 6) {
+		case 0:
+			memcpy(dst, src, count); dst += count; src += count;
+			break;
+		case 1:
+			code = *src++;
+			memset(dst, code, count); dst += count;
+			break;
+		case 2:
+			if (count == 0) {
+				count = *src++;
+			}
+			dst += count;
+			break;
+		case 3:
+			if (count == 0) {
+				count = *src++;
+				if (count == 0) {
+					return;
+				}
+			}
+			dstLine += dstPitch * count;
+			code = *src++;
+			dst = dstLine + code;
+			break;
+		}
+	}
+}
 
 static int res_roundTo2048(int pos) {
 	return ((pos + 2043) / 2044) * 2048;
@@ -94,28 +133,40 @@ static void res_seekAndReadCurrentFile3(File *_ecx, uint8_t *_edx, int size, int
 	}
 }
 
-/*
-0000 MenuList        struc ; (sizeof=0x10)   ; XREF: menu_addToSpriteList
-0000 ptr1            dd ? // picture data ?
-0004 ptr2            dd ? // palette data ?
-0008 size            dd ?
-000C count           dw ?
-000E num             dw ?
-0010 MenuList        ends
-*/
-/*
-.text:004221E0 menu_addToSpriteList proc near
-.text:004221E0                 mov     eax, [ecx+MenuList.size]
-.text:004221E3                 and     [ecx+MenuList.num], 0
-.text:004221E8                 mov     [ecx+MenuList.ptr1], edx
-.text:004221EA                 mov     [ecx+MenuList.ptr2], edx
-.text:004221ED                 add     eax, edx
-.text:004221EF                 retn
-.text:004221EF menu_addToSpriteList endp
-*/
+static int group_counter = 0;
+static int sprite_counter = 0;
 
 static uint8_t *menu_addToSpriteList(uint8_t *_ecx, uint8_t *_edx) {
-	return _edx + READ_LE_UINT32(_ecx + 8);
+	++group_counter;
+	const int size = READ_LE_UINT32(_ecx + 8);
+	const int count = READ_LE_UINT16(_ecx + 12);
+	fprintf(stdout, "sprites size %d count %d\n", size, count);
+	const uint8_t *p = _edx;
+	for (int i = 0; i < count; ++i) {
+		const int x = p[0];
+		const int y = p[1];
+		const int compressedSize = READ_LE_UINT16(p + 2);
+		const int w = READ_LE_UINT16(p + 4);
+		const int h = READ_LE_UINT16(p + 6);
+		fprintf(stdout, "sprite #%d pos %d,%d compressedSize %d dimensions %d,%d\n", i, x, y, compressedSize, w, h);
+
+		if (w != 0 && h != 0) {
+			memset(decodeBuffer, 0, sizeof(decodeBuffer));
+			DecodeSPR_FLAG0(p + 2, decodeBuffer, w);
+
+			char name[32];
+			snprintf(name, sizeof(name), "sprite_%02d_%03d.png", group_counter, sprite_counter);
+			++sprite_counter;
+			FILE *fp = fopen(name, "wb");
+			if (fp) {
+				raw2png(fp, decodeBuffer, w, h, defaultPalette, 0);
+				fclose(fp);
+			}
+		}
+
+		p += compressedSize + 2;
+	}
+	return _edx + size;
 }
 
 /* res_readSetupDat */
@@ -154,13 +205,13 @@ static void ReadSetupDat(File *f) {
 	
 	size = res_roundTo2048(_res_setupDatHeader0x48);
 	printf("size %d/%d\n", size, _res_setupDatHeader0x48);
-	uint8_t *_res_setupDatUnk1 = (uint8_t *)malloc(size);
+	uint8_t *_res_setupDatLoadingImageBuffer = (uint8_t *)malloc(size);
 	int pos = res_roundTo2048(76);
 	size = res_roundTo2048(_res_setupDatHeader0x48);
-	res_seekAndReadCurrentFile3(f, _res_setupDatUnk1, size, pos);
+	res_seekAndReadCurrentFile3(f, _res_setupDatLoadingImageBuffer, size, pos);
 	
-//	_res_setupDatUnk1 = mem_realloc(_res_setupDatUnk1, _res_setupDatHeader0x48);
-	_res_setupDatLoadingPicture = _res_setupDatUnk1;
+//	_res_setupDatLoadingImageBuffer = mem_realloc(_res_setupDatLoadingImageBuffer, _res_setupDatHeader0x48);
+	_res_setupDatLoadingPicture = _res_setupDatLoadingImageBuffer;
 	uint8_t *_ecx = _res_setupDatLoadingPicture;
 
 	// loading screen
@@ -170,7 +221,7 @@ static void ReadSetupDat(File *f) {
 	_ecx += _edx;
 //	WRITE_LE_UINT32(_res_setupDatLoadingPicture + 4, _ecx); // palette data
 	_ecx += 768;
-//	_res_setupDatMenuList = _ecx;
+	uint8_t *_menu_loadingSpritesList = _ecx;
 	
 	uint8_t *_edx_p = _ecx + 16;
 	uint8_t *_eax = menu_addToSpriteList(_ecx, _edx_p);
@@ -181,9 +232,6 @@ static void ReadSetupDat(File *f) {
 	_res_setupDatBaseOffset = READ_LE_UINT32(_datHdr_setupImageOffsetTable + 4 * (2 + _res_setupDatHeader0x40));
 	printf("setupDatBaseOffset is 0x%x (index %d)\n", _res_setupDatBaseOffset, 2 + _res_setupDatHeader0x40);
 }
-
-static uint8_t decodeBuffer[256 * 192 * 4];
-static uint8_t fontBuffer[64 * 16 * 16];
 
 static void res_loadFont() {
 	const int size = UnpackData(9, _res_setupDatFontData, decodeBuffer);
@@ -200,9 +248,7 @@ static void res_loadFont() {
 		}
 		FILE *fp = fopen("font.png", "wb");
 		if (fp) {
-			uint8_t greyPal[256 * 3];
-			for (int i = 0; i < 256; ++i) { greyPal[i * 3] = greyPal[i * 3 + 1] = greyPal[i * 3 + 2] = i << 4; }
-			raw2png(fp, fontBuffer, 16, 16 * 64, greyPal, 0);
+			raw2png(fp, fontBuffer, 16, 16 * 64, defaultPalette, 0);
 			fclose(fp);
 		}
 	}
@@ -223,28 +269,25 @@ static void DecodeLoadingScreen() {
 	}
 }
 
-#define PADDING 4096
-static uint8_t tmpBuf[256 * 192 + PADDING];
-static uint8_t pal[768 + PADDING];
-
 static void DecodeHintScreen(File *f) {
+	uint8_t pal[0x800];
 	for (int i = 0; i < 0x2E; ++i) {
 		uint32_t offs = READ_LE_UINT32(_datHdr_setupImageOffsetTable + i * 4);
 		uint32_t size = READ_LE_UINT32(_datHdr_setupImageSizeTable + i * 4);
 		printf("%02d offs 0x%X size %d\n", i, offs, size);
 		if (size == 256 * 192) {
 			int size_img = res_roundTo2048(size);
-			res_seekAndReadCurrentFile3(f, tmpBuf, size_img, offs);
+			res_seekAndReadCurrentFile3(f, decodeBuffer, size_img, offs);
 			if (i == _res_setupDatHeader0x40 + 1) {
 				// re-use palette from image _res_setupDatHeader0x40
 			} else {
 				res_seekAndReadCurrentFile3(f, pal, 0x800, offs + size_img);
 			}
 			char filename[32];
-			sprintf(filename, "HOD_HINT_%02d.png", i);
+			sprintf(filename, "hint_%02d.png", i);
 			FILE *fp = fopen(filename, "wb");
 			if (fp) {
-				raw2png(fp, tmpBuf, 256, 192, pal, 1);
+				raw2png(fp, decodeBuffer, 256, 192, pal, 1);
 				fclose(fp);
 			}
 		}
@@ -281,9 +324,7 @@ static uint8_t *DecodeMenuBitmap(const char *filename, const uint8_t *data, int 
 		fprintf(stdout, "menuBitmap %d width %d height %d unk %d size 0x%x,0x%x\n", i, w, h, unk, ptr1, ptr2);
 		data += 12;
 
-		//uint8_t *palette = p + w * h;
-
-		uint8_t *src = p + w * h;
+		const uint8_t *src = p + w * h;
 
 		uint8_t *palette = paletteBuffer;
 
@@ -311,7 +352,8 @@ static void DecodeMenuData(File *f) {
 	if (menu_bitmapsBuffer) {
 		res_seekAndReadCurrentFile3(f, menu_bitmapsBuffer, size, offset);
 
-		uint8_t *menu_backgroundBitmap = menu_bitmapsBuffer + 4;
+		uint8_t *menu_titleBitmap = menu_bitmapsBuffer + 4;
+
 		uint8_t *menu_playerBitmap = menu_bitmapsBuffer + 12;
 
 		uint8_t *menu_optionBitmaps = menu_bitmapsBuffer + 20;
@@ -321,48 +363,48 @@ static void DecodeMenuData(File *f) {
 		uint8_t *menu_cutsceneBitmaps = p;
 		p += _res_setupDatHeader0x18 * 12;
 
-		uint8_t *menu_dataPtr2 = p;
+		uint8_t *menu_dataPtr2 = p; // checkpoints level1
 		p += _res_setupDatHeader0x20 * 12;
 
-		uint8_t *menu_dataPtr3 = p;
+		uint8_t *menu_dataPtr3 = p; // checkpoints level2
 		p += _res_setupDatHeader0x24 * 12;
 
-		uint8_t *menu_dataPtr4 = p;
+		uint8_t *menu_dataPtr4 = p; // checkpoints level3
 		p += _res_setupDatHeader0x28 * 12;
 
-		uint8_t *menu_dataPtr5 = p;
+		uint8_t *menu_dataPtr5 = p; // checkpoints level4
 		p += _res_setupDatHeader0x2C * 12;
 
-		uint8_t *menu_dataPtr6 = p;
+		uint8_t *menu_dataPtr6 = p; // checkpoints level5
 		p += _res_setupDatHeader0x30 * 12;
 
-		uint8_t *menu_dataPtr7 = p;
+		uint8_t *menu_dataPtr7 = p; // checkpoints level6
 		p += _res_setupDatHeader0x34 * 12;
 
-		uint8_t *menu_dataPtr8 = p;
+		uint8_t *menu_dataPtr8 = p; // checkpoints level7
 		p += _res_setupDatHeader0x38 * 12;
 
-		uint8_t *menu_dataPtr9 = p;
+		uint8_t *menu_dataPtr9 = p; // checkpoints level8
 		p += _res_setupDatHeader0x3C * 12;
 
-		uint8_t *menu_dataPtr10 = p;
+		uint8_t *menu_dataPtr10 = p; // levels
 		p += _res_setupDatHeader0x1C * 12;
 
-		int compressedSize = READ_LE_UINT32(menu_backgroundBitmap);
+		int compressedSize = READ_LE_UINT32(menu_titleBitmap);
 		if (compressedSize != 0) {
-			DecodeMenuBitmap256x192("menu.png", compressedSize, p);
+			DecodeMenuBitmap256x192("title.png", compressedSize, p);
 			p += compressedSize + 768;
 		}
 		compressedSize = READ_LE_UINT32(menu_playerBitmap);
 		if (compressedSize != 0) {
-			DecodeMenuBitmap256x192("other.png", compressedSize, p);
+			DecodeMenuBitmap256x192("player.png", compressedSize, p);
 			p += compressedSize + 768;
 		}
 		for (int i = 0; i < 152 / 8; ++i) {
 			compressedSize = READ_LE_UINT32(menu_optionBitmaps + i * 8);
 			if (compressedSize != 0) {
 				char name[16];
-				snprintf(name, sizeof(name), "options%02d.png", i);
+				snprintf(name, sizeof(name), "options_%02d.png", i);
 				DecodeMenuBitmap256x192(name, compressedSize, p);
 				p += compressedSize + 768;
 			}
@@ -398,18 +440,42 @@ static void DecodeMenuData(File *f) {
 		_eax = menu_addToSpriteList(_eax, _eax + 16);
 		uint8_t *menu_spritesList3 = _eax;
 
+		_eax += _res_setupDatHeader0x14 * 8;
+
+		uint32_t unkSize = READ_LE_UINT32(_eax); // null_var1
+		_eax += 4;
+		uint8_t *menu_spritesPtr1 = _eax;
+
+		_eax += unkSize;
+		uint8_t *menu_spritesPtr2 = _eax;
+
+		_eax += _res_setupDatHeader0x44;
+		uint8_t *menu_spritesPtr3 = _eax;
+		_eax += _res_setupDatHeader0x10 * 16;
+
+		for (int i = 0; i < _res_setupDatHeader0x10; ++i) {
+			_eax = menu_addToSpriteList(menu_spritesPtr3 + i * 16, _eax);
+		}
+
+		unkSize = READ_LE_UINT32(_eax);
+		_eax += 4;
+		uint8_t *menu_spritesPtr4 = _eax;
+
+		if (unkSize != 0) {
+			_eax += unkSize * 20;
+			for (int i = 0; i < unkSize; ++i) {
+				_eax = menu_addToSpriteList(menu_spritesPtr4 + i * 20 + 4, _eax);
+			}
+		}
+
 		free(menu_spritesBuffer);
 	}
 }
 
 static void writeBenchmarkData(const char *filename, const uint8_t *buf) {
-	for (int i = 0; i < 256; ++i) {
-		const int j = i * 3;
-		pal[j] = pal[j + 1] = pal[j + 2] = i;
-	}
 	FILE *fp = fopen(filename, "wb");
 	if (fp) {
-		raw2png(fp, buf, 256, 192, pal, 1);
+		raw2png(fp, buf, 256, 192, defaultPalette, 0);
 		fclose(fp);
 	}
 }
@@ -435,6 +501,12 @@ static void DecodeBenchmarkData() {
 }
 
 int main(int argc, char *argv[]) {
+	for (int i = 0; i < 256; ++i) {
+		const int color = i * 63 / 255;
+		for (int j = 0; j < 3; ++j) {
+			defaultPalette[3 * i + j] = color;
+		}
+	}
 	if (argc == 2) {
 		File f;
 		if (f.open(argv[1], "rb")) {
