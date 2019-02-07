@@ -1,6 +1,7 @@
 
 #include "game.h"
 #include "paf.h"
+#include "util.h"
 #include "video.h"
 
 void Game::preScreenUpdate_lar1_screen0() {
@@ -105,5 +106,13 @@ void Game::callLevel_tick_lar1() {
 	}
 	if (_res->_currentScreenResourceNum == 12) {
 		_video->_displayShadowLayer = 1;
+	}
+}
+
+void Game::callLevel_setupLvlObjects_lar1(int num) {
+	switch (num) {
+	case 24:
+		warning("callLevel_setupLvlObjects_lar1 not implemented for screen %d", num);
+		break;
 	}
 }

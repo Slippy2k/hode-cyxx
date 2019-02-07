@@ -1,6 +1,7 @@
 
 #include "game.h"
 #include "paf.h"
+#include "util.h"
 #include "video.h"
 
 void Game::postScreenUpdate_lar2_screen7() {
@@ -70,6 +71,14 @@ void Game::callLevel_preScreenUpdate_lar2(int num) {
 		break;
 	case 19:
 		preScreenUpdate_lar2_screen19();
+		break;
+	}
+}
+
+void Game::callLevel_setupLvlObjects_lar2(int num) {
+	switch (num) {
+	case 19:
+		warning("callLevel_setupLvlObjects_lar2 not implemented for screen %d", num);
 		break;
 	}
 }

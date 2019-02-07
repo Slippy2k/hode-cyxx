@@ -233,7 +233,7 @@ const uint8_t *Game::_levelCheckpointData[] = {
 	_level9UpdateData1
 };
 
-const uint8_t *Game::_levelUpdateData2[] = {
+const uint8_t *Game::_levelScreenStartData[] = {
 	_level1UpdateData2,
 	_level2UpdateData2,
 	_level3UpdateData2,

@@ -62,7 +62,7 @@ struct Game {
 	static const uint8_t _actionDirectionKeyMaskTable[];
 	static const char *_resLevelNames[];
 	static const uint8_t *_levelCheckpointData[];
-	static const uint8_t *_levelUpdateData2[];
+	static const uint8_t *_levelScreenStartData[];
 	static const uint8_t _dbVolumeTable[129];
 	static const uint8_t _benchmarkData1[];
 	static const uint8_t _benchmarkData2[];
@@ -419,6 +419,8 @@ struct Game {
 	void callLevel_initialize_lar1();
 	void callLevel_tick_lar1();
 
+	void callLevel_setupLvlObjects_lar1(int num);
+
 	// level8_lar2.cpp
 	void postScreenUpdate_lar2_screen7();
 	void callLevel_postScreenUpdate_lar2(int num);
@@ -427,6 +429,8 @@ struct Game {
 	void preScreenUpdate_lar2_screen15();
 	void preScreenUpdate_lar2_screen19();
 	void callLevel_preScreenUpdate_lar2(int num);
+
+	void callLevel_setupLvlObjects_lar2(int num);
 
 	// level9_dark.cpp
 	void postScreenUpdate_dark_screen0();

@@ -1167,7 +1167,7 @@ void Game::resetScreen() {
 		_res->_screensState[i].s0 = 0;
 		_screenCounterTable[i] = 0;
 	}
-	const uint8_t *dat2 = _levelUpdateData2[_currentLevel];
+	const uint8_t *dat2 = _levelScreenStartData[_currentLevel];
 	const int n = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	for (int i = 0; i < n; ++i) {
 		_res->_screensState[i].s0 = *dat2++;
@@ -1182,11 +1182,26 @@ void Game::resetScreen() {
 		case 1:
 			callLevel_setupLvlObjects_fort(i);
 			break;
+		case 2:
+			// none for 'pwr1'
+			break;
+		case 3:
+			// none for 'isld'
+			break;
 		case 4:
 			callLevel_setupLvlObjects_lava(i);
 			break;
-		default:
-			warning("SetupLvlObjects not implemented for level %d", _currentLevel);
+		case 5:
+			// none for 'pwr2'
+			break;
+		case 6:
+			callLevel_setupLvlObjects_lar1(i);
+			break;
+		case 7:
+			callLevel_setupLvlObjects_lar2(i);
+			break;
+		case 8:
+			// none for 'dark'
 			break;
 		}
 	}
