@@ -122,7 +122,7 @@ void Game::postScreenUpdate_fort_screen16() {
 					_paf->unload(3);
 				}
 				_video->clearPalette();
-				updateAndyLvlObject();
+				restartLevel();
 			}
 		}
 	}

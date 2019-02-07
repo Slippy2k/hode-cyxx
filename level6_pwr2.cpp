@@ -33,7 +33,7 @@ void Game::postScreenUpdate_pwr2_screen5() {
 			_paf->unload(9);
 		}
 		_video->clearPalette();
-		updateAndyLvlObject();
+		restartLevel();
 	}
 }
 
