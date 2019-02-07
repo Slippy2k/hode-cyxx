@@ -27,6 +27,7 @@ enum {
 	kPafAnimation_AndyFailling = 23,
 };
 
+struct FileSystem;
 struct SystemStub;
 
 struct PafPlayer {
@@ -41,6 +42,7 @@ struct PafPlayer {
 
 	bool _skipCutscenes;
 	SystemStub *_system;
+	FileSystem *_fs;
 	File _file;
 	int _videoNum;
 	uint32_t _videoOffset;
@@ -51,7 +53,7 @@ struct PafPlayer {
 	uint8_t _bufferBlock[kBufferBlockSize];
 	uint8_t *_demuxVideoFrameBlocks;
 
-	PafPlayer(SystemStub *system);
+	PafPlayer(SystemStub *system, FileSystem *fs);
 	~PafPlayer();
 
 	void preload(int num);

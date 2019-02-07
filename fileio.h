@@ -10,15 +10,12 @@
 
 struct File {
 
-	static const char *_dataPath;
-
 	FILE *_fp;
 
 	File();
 	virtual ~File();
 
-	static void setDataPath(const char *path);
-	bool open(const char *filename);
+	bool open(const char *filePath);
 	void close();
 	virtual void seekAlign(int pos);
 	virtual void seek(int pos, int whence);

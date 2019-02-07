@@ -3,16 +3,30 @@
  * Copyright (C) 2009-2011 Gregory Montoir
  */
 
+#include "fs.h"
 #include "paf.h"
 #include "systemstub.h"
 #include "util.h"
 
-PafPlayer::PafPlayer(SystemStub *system)
-	: _skipCutscenes(false), _system(system) {
-	if (!_file.open("HOD.PAF")) {
-		if (!_file.open("HOD_DEMO.PAF")) {
-			_skipCutscenes = true;
+static const char *_filenames[] = {
+	"hod.paf",
+	"hod_demo.paf",
+	0
+};
+
+static bool openPaf(FileSystem *fs, File *f) {
+	for (int i = 0; _filenames[i]; ++i) {
+		if (fs->openFile(_filenames[i], f)) {
+			return true;
 		}
+	}
+	return false;
+}
+
+PafPlayer::PafPlayer(SystemStub *system, FileSystem *fs)
+	: _skipCutscenes(false), _system(system), _fs(fs) {
+	if (!openPaf(_fs, &_file)) {
+		_skipCutscenes = true;
 	}
 	_videoNum = -1;
 	memset(&_pafHdr, 0, sizeof(_pafHdr));

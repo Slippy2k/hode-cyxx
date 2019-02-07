@@ -6,6 +6,7 @@
 #ifndef RESOURCE_H__
 #define RESOURCE_H__
 
+#include "fs.h"
 #include "intern.h"
 
 struct DatHdr {
@@ -154,6 +155,8 @@ struct SssPreloadData {
 
 struct Resource {
 
+	FileSystem _fs;
+
 	DatHdr _datHdr;
 	File *_datFile;
 	LvlHdr _lvlHdr;
@@ -201,7 +204,7 @@ struct Resource {
 
 	bool _isDemoData;
 
-	Resource();
+	Resource(const char *dataPath);
 
 	bool detectGameData();
 

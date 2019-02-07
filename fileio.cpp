@@ -6,18 +6,12 @@
 #include <sys/param.h>
 #include "fileio.h"
 
-const char *File::_dataPath = ".";
-
 File::File()
 	: _fp(0) {
 }
 
 File::~File() {
 	close();
-}
-
-void File::setDataPath(const char *path) {
-	_dataPath = path;
 }
 
 static void fioToLowerString(char *p) {
@@ -36,16 +30,8 @@ static void fioToUpperString(char *p) {
 	}
 }
 
-bool File::open(const char *filename) {
-	char filePath[MAXPATHLEN];
-	snprintf(filePath, sizeof(filePath), "%s/%s", _dataPath, filename);
-	char *p = strrchr(filePath, '/');
-	fioToUpperString(p + 1);
+bool File::open(const char *filePath) {
 	_fp = fopen(filePath, "rb");
-	if (!_fp) {
-		fioToLowerString(p + 1);
-		_fp = fopen(filePath, "rb");
-	}
 	return _fp != 0;
 }
 

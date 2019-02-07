@@ -4,12 +4,14 @@
  */
 
 #include "fileio.h"
+#include "fs.h"
 #include "game.h"
 #include "lzw.h"
 #include "resource.h"
 #include "util.h"
 
-Resource::Resource() {
+Resource::Resource(const char *dataPath)
+	: _fs(dataPath) {
 	memset(_screensGrid, 0, sizeof(_screensGrid));
 	memset(_screensBasePos, 0, sizeof(_screensBasePos));
 	memset(_screensState, 0, sizeof(_screensState));
@@ -43,7 +45,7 @@ Resource::Resource() {
 
 bool Resource::detectGameData() {
 	File f;
-	if (!f.open("SETUP.DAT")) {
+	if (!_fs.openFile("SETUP.DAT", &f)) {
 		error("Unable to open 'SETUP.DAT'");
 		return false;
 	}
@@ -52,7 +54,7 @@ bool Resource::detectGameData() {
 
 void Resource::loadSetupDat() {
 	uint8_t hdr[512];
-	_datFile->open("SETUP.DAT");
+	_fs.openFile("SETUP.DAT", _datFile);
 	_datFile->read(hdr, sizeof(hdr));
 	const int version = READ_LE_UINT32(hdr);
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
@@ -263,7 +265,7 @@ void Resource::loadLvlData(const char *levelName) {
 	_lvlFile->close();
 	char filename[32];
 	snprintf(filename, sizeof(filename), "%s.LVL", levelName);
-	if (!_lvlFile->open(filename)) {
+	if (!_fs.openFile(filename, _lvlFile)) {
 		error("Unable to open '%s'", filename);
 		return;
 	}
@@ -497,7 +499,7 @@ void Resource::loadSssData(const char *levelName) {
 	}
 	char filename[32];
 	snprintf(filename, sizeof(filename), "%s.SSS", levelName);
-	if (!_sssFile->open(filename)) {
+	if (!_fs.openFile(filename, _sssFile)) {
 		error("Unable to open '%s'", filename);
 		return;
 	}
@@ -900,7 +902,7 @@ void Resource::loadMstData(const char *levelName) {
 	}
 	char filename[32];
 	snprintf(filename, sizeof(filename), "%s.MST", levelName);
-	if (!_mstFile->open(filename)) {
+	if (!_fs.openFile(filename, _mstFile)) {
 		error("Unable to open '%s'", filename);
 		return;
 	}

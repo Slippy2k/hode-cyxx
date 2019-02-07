@@ -14,10 +14,9 @@
 
 Game::Game(SystemStub *system, const char *dataPath) {
 	memset(this, 0, sizeof(Game)); // TODO: proper init
-	File::setDataPath(dataPath);
 	_system = system;
-	_paf = new PafPlayer(system);
-	_res = new Resource();
+	_res = new Resource(dataPath);
+	_paf = new PafPlayer(system, &_res->_fs);
 	_video = new Video(system);
 	_screen_dx = Video::kScreenWidth / 2;
 	_screen_dy = Video::kScreenHeight / 2;
