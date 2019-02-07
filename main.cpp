@@ -10,10 +10,10 @@
 #include "util.h"
 #include "systemstub.h"
 
-static const char *USAGE =
+static const char *_usage =
 	"HODe - Heart Of Darkness Interpreter\n"
 	"Usage: %s [OPTIONS]...\n"
-	"  --datapath=PATH   Path to data files (default 'DATA')\n"
+	"  --datapath=PATH   Path to data files (default '.')\n"
 	"  --level=NUM       Start at level NUM\n"
 	"  --checkpoint=NUM  Start at checkpoint NUM\n"
 ;
@@ -28,7 +28,9 @@ static void exitMain() {
 	}
 }
 
-static const char *kLevelNames[] = {
+static const char *_defaultDataPath = ".";
+
+static const char *_levelNames[] = {
 	"rock",
 	"fort",
 	"pwr1",
@@ -42,7 +44,7 @@ static const char *kLevelNames[] = {
 };
 
 int main(int argc, char *argv[]) {
-	const char *dataPath = ".";
+	char *dataPath = 0;
 	int level = 0;
 	int checkpoint = 0;
 	if (argc == 2) {
@@ -72,8 +74,8 @@ int main(int argc, char *argv[]) {
 			if (optarg[0] >= '0' && optarg[0] <= '9') {
 				level = atoi(optarg);
 			} else {
-				for (int i = 0; kLevelNames[i]; ++i) {
-					if (strcmp(kLevelNames[i], optarg) == 0) {
+				for (int i = 0; _levelNames[i]; ++i) {
+					if (strcmp(_levelNames[i], optarg) == 0) {
 						level = i;
 						break;
 					}
@@ -84,15 +86,16 @@ int main(int argc, char *argv[]) {
 			checkpoint = atoi(optarg);
 			break;
 		default:
-			fprintf(stdout, "%s\n", USAGE);
+			fprintf(stdout, "%s\n", _usage);
 			return -1;
 		}
 	}
 	_system = SystemStub_SDL_create();
 	atexit(exitMain);
 	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
-	Game *g = new Game(_system, dataPath ? dataPath : "DATA");
+	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
 	g->mainLoop(level, checkpoint);
 	delete g;
+	free(dataPath);
 	return 0;
 }
