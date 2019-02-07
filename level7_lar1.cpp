@@ -46,6 +46,31 @@ void Game::preScreenUpdate_lar1_screen13() {
 	}
 }
 
+void Game::preScreenUpdate_lar1_screen14() {
+	switch (_res->_screensState[14].s0) {
+	case 0:
+		_res->_resLvlScreenBackgroundDataTable[14].currentBackgroundId = 0;
+		_res->_resLvlScreenBackgroundDataTable[14].unk3 = 0;
+		_screenCounterTable[14] = 0;
+		break;
+	case 3:
+		_res->_screensState[14].s0 = 1;
+		_screenCounterTable[14] = 20;
+		break;
+	case 4:
+		_res->_screensState[14].s0 = 2;
+		_screenCounterTable[14] = 37;
+		break;
+	}
+	if (_res->_currentScreenResourceNum == 14) {
+		if (_res->_screensState[14].s0 == 0 && _currentLevelCheckpoint == 4) {
+			if (!_paf->_skipCutscenes) {
+				_paf->preload(11);
+			}
+		}
+	}
+}
+
 void Game::preScreenUpdate_lar1_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
 		if (_levelCheckpoint == 5) {
@@ -82,6 +107,9 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 		break;
 	case 13:
 		preScreenUpdate_lar1_screen13();
+		break;
+	case 14:
+		preScreenUpdate_lar1_screen14();
 		break;
 	case 16:
 		preScreenUpdate_lar1_screen16();

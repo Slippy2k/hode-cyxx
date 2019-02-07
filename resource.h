@@ -230,6 +230,7 @@ struct Resource {
 	void decLevelData0x2988RefCounter(LvlObject *ptr);
 
 	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
+	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
 
 	void loadHintImage(int num, uint8_t *dst, uint8_t *pal);
 

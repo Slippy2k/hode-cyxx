@@ -428,6 +428,17 @@ LvlObject *Resource::findLvlObject(uint8_t type, uint8_t num, int index) {
 	return ptr;
 }
 
+LvlObject *Resource::findLvlObject2(uint8_t type, uint8_t flags, int index) {
+	LvlObject *ptr = _resLvlData0x288PtrTable[index];
+	while (ptr) {
+		if (ptr->type == type && ptr->flags == flags) {
+			break;
+		}
+		ptr = ptr->nextPtr;
+	}
+	return ptr;
+}
+
 void Resource::loadHintImage(int num, uint8_t *dst, uint8_t *pal) {
 	const int offset = _datHdr.hintsImageOffsetTable[num];
 	const int size = _datHdr.hintsImageSizeTable[num];

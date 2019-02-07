@@ -2264,6 +2264,7 @@ void Game::levelMainLoop() {
 				callLevel_postScreenUpdate(_currentRightScreen);
 			}
 		}
+		_currentLevelCheckpoint = _levelCheckpoint;
 		if (updateAndyLvlObject() != 0) {
 			callLevel_tick();
 //			_time_counter1 -= _time_counter2;
@@ -2399,6 +2400,9 @@ void Game::callLevel_preScreenUpdate(int num) {
 		break;
 	case 2:
 		callLevel_preScreenUpdate_pwr1(num);
+		break;
+	case 3:
+		callLevel_preScreenUpdate_isld(num);
 		break;
 	case 4:
 		callLevel_preScreenUpdate_lava(num);

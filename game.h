@@ -83,6 +83,7 @@ struct Game {
 	LvlObject *_currentSoundLvlObject;
 	int _currentLevel;
 	int _levelCheckpoint;
+	int _currentLevelCheckpoint;
 	bool _quit;
 	Sprite _gameSpriteListTable[128];
 	Sprite *_gameSpriteListHead;
@@ -366,9 +367,14 @@ struct Game {
 	// level4_isld.cpp
 	void postScreenUpdate_isld_screen0();
 	void postScreenUpdate_isld_screen1();
+	void postScreenUpdate_isld_screen3();
+	void postScreenUpdate_isld_screen4();
 	void postScreenUpdate_isld_screen8();
 	void postScreenUpdate_isld_screen9();
 	void callLevel_postScreenUpdate_isld(int num);
+
+	void preScreenUpdate_isld_screen20();
+	void callLevel_preScreenUpdate_isld(int num);
 
 	void callLevel_initialize_isld();
 	void callLevel_tick_isld();
@@ -411,6 +417,7 @@ struct Game {
 	void preScreenUpdate_lar1_screen0();
 	void preScreenUpdate_lar1_screen2();
 	void preScreenUpdate_lar1_screen13();
+	void preScreenUpdate_lar1_screen14();
 	void preScreenUpdate_lar1_screen16();
 	void preScreenUpdate_lar1_screen20();
 	void preScreenUpdate_lar1_screen24();
