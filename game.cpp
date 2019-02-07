@@ -1068,14 +1068,14 @@ void Game::updateScreenHelper(int num) {
 	for (LvlObject *ptr = _res->_resLvlData0x288PtrTable[num]; ptr; ptr = ptr->nextPtr) {
 		switch (ptr->type) {
 		case 0: {
-				GameRect *p = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeGameRect);
+				AnimBackgroundData *p = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
 				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->flags & 0xFF];
 				assert(data);
-				p->unkC = READ_LE_UINT16(data); data += 2;
+				p->framesCount = READ_LE_UINT16(data); data += 2;
 				ptr->soundToPlay = READ_LE_UINT16(data); data += 2;
-				p->ptr = p->unk8 = data;
-				p->unkE = 0;
-				p->unk4 = READ_LE_UINT16(data + 4) + data + 4;
+				p->currentSpriteData = p->otherSpriteData = data;
+				p->currentFrame = 0;
+				p->firstSpriteData = READ_LE_UINT16(data + 4) + data + 4;
 			}
 			break;
 		case 1: {
@@ -1743,18 +1743,15 @@ void Game::updateLvlObjectLists() {
 }
 
 LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
-	uint8_t *_edi, *_edx, *_eax;
-	int _cx;
-
-	GameRect *_esi = (GameRect *)getLvlObjectDataPtr(ptr, kObjectDataTypeGameRect);
+	AnimBackgroundData *_esi = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
 	assert(_esi);
-	_edi = _esi->ptr + 2;
+	uint8_t *_edi = _esi->currentSpriteData + 2;
 	if (_res->_currentScreenResourceNum == ptr->screenNum) {
 		if (ptr->soundToPlay != 0xFFFF) {
 			playSound(ptr->soundToPlay, ptr, 0, 3);
 			ptr->soundToPlay = 0xFFFF;
 		}
-		_edx = _edi + 2;
+		uint8_t *_edx = _edi + 2;
 		Sprite *spr = _gameSpriteListHead;
 		if (spr && READ_LE_UINT16(_edx) > 8) {
 			spr->xPos = (int8_t)_edi[0];
@@ -1767,78 +1764,81 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			_gameSpriteListPtrTable[index] = spr;
 		}
 	}
-	uint8_t _dl = ptr->stateValue;
-	_cx = 0xFFFF;
-	_eax = READ_LE_UINT16(_edi + 2) + _edi + 2; // nextSpriteData
-	switch (_dl - 1) {
-/*	case 6:
-		_esi->ptr = _esi->unk4;
-		if (_esi->unkE == 0) {
-			_esi->unkE = 1;
-			_cx = READ_LE_UINT16(_esi->unk4);
-		}
-		_esi->unk16 = 4;
-		goto end_switch;
-		break;
-	case 5:
-		_esi->unkE = 0;
-		_esi->ptr = _esi->unk8;
-		ptr->unk16 = 1;
-		return ptr->nextPtr;
-	case 3:
-		++_esi->unkE;
-		if (_esi->unkE < _esi->unkC) {
-			_esi->ptr = _eax;
-			_cx = READ_LE_UINT16(_eax);
-		} else {
-			_esi->ptr = _esi->unk8;
-			_esi->unkE = 0;
-			ptr->unk16 = 1;
-			_cx = READ_LE_UINT16(_esi->ptr);
-		}
-		goto end_switch;
-		break;
-	case 4:
-		++_esi->unkE;
-		if (_esi->unkE <= _esi->unkC) {
-			_esi->ptr = _eax;
-			_cx = READ_LE_UINT16(_eax);
-		} else {
-			_esi->ptr = _esi->unk8;
-			_esi->unkE = 0;
-			ptr->unk16 = 1;
-			_cx = READ_LE_UINT16(_esi->ptr);
-		}
-		goto end_switch;
-		break;
-	case 2:
-	case 1:*/
+	int16_t soundNum = -1;
+	uint8_t *_eax = READ_LE_UINT16(_edi + 2) + _edi + 2; // nextSpriteData
+	switch (ptr->stateValue - 1) {
 	case 6:
+		_esi->currentSpriteData = _esi->firstSpriteData;
+		if (_esi->currentFrame == 0) {
+			_esi->currentFrame = 1;
+			soundNum = READ_LE_UINT16(_esi->firstSpriteData);
+		}
+		ptr->stateValue = 4;
+		break;
 	case 5:
-	case 4:
+		_esi->currentFrame = 0;
+		_esi->currentSpriteData = _esi->otherSpriteData;
+		ptr->stateValue = 1;
+		break;
 	case 3:
+		++_esi->currentFrame;
+		if (_esi->currentFrame < _esi->framesCount) {
+			_esi->currentSpriteData = _eax;
+			soundNum = READ_LE_UINT16(_eax);
+		} else {
+			_esi->currentFrame = 0;
+			_esi->currentSpriteData = _esi->otherSpriteData;
+			ptr->stateValue = 1;
+			soundNum = READ_LE_UINT16(_esi->currentSpriteData);
+		}
+		break;
+	case 4:
+		++_esi->currentFrame;
+		if (_esi->currentFrame <= _esi->framesCount) {
+			_esi->currentSpriteData = _eax;
+			soundNum = READ_LE_UINT16(_eax);
+		} else {
+			_esi->currentFrame = 0;
+			_esi->currentSpriteData = _esi->otherSpriteData;
+			ptr->stateValue = 1;
+			soundNum = READ_LE_UINT16(_esi->currentSpriteData);
+		}
+		break;
 	case 2:
+		warning("updateAnimatedLvlObjectType0 - TODO case 2");
+		break;
 	case 1:
-		warning("updateAnimatedLvlObjectType0 - TODO case %d", _dl);
+		++_esi->currentFrame;
+		if (_esi->currentFrame < _esi->framesCount - 1) {
+			_esi->currentSpriteData = _eax;
+			soundNum = READ_LE_UINT16(_esi->currentSpriteData);
+		} else {
+			if (_esi->currentFrame > _esi->framesCount) {
+				_esi->currentFrame = _esi->framesCount;
+			}
+			ptr->stateValue = 1;
+			return ptr->nextPtr;
+		}
+		break;
 	case 0:
 		return ptr->nextPtr;
 	default:
-		_cx = READ_LE_UINT16(_esi->ptr);
+		soundNum = READ_LE_UINT16(_esi->currentSpriteData);
 		if (ptr->stateCounter == 0) {
-			++_esi->unkE;
-			if (_esi->unkE >= _esi->unkC) {
-				_esi->ptr = _esi->unk4;
-				_esi->unkE = 1;
+			++_esi->currentFrame;
+			if (_esi->currentFrame >= _esi->framesCount) {
+				_esi->currentSpriteData = _esi->firstSpriteData;
+				_esi->currentFrame = 1;
 			} else {
-				_esi->ptr = _eax;
+				_esi->currentSpriteData = _eax;
 			}
 		} else {
 			--ptr->stateCounter;
 		}
 		break;
 	}
-	if (_cx != 0xFFFF) {
-		playSound(_cx, ptr, 0, 3);
+	if (soundNum != -1) {
+		playSound(soundNum, ptr, 0, 3);
 	}
 	return ptr->nextPtr;
 }
@@ -2546,8 +2546,8 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 		assert(o == _andyObject);
 		assert(o->dataPtr == &_andyObjectScreenData);
 		break;
-	case kObjectDataTypeGameRect:
-		assert(o->dataPtr >= &_gameRectsListTable[0] && o->dataPtr < &_gameRectsListTable[64]);
+	case kObjectDataTypeAnimBackgroundData:
+		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[64]);
 		break;
 	case kObjectDataTypeUnk1:
 		assert(o->dataPtr >= &_gameUnkList1Table[0] && o->dataPtr < &_gameUnkList1Table[32]);
@@ -2992,9 +2992,9 @@ void Game::initLvlObjects() {
 		_res->_resLvlData0x288PtrTable[index] = ptr;
 		switch (ptr->type) {
 		case 0:
-			assert(_gameRectsListCount < 64);
-			ptr->dataPtr = &_gameRectsListTable[_gameRectsListCount++];
-			memset(ptr->dataPtr, 0, sizeof(GameRect));
+			assert(_animBackgroundDataCount < 64);
+			ptr->dataPtr = &_animBackgroundDataTable[_animBackgroundDataCount++];
+			memset(ptr->dataPtr, 0, sizeof(AnimBackgroundData));
 			break;
 		case 1:
 			debug(kDebug_GAME, "Trying to free _resLvlScreenBackgroundDataTable.backgroundSoundTable ; ignored (i=%d index=%d)", i, index);

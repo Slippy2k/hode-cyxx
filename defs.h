@@ -27,13 +27,12 @@ struct Point16_t {
 	int16_t y;
 };
 
-/* LvlBackgroundAnim */
-struct GameRect {
-	uint8_t *ptr; /* currentSpriteData */
-	uint8_t *unk4; /* firstSpriteData */
-	uint8_t *unk8; /* temporarySpriteData */
-	uint16_t unkC; /* numFrames */
-	uint16_t unkE; /* currentFrame */
+struct AnimBackgroundData {
+	uint8_t *currentSpriteData;
+	uint8_t *firstSpriteData;
+	uint8_t *otherSpriteData;
+	uint16_t framesCount;
+	uint16_t currentFrame;
 };
 
 struct LvlAnimSeqHeader {
@@ -139,7 +138,7 @@ struct LvlObject {
 	int (Game::*callbackFuncPtr)(LvlObject *ptr);
 	void *dataPtr;
 // ptr->data0x2988==0:AndyObjectScreenData
-// ptr->type==0: GameRect * / _gameRectsListTable
+// ptr->type==0: AnimBackgroundData * / _animBackgroundDataTable
 // ptr->type==1: _resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
 // ptr->type==8(_andyObject): &_gameUnkList1Element
 	uint32_t unk34; // removeSound

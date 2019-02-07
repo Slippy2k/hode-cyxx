@@ -43,7 +43,7 @@ struct Game {
 	enum {
 		kObjectDataTypeAndy,
 		// LvlObject.type == 0
-		kObjectDataTypeGameRect,
+		kObjectDataTypeAnimBackgroundData,
 		// LvlObject.type == 8
 		kObjectDataTypeUnk1,
 		// LvlObject.type == 1
@@ -155,8 +155,8 @@ struct Game {
 	LvlObject *_declaredLvlObjectsListHead;
 	int _declaredLvlObjectsListCount;
 	AndyObjectScreenData _andyObjectScreenData;
-	GameRect _gameRectsListTable[64];
-	int _gameRectsListCount;
+	AnimBackgroundData _animBackgroundDataTable[64];
+	int _animBackgroundDataCount;
 	uint8_t _resUpdateLevelDataType0Flag;
 	int _executeMstLogicCounter;
 	int _executeMstLogicLastCounter;
