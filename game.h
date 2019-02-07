@@ -157,7 +157,7 @@ struct Game {
 	AndyObjectScreenData _andyObjectScreenData;
 	AnimBackgroundData _animBackgroundDataTable[64];
 	int _animBackgroundDataCount;
-	uint8_t _resUpdateLevelDataType0Flag;
+	uint8_t _andyActionKeysFlags;
 	int _executeMstLogicCounter;
 	int _executeMstLogicLastCounter;
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;

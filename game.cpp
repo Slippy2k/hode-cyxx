@@ -1012,10 +1012,8 @@ void Game::removeLvlObjectNotType2List1(LvlObject *o) {
 void Game::setupCurrentScreen() {
 	LvlObject *ptr = _andyObject;
 	_fallingAndyFlag = false;
-	_resUpdateLevelDataType0Flag = 0;
+	_andyActionKeysFlags = 0;
 	_hideAndyObjectSprite = false;
-	_resUpdateLevelDataType0Flag = 0;
-
 	const uint8_t *dat = &_levelCheckpointData[_currentLevel][_levelCheckpoint * 12];
 	_plasmaCannonFlags = 0;
 	_gameKeyPressedMaskIndex = 0;
@@ -1326,7 +1324,7 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 			if (_andyObject->data0x2988 == 2 && _gameKeyPressedMaskIndex >= 16) {
 				removeLvlObject(_andyObject);
 			}
-			_resUpdateLevelDataType0Flag = 0;
+			_andyActionKeysFlags = 0;
 		}
 		_andyObject->actionKeyMask = _actionDirectionKeyMaskTable[_gameKeyPressedMaskIndex * 2];
 		_andyObject->directionKeyMask = _actionDirectionKeyMaskTable[_gameKeyPressedMaskIndex * 2 + 1];
@@ -2124,7 +2122,7 @@ void Game::updateAndyMonsterObjects() {
 		setupLvlObjectBitmap(ptr);
 		setLvlObjectPosRelativeToPoint(ptr, 3, _screen_dx, _screen_dy);
 	}
-	_resUpdateLevelDataType0Flag = 0;
+	_andyActionKeysFlags = 0;
 	if (ptr->data0x2988 == 2) {
 		removeLvlObject(ptr);
 	}
@@ -2635,23 +2633,23 @@ void Game::lvlObjectType0CallbackHelper1() {
 	}
 	if (_dl == 3) {
 		if (_cl == _dl) {
-			_resUpdateLevelDataType0Flag |= 2;
+			_andyActionKeysFlags |= 2;
 		}
 	} else if (_dl == 7) {
 		if (_cl == 5) {
-			_resUpdateLevelDataType0Flag |= _bl & 4;
+			_andyActionKeysFlags |= _bl & 4;
 		} else {
-			_resUpdateLevelDataType0Flag &= ~4;
+			_andyActionKeysFlags &= ~4;
 		}
 	}
-	if ((_resUpdateLevelDataType0Flag & 2) != 0) {
+	if ((_andyActionKeysFlags & 2) != 0) {
 		if (_bl & 2) {
 			_bl &= ~2;
 		} else {
-			_resUpdateLevelDataType0Flag &= ~2;
+			_andyActionKeysFlags &= ~2;
 		}
 	}
-	if (_resUpdateLevelDataType0Flag & 4) {
+	if (_andyActionKeysFlags & 4) {
 		_bl |= 4;
 	}
 	if (_andyObject->data0x2988 == 2 && (_bl & 5) == 5) {
