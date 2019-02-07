@@ -4,6 +4,7 @@
  */
 
 #include <getopt.h>
+#include <sys/stat.h>
 
 #include "game.h"
 #include "util.h"
@@ -41,9 +42,16 @@ static const char *kLevelNames[] = {
 };
 
 int main(int argc, char *argv[]) {
-	char *dataPath = 0;
+	const char *dataPath = ".";
 	int level = 0;
 	int checkpoint = 0;
+	if (argc == 2) {
+		// data path as the only command line argument
+		struct stat st;
+		if (stat(argv[1], &st) == 0 && S_ISDIR(st.st_mode)) {
+			dataPath = strdup(argv[1]);
+		}
+	}
 	while (1) {
 		static struct option options[] = {
 			{ "datapath",   required_argument, 0, 1 },
@@ -86,6 +94,5 @@ int main(int argc, char *argv[]) {
 	Game *g = new Game(_system, dataPath ? dataPath : "DATA");
 	g->mainLoop(level, checkpoint);
 	delete g;
-	free(dataPath);
 	return 0;
 }
