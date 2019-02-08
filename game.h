@@ -416,6 +416,8 @@ struct Game {
 	// level7_lar1.cpp
 	void preScreenUpdate_lar1_screen0();
 	void preScreenUpdate_lar1_screen2();
+	void preScreenUpdate_lar1_screen6();
+	void preScreenUpdate_lar1_screen11();
 	void preScreenUpdate_lar1_screen13();
 	void preScreenUpdate_lar1_screen14();
 	void preScreenUpdate_lar1_screen16();

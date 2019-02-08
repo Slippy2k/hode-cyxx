@@ -4,6 +4,9 @@
 #include "util.h"
 #include "video.h"
 
+static uint8_t byte_452610;
+static uint8_t byte_452614;
+
 void Game::preScreenUpdate_lar1_screen0() {
 	if (_res->_currentScreenResourceNum == 0) {
 		switch (_res->_screensState[0].s0) {
@@ -33,6 +36,33 @@ void Game::preScreenUpdate_lar1_screen2() {
 		if (_levelCheckpoint == 0) {
 			_levelCheckpoint = 1;
 		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen6() {
+	if (_res->_currentScreenResourceNum == 6) {
+		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
+			if ((byte_452610 & 0xF0) == 0) {
+				_levelCheckpoint = 2;
+				const uint8_t counter = ((byte_452610 & 0xF0) != 0) ? 2 : 0;
+				_screenCounterTable[26] = counter; // +0x1A
+			}
+		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen11() {
+	if (_res->_currentScreenResourceNum == 11) {
+		if (_levelCheckpoint >= 2 && _levelCheckpoint <= 3) {
+			if ((byte_452614 & 0xF) == 1 && (byte_452610 & 0xF) == 1) {
+				_levelCheckpoint = 4;
+			}
+		}
+		if (_transformShadowBuffer) {
+			free(_transformShadowBuffer);
+			_transformShadowBuffer = 0;
+		}
+		_video->_displayShadowLayer = false;
 	}
 }
 
@@ -104,6 +134,12 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 		break;
 	case 2:
 		preScreenUpdate_lar1_screen2();
+		break;
+	case 6:
+		preScreenUpdate_lar1_screen6();
+		break;
+	case 11:
+		preScreenUpdate_lar1_screen11();
 		break;
 	case 13:
 		preScreenUpdate_lar1_screen13();
