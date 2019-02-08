@@ -1039,8 +1039,8 @@ void Game::setupCurrentScreen() {
 		ptr->frame = 0;
 	}
 	ptr->linkObjPtr = 0;
-	ptr->xPos = READ_LE_UINT16(dat + 0);
-	ptr->yPos = READ_LE_UINT16(dat + 2);
+	ptr->xPos = (int16_t)READ_LE_UINT16(dat + 0);
+	ptr->yPos = (int16_t)READ_LE_UINT16(dat + 2);
 	ptr->flags2 = READ_LE_UINT16(dat + 4);
 	ptr->anim = READ_LE_UINT16(dat + 6);
 	ptr->flags1 = ((ptr->flags2 >> 10) & 0x30) | (ptr->flags1 & ~0x30);
