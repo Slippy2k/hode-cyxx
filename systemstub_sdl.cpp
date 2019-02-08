@@ -139,10 +139,10 @@ void SystemStub_SDL::shakeScreen(int dx, int dy) {
 }
 
 static void clearScreen(uint32_t *dst, int dstPitch, int x, int y, int w, int h) {
-	uint32_t *p = dst + (y * dstPitch + x) * 3;
+	uint32_t *p = dst + (y * dstPitch + x) * _scalerMultiplier;
 	for (int j = 0; j < h; ++j) {
-		for (int i = 0; i < 3; ++i) {
-			memset(p, 0, w * sizeof(uint32_t) * 3);
+		for (int i = 0; i < _scalerMultiplier; ++i) {
+			memset(p, 0, w * sizeof(uint32_t) * _scalerMultiplier);
 			p += dstPitch;
 		}
 	}
