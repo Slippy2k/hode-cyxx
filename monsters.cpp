@@ -125,3 +125,50 @@ void Game::executeMstCode() {
 	++_executeMstLogicCounter;
 }
 
+
+Task *Game::findFreeTask() {
+	for (int i = 0; i < 128; ++i) {
+		Task *t = &_tasksTable[i];
+		if (!t->codeData) {
+			return t;
+		}
+	}
+	return 0;
+}
+
+Task *Game::createTask(const uint8_t *codeData) {
+	for (int i = 0; i < 128; ++i) {
+		Task *t = &_tasksTable[i];
+		if (!t->codeData) {
+			memset(t, 0, sizeof(Task));
+			// resetTask(t, codeData);
+			t->next = 0;
+			t->prev = _tasksListTail;
+			if (_tasksListTail) {
+				_tasksListTail->next = t;
+			}
+			_tasksListTail = t;
+			return t;
+		}
+	}
+	return 0;
+}
+
+void Game::removeTask(Task **tasksList, Task *t) {
+	Task *c = t->child;
+	if (c) {
+		c->codeData = 0;
+		t->child = 0;
+	}
+	Task *next = t->next;
+	t->codeData = 0;
+	t = t->prev;
+	if (t) {
+		t->next = next;
+	}
+	if (next) {
+		next->prev = t;
+	} else {
+		*tasksList = t;
+	}
+}

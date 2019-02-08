@@ -13,7 +13,6 @@
 #include "resource.h"
 
 struct Game;
-struct Task;
 struct PafPlayer;
 struct Video;
 struct SystemStub;
@@ -142,7 +141,6 @@ struct Game {
 
 	uint32_t _gameMstLogicHelper1TestValue;
 	uint32_t _gameMstLogicHelper1TestMask;
-	Task *_tasksListTail;
 	int _runTaskOpcodesCount;
 	int32_t _mstGlobalVars[40];
 	uint32_t _mstGlobalFlags;
@@ -164,6 +162,8 @@ struct Game {
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
+	Task _tasksTable[128];
+	Task *_tasksListTail;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -452,6 +452,10 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+
+	Task *findFreeTask();
+	Task *createTask(const uint8_t *codeData);
+	void removeTask(Task **tasksList, Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];

@@ -412,4 +412,18 @@ struct AndyMoveData {
 	const uint8_t *unk28;
 }; // sizeof == 0x2C
 
+struct Task {
+	const uint8_t *codeData;
+	Task *prev, *next; // 4,8
+	uint8_t *dataPtr; // 0xC
+	// GameMstUnk2 *unk10;
+	int16_t localVars[16]; // 0x14
+	uint8_t flags; // 0x34
+	uint8_t runningState; // 0x35
+	int16_t delay; // 0x36
+	uint32_t mstFlags; // mstFlags
+	int (Game::*run)(Task *t); // 0x3C
+	Task *child; // 0x40
+}; // sizeof == 0x44
+
 #endif // DEFS_H__
