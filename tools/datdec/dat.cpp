@@ -217,7 +217,7 @@ static void ReadSetupDat(File *f) {
 	_ecx += _edx;
 //	WRITE_LE_UINT32(_res_setupDatLoadingPicture + 4, _ecx); // palette data
 	_ecx += 768;
-	uint8_t *_menu_loadingSpritesList = _ecx;
+//	uint8_t *_menu_loadingSpritesList = _ecx;
 	
 	uint8_t *_edx_p = _ecx + 16;
 	uint8_t *_eax = menu_addToSpriteList(_ecx, _edx_p);
@@ -410,20 +410,20 @@ static void DecodeMenuData(File *f) {
 
 		uint8_t *_eax = menu_spritesBuffer;
 
-		uint8_t *menu_spritesList1 = _eax;
+//		uint8_t *menu_spritesList1 = _eax;
 		_eax = menu_addToSpriteList(_eax, _eax + 16);
-		uint8_t *menu_spritesList2 = _eax;
+//		uint8_t *menu_spritesList2 = _eax;
 		_eax = menu_addToSpriteList(_eax, _eax + 16);
-		uint8_t *menu_spritesList3 = _eax;
+//		uint8_t *menu_spritesList3 = _eax;
 
 		_eax += _res_setupDatHeader0x14 * 8;
 
-		uint32_t unkSize = READ_LE_UINT32(_eax); // null_var1
+		int unkSize = READ_LE_UINT32(_eax); // null_var1
 		_eax += 4;
-		uint8_t *menu_spritesPtr1 = _eax;
+//		uint8_t *menu_spritesPtr1 = _eax;
 
 		_eax += unkSize;
-		uint8_t *menu_spritesPtr2 = _eax;
+//		uint8_t *menu_spritesPtr2 = _eax;
 
 		_eax += _res_setupDatHeader0x44;
 		uint8_t *menu_spritesPtr3 = _eax;
@@ -449,9 +449,15 @@ static void DecodeMenuData(File *f) {
 }
 
 static void writeBenchmarkData(const char *filename, const uint8_t *data) {
+	uint8_t paletteBuffer[256 * 3];
+	for (int i = 0; i < 16; ++i) {
+		const uint8_t color = i * 16;
+		memset(paletteBuffer + 3 * i, color, 3);
+	}
+	memset(paletteBuffer + 16 * 3, 0, (256 - 240) * 3);
 	const int sz = UnpackData(9, data, decodeBuffer);
 	assert(sz == 256 * 192);
-	savePNG(filename, 256, 192, decodeBuffer, defaultPalette, 1);
+	savePNG(filename, 256, 192, decodeBuffer, paletteBuffer, 0);
 }
 
 static void DecodeBenchmarkData() {
