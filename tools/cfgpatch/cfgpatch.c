@@ -45,7 +45,7 @@ static void PlyPrintConfigData(const uint8_t *p) {
 		printf("Keyboard Action Alt %d 0x%X\n", i, PlyReadNextByte(p)); p++;
 	}
 	printf("Difficulty %d\n", PlyReadNextByte(p)); p++;
-	printf("Sound Enabled %d\n", PlyReadNextByte(p)); p++;
+	printf("Stereo Sound %d\n", PlyReadNextByte(p)); p++;
 	printf("Sound Volume %d\n", PlyReadNextByte(p)); p++;
 	printf("Last Level Reached %d\n", PlyReadNextByte(p)); p++;
 }
