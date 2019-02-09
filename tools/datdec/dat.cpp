@@ -9,6 +9,9 @@ static uint8_t decodeBuffer[256 * 192 * 4];
 static uint8_t fontBuffer[64 * 16 * 16];
 static uint8_t defaultPalette[256 * 3];
 
+static uint8_t titleScreenPalette[256 * 3];
+static uint8_t playerScreenPalette[256 * 3];
+
 static uint8_t _paf_buffer0x800[0x800];
 static uint8_t *_res_setupDatLoadingPicture;
 static int _res_setupDatFontSize;
@@ -138,6 +141,20 @@ static int sprite_counter = 0;
 
 static uint8_t *menu_addToSpriteList(uint8_t *_ecx, uint8_t *_edx) {
 	++group_counter;
+	const uint8_t *palette = defaultPalette;
+	switch (group_counter) {
+	case 1: {
+			const int compressedSize = READ_LE_UINT32(_res_setupDatLoadingPicture);
+			palette = _res_setupDatLoadingPicture + 8 + compressedSize;
+		}
+		break;
+	case 2:
+		palette = titleScreenPalette;
+		break;
+	case 3:
+		palette = playerScreenPalette;
+		break;
+	}
 	const int size = READ_LE_UINT32(_ecx + 8);
 	const int count = READ_LE_UINT16(_ecx + 12);
 	fprintf(stdout, "sprites size %d count %d\n", size, count);
@@ -157,7 +174,7 @@ static uint8_t *menu_addToSpriteList(uint8_t *_ecx, uint8_t *_edx) {
 			char name[32];
 			snprintf(name, sizeof(name), "sprite_%02d_%03d.png", group_counter, sprite_counter);
 			++sprite_counter;
-			savePNG(name, w, h, decodeBuffer, defaultPalette, 1);
+			savePNG(name, w, h, decodeBuffer, palette, 1);
 		}
 
 		p += compressedSize + 2;
@@ -278,12 +295,15 @@ static void DecodeHintScreen(File *f) {
 	}
 }
 
-static void DecodeMenuBitmap256x192(const char *filename, int compressedSize, const uint8_t *p) {
+static void DecodeMenuBitmap256x192(const char *filename, int compressedSize, const uint8_t *p, uint8_t *dstPalette) {
 	const int decompressedSize = UnpackData(9, p, decodeBuffer);
 	fprintf(stdout, "bitmap %d %d\n", compressedSize, decompressedSize);
 	if (decompressedSize == 256 * 192) {
 		const uint8_t *palette = p + compressedSize;
 		savePNG(filename, 256, 192, decodeBuffer, palette, 1);
+		if (dstPalette) {
+			memcpy(dstPalette, palette, 256 * 3);
+		}
 	}
 }
 
@@ -368,12 +388,12 @@ static void DecodeMenuData(File *f) {
 
 		int compressedSize = READ_LE_UINT32(menu_titleBitmap);
 		if (compressedSize != 0) {
-			DecodeMenuBitmap256x192("title.png", compressedSize, p);
+			DecodeMenuBitmap256x192("title.png", compressedSize, p, titleScreenPalette);
 			p += compressedSize + 768;
 		}
 		compressedSize = READ_LE_UINT32(menu_playerBitmap);
 		if (compressedSize != 0) {
-			DecodeMenuBitmap256x192("player.png", compressedSize, p);
+			DecodeMenuBitmap256x192("player.png", compressedSize, p, playerScreenPalette);
 			p += compressedSize + 768;
 		}
 		for (int i = 0; i < 152 / 8; ++i) {
@@ -381,20 +401,20 @@ static void DecodeMenuData(File *f) {
 			if (compressedSize != 0) {
 				char name[16];
 				snprintf(name, sizeof(name), "options_%02d.png", i);
-				DecodeMenuBitmap256x192(name, compressedSize, p);
+				DecodeMenuBitmap256x192(name, compressedSize, p, 0);
 				p += compressedSize + 768;
 			}
 		}
 
-		p = DecodeMenuBitmap("cutscenes%02d.png", menu_cutsceneBitmaps, _res_setupDatHeader0x18, p);
-		p = DecodeMenuBitmap("level1_checkpoints%02d.png", menu_dataPtr2, _res_setupDatHeader0x20, p);
-		p = DecodeMenuBitmap("level2_checkpoints%02d.png", menu_dataPtr3, _res_setupDatHeader0x24, p);
-		p = DecodeMenuBitmap("level3_checkpoints%02d.png", menu_dataPtr4, _res_setupDatHeader0x28, p);
-		p = DecodeMenuBitmap("level4_checkpoints%02d.png", menu_dataPtr5, _res_setupDatHeader0x2C, p);
-		p = DecodeMenuBitmap("level5_checkpoints%02d.png", menu_dataPtr6, _res_setupDatHeader0x30, p);
-		p = DecodeMenuBitmap("level6_checkpoints%02d.png", menu_dataPtr7, _res_setupDatHeader0x34, p);
-		p = DecodeMenuBitmap("level7_checkpoints%02d.png", menu_dataPtr8, _res_setupDatHeader0x38, p);
-		p = DecodeMenuBitmap("level8_checkpoints%02d.png", menu_dataPtr9, _res_setupDatHeader0x3C, p);
+		p = DecodeMenuBitmap("cutscene_%02d.png", menu_cutsceneBitmaps, _res_setupDatHeader0x18, p);
+		p = DecodeMenuBitmap("level1_checkpoint_%02d.png", menu_dataPtr2, _res_setupDatHeader0x20, p);
+		p = DecodeMenuBitmap("level2_checkpoint_%02d.png", menu_dataPtr3, _res_setupDatHeader0x24, p);
+		p = DecodeMenuBitmap("level3_checkpoint_%02d.png", menu_dataPtr4, _res_setupDatHeader0x28, p);
+		p = DecodeMenuBitmap("level4_checkpoint_%02d.png", menu_dataPtr5, _res_setupDatHeader0x2C, p);
+		p = DecodeMenuBitmap("level5_checkpoint_%02d.png", menu_dataPtr6, _res_setupDatHeader0x30, p);
+		p = DecodeMenuBitmap("level6_checkpoint_%02d.png", menu_dataPtr7, _res_setupDatHeader0x34, p);
+		p = DecodeMenuBitmap("level7_checkpoint_%02d.png", menu_dataPtr8, _res_setupDatHeader0x38, p);
+		p = DecodeMenuBitmap("level8_checkpoint_%02d.png", menu_dataPtr9, _res_setupDatHeader0x3C, p);
 		p = DecodeMenuBitmap("levels%02d.png", menu_dataPtr10, _res_setupDatHeader0x1C, p);
 
 		free(menu_bitmapsBuffer);
