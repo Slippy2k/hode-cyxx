@@ -540,8 +540,8 @@ void Resource::loadSssData(const char *levelName) {
 	_sssHdr.codeSize = _sssFile->readUint32();
 	_sssHdr.preloadData1Count = _sssFile->readUint32() & 255;
 	debug(kDebug_RESOURCE, "_sssHdr.codeOffsetsCount %d _sssHdr.codeSize %d", _sssHdr.codeOffsetsCount, _sssHdr.codeSize);
-	_sssHdr.preloadData2Count = _sssFile->readUint32() & 255;
-	_sssHdr.preloadData3Count = _sssFile->readUint32() & 255;
+	_sssHdr.preloadData2Count = _sssFile->readUint32() & 255; // sprites
+	_sssHdr.preloadData3Count = _sssFile->readUint32() & 255; // mst
 	_sssHdr.pcmCount = _sssFile->readUint32(); // _edx
 
 	const int bufferSize = _sssHdr.unk4 + _sssHdr.dataUnk2Count * 52 + _sssHdr.dataUnk3Count * 56;
@@ -727,11 +727,11 @@ void Resource::loadSssData(const char *levelName) {
 		bytesRead += 20;
 	}
 	// _res_sssFilters = data; // size : sssHdr.unk14 * 52
-	static const int kSizeOfDataUnk4 = 52;
+	static const int kSizeOfSssFilter = 52;
 	_sssFilters = (SssFilter *)malloc(_sssHdr.dataUnk2Count * sizeof(SssFilter));
 	for (int i = 0; i < _sssHdr.dataUnk2Count; ++i) {
-		uint8_t buf[kSizeOfDataUnk4];
-		_sssFile->read(buf, kSizeOfDataUnk4);
+		uint8_t buf[kSizeOfSssFilter];
+		_sssFile->read(buf, kSizeOfSssFilter);
 		_sssFilters[i].unk4 = READ_LE_UINT32(buf + 4);
 		_sssFilters[i].unk8 = READ_LE_UINT32(buf + 8);
 		_sssFilters[i].unkC = READ_LE_UINT32(buf + 0xC);
@@ -740,7 +740,7 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFilters[i].unk1C = READ_LE_UINT32(buf + 0x1C);
 		_sssFilters[i].unk24 = READ_LE_UINT32(buf + 0x24);
 		_sssFilters[i].unk30 = READ_LE_UINT32(buf + 0x30);
-		bytesRead += kSizeOfDataUnk4;
+		bytesRead += kSizeOfSssFilter;
 		// debug(kDebug_RESOURCE, "sssFilter #%d/%d ", i, _sssHdr.dataUnk2Count);
 	}
 

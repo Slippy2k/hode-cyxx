@@ -92,8 +92,8 @@ struct SssUnk1 {
 };
 
 struct SssUnk2 {
-	uint8_t unk0;
-	int8_t unk1;
+	uint8_t unk0; // defaultPriority
+	int8_t unk1; // defaultVolume
 	int8_t unk2;
 	uint8_t pad;
 };
@@ -234,7 +234,6 @@ struct Resource {
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
 
 	void loadHintImage(int num, uint8_t *dst, uint8_t *pal);
-
 	void loadLoadingImage(uint8_t *dst, uint8_t *pal);
 
 	uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);

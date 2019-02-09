@@ -909,7 +909,23 @@ void Game::clearSoundObjects() {
 			memset(_res->_sssLookupTable3[i], 0, size);
 		}
 	}
-	// TODO:
+	// memset(_channelMixingTable, 0, 8 * 4);
+	if (_res->_sssFilters) {
+		memset(_res->_sssFilters, 0, _res->_sssHdr.dataUnk2Count * sizeof(SssFilter));
+		if (_res->_sssHdr.dataUnk2Count != 0) {
+			for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
+				const int a = _res->_sssDataUnk2[i].unk0 << 16;
+				_res->_sssFilters[i].unk4 = a;
+				_res->_sssFilters[i].unk0 = a;
+				const int b = _res->_sssDataUnk2[i].unk1 << 16;
+				_res->_sssFilters[i].unk14 = b;
+				_res->_sssFilters[i].unk10 = b;
+				const int c = _res->_sssDataUnk2[i].unk2 << 16;
+				_res->_sssFilters[i].unk24 = c;
+				_res->_sssFilters[i].unk20 = c;
+			}
+		}
+	}
 }
 
 void Game::fadeSoundObject(SssObject *so) {
