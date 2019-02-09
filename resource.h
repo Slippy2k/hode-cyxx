@@ -106,15 +106,16 @@ struct SssUnk3 {
 };
 
 struct SssCodeOffset {
-	uint16_t unk0; // index to _sssPcmTable
+	uint16_t pcm; // index to _sssPcmTable
 	uint16_t unk2;
-	uint16_t unk4;
+	uint8_t unk4;
+	uint8_t unk5;
 	uint8_t unk6;
 	uint8_t unk7;
-	uint32_t unk8; // offset to _sssCodeData
-	uint32_t unkC; // offset to _sssCodeData
-	uint32_t unk10; // offset to _sssCodeData
-	uint32_t unk14; // offset to _sssCodeData
+	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
+	uint32_t codeOffset2; // 0xC offset to _sssCodeData
+	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
+	uint32_t codeOffset4; // 0x14 offset to _sssCodeData
 };
 
 struct SssFilter {

@@ -588,16 +588,17 @@ void Resource::loadSssData(const char *levelName) {
 	// _sssCodeOffsets
 	_sssCodeOffsets = (SssCodeOffset *)malloc(_sssHdr.codeOffsetsCount * sizeof(SssCodeOffset));
 	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
-		_sssCodeOffsets[i].unk0 = _sssFile->readUint16(); // 0x0
+		_sssCodeOffsets[i].pcm = _sssFile->readUint16(); // 0x0
 		_sssCodeOffsets[i].unk2 = _sssFile->readUint16(); // 0x0
-		_sssCodeOffsets[i].unk4 = _sssFile->readUint16(); // 0x4
+		_sssCodeOffsets[i].unk4 = _sssFile->readByte(); // 0x4
+		_sssCodeOffsets[i].unk5 = _sssFile->readByte(); // 0x5
 		_sssCodeOffsets[i].unk6 = _sssFile->readByte(); // 0x6
 		_sssCodeOffsets[i].unk7 = _sssFile->readByte(); // 0x7
-		_sssCodeOffsets[i].unk8 = _sssFile->readUint32(); // 0x8 offset to sssCodeData
-		_sssCodeOffsets[i].unkC = _sssFile->readUint32(); // 0xC offset to sssCodeData
-		_sssCodeOffsets[i].unk10 = _sssFile->readUint32(); // 0x10 offset to sssCodeData
-		_sssCodeOffsets[i].unk14 = _sssFile->readUint32(); // 0x14 offset to sssCodeData
-		debug(kDebug_RESOURCE, "SssCodeOffset #%d unk0 %d unk2 %d", i, _sssCodeOffsets[i].unk0, _sssCodeOffsets[i].unk2);
+		_sssCodeOffsets[i].codeOffset1 = _sssFile->readUint32(); // 0x8 offset to sssCodeData
+		_sssCodeOffsets[i].codeOffset2 = _sssFile->readUint32(); // 0xC offset to sssCodeData
+		_sssCodeOffsets[i].codeOffset3 = _sssFile->readUint32(); // 0x10 offset to sssCodeData
+		_sssCodeOffsets[i].codeOffset4 = _sssFile->readUint32(); // 0x14 offset to sssCodeData
+		debug(kDebug_RESOURCE, "SssCodeOffset #%d unk0 %d unk2 %d", i, _sssCodeOffsets[i].pcm, _sssCodeOffsets[i].unk2);
 		bytesRead += 24;
 	}
 	_sssCodeData = (uint8_t *)malloc(_sssHdr.codeSize);
@@ -791,10 +792,10 @@ void Resource::loadSssData(const char *levelName) {
 		}
 	}
 // loc_429C00:
-	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
-//		if (_sssCodeOffset[] != 0xFFFFFFFF) {
+//	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
+//		if (_sssCodeOffsets[i] != 0xFFFFFFFF) {
 //		}
-	}
+//	}
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
 	assert(bufferSize == bytesRead);
 // loc_429C96:

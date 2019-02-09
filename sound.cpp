@@ -675,10 +675,10 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.unk4C = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
-	debug(kDebug_SOUND, "startSoundObject dpcm %d", _res->_sssCodeOffsets[codeOffset].unk0);
-	tmpObj.pcm = &_res->_sssPcmTable[_res->_sssCodeOffsets[codeOffset].unk0];
+	debug(kDebug_SOUND, "startSoundObject dpcm %d", _res->_sssCodeOffsets[codeOffset].pcm);
+	tmpObj.pcm = &_res->_sssPcmTable[_res->_sssCodeOffsets[codeOffset].pcm];
 	// TEMP: mixSounds
-		const int dpcm = _res->_sssCodeOffsets[codeOffset].unk0;
+		const int dpcm = _res->_sssCodeOffsets[codeOffset].pcm;
 		_res->loadSssDpcm(dpcm);
 		const int16_t *pcm = _res->_sssPcmTable[dpcm].ptr;
 		if (pcm) {
@@ -708,7 +708,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 			_system->unlockAudio();
 		}
 	//
-	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, _res->_sssCodeOffsets[codeOffset].unk8);
+	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, _res->_sssCodeOffsets[codeOffset].codeOffset1);
 	debug(kDebug_SOUND, "code %p", code);
 	if (code) {
 		// executeSssCode(&tmpObj, code);
@@ -944,7 +944,7 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 			if (obj->screenNum == _currentRightScreen) {
 				return 129;
 			}
-			if (obj->screenNum == _currentScreen || (_currentLevel == 7 && obj->data0x2988 == 0x1B) || (_currentLevel == 3 && obj->data0x2988 == 0x1A)) {
+			if (obj->screenNum == _currentScreen || (_currentLevel == 7 && obj->data0x2988 == 27) || (_currentLevel == 3 && obj->data0x2988 == 26)) {
 				const int dist = (obj->xPos + obj->width / 2) / 2;
 				return CLIP(dist, 0, 128);
 			}
