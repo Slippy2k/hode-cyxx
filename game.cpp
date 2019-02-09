@@ -1734,6 +1734,7 @@ void Game::mainLoop(int level, int checkpoint) {
 	benchmarkCpu();
 	_res->loadSetupDat();
 	_res->loadLvlData(_resLevelNames[_currentLevel]);
+	_res->loadMstData(_resLevelNames[_currentLevel]);
 	_res->loadSssData(_resLevelNames[_currentLevel]);
 	_system->startAudio(mixCb, this);
 	levelMainLoop();
