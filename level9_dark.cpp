@@ -12,7 +12,7 @@ void Game::postScreenUpdate_dark_screen0() {
 			if (!_paf->_skipCutscenes) {
 				_paf->play(20);
 				_paf->unload(20);
-				// sub_427F32
+				displayHintScreen(_res->_datHdr.yesNoQuitImage - 1, 25);
 				_paf->preload(21);
 				_paf->play(21);
 				_paf->unload(21);
