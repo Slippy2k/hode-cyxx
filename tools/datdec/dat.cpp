@@ -472,32 +472,19 @@ static void DecodeMenuData(File *f) {
 	}
 }
 
-static void writeBenchmarkData(const char *filename, const uint8_t *buf) {
+static void writeBenchmarkData(const char *filename, const uint8_t *data) {
+	const int sz = UnpackData(9, data, decodeBuffer);
+	assert(sz == 256 * 192);
 	FILE *fp = fopen(filename, "wb");
 	if (fp) {
-		raw2png(fp, buf, 256, 192, defaultPalette, 0);
-		fclose(fp);
-	}
-}
-
-static void writeFile(const char *filename, const uint8_t *buf, int bufSize) {
-	FILE *fp = fopen(filename, "wb");
-	if (fp) {
-		fwrite(buf, bufSize, 1, fp);
+		raw2png(fp, decodeBuffer, 256, 192, defaultPalette, 1);
 		fclose(fp);
 	}
 }
 
 static void DecodeBenchmarkData() {
-	int sz1 = UnpackData(9, byte_43D960, decodeBuffer);
-	assert(sz1 == 256 * 192);
-	writeFile("data_43D960.bin", decodeBuffer, sz1);
-	writeBenchmarkData("data_43D960.png", decodeBuffer);
-
-	int sz2 = UnpackData(9, byte_43EA78, decodeBuffer);
-	assert(sz2 == 256 * 192);
-	writeFile("data_43EA78.bin", decodeBuffer, sz2);
-	writeBenchmarkData("data_43EA78.png", decodeBuffer);
+	writeBenchmarkData("data_43D960.png", byte_43D960);
+	writeBenchmarkData("data_43EA78.png", byte_43EA78);
 }
 
 int main(int argc, char *argv[]) {

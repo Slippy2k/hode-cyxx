@@ -107,8 +107,8 @@ int main(int argc, char* argv[]) {
 
 	// demo
 
-//		dumpInt(fp, "_benchmarkData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_benchmarkData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS);
+//		dumpInt(fp, "Game::_transformBufferData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS); // _benchmarkData1
+//		dumpInt(fp, "Game::_transformBufferData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS); // _benchmarkData2
 //		dumpInt(fp, "_byte_43E8F8", 0x3E8F8, 68, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_byte_43E940", 0x3E940, 68, "0x%02X", UNSIGNED_8BITS);
 //		dumpInt(fp, "_level1OpHelper1KeyMaskTable", 0x3E888, 112, "%d", UNSIGNED_8BITS);

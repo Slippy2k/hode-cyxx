@@ -24,9 +24,9 @@ uint32_t Game::benchmarkCpu() {
 	uint8_t *p = _video->_shadowLayer;
 	int count = 32;
 	do {
-		decodeLZW(_benchmarkData1, p);
+		decodeLZW(_transformBufferData1, p);
 		benchmarkLoop(p, 65536);
-		decodeLZW(_benchmarkData2, p);
+		decodeLZW(_transformBufferData2, p);
 		_video->updateGameDisplay(p);
 	} while (--count != 0);
 	const uint32_t score = _system->getTimeStamp() - t0;
