@@ -91,11 +91,10 @@ struct SssUnk1 {
 	uint8_t unk7;
 };
 
-struct SssUnk2 {
+struct SssUnk2 { // SssProperty
 	uint8_t unk0; // defaultPriority
 	int8_t unk1; // defaultVolume
 	int8_t unk2;
-	uint8_t pad;
 };
 
 struct SssUnk3 {
@@ -132,10 +131,12 @@ struct SssFilter {
 	int32_t unk30; // flag
 };
 
+#define SIZEOF_SssFilter 52
+
 struct SssPcm {
 	int16_t *ptr;    // 0 PCM data
 	uint32_t offset; // 4 offset in .sss
-	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed with indexes)
+	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed by indexes)
 	uint32_t strideSize;
 	uint16_t strideCount;
 	uint16_t flag;
