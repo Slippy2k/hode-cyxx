@@ -49,3 +49,11 @@ void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t 
 
 	png_destroy_write_struct(&png, &png_info);
 }
+
+void savePNG(const char *filename, int w, int h, const uint8_t *src, const uint8_t *palette, int vga_colors) {
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		raw2png(fp, src, w, h, palette, vga_colors);
+		fclose(fp);
+	}
+}

@@ -2,7 +2,7 @@
 #include "file.h"
 #include "staticdata.h"
 
-extern void raw2png(FILE *fp, const uint8_t *src, int width, int height, const uint8_t *palette, int raw2png_6bits_color);
+extern void savePNG(const char *filename, int w, int h, const uint8_t *src, const uint8_t *palette, int vga_colors);
 extern int UnpackData(int type, const uint8_t *src, uint8_t *dst);
 
 static uint8_t decodeBuffer[256 * 192 * 4];
@@ -157,11 +157,7 @@ static uint8_t *menu_addToSpriteList(uint8_t *_ecx, uint8_t *_edx) {
 			char name[32];
 			snprintf(name, sizeof(name), "sprite_%02d_%03d.png", group_counter, sprite_counter);
 			++sprite_counter;
-			FILE *fp = fopen(name, "wb");
-			if (fp) {
-				raw2png(fp, decodeBuffer, w, h, defaultPalette, 0);
-				fclose(fp);
-			}
+			savePNG(name, w, h, decodeBuffer, defaultPalette, 1);
 		}
 
 		p += compressedSize + 2;
@@ -246,11 +242,7 @@ static void res_loadFont() {
 				offset += 16;
 			}
 		}
-		FILE *fp = fopen("font.png", "wb");
-		if (fp) {
-			raw2png(fp, fontBuffer, 16, 16 * 64, defaultPalette, 0);
-			fclose(fp);
-		}
+		savePNG("font.png", 16, 16 * 64, fontBuffer, defaultPalette, 1);
 	}
 }
 
@@ -261,11 +253,7 @@ static void DecodeLoadingScreen() {
 	int size = UnpackData(9, _res_setupDatLoadingPicture + 8, decodeBuffer);
 	printf("DecodeLoadingScreen size %d\n", size);
 	if (size == 256 * 192) {
-		FILE *fp = fopen("loading.png", "wb");
-		if (fp) {
-			raw2png(fp, decodeBuffer, 256, 192, _res_setupDatLoadingPicture + 8 + src_size_1, 1);
-			fclose(fp);
-		}
+		savePNG("loading.png", 256, 192, decodeBuffer, _res_setupDatLoadingPicture + 8 + src_size_1, 1);
 	}
 }
 
@@ -284,12 +272,8 @@ static void DecodeHintScreen(File *f) {
 				res_seekAndReadCurrentFile3(f, pal, 0x800, offs + size_img);
 			}
 			char filename[32];
-			sprintf(filename, "hint_%02d.png", i);
-			FILE *fp = fopen(filename, "wb");
-			if (fp) {
-				raw2png(fp, decodeBuffer, 256, 192, pal, 1);
-				fclose(fp);
-			}
+			snprintf(filename, sizeof(filename), "hint_%02d.png", i);
+			savePNG(filename, 256, 192, decodeBuffer, pal, 1);
 		}
 	}
 }
@@ -299,11 +283,7 @@ static void DecodeMenuBitmap256x192(const char *filename, int compressedSize, co
 	fprintf(stdout, "bitmap %d %d\n", compressedSize, decompressedSize);
 	if (decompressedSize == 256 * 192) {
 		const uint8_t *palette = p + compressedSize;
-		FILE *fp = fopen(filename, "wb");
-		if (fp) {
-			raw2png(fp, decodeBuffer, 256, 192, palette, 1);
-			fclose(fp);
-		}
+		savePNG(filename, 256, 192, decodeBuffer, palette, 1);
 	}
 }
 
@@ -332,11 +312,7 @@ static uint8_t *DecodeMenuBitmap(const char *filename, const uint8_t *data, int 
 
 		char name[32];
 		snprintf(name, sizeof(name), filename, i);
-		FILE *fp = fopen(name, "wb");
-		if (fp) {
-			raw2png(fp, p, w, h, palette, 1);
-			fclose(fp);
-		}
+		savePNG(name, w, h, p, palette, 1);
 
 		p += w * h + 768;
 	}
@@ -475,11 +451,7 @@ static void DecodeMenuData(File *f) {
 static void writeBenchmarkData(const char *filename, const uint8_t *data) {
 	const int sz = UnpackData(9, data, decodeBuffer);
 	assert(sz == 256 * 192);
-	FILE *fp = fopen(filename, "wb");
-	if (fp) {
-		raw2png(fp, decodeBuffer, 256, 192, defaultPalette, 1);
-		fclose(fp);
-	}
+	savePNG(filename, 256, 192, decodeBuffer, defaultPalette, 1);
 }
 
 static void DecodeBenchmarkData() {
