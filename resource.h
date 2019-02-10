@@ -98,8 +98,8 @@ struct SssUnk2 { // SssProperty
 };
 
 struct SssUnk3 {
-	uint8_t unk0; // 0 flags0
-	uint8_t unk1; // 1 flags1
+	uint8_t flags; // 0 flags0
+	int8_t count; // 1
 	uint16_t sssFilter; // 2 index to _sssFilters
 	uint32_t firstCodeOffset; // 4 offset to _sssCodeOffsets
 };
@@ -143,11 +143,8 @@ struct SssPcm {
 };
 
 struct SssUnk6 {
-	uint32_t unk0;
-	uint32_t unk4;
-	uint32_t unk8;
-	uint32_t unkC;
-	uint32_t unk10;
+	uint32_t unk0[4]; // 0
+	uint32_t unk10; // 10
 };
 
 struct SssPreloadData {

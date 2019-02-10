@@ -633,26 +633,86 @@ void Game::killSoundObject(uint32_t flags) {
 	}
 }
 
-void Game::prepareSoundObject(int num, int b, int c) {
-	debug(kDebug_SOUND, "prepareSoundObject num %d b %d c 0x%x", num, b, c);
+SssObject *Game::prepareSoundObject(int num, int b, int flags) {
+	debug(kDebug_SOUND, "prepareSoundObject num %d b %d c 0x%x", num, b, flags);
+	SssObject *ret = 0;
 	if (b > 0) {
-		if ((_res->_sssDataUnk3[num].unk1 & 1) != 0) {
-			// int var8 = _res->_sssDataUnk3[num].sssFilter
-			if (_res->_sssDataUnk3[num].unk0 <= 0) {
-				return; // 0;
+		SssUnk3 *unk3 = &_res->_sssDataUnk3[num];
+		if ((unk3->flags & 1) != 0) {
+			int firstCodeOffset = unk3->firstCodeOffset;
+			if (unk3->count <= 0) {
+				return 0;
 			}
+			assert(firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
+			SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
 // 42B81D
+			int i = 0;
+			int priority = 0;
+			do {
+				if (codeOffset->pcm != -1) {
+					SssObject *so = startSoundObject(num, i, flags);
+					if (so && so->unk2C < priority) {
+						priority = so->unk2C;
+						ret = so;
+					}
+				}
+				++codeOffset;
+			} while (++i < unk3->count);
 		}
-// 42B865:
-		// TODO:
-		warning("prepareSoundObject b %d unimplemented", b);
+// 42B865
+#if 1
+		warning("prepareSoundObject b %d unimplemented, SssUnk6 not updated", b);
+#else
+		uint32_t _eax = 1 << (_rnd.update() & 31);
+		SssUnk6 *unk6 = &_res->_sssDataUnk6[num];
+		if ((unk6->unk10 & _eax) == 0) {
+			if (_eax > unk6->unk10) {
+				do {
+					_eax >>= 1;
+				} while ((unk6->unk10 & _eax) == 0);
+			} else {
+// 42B8A8
+				do {
+					_eax <<= 1;
+				} while ((unk6->unk10 & _eax) == 0);
+			}
+		}
+// 42B8AE
+		b = 0;
+		if (unk3->count > 0) {
+			do {
+				if ((unk6->unk0[b] & _eax) != 0) {
+					break;
+				}
+			} while (++b < unk3->count);
+		}
+// 42B8C7
+		if ((unk3->flags & 2) != 0) {
+			unk6->unk10 &= ~unk6->unk0[b];
+			if (unk6->unk10 == 0 && unk3->count > 0) {
+				int i = 0;
+				do {
+					unk6->unk10 |= unk6->unk0[i];
+				} while (++i < unk3->count);
+			}
+		}
+#endif
+// 42B8E9
+		ret = startSoundObject(num, b, flags);
+// 42B909
+		if (ret && (_res->_sssDataUnk3[num].flags & 4) != 0) {
+			ret->unk78 = num;
+			ret->unk7C = -1;
+		}
 	} else {
-		SssObject *so = startSoundObject(num, b, c);
-		if (so && (_res->_sssDataUnk3[num].unk0 & 4) != 0) {
+		SssObject *so = startSoundObject(num, b, flags);
+		if (so && (_res->_sssDataUnk3[num].flags & 4) != 0) {
 			so->unk7C = b;
 			so->unk78 = num;
 		}
+		ret = so;
 	}
+	return ret;
 }
 
 SssObject *Game::startSoundObject(int num, int b, int flags) {

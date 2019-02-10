@@ -578,11 +578,11 @@ void Resource::loadSssData(const char *levelName) {
 	// _sssDataUnk3
 	_sssDataUnk3 = (SssUnk3 *)malloc(_sssHdr.dataUnk3Count * sizeof(SssUnk3));
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
-		_sssDataUnk3[i].unk0 = _sssFile->readByte();
-		_sssDataUnk3[i].unk1 = _sssFile->readByte();
+		_sssDataUnk3[i].flags = _sssFile->readByte();
+		_sssDataUnk3[i].count = _sssFile->readByte();
 		_sssDataUnk3[i].sssFilter = _sssFile->readUint16();
 		_sssDataUnk3[i].firstCodeOffset = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "SssDataUnk3 #%d unk1 %d codeOffset 0x%x", i, _sssDataUnk3[i].unk1, _sssDataUnk3[i].firstCodeOffset);
+		debug(kDebug_RESOURCE, "SssDataUnk3 #%d count %d codeOffset 0x%x", i, _sssDataUnk3[i].count, _sssDataUnk3[i].firstCodeOffset);
 		bytesRead += 8;
 	}
 	// _sssCodeOffsets
@@ -783,7 +783,7 @@ void Resource::loadSssData(const char *levelName) {
 		}
 	}
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
-		if (_sssDataUnk3[i].unk1 != 0) {
+		if (_sssDataUnk3[i].count != 0) {
 			const int num = _sssDataUnk3[i].firstCodeOffset;
 			// _sssDataUnk3[i].codeOffset = &_sssCodeOffsets[num];
 			debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
