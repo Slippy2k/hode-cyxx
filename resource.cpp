@@ -719,7 +719,7 @@ void Resource::loadSssData(const char *levelName) {
 		_sssPcmTable[i].strideSize = d;
 		_sssPcmTable[i].strideCount = e;
 		_sssPcmTable[i].flag = f;
-		debug(kDebug_RESOURCE, "sssDpcmTable #%d/%d 0x%x offset 0x%x size %d stride %d %d flag %d", i, _sssHdr.pcmCount, a, b, c, d, e, f);
+		debug(kDebug_RESOURCE, "sssPcmTable #%d/%d 0x%x offset 0x%x size %d stride %d %d flag %d", i, _sssHdr.pcmCount, a, b, c, d, e, f);
 		if (c != 0) {
 			assert((c % d) == 0); // total size must be multiple of stride
 			assert(c == d * e); // total size is stride size * count
@@ -885,15 +885,12 @@ void Resource::checkSssCode(const uint8_t *buf, int size) {
 	}
 }
 
-uint32_t Resource::getSssDpcmSize(int num) const {
-	if (num >= 0 && num < _sssHdr.pcmCount) {
-		return (_sssPcmTable[num].strideSize - 256 * sizeof(int16_t)) * _sssPcmTable[num].strideCount * sizeof(int16_t);
-	}
-	return 0;
+uint32_t Resource::getSssPcmSize(SssPcm *pcm) const {
+	return (pcm->strideSize - 256 * sizeof(int16_t)) * pcm->strideCount * sizeof(int16_t);
 }
 
-void Resource::loadSssDpcm(int num) {
-	uint32_t decompressedSize = getSssDpcmSize(num);
+void Resource::loadSssPcm(int num) {
+	uint32_t decompressedSize = getSssPcmSize(&_sssPcmTable[num]);
 	if (decompressedSize != 0 && !_sssPcmTable[num].ptr) {
 		debug(kDebug_SOUND, "Loading PCM %d decompressedSize %d", num, decompressedSize);
 		int16_t *p = (int16_t *)malloc(decompressedSize);

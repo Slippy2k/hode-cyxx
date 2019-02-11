@@ -240,8 +240,8 @@ struct Resource {
 
 	void loadSssData(const char *levelName);
 	void checkSssCode(const uint8_t *buf, int size);
-	void loadSssDpcm(int num);
-	uint32_t getSssDpcmSize(int num) const;
+	void loadSssPcm(int num);
+	uint32_t getSssPcmSize(SssPcm *pcm) const;
 
 	uint32_t *getSssLutPtr(int lut, uint32_t flags) {
 		const uint32_t a = (flags >> 20) & 0xF;

@@ -719,7 +719,18 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "startSoundObject codeOffset %d", firstCodeOffset);
 	assert(firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
 	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
-	if (unk3->sssFilter != 0 && 0) {
+	// TEMP: mixSounds
+	{
+		_res->loadSssPcm(codeOffset->pcm);
+		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
+		if (pcm->ptr) {
+			uint32_t size = _res->getSssPcmSize(pcm);
+			assert((size & 1) == 0);
+			_mix.playPcm((const uint8_t *)pcm->ptr, size, 22050, 0 /* volume */, 0 /* pan */);
+		}
+	}
+	//
+	if (unk3->sssFilter != 0) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[unk3->sssFilter];
 		// int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
@@ -783,16 +794,6 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.volumePtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", codeOffset->pcm);
 	tmpObj.pcm = &_res->_sssPcmTable[codeOffset->pcm];
-	// TEMP: mixSounds
-		const int dpcm = codeOffset->pcm;
-		_res->loadSssDpcm(dpcm);
-		const int16_t *pcm = _res->_sssPcmTable[dpcm].ptr;
-		if (pcm) {
-			uint32_t size = _res->getSssDpcmSize(dpcm);
-			assert((size & 1) == 0);
-			_mix.playPcm((const uint8_t *)pcm, size, 22050, 0 /* volume */, 0 /* pan */);
-		}
-	//
 	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
 	debug(kDebug_SOUND, "code %p", code);
 	if (code) {
