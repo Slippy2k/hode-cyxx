@@ -12,8 +12,18 @@
 static const char *kIconBmp = "icon.bmp";
 
 static int _scalerMultiplier = 3;
+static const Scaler *_scaler = &scaler_xbr;
 
 static const int _pixelFormat = SDL_PIXELFORMAT_RGB888;
+
+static const struct {
+	const char *name;
+	const Scaler *scaler;
+} _scalers[] = {
+	{ "nearest", &scaler_nearest },
+	{ "xbr", &scaler_xbr },
+	{ 0, 0 }
+};
 
 struct KeyMapping {
 	int keyCode;
@@ -45,6 +55,7 @@ struct SystemStub_SDL : SystemStub {
 	virtual ~SystemStub_SDL() {}
 	virtual void init(const char *title, int w, int h);
 	virtual void destroy();
+	virtual void setScaler(const char *name, int multiplier);
 	virtual void setPalette(const uint8_t *pal, int n, int depth);
 	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch);
 	virtual void fillRect(int x, int y, int w, int h, uint8_t color);
@@ -97,6 +108,20 @@ void SystemStub_SDL::destroy() {
 	_offscreenLut = 0;
 	free(_offscreenRgb);
 	_offscreenRgb = 0;
+}
+
+void SystemStub_SDL::setScaler(const char *name, int multiplier) {
+	if (multiplier != 0) {
+		_scalerMultiplier = multiplier;
+	}
+	if (name) {
+		for (int i = 0; _scalers[i].name; ++i) {
+			if (strcmp(name, _scalers[i].name) == 0) {
+				_scaler = _scalers[i].scaler;
+				break;
+			}
+		}
+	}
 }
 
 void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
@@ -186,7 +211,7 @@ void SystemStub_SDL::updateScreen() {
 		}
 		p += w;
 	}
-	scaler_xbr.scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
+	_scaler->scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
 	SDL_UnlockTexture(_texture);
 
 	//SDL_UpdateTexture(_texture, 0, _screenBuffer, _screenW * sizeof(uint32_t));

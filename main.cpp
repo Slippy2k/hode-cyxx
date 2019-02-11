@@ -6,9 +6,14 @@
 #include <getopt.h>
 #include <sys/stat.h>
 
+#include "3p/inih/ini.h"
+
 #include "game.h"
+#include "paf.h"
 #include "util.h"
 #include "systemstub.h"
+
+static const char *_configIni = "hode.ini";
 
 static const char *_usage =
 	"HODe - Heart Of Darkness Interpreter\n"
@@ -42,6 +47,35 @@ static const char *_levelNames[] = {
 	"dark",
 	0
 };
+
+static bool configBool(const char *value) {
+	return strcasecmp(value, "true") == 0 || (strlen(value) == 2 && (value[0] == 't' || value[0] == '1'));
+}
+
+static int configInt(const char *value) {
+	return atoi(value);
+}
+
+static int handleConfigIni(void *userdata, const char *section, const char *name, const char *value) {
+	Game *g = (Game *)userdata;
+	// fprintf(stdout, "config.ini: section '%s' name '%s' value '%s'\n", section, name, value);
+	if (strcmp(section, "engine") == 0) {
+		if (strcmp(name, "disable_paf") == 0) {
+			g->_paf->_skipCutscenes = configBool(value);
+		} else if (strcmp(name, "disable_mst") == 0) {
+			g->_mstLogicDisabled = configBool(value);
+		} else if (strcmp(name, "disable_sss") == 0) {
+		}
+	} else if (strcmp(section, "display") == 0) {
+		if (strcmp(name, "scale_factor") == 0) {
+			const int scale = configInt(value);
+			_system->setScaler(0, scale);
+		} else if (strcmp(name, "scale_algorithm") == 0) {
+			_system->setScaler(value, 0);
+		}
+	}
+	return 0;
+}
 
 int main(int argc, char *argv[]) {
 	char *dataPath = 0;
@@ -94,6 +128,7 @@ int main(int argc, char *argv[]) {
 	atexit(exitMain);
 	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
+	ini_parse(_configIni, handleConfigIni, g);
 	g->mainLoop(level, checkpoint);
 	delete g;
 	free(dataPath);
