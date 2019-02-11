@@ -52,10 +52,6 @@ static bool configBool(const char *value) {
 	return strcasecmp(value, "true") == 0 || (strlen(value) == 2 && (value[0] == 't' || value[0] == '1'));
 }
 
-static int configInt(const char *value) {
-	return atoi(value);
-}
-
 static int handleConfigIni(void *userdata, const char *section, const char *name, const char *value) {
 	Game *g = (Game *)userdata;
 	// fprintf(stdout, "config.ini: section '%s' name '%s' value '%s'\n", section, name, value);
@@ -68,10 +64,14 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 		}
 	} else if (strcmp(section, "display") == 0) {
 		if (strcmp(name, "scale_factor") == 0) {
-			const int scale = configInt(value);
+			const int scale = atoi(value);
 			_system->setScaler(0, scale);
 		} else if (strcmp(name, "scale_algorithm") == 0) {
 			_system->setScaler(value, 0);
+		} else if (strcmp(name, "gamma") == 0) {
+			_system->setGamma(atof(value));
+		} else if (strcmp(name, "grayscale") == 0) {
+			_system->setPaletteScale(configBool(value));
 		}
 	}
 	return 0;

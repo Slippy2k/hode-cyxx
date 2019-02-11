@@ -5,6 +5,7 @@
 
 #include <SDL.h>
 #include <stdarg.h>
+#include <math.h>
 #include "scaler.h"
 #include "systemstub.h"
 #include "util.h"
@@ -13,6 +14,7 @@ static const char *kIconBmp = "icon.bmp";
 
 static int _scalerMultiplier = 3;
 static const Scaler *_scaler = &scaler_xbr;
+static const float _gamma = 1.f;
 
 static const int _pixelFormat = SDL_PIXELFORMAT_RGB888;
 
@@ -51,11 +53,16 @@ struct SystemStub_SDL : SystemStub {
 	int _keyMappingsCount;
 	void (*_audioCbProc)(void *, int16_t *, int);
 	void *_audioCbData;
+	bool _paletteGrayScale;
+	uint8_t _gammaLut[256];
 
+	SystemStub_SDL();
 	virtual ~SystemStub_SDL() {}
 	virtual void init(const char *title, int w, int h);
 	virtual void destroy();
 	virtual void setScaler(const char *name, int multiplier);
+	virtual void setGamma(float gamma);
+	virtual void setPaletteScale(bool gray);
 	virtual void setPalette(const uint8_t *pal, int n, int depth);
 	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch);
 	virtual void fillRect(int x, int y, int w, int h, uint8_t color);
@@ -79,6 +86,13 @@ struct SystemStub_SDL : SystemStub {
 
 SystemStub *SystemStub_SDL_create() {
 	return new SystemStub_SDL();
+}
+
+SystemStub_SDL::SystemStub_SDL():
+	_paletteGrayScale(false) {
+	for (int i = 0; i < 256; ++i) {
+		_gammaLut[i] = i;
+	}
 }
 
 void SystemStub_SDL::init(const char *title, int w, int h) {
@@ -124,6 +138,16 @@ void SystemStub_SDL::setScaler(const char *name, int multiplier) {
 	}
 }
 
+void SystemStub_SDL::setGamma(float gamma) {
+	for (int i = 0; i < 256; ++i) {
+		_gammaLut[i] = (uint8_t)round(pow(i / 255., 1. / gamma) * 255);
+	}
+}
+
+void SystemStub_SDL::setPaletteScale(bool gray) {
+	_paletteGrayScale = gray;
+}
+
 void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 	assert(n <= 256);
 	assert(depth <= 8);
@@ -137,6 +161,13 @@ void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 			g = (g << shift) | (g >> depth);
 			b = (b << shift) | (b >> depth);
 		}
+		if (_paletteGrayScale) {
+			const int gray = (r * 30 + g * 59 + b * 11) / 100;
+			r = g = b = gray;
+		}
+		r = _gammaLut[r];
+		g = _gammaLut[g];
+		b = _gammaLut[b];
 		_pal[i] = SDL_MapRGB(_fmt, r, g, b);
 	}
 }

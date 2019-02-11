@@ -41,6 +41,8 @@ struct SystemStub {
 	virtual void destroy() = 0;
 
 	virtual void setScaler(const char *name, int multiplier) = 0;
+	virtual void setGamma(float gamma) = 0;
+	virtual void setPaletteScale(bool gray) = 0;
 
 	virtual void setPalette(const uint8_t *pal, int n, int depth = 8) = 0;
 	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) = 0;
