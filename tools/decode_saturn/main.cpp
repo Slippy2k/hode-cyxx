@@ -9,20 +9,38 @@
 
 static const int MAX_OFFSETS = 1024;
 
-static uint8_t _buffer[256 * 224];
-static uint8_t _buffer2[256 * 224 + 1024];
+static uint8_t _buffer[256 * 192];
+static uint8_t _buffer2[256 * 192 + 1024];
 static uint8_t _palette[256 * 3];
 
 static uint32_t offsets[MAX_OFFSETS];
 
-static void decodeBitmap(FILE *fp, uint32_t offset, const char *name) {
+static void convertVgaColors() {
+	for (int i = 0; i < 256 * 3; ++i) {
+		_palette[i] = (_palette[i] << 2) | (_palette[i] & 3);
+	}
+}
+
+static void decodeBitmap(FILE *fp, uint32_t offset, const char *name, int screen, int state) {
 	int count;
+
+	if (screen == 0 || screen == 4 || screen == 9 || screen == 18 || screen == 19) {
+		if (state == 0) {
+			fseek(fp, offset - 0x60C, SEEK_SET);
+			fread(_palette, 1, sizeof(_palette), fp);
+			convertVgaColors();
+		}
+	} else {
+		for (int i = 0; i < 256; ++i) {
+			_palette[3 * i] = _palette[3 * i + 1] = _palette[3 * i + 2] = i;
+		}
+	}
 
 	fseek(fp, offset, SEEK_SET);
 	fread(_buffer, 1, sizeof(_buffer), fp);
 	count = decodeLZW(_buffer, _buffer2);
 	fprintf(stdout, "bitmap size %d offset 0x%x name %s\n", count, offset, name);
-	saveBMP(name, _buffer2, _palette, 256, 224);
+	saveBMP(name, _buffer2, _palette, 256, 192);
 }
 
 static const int kMaxScreens = 40;
@@ -148,18 +166,6 @@ int main(int argc, char *argv[]) {
 		decodeBitmap(fp, 0x9D9CA);
 		decodeBitmap(fp, 0xAF514);
 */
-		// generate default grayscale palette
-		if (1) {
-			fseek(fp, 10, SEEK_SET);
-			fread(_palette, 1, sizeof(_palette), fp);
-			for (int i = 0; i < 256 * 3; ++i) {
-				_palette[i] = (_palette[i] << 2) | (_palette[i] & 3);
-			}
-		} else {
-			for (int i = 0; i < 256; ++i) {
-				_palette[3 * i] = _palette[3 * i + 1] = _palette[3 * i + 2] = i;
-			}
-		}
 
 		// find 0x00 0xAD 0x00
 		fseek(fp, 0, SEEK_SET);
@@ -190,13 +196,8 @@ int main(int argc, char *argv[]) {
 					}
 				}
 				snprintf(name, sizeof(name), "hod_%02d_%02d.bmp", screenNum, stateNum);
-				decodeBitmap(fp, offsets[i], name);
+				decodeBitmap(fp, offsets[i], name, screenNum, stateNum);
 				prev = offsets[i];
-				if (i == 1) {
-					for (int i = 0; i < 256; ++i) {
-						_palette[3 * i] = _palette[3 * i + 1] = _palette[3 * i + 2] = i;
-					}
-				}
 			}
 		}
 end:
