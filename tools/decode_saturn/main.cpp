@@ -13,7 +13,12 @@ static uint8_t _buffer[256 * 192];
 static uint8_t _buffer2[256 * 192 + 1024];
 static uint8_t _palette[256 * 3];
 
+static uint32_t _basePaletteOffset;
 static uint32_t offsets[MAX_OFFSETS];
+
+static const int kMaxScreens = 40;
+
+static uint8_t _screenStates[kMaxScreens];
 
 static void convertVgaColors() {
 	for (int i = 0; i < 256 * 3; ++i) {
@@ -24,17 +29,15 @@ static void convertVgaColors() {
 static void decodeBitmap(FILE *fp, uint32_t offset, const char *name, int screen, int state) {
 	int count;
 
-	if (screen == 0 || screen == 4 || screen == 9 || screen == 18 || screen == 19) {
-		if (state == 0) {
-			fseek(fp, offset - 0x60C, SEEK_SET);
-			fread(_palette, 1, sizeof(_palette), fp);
-			convertVgaColors();
-		}
+	if (state == 0) {
+		const int palOffset = 0x306 * (_screenStates[screen] + 1 - state);
+		_basePaletteOffset = offset - palOffset;
 	} else {
-		for (int i = 0; i < 256; ++i) {
-			_palette[3 * i] = _palette[3 * i + 1] = _palette[3 * i + 2] = i;
-		}
+		_basePaletteOffset += 0x306;
 	}
+	fseek(fp, _basePaletteOffset, SEEK_SET);
+	fread(_palette, 1, sizeof(_palette), fp);
+	convertVgaColors();
 
 	fseek(fp, offset, SEEK_SET);
 	fread(_buffer, 1, sizeof(_buffer), fp);
@@ -42,8 +45,6 @@ static void decodeBitmap(FILE *fp, uint32_t offset, const char *name, int screen
 	fprintf(stdout, "bitmap size %d offset 0x%x name %s\n", count, offset, name);
 	saveBMP(name, _buffer2, _palette, 256, 192);
 }
-
-static const int kMaxScreens = 40;
 
 enum {
 	kPosTopScreen    = 0,
@@ -57,8 +58,8 @@ struct LevelScreen {
 	int x, y;
 };
 
-static const int kLevelMapMaxW = 128;
-static const int kLevelMapMaxH = 128;
+static const int kLevelMapMaxW = kMaxScreens;
+static const int kLevelMapMaxH = kMaxScreens;
 
 static void GenerateLevelMap(const uint8_t *data, int count) {
 	bool visited[kMaxScreens];
@@ -157,7 +158,8 @@ int main(int argc, char *argv[]) {
 			count = fgetc(fp);
 			fread(_buffer, 1, 4 * count, fp);
 			GenerateLevelMap(_buffer, count);
-			goto end;
+			fclose(fp);
+			return 0;
 		}
 /*
 		// matches DOS demo
@@ -169,13 +171,25 @@ int main(int argc, char *argv[]) {
 
 		// find 0x00 0xAD 0x00
 		fseek(fp, 0, SEEK_SET);
+		int screens = 0;
+		int states = 0;
 		do {
 			if (fgetc(fp) == 0) {
 				uint8_t code1 = fgetc(fp);
 				uint8_t code2 = fgetc(fp);
 				if ((code1 == 0xAD || code1 == 0xBD) && code2 == 0) {
+					const int offset = ftell(fp) - 1;
+					if (count != 0) {
+						if (offset - offsets[count - 1] < 0x8000) {
+							++states;
+							_screenStates[screens] = states;
+						} else {
+							++screens;
+							states = 0;
+						}
+					}
 					assert(count < MAX_OFFSETS);
-					offsets[count++] = ftell(fp) - 1;
+					offsets[count++] = offset;
 				}
 			}
 		} while (!feof(fp));
@@ -200,7 +214,6 @@ int main(int argc, char *argv[]) {
 				prev = offsets[i];
 			}
 		}
-end:
 		fclose(fp);
 	}
 	return 0;
