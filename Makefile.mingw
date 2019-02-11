@@ -1,0 +1,34 @@
+
+SDL_CFLAGS := `sdl2-config --cflags`
+SDL_LIBS   := `sdl2-config --libs`
+
+CC      := i686-w64-mingw32-gcc
+CXX     := i686-w64-mingw32-g++
+STRIP   := i686-w64-mingw32-strip
+WINDRES := i686-w64-mingw32-windres
+
+CPPFLAGS += -O2 -Wall $(SDL_CFLAGS)
+
+SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
+        level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \
+        level5_lava.cpp level6_pwr2.cpp level7_lar1.cpp level8_lar2.cpp level9_dark.cpp \
+        lzw.cpp main.cpp mixer.cpp monsters.cpp paf.cpp random.cpp resource.cpp \
+        scaler.cpp screenshot.cpp sound.cpp staticres.cpp systemstub_sdl.cpp \
+        util.cpp video.cpp
+
+SCALERS := scaler_nearest.cpp scaler_xbr.cpp
+
+OBJS = $(SRCS:.cpp=.o) $(SCALERS:.cpp=.o) 3p/inih/ini.o 3p/libxbr-standalone/xbr.o
+DEPS = $(SRCS:.cpp=.d) $(SCALERS:.cpp=.d) 3p/inih/ini.d 3p/libxbr-standalone/xbr.d
+
+all: hode.exe
+
+hode.exe: $(OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^ -static-libgcc -static-libstdc++ $(SDL_LIBS)
+	$(STRIP) $@
+	upx -9 $@
+
+clean:
+	rm -f $(OBJS) $(DEPS)
+
+-include $(DEPS)

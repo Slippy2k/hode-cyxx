@@ -3,6 +3,7 @@
  * Copyright (C) 2009-2011 Gregory Montoir
  */
 
+#include <SDL.h>
 #include <getopt.h>
 #include <sys/stat.h>
 
