@@ -42,8 +42,8 @@ static void decodeBitmap(FILE *fp, uint32_t offset, const char *name, int screen
 	fseek(fp, offset, SEEK_SET);
 	fread(_buffer, 1, sizeof(_buffer), fp);
 	count = decodeLZW(_buffer, _buffer2);
-	fprintf(stdout, "bitmap size %d offset 0x%x name %s\n", count, offset, name);
 	saveBMP(name, _buffer2, _palette, 256, 192);
+	fprintf(stdout, "bitmap screen %d state %d offset 0x%x size %d palette 0x%x\n", screen, state, offset, count, _basePaletteOffset);
 }
 
 enum {
