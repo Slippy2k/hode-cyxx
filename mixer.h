@@ -24,7 +24,7 @@ struct Mixer {
 	void playPcm(const uint8_t *data, int len, int frequency, int volume, int pan);
 	void stopPcm(const uint8_t *data);
 
-	static void mix(void *userdata, uint8_t *buf, int len);
+	static void mix(void *userdata, int16_t *buf, int len);
 };
 
 #endif

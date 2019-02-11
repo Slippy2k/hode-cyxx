@@ -27,8 +27,6 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_snd_volumeMin = 10;
 	_snd_volumeMax = 64;
 	_snd_masterVolume = 128;
-	// TEMP: mixSounds
-	memset(_mixerChannels, 0, sizeof(_mixerChannels));
 }
 
 Game::~Game() {
@@ -1723,10 +1721,6 @@ void Game::redrawObjects() {
 	}
 }
 
-static void mixCb(void *p, int16_t *stream, int len) {
-	((Game *)p)->mixSoundsCb(stream, len);
-}
-
 void Game::mainLoop(int level, int checkpoint) {
 	// TODO: check bounds
 	_currentLevel = level;
@@ -1737,7 +1731,6 @@ void Game::mainLoop(int level, int checkpoint) {
 	_res->loadLvlData(_resLevelNames[_currentLevel]);
 	_res->loadMstData(_resLevelNames[_currentLevel]);
 	_res->loadSssData(_resLevelNames[_currentLevel]);
-	_system->startAudio(mixCb, this);
 	levelMainLoop();
 }
 

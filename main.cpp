@@ -9,6 +9,7 @@
 #include "3p/inih/ini.h"
 
 #include "game.h"
+#include "mixer.h"
 #include "paf.h"
 #include "util.h"
 #include "systemstub.h"
@@ -31,6 +32,20 @@ static void exitMain() {
 		delete _system;
 		_system = 0;
 	}
+}
+
+static void lockAudio(int flag) {
+	if (flag) {
+		_system->lockAudio();
+	} else {
+		_system->unlockAudio();
+	}
+}
+
+static void setupAudio(Game *g) {
+	g->_mix._lock = lockAudio;
+	g->_mix.init(_system->getOutputSampleRate());
+	_system->startAudio(Mixer::mix, &g->_mix);
 }
 
 static const char *_defaultDataPath = ".";
@@ -129,6 +144,7 @@ int main(int argc, char *argv[]) {
 	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
 	ini_parse(_configIni, handleConfigIni, g);
+	setupAudio(g);
 	g->mainLoop(level, checkpoint);
 	delete g;
 	free(dataPath);

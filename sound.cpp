@@ -719,7 +719,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "startSoundObject codeOffset %d", firstCodeOffset);
 	assert(firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
 	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
-	if (unk3->sssFilter != 0) {
+	if (unk3->sssFilter != 0 && 0) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[unk3->sssFilter];
 		// int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
@@ -790,28 +790,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		if (pcm) {
 			uint32_t size = _res->getSssDpcmSize(dpcm);
 			assert((size & 1) == 0);
-			size /= sizeof(int16_t);
-			_system->lockAudio();
-			bool found = false;
-			for (int i = 0; i < kMixerChannelsCount; ++i) {
-				if (_mixerChannels[i].pcm == pcm) {
-					assert(_mixerChannels[i].size == size);
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				for (int i = 0; i < kMixerChannelsCount; ++i) {
-					if (!_mixerChannels[i].pcm) {
-						_mixerChannels[i].pcm = pcm;
-						_mixerChannels[i].size = size;
-						_mixerChannels[i].offset = 0;
-						debug(kDebug_SOUND, "Adding PCM %d to channel %d size %d", dpcm, i, _mixerChannels[i].size);
-						break;
-					}
-				}
-			}
-			_system->unlockAudio();
+			_mix.playPcm((const uint8_t *)pcm, size, 22050, 0 /* volume */, 0 /* pan */);
 		}
 	//
 	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
@@ -1254,28 +1233,5 @@ void Game::mixSoundObjects() {
 			}
 		}
 		so = so->nextPtr;
-	}
-}
-
-static int clipS16(int sample) {
-	return CLIP(sample, -32768, 32767);
-}
-
-void Game::mixSoundsCb(int16_t *buf, int len) {
-	// TODO: pull from mixingQueue
-	for (int i = 0; i < kMixerChannelsCount; ++i) {
-		MixerChannel *ch = &_mixerChannels[i];
-		if (ch->pcm) {
-			for (int offset = 0; offset < len; ++offset) {
-				if (ch->offset < ch->size) {
-					buf[offset] = clipS16((int)buf[offset] + ch->pcm[ch->offset]);
-					ch->offset++;
-				} else {
-					debug(kDebug_SOUND, "PCM sample finished size %d", ch->size);
-					memset(ch, 0, sizeof(MixerChannel));
-					break;
-				}
-			}
-		}
 	}
 }

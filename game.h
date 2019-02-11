@@ -9,6 +9,7 @@
 #include "intern.h"
 #include "defs.h"
 #include "fileio.h"
+#include "mixer.h"
 #include "random.h"
 #include "resource.h"
 
@@ -28,12 +29,6 @@ inline const uint8_t *PTR_OFFS(const uint8_t *base, uint32_t index) {
 	return index == 0xFFFFFFFF ? 0 : (const uint8_t *)base + index * sizeof(T);
 }
 
-struct MixerChannel {
-	const int16_t *pcm;
-	uint32_t size;
-	uint32_t offset;
-};
-
 struct Game {
 	typedef int (Game::*OpStage1Proc)(LvlObject *o);
 	typedef void (Game::*CallLevelProc1)(int);
@@ -49,7 +44,6 @@ struct Game {
 		kObjectDataTypeLvlBackgroundSound
 	};
 	enum {
-		kMixerChannelsCount = 16,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -66,12 +60,12 @@ struct Game {
 	static const uint8_t _transformBufferData1[];
 	static const uint8_t _transformBufferData2[];
 
+	Mixer _mix;
 	PafPlayer *_paf;
 	Random _rnd;
 	Resource *_res;
 	Video *_video;
 	SystemStub *_system;
-	MixerChannel _mixerChannels[kMixerChannelsCount];
 
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
@@ -496,7 +490,6 @@ struct Game {
 	void expireSoundObjects(int flags);
 	void mixSoundObjects17640(bool flag);
 	void mixSoundObjects();
-	void mixSoundsCb(int16_t *buf, int len);
 
 	// andy.cpp
 

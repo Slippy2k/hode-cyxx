@@ -1,6 +1,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mixer.h"
@@ -10,7 +11,7 @@
 
 static const float kGain = 1.f;
 static const float kPitch = 1.f;
-static const float kPan = 1.f;
+static const float kPan = 0.f;
 
 static void nullMixerLock(int lock) {
 }
@@ -91,8 +92,8 @@ void Mixer::stopPcm(const uint8_t *data) {
 	}
 }
 
-void Mixer::mix(void *userdata, uint8_t *buf, int len) {
+void Mixer::mix(void *userdata, int16_t *buf, int len) {
 	// stereo s16
-	assert((len & 3) == 0);
-	sts_mixer_mix_audio(&((Mixer *)userdata)->_mixer, buf, len / 4);
+	assert((len & 1) == 0);
+	sts_mixer_mix_audio(&((Mixer *)userdata)->_mixer, buf, len / 2);
 }
