@@ -514,7 +514,7 @@ void Resource::loadSssData(const char *levelName) {
 		error("Unable to open '%s'", filename);
 		return;
 	}
-	// if (_sssBuffer1) {
+	if (0 /* _sssBuffer1 */ ) {
 		int count = _sssHdr.pcmCount;
 		if (count > _sssHdr.unk8) {
 			count = _sssHdr.unk8;
@@ -525,7 +525,7 @@ void Resource::loadSssData(const char *levelName) {
 		// free(_sssBuffer1);
 		// _sssBuffer1 = 0;
 		_sssHdr.dataUnk1Count = 0;
-	// }
+	}
 	_sssHdr.unk0 = _sssFile->readUint32();
 	assert(_sssHdr.unk0 == 10);
 	_sssHdr.unk4 = _sssFile->readUint32(); // _edi
@@ -633,7 +633,7 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFile->read(_sssPreloadData1[i].ptr, count);
 		bytesRead += count + 1;
 	}
-	_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.preloadData1Count * sizeof(SssPreloadData));
+	_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.preloadData2Count * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
 		// _sssPreloadData2[i] = data
 		const int count = _sssFile->readByte();
@@ -643,7 +643,7 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFile->read(_sssPreloadData2[i].ptr, count);
 		bytesRead += count + 1;
 	}
-	_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.preloadData1Count * sizeof(SssPreloadData));
+	_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.preloadData3Count * sizeof(SssPreloadData));
 	for (int i = 0; i < _sssHdr.preloadData3Count; ++i) {
 		// _sssPreloadData3[i] = data
 		const int count = _sssFile->readByte();
