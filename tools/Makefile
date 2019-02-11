@@ -1,5 +1,5 @@
 
-ALL = bitop decode_sss dump_data gen_rename hod_extract opcode_map split_paf
+ALL = bitop decode_sss dump_data hod_extract opcode_map split_paf
 
 all: $(ALL)
 
@@ -10,9 +10,6 @@ decode_sss: decode_sss.o
 	$(CXX) $^ -o $@
 
 dump_data: dump_data.o
-	$(CC) $^ -o $@
-
-gen_rename: gen_rename.o
 	$(CC) $^ -o $@
 
 hod_extract: hod_extract.o
@@ -26,5 +23,3 @@ split_paf: split_paf.o
 
 clean:
 	rm -f *.o $(ALL)
-
-
