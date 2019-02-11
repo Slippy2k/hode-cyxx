@@ -109,6 +109,7 @@ struct LvlObjectData {
 };
 
 struct Game;
+struct SssObject;
 
 struct LvlObject {
 	int32_t xPos;
@@ -141,7 +142,7 @@ struct LvlObject {
 // ptr->type==0: AnimBackgroundData * / _animBackgroundDataTable
 // ptr->type==1: _resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
 // ptr->type==8(_andyObject): &_gameUnkList1Element
-	uint32_t unk34; // removeSound
+	SssObject *sssObj; // 0x34
 	LvlObjectData *levelData0x2988;
 	Point16_t posTable[8];
 	LvlObject *nextPtr;
@@ -177,6 +178,7 @@ struct SssObject {
 	int32_t unk50; // 0x50 counter2
 	int32_t unk54; // 0x54 counter3
 	int32_t unk58; // 0x58 counter4
+	int32_t unk60; // 0x60
 	int32_t unk64; // 0x64 counter5
 	int32_t unk68; // 0x68 counter6
 	int32_t unk6C; // 0x6C counter7

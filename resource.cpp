@@ -129,7 +129,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->bitmapBits = 0; _lvlFile->readUint32();
 	dat->callbackFuncPtr = 0; _lvlFile->readUint32();
 	dat->dataPtr = 0; _lvlFile->readUint32();
-	dat->unk34 = _lvlFile->readUint32();
+	dat->sssObj = 0; _lvlFile->readUint32();
 	dat->levelData0x2988 = 0; _lvlFile->readUint32();
 	for (int i = 0; i < 8; ++i) {
 		dat->posTable[i].x = _lvlFile->readUint16();

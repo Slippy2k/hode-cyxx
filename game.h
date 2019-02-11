@@ -473,6 +473,7 @@ struct Game {
 	SssObject *_sssObjectsList3;
 	uint8_t _channelMixingTable[32];
 	int _snd_volumeMin;
+	int _snd_volumeMax;
 	int _snd_fadeVolumeCounter;
 	int _snd_masterVolume;
 

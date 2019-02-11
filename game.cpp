@@ -25,6 +25,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_transformShadowLayerDelta = 0;
 	_mstLogicDisabled = true;
 	_snd_volumeMin = 10;
+	_snd_volumeMax = 64;
 	_snd_masterVolume = 128;
 	// TEMP: mixSounds
 	memset(_mixerChannels, 0, sizeof(_mixerChannels));
@@ -202,7 +203,7 @@ void Game::removeSound(LvlObject *ptr) {
 			_sssObjectsTable[i].lvlObject = 0;
 		}
 	}
-	ptr->unk34 = 0;
+	ptr->sssObj = 0;
 }
 
 void Game::setupBackgroundBitmap() {
@@ -598,10 +599,10 @@ void Game::destroyLvlObject(LvlObject *o) {
 			break;
 		}
 	}
-	if (o->unk34) {
+	if (o->sssObj) {
 		removeSound(o);
 	}
-	o->unk34 = 0;
+	o->sssObj = 0;
 	o->bitmapBits = 0;
 }
 
@@ -823,10 +824,10 @@ void Game::clearLvlObjectsList1() {
 				}
 				break;
 			}
-			if (ptr->unk34) {
+			if (ptr->sssObj) {
 				removeSound(ptr);
 			}
-			ptr->unk34 = 0;
+			ptr->sssObj = 0;
 			ptr->bitmapBits = 0;
 		}
 		ptr = next;
@@ -855,10 +856,10 @@ void Game::clearLvlObjectsList2() {
 				}
 				break;
 			}
-			if (ptr->unk34) {
+			if (ptr->sssObj) {
 				removeSound(ptr);
 			}
-			ptr->unk34 = 0;
+			ptr->sssObj = 0;
 			ptr->bitmapBits = 0;
 		}
 		ptr = next;
@@ -887,10 +888,10 @@ void Game::clearLvlObjectsList3() {
 				}
 				break;
 			}
-			if (ptr->unk34) {
+			if (ptr->sssObj) {
 				removeSound(ptr);
 			}
-			ptr->unk34 = 0;
+			ptr->sssObj = 0;
 			ptr->bitmapBits = 0;
 		}
 		ptr = next;
@@ -910,7 +911,7 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 			lvlObjectTypeCallback(ptr);
 		}
 		ptr->unk22 = 0;
-		ptr->unk34 = 0;
+		ptr->sssObj = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList1;
@@ -931,7 +932,7 @@ int Game::addLvlObjectToList3(int num) {
 		ptr->type = 8;
 		_res->incLevelData0x2988RefCounter(ptr);
 		ptr->unk22 = 0;
-		ptr->unk34 = 0;
+		ptr->sssObj = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList3;
@@ -1002,9 +1003,9 @@ void Game::removeLvlObjectNotType2List1(LvlObject *o) {
 			break;
 		}
 	}
-	if (o->unk34) {
+	if (o->sssObj) {
 		removeSound(o);
-		o->unk34 = 0;
+		o->sssObj = 0;
 	}
 	o->bitmapBits = 0;
 }
@@ -2859,10 +2860,10 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 				break;
 			}
 		}
-		if (o->unk34) {
+		if (o->sssObj) {
 			removeSound(o);
 		}
-		o->unk34 = 0;
+		o->sssObj = 0;
 		o->bitmapBits = 0;
 	} else {
 		updateAndyObject(o);
@@ -2979,7 +2980,7 @@ LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 				lvlObjectTypeCallback(ptr);
 			}
 			ptr->unk22 = 0;
-			ptr->unk34 = 0;
+			ptr->sssObj = 0;
 			ptr->nextPtr = 0;
 			ptr->bitmapBits = 0;
 			return ptr;

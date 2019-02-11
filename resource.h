@@ -109,7 +109,7 @@ struct SssCodeOffset {
 	uint16_t unk2;
 	uint8_t unk4;
 	uint8_t unk5;
-	uint8_t unk6;
+	int8_t unk6;
 	uint8_t unk7;
 	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData

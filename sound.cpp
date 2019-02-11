@@ -714,12 +714,62 @@ SssObject *Game::prepareSoundObject(int num, int b, int flags) {
 SssObject *Game::startSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 
-	int codeOffset = _res->_sssDataUnk3[num].firstCodeOffset;
-	debug(kDebug_SOUND, "startSoundObject codeOffset %d", codeOffset);
-	assert(codeOffset < _res->_sssHdr.codeOffsetsCount);
-	if (_res->_sssCodeOffsets[codeOffset].unk2 != 0) {
+	SssUnk3 *unk3 = &_res->_sssDataUnk3[num];
+	int firstCodeOffset = unk3->firstCodeOffset;
+	debug(kDebug_SOUND, "startSoundObject codeOffset %d", firstCodeOffset);
+	assert(firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
+	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
+	if (unk3->sssFilter != 0) {
 // 42B64C
-//		return 0;
+		SssFilter *filter = &_res->_sssFilters[unk3->sssFilter];
+		// int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
+// 42B67F
+		// TODO:
+		SssObject *so = 0;
+		if (so) {
+			if (!codeOffset->codeOffset1 || !codeOffset->codeOffset2 || !codeOffset->codeOffset3 || !codeOffset->codeOffset4) {
+				so->flags |= 4;
+			}
+			so->codeDataStage1 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
+			so->codeDataStage2 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset2);
+			so->codeDataStage3 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset3);
+			so->codeDataStage4 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset4);
+			so->lvlObject = _currentSoundLvlObject;
+			so->counter = -1;
+			so->unk4C = -1;
+			so->unk50 = -1;
+			so->unk54 = -100;
+			so->unk58 = -1;
+			so->unk60 = 0;
+			so->unk68 = 0;
+			so->flags = flags;
+			so->unk2C = codeOffset->unk2;
+			so->unk6 = num;
+			so->unk8 = codeOffset->unk6;
+			so->filter = filter;
+			so->unk18 = codeOffset->unk4;
+			so->volume = codeOffset->unk7;
+			if (codeOffset->unk7 == -1) {
+				if (_currentSoundLvlObject) {
+					_currentSoundLvlObject->sssObj = so;
+					so->volumePtr = &_snd_volumeMax;
+					so->volume = getSoundObjectVolumeByPos(so);
+				} else {
+					so->volumePtr = 0;
+					so->volume = 64;
+				}
+			} else {
+// 42B7A5
+				so->volumePtr = 0;
+			}
+// 42B7C3
+			setSoundObjectVolume(so);
+			if (so->pcm) {
+				updateSoundObject(so);
+				return so;
+			}
+		}
+		return 0;
 	}
 
 	SssObject tmpObj;
@@ -731,10 +781,10 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.unk4C = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
-	debug(kDebug_SOUND, "startSoundObject dpcm %d", _res->_sssCodeOffsets[codeOffset].pcm);
-	tmpObj.pcm = &_res->_sssPcmTable[_res->_sssCodeOffsets[codeOffset].pcm];
+	debug(kDebug_SOUND, "startSoundObject dpcm %d", codeOffset->pcm);
+	tmpObj.pcm = &_res->_sssPcmTable[codeOffset->pcm];
 	// TEMP: mixSounds
-		const int dpcm = _res->_sssCodeOffsets[codeOffset].pcm;
+		const int dpcm = codeOffset->pcm;
 		_res->loadSssDpcm(dpcm);
 		const int16_t *pcm = _res->_sssPcmTable[dpcm].ptr;
 		if (pcm) {
@@ -764,7 +814,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 			_system->unlockAudio();
 		}
 	//
-	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, _res->_sssCodeOffsets[codeOffset].codeOffset1);
+	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
 	debug(kDebug_SOUND, "code %p", code);
 	if (code) {
 		// executeSssCode(&tmpObj, code);
