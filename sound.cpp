@@ -660,9 +660,6 @@ SssObject *Game::prepareSoundObject(int num, int b, int flags) {
 			} while (++i < unk3->count);
 		}
 // 42B865
-#if 1
-		warning("prepareSoundObject b %d unimplemented, SssUnk6 not updated", b);
-#else
 		uint32_t _eax = 1 << (_rnd.update() & 31);
 		SssUnk6 *unk6 = &_res->_sssDataUnk6[num];
 		if ((unk6->unk10 & _eax) == 0) {
@@ -696,7 +693,6 @@ SssObject *Game::prepareSoundObject(int num, int b, int flags) {
 				} while (++i < unk3->count);
 			}
 		}
-#endif
 // 42B8E9
 		ret = startSoundObject(num, b, flags);
 // 42B909

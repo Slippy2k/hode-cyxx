@@ -193,6 +193,7 @@ struct Resource {
 	SssCodeOffset *_sssCodeOffsets;
 	SssFilter *_sssFilters;
 	SssPcm *_sssPcmTable;
+	SssUnk6 *_sssDataUnk6;
 	SssPreloadData *_sssPreloadData1;
 	SssPreloadData *_sssPreloadData2;
 	SssPreloadData *_sssPreloadData3;

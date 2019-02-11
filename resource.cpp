@@ -745,11 +745,15 @@ void Resource::loadSssData(const char *levelName) {
 	}
 
 	// _res_sssDataUnk6 = data; // size : sssHdr.unk18 * 20
+	_sssDataUnk6 = (SssUnk6 *)malloc(_sssHdr.dataUnk3Count * sizeof(SssUnk6));
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
-		uint8_t buf[20];
-		_sssFile->read(buf, sizeof(buf));
-		bytesRead += sizeof(buf);
-		// debug(kDebug_RESOURCE, "sssUnk12 #%d/%d 0x%x", i, _sssHdr.dataUnk3Count, READ_LE_UINT32(buf));
+		_sssDataUnk6[i].unk0[0] = _sssFile->readUint32();
+		_sssDataUnk6[i].unk0[1] = _sssFile->readUint32();
+		_sssDataUnk6[i].unk0[2] = _sssFile->readUint32();
+		_sssDataUnk6[i].unk0[3] = _sssFile->readUint32();
+		_sssDataUnk6[i].unk10 = _sssFile->readUint32();
+		bytesRead += 20;
+		// debug(kDebug_RESOURCE, "sssUnk12 #%d/%d", i, _sssHdr.dataUnk3Count);
 	}
 
 // loc_429AB8:
@@ -812,6 +816,8 @@ void Resource::loadSssData(const char *levelName) {
 	}
 // loc_429D32:
 	// TODO:
+	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
+	}
 
 // loc_429E64:
 	for (int i = 0; i < _sssHdr.dataUnk2Count; ++i) {
