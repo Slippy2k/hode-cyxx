@@ -378,12 +378,24 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 				code += 4;
 			}
+#endif
 		case 10: {
-				// TODO:
-				warning("executeSssCode case 10 unimplemented");
+				if (so->unk54 >= 0) {
+					so->unk5C += so->unk60;
+					int value = (so->unk5C + 0x8000) >> 16;
+					if (value != so->unk18) {
+						so->unk18 = value;
+						_sssObjectsChanged = 1;
+					}
+					--so->unk54;
+					if (so->unk54 >= 0) {
+						return code;
+					}
+				}
 				code += 4;
 			}
 			break;
+#if 0
 		case 11: {
 				if (so->unk18 != code[1]) {
 					so->unk18 = code[1];
