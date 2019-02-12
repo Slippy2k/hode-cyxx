@@ -318,8 +318,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#if 0
-		case 5: {
+		case 5: { // seek_sound
 				int32_t _eax = READ_LE_UINT32(code + 4);
 				if (so->unk6C < _eax) {
 					so->unk6C = _eax;
@@ -333,6 +332,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 12;
 			}
 			break;
+#if 0
 		case 6: { // jump_ge
 				--so->counter;
 				if (so->counter < 0) {
@@ -378,6 +378,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 				code += 4;
 			}
+			break;
 #endif
 		case 10: {
 				if (so->unk54 >= 0) {
@@ -540,7 +541,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code -= offset;
 			}
 			break;
-		case 29:
+		case 29: // end
 			so->unk2C = 0;
 			return 0;
 #endif
