@@ -801,7 +801,7 @@ if (_sssHdr.unk0 == 10) {
 			// _sssDataUnk3[i].codeOffset = &_sssCodeOffsets[num];
 			debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
 		} else {
-			_sssDataUnk3[i].firstCodeOffset = 0;
+			_sssDataUnk3[i].firstCodeOffset = 0xFFFFFFFF;
 		}
 	}
 // 429C00:

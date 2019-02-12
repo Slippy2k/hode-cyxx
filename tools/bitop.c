@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 
 static int bit_op(int dst_bit, int src_bit, int mask) {
@@ -13,6 +14,16 @@ static int bitmask_set(int dst_bit, int src_bit, int mask) {
 	return lomask | himask;
 }
 
+// _ebx is (un)initialized with some stack variable
+static uint32_t xor_uninit_42ACF9(uint32_t flags, uint32_t _ebx) {
+	uint32_t _eax = flags & 0xFF00F000;
+	uint32_t _edx = (flags ^ _ebx) & 0x00F00000;
+	_ebx ^= _edx;
+	_ebx &= 0xF00000;
+	_eax ^= _ebx;
+	return _eax;
+}
+
 int main(int argc, char *argv[]) {
 	int i, j, m, t;
 	for (m = 1; m <= 15; ++m) {
@@ -20,10 +31,14 @@ int main(int argc, char *argv[]) {
 			for (i = 0; i <= 7; ++i) {
 				const int v = bit_op(j, i, m);
 				const int t = bitmask_set(j, i, m);
-				printf("bit_op(%d,%d,%d) = %d (%d)\n", j, i, m, v, t);
+				// printf("bit_op(%d,%d,%d) = %d (%d)\n", j, i, m, v, t);
 				assert(v == t);
 			}
 		}
+	}
+	static const uint32_t mask = 0xFFFFFFFF;
+	for (uint32_t i = 0; i < 0x0FFFF000; ++i) {
+		assert(xor_uninit_42ACF9(mask, i) == (mask & 0xFFF0F000));
 	}
 	return 0;
 }

@@ -310,18 +310,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			}
 			break;
 		case 4: {
-			// TODO: _ebx is (un)initialized with var4...
 				const uint8_t _cl = code[1] & 0xF;
-			// _eax = so->flags0 & 0xFF00F000;
-			// _edx = (so->flags0 ^ _ebx) & 0x00F00000;
-			// _ebx ^= _edx;
 				const uint16_t _dx = READ_LE_UINT16(code + 2);
-			// _ebx &= 0xF00000;
-			// _edx &= 0xFFF;
-			// _eax ^= _ebx;
-			// _eax |= _ecx << 16;
-			// _eax |= _edx;
-
 				uint32_t flags = (so->flags0 & 0xFFF0F000);
 				flags |= (_cl << 16) | (_dx & 0xFFF);
 				executeSssCodeOp4(flags);
@@ -411,13 +401,21 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#if 0
 		case 13: {
-				// TODO:
-				warning("executeSssCode case 13 unimplemented");
+				so->unk54 = READ_LE_UINT32(code + 4) - 1;
+				int16_t value = READ_LE_UINT16(code + 2);
+				if (value == -1) {
+					so->unk5C = so->unk18 << 16;
+				} else {
+					so->unk5C = value << 16;
+				}
+				so->unk18 = value;
+				_sssObjectsChanged = 1;
+				so->unk60 = (code[1] << 16) - so->unk5C / READ_LE_UINT32(code + 4);
 				code += 8;
 			}
 			break;
+#if 0
 		case 14: {
 				// TODO:
 				warning("executeSssCode case 14 unimplemented");
@@ -475,6 +473,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
+#endif
 		case 22: { // load_unk50
 				so->unk50 = READ_LE_UINT32(code + 4);
 				return code + 8;
@@ -492,6 +491,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				so->unk54 = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
+			break;
+#if 0
 		case 25: { // dec_unk58
 				--so->unk58;
 				if (so->unk58 >= 0) {
@@ -539,7 +540,59 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 	return code;
 }
 
+SssObject *Game::loadSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b) {
+	// if (!_sss_enabled) return;
+	int minIndex = -1;
+	int minUnk9 = -1;
+	for (int i = 0; i < 32; ++i) {
+		if (_sssObjectsTable[i].unk9 == 0) {
+// 42A2FA
+			minUnk9 = 0;
+			minIndex = i;
+			break;
+		}
+		if (_sssObjectsTable[i].unk9 < minUnk9) {
+			minUnk9 = _sssObjectsTable[i].unk9;
+			minIndex = i;
+		}
+	}
+// 42A2FE
+	if (minIndex == -1) {
+		return 0;
+	}
+	assert(minIndex != -1);
+	SssObject *so = &_sssObjectsTable[minIndex];
+	if (so && minUnk9 < priority) {
+		if (so->pcm) {
+			removeSoundObject(so);
+		}
+	}
+// 42A332
+	so->flags1 = flags_a;
+	so->unk9 = priority;
+	so->pcm = pcm;
+	so->unk18 = 128;
+	so->volume = 64;
+	if (pcm->flag & 1) {
+		so->unkB = 1;
+	} else {
+		so->unkB = 0;
+	}
+	so->unk78 = 0xFFFFFFFF;
+	so->unk6C = 0;
+	so->flags = 0;
+	so->unk2C = pcm->strideCount;
+	so->currentPcmPtr = pcm->ptr;
+	if (!so->currentPcmPtr) {
+		so->flags |= 2;
+	}
+	so->flags0 = flags_b;
+	duplicateSoundObject(so);
+	return so->pcm ? so : 0;
+}
+
 void Game::duplicateSoundObject(SssObject *so) {
+	return; // TODO
 	if (so->pcm && so->pcm->ptr) {
 		so->flags = (so->flags & ~1) | 2;
 	}
@@ -557,8 +610,9 @@ void Game::duplicateSoundObject(SssObject *so) {
 			if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
 				SssObject *cur = _sssObjectsList3; // _eax
 				if (so->unk9 > cur->unk9) {
+					SssObject *_edx = cur->nextPtr;
 					so2 = cur;
-					so->nextPtr = cur->nextPtr;
+					so->nextPtr = _edx;
 					so->prevPtr = _sssObjectsList3->prevPtr;
 					if (so->nextPtr) {
 						so->nextPtr->prevPtr = so;
@@ -643,7 +697,7 @@ SssObject *Game::prepareSoundObject(int num, int b, int flags) {
 			if (unk3->count <= 0) {
 				return 0;
 			}
-			assert(firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
+			assert(firstCodeOffset >= 0 && firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
 			SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
 // 42B81D
 			int i = 0;
@@ -717,7 +771,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	SssUnk3 *unk3 = &_res->_sssDataUnk3[num];
 	int firstCodeOffset = unk3->firstCodeOffset;
 	debug(kDebug_SOUND, "startSoundObject codeOffset %d", firstCodeOffset);
-	assert(firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
+	assert(firstCodeOffset >= 0 && firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
 	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
 	// TEMP: mixSounds
 	{
@@ -730,13 +784,15 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		}
 	}
 	//
-	if (unk3->sssFilter != 0) {
+	if (codeOffset->unk2 != 0) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[unk3->sssFilter];
-		// int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
+		int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
 // 42B67F
-		// TODO:
-		SssObject *so = 0;
+		uint32_t flags1 = flags & 0xFFF0F000;
+		flags1 |= (b << 16) | (num & 0xFFF);
+		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
+		SssObject *so = loadSoundObject(pcm, _ecx, flags1, flags);
 		if (so) {
 			if (!codeOffset->codeOffset1 || !codeOffset->codeOffset2 || !codeOffset->codeOffset3 || !codeOffset->codeOffset4) {
 				so->flags |= 4;
@@ -1205,7 +1261,8 @@ void Game::mixSoundObjects17640(bool flag) {
 			if (_channelMixingTable[i] != 0) {
 				continue;
 			}
-			if (flag) {
+			// TODO
+			if (flag && 0) {
 				const int mask = 1 << (so->flags1 >> 24);
 				if ((*_res->getSssLutPtr(2, so->flags1) & mask) != 0) {
 					if ((*_res->getSssLutPtr(3, so->flags1) & mask) == 0) {

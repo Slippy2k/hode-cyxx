@@ -158,6 +158,7 @@ struct SssObject {
 	int8_t unk8; // 0x8
 	int8_t unk9; // 0x9
 	uint8_t flags; // 0xA
+	uint8_t unkB;
 	uint32_t flags0; // 0xC
 	uint32_t flags1; // 0x10
 	int32_t volume; // 0x14
@@ -178,6 +179,7 @@ struct SssObject {
 	int32_t unk50; // 0x50 counter2
 	int32_t unk54; // 0x54 counter3
 	int32_t unk58; // 0x58 counter4
+	int32_t unk5C; // 0x5C
 	int32_t unk60; // 0x60
 	int32_t unk64; // 0x64 counter5
 	int32_t unk68; // 0x68 counter6
