@@ -479,30 +479,6 @@ uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	return p;
 }
 
-static void dumpPcm(File *fp, const SssPcm *dpcmTable, int pcmCount) {
-	for (int i = 0; i < pcmCount; ++i) {
-		if (dpcmTable[i].totalSize != 0) {
-			char name[32];
-			snprintf(name, sizeof(name), "/tmp/%03d.raw", i);
-			FILE *out = fopen(name, "wb");
-			if (out) {
-				fp->seek(dpcmTable[i].offset, SEEK_SET);
-				for (uint32_t offset = 0; offset < dpcmTable[i].totalSize; offset += dpcmTable[i].strideSize) {
-					int16_t lut[256];
-					for (int j = 0; j < 256; ++j) {
-						lut[j] = fp->readUint16();
-					}
-					for (uint32_t j = 256 * sizeof(int16_t); j < dpcmTable[i].strideSize; ++j) {
-						int16_t sample = lut[fp->readByte()];
-						fwrite(&sample, 1, sizeof(int16_t), out);
-					}
-				}
-				fclose(out);
-			}
-		}
-	}
-}
-
 void Resource::loadSssData(const char *levelName) {
 	if (!_sssFile) {
 		memset(&_sssHdr, 0, sizeof(_sssHdr));
@@ -844,9 +820,6 @@ if (_sssHdr.unk0 == 10) {
 
 // 429F38:
 	// clearSssData();
-	if (0) {
-		dumpPcm(_sssFile, _sssPcmTable, _sssHdr.pcmCount);
-	}
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {

@@ -18,8 +18,8 @@ static const uint8_t _dbVolumeTable[129] = {
 
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	// (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF) ?
-	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) {
-		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) {
+	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // lut index
+		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // lut offset
 			return (flags_a >> 24) == (flags_b >> 24);
 		}
 	}

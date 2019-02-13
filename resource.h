@@ -245,6 +245,7 @@ struct Resource {
 
 	uint32_t *getSssLutPtr(int lut, uint32_t flags) {
 		const uint32_t a = (flags >> 20) & 0xF;
+		assert(a < 3);
 		const uint32_t b = flags & 0xFFF;
 		switch (lut) {
 		case 1:
