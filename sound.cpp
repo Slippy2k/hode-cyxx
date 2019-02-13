@@ -807,6 +807,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
 		SssObject *so = loadSoundObject(pcm, _ecx, flags1, flags);
 		if (so) {
+			// TODO: compare with 0xFFFFFFFF ?
 			if (!codeOffset->codeOffset1 || !codeOffset->codeOffset2 || !codeOffset->codeOffset3 || !codeOffset->codeOffset4) {
 				so->flags |= 4;
 			}
@@ -950,9 +951,9 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 		}
 	}
 // 42BA9D
-	int _ebp = 0;
-	int _edx = b << 4;
-	int _al = s->unk6;
+	uint32_t _ebp = 0;
+	uint32_t _edx = b << 4;
+	uint8_t _al = s->unk6;
 	_ebp = (a & 0xF) | _edx;
 	_edx = s->unk2 & 0xF;
 	_ecx = s->sssUnk3;
@@ -966,82 +967,51 @@ void Game::setupSoundObject(SssUnk1 *s, int a, int b) {
 	_ebp <<= 0xC;
 	_edx &= 0xFFF;
 	_ebp |= _edx;
-#if 0
 	if (_al & 2) {
-		_eax = (_ebp >> 20) & 15;
-		_edx = sssLookupTable3[_eax];
-		_esi = _edx + _ecx * 4;
-		_ecx = _ebp >> 24
-		_edi = *(uint32_t *)_esi;
-		_edx = 1 << _ecx;
-		_ecx = 0;
-		_edi |= _edx;
-		*(uint32_t *)_esi = _edi;
-		_cx = *(uint16_t *)_ebx;
-		_eax = sssLookupTable2[_eax];
-		_ecx = _eax + _ecx * 4;
-		_eax = *(uint32_t *)_ecx;
-		if ((_eax & _edx) != 0) {
-			return 0;
+		const uint32_t mask = 1 << (_ebp >> 24);
+		uint32_t *sssLut3 = _res->_sssLookupTable3[(_ebp >> 20) & 15] + _ecx;
+		*sssLut3 |= mask;
+		uint32_t *sssLut2 = _res->_sssLookupTable2[(_ebp >> 20) & 15] + _ecx;
+		if (*sssLut2 & mask) {
+			return;
 		}
-		_eax |= _edx;
-		*(uint32_t *)_ecx = _eax;
-		goto 42BBDD
+		*sssLut2 |= mask;
 // 42BB26
 	} else if ((_al & 1) != 0) {
-		_eax = _ebp;
-		_edx >>= 20;
-		_edx &= 15;
-		_eax = sssLookupTable1[_edx];
-		_edx = _eax + _ecx * 4;
-		_ecx =_ebp;
-		ecx >>= 24;
-		_eax = 1 << _ecx;
-		_ecx = *(uint32_t *)edx;
-		if ((_ecx & _eax) != 0) {
-			return 0;
+		const uint32_t mask = 1 << (_ebp >> 24);
+		uint32_t *sssLut1 = _res->_sssLookupTable1[(_ebp >> 20) & 15] + _ecx;
+		if (*sssLut1 & mask) {
+			return;
 		}
-		_ecx |= _eax;
-		*(uint32_t *)_edx = _ecx;
-		goto 42BBDD
+		*sssLut1 |= mask;
 // 42BB60
 	} else if ((_al & 4) != 0) {
-		_esi = (_ebp >> 20) & 15;
-		_edi = _ebp >> 24;
-		_eax = _sssObjectsList1;
-		while (_eax != 0) {
-			_edx = _eax->flags0;
-			_ebx = _edx & 0xFFF;
-			if (_ebx == _ecx) {
-				_ebx = (_edx >> 20) & 15;
-				if (_ebx == _esi) {
-					_edx >>= 24;
-					if (_edx == _edi) {
-						_ebx = s;
-						goto 42BBDD
+		SssObject *ptr1 = _sssObjectsList1;
+		while (ptr1) {
+			if ((ptr1->flags0 & 0xFFF) == (uint32_t)_ecx) {
+				if (((_edx >> 20) & 15) == ((ptr1->flags0 >> 20) & 15)) {
+					if ((_edx >> 24) == (ptr1->flags0 >> 24)) {
+						goto prepare;
+					}
 				}
 			}
-			_eax = _eax->nextPtr;
+			ptr1 = ptr1->nextPtr;
 		}
-		_ebx = s;
-		_eax = _sssObjectsList2;
-		while (_eax != 0) {
-			_edx = _eax->flags0;
-			_ebx = _edx & 0xFFF;
-			if (_ebx == _ecx) {
-				_ebx = (_edx >> 20) & 15;
-				if (_ebx == _esi) {
-					_edx >>= 24;
-					if (_edx == _edi) {
-						_ebx = s;
-						goto 42BBDD;
+		SssObject *ptr2 = _sssObjectsList2;
+		while (ptr2) {
+			if ((ptr2->flags & 0xFFF) == (uint32_t)_ecx) {
+				if (((_edx >> 20) & 15) == ((ptr2->flags0 >> 20) & 15)) {
+					if ((_edx >> 24) == (ptr2->flags0 >> 24)) {
+						goto prepare;
+					}
 				}
 			}
-			_eax = _eax->nextPtr;
+			ptr2 = ptr2->nextPtr;
 		}
+		return;
 	}
-#endif
 // 42BBDD
+prepare:
 	prepareSoundObject(s->sssUnk3, (int8_t)s->unk2, _ebp);
 }
 
@@ -1129,18 +1099,11 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 
 void Game::setSoundObjectVolume(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->unk18 != 0 && _snd_masterVolume != 0) {
-		int volume = so->filter->unk4;
-		volume = ((volume >> 16) * so->unk18) >> 7;
+		int volume = ((so->filter->unk4 >> 16) * so->unk18) >> 7;
 		int _esi = 0;
 		if (so->volumePtr) {
-			int _eax = so->unk8;
-			_eax += so->filter->unk24;
+			int _eax = CLIP(so->unk8 + so->filter->unk24, 0, 7);
 			_esi = so->volume;
-			if (_eax < 0) {
-				_eax = 0;
-			} else if (_eax > 7) {
-				_eax = 7;
-			}
 			if (_esi == -2) {
 				volume = 0;
 				_esi = 64;
@@ -1173,8 +1136,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 
 		} else {
 // 429076:
-			_esi = so->filter->unk14;
-			_esi = CLIP(so->volume + (_esi >> 16), 0, 128);
+			_esi = CLIP(so->volume + (so->filter->unk14 >> 16), 0, 128);
 		}
 // 429094
 		if (so->pcm == 0) {
