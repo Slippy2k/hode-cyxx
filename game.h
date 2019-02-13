@@ -56,7 +56,6 @@ struct Game {
 	static const char *_resLevelNames[];
 	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelScreenStartData[];
-	static const uint8_t _dbVolumeTable[129];
 	static const uint8_t _transformBufferData1[];
 	static const uint8_t _transformBufferData2[];
 
@@ -460,7 +459,7 @@ struct Game {
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
-	uint8_t _sssObjectsChanged;
+	bool _sssObjectsChanged;
 	int _sssObjectsCount;
 	SssObject *_sssObjectsList1;
 	SssObject *_sssObjectsList2;

@@ -4,6 +4,18 @@
 #include "systemstub.h"
 #include "util.h"
 
+static const uint8_t _dbVolumeTable[129] = {
+	0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06,
+	0x06, 0x07, 0x07, 0x07, 0x08, 0x08, 0x09, 0x09, 0x09, 0x0A, 0x0A, 0x0B, 0x0B, 0x0C, 0x0C, 0x0C,
+	0x0D, 0x0D, 0x0E, 0x0E, 0x0F, 0x0F, 0x10, 0x10, 0x10, 0x11, 0x11, 0x12, 0x12, 0x13, 0x13, 0x14,
+	0x14, 0x15, 0x15, 0x16, 0x16, 0x17, 0x17, 0x18, 0x18, 0x19, 0x1A, 0x1A, 0x1B, 0x1B, 0x1C, 0x1C,
+	0x1D, 0x1D, 0x1E, 0x1F, 0x1F, 0x20, 0x20, 0x21, 0x22, 0x22, 0x23, 0x23, 0x24, 0x25, 0x25, 0x26,
+	0x27, 0x27, 0x28, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2F, 0x30, 0x32, 0x33, 0x35, 0x37, 0x38,
+	0x3A, 0x3C, 0x3D, 0x3F, 0x41, 0x43, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E, 0x50, 0x52, 0x54, 0x56,
+	0x59, 0x5B, 0x5D, 0x5F, 0x62, 0x64, 0x66, 0x69, 0x6B, 0x6E, 0x70, 0x73, 0x76, 0x78, 0x7B, 0x7E,
+	0x80
+};
+
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	// (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF) ?
 	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) {
@@ -101,7 +113,7 @@ void Game::updateSoundObject(SssObject *so) {
 				const int volume = getSoundObjectVolumeByPos(so);
 				if (volume != so->volume) {
 					so->volume = volume;
-					_sssObjectsChanged = 1;
+					_sssObjectsChanged = true;
 				}
 			} else {
 				if (so->codeDataStage2) {
@@ -120,7 +132,7 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->pcm == 0) {
 				return;
 			}
-			if (_sssObjectsChanged == 0 || (so->flags & 1) == 0) {
+			if (!_sssObjectsChanged || (so->flags & 1) == 0) {
 				goto flag_case0;
 			}
 			goto flag_case1;
@@ -131,7 +143,7 @@ void Game::updateSoundObject(SssObject *so) {
 		const int volume = getSoundObjectVolumeByPos(so);
 		if (volume != so->volume) {
 			so->volume = volume;
-			_sssObjectsChanged = 1;
+			_sssObjectsChanged = true;
 			goto flag_case1;
 		}
 	}
@@ -370,7 +382,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				const int volume = (so->unk64 + 0x8000) >> 16;
 				if (volume != so->volume) {
 					so->volume = volume;
-					_sssObjectsChanged = 1;
+					_sssObjectsChanged = true;
 				}
 				--so->unk58;
 				if (so->unk58 >= 0) {
@@ -386,7 +398,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					int value = (so->unk5C + 0x8000) >> 16;
 					if (value != so->unk18) {
 						so->unk18 = value;
-						_sssObjectsChanged = 1;
+						_sssObjectsChanged = true;
 					}
 					--so->unk54;
 					if (so->unk54 >= 0) {
@@ -400,7 +412,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		case 11: {
 				if (so->unk18 != code[1]) {
 					so->unk18 = code[1];
-					_sssObjectsChanged = 1;
+					_sssObjectsChanged = true;
 				}
 				code += 4;
 			}
@@ -423,7 +435,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 					so->unk5C = value << 16;
 				}
 				so->unk18 = value;
-				_sssObjectsChanged = 1;
+				_sssObjectsChanged = true;
 				so->unk60 = (code[1] << 16) - so->unk5C / READ_LE_UINT32(code + 4);
 				code += 8;
 			}
@@ -445,7 +457,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				if (so->pcm == 0) {
 					return code;
 				}
-				_sssObjectsChanged = 1;
+				_sssObjectsChanged = true;
 			}
 			break;
 #endif
@@ -466,7 +478,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		case 19: { // set_volume
 				if (so->volume != code[1]) {
 					so->volume = code[1];
-					_sssObjectsChanged = 1;
+					_sssObjectsChanged = true;
 				}
 				code += 4;
 			}
@@ -1034,7 +1046,7 @@ void Game::clearSoundObjects() {
 			memset(_res->_sssLookupTable3[i], 0, size);
 		}
 	}
-	// memset(_channelMixingTable, 0, 8 * 4);
+	memset(_channelMixingTable, 0, sizeof(_channelMixingTable));
 	if (_res->_sssFilters) {
 		memset(_res->_sssFilters, 0, _res->_sssHdr.dataUnk2Count * sizeof(SssFilter));
 		if (_res->_sssHdr.dataUnk2Count != 0) {
