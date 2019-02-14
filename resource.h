@@ -183,7 +183,6 @@ struct Resource {
 	uint8_t *_resLvlScreenSpriteDataPtrTable[32];
 	uint32_t _resLevelData0x2B88SizeTable[40];
 	uint32_t _resLevelData0x2988SizeTable[32];
-	LvlObject *_resLvlData0x288PtrTable[40];
 	LvlObjectData _resLevelData0x2988Table[40];
 	LvlObjectData *_resLevelData0x2988PtrTable[32];
 	LvlBackgroundData _resLvlScreenBackgroundDataTable[40];
@@ -234,9 +233,6 @@ struct Resource {
 
 	void incLevelData0x2988RefCounter(LvlObject *ptr);
 	void decLevelData0x2988RefCounter(LvlObject *ptr);
-
-	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
-	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
 
 	void loadHintImage(int num, uint8_t *dst, uint8_t *pal);
 	void loadLoadingImage(uint8_t *dst, uint8_t *pal);

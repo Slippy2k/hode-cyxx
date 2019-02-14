@@ -15,7 +15,7 @@ static void sub_406250(LvlObject *o, uint8_t *p, int num) {
 }
 
 void Game::postScreenUpdate_lar2_screen3() {
-	LvlObject *o = _res->findLvlObject(2, 0, 3);
+	LvlObject *o = findLvlObject(2, 0, 3);
 	sub_406250(o, byte_4528D4, 1);
 }
 
@@ -29,7 +29,7 @@ void Game::postScreenUpdate_lar2_screen4() {
 			_currentLevelCheckpoint = _levelCheckpoint;
 			updateScreen(_andyObject->screenNum);
 		}
-		LvlObject *o = _res->findLvlObject(2, 0, 4);
+		LvlObject *o = findLvlObject(2, 0, 4);
 		sub_406250(o, byte_4528D8, 2);
 	}
 }
@@ -38,7 +38,7 @@ void Game::postScreenUpdate_lar2_screen5() {
 	if (_currentLevelCheckpoint == 7 and _levelCheckpoint == 8) {
 		byte_4528DC[0] &= 0xF;
 	}
-	LvlObject *o = _res->findLvlObject(2, 0, 5);
+	LvlObject *o = findLvlObject(2, 0, 5);
 	sub_406250(o, byte_4528DC, 3);
 }
 
@@ -58,7 +58,7 @@ void Game::postScreenUpdate_lar2_screen7() {
 }
 
 void Game::postScreenUpdate_lar2_screen10() {
-	LvlObject *o = _res->findLvlObject(2, 0, 10);
+	LvlObject *o = findLvlObject(2, 0, 10);
 	sub_406250(o, byte_4528E0, 4);
 }
 
@@ -83,7 +83,7 @@ void Game::callLevel_postScreenUpdate_lar2(int num) {
 }
 
 void Game::preScreenUpdate_lar2_screen2() {
-	LvlObject *o = _res->findLvlObject(2, 0, 2);
+	LvlObject *o = findLvlObject(2, 0, 2);
 	sub_406250(o, byte_4528D0, 1);
 	if (_res->_currentScreenResourceNum == 2) {
 		if (_levelCheckpoint == 0) {

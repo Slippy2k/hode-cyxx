@@ -942,7 +942,7 @@ int Game::addLvlObjectToList3(int num) {
 }
 
 LvlObject *Game::findLvlObjectNoDataPtr(int num, int index) {
-	LvlObject *ptr = _res->_resLvlData0x288PtrTable[index];
+	LvlObject *ptr = _screenLvlObjectsList[index];
 	while (ptr) {
 		if (ptr->type == 2 && ptr->data0x2988 == num && !ptr->dataPtr) {
 			break;
@@ -1062,7 +1062,7 @@ void Game::setupCurrentScreen() {
 
 void Game::updateScreenHelper(int num) {
 	_res->_screensState[num].s2 = 1;
-	for (LvlObject *ptr = _res->_resLvlData0x288PtrTable[num]; ptr; ptr = ptr->nextPtr) {
+	for (LvlObject *ptr = _screenLvlObjectsList[num]; ptr; ptr = ptr->nextPtr) {
 		switch (ptr->type) {
 		case 0: {
 				AnimBackgroundData *p = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
@@ -1990,7 +1990,7 @@ LvlObject *Game::updateAnimatedLvlObject(LvlObject *o) {
 }
 
 void Game::updateAnimatedLvlObjectsLeftRightCurrentScreens() {
-	LvlObject *ptr = _res->_resLvlData0x288PtrTable[_res->_currentScreenResourceNum];
+	LvlObject *ptr = _screenLvlObjectsList[_res->_currentScreenResourceNum];
 	while (ptr) {
 		if (ptr->screenState == 0xFF || ptr->screenState == _res->_screensState[_res->_currentScreenResourceNum].s0) {
 			ptr = updateAnimatedLvlObject(ptr);
@@ -2000,7 +2000,7 @@ void Game::updateAnimatedLvlObjectsLeftRightCurrentScreens() {
 	}
 	int index = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen];
 	if (index != 0xFF && _res->_screensState[index].s2 != 0) {
-		ptr = _res->_resLvlData0x288PtrTable[index];
+		ptr = _screenLvlObjectsList[index];
 		while (ptr) {
 			if (ptr->screenState == 0xFF || ptr->screenState == _res->_screensState[index].s0) {
 				ptr = updateAnimatedLvlObject(ptr);
@@ -2011,7 +2011,7 @@ void Game::updateAnimatedLvlObjectsLeftRightCurrentScreens() {
 	}
 	index = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen];
 	if (index != 0xFF && _res->_screensState[index].s2 != 0) {
-		ptr = _res->_resLvlData0x288PtrTable[index];
+		ptr = _screenLvlObjectsList[index];
 		while (ptr) {
 			if (ptr->screenState == 0xFF || ptr->screenState == _res->_screensState[index].s0) {
 				ptr = updateAnimatedLvlObject(ptr);
@@ -2994,14 +2994,14 @@ void Game::clearDeclaredLvlObjectsList() {
 
 void Game::initLvlObjects() {
 	for (int i = 0; i < _res->_lvlHdr.screensCount; ++i) {
-		_res->_resLvlData0x288PtrTable[i] = 0;
+		_screenLvlObjectsList[i] = 0;
 	}
 	LvlObject *prevLvlObj = 0;
 	for (int i = 0; i < _res->_lvlHdr.staticLvlObjectsCount; ++i) {
 		LvlObject *ptr = &_res->_resLvlScreenObjectDataTable[i];
 		int index = ptr->screenNum;
-		ptr->nextPtr = _res->_resLvlData0x288PtrTable[index];
-		_res->_resLvlData0x288PtrTable[index] = ptr;
+		ptr->nextPtr = _screenLvlObjectsList[index];
+		_screenLvlObjectsList[index] = ptr;
 		switch (ptr->type) {
 		case 0:
 			assert(_animBackgroundDataCount < 64);
@@ -3042,6 +3042,28 @@ void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) 
 		ptr->type = type;
 		_res->incLevelData0x2988RefCounter(ptr);
 	}
+}
+
+LvlObject *Game::findLvlObject(uint8_t type, uint8_t num, int index) {
+	LvlObject *ptr = _screenLvlObjectsList[index];
+	while (ptr) {
+		if (ptr->type == type && ptr->data0x2988 == num) {
+			break;
+		}
+		ptr = ptr->nextPtr;
+	}
+	return ptr;
+}
+
+LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int index) {
+	LvlObject *ptr = _screenLvlObjectsList[index];
+	while (ptr) {
+		if (ptr->type == type && ptr->flags == flags) {
+			break;
+		}
+		ptr = ptr->nextPtr;
+	}
+	return ptr;
 }
 
 void Game::captureScreenshot() {

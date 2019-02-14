@@ -283,7 +283,7 @@ void Game::postScreenUpdate_rock_screen18() {
 		}
 		break;
 	case 2:
-		o = _res->findLvlObject(2, 0, 18);
+		o = findLvlObject(2, 0, 18);
 		assert(o);
 		o->actionKeyMask = 1;
 		++_screenCounterTable[18];
@@ -295,7 +295,7 @@ void Game::postScreenUpdate_rock_screen18() {
 			_res->_screensState[18].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[18].currentBackgroundId = 1;
 		} else {
-			o = _res->findLvlObject(2, 0, 18);
+			o = findLvlObject(2, 0, 18);
 			assert(o);
 			if ((o->flags0 & 0x1F) == 11 || (o->flags0 & 0x1F) == 1) {
 				break;
@@ -585,13 +585,13 @@ void Game::preScreenUpdate_rock_screen2() {
 	if (_res->_currentScreenResourceNum == 2 && _levelCheckpoint == 0) {
 		_levelCheckpoint = 1;
 	} else if (_levelCheckpoint > 1) {
-		LvlObject *ptr = _res->findLvlObject(2, 0, 2);
+		LvlObject *ptr = findLvlObject(2, 0, 2);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
 		}
 		setupLvlObjectBitmap(ptr);
-		ptr = _res->findLvlObject(2, 1, 2);
+		ptr = findLvlObject(2, 1, 2);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
@@ -602,13 +602,13 @@ void Game::preScreenUpdate_rock_screen2() {
 
 void Game::preScreenUpdate_rock_screen3() {
 	if (_levelCheckpoint > 1) {
-		LvlObject *ptr = _res->findLvlObject(2, 0, 3);
+		LvlObject *ptr = findLvlObject(2, 0, 3);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
 		}
 		setupLvlObjectBitmap(ptr);
-		ptr = _res->findLvlObject(2, 1, 3);
+		ptr = findLvlObject(2, 1, 3);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
@@ -855,7 +855,7 @@ void Game::callLevel_terminate_rock() {
 }
 
 void Game::setupLvlObjects_rock_screen2() {
-	LvlObject *ptr = _res->findLvlObject(2, 0, 2);
+	LvlObject *ptr = findLvlObject(2, 0, 2);
 	if (ptr) {
 		ptr->xPos = 146;
 		ptr->yPos = 0;
@@ -864,7 +864,7 @@ void Game::setupLvlObjects_rock_screen2() {
 		ptr->directionKeyMask = 0;
 		ptr->actionKeyMask = 0;
 	}
-	ptr = _res->findLvlObject(2, 1, 2);
+	ptr = findLvlObject(2, 1, 2);
 	if (ptr) {
 		ptr->xPos = 88;
 		ptr->yPos = 0;
@@ -876,7 +876,7 @@ void Game::setupLvlObjects_rock_screen2() {
 }
 
 void Game::setupLvlObjects_rock_screen3() {
-	LvlObject *ptr = _res->findLvlObject(2, 0, 3);
+	LvlObject *ptr = findLvlObject(2, 0, 3);
 	if (ptr) {
 		ptr->xPos = 198;
 		ptr->yPos = 0;
@@ -885,7 +885,7 @@ void Game::setupLvlObjects_rock_screen3() {
 		ptr->directionKeyMask = 0;
 		ptr->actionKeyMask = 0;
 	}
-	ptr = _res->findLvlObject(2, 1, 3);
+	ptr = findLvlObject(2, 1, 3);
 	if (ptr) {
 		ptr->xPos = 116;
 		ptr->yPos = 0;
@@ -897,7 +897,7 @@ void Game::setupLvlObjects_rock_screen3() {
 }
 
 void Game::setupLvlObjects_rock_screen18() {
-	LvlObject *ptr = _res->findLvlObject(2, 0, 18);
+	LvlObject *ptr = findLvlObject(2, 0, 18);
 	if (ptr) {
 		ptr->xPos = 16;
 		ptr->yPos = 78;

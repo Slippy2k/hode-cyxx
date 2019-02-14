@@ -11,7 +11,7 @@
 
 void Game::postScreenUpdate_fort_screen1() {
 	if (_res->_screensState[1].s0 == 2) {
-		LvlObject *o = _res->findLvlObject(2, 0, 1);
+		LvlObject *o = findLvlObject(2, 0, 1);
 		if (o) {
 			o->actionKeyMask = 1;
 		}
@@ -277,7 +277,7 @@ void Game::callLevel_preScreenUpdate_fort(int num) {
 }
 
 void Game::setupLvlObjects_fort_screen1() {
-	LvlObject *ptr = _res->findLvlObject(2, 0, 1);
+	LvlObject *ptr = findLvlObject(2, 0, 1);
 	if (ptr) {
 		ptr->xPos = 129;
 		ptr->yPos = 97;

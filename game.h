@@ -44,6 +44,7 @@ struct Game {
 		kObjectDataTypeLvlBackgroundSound
 	};
 	enum {
+		kMaxScreens = 40,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -66,6 +67,7 @@ struct Game {
 	Video *_video;
 	SystemStub *_system;
 
+	LvlObject *_screenLvlObjectsList[kMaxScreens];
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
 	LvlObject *_plasmaCannonObject;
@@ -258,6 +260,8 @@ struct Game {
 	void clearDeclaredLvlObjectsList();
 	void initLvlObjects();
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
+	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
+	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
 	void captureScreenshot();
 
 	// level1_rock.cpp

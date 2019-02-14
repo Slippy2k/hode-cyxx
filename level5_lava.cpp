@@ -147,7 +147,7 @@ void Game::callLevel_tick_lava() {
 }
 
 void Game::setupLvlObjects_lava_screen3() {
-	LvlObject *ptr = _res->findLvlObject(2, 0, 3);
+	LvlObject *ptr = findLvlObject(2, 0, 3);
 	assert(ptr);
 	ptr->flags0 = 0xFC00;
 	ptr->xPos = 138;

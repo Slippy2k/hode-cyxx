@@ -27,7 +27,7 @@ void Game::postScreenUpdate_isld_screen1() {
 void Game::postScreenUpdate_isld_screen3() {
 	if (_res->_currentScreenResourceNum == 3) {
 		if (_andyObject->xPos < 150) {
-			LvlObject *o = _res->findLvlObject2(0, 1, 3);
+			LvlObject *o = findLvlObject2(0, 1, 3);
 			if (o) {
 				// TODO:
 			}
@@ -38,7 +38,7 @@ void Game::postScreenUpdate_isld_screen3() {
 void Game::postScreenUpdate_isld_screen4() {
 	if (_res->_currentScreenResourceNum == 3) {
 		if (_andyObject->xPos < 150) {
-			LvlObject *o = _res->findLvlObject2(0, 1, 4);
+			LvlObject *o = findLvlObject2(0, 1, 4);
 			if (o) {
 				// TODO:
 			}

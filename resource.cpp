@@ -21,7 +21,6 @@ Resource::Resource(const char *dataPath)
 	memset(_resLvlScreenSpriteDataPtrTable, 0, sizeof(_resLvlScreenSpriteDataPtrTable));
 	memset(_resLevelData0x2B88SizeTable, 0, sizeof(_resLevelData0x2B88SizeTable));
 	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
-	memset(_resLvlData0x288PtrTable, 0, sizeof(_resLvlData0x288PtrTable));
 	memset(_resLevelData0x2988Table, 0, sizeof(_resLevelData0x2988Table));
 	memset(_resLevelData0x2988PtrTable, 0, sizeof(_resLevelData0x2988PtrTable));
 	memset(_resLvlScreenBackgroundDataTable, 0, sizeof(_resLvlScreenBackgroundDataTable));
@@ -415,28 +414,6 @@ void Resource::decLevelData0x2988RefCounter(LvlObject *ptr) {
 	if (dat) {
 		--dat->refCount;
 	}
-}
-
-LvlObject *Resource::findLvlObject(uint8_t type, uint8_t num, int index) {
-	LvlObject *ptr = _resLvlData0x288PtrTable[index];
-	while (ptr) {
-		if (ptr->type == type && ptr->data0x2988 == num) {
-			break;
-		}
-		ptr = ptr->nextPtr;
-	}
-	return ptr;
-}
-
-LvlObject *Resource::findLvlObject2(uint8_t type, uint8_t flags, int index) {
-	LvlObject *ptr = _resLvlData0x288PtrTable[index];
-	while (ptr) {
-		if (ptr->type == type && ptr->flags == flags) {
-			break;
-		}
-		ptr = ptr->nextPtr;
-	}
-	return ptr;
 }
 
 void Resource::loadHintImage(int num, uint8_t *dst, uint8_t *pal) {
