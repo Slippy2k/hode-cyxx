@@ -26,7 +26,7 @@ Resource::Resource(const char *dataPath)
 	memset(_resLvlScreenBackgroundDataTable, 0, sizeof(_resLvlScreenBackgroundDataTable));
 	memset(_resLvlScreenBackgroundDataPtrTable, 0, sizeof(_resLvlScreenBackgroundDataPtrTable));
 	memset(_resLvlScreenObjectDataTable, 0, sizeof(_resLvlScreenObjectDataTable));
-	memset(&_lvlLinkObject, 0, sizeof(_lvlLinkObject));
+	memset(&_dummyObject, 0, sizeof(_dummyObject));
 	_isDemoData = detectGameData();
 	if (_isDemoData) {
 		_datFile = new SectorFile;
@@ -114,8 +114,8 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->stateCounter = _lvlFile->readByte();
 	const uint32_t objRef = _lvlFile->readUint32();
 	if (objRef) {
-		dat->linkObjPtr = &_lvlLinkObject;
-		debug(kDebug_RESOURCE, "loadLvlObj num %d linkObjRef %d", num, (int)objRef);
+		dat->linkObjPtr = &_dummyObject;
+		debug(kDebug_RESOURCE, "loadLvlObj num %d linkObjRef 0x%x", num, objRef);
 	}
 	dat->width = _lvlFile->readUint16();
 	dat->height = _lvlFile->readUint16();
@@ -300,8 +300,6 @@ void Resource::loadLvlData(const char *levelName) {
 	for (int i = 0; i < _lvlHdr.spritesCount; ++i) {
 		loadLvlSpriteData(i);
 	}
-
-//	loadLevelDataMst();
 }
 
 static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlBackgroundData *dat) {
@@ -492,6 +490,7 @@ void Resource::loadSssData(const char *levelName) {
 		warning("Unhandled %s version %d", filename, _sssHdr.version);
 		_fs.closeFile(_sssFile);
 		delete _sssFile;
+		_sssFile = 0;
 		return;
 	}
 	_sssHdr.unk4 = _sssFile->readUint32(); // _edi
@@ -784,13 +783,6 @@ void Resource::loadSssData(const char *levelName) {
 
 // 429B9F:
 	checkSssCode(_sssCodeData, _sssHdr.codeSize);
-	if (0) {
-		FILE *fp = fopen("code.sss", "wb");
-		if (fp) {
-			fwrite(_sssCodeData, 1, _sssHdr.codeSize, fp);
-			fclose(fp);
-		}
-	}
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		if (_sssDataUnk3[i].count != 0) {
 			const int num = _sssDataUnk3[i].firstCodeOffset;

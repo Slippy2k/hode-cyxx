@@ -3020,7 +3020,7 @@ void Game::initLvlObjects() {
 			ptr->yPos = 0;
 			break;
 		case 2:
-			if (prevLvlObj == &_res->_lvlLinkObject) {
+			if (prevLvlObj == &_res->_dummyObject) {
 				prevLvlObj = 0;
 				ptr->linkObjPtr = ptr->nextPtr;
 			} else {

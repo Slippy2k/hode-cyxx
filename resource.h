@@ -189,7 +189,7 @@ struct Resource {
 	uint8_t *_resLvlScreenBackgroundDataPtrTable[40];
 
 	LvlObject _resLvlScreenObjectDataTable[104];
-	LvlObject _lvlLinkObject;
+	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
 
 	SssUnk1 *_sssDataUnk1;
 	SssUnk2 *_sssDataUnk2;
