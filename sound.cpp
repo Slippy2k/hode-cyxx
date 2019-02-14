@@ -436,17 +436,25 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 				so->unk18 = value;
 				_sssObjectsChanged = true;
-				so->unk60 = (code[1] << 16) - so->unk5C / READ_LE_UINT32(code + 4);
-				code += 8;
+				so->unk60 = ((code[1] << 16) - so->unk5C) / READ_LE_UINT32(code + 4);
+				return code + 8;
+			}
+			break;
+		case 14: {
+				so->unk58 = READ_LE_UINT32(code + 8) - 1;
+				int16_t value = READ_LE_UINT16(code + 2);
+				if (value == -1) {
+					so->unk64 = so->volume << 16;
+				} else {
+					so->unk64 = value << 16;
+					so->volume = value;
+					_sssObjectsChanged = true;
+				}
+				so->unk68 = ((code[1] << 16) - so->unk64) / READ_LE_UINT32(code + 8);
+				return code + 12;
 			}
 			break;
 #if 0
-		case 14: {
-				// TODO:
-				warning("executeSssCode case 14 unimplemented");
-				code += 12;
-			}
-			break;
 		case 16: { // stop_sound
 				--so->unk4C;
 				if (so->unk4C >= 0) {
