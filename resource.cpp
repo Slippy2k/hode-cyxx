@@ -38,7 +38,7 @@ Resource::Resource(const char *dataPath)
 		_datFile = new File;
 		_lvlFile = new File;
 		_mstFile = 0;
-		_sssFile = 0;
+		_sssFile = new File;
 	}
 	_loadingImageBuffer = 0;
 }
@@ -479,6 +479,13 @@ uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	return p;
 }
 
+static void skipBytesAlign(File *f, int align) {
+	int size = (align + 3) & ~3;
+	for (int i = 0; i < size; ++i) {
+		f->readByte();
+	}
+}
+
 void Resource::loadSssData(const char *levelName) {
 	if (!_sssFile) {
 		memset(&_sssHdr, 0, sizeof(_sssHdr));
@@ -502,9 +509,9 @@ void Resource::loadSssData(const char *levelName) {
 		// _sssBuffer1 = 0;
 		_sssHdr.dataUnk1Count = 0;
 	}
-	_sssHdr.unk0 = _sssFile->readUint32();
-	if (_sssHdr.unk0 != 6 && _sssHdr.unk0 != 10) {
-		warning("Unhandled %s version %d", filename, _sssHdr.unk0);
+	_sssHdr.version = _sssFile->readUint32();
+	if (_sssHdr.version != 6 && _sssHdr.version != 10) {
+		warning("Unhandled %s version %d", filename, _sssHdr.version);
 		_fs.closeFile(_sssFile);
 		delete _sssFile;
 		return;
@@ -520,7 +527,7 @@ void Resource::loadSssData(const char *levelName) {
 	_sssHdr.codeOffsetsCount = _sssFile->readUint32(); // _sssCodeOffsetsCount
 	_sssHdr.codeSize = _sssFile->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.codeOffsetsCount %d _sssHdr.codeSize %d", _sssHdr.codeOffsetsCount, _sssHdr.codeSize);
-	if (_sssHdr.unk0 == 10) {
+	if (_sssHdr.version == 10) {
 		_sssHdr.preloadData1Count = _sssFile->readUint32() & 255;
 		_sssHdr.preloadData2Count = _sssFile->readUint32() & 255; // sprites
 		_sssHdr.preloadData3Count = _sssFile->readUint32() & 255; // mst
@@ -588,7 +595,7 @@ void Resource::loadSssData(const char *levelName) {
 	_sssCodeData = (uint8_t *)malloc(_sssHdr.codeSize);
 	_sssFile->read(_sssCodeData, _sssHdr.codeSize);
 	bytesRead += _sssHdr.codeSize;
-if (_sssHdr.unk0 == 10) {
+if (_sssHdr.version == 10) {
 	// _sssPreloadData1
 	for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
 		int addr = _sssFile->readUint32();
@@ -649,13 +656,16 @@ if (_sssHdr.unk0 == 10) {
 // 00429A20:
 	// data += _sssHdr.unkC * 8;
 	int dataUnk6Bytes = 0;
+	_sssDataUnk4 = (SssUnk4 *)malloc(_sssHdr.unkC * sizeof(SssUnk4));
 	for (int i = 0; i < _sssHdr.unkC; ++i) {
 		int32_t count = _sssFile->readUint32();
 		int32_t offset = _sssFile->readUint32();
+		_sssDataUnk4[i].count = count;
 		debug(kDebug_RESOURCE, "DataUnk6 #%d/%d count %d offset 0x%x", i, _sssHdr.unkC, count, offset);
 		bytesRead += 8;
 		dataUnk6Bytes += count * 32;
 	}
+if (_sssHdr.version == 10) {
 	for (int i = 0; i < _sssHdr.unkC; ++i) {
 // 00429A25:
 		// _sssPreloadData4[i * 8 + 4] = data;
@@ -687,6 +697,39 @@ if (_sssHdr.unk0 == 10) {
 		_sssFile->readByte();
 		++bytesRead;
 	}
+}
+// 42E8DF
+if (_sssHdr.version == 6) {
+	static const int kSizeOfUnk4Data = 68;
+	for (int i = 0; i < _sssHdr.unkC; ++i) {
+		const int count = _sssDataUnk4[i].count;
+		uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data * count);
+		assert(p);
+		_sssFile->read(p, kSizeOfUnk4Data * count);
+		_sssDataUnk4[i].data = p;
+
+		for (int j = 0; j < count; ++j) {
+
+			const uint32_t unk0x2C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x2C) * 2;
+			const uint32_t unk0x30 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x30);
+			const uint32_t unk0x34 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x34);
+			const uint32_t unk0x04 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x04) * 2;
+			const uint32_t unk0x08 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x08) * 2;
+			const uint32_t unk0x0C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x0C);
+			const uint32_t unk0x10 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x10);
+			const uint32_t unk0x14 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x14);
+
+			skipBytesAlign(_sssFile, unk0x2C);
+			skipBytesAlign(_sssFile, unk0x30);
+			skipBytesAlign(_sssFile, unk0x34);
+			skipBytesAlign(_sssFile, unk0x04);
+			skipBytesAlign(_sssFile, unk0x08);
+			skipBytesAlign(_sssFile, unk0x0C);
+			skipBytesAlign(_sssFile, unk0x10);
+			skipBytesAlign(_sssFile, unk0x14);
+		}
+	}
+}
 
 	// _res_sssPcmTable = data; // size : sssHdr.unk30 * 20
 	_sssPcmTable = (SssPcm *)malloc(_sssHdr.pcmCount * sizeof(SssPcm));
@@ -785,8 +828,10 @@ if (_sssHdr.unk0 == 10) {
 //		if (_sssCodeOffsets[i] != 0xFFFFFFFF) {
 //		}
 //	}
+if (_sssHdr.version == 10) {
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
 	assert(bufferSize == bytesRead);
+}
 // 429C96:
 	if (_sssHdr.dataUnk2Count != 0) {
 		// TODO:

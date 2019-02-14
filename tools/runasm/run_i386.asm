@@ -7,6 +7,7 @@ GLOBAL test_negsbb
 GLOBAL test_andnegsbb
 GLOBAL test_mullongintlongint
 GLOBAL test_cdq
+GLOBAL test_0042E910
 
 SECTION .text
 
@@ -155,6 +156,22 @@ test_cdq:
     and edx, 3
     add eax, edx
     sar eax, 2
+
+  pop edx
+  pop ebp
+  ret
+
+
+test_0042E910:
+
+  push ebp
+  mov ebp, esp
+  push edx
+
+    mov eax, [ebp + arg0]
+    neg eax
+    shl eax, 1
+    and eax, 3
 
   pop edx
   pop ebp

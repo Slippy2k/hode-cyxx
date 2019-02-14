@@ -66,7 +66,7 @@ struct MstHdr {
 };
 
 struct SssHdr {
-	int unk0;
+	int version;
 	int unk4;
 	int unk8;
 	int unkC;
@@ -115,6 +115,11 @@ struct SssCodeOffset {
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData
 	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
 	uint32_t codeOffset4; // 0x14 offset to _sssCodeData
+};
+
+struct SssUnk4 {
+	uint32_t count;
+	uint8_t *data;
 };
 
 struct SssFilter {
@@ -191,6 +196,7 @@ struct Resource {
 	SssUnk2 *_sssDataUnk2;
 	SssUnk3 *_sssDataUnk3;
 	SssCodeOffset *_sssCodeOffsets;
+	SssUnk4 *_sssDataUnk4;
 	SssFilter *_sssFilters;
 	SssPcm *_sssPcmTable;
 	SssUnk6 *_sssDataUnk6;
