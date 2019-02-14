@@ -97,7 +97,7 @@ struct SssUnk2 { // SssProperty
 	int8_t unk2;
 };
 
-struct SssUnk3 {
+struct SssUnk3 { // SssInfo
 	uint8_t flags; // 0 flags0
 	int8_t count; // 1
 	uint16_t sssFilter; // 2 index to _sssFilters

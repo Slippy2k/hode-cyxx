@@ -479,11 +479,12 @@ uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	return p;
 }
 
-static void skipBytesAlign(File *f, int align) {
-	int size = (align + 3) & ~3;
+static int skipBytesAlign(File *f, int len) {
+	const int size = (len + 3) & ~3;
 	for (int i = 0; i < size; ++i) {
 		f->readByte();
 	}
+	return size;
 }
 
 void Resource::loadSssData(const char *levelName) {
@@ -595,65 +596,65 @@ void Resource::loadSssData(const char *levelName) {
 	_sssCodeData = (uint8_t *)malloc(_sssHdr.codeSize);
 	_sssFile->read(_sssCodeData, _sssHdr.codeSize);
 	bytesRead += _sssHdr.codeSize;
-if (_sssHdr.version == 10) {
-	// _sssPreloadData1
-	for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
-		int addr = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "sssPreloadData1 #%d 0x%x", i, addr);
-		bytesRead += 4;
+	if (_sssHdr.version == 10) {
+		// _sssPreloadData1
+		for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
+			int addr = _sssFile->readUint32();
+			debug(kDebug_RESOURCE, "sssPreloadData1 #%d 0x%x", i, addr);
+			bytesRead += 4;
+		}
+		// _sssPreloadData2
+		for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
+			int addr = _sssFile->readUint32();
+			debug(kDebug_RESOURCE, "sssPreloadData2 #%d 0x%x", i, addr);
+			bytesRead += 4;
+		}
+		// _sssPreloadData3
+		for (int i = 0; i < _sssHdr.preloadData3Count; ++i) {
+			int addr = _sssFile->readUint32();
+			debug(kDebug_RESOURCE, "sssPreloadData3 #%d 0x%x", i, addr);
+			bytesRead += 4;
+		}
+		_sssPreloadData1 = (SssPreloadData *)malloc(_sssHdr.preloadData1Count * sizeof(SssPreloadData));
+		for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
+			// _sssPreloadData1[i] = data
+			const int count = _sssFile->readByte();
+			_sssPreloadData1[i].count = count;
+			_sssPreloadData1[i].ptr = (uint8_t *)malloc(count);
+			debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
+			_sssFile->read(_sssPreloadData1[i].ptr, count);
+			bytesRead += count + 1;
+		}
+		_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.preloadData2Count * sizeof(SssPreloadData));
+		for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
+			// _sssPreloadData2[i] = data
+			const int count = _sssFile->readByte();
+			_sssPreloadData2[i].count = count;
+			_sssPreloadData2[i].ptr = (uint8_t *)malloc(count);
+			debug(kDebug_RESOURCE, "sssPreloadData2 #%d count %d", i, count);
+			_sssFile->read(_sssPreloadData2[i].ptr, count);
+			bytesRead += count + 1;
+		}
+		_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.preloadData3Count * sizeof(SssPreloadData));
+		for (int i = 0; i < _sssHdr.preloadData3Count; ++i) {
+			// _sssPreloadData3[i] = data
+			const int count = _sssFile->readByte();
+			_sssPreloadData3[i].count = count;
+			_sssPreloadData3[i].ptr = (uint8_t *)malloc(count);
+			debug(kDebug_RESOURCE, "sssPreloadData3 #%d count %d", i, count);
+			_sssFile->read(_sssPreloadData3[i].ptr, count);
+			bytesRead += count + 1;
+		}
+// 429A06
+		{
+			const int count = _sssFile->readByte();
+			uint8_t buf[256];
+			_sssFile->read(buf, count);
+			bytesRead += count + 1;
+		}
+		// _sssDataUnk4 = data;
 	}
-	// _sssPreloadData2
-	for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
-		int addr = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "sssPreloadData2 #%d 0x%x", i, addr);
-		bytesRead += 4;
-	}
-	// _sssPreloadData3
-	for (int i = 0; i < _sssHdr.preloadData3Count; ++i) {
-		int addr = _sssFile->readUint32();
-		debug(kDebug_RESOURCE, "sssPreloadData3 #%d 0x%x", i, addr);
-		bytesRead += 4;
-	}
-	_sssPreloadData1 = (SssPreloadData *)malloc(_sssHdr.preloadData1Count * sizeof(SssPreloadData));
-	for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
-		// _sssPreloadData1[i] = data
-		const int count = _sssFile->readByte();
-		_sssPreloadData1[i].count = count;
-		_sssPreloadData1[i].ptr = (uint8_t *)malloc(count);
-		debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
-		_sssFile->read(_sssPreloadData1[i].ptr, count);
-		bytesRead += count + 1;
-	}
-	_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.preloadData2Count * sizeof(SssPreloadData));
-	for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
-		// _sssPreloadData2[i] = data
-		const int count = _sssFile->readByte();
-		_sssPreloadData2[i].count = count;
-		_sssPreloadData2[i].ptr = (uint8_t *)malloc(count);
-		debug(kDebug_RESOURCE, "sssPreloadData2 #%d count %d", i, count);
-		_sssFile->read(_sssPreloadData2[i].ptr, count);
-		bytesRead += count + 1;
-	}
-	_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.preloadData3Count * sizeof(SssPreloadData));
-	for (int i = 0; i < _sssHdr.preloadData3Count; ++i) {
-		// _sssPreloadData3[i] = data
-		const int count = _sssFile->readByte();
-		_sssPreloadData3[i].count = count;
-		_sssPreloadData3[i].ptr = (uint8_t *)malloc(count);
-		debug(kDebug_RESOURCE, "sssPreloadData3 #%d count %d", i, count);
-		_sssFile->read(_sssPreloadData3[i].ptr, count);
-		bytesRead += count + 1;
-	}
-// 429A06:
-	{
-		const int count = _sssFile->readByte();
-		uint8_t buf[256];
-		_sssFile->read(buf, count);
-		bytesRead += count + 1;
-		// _sssPreloadData4 = data;
-	}
-}
-// 00429A20:
+// 429A20
 	// data += _sssHdr.unkC * 8;
 	int dataUnk6Bytes = 0;
 	_sssDataUnk4 = (SssUnk4 *)malloc(_sssHdr.unkC * sizeof(SssUnk4));
@@ -665,71 +666,70 @@ if (_sssHdr.version == 10) {
 		bytesRead += 8;
 		dataUnk6Bytes += count * 32;
 	}
-if (_sssHdr.version == 10) {
-	for (int i = 0; i < _sssHdr.unkC; ++i) {
-// 00429A25:
-		// _sssPreloadData4[i * 8 + 4] = data;
+	if (_sssHdr.version == 10) {
+		for (int i = 0; i < _sssHdr.unkC; ++i) {
+// 429A25
+			// _sssDataUnk4[i * 8 + 4] = data;
 /*
-		_esi = _sssPreloadData4;
-		_ebp = 0;
-		_ecx = *(uint32_t *)data;
-		data += _ecx * 32;
-		if (_ecx > 0) {
-			_edx = 0;
-			_ecx = _esi + i * 8 + 4;
-			do {
-				*(uint32_t *)(_edx + _ecx + 24) = _eax;
-				++_ebp;
-				_edx += 32;
-				_ecx = *(uint32_t *)(_esi + _edi * 8 + 4);
-				_ebx = *(uint32_t *)(_edx + _ecx - 4);
-				_eax += _ebx * 4;
-				_ebx = *(uint32_t *)(_esi + _edi * 8);
-			} while (_ebp < _ebx);
-		}
-		_ebx = 0;
+			_esi = _sssDataUnk4;
+			_ebp = 0;
+			_ecx = *(uint32_t *)data;
+			data += _ecx * 32;
+			if (_ecx > 0) {
+				_edx = 0;
+				_ecx = _esi + i * 8 + 4;
+				do {
+					*(uint32_t *)(_edx + _ecx + 24) = _eax;
+					++_ebp;
+					_edx += 32;
+					_ecx = *(uint32_t *)(_esi + _edi * 8 + 4);
+					_ebx = *(uint32_t *)(_edx + _ecx - 4);
+					_eax += _ebx * 4;
+					_ebx = *(uint32_t *)(_esi + _edi * 8);
+				} while (_ebp < _ebx);
+			}
+			_ebx = 0;
 */
-	}
-// 429A78:
-	// TEMP:
-	debug(kDebug_RESOURCE, "DataUnk6Bytes %d", dataUnk6Bytes);
-	for (int i = 0; i < dataUnk6Bytes; ++i) {
-		_sssFile->readByte();
-		++bytesRead;
-	}
-}
+		}
+// 429A78
+		// TEMP:
+		debug(kDebug_RESOURCE, "DataUnk6Bytes %d", dataUnk6Bytes);
+		for (int i = 0; i < dataUnk6Bytes; ++i) {
+			_sssFile->readByte();
+			++bytesRead;
+		}
+	} else if (_sssHdr.version == 6) {
 // 42E8DF
-if (_sssHdr.version == 6) {
-	static const int kSizeOfUnk4Data = 68;
-	for (int i = 0; i < _sssHdr.unkC; ++i) {
-		const int count = _sssDataUnk4[i].count;
-		uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data * count);
-		assert(p);
-		_sssFile->read(p, kSizeOfUnk4Data * count);
-		_sssDataUnk4[i].data = p;
+		static const int kSizeOfUnk4Data = 68;
+		for (int i = 0; i < _sssHdr.unkC; ++i) {
+			const int count = _sssDataUnk4[i].count;
+			uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data * count);
+			assert(p);
+			_sssFile->read(p, kSizeOfUnk4Data * count);
+			_sssDataUnk4[i].data = p;
 
-		for (int j = 0; j < count; ++j) {
+			for (int j = 0; j < count; ++j) {
 
-			const uint32_t unk0x2C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x2C) * 2;
-			const uint32_t unk0x30 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x30);
-			const uint32_t unk0x34 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x34);
-			const uint32_t unk0x04 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x04) * 2;
-			const uint32_t unk0x08 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x08) * 2;
-			const uint32_t unk0x0C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x0C);
-			const uint32_t unk0x10 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x10);
-			const uint32_t unk0x14 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x14);
+				const uint32_t unk0x2C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x2C) * 2;
+				const uint32_t unk0x30 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x30);
+				const uint32_t unk0x34 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x34);
+				const uint32_t unk0x04 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x04) * 2;
+				const uint32_t unk0x08 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x08) * 2;
+				const uint32_t unk0x0C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x0C);
+				const uint32_t unk0x10 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x10);
+				const uint32_t unk0x14 = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x14);
 
-			skipBytesAlign(_sssFile, unk0x2C);
-			skipBytesAlign(_sssFile, unk0x30);
-			skipBytesAlign(_sssFile, unk0x34);
-			skipBytesAlign(_sssFile, unk0x04);
-			skipBytesAlign(_sssFile, unk0x08);
-			skipBytesAlign(_sssFile, unk0x0C);
-			skipBytesAlign(_sssFile, unk0x10);
-			skipBytesAlign(_sssFile, unk0x14);
+				bytesRead += skipBytesAlign(_sssFile, unk0x2C);
+				bytesRead += skipBytesAlign(_sssFile, unk0x30);
+				bytesRead += skipBytesAlign(_sssFile, unk0x34);
+				bytesRead += skipBytesAlign(_sssFile, unk0x04);
+				bytesRead += skipBytesAlign(_sssFile, unk0x08);
+				bytesRead += skipBytesAlign(_sssFile, unk0x0C);
+				bytesRead += skipBytesAlign(_sssFile, unk0x10);
+				bytesRead += skipBytesAlign(_sssFile, unk0x14);
+			}
 		}
 	}
-}
 
 	// _res_sssPcmTable = data; // size : sssHdr.unk30 * 20
 	_sssPcmTable = (SssPcm *)malloc(_sssHdr.pcmCount * sizeof(SssPcm));
@@ -828,10 +828,14 @@ if (_sssHdr.version == 6) {
 //		if (_sssCodeOffsets[i] != 0xFFFFFFFF) {
 //		}
 //	}
-if (_sssHdr.version == 10) {
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
-	assert(bufferSize == bytesRead);
-}
+	if (_sssHdr.version == 10) {
+		assert(bufferSize == bytesRead);
+	}
+	if (bufferSize != bytesRead) {
+		warning("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
+	}
+
 // 429C96:
 	if (_sssHdr.dataUnk2Count != 0) {
 		// TODO:
@@ -868,6 +872,7 @@ if (_sssHdr.version == 10) {
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {
+	// TODO: table with opcodes size (-1 if the opcode is invalid)
 	const uint8_t *end = buf + size;
 	while (buf < end) {
 		switch (*buf) {
