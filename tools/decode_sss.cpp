@@ -274,6 +274,54 @@ static int parse(const uint8_t *buf, uint32_t size) {
 	return 0;
 }
 
+static void opcodesLength() {
+	uint8_t len[op_count];
+	for (int i = 0; i < op_count; ++i) {
+		switch (i) {
+		case 0:
+		case 2:
+		case 4:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 16:
+		case 19:
+		case 20:
+		case 21:
+		case 23:
+		case 25:
+		case 29:
+			len[i] = 4;
+			break;
+		case 6:
+		case 13:
+		case 17:
+		case 18:
+		case 22:
+		case 24:
+		case 26:
+		case 28:
+			len[i] = 8;
+			break;
+		case 5:
+		case 14:
+			len[i] = 12;
+			break;
+		case 8:
+		case 27:
+			len[i] = 16;
+			break;
+		default: // invalid opcode
+			len[i] = 0;
+			break;
+		}
+	}
+	for (int i = 0; i < op_count; ++i) {
+		fprintf(stdout, "%d, ", len[i]);
+	}
+}
+
 static int readFile(const char *path) {
 	int size = 0;
 	FILE *fp = fopen(path, "rb");
@@ -314,6 +362,8 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
+	} else {
+		opcodesLength();
 	}
 	return 0;
 }

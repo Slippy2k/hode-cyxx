@@ -872,49 +872,19 @@ void Resource::loadSssData(const char *levelName) {
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {
-	// TODO: table with opcodes size (-1 if the opcode is invalid)
-	const uint8_t *end = buf + size;
-	while (buf < end) {
-		switch (*buf) {
-		case 0:
-		case 2:
-		case 4:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 16:
-		case 19:
-		case 20:
-		case 21:
-		case 23:
-		case 25:
-		case 29:
-			buf += 4;
-			break;
-		case 6:
-		case 13:
-		case 17:
-		case 18:
-		case 22:
-		case 24:
-		case 26:
-		case 28:
-			buf += 8;
-			break;
-		case 5:
-		case 14:
-			buf += 12;
-			break;
-		case 8:
-		case 27:
-			buf += 16;
-			break;
-		default:
-			error("Invalid .sss opcode %d", *buf);
+	static const uint8_t _opcodesLength[] = {
+		4, 0, 4, 0, 4, 12, 8, 0, 16, 4, 4, 4, 4, 8, 12, 0, 4, 8, 8, 4, 4, 4, 8, 4, 8, 4, 8, 16, 8, 4
+	};
+	int offset = 0;
+	while (offset < size) {
+		const int len = _opcodesLength[buf[offset]];
+		if (len == 0) {
+			warning("Invalid .sss opcode %d", buf[offset]);
 			break;
 		}
+		offset += len;
 	}
+	assert(offset == size);
 }
 
 uint32_t Resource::getSssPcmSize(SssPcm *pcm) const {
