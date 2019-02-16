@@ -639,26 +639,32 @@ void Game::duplicateSoundObject(SssObject *so) {
 		_sssObjectsList2 = so;
 	} else {
 // 429185
-		SssObject *so2 = so; // _edi
+		SssObject *stopSo = so; // _edi
 		if (so->pcm && so->pcm->ptr) {
 			if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
-				SssObject *cur = _sssObjectsList3; // _eax
-				if (so->unk9 > cur->unk9) {
-					SssObject *_edx = cur->nextPtr;
-					so2 = cur;
-					so->nextPtr = _edx;
-					so->prevPtr = _sssObjectsList3->prevPtr;
-					if (so->nextPtr) {
-						so->nextPtr->prevPtr = so;
+				if (so->unk9 > _sssObjectsList3->unk9) {
+
+					stopSo = _sssObjectsList3;
+					SssObject *next = _sssObjectsList3->nextPtr; // _edx
+					SssObject *prev = _sssObjectsList3->prevPtr; // _ecx
+
+					so->nextPtr = next;
+					so->prevPtr = prev;
+
+					if (next) {
+						next->prevPtr = so;
 					}
-					if (so->prevPtr) {
-						so->prevPtr->nextPtr = so;
-// 429281
-// TODO
+					if (prev) {
+						prev->nextPtr = so;
 					} else {
 						_sssObjectsList1 = so;
-// 42927B
-// TODO
+					}
+// 429281
+					_sssObjectsList3 = 0;
+					for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
+						if (!_sssObjectsList3 || _sssObjectsList3->unk9 > current->unk9) {
+							_sssObjectsList3 = current;
+						}
 					}
 				}
 			} else {
@@ -676,20 +682,29 @@ void Game::duplicateSoundObject(SssObject *so) {
 				} else {
 					if (_sssObjectsList3 == 0) {
 						_sssObjectsList3 = 0;
-						// if (so == 0) goto 4292BE
-					}
+						for (SssObject *current = so; current; current = current->nextPtr) {
+							if (!_sssObjectsList3 || _sssObjectsList3->unk9 > current->unk9) {
+								_sssObjectsList3 = current;
+							}
+						}
+						// goto 4292BE
+					} else {
 // 429269
-
+						if (so->unk9 < _sssObjectsList3->unk9) {
+							_sssObjectsList3 = so;
+						}
+						// goto 4292BE
+					}
 				}
-
-// 4292BE
 			}
+// 4292BE
+			so->flags |= 1;
 		}
 // 4292C2
-		if (so2) {
-			so2->flags &= ~1;
-			so2->pcm = 0;
-			killSoundObject(so2->flags0);
+		if (stopSo) {
+			stopSo->flags &= ~1;
+			stopSo->pcm = 0;
+			killSoundObject(stopSo->flags0);
 		}
 	}
 // 4292DF
@@ -1281,5 +1296,47 @@ void Game::mixSoundObjects() {
 			}
 		}
 		so = so->nextPtr;
+	}
+}
+
+void Game::stopSoundObjects(SssObject **sssObjectsList, int num) {
+	bool found = false;
+	SssPcm *pcm = &_res->_sssPcmTable[num];
+	SssObject *current = *sssObjectsList;
+	while (current) {
+		if (current->pcm == pcm) {
+			SssObject *prev = current->prevPtr; // _ecx
+			SssObject *next = current->nextPtr; // _esi
+			if (next) {
+				next->prevPtr = prev;
+			}
+			if (prev) {
+				prev->nextPtr = next;
+			} else {
+				*sssObjectsList = next;
+			}
+			if (sssObjectsList != &_sssObjectsList1) {
+				--_snd_fadeVolumeCounter;
+				if (current == _sssObjectsList3 || (_snd_fadeVolumeCounter >= _snd_volumeMin && _sssObjectsList3 == 0)) {
+					found = true;
+				}
+			}
+// 429576
+			killSoundObject(current->flags);
+			current = next;
+		} else {
+// 429583
+			current = current->nextPtr;
+		}
+	}
+	if (found) {
+		_sssObjectsList3 = 0;
+		if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
+			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
+				if (!_sssObjectsList3 || _sssObjectsList3->unk9 > current->unk9) {
+					_sssObjectsList3 = current;
+				}
+			}
+		}
 	}
 }

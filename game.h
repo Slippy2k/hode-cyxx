@@ -494,6 +494,7 @@ struct Game {
 	void expireSoundObjects(int flags);
 	void mixSoundObjects17640(bool flag);
 	void mixSoundObjects();
+	void stopSoundObjects(SssObject **sssObjectsList, int num);
 
 	// andy.cpp
 
