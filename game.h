@@ -467,7 +467,7 @@ struct Game {
 	int _sssObjectsCount;
 	SssObject *_sssObjectsList1;
 	SssObject *_sssObjectsList2;
-	SssObject *_sssObjectsList3;
+	SssObject *_sssObjectsList3; // point to the object in _sssObjectsList1 with the highest 'unk9'
 	uint8_t _channelMixingTable[32];
 	int _snd_volumeMin;
 	int _snd_volumeMax;

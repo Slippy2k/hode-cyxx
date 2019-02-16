@@ -493,23 +493,23 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFile = 0;
 		return;
 	}
-	_sssHdr.unk4 = _sssFile->readUint32(); // _edi
+	_sssHdr.unk4 = _sssFile->readUint32();
 	_sssHdr.preloadPcmCount = _sssFile->readUint32();
 	_sssHdr.unkC = _sssFile->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.unk4 %d _sssHdr.preloadPcmCount %d _sssHdr.unkC %d", _sssHdr.unk4, _sssHdr.preloadPcmCount, _sssHdr.unkC);
-	_sssHdr.dataUnk1Count = _sssFile->readUint32(); // _dataUnk1Count
-	_sssHdr.dataUnk2Count = _sssFile->readUint32(); // _eax _dataUnk2Count
-	_sssHdr.dataUnk3Count = _sssFile->readUint32(); // _ecx _dataUnk3Count
+	_sssHdr.dataUnk1Count = _sssFile->readUint32();
+	_sssHdr.dataUnk2Count = _sssFile->readUint32();
+	_sssHdr.dataUnk3Count = _sssFile->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.dataUnk1Count %d _sssHdr.dataUnk2Count %d _sssHdr.dataUnk3Count %d", _sssHdr.dataUnk1Count, _sssHdr.dataUnk2Count, _sssHdr.dataUnk3Count);
-	_sssHdr.codeOffsetsCount = _sssFile->readUint32(); // _sssCodeOffsetsCount
+	_sssHdr.codeOffsetsCount = _sssFile->readUint32();
 	_sssHdr.codeSize = _sssFile->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.codeOffsetsCount %d _sssHdr.codeSize %d", _sssHdr.codeOffsetsCount, _sssHdr.codeSize);
 	if (_sssHdr.version == 10) {
-		_sssHdr.preloadData1Count = _sssFile->readUint32() & 255;
+		_sssHdr.preloadData1Count = _sssFile->readUint32() & 255; // pcm
 		_sssHdr.preloadData2Count = _sssFile->readUint32() & 255; // sprites
 		_sssHdr.preloadData3Count = _sssFile->readUint32() & 255; // mst
 	}
-	_sssHdr.pcmCount = _sssFile->readUint32(); // _edx
+	_sssHdr.pcmCount = _sssFile->readUint32();
 
 	const int bufferSize = _sssHdr.unk4 + _sssHdr.dataUnk2Count * 52 + _sssHdr.dataUnk3Count * 56;
 	debug(kDebug_RESOURCE, "bufferSize %d", bufferSize);
