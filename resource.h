@@ -68,7 +68,7 @@ struct MstHdr {
 struct SssHdr {
 	int version;
 	int unk4;
-	int unk8;
+	int preloadPcmCount;
 	int unkC;
 	int dataUnk1Count;
 	int dataUnk2Count;
@@ -142,9 +142,9 @@ struct SssPcm {
 	int16_t *ptr;    // 0 PCM data
 	uint32_t offset; // 4 offset in .sss
 	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed by indexes)
-	uint32_t strideSize;
-	uint16_t strideCount;
-	uint16_t flag;
+	uint32_t strideSize;  // 12
+	uint16_t strideCount; // 16
+	uint16_t flag;        // 18
 };
 
 struct SssUnk6 {
@@ -206,6 +206,7 @@ struct Resource {
 	uint32_t *_sssLookupTable2[3];
 	uint32_t *_sssLookupTable3[3];
 	uint8_t *_sssCodeData;
+	uint32_t _sssUnk14; // _sssPreloadedPcmTotalSize
 
 	bool _isDemoData;
 
