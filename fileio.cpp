@@ -123,9 +123,27 @@ void SectorFile::seekAlign(int pos) {
 }
 
 void SectorFile::seek(int pos, int whence) {
-	_bufLen = _bufPos = 0;
-	assert(whence == SEEK_SET);
-	File::seek(pos, whence);
+	if (whence == SEEK_SET) {
+		assert((pos & 2047) == 0);
+		_bufLen = _bufPos = 0;
+		File::seek(pos, SEEK_SET);
+	} else {
+		assert(whence == SEEK_CUR && pos >= 0);
+		if (pos < _bufLen) {
+			_bufLen -= pos;
+			_bufPos += pos;
+		} else {
+			pos -= _bufLen;
+			const int count = fioAlignSizeTo2048(pos) / 2048;
+			if (count > 1) {
+				const int alignPos = (count - 1) * 2048;
+				fseek(_fp, alignPos, SEEK_CUR);
+			}
+			refillBuffer();
+			_bufPos = pos % 2044;
+			_bufLen = 2044 - _bufPos;
+		}
+	}
 }
 
 int SectorFile::read(uint8_t *ptr, int size) {
