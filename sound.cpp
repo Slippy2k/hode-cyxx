@@ -34,6 +34,8 @@ void Game::resetSound() {
 void Game::removeSoundObject(SssObject *so) {
 	so->pcm = 0;
 	if ((so->flags & 1) != 0) {
+
+		// remove from linked list1
 		SssObject *next = so->nextPtr;
 		SssObject *prev = so->prevPtr;
 		if (next) {
@@ -42,9 +44,11 @@ void Game::removeSoundObject(SssObject *so) {
 		if (prev) {
 			prev->nextPtr = next;
 		} else {
+			// assert(so == _sssObjectsList1);
 			_sssObjectsList1 = next;
 		}
 
+		// fade/remove counter
 		--_snd_fadeVolumeCounter;
 		if (_sssObjectsList3 != so) {
 			if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
@@ -54,31 +58,28 @@ void Game::removeSoundObject(SssObject *so) {
 				return;
 			}
 		}
+
+		// set _sssObjectsList3 to the highest 'unk9'
 		_sssObjectsList3 = 0;
-		if (_snd_fadeVolumeCounter < _snd_volumeMin) {
-			return;
+		for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
+			if (!_sssObjectsList3 || _sssObjectsList3->unk9 > current->unk9) {
+				_sssObjectsList3 = current;
+			}
 		}
-		SssObject *current = _sssObjectsList1;
-		if (current != 0) {
-			SssObject *_ecx = 0;
-			do {
-				if (_ecx && _ecx->unk9 > current->unk9) {
-					_ecx = current;
-					_sssObjectsList3 = _ecx;
-				}
-			} while ((current = current->nextPtr) != 0);
-		}
-		return;
-	}
-	SssObject *next = so->nextPtr;
-	SssObject *prev = so->prevPtr;
-	if (next) {
-		next->prevPtr = prev;
-	}
-	if (prev) {
-		prev->nextPtr = next;
 	} else {
-		_sssObjectsList2 = next;
+
+		// remove from linked list2
+		SssObject *next = so->nextPtr;
+		SssObject *prev = so->prevPtr;
+		if (next) {
+			next->prevPtr = prev;
+		}
+		if (prev) {
+			prev->nextPtr = next;
+		} else {
+			// assert(so == _sssObjectsList2);
+			_sssObjectsList2 = next;
+		}
 	}
 }
 
@@ -1077,16 +1078,10 @@ void Game::fadeSoundObject(SssObject *so) {
 	if ((so->flags & 2) == 0) {
 		_sssObjectsList3 = 0;
 		if (_snd_fadeVolumeCounter >= _snd_volumeMin) {
-			so = 0;
-			SssObject *cur = _sssObjectsList1;
-			for (; cur; cur = cur->nextPtr) {
-				if (so) {
-					if (so->unk9 <= cur->unk9) {
-						continue;
-					}
+			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
+				if (!_sssObjectsList3 || _sssObjectsList3->unk9 > current->unk9) {
+					_sssObjectsList3 = current;
 				}
-				so = cur;
-				_sssObjectsList2 = cur;
 			}
 		}
 	}
