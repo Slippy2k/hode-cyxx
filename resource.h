@@ -206,7 +206,7 @@ struct Resource {
 	uint32_t *_sssLookupTable2[3];
 	uint32_t *_sssLookupTable3[3];
 	uint8_t *_sssCodeData;
-	uint32_t _sssUnk14; // _sssPreloadedPcmTotalSize
+	uint32_t _sssPreloadedPcmTotalSize;
 
 	bool _isDemoData;
 

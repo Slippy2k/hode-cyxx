@@ -780,18 +780,18 @@ void Resource::loadSssData(const char *levelName) {
 		debug(kDebug_RESOURCE, "sssLookupTable3[%d] = 0x%x", i, _sssLookupTable3[i][0]);
 		bytesRead += lutSize * 3;
 	}
-	_sssUnk14 = 0;
+	_sssPreloadedPcmTotalSize = 0;
 // 429B4B
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 		// _sssPcmTable[i].offset += baseOffset;
 		// _sssPcmTable[i].ptr = 0;
 		if (i >= _sssHdr.preloadPcmCount && _sssPcmTable[i].strideCount != 0) {
 			// *var103++ = i;
-			_sssUnk14 += _sssPcmTable[i].totalSize;
+			_sssPreloadedPcmTotalSize += _sssPcmTable[i].totalSize;
 		}
-		if (_sssPcmTable[i].totalSize == 0) {
-			_sssPcmTable[i].strideCount = 1;
-		}
+		// if (_sssPcmTable[i].totalSize == 0) {
+		//	_sssPcmTable[i].strideCount = 1;
+		// }
 	}
 
 // 429B9F:
