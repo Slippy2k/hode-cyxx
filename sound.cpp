@@ -1132,18 +1132,13 @@ void Game::setSoundObjectVolume(SssObject *so) {
 		int volume = ((so->filter->unk4 >> 16) * so->unk18) >> 7;
 		int _esi = 0;
 		if (so->volumePtr) {
-			int _eax = CLIP(so->unk8 + so->filter->unk24, 0, 7);
-			_esi = so->volume;
-			if (_esi == -2) {
+			int _eax = CLIP(so->unk8 + so->filter->unk24, 0, 7); // priority
+			if (so->volume == -2) {
 				volume = 0;
 				_esi = 64;
 				_eax = 0;
 			} else {
-				if (_esi < 0) {
-					_esi = 0;
-				} else if (_esi > 128) {
-					_esi = 128;
-				}
+				_esi = CLIP(so->volume, 0, 128);
 				volume >>= 2; // _edi
 				_eax /= 2;
 			}
@@ -1151,15 +1146,10 @@ void Game::setSoundObjectVolume(SssObject *so) {
 				so->priority = _eax;
 				_lowPrioritySssObject = 0;
 				if (_playingSssObjectsCount >= _playingSssObjectsMax) {
-					SssObject *o = _sssObjectsList1;
-					SssObject *_ebp = 0;
-					while (o) {
-						if (_ebp && _ebp->priority <= o->priority) {
-							continue;
+					for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
+						if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
+							_lowPrioritySssObject = current;
 						}
-						_ebp = o;
-						_lowPrioritySssObject = o;
-						o = o->nextPtr;
 					}
 				}
 			}
@@ -1281,7 +1271,7 @@ void Game::mixSoundObjects17640(bool flag) {
 // 42B4B2
 	memset(_channelMixingTable, 0, sizeof(_channelMixingTable));
 	if (flag) {
-//		clearSssBuffer2();
+		_res->clearSssLookupTable3();
 	}
 	mixSoundObjects();
 }

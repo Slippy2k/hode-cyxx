@@ -262,6 +262,8 @@ struct Resource {
 		return 0;
 	}
 
+	void clearSssLookupTable3();
+
 	void loadMstData(const char *levelName);
 };
 

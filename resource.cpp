@@ -848,9 +848,10 @@ void Resource::loadSssData(const char *levelName) {
 		_sssFilters[i].unk20 = c;
 	}
 // 429EFA:
+	// TODO
 
 // 429F38:
-	// clearSssData();
+	clearSssLookupTable3();
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {
@@ -892,6 +893,12 @@ void Resource::loadSssPcm(int num) {
 			}
 			assert((p - _sssPcmTable[num].ptr) * sizeof(int16_t) == decompressedSize);
 		}
+	}
+}
+
+void Resource::clearSssLookupTable3() {
+	for (int i = 0; i < 3; ++i) {
+		memset(_sssLookupTable3[i], 0, _sssHdr.dataUnk3Count * sizeof(uint32_t));
 	}
 }
 
