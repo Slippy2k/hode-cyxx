@@ -156,7 +156,7 @@ struct SssObject {
 	uint16_t num; // 0x4
 	uint16_t unk6; // 0x6
 	int8_t unk8; // 0x8
-	int8_t unk9; // 0x9
+	int8_t priority; // 0x9
 	uint8_t flags; // 0xA
 	uint8_t unkB;
 	uint32_t flags0; // 0xC

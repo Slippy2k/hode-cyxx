@@ -24,7 +24,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
 	_mstLogicDisabled = true;
-	_snd_volumeMin = 10;
+	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
 	_snd_volumeMax = 64;
 	_snd_masterVolume = 128;
 }

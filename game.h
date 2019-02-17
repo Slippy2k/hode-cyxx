@@ -467,11 +467,11 @@ struct Game {
 	int _sssObjectsCount;
 	SssObject *_sssObjectsList1;
 	SssObject *_sssObjectsList2;
-	SssObject *_sssObjectsList3; // point to the object in _sssObjectsList1 with the highest 'unk9'
+	SssObject *_lowPrioritySssObject; // point to the object in _sssObjectsList1 with the highest 'priority'
 	uint8_t _channelMixingTable[32];
-	int _snd_volumeMin;
+	int _playingSssObjectsMax;
 	int _snd_volumeMax;
-	int _snd_fadeVolumeCounter;
+	int _playingSssObjectsCount;
 	int _snd_masterVolume;
 
 	void resetSound();
@@ -488,7 +488,7 @@ struct Game {
 	SssObject *startSoundObject(int num, int b, int flags);
 	void setupSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
-	void fadeSoundObject(SssObject *so);
+	void setLowPrioritySssObject(SssObject *so);
 	int getSoundObjectVolumeByPos(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
 	void expireSoundObjects(int flags);
