@@ -465,8 +465,8 @@ struct Game {
 	SssObject _sssObjectsTable[32];
 	bool _sssObjectsChanged;
 	int _sssObjectsCount;
-	SssObject *_sssObjectsList1;
-	SssObject *_sssObjectsList2;
+	SssObject *_sssObjectsList1; // playing
+	SssObject *_sssObjectsList2; // paused
 	SssObject *_lowPrioritySssObject; // point to the object in _sssObjectsList1 with the highest 'priority'
 	uint8_t _channelMixingTable[32];
 	int _playingSssObjectsMax;
@@ -475,20 +475,20 @@ struct Game {
 	int _snd_masterVolume;
 
 	void resetSound();
-	void removeSoundObject(SssObject *so);
+	void removeSoundObject(SssObject *so); // removeSoundObjectFromList
 	void updateSoundObject(SssObject *so);
 	void executeSssCodeOp4(uint32_t flags);
 	void executeSssCodeOp12(int num, uint8_t lut, uint8_t c);
 	void executeSssCodeOp17(SssObject *so);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code);
-	SssObject *loadSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b);
-	void duplicateSoundObject(SssObject *so);
-	void killSoundObject(uint32_t flags);
-	SssObject *prepareSoundObject(int num, int b, int c);
-	SssObject *startSoundObject(int num, int b, int flags);
-	void setupSoundObject(SssUnk1 *s, int a, int b);
+	SssObject *loadSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b); // addSoundObject
+	void duplicateSoundObject(SssObject *so); // addSoundObjectToList
+	void killSoundObject(uint32_t flags); // updateSoundObjectLut2
+	SssObject *prepareSoundObject(int num, int b, int c); // createSoundObject
+	SssObject *startSoundObject(int num, int b, int flags); // createSoundObjectHelper
+	void setupSoundObject(SssUnk1 *s, int a, int b); // playSoundObject
 	void clearSoundObjects();
-	void setLowPrioritySssObject(SssObject *so);
+	void setLowPrioritySssObject(SssObject *so); // setLowPrioritySoundObject
 	int getSoundObjectVolumeByPos(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
 	void expireSoundObjects(int flags);
