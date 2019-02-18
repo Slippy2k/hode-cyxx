@@ -3,7 +3,7 @@
  * Copyright (C) 2009-2011 Gregory Montoir
  */
 
-#include <cstdarg>
+#include <stdarg.h>
 #include "util.h"
 
 int g_debugMask;

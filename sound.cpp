@@ -752,7 +752,7 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 			int i = 0;
 			int priority = 0;
 			do {
-				if (codeOffset->pcm != -1) {
+				if (codeOffset->pcm != 0xFFFF) {
 					SssObject *so = startSoundObject(num, i, flags);
 					if (so && so->unk2C < priority) {
 						priority = so->unk2C;
@@ -866,7 +866,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 			so->filter = filter;
 			so->unk18 = codeOffset->unk4;
 			so->volume = codeOffset->unk7;
-			if (codeOffset->unk7 == -1) {
+			if (codeOffset->unk7 == 0xFF) {
 				if (_currentSoundLvlObject) {
 					_currentSoundLvlObject->sssObj = so;
 					so->volumePtr = &_snd_volumeMax;
