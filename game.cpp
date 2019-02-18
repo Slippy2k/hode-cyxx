@@ -2707,7 +2707,80 @@ int Game::lvlObjectType0CallbackHelper2(int x, int y, int num) {
 }
 
 void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
-	warning("lvlObjectType0CallbackHelper3 unimplemented");
+
+	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+
+	int xPos = ptr->xPos + ptr->posTable[7].x;
+	int yPos = ptr->yPos + ptr->posTable[7].y;
+
+// 409657
+	// TODO: clipping with transformed screen
+
+	addLvlObjectToList3(4);
+	_lvlObjectsList3->xPos = xPos;
+	_lvlObjectsList3->yPos = yPos + 24;
+	_lvlObjectsList3->screenNum = ptr->screenNum;
+	_lvlObjectsList3->anim = 0;
+	_lvlObjectsList3->frame = 0;
+	_lvlObjectsList3->flags2 += 1;
+	_lvlObjectsList3->flags0 = (_lvlObjectsList3->flags0 & 0xFFE6) | 6;
+	_lvlObjectsList3->flags1 &= ~0x20;
+
+	uint8_t _dl = _edi->unk3;
+	static const int16_t word_43E53C[] = { 625, 937, 1094, 1250 };
+// 40973C
+	int _al = 0;
+	while (_al < 4 && _edi->unk6 >= word_43E53C[_al]) {
+		++_al;
+	}
+	_edi->unk3 = _al;
+	static const uint8_t byte_43E534[] = { 22, 20, 18, 16, 14 };
+	_edi->unk2 = byte_43E534[_al];
+	if (_dl == 1) {
+		if (_al == 3) {
+			if (_gameKeyPressedMaskIndex < 1) {
+				_gameKeyPressedMaskIndex = 1;
+				_plasmaCannonKeyMaskCounter = 0;
+			}
+		}
+	} else if (_dl == 3) {
+// 4097A2
+		if (_al == 4) {
+			if (_gameKeyPressedMaskIndex < 2) {
+				_gameKeyPressedMaskIndex = 2;
+				_plasmaCannonKeyMaskCounter = 0;
+			}
+		}
+	} else if (_dl == 4 && _edi->unk6 >= 1250) {
+// 4097BD
+		if (_gameKeyPressedMaskIndex < 160) {
+			_gameKeyPressedMaskIndex = 160;
+			_plasmaCannonKeyMaskCounter = 0;
+		}
+	}
+// 4097E1
+	switch (_al) {
+	case 0:
+		_lvlObjectsList3->actionKeyMask = 1;
+		break;
+	case 1:
+		_lvlObjectsList3->actionKeyMask = 2;
+		break;
+	case 2:
+		_lvlObjectsList3->actionKeyMask = 4;
+		break;
+	case 3:
+		_lvlObjectsList3->actionKeyMask = 8;
+		break;
+	default:
+		_lvlObjectsList3->actionKeyMask = 16;
+		break;
+	}
+
+// 409809
+	if (_edi->unk2 != 0) {
+		--_edi->unk2;
+	}
 }
 
 void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
