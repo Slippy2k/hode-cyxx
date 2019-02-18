@@ -475,20 +475,20 @@ struct Game {
 	int _snd_masterVolume;
 
 	void resetSound();
-	void removeSoundObject(SssObject *so); // removeSoundObjectFromList
+	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);
 	void executeSssCodeOp4(uint32_t flags);
 	void executeSssCodeOp12(int num, uint8_t lut, uint8_t c);
 	void executeSssCodeOp17(SssObject *so);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code);
-	SssObject *loadSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b); // addSoundObject
-	void duplicateSoundObject(SssObject *so); // addSoundObjectToList
-	void killSoundObject(uint32_t flags); // updateSoundObjectLut2
-	SssObject *prepareSoundObject(int num, int b, int c); // createSoundObject
-	SssObject *startSoundObject(int num, int b, int flags); // createSoundObjectHelper
-	void setupSoundObject(SssUnk1 *s, int a, int b); // playSoundObject
+	SssObject *addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b);
+	void addSoundObjectToList(SssObject *so);
+	void updateSoundObjectLut2(uint32_t flags);
+	SssObject *createSoundObject(int num, int b, int c);
+	SssObject *startSoundObject(int num, int b, int flags);
+	void playSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
-	void setLowPrioritySssObject(SssObject *so); // setLowPrioritySoundObject
+	void setLowPrioritySoundObject(SssObject *so);
 	int getSoundObjectVolumeByPos(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
 	void expireSoundObjects(int flags);

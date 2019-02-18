@@ -190,7 +190,7 @@ void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.dataUnk1Count) {
 		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.dataUnk1Count, a, b);
 		_currentSoundLvlObject = ptr;
-		setupSoundObject(&_res->_sssDataUnk1[num], a, b);
+		playSoundObject(&_res->_sssDataUnk1[num], a, b);
 		_currentSoundLvlObject = 0;
 	}
 }
