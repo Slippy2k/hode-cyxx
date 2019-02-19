@@ -456,9 +456,7 @@ uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 
 static int skipBytesAlign(File *f, int len) {
 	const int size = (len + 3) & ~3;
-	for (int i = 0; i < size; ++i) {
-		f->readByte();
-	}
+	f->seek(size, SEEK_CUR);
 	return size;
 }
 
@@ -670,10 +668,9 @@ void Resource::loadSssData(const char *levelName) {
 // 429A78
 		// TEMP:
 		debug(kDebug_RESOURCE, "DataUnk6Bytes %d", dataUnk6Bytes);
-		for (int i = 0; i < dataUnk6Bytes; ++i) {
-			_sssFile->readByte();
-			++bytesRead;
-		}
+		_sssFile->seek(dataUnk6Bytes, SEEK_CUR);
+		bytesRead += dataUnk6Bytes;
+
 	} else if (_sssHdr.version == 6) {
 // 42E8DF
 		static const int kSizeOfUnk4Data = 68;
@@ -711,22 +708,16 @@ void Resource::loadSssData(const char *levelName) {
 	_sssPcmTable = (SssPcm *)malloc(_sssHdr.pcmCount * sizeof(SssPcm));
 // 429AB8:
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
-		int a = _sssFile->readUint32(); // ptr to PCM data
-		int b = _sssFile->readUint32(); // offset in .sss
-		int c = _sssFile->readUint32(); // size in .sss
-		int d = _sssFile->readUint32();
-		int e = _sssFile->readUint16();
-		int f = _sssFile->readUint16();
-		_sssPcmTable[i].ptr = 0;
-		_sssPcmTable[i].offset = b;
-		_sssPcmTable[i].totalSize = c;
-		_sssPcmTable[i].strideSize = d;
-		_sssPcmTable[i].strideCount = e;
-		_sssPcmTable[i].flag = f;
-		debug(kDebug_RESOURCE, "sssPcmTable #%d/%d 0x%x offset 0x%x size %d stride %d %d flag %d", i, _sssHdr.pcmCount, a, b, c, d, e, f);
-		if (c != 0) {
-			assert((c % d) == 0); // total size must be multiple of stride
-			assert(c == d * e); // total size is stride size * count
+		_sssPcmTable[i].ptr = 0; _sssFile->readUint32();
+		_sssPcmTable[i].offset = _sssFile->readUint32();
+		_sssPcmTable[i].totalSize = _sssFile->readUint32();
+		_sssPcmTable[i].strideSize = _sssFile->readUint32();
+		_sssPcmTable[i].strideCount = _sssFile->readUint16();
+		_sssPcmTable[i].flag = _sssFile->readUint16();
+		debug(kDebug_RESOURCE, "sssPcmTable #%d/%d offset 0x%x size %d", i, _sssHdr.pcmCount, _sssPcmTable[i].offset, _sssPcmTable[i].totalSize);
+		if (_sssPcmTable[i].totalSize != 0) {
+			assert((_sssPcmTable[i].totalSize % _sssPcmTable[i].strideSize) == 0);
+			assert(_sssPcmTable[i].totalSize == _sssPcmTable[i].strideSize * _sssPcmTable[i].strideCount);
 		}
 		bytesRead += 20;
 	}
