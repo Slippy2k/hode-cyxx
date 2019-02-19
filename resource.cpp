@@ -43,12 +43,25 @@ Resource::Resource(const char *dataPath)
 }
 
 bool Resource::detectGameData() {
+	static const uint32_t _sizes[] = {
+		5804032, // hod_demo-weben1_2.exe
+		5867520, // HOD_Demo-WebFr1.2.exe
+		0
+	};
 	File f;
 	if (!_fs.openFile("SETUP.DAT", &f)) {
 		error("Unable to open 'SETUP.DAT'");
 		return false;
 	}
-	return f.getSize() == 5804032;
+	if (f.readUint32() == 11) {
+		const uint32_t size = f.getSize();
+		for (int i = 0; _sizes[i]; ++i) {
+			if (size == _sizes[i]) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void Resource::loadSetupDat() {
@@ -59,7 +72,7 @@ void Resource::loadSetupDat() {
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
 	_datHdr.yesNoQuitImage = READ_LE_UINT32(hdr + 0x40);
 	_datHdr.loadingImageSize = READ_LE_UINT32(hdr + 0x48);
-	const int hintsCount = _isDemoData ? 46 : 20;
+	const int hintsCount = (version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
 		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x4C + i * 4);
 		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x4C + (hintsCount + i) * 4);
