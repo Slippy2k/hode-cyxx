@@ -356,7 +356,7 @@ struct AndyObjectScreenData {
 	LvlObject *nextPtr; // 0x20 lvlObject
 };
 
-struct GameUnkList1 { // OtherObjectScreenData
+struct OtherObjectScreenData {
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;
@@ -368,7 +368,7 @@ struct GameUnkList1 { // OtherObjectScreenData
 	BoundingBox boundingBox; // 8
 	int32_t dxPos;
 	int32_t dyPos;
-	GameUnkList1 *nextPtr;
+	OtherObjectScreenData *nextPtr;
 };
 
 struct ScreenMask { // ShadowScreenMask
@@ -389,7 +389,7 @@ struct MovingOpcodeState {
 	int32_t unk0x1C;
 	int32_t unk0x20;
 	int32_t unk0x24;
-	GameUnkList1 *unk0x28;
+	OtherObjectScreenData *unk0x28;
 	LvlObject *unk0x2C;
 	uint32_t unk0x30;
 	uint32_t unk0x3C;

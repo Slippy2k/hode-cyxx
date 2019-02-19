@@ -39,7 +39,7 @@ struct Game {
 		// LvlObject.type == 0
 		kObjectDataTypeAnimBackgroundData,
 		// LvlObject.type == 8
-		kObjectDataTypeUnk1,
+		kObjectDataTypeOther,
 		// LvlObject.type == 1
 		kObjectDataTypeLvlBackgroundSound
 	};
@@ -92,8 +92,8 @@ struct Game {
 	uint8_t _fadePaletteCounter;
 	uint8_t _fadePalette;
 	bool _hideAndyObjectSprite;
-	GameUnkList1 _gameUnkList1Table[32];
-	GameUnkList1 *_gameUnkList1Head;
+	OtherObjectScreenData _otherObjectScreenDataTable[32];
+	OtherObjectScreenData *_otherObjectScreenDataList;
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -168,8 +168,8 @@ struct Game {
 	// game.cpp
 
 	void mainLoop(int level, int checkpoint);
-	void GameClearUnkList1();
-	void GameRemoveGameUnkList1ElementFromLevelScreenData(LvlObject *ptr);
+	void clearObjectScreenDataList();
+	void prependObjectScreenDataList(LvlObject *ptr);
 	void setShakeScreen(int type, int counter);
 	void fadeScreenPalette();
 	void shakeScreen();

@@ -36,20 +36,20 @@ Game::~Game() {
 	free(_shadowScreenMaskBuffer);
 }
 
-void Game::GameClearUnkList1() {
-	_gameUnkList1Head = &_gameUnkList1Table[0];
+void Game::clearObjectScreenDataList() {
+	_otherObjectScreenDataList = &_otherObjectScreenDataTable[0];
 	for (int i = 0; i < 31; ++i) {
-		_gameUnkList1Table[i].nextPtr = &_gameUnkList1Table[i + 1];
+		_otherObjectScreenDataTable[i].nextPtr = &_otherObjectScreenDataTable[i + 1];
 	}
-	_gameUnkList1Table[31].nextPtr = 0;
+	_otherObjectScreenDataTable[31].nextPtr = 0;
 }
 
-void Game::GameRemoveGameUnkList1ElementFromLevelScreenData(LvlObject *ptr) {
-	warning("GameRemoveGameUnkList1ElementFromLevelScreenData unimplemented");
+void Game::prependObjectScreenDataList(LvlObject *ptr) {
+	warning("prependObjectScreenDataList unimplemented");
 /*
-	GameUnkList1 *dat = (GameUnkList1 *)getLvlObjectDataPtr(ptr, kObjectDataTypeUnk1);
-	dat->nextPtr = _gameUnkList1Head;
-	_gameUnkList1Head = dat;
+	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeOther);
+	dat->nextPtr = _otherObjectScreenDataList;
+	_otherObjectScreenDataList = dat;
 	ptr->dataPtr = 0;
 */
 }
@@ -262,8 +262,8 @@ void Game::addToSpriteList(LvlObject *ptr) {
 			return;
 		}
 		if (_currentLevel == 3 && ptr->data0x2988 == 2) {
-			const int dxPos = ((GameUnkList1 *)ptr->dataPtr)->dxPos;
-			warning("ptr->dataPtr to GameUnkList1 dxPos %d", dxPos);
+			const int dxPos = ((OtherObjectScreenData *)ptr->dataPtr)->dxPos;
+			warning("ptr->dataPtr to OtherObjectScreenData dxPos %d", dxPos);
 			spr->xPos += dxPos;
 		}
 		if (READ_LE_UINT16(ptr->bitmapBits) > 8) {
@@ -592,7 +592,7 @@ void Game::destroyLvlObject(LvlObject *o) {
 		case 3:
 		case 7:
 			if (o->dataPtr) {
-				GameRemoveGameUnkList1ElementFromLevelScreenData(o);
+				prependObjectScreenDataList(o);
 			}
 			break;
 		}
@@ -818,7 +818,7 @@ void Game::clearLvlObjectsList1() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					GameRemoveGameUnkList1ElementFromLevelScreenData(ptr);
+					prependObjectScreenDataList(ptr);
 				}
 				break;
 			}
@@ -850,7 +850,7 @@ void Game::clearLvlObjectsList2() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					GameRemoveGameUnkList1ElementFromLevelScreenData(ptr);
+					prependObjectScreenDataList(ptr);
 				}
 				break;
 			}
@@ -882,7 +882,7 @@ void Game::clearLvlObjectsList3() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					GameRemoveGameUnkList1ElementFromLevelScreenData(ptr);
+					prependObjectScreenDataList(ptr);
 				}
 				break;
 			}
@@ -954,7 +954,7 @@ LvlObject *Game::findLvlObjectNoDataPtr(int num, int index) {
 
 void Game::removeLvlObject(LvlObject *ptr) {
 #if 0
-	GameUnkList1 *data = (GameUnkList1 *)ptr->dataPtr;
+	OtherObjectScreenData *data = (OtherObjectScreenData *)ptr->dataPtr;
 	LvlObject *o = data->nextPtr; // +0x20
 	if (o) {
 		data->nextPtr = 0;
@@ -996,7 +996,7 @@ void Game::removeLvlObjectNotType2List1(LvlObject *o) {
 		case 3:
 		case 7:
 			if (o->dataPtr) {
-				GameRemoveGameUnkList1ElementFromLevelScreenData(o);
+				prependObjectScreenDataList(o);
 			}
 			break;
 		}
@@ -2190,7 +2190,7 @@ void Game::levelMainLoop() {
 		resetSound();
 	}
 	_quit = false;
-	GameClearUnkList1();
+	clearObjectScreenDataList();
 	callLevel_initialize();
 	setupCurrentScreen();
 	clearLvlObjectsList2();
@@ -2561,8 +2561,8 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 	case kObjectDataTypeAnimBackgroundData:
 		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[64]);
 		break;
-	case kObjectDataTypeUnk1:
-		assert(o->dataPtr >= &_gameUnkList1Table[0] && o->dataPtr < &_gameUnkList1Table[32]);
+	case kObjectDataTypeOther:
+		assert(o->dataPtr >= &_otherObjectScreenDataTable[0] && o->dataPtr < &_otherObjectScreenDataTable[32]);
 		break;
 	}
 	return o->dataPtr;
@@ -2670,7 +2670,7 @@ void Game::lvlObjectType0CallbackHelper1() {
 		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		LvlObject *o = data->nextPtr;
 		if (o) {
-			GameUnkList1 *dataUnk1 = (GameUnkList1 *)getLvlObjectDataPtr(o, kObjectDataTypeUnk1);
+			OtherObjectScreenData *dataUnk1 = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
 			if (dataUnk1->unk0 < 4) {
 				_bl |= 0xC0;
 			}
@@ -2806,10 +2806,10 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 				if (_eax) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->nextPtr = _edx;
-					_edx->dataPtr = _gameUnkList1Head;
-					if (_gameUnkList1Head) {
-						_gameUnkList1Head = _gameUnkList1Head->nextPtr;
-						 memset(_edx->dataPtr, 0, sizeof(GameUnkList1));
+					_edx->dataPtr = _otherObjectScreenDataList;
+					if (_otherObjectScreenDataList) {
+						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
+						 memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -2837,10 +2837,10 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 				if (_eax) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->nextPtr = _edx;
-					_edx->dataPtr = _gameUnkList1Head;
-					if (_gameUnkList1Head) {
-						_gameUnkList1Head = _gameUnkList1Head->nextPtr;
-						memset(_edx->dataPtr, 0, sizeof(GameUnkList1));
+					_edx->dataPtr = _otherObjectScreenDataList;
+					if (_otherObjectScreenDataList) {
+						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
+						memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3001,7 +3001,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 			case 3:
 			case 7:
 				if (o->dataPtr) {
-					GameRemoveGameUnkList1ElementFromLevelScreenData(o);
+					prependObjectScreenDataList(o);
 				}
 				break;
 			}
