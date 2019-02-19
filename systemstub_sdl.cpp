@@ -58,7 +58,7 @@ struct SystemStub_SDL : SystemStub {
 
 	SystemStub_SDL();
 	virtual ~SystemStub_SDL() {}
-	virtual void init(const char *title, int w, int h);
+	virtual void init(const char *title, int w, int h, bool fullscreen);
 	virtual void destroy();
 	virtual void setScaler(const char *name, int multiplier);
 	virtual void setGamma(float gamma);
@@ -81,7 +81,7 @@ struct SystemStub_SDL : SystemStub {
 	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
 	void updateKeys(PlayerInput *inp);
-	void prepareScaledGfx(const char *caption);
+	void prepareScaledGfx(const char *caption, bool fullscreen);
 };
 
 SystemStub *SystemStub_SDL_create() {
@@ -95,7 +95,7 @@ SystemStub_SDL::SystemStub_SDL():
 	}
 }
 
-void SystemStub_SDL::init(const char *title, int w, int h) {
+void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	SDL_ShowCursor(SDL_DISABLE);
 	setupDefaultKeyMappings();
@@ -114,7 +114,7 @@ void SystemStub_SDL::init(const char *title, int w, int h) {
 		error("SystemStub_SDL::init() Unable to allocate RGB offscreen buffer");
 	}
 	memset(_offscreenLut, 0, offscreenSize);
-	prepareScaledGfx(title);
+	prepareScaledGfx(title, fullscreen);
 }
 
 void SystemStub_SDL::destroy() {
@@ -379,16 +379,23 @@ void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	}
 }
 
-void SystemStub_SDL::prepareScaledGfx(const char *caption) {
+void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen) {
+	int flags = 0;
+	if (fullscreen) {
+		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+	} else {
+		flags |= SDL_WINDOW_RESIZABLE;
+	}
 	_texW = _screenW * _scalerMultiplier;
 	_texH = _screenH * _scalerMultiplier;
-	_window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _texW, _texH, 0);
+	_window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _texW, _texH, flags);
 	SDL_Surface *icon = SDL_LoadBMP(kIconBmp);
 	if (icon) {
 		SDL_SetWindowIcon(_window, icon);
 		SDL_FreeSurface(icon);
 	}
 	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
+	SDL_RenderSetLogicalSize(_renderer, _texW, _texH);
 	_texture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _texW, _texH);
 	_fmt = SDL_AllocFormat(_pixelFormat);
 }

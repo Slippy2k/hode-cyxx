@@ -37,7 +37,7 @@ struct SystemStub {
 
 	virtual ~SystemStub() {}
 
-	virtual void init(const char *title, int w, int h) = 0;
+	virtual void init(const char *title, int w, int h, bool fullscreen) = 0;
 	virtual void destroy() = 0;
 
 	virtual void setScaler(const char *name, int multiplier) = 0;
