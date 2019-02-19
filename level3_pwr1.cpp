@@ -11,6 +11,93 @@
 #include "util.h"
 #include "video.h"
 
+void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
+	LvlObject *o = 0; //_unkLvlObject;
+	while (o) {
+		if (o->data0x2988 == 4 && o->anim <= 9) {
+			BoundingBox b2;
+			b2.x1 = o->posTable[3].x + o->xPos - 1;
+			b2.x2 = o->posTable[3].x + o->xPos + 1;
+			b2.y1 = o->posTable[3].y + o->yPos - 1;
+			b2.y2 = o->posTable[3].y + o->yPos + 1;
+			if (clipBoundingBox(b, &b2)) {
+				o->xPos += dx;
+				o->yPos += dy;
+			}
+		}
+		o = o->nextPtr;
+	}
+	BoundingBox b2;
+	b2.x1 = _andyObject->posTable[3].x + _andyObject->xPos - 1;
+	b2.x2 = _andyObject->posTable[3].x + _andyObject->xPos + 1;
+	b2.y1 = _andyObject->posTable[3].y + _andyObject->yPos - 1;
+	b2.y2 = _andyObject->posTable[3].y + _andyObject->yPos + 1;
+	if (clipBoundingBox(b, &b2)) {
+		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		data->dxPos += dx;
+		data->dyPos += dy;
+	}
+}
+
+void Game::postScreenUpdate_pwr1_screen10() {
+	if (_res->_currentScreenResourceNum == 10) {
+		BoundingBox b1 = { 50, 0, 100, 122 };
+		postScreenUpdate_pwr1_helper(&b1, 0, 2);
+		BoundingBox b2 = { 58, 50, 84, 132 };
+		postScreenUpdate_pwr1_helper(&b2, 0, 2);
+		BoundingBox b3 = { 42, 80, 72, 142 };
+		postScreenUpdate_pwr1_helper(&b3, 4, 0);
+		BoundingBox b4 = { 73, 100, 94, 142 };
+		postScreenUpdate_pwr1_helper(&b4, -2, 0);
+	}
+}
+
+void Game::postScreenUpdate_pwr1_screen14() {
+	if (_res->_currentScreenResourceNum == 14) {
+		BoundingBox b1 = { 0, 136, 104, 191 };
+		postScreenUpdate_pwr1_helper(&b1, 2, 0);
+		BoundingBox b2 = { 0, 152, 112, 178 };
+		postScreenUpdate_pwr1_helper(&b2, 2, 0);
+		BoundingBox b3 = { 76, 148, 116, 164 };
+		postScreenUpdate_pwr1_helper(&b3, 0, 2);
+		BoundingBox b4 = { 76, 164, 116, 186 };
+		postScreenUpdate_pwr1_helper(&b4, 0, -2);
+	}
+}
+
+void Game::postScreenUpdate_pwr1_screen16() {
+	if (_res->_currentScreenResourceNum == 16) {
+		BoundingBox b1 = { 100, 130, 160, 176 };
+		postScreenUpdate_pwr1_helper(&b1, 2, 0);
+		BoundingBox b2 = { 88, 140, 180, 167 };
+		postScreenUpdate_pwr1_helper(&b2, 2, 0);
+		BoundingBox b3 = { 88, 82, 185, 120 };
+		postScreenUpdate_pwr1_helper(&b3, 2, 0);
+		BoundingBox b4 = { 120, 92, 190, 114 };
+		postScreenUpdate_pwr1_helper(&b4, 2, 0);
+		BoundingBox b5 = { 104, 40, 147, 120 };
+		postScreenUpdate_pwr1_helper(&b5, 0, -1);
+		BoundingBox b6 = { 115, 24, 138, 90 };
+		postScreenUpdate_pwr1_helper(&b6, 0, -1);
+	}
+}
+
+void Game::postScreenUpdate_pwr1_screen18() {
+	if (_res->_currentScreenResourceNum == 18) {
+		if (_levelCheckpoint == 3) {
+			BoundingBox b = { 0, 0, 123, 125 };
+			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (clipBoundingBox(&b, &data->boundingBox)) {
+				++_levelCheckpoint;
+			}
+		}
+		BoundingBox b1 = { 156, 80, 204, 144 };
+		postScreenUpdate_pwr1_helper(&b1, 0, -2);
+		BoundingBox b2 = { 166, 88, 194, 152 };
+		postScreenUpdate_pwr1_helper(&b2, 0, -2);
+	}
+}
+
 void Game::postScreenUpdate_pwr1_screen35() {
 	if (_res->_currentScreenResourceNum == 35) {
 		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
@@ -37,14 +124,22 @@ void Game::postScreenUpdate_pwr1_screen35() {
 void Game::callLevel_postScreenUpdate_pwr1(int num) {
 	switch (num) {
 	case 6:
-	case 10:
 	case 12:
-	case 14:
-	case 16:
-	case 18:
 	case 23:
 	case 27:
 		warning("callLevel_postScreenUpdate_pwr1 %d unimplemented", num);
+		break;
+	case 10:
+		postScreenUpdate_pwr1_screen10();
+		break;
+	case 14:
+		postScreenUpdate_pwr1_screen14();
+		break;
+	case 16:
+		postScreenUpdate_pwr1_screen16();
+		break;
+	case 18:
+		postScreenUpdate_pwr1_screen18();
 		break;
 	case 35:
 		postScreenUpdate_pwr1_screen35();
