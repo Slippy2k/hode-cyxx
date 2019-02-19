@@ -26,9 +26,9 @@ static const char *_usage =
 	"  --datapath=PATH   Path to data files (default '.')\n"
 	"  --level=NUM       Start at level NUM\n"
 	"  --checkpoint=NUM  Start at checkpoint NUM\n"
-	"  --fullscreen      Fullscreen display\n"
 ;
 
+static bool _fullscreen = false;
 static SystemStub *_system = 0;
 
 static void exitMain() {
@@ -94,6 +94,8 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 			_system->setGamma(atof(value));
 		} else if (strcmp(name, "grayscale") == 0) {
 			_system->setPaletteScale(configBool(value));
+		} else if (strcmp(name, "fullscreen") == 0) {
+			_fullscreen = configBool(value);
 		}
 	}
 	return 0;
@@ -103,7 +105,6 @@ int main(int argc, char *argv[]) {
 	char *dataPath = 0;
 	int level = 0;
 	int checkpoint = 0;
-	bool fullscreen = false;
 	if (argc == 2) {
 		// data path as the only command line argument
 		struct stat st;
@@ -116,7 +117,6 @@ int main(int argc, char *argv[]) {
 			{ "datapath",   required_argument, 0, 1 },
 			{ "level",      required_argument, 0, 2 },
 			{ "checkpoint", required_argument, 0, 3 },
-			{ "fullscreen", no_argument,       0, 4 },
 			{ 0, 0, 0, 0 },
 		};
 		int index;
@@ -143,9 +143,6 @@ int main(int argc, char *argv[]) {
 		case 3:
 			checkpoint = atoi(optarg);
 			break;
-		case 4:
-			fullscreen = true;
-			break;
 		default:
 			fprintf(stdout, "%s\n", _usage);
 			return -1;
@@ -157,7 +154,7 @@ int main(int argc, char *argv[]) {
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);
-	_system->init(_title, Video::kScreenWidth, Video::kScreenHeight, fullscreen);
+	_system->init(_title, Video::kScreenWidth, Video::kScreenHeight, _fullscreen);
 	g->mainLoop(level, checkpoint);
 	delete g;
 	free(dataPath);
