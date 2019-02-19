@@ -2715,15 +2715,16 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 // 409657
 	// TODO: clipping with transformed screen
 
-	addLvlObjectToList3(4);
-	_lvlObjectsList3->xPos = xPos;
-	_lvlObjectsList3->yPos = yPos + 24;
-	_lvlObjectsList3->screenNum = ptr->screenNum;
-	_lvlObjectsList3->anim = 0;
-	_lvlObjectsList3->frame = 0;
-	_lvlObjectsList3->flags2 += 1;
-	_lvlObjectsList3->flags0 = (_lvlObjectsList3->flags0 & 0xFFE6) | 6;
-	_lvlObjectsList3->flags1 &= ~0x20;
+	if (addLvlObjectToList3(4)) {
+		_lvlObjectsList3->xPos = xPos;
+		_lvlObjectsList3->yPos = yPos + 24;
+		_lvlObjectsList3->screenNum = ptr->screenNum;
+		_lvlObjectsList3->anim = 0;
+		_lvlObjectsList3->frame = 0;
+		_lvlObjectsList3->flags2 += 1;
+		_lvlObjectsList3->flags0 = (_lvlObjectsList3->flags0 & 0xFFE6) | 6;
+		_lvlObjectsList3->flags1 &= ~0x20;
+	}
 
 	uint8_t _dl = _edi->unk3;
 	static const int16_t word_43E53C[] = { 625, 937, 1094, 1250 };
@@ -2758,22 +2759,26 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 		}
 	}
 // 4097E1
-	switch (_al) {
-	case 0:
-		_lvlObjectsList3->actionKeyMask = 1;
-		break;
-	case 1:
-		_lvlObjectsList3->actionKeyMask = 2;
-		break;
-	case 2:
-		_lvlObjectsList3->actionKeyMask = 4;
-		break;
-	case 3:
-		_lvlObjectsList3->actionKeyMask = 8;
-		break;
-	default:
-		_lvlObjectsList3->actionKeyMask = 16;
-		break;
+	if (!_lvlObjectsList3) {
+		warning("_lvlObjectsList3 is 0");
+	} else {
+		switch (_al) {
+		case 0:
+			_lvlObjectsList3->actionKeyMask = 1;
+			break;
+		case 1:
+			_lvlObjectsList3->actionKeyMask = 2;
+			break;
+		case 2:
+			_lvlObjectsList3->actionKeyMask = 4;
+			break;
+		case 3:
+			_lvlObjectsList3->actionKeyMask = 8;
+			break;
+		default:
+			_lvlObjectsList3->actionKeyMask = 16;
+			break;
+		}
 	}
 
 // 409809
