@@ -2785,6 +2785,86 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 
 void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 	warning("lvlObjectType0CallbackHelper4 unimplemented");
+
+	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	LvlObject *_esi = _edi->nextPtr;
+	uint8_t _al  = ptr->flags0 & 0x1F;
+	uint8_t var1 = (ptr->flags0 >> 5) & 7;
+	if (_al == 4) {
+		// _eax = _esi->dataPtr;
+		// _esi->callbackFuncPtr = &Game::lvlObjectCallbackUnk1;
+		// uint8_t _cl = (ptr->flags1 >> 4) & 3;
+		// uint8_t _dl = _eax[0];
+	} else if (_al == 7) {
+// 40DD4B
+		switch (var1) {
+		case 0:
+			// TODO
+			break;
+		case 2: {
+				LvlObject *_eax = _edi->nextPtr;
+				if (_eax) {
+					LvlObject *_edx = declareLvlObject(8, 3);
+					_edi->nextPtr = _edx;
+					_edx->dataPtr = _gameUnkList1Head;
+					if (_gameUnkList1Head) {
+						_gameUnkList1Head = _gameUnkList1Head->nextPtr;
+						 memset(_edx->dataPtr, 0, sizeof(GameUnkList1));
+					}
+					_edx->xPos = ptr->xPos;
+					_edx->yPos = ptr->yPos;
+					_edx->flags &= 0xFFCF;
+					_edx->screenNum = ptr->screenNum;
+					_edx->anim = 7;
+					_edx->frame = 0;
+					_edx->bitmapBits = 0;
+					_edx->flags2 = (ptr->flags2 & 0xDFFF) - 1;
+					prependLvlObjectToList(&_lvlObjectsList0, _edx);
+				}
+// 40DEEC
+				// TODO
+			}
+			break;
+		case 1:
+			if (_esi) {
+				updateAndyObject(_esi);
+				_esi->bitmapBits = 0;
+			}
+			break;
+		case 3:
+			{
+				LvlObject *_eax = _edi->nextPtr;
+				if (_eax) {
+					LvlObject *_edx = declareLvlObject(8, 3);
+					_edi->nextPtr = _edx;
+					_edx->dataPtr = _gameUnkList1Head;
+					if (_gameUnkList1Head) {
+						_gameUnkList1Head = _gameUnkList1Head->nextPtr;
+						memset(_edx->dataPtr, 0, sizeof(GameUnkList1));
+					}
+					_edx->xPos = ptr->xPos;
+					_edx->yPos = ptr->yPos;
+					_edx->flags &= 0xFFCF;
+					_edx->screenNum = ptr->screenNum;
+					_edx->anim = 7;
+					_edx->frame = 0;
+					_edx->bitmapBits = 0;
+					_edx->flags2 = (ptr->flags2 & 0xDFFF) - 1;
+					prependLvlObjectToList(&_lvlObjectsList0, _edx);
+				}
+// 40DF82
+				// TODO
+			}
+			break;
+		case 4:
+			if (_esi) {
+				_edi->nextPtr = 0;
+				removeLvlObjectFromList(&_lvlObjectsList0, _esi);
+				destroyLvlObject(_esi);
+			}
+			break;
+		}
+	}
 }
 
 int Game::lvlObjectType0Callback(LvlObject *ptr) {

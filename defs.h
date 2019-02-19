@@ -353,10 +353,10 @@ struct AndyObjectScreenData {
 	BoundingBox boundingBox; // 0x8
 	int32_t dxPos; // 0x18
 	int32_t dyPos; // 0x1C
-	LvlObject *nextPtr; // 0x20
+	LvlObject *nextPtr; // 0x20 lvlObject
 };
 
-struct GameUnkList1 { // ObjectScreenData
+struct GameUnkList1 { // OtherObjectScreenData
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;
