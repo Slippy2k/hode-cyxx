@@ -178,7 +178,7 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 
 	assert(src == base + kLvlAnimHdrOffset);
 	dat->animsInfoData = base;
-	for (int i = 0; i < dat->framesCount; ++i) {
+	for (int i = 0; i < dat->hotspotsCount; ++i) {
 		LvlAnimHeader *ah = ((LvlAnimHeader *)(base + kLvlAnimHdrOffset)) + i;
 		ah->unk0 = FROM_LE16(ah->unk0);
 		ah->seqOffset = FROM_LE32(ah->seqOffset);
