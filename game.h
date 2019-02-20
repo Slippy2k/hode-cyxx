@@ -170,6 +170,7 @@ struct Game {
 	// game.cpp
 
 	void mainLoop(int level, int checkpoint);
+	void mixAudio(int16_t *buf, int len);
 	void clearObjectScreenDataList();
 	void prependObjectScreenDataList(LvlObject *ptr);
 	void setShakeScreen(int type, int counter);

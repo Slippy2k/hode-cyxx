@@ -92,8 +92,8 @@ void Mixer::stopPcm(const uint8_t *data) {
 	}
 }
 
-void Mixer::mix(void *userdata, int16_t *buf, int len) {
+void Mixer::mix(int16_t *buf, int len) {
 	// stereo s16
 	assert((len & 1) == 0);
-	sts_mixer_mix_audio(&((Mixer *)userdata)->_mixer, buf, len / 2);
+	sts_mixer_mix_audio(&_mixer, buf, len / 2);
 }

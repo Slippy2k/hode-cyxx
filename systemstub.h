@@ -30,9 +30,12 @@ struct PlayerInput {
 	}
 };
 
-struct SystemStub {
-	typedef void (*AudioCallback)(void *param, int16_t *stream, int len);
+struct AudioCallback {
+	void (*proc)(void *param, int16_t *stream, int len);
+	void *userdata;
+};
 
+struct SystemStub {
 	PlayerInput inp;
 
 	virtual ~SystemStub() {}
@@ -54,11 +57,12 @@ struct SystemStub {
 	virtual void sleep(int duration) = 0;
 	virtual uint32_t getTimeStamp() = 0;
 
-	virtual void startAudio(AudioCallback callback, void *param) = 0;
+	virtual void startAudio(AudioCallback callback) = 0;
 	virtual void stopAudio() = 0;
 	virtual uint32_t getOutputSampleRate() = 0;
 	virtual void lockAudio() = 0;
 	virtual void unlockAudio() = 0;
+	virtual AudioCallback setAudioCallback(AudioCallback callback) = 0;
 };
 
 extern SystemStub *SystemStub_SDL_create();

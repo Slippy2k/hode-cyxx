@@ -47,10 +47,17 @@ static void lockAudio(int flag) {
 	}
 }
 
+static void mixAudio(void *userdata, int16_t *buf, int len) {
+	((Game *)userdata)->mixAudio(buf, len);
+}
+
 static void setupAudio(Game *g) {
 	g->_mix._lock = lockAudio;
 	g->_mix.init(_system->getOutputSampleRate());
-	_system->startAudio(Mixer::mix, &g->_mix);
+	AudioCallback cb;
+	cb.proc = mixAudio;
+	cb.userdata = g;
+	_system->startAudio(cb);
 }
 
 static const char *_defaultDataPath = ".";

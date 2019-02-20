@@ -51,8 +51,7 @@ struct SystemStub_SDL : SystemStub {
 	int _shakeDx, _shakeDy;
 	KeyMapping _keyMappings[kKeyMappingsSize];
 	int _keyMappingsCount;
-	void (*_audioCbProc)(void *, int16_t *, int);
-	void *_audioCbData;
+	AudioCallback _audioCb;
 	bool _paletteGrayScale;
 	uint8_t _gammaLut[256];
 
@@ -72,11 +71,12 @@ struct SystemStub_SDL : SystemStub {
 	virtual void sleep(int duration);
 	virtual uint32_t getTimeStamp();
 
-	virtual void startAudio(AudioCallback callback, void *param);
+	virtual void startAudio(AudioCallback callback);
 	virtual void stopAudio();
 	virtual uint32_t getOutputSampleRate();
 	virtual void lockAudio();
 	virtual void unlockAudio();
+	virtual AudioCallback setAudioCallback(AudioCallback callback);
 
 	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
@@ -286,10 +286,10 @@ uint32_t SystemStub_SDL::getTimeStamp() {
 static void mixAudioS16(void *param, uint8_t *buf, int len) {
 	SystemStub_SDL *stub = (SystemStub_SDL *)param;
 	memset(buf, 0, len);
-	stub->_audioCbProc(stub->_audioCbData, (int16_t *)buf, len / 2);
+	stub->_audioCb.proc(stub->_audioCb.userdata, (int16_t *)buf, len / 2);
 }
 
-void SystemStub_SDL::startAudio(AudioCallback callback, void *param) {
+void SystemStub_SDL::startAudio(AudioCallback callback) {
 	SDL_AudioSpec desired;
 	memset(&desired, 0, sizeof(desired));
 	desired.freq = kAudioHz;
@@ -299,8 +299,7 @@ void SystemStub_SDL::startAudio(AudioCallback callback, void *param) {
 	desired.callback = mixAudioS16;
 	desired.userdata = this;
 	if (SDL_OpenAudio(&desired, 0) == 0) {
-		_audioCbProc = callback;
-		_audioCbData = param;
+		_audioCb = callback;
 		SDL_PauseAudio(0);
 	} else {
 		error("SystemStub_SDL::startAudio() Unable to open sound device");
@@ -321,6 +320,14 @@ void SystemStub_SDL::lockAudio() {
 
 void SystemStub_SDL::unlockAudio() {
 	SDL_UnlockAudio();
+}
+
+AudioCallback SystemStub_SDL::setAudioCallback(AudioCallback callback) {
+	SDL_LockAudio();
+	AudioCallback cb = _audioCb;
+	_audioCb = callback;
+	SDL_UnlockAudio();
+	return cb;
 }
 
 void SystemStub_SDL::addKeyMapping(int key, uint8_t mask) {

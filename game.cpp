@@ -1760,6 +1760,10 @@ void Game::mainLoop(int level, int checkpoint) {
 	levelMainLoop();
 }
 
+void Game::mixAudio(int16_t *buf, int len) {
+	_mix.mix(buf, len);
+}
+
 void Game::updateLvlObjectList(LvlObject *list) {
 	for (LvlObject *ptr = list; ptr; ptr = ptr->nextPtr) {
 		(this->*(ptr->callbackFuncPtr))(ptr);
