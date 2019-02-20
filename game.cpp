@@ -126,16 +126,24 @@ void Game::shakeScreen() {
 	}
 }
 
+static BoundingBox _screenTransformRects[] = {
+	{  0,  0,   0,   0 },
+	{  0,  0, 255, 128 },
+	{  0, 10, 154, 126 },
+	{  0,  0, 107,  36 },
+	{  0,  1,  78,  29 },
+	{ 14,  7, 249,  72 },
+	{ 14,  0, 255,  72 },
+	{  0,  0, 255, 144 },
+	{  0,  0, 255, 144 },
+	{  0, 69, 255, 191 }
+};
+
 void Game::transformShadowLayer(int delta) {
 	const uint8_t *src = _transformShadowBuffer + _transformShadowLayerDelta; // _esi
 	uint8_t *dst = _video->_shadowLayer; // _eax
 	_transformShadowLayerDelta += delta; // overflow/wrap at 255
-	int y = 0;
-	if (_currentLevel == 2 || _currentLevel == 5) {
-		warning("transformShadowLayer unimplemented for level %d", _currentLevel);
-		// TODO
-	}
-	for (; y < 192; ++y) {
+	for (int y = 0; y < 192; ++y) {
 		for (int x = 0; x < 250; ++x) {
 			const int offset = x + *src++;
 			*dst++ = _video->_frontLayer[y * 256 + offset];
@@ -143,6 +151,25 @@ void Game::transformShadowLayer(int delta) {
 		memset(dst, 0xC4, 6);
 		dst += 6;
 		src += 6;
+	}
+	int r = -1;
+	if (_currentLevel == 2) {
+		r = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
+	} else if (_currentLevel == 5) {
+		r = _pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
+	}
+	if (!(r < 0)) {
+		const BoundingBox *b = &_screenTransformRects[r];
+		const int offset = b->y1 * 256 + b->x1;
+		src = _video->_frontLayer + offset;
+		dst = _video->_shadowLayer + offset;
+		for (int y = b->y1; y < b->y2; ++y) {
+			for (int x = b->x1; x < b->x2; ++x) {
+				dst[x] = src[x];
+			}
+			dst += 256;
+			src += 256;
+		}
 	}
 }
 
@@ -2458,6 +2485,9 @@ void Game::callLevel_tick() {
 		break;
 	case 4:
 		callLevel_tick_lava();
+		break;
+	case 5:
+		callLevel_tick_pwr2();
 		break;
 	case 6:
 		callLevel_tick_lar1();

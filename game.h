@@ -57,8 +57,10 @@ struct Game {
 	static const char *_resLevelNames[];
 	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelScreenStartData[];
-	static const uint8_t _transformBufferData1[];
-	static const uint8_t _transformBufferData2[];
+	static const uint8_t _transformBufferData1[]; // _pwr1_screenTransformData
+	static const uint8_t _transformBufferData2[]; // _pwr2_screenTransformData
+	static const uint8_t _pwr1_screenTransformLut[];
+	static const uint8_t _pwr2_screenTransformLut[];
 
 	Mixer _mix;
 	PafPlayer *_paf;
@@ -412,6 +414,7 @@ struct Game {
 	void callLevel_preScreenUpdate_pwr2(int num);
 
 	void callLevel_initialize_pwr2();
+	void callLevel_tick_pwr2();
 
 	// level7_lar1.cpp
 	void preScreenUpdate_lar1_screen0();

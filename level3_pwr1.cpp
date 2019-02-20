@@ -275,7 +275,7 @@ void Game::callLevel_initialize_pwr1() {
 	warning("callLevel_initialize_pwr1 unimplemented");
 }
 
-static const uint8_t byte_454520[] = {
+const uint8_t Game::_pwr1_screenTransformLut[] = {
 	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0,
 	1, 2, 1, 0, 1, 3, 1, 0, 1, 0, 1, 4, 1, 0, 1, 0, 1, 0,
 	1, 5, 1, 0, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0,
@@ -284,6 +284,6 @@ static const uint8_t byte_454520[] = {
 
 void Game::callLevel_tick_pwr1() {
 	// TODO:
-	_video->_displayShadowLayer = byte_454520[_res->_currentScreenResourceNum * 2];
+	_video->_displayShadowLayer = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2];
 	warning("callLevel_tick_pwr1 unimplemented");
 }
