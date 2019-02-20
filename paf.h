@@ -38,6 +38,7 @@ struct PafPlayer {
 		kVideoWidth = 256,
 		kVideoHeight = 192,
 		kPageBufferSize = 256 * 256,
+		kAudioStrideSize = 4922 // 256 * sizeof(int16_t) + 2205 * 2
 	};
 
 	bool _skipCutscenes;
@@ -52,6 +53,7 @@ struct PafPlayer {
 	uint8_t _paletteBuffer[256 * 3];
 	uint8_t _bufferBlock[kBufferBlockSize];
 	uint8_t *_demuxVideoFrameBlocks;
+	uint8_t *_demuxAudioFrameBlocks;
 
 	PafPlayer(SystemStub *system, FileSystem *fs);
 	~PafPlayer();
@@ -59,14 +61,20 @@ struct PafPlayer {
 	void preload(int num);
 	void play(int num);
 	void unload(int num);
+
 	void readPafHeader();
 	void readPafHeaderTable(uint32_t *dst, int count);
+
 	void decodeVideoFrame(const uint8_t *src);
 	uint8_t *getVideoPageOffset(uint8_t a, uint8_t b);
 	void decodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, uint8_t code);
 	void decodeVideoFrameOp1(const uint8_t *src);
 	void decodeVideoFrameOp2(const uint8_t *src);
 	void decodeVideoFrameOp4(const uint8_t *src);
+
+	void decodeAudioFrame(const uint8_t *src, uint32_t offset);
+	void decodeAudioFrame2205(const uint8_t *src);
+
 	void mainLoop();
 };
 

@@ -31,6 +31,7 @@ PafPlayer::PafPlayer(SystemStub *system, FileSystem *fs)
 	_videoNum = -1;
 	memset(&_pafHdr, 0, sizeof(_pafHdr));
 	memset(_pageBuffers, 0, sizeof(_pageBuffers));
+	_demuxAudioFrameBlocks = 0;
 	_demuxVideoFrameBlocks = 0;
 }
 
@@ -57,7 +58,12 @@ void PafPlayer::preload(int num) {
 	for (int i = 0; i < 4; ++i) {
 		_pageBuffers[i] = (uint8_t *)calloc(kPageBufferSize, 1);
 	}
-	_demuxVideoFrameBlocks = (uint8_t *)calloc(_pafHdr.maxVideoFrameBlocksCount * _pafHdr.readBufferSize, 1);
+	_demuxVideoFrameBlocks = (uint8_t *)calloc(_pafHdr.maxVideoFrameBlocksCount, _pafHdr.readBufferSize);
+	if (_pafHdr.maxAudioFrameBlocksCount != 0) {
+		_demuxAudioFrameBlocks = (uint8_t *)calloc(_pafHdr.maxAudioFrameBlocksCount, _pafHdr.readBufferSize);
+	} else {
+		_demuxAudioFrameBlocks = 0;
+	}
 }
 
 void PafPlayer::play(int num) {
@@ -77,6 +83,8 @@ void PafPlayer::unload(int num) {
 	}
 	free(_demuxVideoFrameBlocks);
 	_demuxVideoFrameBlocks = 0;
+	free(_demuxAudioFrameBlocks);
+	_demuxAudioFrameBlocks = 0;
 	free(_pafHdr.frameBlocksCountTable);
 	free(_pafHdr.framesOffsetTable);
 	free(_pafHdr.frameBlocksOffsetTable);
@@ -328,6 +336,32 @@ void PafPlayer::decodeVideoFrameOp4(const uint8_t *src) {
 	}
 }
 
+void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset) {
+	assert(_pafHdr.maxAudioFrameBlocksCount > 2);
+	uint32_t endOffset = (_pafHdr.maxAudioFrameBlocksCount - 2) * _pafHdr.readBufferSize;
+	if (offset == endOffset) {
+		int count = (endOffset + _pafHdr.readBufferSize) / kAudioStrideSize;
+		while (count--) {
+			decodeAudioFrame2205(src);
+			src += kAudioStrideSize;
+		}
+	}
+}
+
+void PafPlayer::decodeAudioFrame2205(const uint8_t *src) {
+	static const int kFrames = 2205;
+
+	const uint8_t *samples = src;
+	src += 256 * sizeof(int16_t);
+
+	for (int i = 0; i < kFrames; ++i) {
+		for (int channel = 0; channel < 2; ++channel) {
+			const uint8_t num = *src++;
+			int16_t pcm = READ_LE_UINT16(samples + num * sizeof(int16_t));
+		}
+	}
+}
+
 void PafPlayer::mainLoop() {
 	assert(_pafHdr.readBufferSize == 2048);
 	_file.seek(_videoOffset + _pafHdr.startOffset, SEEK_SET);
@@ -342,11 +376,11 @@ void PafPlayer::mainLoop() {
 		uint32_t blocksCountForFrame = (i == 0) ? _pafHdr.preloadFrameBlocksCount : _pafHdr.frameBlocksCountTable[i - 1];
 		while (blocksCountForFrame != 0) {
 			_file.read(_bufferBlock, _pafHdr.readBufferSize);
-			uint32_t dstOffset = _pafHdr.frameBlocksOffsetTable[currentFrameBlock] & ~(1 << 31);
+			const uint32_t dstOffset = _pafHdr.frameBlocksOffsetTable[currentFrameBlock] & ~(1 << 31);
 			if (_pafHdr.frameBlocksOffsetTable[currentFrameBlock] & (1 << 31)) {
-//				assert(dstOffset + _pafHdr.readBufferSize <= _pafHdr.maxAudioFrameBlocksCount * _pafHdr.readBufferSize);
-//				memcpy(_demuxAudioFrameBlocks + dstOffset, _bufferBlock, _pafHdr.readBufferSize);
-//				decodeAudioFrame(_demuxAudioFrameBlocks, dstOffset);
+				assert(dstOffset + _pafHdr.readBufferSize <= _pafHdr.maxAudioFrameBlocksCount * _pafHdr.readBufferSize);
+				memcpy(_demuxAudioFrameBlocks + dstOffset, _bufferBlock, _pafHdr.readBufferSize);
+				decodeAudioFrame(_demuxAudioFrameBlocks, dstOffset);
 			} else {
 				assert(dstOffset + _pafHdr.readBufferSize <= _pafHdr.maxVideoFrameBlocksCount * _pafHdr.readBufferSize);
 				memcpy(_demuxVideoFrameBlocks + dstOffset, _bufferBlock, _pafHdr.readBufferSize);
