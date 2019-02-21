@@ -57,6 +57,7 @@ private:
 	int m_videoNum;
 	const char *m_videoName;
 	uint32_t m_videoOffset;
+	uint32_t m_flushAudioOffset;
 	PafHeader m_pafHdr;
 	int m_currentVideoPage;
 	uint8_t *m_videoPages[4];

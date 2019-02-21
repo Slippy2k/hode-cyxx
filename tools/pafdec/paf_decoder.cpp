@@ -97,8 +97,11 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 		m_demuxVideoFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxVideoFrameBlocksCount, m_pafHdr.readBufferSize);
 		if (m_pafHdr.maxAudioFrameBlocksCount != 0) {
 			m_demuxAudioFrameBlocks = (uint8_t *)calloc(m_pafHdr.maxAudioFrameBlocksCount, m_pafHdr.readBufferSize);
+			assert(m_pafHdr.maxAudioFrameBlocksCount > 1);
+			m_flushAudioOffset = (m_pafHdr.maxAudioFrameBlocksCount - 1) * m_pafHdr.readBufferSize;
 		} else {
 			m_demuxAudioFrameBlocks = 0;
+			m_flushAudioOffset = 0;
 		}
 	}
 	return m_fileOpen;
@@ -138,6 +141,8 @@ void PafDecoder::Decode() {
 	}
 
 	int currentFrameBlock = 0;
+	uint32_t audioOffset = 0;
+
 	for (uint32_t i = 0; i < m_pafHdr.framesCount; ++i) {
 
 		printf("Decoding frame %d/%d... ", i, m_pafHdr.framesCount);
@@ -150,7 +155,10 @@ void PafDecoder::Decode() {
 			if (m_pafHdr.frameBlocksOffsetTable[currentFrameBlock] & (1 << 31)) {
 				assert(dstOffset + m_pafHdr.readBufferSize <= m_pafHdr.maxAudioFrameBlocksCount * m_pafHdr.readBufferSize);
 				memcpy(m_demuxAudioFrameBlocks + dstOffset, m_bufferBlock, m_pafHdr.readBufferSize);
-				DecodeAudioFrame(m_demuxAudioFrameBlocks, dstOffset);
+				audioOffset = dstOffset + m_pafHdr.readBufferSize;
+				if (audioOffset == m_flushAudioOffset) {
+					DecodeAudioFrame(m_demuxAudioFrameBlocks, audioOffset);
+				}
 			} else {
 				assert(dstOffset + m_pafHdr.readBufferSize <= m_pafHdr.maxVideoFrameBlocksCount * m_pafHdr.readBufferSize);
 				memcpy(m_demuxVideoFrameBlocks + dstOffset, m_bufferBlock, m_pafHdr.readBufferSize);
@@ -175,6 +183,10 @@ void PafDecoder::Decode() {
 		// set next decoding video page
 		++m_currentVideoPage;
 		m_currentVideoPage &= 3;
+	}
+
+	if (m_demuxAudioFrameBlocks && audioOffset != m_flushAudioOffset) {
+		DecodeAudioFrame(m_demuxAudioFrameBlocks, audioOffset);
 	}
 
 	delete m_imageWriter;
@@ -241,14 +253,10 @@ bool PafDecoder::ReadPafHeader() {
 }
 
 void PafDecoder::DecodeAudioFrame(const uint8_t *src, uint32_t offset) {
-	assert(m_pafHdr.maxAudioFrameBlocksCount > 2);
-	uint32_t endOffset = (m_pafHdr.maxAudioFrameBlocksCount - 2) * m_pafHdr.readBufferSize;
-	if (offset == endOffset) {
-		int soundBuffersCount = (endOffset + m_pafHdr.readBufferSize) / kSoundBufferSize;
-		while (soundBuffersCount--) {
-			DecodeAudioFrame2205(src);
-			src += kSoundBufferSize;
-		}
+	const int count = offset / kSoundBufferSize;
+	for (int i = 0; i < count; ++i) {
+		DecodeAudioFrame2205(src);
+		src += kSoundBufferSize;
 	}
 }
 
