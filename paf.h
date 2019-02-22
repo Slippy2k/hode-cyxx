@@ -30,7 +30,7 @@ enum {
 struct FileSystem;
 struct SystemStub;
 
-struct PafSoundQueue {
+struct PafSoundQueue { // PafAudioQueue
 	int16_t *buffer; // stereo samples
 	int offset, size;
 	PafSoundQueue *next;
@@ -44,7 +44,6 @@ struct PafPlayer {
 		kVideoWidth = 256,
 		kVideoHeight = 192,
 		kPageBufferSize = 256 * 256,
-		kSoundQueuePreloadSize = 4,
 		kAudioSamples = 2205,
 		kAudioStrideSize = 4922 // 256 * sizeof(int16_t) + 2205 * 2
 	};
@@ -62,11 +61,10 @@ struct PafPlayer {
 	uint8_t _bufferBlock[kBufferBlockSize];
 	uint8_t *_demuxVideoFrameBlocks;
 	uint8_t *_demuxAudioFrameBlocks;
-	uint32_t _audioQueueOffsetRd;
-	uint32_t _audioQueueOffsetWr;
-	uint32_t _audioQueueSize;
+	uint32_t _audioBufferOffsetRd;
+	uint32_t _audioBufferOffsetWr;
 	PafSoundQueue *_soundQueue, *_soundQueueTail;
-	int _soundQueuePreloadSize;
+	uint32_t _flushAudioSize;
 
 	PafPlayer(SystemStub *system, FileSystem *fs);
 	~PafPlayer();
@@ -85,9 +83,6 @@ struct PafPlayer {
 	void decodeVideoFrameOp2(const uint8_t *src);
 	void decodeVideoFrameOp4(const uint8_t *src);
 
-	uint32_t getAudioDataAvailableSize();
-	void queueAudioData(const uint8_t *src, uint32_t offset, uint32_t size);
-	void dequeueAudioData(uint32_t size, uint8_t *dst);
 	void decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t size);
 	void decodeAudioFrame2205(const uint8_t *src, int16_t *dst);
 

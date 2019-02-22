@@ -61,16 +61,14 @@ void PafPlayer::preload(int num) {
 	_demuxVideoFrameBlocks = (uint8_t *)calloc(_pafHdr.maxVideoFrameBlocksCount, _pafHdr.readBufferSize);
 	if (_pafHdr.maxAudioFrameBlocksCount != 0) {
 		_demuxAudioFrameBlocks = (uint8_t *)calloc(_pafHdr.maxAudioFrameBlocksCount, _pafHdr.readBufferSize);
-		const int flushSize = (_pafHdr.maxAudioFrameBlocksCount - 1) * _pafHdr.readBufferSize;
-		_audioQueueSize = (flushSize / kAudioStrideSize) * kAudioStrideSize;
+		_flushAudioSize = (_pafHdr.maxAudioFrameBlocksCount - 1) * _pafHdr.readBufferSize;
 	} else {
 		_demuxAudioFrameBlocks = 0;
-		_audioQueueSize = 0;
+		_flushAudioSize = 0;
 	}
-	_audioQueueOffsetRd = 0;
-	_audioQueueOffsetWr = 0;
+	_audioBufferOffsetRd = 0;
+	_audioBufferOffsetWr = 0;
 	_soundQueue = _soundQueueTail = 0;
-	_soundQueuePreloadSize = 0;
 }
 
 void PafPlayer::play(int num) {
@@ -350,76 +348,43 @@ void PafPlayer::decodeVideoFrameOp4(const uint8_t *src) {
 	}
 }
 
-uint32_t PafPlayer::getAudioDataAvailableSize() {
-	if (_audioQueueOffsetRd < _audioQueueOffsetWr) {
-		return _audioQueueOffsetWr - _audioQueueOffsetRd;
-	} else {
-		return _audioQueueSize - _audioQueueOffsetRd + _audioQueueOffsetWr;
-	}
-}
-
-void PafPlayer::queueAudioData(const uint8_t *src, uint32_t offset, uint32_t size) {
-	assert(size == _pafHdr.readBufferSize);
-	if (offset < _audioQueueOffsetWr) {
-		// wrap around
-	} else {
-		// copy should be sequential
-		assert(offset == _audioQueueOffsetWr);
-	}
-	_audioQueueOffsetWr = MIN(offset + size, _audioQueueSize);
-}
-
-void PafPlayer::dequeueAudioData(uint32_t size, uint8_t *dst) {
-	while (size != 0) {
-		if (_audioQueueOffsetRd < _audioQueueOffsetWr) {
-			const uint32_t avail = _audioQueueOffsetWr - _audioQueueOffsetRd;
-			if (size > avail) {
-				size = avail;
-			}
-			memcpy(dst, _demuxAudioFrameBlocks + _audioQueueOffsetRd, size);
-			_audioQueueOffsetRd += size;
-			break;
-		} else {
-			const uint32_t avail = _audioQueueSize - _audioQueueOffsetRd;
-			if (size < avail) {
-				memcpy(dst, _demuxAudioFrameBlocks + _audioQueueOffsetRd, size);
-				_audioQueueOffsetRd += size;
-				break;
-			}
-			memcpy(dst, _demuxAudioFrameBlocks + _audioQueueOffsetRd, avail);
-			_audioQueueOffsetRd = 0;
-			size -= avail;
-		}
-	}
-}
-
 void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t size) {
-	queueAudioData(src, offset, size);
-	const int count = getAudioDataAvailableSize() / kAudioStrideSize;
+	assert(size == _pafHdr.readBufferSize);
+
+	// copy must be sequential
+	assert(offset == _audioBufferOffsetWr);
+
+	_audioBufferOffsetWr = offset + size;
+
+	const int count = (_audioBufferOffsetWr - _audioBufferOffsetRd) / kAudioStrideSize;
 	if (count != 0) {
 		PafSoundQueue *sq = (PafSoundQueue *)malloc(sizeof(PafSoundQueue));
 		if (sq) {
 			sq->offset = 0;
-			sq->size = kAudioSamples * 2 * sizeof(int16_t) * count;
-			sq->buffer = (int16_t *)malloc(sq->size);
+			sq->size = count * kAudioSamples * 2;
+			sq->buffer = (int16_t *)calloc(sq->size, sizeof(int16_t));
 			if (sq->buffer) {
-				uint8_t buf[kAudioStrideSize];
 				for (int i = 0; i < count; ++i) {
-					dequeueAudioData(kAudioStrideSize, buf);
-					decodeAudioFrame2205(buf, sq->buffer + i * kAudioSamples * 2);
+					decodeAudioFrame2205(src + _audioBufferOffsetRd + i * kAudioStrideSize, sq->buffer + i * kAudioSamples * 2);
 				}
 			}
 			sq->next = 0;
+
+			_system->lockAudio();
 			if (_soundQueueTail) {
 				_soundQueueTail->next = sq;
 			} else {
 				assert(!_soundQueue);
-				_soundQueueTail = _soundQueue = sq;
+				_soundQueue = sq;
 			}
-			if (_soundQueuePreloadSize < kSoundQueuePreloadSize) {
-				++_soundQueuePreloadSize;
-			}
+			_soundQueueTail = sq;
+			_system->unlockAudio();
 		}
+	}
+	_audioBufferOffsetRd += count * kAudioStrideSize;
+	if (_audioBufferOffsetWr == _flushAudioSize) {
+		_audioBufferOffsetWr = 0;
+		_audioBufferOffsetRd = 0;
 	}
 }
 
@@ -438,10 +403,8 @@ void PafPlayer::decodeAudioFrame2205(const uint8_t *src, int16_t *dst) {
 }
 
 void PafPlayer::mix(int16_t *buf, int samples) {
-	if (_soundQueuePreloadSize < kSoundQueuePreloadSize) {
-		return;
-	}
 	while (_soundQueue && samples > 0) {
+		assert(_soundQueue->size != 0);
 		*buf++ = _soundQueue->buffer[_soundQueue->offset++];
 		*buf++ = _soundQueue->buffer[_soundQueue->offset++];
 		samples -= 2;
@@ -505,7 +468,7 @@ void PafPlayer::mainLoop() {
 		if (_system->inp.quit || _system->inp.keyPressed(SYS_INP_ESC)) {
 			break;
 		}
-		_system->sleep(90);
+		_system->sleep(50);
 		// set next decoding video page
 		++_currentPageBuffer;
 		_currentPageBuffer &= 3;
