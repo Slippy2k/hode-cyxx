@@ -30,10 +30,10 @@ enum {
 struct FileSystem;
 struct SystemStub;
 
-struct PafSoundQueue { // PafAudioQueue
+struct PafAudioQueue {
 	int16_t *buffer; // stereo samples
 	int offset, size;
-	PafSoundQueue *next;
+	PafAudioQueue *next;
 };
 
 struct PafPlayer {
@@ -64,7 +64,7 @@ struct PafPlayer {
 	uint8_t *_demuxAudioFrameBlocks;
 	uint32_t _audioBufferOffsetRd;
 	uint32_t _audioBufferOffsetWr;
-	PafSoundQueue *_soundQueue, *_soundQueueTail;
+	PafAudioQueue *_audioQueue, *_audioQueueTail;
 	uint32_t _flushAudioSize;
 
 	PafPlayer(SystemStub *system, FileSystem *fs);

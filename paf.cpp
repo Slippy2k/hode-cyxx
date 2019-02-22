@@ -68,7 +68,7 @@ void PafPlayer::preload(int num) {
 	}
 	_audioBufferOffsetRd = 0;
 	_audioBufferOffsetWr = 0;
-	_soundQueue = _soundQueueTail = 0;
+	_audioQueue = _audioQueueTail = 0;
 }
 
 void PafPlayer::play(int num) {
@@ -95,13 +95,13 @@ void PafPlayer::unload(int num) {
 	free(_pafHdr.frameBlocksOffsetTable);
 	memset(&_pafHdr, 0, sizeof(_pafHdr));
 	_videoNum = -1;
-	while (_soundQueue) {
-		PafSoundQueue *next = _soundQueue->next;
-		free(_soundQueue->buffer);
-		free(_soundQueue);
-		_soundQueue = next;
+	while (_audioQueue) {
+		PafAudioQueue *next = _audioQueue->next;
+		free(_audioQueue->buffer);
+		free(_audioQueue);
+		_audioQueue = next;
 	}
-	_soundQueueTail = 0;
+	_audioQueueTail = 0;
 }
 
 void PafPlayer::readPafHeader() {
@@ -358,7 +358,7 @@ void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t s
 
 	const int count = (_audioBufferOffsetWr - _audioBufferOffsetRd) / kAudioStrideSize;
 	if (count != 0) {
-		PafSoundQueue *sq = (PafSoundQueue *)malloc(sizeof(PafSoundQueue));
+		PafAudioQueue *sq = (PafAudioQueue *)malloc(sizeof(PafAudioQueue));
 		if (sq) {
 			sq->offset = 0;
 			sq->size = count * kAudioSamples * 2;
@@ -371,13 +371,13 @@ void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t s
 			sq->next = 0;
 
 			_system->lockAudio();
-			if (_soundQueueTail) {
-				_soundQueueTail->next = sq;
+			if (_audioQueueTail) {
+				_audioQueueTail->next = sq;
 			} else {
-				assert(!_soundQueue);
-				_soundQueue = sq;
+				assert(!_audioQueue);
+				_audioQueue = sq;
 			}
-			_soundQueueTail = sq;
+			_audioQueueTail = sq;
 			_system->unlockAudio();
 		}
 	}
@@ -403,21 +403,21 @@ void PafPlayer::decodeAudioFrame2205(const uint8_t *src, int16_t *dst) {
 }
 
 void PafPlayer::mix(int16_t *buf, int samples) {
-	while (_soundQueue && samples > 0) {
-		assert(_soundQueue->size != 0);
-		*buf++ = _soundQueue->buffer[_soundQueue->offset++];
-		*buf++ = _soundQueue->buffer[_soundQueue->offset++];
+	while (_audioQueue && samples > 0) {
+		assert(_audioQueue->size != 0);
+		*buf++ = _audioQueue->buffer[_audioQueue->offset++];
+		*buf++ = _audioQueue->buffer[_audioQueue->offset++];
 		samples -= 2;
-		if (_soundQueue->offset >= _soundQueue->size) {
-			assert(_soundQueue->offset == _soundQueue->size);
-			PafSoundQueue *next = _soundQueue->next;
-			free(_soundQueue->buffer);
-			free(_soundQueue);
-			_soundQueue = next;
+		if (_audioQueue->offset >= _audioQueue->size) {
+			assert(_audioQueue->offset == _audioQueue->size);
+			PafAudioQueue *next = _audioQueue->next;
+			free(_audioQueue->buffer);
+			free(_audioQueue);
+			_audioQueue = next;
 		}
 	}
-	if (!_soundQueue) {
-		_soundQueueTail = 0;
+	if (!_audioQueue) {
+		_audioQueueTail = 0;
 	}
 	if (samples > 0) {
 		warning("PafPlayer::mix() soundQueue underrun %d", samples);
