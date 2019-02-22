@@ -33,6 +33,7 @@ PafPlayer::PafPlayer(SystemStub *system, FileSystem *fs)
 	memset(_pageBuffers, 0, sizeof(_pageBuffers));
 	_demuxAudioFrameBlocks = 0;
 	_demuxVideoFrameBlocks = 0;
+	_audioQueue = _audioQueueTail = 0;
 }
 
 PafPlayer::~PafPlayer() {
