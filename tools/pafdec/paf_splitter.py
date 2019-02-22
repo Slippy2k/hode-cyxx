@@ -15,6 +15,8 @@ for i in range(0, COUNT):
 	offs = struct.unpack('<I', f.read(4))[0]
 	offsets.append(offs)
 
+assert offsets[0] == COUNT * 4
+
 sizes = [ 0 ] * COUNT
 offset = os.path.getsize(sys.argv[1])
 for i in range(COUNT - 1, -1, -1):
