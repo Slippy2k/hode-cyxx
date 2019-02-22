@@ -442,6 +442,9 @@ void PafPlayer::mainLoop() {
 	audioCb.proc = mixAudio;
 	audioCb.userdata = this;
 	AudioCallback prevAudioCb = _system->setAudioCallback(audioCb);
+
+	uint32_t frameTime = _system->getTimeStamp() + 1000 / kFramesPerSec;
+
 	for (int i = 0; i < (int)_pafHdr.framesCount; ++i) {
 		// read buffering blocks
 		uint32_t blocksCountForFrame = (i == 0) ? _pafHdr.preloadFrameBlocksCount : _pafHdr.frameBlocksCountTable[i - 1];
@@ -468,7 +471,11 @@ void PafPlayer::mainLoop() {
 		if (_system->inp.quit || _system->inp.keyPressed(SYS_INP_ESC)) {
 			break;
 		}
-		_system->sleep(50);
+
+		const int delay = MAX(10, int(frameTime - _system->getTimeStamp()));
+		_system->sleep(delay);
+		frameTime = _system->getTimeStamp() + 1000 / kFramesPerSec;
+
 		// set next decoding video page
 		++_currentPageBuffer;
 		_currentPageBuffer &= 3;
