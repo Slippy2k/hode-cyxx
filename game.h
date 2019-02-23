@@ -348,9 +348,12 @@ struct Game {
 	// level3_pwr1.cpp
 	void postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy);
 	void postScreenUpdate_pwr1_screen10();
+	void postScreenUpdate_pwr1_screen12();
 	void postScreenUpdate_pwr1_screen14();
 	void postScreenUpdate_pwr1_screen16();
 	void postScreenUpdate_pwr1_screen18();
+	void postScreenUpdate_pwr1_screen23();
+	void postScreenUpdate_pwr1_screen27();
 	void postScreenUpdate_pwr1_screen35();
 	void callLevel_postScreenUpdate_pwr1(int num);
 
