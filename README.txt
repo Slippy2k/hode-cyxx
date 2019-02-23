@@ -1,6 +1,6 @@
 
 HODe README
-Release version: 0.1.0
+Release version: 0.1.1
 -------------------------------------------------------------------------------
 
 
@@ -8,7 +8,7 @@ About:
 ------
 
 HODe is a reimplementation of the engine used by the game 'Heart of Darkness'
-developed by Amazing Studios.
+developed by Amazing Studio.
 
 
 Datafiles:
@@ -26,24 +26,36 @@ The original datafiles from the Windows releases (Demo or CD) are required.
 Running:
 --------
 
+By default the engine will try to load the files from the current directory
+and start the game from the first level.
+
+These defaults can be changed using command line switches :
+
+    Usage: hode [OPTIONS]...
+    --datapath=PATH   Path to data files (default '.')
+    --level=NUM       Start at level NUM
+    --checkpoint=NUM  Start at checkpoint NUM
+
+Display settings can be configured in the 'hode.ini' file.
+
 
 Status:
 -------
 
-The game is not completable. Levels load and Andy can be controlled and can move
-through the level screens. Cinematics are also played.
+The game is not completable.
 
-.lvl file parsing
-.sss partially (only with demo datafiles)
-.paf
+What is working :
+* Cinematics (PAF)
+* Andy
+* Plasma Cannon
+* Level screens
+* Hint screens
 
-.mst
-sound in .paf
-menus
-
-Andy cannon plasma
-Andy special powers
-
+What is missing/incomplete :
+* Monsters and game logic (.mst files)
+* Sound playback
+* Menus
+* Special Powers
 
 
 Credits:
@@ -56,15 +68,18 @@ URLs:
 -----
 
 [1] https://www.mobygames.com/game/heart-of-darkness
+[2] http://heartofdarkness.ca/
 
 
 Notes:
 ------
 
-The datafiles of Heart of Darkness are quite interesting. Each level is made of 3 different files, .lvl, .sss and .mst.
-The files contains C structures, which includes pointers (eg. to data or to other structures). When loading these files,
-the original engine needs to fixup the structure and the pointers.
+The datafiles of Heart of Darkness are quite interesting. Each level is made of 3 different
+files, .lvl, .sss and .mst. Each file contains several C structures, which includes pointers
+(eg. to binary data or to other structures).  When loading these files, the original engine
+needs to fixup the structure and the pointers.
 
-As the game was written for 32 bits platform, the same method cannot be directly applied on more modern platforms.
+As the game was written for 32 bits platform, the same method cannot be directly applied on
+more modern platforms (64 bits or big-endian).
 
-Although focus has been on the PC version, PSX and Saturn use a similar structure.
+Although focus has been on the PC version, PSX and Saturn appear to use a similar structure.
