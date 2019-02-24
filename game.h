@@ -379,7 +379,14 @@ struct Game {
 	void postScreenUpdate_isld_screen9();
 	void callLevel_postScreenUpdate_isld(int num);
 
-	void preScreenUpdate_isld_screen20();
+	void preScreenUpdate_isld_screen1();
+	void preScreenUpdate_isld_screen2();
+	void preScreenUpdate_isld_screen3();
+	void preScreenUpdate_isld_screen9();
+	void preScreenUpdate_isld_screen14();
+	void preScreenUpdate_isld_screen15();
+	void preScreenUpdate_isld_screen16();
+	void preScreenUpdate_isld_screen21();
 	void callLevel_preScreenUpdate_isld(int num);
 
 	void callLevel_initialize_isld();

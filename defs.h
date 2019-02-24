@@ -28,11 +28,11 @@ struct Point16_t {
 };
 
 struct AnimBackgroundData {
-	uint8_t *currentSpriteData;
-	uint8_t *firstSpriteData;
-	uint8_t *otherSpriteData;
-	uint16_t framesCount;
-	uint16_t currentFrame;
+	uint8_t *currentSpriteData; // 0
+	uint8_t *firstSpriteData; // 4
+	uint8_t *otherSpriteData; // 8
+	uint16_t framesCount; // 12
+	uint16_t currentFrame; // 14
 };
 
 struct LvlAnimSeqHeader {
