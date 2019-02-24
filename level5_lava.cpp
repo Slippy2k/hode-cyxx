@@ -7,6 +7,10 @@
 #include "util.h"
 #include "video.h"
 
+void Game::postScreenUpdate_lava_helper(int yPos) {
+	warning("postScreenUpdate_lava_helper unimplemented");
+}
+
 void Game::postScreenUpdate_lava_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 2:
@@ -20,6 +24,107 @@ void Game::postScreenUpdate_lava_screen0() {
 			_res->_screensState[0].s0 = 2;
 		}
 		break;
+	}
+}
+
+void Game::postScreenUpdate_lava_screen4() {
+	if (_res->_currentScreenResourceNum == 4) {
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen5() {
+	if (_res->_currentScreenResourceNum == 5) {
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen6() {
+	if (_res->_currentScreenResourceNum == 6) {
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen7() {
+	if (_res->_currentScreenResourceNum == 7) {
+		if (_levelCheckpoint == 2) {
+			BoundingBox b = { 104, 0, 239, 50 };
+                        AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+                        if (clipBoundingBox(&b, &data->boundingBox)) {
+				_levelCheckpoint = 3;
+			}
+		}
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen8() {
+	if (_res->_currentScreenResourceNum == 8) {
+		if (_andyObject->xPos + _andyObject->posTable[5].x < 72 || _andyObject->xPos + _andyObject->posTable[4].x < 72) {
+			const uint8_t flags = _andyObject->flags0 & 0x1F;
+			if (flags != 3 && flags != 7 && flags != 4) {
+				postScreenUpdate_lava_helper(175);
+			}
+		}
+	}
+}
+
+void Game::postScreenUpdate_lava_screen10() {
+	if (_res->_currentScreenResourceNum == 10) {
+		if (_screenCounterTable[10] < 37) {
+			if (_andyObject->yPos + _andyObject->posTable[3].y < 142) {
+				_andyObject->actionKeyMask = 0x40;
+				_andyObject->directionKeyMask = 0;
+				if (_levelCheckpoint == 3) {
+					_levelCheckpoint = 4;
+					_res->_screensState[10].s0 = 1;
+					_res->_resLvlScreenBackgroundDataTable[10].unk3 = 1;
+					setupScreenMask(10);
+				}
+				++_screenCounterTable[10];
+				if (_screenCounterTable[10] == 13) {
+					_fadePaletteCounter = 12;
+				} else {
+					++_screenCounterTable[10];
+					if (_screenCounterTable[10] == 37) {
+						if (!_paf->_skipCutscenes) {
+							_paf->play(7);
+							_paf->unload(7);
+							_video->clearPalette();
+							updateScreen(_andyObject->screenNum);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void Game::postScreenUpdate_lava_screen11() {
+	if (_res->_currentScreenResourceNum == 11) {
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen12() {
+	if (_res->_currentScreenResourceNum == 12) {
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen13() {
+	if (_res->_currentScreenResourceNum == 13) {
+		postScreenUpdate_lava_helper(175);
+	}
+}
+
+void Game::postScreenUpdate_lava_screen14() {
+	if (_res->_currentScreenResourceNum == 14) {
+		const int x = _andyObject->xPos;
+		const Point16_t *pos = _andyObject->posTable;
+		if (x + pos[5].x < 114 || x + pos[4].x < 114 || x + pos[3].x < 114 || x + pos[0].x < 114) {
+			postScreenUpdate_lava_helper(175);
+		}
 	}
 }
 
@@ -38,6 +143,36 @@ void Game::callLevel_postScreenUpdate_lava(int num) {
 	switch (num) {
 	case 0:
 		postScreenUpdate_lava_screen0();
+		break;
+	case 4:
+		postScreenUpdate_lava_screen4();
+		break;
+	case 5:
+		postScreenUpdate_lava_screen5();
+		break;
+	case 6:
+		postScreenUpdate_lava_screen6();
+		break;
+	case 7:
+		postScreenUpdate_lava_screen7();
+		break;
+	case 8:
+		postScreenUpdate_lava_screen8();
+		break;
+	case 10:
+		postScreenUpdate_lava_screen10();
+		break;
+	case 11:
+		postScreenUpdate_lava_screen11();
+		break;
+	case 12:
+		postScreenUpdate_lava_screen12();
+		break;
+	case 13:
+		postScreenUpdate_lava_screen13();
+		break;
+	case 14:
+		postScreenUpdate_lava_screen14();
 		break;
 	case 15:
 		postScreenUpdate_lava_screen15();

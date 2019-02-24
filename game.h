@@ -394,7 +394,18 @@ struct Game {
 	void callLevel_terminate_isld();
 
 	// level5_lava.cpp
+	void postScreenUpdate_lava_helper(int yPos);
 	void postScreenUpdate_lava_screen0();
+	void postScreenUpdate_lava_screen4();
+	void postScreenUpdate_lava_screen5();
+	void postScreenUpdate_lava_screen6();
+	void postScreenUpdate_lava_screen7();
+	void postScreenUpdate_lava_screen8();
+	void postScreenUpdate_lava_screen10();
+	void postScreenUpdate_lava_screen11();
+	void postScreenUpdate_lava_screen12();
+	void postScreenUpdate_lava_screen13();
+	void postScreenUpdate_lava_screen14();
 	void postScreenUpdate_lava_screen15();
 	void callLevel_postScreenUpdate_lava(int num);
 
