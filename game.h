@@ -104,7 +104,7 @@ struct Game {
 	uint8_t _screenPosTable[5][24 * 32];
 	uint8_t _screenTempMaskBuffer[24 * 32];
 	uint8_t _screenMaskBuffer[96 * 24 * 32];
-	int _gameCurrentLevelScreenNum;
+	int _andyCurrentLevelScreenNum;
 	uint8_t _shakeScreenDuration;
 	const uint8_t *_shakeScreenTable;
 	uint8_t _plasmaCannonDirection;
@@ -119,7 +119,7 @@ struct Game {
 	uint8_t _plasmaCannonKeyMaskCounter;
 	bool _fallingAndyFlag;
 	uint8_t _fallingAndyCounter;
-	uint8_t _gameKeyPressedMaskIndex;
+	uint8_t _actionDirectionKeyMaskIndex;
 	uint8_t _andyActionKeyMaskAnd, _andyActionKeyMaskOr;
 	uint8_t _andyDirectionKeyMaskAnd, _andyDirectionKeyMaskOr;
 	int32_t _gameXPosTable[129];

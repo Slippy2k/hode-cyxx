@@ -184,8 +184,8 @@ void Game::postScreenUpdate_rock_helper2(BoundingBox *box, int num) {
 		if (byte_478C6C == 2) {
 			_al = 0x80;
 		}
-		if (_al != 0 && _al > _gameKeyPressedMaskIndex) {
-			_gameKeyPressedMaskIndex = _al;
+		if (_al != 0 && _al > _actionDirectionKeyMaskIndex) {
+			_actionDirectionKeyMaskIndex = _al;
 			_plasmaCannonKeyMaskCounter = 0;
 		}
 	}

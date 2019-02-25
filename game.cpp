@@ -1042,8 +1042,8 @@ void Game::setupCurrentScreen() {
 	_hideAndyObjectSprite = false;
 	const uint8_t *dat = &_levelCheckpointData[_currentLevel][_levelCheckpoint * 12];
 	_plasmaCannonFlags = 0;
-	_gameKeyPressedMaskIndex = 0;
-	_gameCurrentLevelScreenNum = ptr->screenNum;
+	_actionDirectionKeyMaskIndex = 0;
+	_andyCurrentLevelScreenNum = ptr->screenNum;
 	if (dat[9] != ptr->data0x2988) {
 		switch (dat[9]) {
 		case 0:
@@ -1340,7 +1340,7 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 
 void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 	if (_plasmaCannonKeyMaskCounter == 0) {
-		switch (_gameKeyPressedMaskIndex >> 4) {
+		switch (_actionDirectionKeyMaskIndex >> 4) {
 		case 0:
 			_plasmaCannonKeyMaskCounter = 6;
 			break;
@@ -1357,28 +1357,28 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 			break;
 		}
 	}
-	if (_gameKeyPressedMaskIndex != 0) {
-		if (_gameKeyPressedMaskIndex == 164 && _fadePalette == 0) {
+	if (_actionDirectionKeyMaskIndex != 0) {
+		if (_actionDirectionKeyMaskIndex == 164 && _fadePalette == 0) {
 			_fadePaletteCounter = 10;
 			_plasmaCannonFlags |= 1;
 		} else {
-			if (_andyObject->data0x2988 == 2 && _gameKeyPressedMaskIndex >= 16) {
+			if (_andyObject->data0x2988 == 2 && _actionDirectionKeyMaskIndex >= 16) {
 				removeLvlObject(_andyObject);
 			}
 			_andyActionKeysFlags = 0;
 		}
-		_andyObject->actionKeyMask = _actionDirectionKeyMaskTable[_gameKeyPressedMaskIndex * 2];
-		_andyObject->directionKeyMask = _actionDirectionKeyMaskTable[_gameKeyPressedMaskIndex * 2 + 1];
+		_andyObject->actionKeyMask = _actionDirectionKeyMaskTable[_actionDirectionKeyMaskIndex * 2];
+		_andyObject->directionKeyMask = _actionDirectionKeyMaskTable[_actionDirectionKeyMaskIndex * 2 + 1];
 	}
 	--_plasmaCannonKeyMaskCounter;
 	if (_plasmaCannonKeyMaskCounter == 0) {
-		_gameKeyPressedMaskIndex = 0;
+		_actionDirectionKeyMaskIndex = 0;
 	}
 }
 
 int Game::resetAndyLvlObjectPlasmaCannonKeyMask(uint8_t mask) {
-	if (mask > _gameKeyPressedMaskIndex) {
-		_gameKeyPressedMaskIndex = mask;
+	if (mask > _actionDirectionKeyMaskIndex) {
+		_actionDirectionKeyMaskIndex = mask;
 		_plasmaCannonKeyMaskCounter = 0;
 		return 1;
 	}
@@ -1577,7 +1577,7 @@ int Game::updateAndyLvlObject() {
 	if (!_andyObject) {
 		return 0;
 	}
-	if (_gameKeyPressedMaskIndex != 0) {
+	if (_actionDirectionKeyMaskIndex != 0) {
 		setAndyLvlObjectPlasmaCannonKeyMask();
 	}
 	assert(_andyObject->callbackFuncPtr);
@@ -2117,10 +2117,10 @@ void Game::resetPlasmaCannonState() {
 void Game::updateAndyMonsterObjects() {
 	uint8_t _dl = 3;
 	LvlObject *ptr = _andyObject;
-	switch (_gameKeyPressedMaskIndex >> 4) {
+	switch (_actionDirectionKeyMaskIndex >> 4) {
 	case 6:
 		_hideAndyObjectSprite = false;
-		if (_gameKeyPressedMaskIndex == 0x61) {
+		if (_actionDirectionKeyMaskIndex == 0x61) {
 			assert(_currentMonsterObject);
 			_screen_dx += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_screen_dy += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
@@ -2129,7 +2129,7 @@ void Game::updateAndyMonsterObjects() {
 		break;
 	case 7:
 		_hideAndyObjectSprite = true;
-		if (_gameKeyPressedMaskIndex == 0x71) {
+		if (_actionDirectionKeyMaskIndex == 0x71) {
 			assert(_currentMonsterObject);
 			_screen_dx += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_screen_dy += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
@@ -2140,13 +2140,13 @@ void Game::updateAndyMonsterObjects() {
 		}
 		break;
 	case 10:
-		if (_gameKeyPressedMaskIndex != 0xA3) {
+		if (_actionDirectionKeyMaskIndex != 0xA3) {
 			return;
 		}
 		ptr->actionKeyMask = _actionDirectionKeyMaskTable[0x146];
-		ptr->directionKeyMask = _actionDirectionKeyMaskTable[_gameKeyPressedMaskIndex * 2 + 1];
+		ptr->directionKeyMask = _actionDirectionKeyMaskTable[_actionDirectionKeyMaskIndex * 2 + 1];
 		updateAndyObject(ptr);
-		_gameKeyPressedMaskIndex = 0;
+		_actionDirectionKeyMaskIndex = 0;
 		_hideAndyObjectSprite = false;
 		_mstGlobalFlags |= 0x80000000;
 		_dl = 1;
@@ -2155,7 +2155,7 @@ void Game::updateAndyMonsterObjects() {
 		return;
 	}
 	if (_dl & 2) {
-		_gameKeyPressedMaskIndex = 0;
+		_actionDirectionKeyMaskIndex = 0;
 		ptr->anim = _gameMstAnim;
 		ptr->frame = 0;
 		ptr->flags1 = bitmask_set(ptr->flags1, _gameMstAnimFlags1, 0x30);
@@ -2192,7 +2192,7 @@ void Game::updateInput() {
 }
 
 void Game::levelMainLoop() {
-	_gameCurrentLevelScreenNum = -1;
+	_andyCurrentLevelScreenNum = -1;
 	initMstCode();
 //	res_initIO();
 	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8], 0xFF);
@@ -2772,23 +2772,23 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 	_edi->unk2 = byte_43E534[_al];
 	if (_dl == 1) {
 		if (_al == 3) {
-			if (_gameKeyPressedMaskIndex < 1) {
-				_gameKeyPressedMaskIndex = 1;
+			if (_actionDirectionKeyMaskIndex < 1) {
+				_actionDirectionKeyMaskIndex = 1;
 				_plasmaCannonKeyMaskCounter = 0;
 			}
 		}
 	} else if (_dl == 3) {
 // 4097A2
 		if (_al == 4) {
-			if (_gameKeyPressedMaskIndex < 2) {
-				_gameKeyPressedMaskIndex = 2;
+			if (_actionDirectionKeyMaskIndex < 2) {
+				_actionDirectionKeyMaskIndex = 2;
 				_plasmaCannonKeyMaskCounter = 0;
 			}
 		}
 	} else if (_dl == 4 && _edi->unk6 >= 1250) {
 // 4097BD
-		if (_gameKeyPressedMaskIndex < 160) {
-			_gameKeyPressedMaskIndex = 160;
+		if (_actionDirectionKeyMaskIndex < 160) {
+			_actionDirectionKeyMaskIndex = 160;
 			_plasmaCannonKeyMaskCounter = 0;
 		}
 	}

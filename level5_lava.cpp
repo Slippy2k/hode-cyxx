@@ -19,8 +19,8 @@ void Game::postScreenUpdate_lava_helper(int yPos) {
 			if (flags == 2 || _andyObject->posTable[7].y + y >= yPos) {
 				mask = 0xA3;
 			}
-			if (mask != 0 && _gameKeyPressedMaskIndex > 0) {
-				_gameKeyPressedMaskIndex = mask;
+			if (mask != 0 && _actionDirectionKeyMaskIndex > 0) {
+				_actionDirectionKeyMaskIndex = mask;
 				_plasmaCannonKeyMaskCounter = 0;
 			}
 		} else if (flags == 0xB) {
