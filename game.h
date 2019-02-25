@@ -443,6 +443,16 @@ struct Game {
 	void callLevel_tick_pwr2();
 
 	// level7_lar1.cpp
+	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
+
+	void postScreenUpdate_lar1_screen3();
+	void postScreenUpdate_lar1_screen4();
+	void postScreenUpdate_lar1_screen5();
+	void postScreenUpdate_lar1_screen16();
+	void postScreenUpdate_lar1_screen22();
+	void postScreenUpdate_lar1_screen24();
+	void callLevel_postScreenUpdate_lar1(int num);
+
 	void preScreenUpdate_lar1_screen0();
 	void preScreenUpdate_lar1_screen2();
 	void preScreenUpdate_lar1_screen6();

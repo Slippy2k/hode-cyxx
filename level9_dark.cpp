@@ -18,7 +18,7 @@ void Game::postScreenUpdate_dark_screen0() {
 				_paf->unload(21);
 			}
 			_video->clearPalette();
-			// sub_4375E0
+			_video->fillBackBuffer();
 			_quit = true;
 		}
 	}
