@@ -713,6 +713,8 @@ void Resource::loadSssData(File *fp) {
 			_sssFile->read(p, kSizeOfUnk4Data * count);
 			_sssDataUnk4[i].data = p;
 
+			bytesRead += kSizeOfUnk4Data * count;
+
 			for (int j = 0; j < count; ++j) {
 
 				const uint32_t unk0x2C = READ_LE_UINT32(p + j * kSizeOfUnk4Data + 0x2C) * 2;
@@ -834,11 +836,8 @@ void Resource::loadSssData(File *fp) {
 //		}
 //	}
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
-	if (_sssHdr.version == 10) {
-		assert(bufferSize == bytesRead);
-	}
 	if (bufferSize != bytesRead) {
-		warning("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
+		error("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
 	}
 
 // 429C96:
