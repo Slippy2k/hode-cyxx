@@ -1754,9 +1754,7 @@ void Game::mainLoop(int level, int checkpoint) {
 	_levelCheckpoint = checkpoint;
 	benchmarkCpu();
 	_res->loadSetupDat();
-	_res->loadLvlData(_resLevelNames[_currentLevel]);
-	_res->loadMstData(_resLevelNames[_currentLevel]);
-	_res->loadSssData(_resLevelNames[_currentLevel]);
+	_res->loadLevelData(_resLevelNames[_currentLevel]);
 	levelMainLoop();
 }
 

@@ -214,12 +214,14 @@ struct Resource {
 
 	bool detectGameData();
 
+	void loadLevelData(const char *levelName);
+
 	void loadSetupDat();
 	void loadLvlScreenMoveData(int num);
 	void loadLvlScreenVectorData(int num);
 	void loadLvlScreenStateData(int num);
 	void loadLvlScreenObjectData(int num);
-	void loadLvlData(const char *levelName);
+	void loadLvlData(File *fp);
 	void loadLvlSpriteData(int num);
 
 	uint8_t *getLevelData0x470CPtr0(int num); // getLvlScreenMaskDataPtr
@@ -241,7 +243,7 @@ struct Resource {
 	uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
 	uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
 
-	void loadSssData(const char *levelName);
+	void loadSssData(File *fp);
 	void checkSssCode(const uint8_t *buf, int size);
 	void loadSssPcm(int num);
 	uint32_t getSssPcmSize(SssPcm *pcm) const;
@@ -264,7 +266,7 @@ struct Resource {
 
 	void clearSssLookupTable3();
 
-	void loadMstData(const char *levelName);
+	void loadMstData(File *fp);
 };
 
 #endif // RESOURCE_H__

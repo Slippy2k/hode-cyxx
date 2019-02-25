@@ -86,6 +86,39 @@ void Resource::loadSetupDat() {
 	}
 }
 
+void Resource::loadLevelData(const char *levelName) {
+	char filename[32];
+
+	if (_lvlFile) {
+		_fs.closeFile(_lvlFile);
+		snprintf(filename, sizeof(filename), "%s.LVL", levelName);
+		if (_fs.openFile(filename, _lvlFile)) {
+			loadLvlData(_lvlFile);
+		} else {
+			error("Unable to open '%s'", filename);
+		}
+	}
+	if (_mstFile) {
+		_fs.closeFile(_mstFile);
+		snprintf(filename, sizeof(filename), "%s.MST", levelName);
+		if (_fs.openFile(filename, _mstFile)) {
+			loadMstData(_mstFile);
+		} else {
+			warning("Unable to open '%s'", filename);
+		}
+	}
+	if (_sssFile) {
+		_fs.closeFile(_sssFile);
+		snprintf(filename, sizeof(filename), "%s.SSS", levelName);
+		if (_fs.openFile(filename, _sssFile)) {
+			loadSssData(_sssFile);
+		} else {
+			warning("Unable to open '%s'", filename);
+			memset(&_sssHdr, 0, sizeof(_sssHdr));
+		}
+	}
+}
+
 void Resource::loadLvlScreenMoveData(int num) { // GridData
 	_lvlFile->seekAlign(0x8 + num * 4);
 	_lvlFile->read(&_screensGrid[num * 4], 4);
@@ -273,14 +306,9 @@ void Resource::loadLevelData0x470C() {
 
 static const uint32_t lvlHdrTag = 0x484F4400;
 
-void Resource::loadLvlData(const char *levelName) {
-	_lvlFile->close();
-	char filename[32];
-	snprintf(filename, sizeof(filename), "%s.LVL", levelName);
-	if (!_fs.openFile(filename, _lvlFile)) {
-		error("Unable to open '%s'", filename);
-		return;
-	}
+void Resource::loadLvlData(File *fp) {
+
+	assert(fp == _lvlFile);
 
 	const uint32_t tag = _lvlFile->readUint32();
 	assert(tag == lvlHdrTag);
@@ -473,17 +501,10 @@ static int skipBytesAlign(File *f, int len) {
 	return size;
 }
 
-void Resource::loadSssData(const char *levelName) {
-	if (!_sssFile) {
-		memset(&_sssHdr, 0, sizeof(_sssHdr));
-		return;
-	}
-	char filename[32];
-	snprintf(filename, sizeof(filename), "%s.SSS", levelName);
-	if (!_fs.openFile(filename, _sssFile)) {
-		error("Unable to open '%s'", filename);
-		return;
-	}
+void Resource::loadSssData(File *fp) {
+
+	assert(fp == _sssFile); // TODO: or _datFile
+
 	if (0 /* _sssBuffer1 */ ) {
 		int count = _sssHdr.pcmCount;
 		if (count > _sssHdr.preloadPcmCount) {
@@ -498,10 +519,8 @@ void Resource::loadSssData(const char *levelName) {
 	}
 	_sssHdr.version = _sssFile->readUint32();
 	if (_sssHdr.version != 6 && _sssHdr.version != 10) {
-		warning("Unhandled %s version %d", filename, _sssHdr.version);
+		warning("Unhandled .sss version %d", _sssHdr.version);
 		_fs.closeFile(_sssFile);
-		delete _sssFile;
-		_sssFile = 0;
 		return;
 	}
 	_sssHdr.unk4 = _sssFile->readUint32();
@@ -906,15 +925,7 @@ void Resource::clearSssLookupTable3() {
 	}
 }
 
-void Resource::loadMstData(const char *levelName) {
-	if (!_mstFile) {
-		return;
-	}
-	char filename[32];
-	snprintf(filename, sizeof(filename), "%s.MST", levelName);
-	if (!_fs.openFile(filename, _mstFile)) {
-		error("Unable to open '%s'", filename);
-		return;
-	}
+void Resource::loadMstData(File *fp) {
+	assert(fp == _mstFile);
 	// TODO:
 }
