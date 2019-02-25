@@ -315,6 +315,49 @@ void Game::preScreenUpdate_pwr1_screen26() {
 	}
 }
 
+void Game::preScreenUpdate_pwr1_screen27() {
+	if (_res->_currentScreenResourceNum == 27) {
+		uint8_t num = 0;
+		if (_res->_screensState[27].s0 != 0 || _levelCheckpoint >= 7) {
+			num = 1;
+			_screenCounterTable[27] = 37;
+		} else if (_levelCheckpoint <= 5) {
+			_screenCounterTable[27] = 0;
+			if (_levelCheckpoint == 5) {
+				_levelCheckpoint = 6;
+			}
+		}
+		_res->_screensState[27].s0 = num;
+		_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = num;
+		_res->_resLvlScreenBackgroundDataTable[27].unk3 = num;
+	}
+}
+
+void Game::preScreenUpdate_pwr1_screen29() {
+	if (_res->_currentScreenResourceNum == 29) {
+		if (_levelCheckpoint == 7) {
+			_levelCheckpoint = 8;
+		}
+	}
+}
+
+void Game::preScreenUpdate_pwr1_screen31() {
+	if (_res->_currentScreenResourceNum == 31) {
+		if (_levelCheckpoint == 8) {
+			_levelCheckpoint = 9;
+		}
+	}
+}
+
+void Game::preScreenUpdate_pwr1_screen35() {
+	if (_res->_currentScreenResourceNum == 35) {
+		_screenCounterTable[25] = 0;
+		if (!_paf->_skipCutscenes) {
+			_paf->preload(5);
+		}
+	}
+}
+
 void Game::callLevel_preScreenUpdate_pwr1(int num) {
 	switch (num) {
 	case 4:
@@ -342,10 +385,16 @@ void Game::callLevel_preScreenUpdate_pwr1(int num) {
 		preScreenUpdate_pwr1_screen26();
 		break;
 	case 27:
+		preScreenUpdate_pwr1_screen27();
+		break;
 	case 29:
+		preScreenUpdate_pwr1_screen29();
+		break;
 	case 31:
+		preScreenUpdate_pwr1_screen31();
+		break;
 	case 35:
-		warning("callLevel_preScreenUpdate_level3 %d unimplemented", num);
+		preScreenUpdate_pwr1_screen35();
 		break;
 	}
 }

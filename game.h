@@ -365,6 +365,10 @@ struct Game {
 	void preScreenUpdate_pwr1_screen23();
 	void preScreenUpdate_pwr1_screen24();
 	void preScreenUpdate_pwr1_screen26();
+	void preScreenUpdate_pwr1_screen27();
+	void preScreenUpdate_pwr1_screen29();
+	void preScreenUpdate_pwr1_screen31();
+	void preScreenUpdate_pwr1_screen35();
 	void callLevel_preScreenUpdate_pwr1(int num);
 
 	void callLevel_initialize_pwr1();

@@ -160,12 +160,13 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 }
 
 void Game::callLevel_initialize_lar1() {
+	// TODO
 	_screenCounterTable[26] = 0;
 }
 
 void Game::callLevel_tick_lar1() {
 	// TODO
-	if (_screenCounterTable[26] != 0) {
+	if (_screenCounterTable[19] != 0) {
 		_plasmaCannonFlags |= 2;
 	}
 	if (_res->_currentScreenResourceNum == 12) {

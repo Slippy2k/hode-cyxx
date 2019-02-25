@@ -2497,7 +2497,7 @@ void Game::callLevel_tick() {
 		callLevel_tick_lar1();
 		break;
 	default:
-		warning("callLevel_tick unimplemented for screen %d", _currentLevel);
+		warning("callLevel_tick unimplemented for level %d", _currentLevel);
 		break;
 	}
 }
