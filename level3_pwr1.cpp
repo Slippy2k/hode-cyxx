@@ -12,7 +12,7 @@
 #include "video.h"
 
 void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
-	LvlObject *o = 0; //_unkLvlObject;
+	LvlObject *o = _lvlObjectsList3;
 	while (o) {
 		if (o->data0x2988 == 4 && o->anim <= 9) {
 			BoundingBox b2;
