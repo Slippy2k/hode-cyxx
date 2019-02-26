@@ -69,7 +69,7 @@ struct SssHdr {
 	int version;
 	int unk4;
 	int preloadPcmCount;
-	int unkC;
+	int preloadInfoCount;
 	int dataUnk1Count;
 	int dataUnk2Count;
 	int dataUnk3Count;

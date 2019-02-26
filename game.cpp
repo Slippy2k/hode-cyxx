@@ -794,7 +794,7 @@ void Game::loadLevelScreenSounds(int num) {
 			debug(kDebug_GAME, "levelScreen preloadData2 #%d res %d", i, j);
 		}
 	}
-	if (_res->_sssHdr.unkC > 0 && _res->_sssPreloadData3) {
+	if (_res->_sssHdr.preloadInfoCount > 0 && _res->_sssPreloadData3) {
 		for (size_t i = 0; i < _res->_sssPreloadData3[num].count; ++i) {
 			const int j = _res->_sssPreloadData3[num].ptr[i];
 			debug(kDebug_GAME, "levelScreen preloadData3 #%d res %d", i, j);
