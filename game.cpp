@@ -289,9 +289,8 @@ void Game::addToSpriteList(LvlObject *ptr) {
 			return;
 		}
 		if (_currentLevel == 3 && ptr->data0x2988 == 2) {
-			const int dxPos = ((OtherObjectScreenData *)ptr->dataPtr)->dxPos;
-			warning("ptr->dataPtr to OtherObjectScreenData dxPos %d", dxPos);
-			spr->xPos += dxPos;
+			AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+			spr->xPos += dataPtr->dxPos;
 		}
 		if (READ_LE_UINT16(ptr->bitmapBits) > 8) {
 			spr->bitmapBits = ptr->bitmapBits;
