@@ -240,8 +240,9 @@ void Game::executeSssCodeOp17(SssObject *so) {
 			}
 			if (prev) {
 				prev->nextPtr = next;
+			} else {
+				_sssObjectsList1 = next;
 			}
-			_sssObjectsList1 = next;
 			--_playingSssObjectsCount;
 			if (so == _lowPrioritySssObject || (_playingSssObjectsCount < _playingSssObjectsMax && _lowPrioritySssObject)) {
 				SssObject *prev3 = 0; // _esi
