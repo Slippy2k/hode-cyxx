@@ -582,7 +582,7 @@ void Game::setupPlasmaCannonPointsHelper() {
 	}
 }
 
-void Game::destroyLvlObjectUnk(LvlObject *o) {
+void Game::destroyLvlObjectPlasmaExplosion(LvlObject *o) {
 	AndyObjectScreenData *l = (AndyObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeAndy);
 	if (l->nextPtr) {
 		l->nextPtr = 0;
@@ -634,7 +634,7 @@ void Game::setupPlasmaCannonPoints(LvlObject *ptr) {
 	_plasmaCannonDirection = 0;
 	if ((ptr->flags0 & 0x1F) == 4) {
 		if ((ptr->actionKeyMask & 4) == 0) { // not using plasma cannon
-			destroyLvlObjectUnk(ptr);
+			destroyLvlObjectPlasmaExplosion(ptr);
 		} else {
 			_gameXPosTable[0] = _gameXPosTable[128] = ptr->xPos + ptr->posTable[6].x;
 			_gameYPosTable[0] = _gameYPosTable[128] = ptr->yPos + ptr->posTable[6].y;
@@ -979,15 +979,13 @@ LvlObject *Game::findLvlObjectNoDataPtr(int num, int index) {
 }
 
 void Game::removeLvlObject(LvlObject *ptr) {
-#if 0
-	OtherObjectScreenData *data = (OtherObjectScreenData *)ptr->dataPtr;
-	LvlObject *o = data->nextPtr; // +0x20
+	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	LvlObject *o = dataPtr->nextPtr;
 	if (o) {
-		data->nextPtr = 0;
+		dataPtr->nextPtr = 0;
 		removeLvlObjectFromList(&_lvlObjectsList0, o);
 		destroyLvlObject(o);
 	}
-#endif
 }
 
 void Game::removeLvlObjectNotType2List1(LvlObject *o) {
@@ -1051,7 +1049,7 @@ void Game::setupCurrentScreen() {
 			ptr->anim = 48;
 			break;
 		case 2:
-			destroyLvlObjectUnk(_andyObject);
+			destroyLvlObjectPlasmaExplosion(_andyObject);
 			setLvlObjectType8Resource(ptr, 8, 2);
 			_plasmaCannonDirection = 0;
 			_plasmaCannonLastIndex1 = 0;
@@ -1082,7 +1080,7 @@ void Game::setupCurrentScreen() {
 	if (ptr->data0x2988 == 2) {
 		removeLvlObject(ptr);
 	} else {
-		destroyLvlObjectUnk(ptr);
+		destroyLvlObjectPlasmaExplosion(ptr);
 	}
 }
 

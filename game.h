@@ -190,7 +190,7 @@ struct Game {
 	void randomizeInterpolatePoints(int32_t *pts, int count);
 	int fixPlasmaCannonPointsScreenMask(int num);
 	void setupPlasmaCannonPointsHelper();
-	void destroyLvlObjectUnk(LvlObject *o);
+	void destroyLvlObjectPlasmaExplosion(LvlObject *o);
 	void shuffleArray(uint8_t *p, int count);
 	void destroyLvlObject(LvlObject *o);
 	void setupPlasmaCannonPoints(LvlObject *ptr);

@@ -99,7 +99,7 @@ void Game::postScreenUpdate_rock_helper1(int num) {
 		_andyObject->anim = 48;
 		break;
 	case 2:
-		destroyLvlObjectUnk(_andyObject);
+		destroyLvlObjectPlasmaExplosion(_andyObject);
 		_plasmaCannonDirection = 0;
 		_plasmaCannonLastIndex1 = 0;
 		_plasmaCannonExplodeFlag = 0;
