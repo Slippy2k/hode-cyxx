@@ -1277,6 +1277,7 @@ void Game::mixSoundObjects17640(bool flag) {
 }
 
 void Game::mixSoundObjects() {
+	int count = 0;
 	SssObject *so = _sssObjectsList1;
 	while (so) {
 		if (so->pcm != 0) {
@@ -1286,6 +1287,11 @@ void Game::mixSoundObjects() {
 			}
 		}
 		so = so->nextPtr;
+		++count;
+		if (count > 256) {
+			warning("Infinite loop (corrupted linked list) in mixSoundObjects");
+			break;
+		}
 	}
 }
 
