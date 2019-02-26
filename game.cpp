@@ -1885,9 +1885,7 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 				playSound(ptr->soundToPlay, 0, 0, 3);
 				ptr->soundToPlay = 0xFFFF;
 			}
-			// TODO: deref to correct type
-			uint8_t *data = (uint8_t *)ptr->dataPtr;
-			assert(data);
+			uint8_t *data = (uint8_t *)getLvlObjectDataPtr(ptr, kObjectDataTypeLvlBackgroundSound);
 			Sprite *spr = _gameSpriteListHead;
 			if (spr && READ_LE_UINT16(data + 2) > 8) {
 				spr->bitmapBits = data + 2;
@@ -2596,6 +2594,11 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 		break;
 	case kObjectDataTypeOther:
 		assert(o->dataPtr >= &_otherObjectScreenDataTable[0] && o->dataPtr < &_otherObjectScreenDataTable[32]);
+		break;
+	case kObjectDataTypeLvlBackgroundSound:
+		assert(o->type == 1);
+		// dataPtr is _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable + 2
+		assert(o->dataPtr);
 		break;
 	}
 	return o->dataPtr;
