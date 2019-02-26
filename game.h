@@ -485,6 +485,8 @@ struct Game {
 	void preScreenUpdate_lar2_screen19();
 	void callLevel_preScreenUpdate_lar2(int num);
 
+	void callLevel_tick_lar2();
+
 	void callLevel_setupLvlObjects_lar2(int num);
 
 	// level9_dark.cpp

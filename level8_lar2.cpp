@@ -176,6 +176,10 @@ void Game::callLevel_preScreenUpdate_lar2(int num) {
 	}
 }
 
+void Game::callLevel_tick_lar2() {
+	warning("callLevel_tick_lar2 unimplemented");
+}
+
 void Game::callLevel_setupLvlObjects_lar2(int num) {
 	switch (num) {
 	case 19:
