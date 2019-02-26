@@ -852,8 +852,22 @@ void Resource::loadSssData(File *fp) {
 		}
 	}
 // 429D32
-	// TODO:
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
+		uint32_t mask = 1;
+		_sssDataUnk6[i].unk10 = 0;
+		const SssCodeOffset *codeOffset = &_sssCodeOffsets[_sssDataUnk3[i].firstCodeOffset];
+		uint32_t *ptr = _sssDataUnk6[i].unk0;
+		for (int j = 0; j < _sssDataUnk3[i].count; ++j) {
+			for (int k = 0; k < codeOffset->unk5; ++k) {
+				if (mask != 0) {
+					*ptr |= mask;
+					mask <<= 1;
+				}
+			}
+			++codeOffset;
+			_sssDataUnk6[i].unk10 |= *ptr;
+			++ptr;
+		}
 	}
 
 // 429E09
