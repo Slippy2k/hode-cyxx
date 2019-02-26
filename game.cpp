@@ -603,7 +603,6 @@ void Game::shuffleArray(uint8_t *p, int count) {
 }
 
 void Game::destroyLvlObject(LvlObject *o) {
-	if (!o) return; // TEMP
 	assert(o);
 	if (o->type == 8) {
 		_res->decLevelData0x2988RefCounter(o);
