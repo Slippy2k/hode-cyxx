@@ -240,8 +240,8 @@ struct Resource {
 	void loadHintImage(int num, uint8_t *dst, uint8_t *pal);
 	void loadLoadingImage(uint8_t *dst, uint8_t *pal);
 
-	uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
-	uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
+	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
+	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
 
 	void loadSssData(File *fp);
 	void checkSssCode(const uint8_t *buf, int size);

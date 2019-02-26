@@ -475,7 +475,7 @@ void Resource::loadLoadingImage(uint8_t *dst, uint8_t *pal) {
 	}
 }
 
-uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
+const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 	assert(frame < dat->framesCount);
 	uint8_t *p = dat->framesData;
 	for (int i = 0; i < frame; ++i) {
@@ -485,7 +485,7 @@ uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 	return p;
 }
 
-uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
+const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	assert(num < dat->animsCount);
 	uint8_t *p = dat->coordsData;
 	for (int i = 0; i < num; ++i) {

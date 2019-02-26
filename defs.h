@@ -135,7 +135,7 @@ struct LvlObject {
 	uint16_t soundToPlay;
 	uint8_t unk26;
 	uint8_t unk27;
-	uint8_t *bitmapBits;
+	const uint8_t *bitmapBits;
 	int (Game::*callbackFuncPtr)(LvlObject *ptr);
 	void *dataPtr;
 // ptr->data0x2988==0:AndyObjectScreenData
@@ -329,7 +329,7 @@ struct MstUnk54 {
 struct Sprite {
 	int16_t xPos;
 	int16_t yPos;
-	uint8_t *bitmapBits;
+	const uint8_t *bitmapBits;
 	Sprite *nextPtr;
 	uint16_t num;
 	uint16_t flags;

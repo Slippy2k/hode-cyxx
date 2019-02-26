@@ -1932,7 +1932,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		return o;
 	}
 	if (_currentScreen == ptr->screenNum) {
-		uint8_t *_edi = ptr->bitmapBits;
+		const uint8_t *_edi = ptr->bitmapBits;
 
 		LvlObjectData *dat = ptr->levelData0x2988;
 		LvlAnimHeader *ah = (LvlAnimHeader *)(dat->animsInfoData + kLvlAnimHdrOffset) + ptr->anim;
