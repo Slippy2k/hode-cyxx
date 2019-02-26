@@ -118,7 +118,7 @@ void Game::preScreenUpdate_isld_screen1() {
 void Game::preScreenUpdate_isld_screen2() {
 	if (_res->_currentScreenResourceNum == 2) {
 		_res->_screensState[2].s0 = 0;
-		_res->_resLvlScreenBackgroundDataTable[2].unk3 = 0;
+		_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = 0;
 		_screenCounterTable[2] = 0;
 		LvlObject *o = findLvlObject(2, 0, 2);
 		if (o) {
@@ -154,10 +154,10 @@ void Game::preScreenUpdate_isld_screen9() {
 void Game::preScreenUpdate_isld_screen14() {
 	if (_res->_screensState[14].s0 != 0) {
 		_res->_resLvlScreenBackgroundDataTable[14].currentBackgroundId = 1;
-		_res->_resLvlScreenBackgroundDataTable[14].unk3 = 1;
+		_res->_resLvlScreenBackgroundDataTable[14].currentMaskId = 1;
 	} else {
 		_res->_resLvlScreenBackgroundDataTable[14].currentBackgroundId = 0;
-		_res->_resLvlScreenBackgroundDataTable[14].unk3 = 0;
+		_res->_resLvlScreenBackgroundDataTable[14].currentMaskId = 0;
 	}
 	if (_res->_currentScreenResourceNum == 14) {
 		if (_levelCheckpoint == 2) {

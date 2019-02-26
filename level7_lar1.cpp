@@ -115,20 +115,20 @@ void Game::preScreenUpdate_lar1_screen0() {
 		switch (_res->_screensState[0].s0) {
 		case 0:
 			_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 0;
-			_res->_resLvlScreenBackgroundDataTable[0].unk3 = 0;
+			_res->_resLvlScreenBackgroundDataTable[0].currentMaskId = 0;
 			_screenCounterTable[0] = 0;
 			break;
 		case 3:
 			_res->_screensState[0].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 1;
-			_res->_resLvlScreenBackgroundDataTable[0].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[0].currentMaskId = 1;
 			_screenCounterTable[0] = 45;
 			break;
 		case 4:
 			_screenCounterTable[0] = 64;
 			_res->_screensState[0].s0 = 2;
 			_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 2;
-			_res->_resLvlScreenBackgroundDataTable[0].unk3 = 2;
+			_res->_resLvlScreenBackgroundDataTable[0].currentMaskId = 2;
 			break;
 		}
 	}
@@ -183,7 +183,7 @@ void Game::preScreenUpdate_lar1_screen14() {
 	switch (_res->_screensState[14].s0) {
 	case 0:
 		_res->_resLvlScreenBackgroundDataTable[14].currentBackgroundId = 0;
-		_res->_resLvlScreenBackgroundDataTable[14].unk3 = 0;
+		_res->_resLvlScreenBackgroundDataTable[14].currentMaskId = 0;
 		_screenCounterTable[14] = 0;
 		break;
 	case 3:

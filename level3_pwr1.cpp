@@ -128,7 +128,7 @@ void Game::postScreenUpdate_pwr1_screen23() {
 	case 2:
 		++_screenCounterTable[23];
 		if (_screenCounterTable[23] == 26) {
-			_res->_resLvlScreenBackgroundDataTable[23].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[23].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = 1;
 			setupScreenMask(23);
 		}
@@ -154,7 +154,7 @@ void Game::postScreenUpdate_pwr1_screen27() {
 	if (_res->_screensState[27].s0 != 0) {
 		++_screenCounterTable[27];
 		if (_screenCounterTable[27] == 37) {
-			_res->_resLvlScreenBackgroundDataTable[27].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[27].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = 1;
 			setupScreenMask(27);
 		}
@@ -235,7 +235,7 @@ void Game::preScreenUpdate_pwr1_screen4() {
         if (_res->_currentScreenResourceNum == 4) {
 		const uint8_t num = (_res->_screensState[4].s0 == 0) ? 0 : 1;
 		_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
-		_res->_resLvlScreenBackgroundDataTable[4].unk3 = num;
+		_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = num;
 	}
 }
 
@@ -245,18 +245,18 @@ void Game::preScreenUpdate_pwr1_screen6() {
 			if (_levelCheckpoint != 1) {
 				_screenCounterTable[6] = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 0;
-				_res->_resLvlScreenBackgroundDataTable[6].unk3 = 0;
+				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 0;
 				_res->_screensState[6].s0 = 0;
 			} else {
 				_screenCounterTable[6] = 41;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 1;
-				_res->_resLvlScreenBackgroundDataTable[6].unk3 = 1;
+				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 1;
 				_res->_screensState[6].s0 = 1;
 			}
 		} else {
 			_screenCounterTable[6] = 54;
 			_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 2;
-			_res->_resLvlScreenBackgroundDataTable[6].unk3 = 2;
+			_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 2;
 			_res->_screensState[6].s0 = 2;
 		}
         }
@@ -290,7 +290,7 @@ void Game::preScreenUpdate_pwr1_screen23() {
 	if (_res->_currentScreenResourceNum == 23 || _res->_currentScreenResourceNum == 26) {
 		const uint8_t num = _res->_screensState[23].s0 != 0 ? 1 : 0;
 		_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = num;
-		_res->_resLvlScreenBackgroundDataTable[23].unk3 = num;
+		_res->_resLvlScreenBackgroundDataTable[23].currentMaskId = num;
 	}
 }
 
@@ -311,7 +311,7 @@ void Game::preScreenUpdate_pwr1_screen26() {
 	if (_res->_currentScreenResourceNum == 23 || _res->_currentScreenResourceNum == 26) {
 		const uint8_t num = _res->_screensState[23].s0 != 0 ? 1 : 0;
 		_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = num;
-		_res->_resLvlScreenBackgroundDataTable[23].unk3 = num;
+		_res->_resLvlScreenBackgroundDataTable[23].currentMaskId = num;
 	}
 }
 
@@ -329,7 +329,7 @@ void Game::preScreenUpdate_pwr1_screen27() {
 		}
 		_res->_screensState[27].s0 = num;
 		_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = num;
-		_res->_resLvlScreenBackgroundDataTable[27].unk3 = num;
+		_res->_resLvlScreenBackgroundDataTable[27].currentMaskId = num;
 	}
 }
 

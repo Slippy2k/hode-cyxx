@@ -17,7 +17,7 @@ void Game::postScreenUpdate_fort_screen1() {
 		}
 		++_screenCounterTable[1];
 		if (_screenCounterTable[1] == 25) {
-			_res->_resLvlScreenBackgroundDataTable[1].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[1].currentMaskId = 1;
 			setupScreenMask(1);
 		} else if (_screenCounterTable[1] == 59) {
 			_res->_screensState[1].s0 = 1;
@@ -190,7 +190,7 @@ void Game::preScreenUpdate_fort_screen1() {
 	}
 	const int num = _res->_screensState[1].s0 == 0 ? 0 : 1;
 	_res->_resLvlScreenBackgroundDataTable[1].currentBackgroundId = num;
-	_res->_resLvlScreenBackgroundDataTable[1].unk3 = num;
+	_res->_resLvlScreenBackgroundDataTable[1].currentMaskId = num;
 }
 
 void Game::preScreenUpdate_fort_screen2() {

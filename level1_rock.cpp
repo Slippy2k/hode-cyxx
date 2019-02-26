@@ -67,7 +67,7 @@ void Game::postScreenUpdate_rock_screen4() {
 	case 2:
 		++_screenCounterTable[4];
 		if (_screenCounterTable[4] == 33) {
-			_res->_resLvlScreenBackgroundDataTable[4].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = 1;
 			setupScreenMask(4);
 		} else if (_screenCounterTable[4] > 46) {
 			_res->_screensState[4].s0 = 1;
@@ -242,7 +242,7 @@ void Game::postScreenUpdate_rock_screen16() {
 	case 2:
 		++_screenCounterTable[16];
 		if (_screenCounterTable[16] == 5) {
-			_res->_resLvlScreenBackgroundDataTable[16].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[16].currentMaskId = 1;
 			setupScreenMask(16);
 		} else if (_screenCounterTable[16] == 23) {
 			_andyObject->flags1 &= ~0x30;
@@ -276,7 +276,7 @@ void Game::postScreenUpdate_rock_screen18() {
 				++_screenCounterTable[18];
 				if (_screenCounterTable[18] == 24) {
 					_res->_screensState[16].s0 = 2;
-					_res->_resLvlScreenBackgroundDataTable[18].unk3 = 2;
+					_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 2;
 					setupScreenMask(18);
 				}
 			}
@@ -289,7 +289,7 @@ void Game::postScreenUpdate_rock_screen18() {
 		++_screenCounterTable[18];
 		if (_screenCounterTable[18] == 43) {
 			setShakeScreen(2, 5);
-			_res->_resLvlScreenBackgroundDataTable[18].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 1;
 			setupScreenMask(18);
 		} else if (_screenCounterTable[18] == 51) {
 			_res->_screensState[18].s0 = 1;
@@ -357,7 +357,7 @@ void Game::postScreenUpdate_rock_screen19() {
 	case 3:
 		++_screenCounterTable[19];
 		if (_screenCounterTable[19] == 1) {
-			_res->_resLvlScreenBackgroundDataTable[19].unk3 = 1;
+			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
 			warning("Workaround Andy position in Level 1 Screen 19");
 			/// setupScreenMask(19);
 			resetAndyLvlObjectPlasmaCannonKeyMask(18);
@@ -370,7 +370,7 @@ void Game::postScreenUpdate_rock_screen19() {
 		++_screenCounterTable[19];
 		if (_screenCounterTable[19] == 25) {
 			setShakeScreen(2, 5);
-			_res->_resLvlScreenBackgroundDataTable[19].unk3 = 2;
+			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 2;
 			setupScreenMask(19);
 		} else if (_screenCounterTable[19] == 33) {
 			_res->_screensState[19].s0 = 2;
@@ -633,7 +633,7 @@ void Game::preScreenUpdate_rock_screen4() {
 	}
 	_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentDataUnk1Id = num;
-	_res->_resLvlScreenBackgroundDataTable[4].unk3 = num;
+	_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = num;
 	if (_res->_currentScreenResourceNum == 4 && _levelCheckpoint == 1) {
 		_levelCheckpoint = 2;
 	}
@@ -719,7 +719,7 @@ void Game::preScreenUpdate_rock_screen16() {
 		break;
 	}
 	_res->_resLvlScreenBackgroundDataTable[16].currentBackgroundId = _al;
-	_res->_resLvlScreenBackgroundDataTable[16].unk3 = _al;
+	_res->_resLvlScreenBackgroundDataTable[16].currentMaskId = _al;
 	if (_res->_currentScreenResourceNum == 16) {
 		playAndyFallingCutscene(1);
 	}
@@ -746,7 +746,7 @@ void Game::preScreenUpdate_rock_screen18() {
 		break;
 	}
 	_res->_resLvlScreenBackgroundDataTable[18].currentBackgroundId = _al;
-	_res->_resLvlScreenBackgroundDataTable[18].unk3 = _al;
+	_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = _al;
 	if (_res->_currentScreenResourceNum == 18) {
 		playAndyFallingCutscene(1);
 	}
@@ -767,7 +767,7 @@ void Game::preScreenUpdate_rock_screen19() {
 		break;
 	}
 	_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = _al;
-	_res->_resLvlScreenBackgroundDataTable[19].unk3 = _al;
+	_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = _al;
 	if (_res->_currentScreenResourceNum == 19) {
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(2);

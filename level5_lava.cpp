@@ -96,7 +96,7 @@ void Game::postScreenUpdate_lava_screen10() {
 				if (_levelCheckpoint == 3) {
 					_levelCheckpoint = 4;
 					_res->_screensState[10].s0 = 1;
-					_res->_resLvlScreenBackgroundDataTable[10].unk3 = 1;
+					_res->_resLvlScreenBackgroundDataTable[10].currentMaskId = 1;
 					setupScreenMask(10);
 				}
 				++_screenCounterTable[10];
@@ -226,7 +226,7 @@ void Game::preScreenUpdate_lava_screen10() {
 		_res->_screensState[10].s0 = 1;
 	}
 	if (_res->_currentScreenResourceNum == 10) {
-		_res->_resLvlScreenBackgroundDataTable[10].unk3 = num;
+		_res->_resLvlScreenBackgroundDataTable[10].currentMaskId = num;
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(7);
 		}

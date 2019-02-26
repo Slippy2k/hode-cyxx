@@ -16,7 +16,7 @@ void Game::postScreenUpdate_pwr2_screen2() {
 		mask = 0;
 		break;
 	}
-	_res->_resLvlScreenBackgroundDataTable[2].unk3 = mask;
+	_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = mask;
 	if (_res->_screensState[2].s3 != mask) {
 		setupScreenMask(2);
 	}
@@ -69,7 +69,7 @@ void Game::preScreenUpdate_pwr2_screen2() {
 	if (_levelCheckpoint == 1) {
 		if (_res->_screensState[2].s0 == 0) {
 			_res->_screensState[2].s0 = 2;
-			_res->_resLvlScreenBackgroundDataTable[2].unk3 = 2;
+			_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = 2;
 		}
 	}
 }

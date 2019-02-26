@@ -359,7 +359,7 @@ void Game::setupScreenPosTable(uint8_t num) {
 	const uint8_t *src = &_res->_screensGrid[num * 4];
 	for (int i = 0; i < 4; ++i) {
 		if (src[i] != 0xFF) {
-			int index = _res->_resLvlScreenBackgroundDataTable[src[i]].unk3;
+			int index = _res->_resLvlScreenBackgroundDataTable[src[i]].currentMaskId;
 			const uint8_t *p = _res->getLevelData0x470CPtr4(src[i] * 4 + index);
 			if (p) {
 				Video::decodeRLE(p, _screenPosTable[i], 768);
@@ -368,7 +368,7 @@ void Game::setupScreenPosTable(uint8_t num) {
 		}
 		memset(_screenPosTable[i], 0, 768);
 	}
-	int index = _res->_resLvlScreenBackgroundDataTable[num].unk3;
+	int index = _res->_resLvlScreenBackgroundDataTable[num].currentMaskId;
 	const uint8_t *p = _res->getLevelData0x470CPtr4(num * 4 + index);
 	if (p) {
 		Video::decodeRLE(p, _screenPosTable[4], 768);
@@ -381,7 +381,7 @@ void Game::setupScreenMask(uint8_t num) {
 	if (num == 0xFF) {
 		return;
 	}
-	int mask = _res->_resLvlScreenBackgroundDataTable[num].unk3;
+	int mask = _res->_resLvlScreenBackgroundDataTable[num].currentMaskId;
 	if (_res->_screensState[num].s3 != mask) {
 		debug(kDebug_GAME, "setupScreenMask num %d mask %d", num, mask);
 		_res->_screensState[num].s3 = mask;

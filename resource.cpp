@@ -348,12 +348,12 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 
 	dat->backgroundCount = *src++;
 	dat->currentBackgroundId = *src++;
-	dat->dataUnk0Count = *src++;
-	dat->unk3 = *src++;
+	dat->maskCount = *src++;
+	dat->currentMaskId = *src++;
 	dat->dataUnk1Count = *src++;
 	dat->currentDataUnk1Id = *src++;
-	dat->dataUnk2Count = *src++; // soundsCount
-	dat->unk7 = *src++; // currentSoundId
+	dat->dataUnk2Count = *src++;
+	dat->unk7 = *src++;
 	dat->dataUnk3Count = *src++;
 	dat->unk9 = *src++;
 	dat->dataUnk45Count = *src++;
