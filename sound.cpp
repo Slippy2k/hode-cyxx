@@ -844,8 +844,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
 		SssObject *so = addSoundObject(pcm, _ecx, flags1, flags);
 		if (so) {
-			// TODO: compare with 0xFFFFFFFF ?
-			if (!codeOffset->codeOffset1 || !codeOffset->codeOffset2 || !codeOffset->codeOffset3 || !codeOffset->codeOffset4) {
+			if (codeOffset->codeOffset1 == kNone || codeOffset->codeOffset2 == kNone || codeOffset->codeOffset3 == kNone || codeOffset->codeOffset4 == kNone) {
 				so->flags |= 4;
 			}
 			so->codeDataStage1 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);

@@ -14,6 +14,7 @@ enum {
 };
 
 enum {
+	kNone = 0xFFFFFFFF, // (uint32_t)-1
 	kLvlAnimHdrOffset = 0x2C
 };
 

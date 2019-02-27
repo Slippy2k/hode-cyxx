@@ -99,7 +99,7 @@ struct SssUnk2 { // SssProperty
 
 struct SssUnk3 { // SssInfo
 	uint8_t flags; // 0 flags0
-	int8_t count; // 1
+	int8_t count; // 1 codeOffsetCount
 	uint16_t sssFilter; // 2 index to _sssFilters
 	uint32_t firstCodeOffset; // 4 offset to _sssCodeOffsets
 };
@@ -117,7 +117,7 @@ struct SssCodeOffset {
 	uint32_t codeOffset4; // 0x14 offset to _sssCodeData
 };
 
-struct SssUnk4 {
+struct SssUnk4 { // SssPreloadInfo
 	uint32_t count;
 	uint8_t *data;
 };
