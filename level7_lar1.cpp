@@ -52,6 +52,52 @@ void Game::postScreenUpdate_lar1_screen16() {
 	postScreenUpdate_lar1_helper(o, byte_452620, 10);
 }
 
+void Game::postScreenUpdate_lar1_screen19() {
+	if (_screenCounterTable[19] == 0) {
+		if (_res->_currentScreenResourceNum == 19) {
+			BoundingBox b = { 160, 0, 209, 71 };
+			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (clipBoundingBox(&b, &data->boundingBox)) {
+				_plasmaCannonFlags |= 2;
+				if (!_paf->_skipCutscenes) {
+					_paf->play(13);
+					_paf->unload(13);
+					_video->clearPalette();
+					++_screenCounterTable[19];
+					updateScreen(_andyObject->screenNum);
+					// byte_4525E1 = 0;
+					// byte_4525E7 = 0;
+				}
+				_andyObject->xPos = 204;
+				_andyObject->yPos = 25;
+				_andyObject->anim = 232;
+				_andyObject->frame = 0;
+				_andyObject->flags1 = (_andyObject->flags1 & 0xFFDF) | 0x10;
+				_andyObject->directionKeyMask = 0;
+				_andyObject->actionKeyMask = 0;
+				setupLvlObjectBitmap(_andyObject);
+				removeLvlObject(_andyObject);
+				// sub_40E3C0
+			}
+		}
+	} else if (_res->_screensState[19].s0 == 2) {
+		++_screenCounterTable[19];
+		if (_screenCounterTable[19] == 2) {
+			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
+			setupScreenMask(19);
+		} else if (_screenCounterTable[19] >= 14) {
+			_res->_screensState[19].s0 = 1;
+			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
+		}
+	}
+}
+
+void Game::postScreenUpdate_lar1_screen20() {
+	if (_res->_currentScreenResourceNum == 20) {
+		postScreenUpdate_lar1_screen19();
+	}
+}
+
 void Game::postScreenUpdate_lar1_screen22() {
 	if (_res->_currentScreenResourceNum == 22) {
 		BoundingBox b = { 36, 0, 208, 82 };
@@ -88,6 +134,12 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 	case 5:
 		postScreenUpdate_lar1_screen5();
 		break;
+	case 19:
+		postScreenUpdate_lar1_screen19();
+		break;
+	case 20:
+		postScreenUpdate_lar1_screen20();
+		break;
 	case 22:
 		postScreenUpdate_lar1_screen22();
 		break;
@@ -103,8 +155,6 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 	case 15:
 	case 16:
 	case 18:
-	case 19:
-	case 20:
 		warning("callLevel_postScreenUpdate_lar1 %d unimplemented", num);
 		break;
 	}
