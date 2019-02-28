@@ -50,7 +50,7 @@ Saturn
 	file02 'DHD'
 		at offset 4, byte screens count
 		at offset 5, contains screenGrid (4 * sizeof(screens count))
-	file03 ?
+	file03 .sss
 	file04 paf
 	file05 paf
 	file06 paf
