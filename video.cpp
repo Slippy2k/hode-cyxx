@@ -217,6 +217,7 @@ void Video::decodeRLE(const uint8_t *src, uint8_t *dst, int size) {
 	assert(size == 0);
 }
 
+// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 int Video::computeLineOutCode(int x, int y) {
 	int mask = 0;
 	if (y > _drawLine.y2) mask |= 1 << 24;
