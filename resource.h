@@ -164,7 +164,7 @@ struct MstUnk48 {
 	uint8_t unk7;
 	uint32_t codeData; // 0x8, PTR_OFFS<uint32>(_mstCodeData, N)
 	uint32_t offsetUnk12; // MstUnk48Unk12 *
-	uint32_t countUnk12; // 0x10
+	int countUnk12; // 0x10
 	uint32_t offsets1[2]; // 0x14, 0x18
 	uint32_t offsets2[2]; // 0x1C, 0x20
 	uint32_t count[2]; // 36,40
@@ -174,7 +174,7 @@ struct MstUnk48Unk12 {
 	uint32_t unk0;
 	uint32_t offset; // sizeof == 28
 	uint32_t count;
-} PACKED;
+}; // sizeof == 12
 
 struct MstUnk49 {
 	uint8_t pad0[8];
@@ -381,6 +381,12 @@ struct Resource {
 	MstUnk44 *_mstUnk44;
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
+	MstUnk48 *_mstUnk48;
+	uint8_t *_mstHeightMapData;
+	MstUnk49 *_mstUnk49;
+	MstUnk50 *_mstUnk50;
+	MstUnk51 *_mstUnk51;
+	uint32_t *_mstCodeData;
 
 	bool _isDemoData;
 

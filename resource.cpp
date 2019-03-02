@@ -985,13 +985,17 @@ void Resource::loadMstData(File *fp) {
 
 	fp->seek(2048, SEEK_SET);
 
+	int bytesRead = 0;
+
 	_mstPointOffsets = (MstPointOffset *)malloc(_mstHdr.pointsCount * sizeof(MstPointOffset));
 	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
 		_mstPointOffsets[i].xOffset = fp->readUint32();
 		_mstPointOffsets[i].yOffset = fp->readUint32();
+		bytesRead += 8;
 	}
 
 	fp->seek(_mstHdr.unk0x08 * 20, SEEK_CUR); // _mstUnk34
+	bytesRead += _mstHdr.unk0x08 * 20;
 
 	_mstUnk35 = (MstUnk35 *)malloc(_mstHdr.unk0x0C * sizeof(MstUnk35));
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
@@ -999,17 +1003,22 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk35[i].count = fp->readUint32();
 		_mstUnk35[i].unk8  = fp->readUint32();
 		_mstUnk35[i].size  = fp->readUint32();
+		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
 		fp->seek(_mstUnk35[i].count * 4, SEEK_CUR);
-		skipBytesAlign(fp, _mstUnk35[i].size);
+		bytesRead += _mstUnk35[i].count * 4;
+		bytesRead += skipBytesAlign(fp, _mstUnk35[i].size);
 	}
 
 	fp->seek(_mstHdr.unk0x10 * 12, SEEK_CUR); // _mstUnk36
+	bytesRead += _mstHdr.unk0x10 * 12;
 
 	fp->seek(8, SEEK_CUR); // _mstUnk37
+	bytesRead += 8;
 
 	fp->seek(_mstHdr.unk0x14 * 4, SEEK_CUR); // _resMstCodeData_screenInit
+	bytesRead += _mstHdr.unk0x14 * 4;
 
 	_mstScreenAreaCodes = (MstScreenAreaCode *)malloc(_mstHdr.screenAreaCodesCount * sizeof(MstScreenAreaCode)); // _mstUnk38
 	for (int i = 0; i < _mstHdr.screenAreaCodesCount; ++i) {
@@ -1025,21 +1034,25 @@ void Resource::loadMstData(File *fp) {
 		msac->unk0x1D = fp->readByte();
 		msac->unk0x1E = fp->readUint16();
 		msac->codeData = fp->readUint32();
+		bytesRead += 36;
 	}
 
 	_mstUnk39 = (uint32_t *)malloc(_mstHdr.unk0x1C * sizeof(uint32_t));
 	for (int i = 0; i < _mstHdr.unk0x1C; ++i) {
 		_mstUnk39[i] = fp->readUint32();
+		bytesRead += 4;
 	}
 
 	_mstUnk40 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
 	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
 		_mstUnk40[i] = fp->readUint32();
+		bytesRead += 4;
 	}
 
 	_mstUnk41 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
 	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
 		_mstUnk41[i] = fp->readUint32();
+		bytesRead += 4;
 	}
 
 	_mstUnk42 = (MstUnk42 *)malloc(_mstHdr.unk0x20 * sizeof(MstUnk42));
@@ -1048,10 +1061,12 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk42[i].count1  = fp->readUint32();
 		_mstUnk42[i].offset2 = fp->readUint32();
 		_mstUnk42[i].count2  = fp->readUint32();
+		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		fp->seek(_mstUnk42[i].count1 * 4, SEEK_CUR);
-		skipBytesAlign(fp, _mstUnk42[i].count2);
+		bytesRead += _mstUnk42[i].count1 * 4;
+		bytesRead += skipBytesAlign(fp, _mstUnk42[i].count2);
 	}
 
 	_mstUnk43 = (MstUnk43 *)malloc(_mstHdr.unk0x24 * sizeof(MstUnk43));
@@ -1060,10 +1075,12 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk43[i].count1  = fp->readUint32();
 		_mstUnk43[i].offset2 = fp->readUint32();
 		_mstUnk43[i].count2  = fp->readUint32();
+		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
 		fp->seek(_mstUnk43[i].count1 * 4, SEEK_CUR);
-		skipBytesAlign(fp, _mstUnk43[i].count2);
+		bytesRead += _mstUnk43[i].count1 * 4;
+		bytesRead += skipBytesAlign(fp, _mstUnk43[i].count2);
 	}
 
 	_mstUnk44 = (MstUnk44 *)malloc(_mstHdr.unk0x28 * sizeof(MstUnk44));
@@ -1072,36 +1089,175 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk44[i].unk4  = fp->readUint32();
 		_mstUnk44[i].unk8  = fp->readUint32();
 		_mstUnk44[i].count = fp->readUint32();
+		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
 		const int count = _mstUnk44[i].count;
 		fp->seek(count * 104, SEEK_CUR);
+		bytesRead += count * 104;
 		fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR);
+		bytesRead += _mstHdr.pointsCount * 4;
 		for (int j = 0; j < count; ++j) {
 			for (int k = 0; k < 2; ++k) {
-				skipBytesAlign(fp, count);
+				bytesRead += skipBytesAlign(fp, count);
 			}
 		}
 	}
 
 	fp->seek(_mstHdr.unk0x2C * 12, SEEK_CUR); // _mstUnk45
+	bytesRead += _mstHdr.unk0x2C * 12;
 
 	_mstUnk46 = (MstUnk46 *)malloc(_mstHdr.unk0x30 * sizeof(MstUnk46));
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
 		_mstUnk46[i].offset = fp->readUint32();
 		_mstUnk46[i].count  = fp->readUint32();
+		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
 		fp->seek(_mstUnk46[i].count * 44, SEEK_CUR);
+		bytesRead += _mstUnk46[i].count * 44;
 	}
 
 	_mstUnk47 = (MstUnk47 *)malloc(_mstHdr.unk0x34 * sizeof(MstUnk47));
 	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
 		_mstUnk47[i].offset = fp->readUint32();
 		_mstUnk47[i].count  = fp->readUint32();
+		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
 		fp->seek(_mstUnk47[i].count * 20, SEEK_CUR);
+		bytesRead += _mstUnk47[i].count * 20;
+	}
+
+	_mstUnk48 = (MstUnk48 *)malloc(_mstHdr.unk0x38 * sizeof(MstUnk48));
+	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
+		MstUnk48 *m = &_mstUnk48[i];
+		m->unk0 = fp->readUint32();
+		m->unk4 = fp->readByte();
+		m->unk5 = fp->readByte();
+		m->unk6 = fp->readByte();
+		m->unk7 = fp->readByte();
+		m->codeData = fp->readUint32();
+		m->offsetUnk12 = fp->readUint32();
+		m->countUnk12 = fp->readUint32();
+		m->offsets1[0] = fp->readUint32();
+		m->offsets1[1] = fp->readUint32();
+		m->offsets2[0] = fp->readUint32();
+		m->offsets2[1] = fp->readUint32();
+		m->count[0] = fp->readUint32();
+		m->count[1] = fp->readUint32();
+		bytesRead += 44;
+	}
+	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
+		MstUnk48 *m = &_mstUnk48[i];
+		for (int j = 0; j < 2; ++j) {
+			if (m->count[j] != 0) {
+				fp->seek(m->count[j] * 4, SEEK_CUR);
+				bytesRead += m->count[j] * 4;
+				fp->seek(m->count[j] * 4, SEEK_CUR);
+				bytesRead += m->count[j] * 4;
+			}
+		}
+		MstUnk48Unk12 *m12 = (MstUnk48Unk12 *)malloc(m->countUnk12 * sizeof(MstUnk48Unk12));
+		for (int j = 0; j < m->countUnk12; ++j) {
+			m12[j].unk0   = fp->readUint32();
+			m12[j].offset = fp->readUint32();
+			m12[j].count  = fp->readUint32();
+			bytesRead += 12;
+		}
+		for (int j = 0; j < m->countUnk12; ++j) {
+			fp->seek(m12[j].count * 28, SEEK_CUR);
+			bytesRead += m12[j].count * 28;
+		}
+		free(m12);
+	}
+
+	const int mapDataSize = _mstHdr.unk0x3C * 948;
+	_mstHeightMapData = (uint8_t *)malloc(mapDataSize);
+	fp->read(_mstHeightMapData, mapDataSize);
+	bytesRead += mapDataSize;
+
+	_mstUnk49 = (MstUnk49 *)malloc(_mstHdr.unk0x40 * sizeof(MstUnk49));
+	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
+		fp->read(_mstUnk49[i].pad0, 8);
+		_mstUnk49[i].count1  = fp->readUint32();
+		_mstUnk49[i].offset1 = fp->readUint32();
+		_mstUnk49[i].count2  = fp->readUint32();
+		_mstUnk49[i].unk0x14 = fp->readUint32();
+		bytesRead += 24;
+	}
+	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
+		fp->seek(_mstUnk49[i].count1 * 16, SEEK_CUR);
+		bytesRead += _mstUnk49[i].count1 * 16;
+		bytesRead += skipBytesAlign(fp, _mstUnk49[i].count2);
+	}
+
+	_mstUnk50 = (MstUnk50 *)malloc(_mstHdr.unk0x44 * sizeof(MstUnk50));
+	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
+		_mstUnk50[i].offset = fp->readUint32();
+		_mstUnk50[i].count  = fp->readUint32();
+		bytesRead += 8;
+	}
+	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
+		fp->seek(_mstUnk50[i].count * 40, SEEK_CUR);
+		bytesRead += _mstUnk50[i].count * 40;
+	}
+
+	_mstUnk51 = (MstUnk51 *)malloc(_mstHdr.unk0x48 * sizeof(MstUnk51));
+	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
+		_mstUnk51[i].unk0   = fp->readUint32();
+		_mstUnk51[i].offset = fp->readUint32();
+		_mstUnk51[i].count  = fp->readUint32();
+		bytesRead += 12;
+	}
+	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
+		fp->seek(_mstUnk51[i].count * 36, SEEK_CUR);
+		bytesRead += _mstUnk51[i].count * 36;
+	}
+	fp->seek(_mstHdr.unk0x4C * 4, SEEK_CUR); // _mstUnk52
+	bytesRead += _mstHdr.unk0x4C * 4;
+
+	fp->seek(_mstHdr.unk0x50 * 20, SEEK_CUR); // _mstUnk53
+	bytesRead += _mstHdr.unk0x50 * 20;
+
+	fp->seek(_mstHdr.unk0x54 * 8, SEEK_CUR); // _mstUnk63
+	bytesRead += _mstHdr.unk0x54 * 8;
+
+	fp->seek(_mstHdr.unk0x58 * 8, SEEK_CUR); // _mstUnk54
+	bytesRead += _mstHdr.unk0x58 * 8;
+
+	fp->seek(_mstHdr.unk0x5C * 8, SEEK_CUR); // _mstUnk55
+	bytesRead += _mstHdr.unk0x5C * 8;
+
+	fp->seek(_mstHdr.unk0x60 * 12, SEEK_CUR); // _mstUnk56
+	bytesRead += _mstHdr.unk0x60 * 12;
+
+	fp->seek(_mstHdr.unk0x64 * 16, SEEK_CUR); // _mstUnk57
+	bytesRead += _mstHdr.unk0x64 * 16;
+
+	fp->seek(_mstHdr.unk0x68 * 16, SEEK_CUR); // _mstUnk58
+	bytesRead += _mstHdr.unk0x68 * 16;
+
+	fp->seek(_mstHdr.unk0x6C * 8, SEEK_CUR); // _mstUnk59
+	bytesRead += _mstHdr.unk0x6C * 8;
+
+	fp->seek(_mstHdr.unk0x70 * 4, SEEK_CUR); // _mstUnk60
+	bytesRead += _mstHdr.unk0x70 * 4;
+
+	fp->seek(_mstHdr.unk0x74 * 4, SEEK_CUR); // _mstUnk61
+	bytesRead += _mstHdr.unk0x74 * 4;
+
+	fp->seek(_mstHdr.unk0x78 * 16, SEEK_CUR); // _mstOpcodeData
+	bytesRead += _mstHdr.unk0x78 * 16;
+
+	_mstCodeData = (uint32_t *)malloc(_mstHdr.codeSize * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.codeSize; ++i) {
+		_mstCodeData[i] = fp->readUint32();
+		bytesRead += 4;
+	}
+
+	if (bytesRead != _mstHdr.dataSize) {
+		warning("Unexpected .mst bytesRead %d dataSize %d", bytesRead, _mstHdr.dataSize);
 	}
 
 	// TODO:
