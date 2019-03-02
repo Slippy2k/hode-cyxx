@@ -293,6 +293,23 @@ int Game::runTask_default(Task *t) {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		switch (*p) {
+		case 177: {
+				const int16_t num = READ_LE_UINT16(p + 2);
+				assert(p[1] < 40);
+				arithOp(p[0] - 177, &_mstVars[p[1]], num);
+			}
+			break;
+		case 217:
+		case 223:
+			warning("Skipping opcode %d in runTask_default", *p);
+			break;
+		case 239: {
+				const int i = READ_LE_UINT16(p + 2);
+				const uint32_t codeData = _res->_mstUnk60[i];
+				assert(codeData != kNone);
+				createTask(_res->_mstCodeData + codeData * 4);
+			}
+			break;
 		default:
 			warning("Unhandled opcode %d in runTask_default", *p);
 			return 1;

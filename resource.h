@@ -206,10 +206,10 @@ struct MstUnk59 {
 }; // SIZEOF_MstUnk59 8
 
 struct MstUnk53 {
-	int16_t index1;
-	int16_t index2; // 2
-	int16_t index3; // 4
-	int16_t index4; // 6
+	int16_t index1; // typeVar1
+	int16_t index2; // 2 typeVar2
+	int16_t index3; // 4 typeVar3
+	int16_t index4; // 6 typeVar4
 	uint8_t unk8; // 8
 	uint8_t unk9;
 	int8_t index5; // 10
@@ -386,6 +386,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
+	uint32_t *_mstUnk60;
 	uint8_t *_mstCodeData;
 
 	bool _isDemoData;

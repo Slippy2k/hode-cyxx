@@ -1241,8 +1241,11 @@ void Resource::loadMstData(File *fp) {
 	fp->seek(_mstHdr.unk0x6C * 8, SEEK_CUR); // _mstUnk59
 	bytesRead += _mstHdr.unk0x6C * 8;
 
-	fp->seek(_mstHdr.unk0x70 * 4, SEEK_CUR); // _mstUnk60
-	bytesRead += _mstHdr.unk0x70 * 4;
+	_mstUnk60 = (uint32_t *)malloc(_mstHdr.unk0x70 * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.unk0x70; ++i) {
+		_mstUnk60[i] = fp->readUint32();
+		bytesRead += 4;
+	}
 
 	fp->seek(_mstHdr.unk0x74 * 4, SEEK_CUR); // _mstUnk61
 	bytesRead += _mstHdr.unk0x74 * 4;
