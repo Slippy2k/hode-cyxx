@@ -103,12 +103,129 @@ struct MstPointOffset {
 	int32_t yOffset;
 }; // sizeof == 8
 
+
+struct MstScreenAreaCode {
+	int32_t x1; // 0
+	int32_t x2; // 4
+	int32_t y1; // 8
+	int32_t y2; // 0xC
+	uint32_t next; // struct MstAreaCode* next; // 0x10, offset _resMstUnk38
+	uint32_t prev; // 0x14, offset _resMstUnk38
+	uint32_t unk0x18; // 0x18, offset _resMstUnk38
+	uint8_t unk0x1C; // 0x1C
+	uint8_t unk0x1D; // 0x1D
+	uint16_t unk0x1E;
+	uint32_t codeData; // const uint8_t *codeData; // 0x20, offset _mstCodeData
+}; // SIZEOF_MstScreenAreaCode 36
+
 struct MstUnk35 {
 	uint32_t ptr;
 	uint32_t count;
 	uint32_t unk8;
 	uint32_t size;
 }; // sizeof == 16
+
+struct MstUnk42 {
+	uint32_t offset1; //
+	uint32_t count1; // 4
+	uint32_t offset2; // 8
+	uint32_t count2; // 12
+}; // SIZEOF_MstUnk42 16
+
+struct MstUnk43 {
+	uint32_t offset1; // indexes _resMstUnk48
+	uint32_t count1; // 4
+	uint32_t offset2; // 8
+	uint32_t count2; // 12
+}; // SIZEOF_MstUnk43 16
+
+struct MstUnk44 {
+	uint32_t unk0;
+	uint32_t unk4;
+	uint32_t unk8;
+	uint32_t count;
+}; // SIZEOF_MstUnk44 16
+
+struct MstUnk46 {
+	uint32_t offset;
+	uint32_t count;
+}; // SIZEOF_MstUnk46 8
+
+struct MstUnk47 {
+	uint32_t offset;
+	uint32_t count;
+}; // SIZEOF_MstUnk47 8
+
+struct MstUnk48 {
+	uint32_t unk0;
+	uint8_t unk4;
+	uint8_t unk5;
+	uint8_t unk6;
+	uint8_t unk7;
+	uint32_t codeData; // 0x8, PTR_OFFS<uint32>(_mstCodeData, N)
+	uint32_t offsetUnk12; // MstUnk48Unk12 *
+	uint32_t countUnk12; // 0x10
+	uint32_t offsets1[2]; // 0x14, 0x18
+	uint32_t offsets2[2]; // 0x1C, 0x20
+	uint32_t count[2]; // 36,40
+}; // SIZEOF_MstUnk48 44
+
+struct MstUnk48Unk12 {
+	uint32_t unk0;
+	uint32_t offset; // sizeof == 28
+	uint32_t count;
+} PACKED;
+
+struct MstUnk49 {
+	uint8_t pad0[8];
+	uint32_t count1; // 8
+	uint32_t offset1;
+	uint32_t count2; // 16
+	uint32_t unk0x14;
+}; // SIZEOF_MstUnk49 24
+
+struct MstUnk50 {
+	uint32_t offset;
+	uint32_t count;
+}; // SIZEOF_MstUnk50 8
+
+struct MstUnk51 {
+	uint32_t unk0;
+	uint32_t offset;
+	uint32_t count;
+}; // SIZEOF_MstUnk51 12
+
+struct MstScreenInitCode {
+	int32_t delay;
+	uint32_t codeData;
+}; // SIZEOF_MstScreenInitCode 8
+
+struct MstUnk59 {
+	uint32_t unk0;
+	uint32_t codeIndex;
+}; // SIZEOF_MstUnk59 8
+
+struct MstUnk53 {
+	int16_t index1;
+	int16_t index2; // 2
+	int16_t index3; // 4
+	int16_t index4; // 6
+	uint8_t unk8; // 8
+	uint8_t unk9;
+	int8_t index5; // 10
+	int8_t unk11; // 11
+	uint16_t unk12; // 12
+	uint16_t unk14;
+	uint32_t unk16; // 16
+}; // SIZEOF_MstUnk53 20
+
+struct MstUnk54 {
+	int16_t unk0;
+	int16_t unk2;
+	uint8_t unk4;
+	uint8_t unk5;
+	uint16_t codeIndex;
+}; // SIZEOF_MstUnk54 8
 
 struct SssHdr {
 	int version;
