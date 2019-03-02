@@ -302,7 +302,7 @@ struct Resource {
 
 	void loadSssData(File *fp);
 	void checkSssCode(const uint8_t *buf, int size);
-	void loadSssPcm(int num);
+	void loadSssPcm(File *fp, int num);
 	uint32_t getSssPcmSize(SssPcm *pcm) const;
 
 	uint32_t *getSssLutPtr(int lut, uint32_t flags) {

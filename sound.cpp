@@ -825,7 +825,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
 	// TEMP: mixSounds
 	{
-		_res->loadSssPcm(codeOffset->pcm);
+		_res->loadSssPcm(_res->_sssFile, codeOffset->pcm);
 		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
 		if (pcm->ptr) {
 			uint32_t size = _res->getSssPcmSize(pcm);
