@@ -14,22 +14,6 @@ File::~File() {
 	close();
 }
 
-static void fioToLowerString(char *p) {
-	for (; *p; ++p) {
-		if (*p >= 'A' && *p <= 'Z') {
-			*p += 'a' - 'A';
-		}
-	}
-}
-
-static void fioToUpperString(char *p) {
-	for (; *p; ++p) {
-		if (*p >= 'a' && *p <= 'z') {
-			*p += 'A' - 'a';
-		}
-	}
-}
-
 bool File::open(const char *filePath) {
 	_fp = fopen(filePath, "rb");
 	return _fp != 0;
@@ -88,11 +72,11 @@ SectorFile::SectorFile() {
 	_bufPos = _bufLen = 0;
 }
 
-static int fioAlignSizeTo2048(int size) {
+int fioAlignSizeTo2048(int size) {
 	return ((size + 2043) / 2044) * 2048;
 }
 
-static uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size) {
+uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size) {
 	assert((size & 3) == 0);
 	size >>= 2;
 	while (size--) {
@@ -172,4 +156,3 @@ void SectorFile::flush() {
 	assert((currentPos & 2047) == 0);
 	_bufLen = _bufPos = 0;
 }
-

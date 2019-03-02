@@ -46,5 +46,8 @@ struct SectorFile : File {
 	virtual void flush();
 };
 
+int fioAlignSizeTo2048(int size);
+uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size);
+
 #endif // FILEIO_H__
 
