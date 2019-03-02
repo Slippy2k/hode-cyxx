@@ -159,6 +159,8 @@ struct Game {
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
 	Task _tasksTable[128];
 	Task *_tasksListTail;
+	int _mstPrevPosX;
+	int _mstPrevPosY;
 	int _mstPosX;
 	int _mstPosY;
 	int _mstRefPosX;
@@ -512,7 +514,11 @@ struct Game {
 
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
+	void resetTask(Task *t, const uint8_t *codeData);
 	void removeTask(Task **tasksList, Task *t);
+	int getTaskVar(Task *t, int index, int type) const;
+	int getTaskOtherVar(int index, Task *t) const;
+	int runTask_default(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
