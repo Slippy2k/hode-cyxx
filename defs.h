@@ -226,6 +226,15 @@ struct MstUnk43 {
 
 #define SIZEOF_MstUnk43 16
 
+struct MstUnk44 {
+	uint32_t unk0;
+	uint32_t unk4;
+	uint32_t unk8;
+	uint32_t count;
+} PACKED;
+
+#define SIZEOF_MstUnk44 16
+
 struct MstUnk46 {
 	uint32_t offset;
 	uint32_t count;

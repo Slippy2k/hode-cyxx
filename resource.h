@@ -261,6 +261,9 @@ struct Resource {
 	uint32_t *_mstUnk41;
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
+	MstUnk44 *_mstUnk44;
+	MstUnk46 *_mstUnk46;
+	MstUnk47 *_mstUnk47;
 
 	bool _isDemoData;
 

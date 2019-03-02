@@ -1059,6 +1059,44 @@ void Resource::loadMstData(File *fp) {
 		skipBytesAlign(fp, _mstUnk43[i].count2);
 	}
 
+	_mstUnk44 = (MstUnk44 *)malloc(_mstHdr.unk0x28 * sizeof(MstUnk44));
+	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
+		_mstUnk44[i].unk0  = fp->readUint32();
+		_mstUnk44[i].unk4  = fp->readUint32();
+		_mstUnk44[i].unk8  = fp->readUint32();
+		_mstUnk44[i].count = fp->readUint32();
+	}
+	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
+		const int count = _mstUnk44[i].count;
+		fp->seek(count * 104, SEEK_CUR);
+		fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR);
+		for (int j = 0; j < count; ++j) {
+			for (int k = 0; k < 2; ++k) {
+				skipBytesAlign(fp, count);
+			}
+		}
+	}
+
+	fp->seek(_mstHdr.unk0x2C * 12, SEEK_CUR); // _mstUnk45
+
+	_mstUnk46 = (MstUnk46 *)malloc(_mstHdr.unk0x30 * sizeof(MstUnk46));
+	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
+		_mstUnk46[i].offset = fp->readUint32();
+		_mstUnk46[i].count  = fp->readUint32();
+	}
+	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
+		fp->seek(_mstUnk46[i].count * 44, SEEK_CUR);
+	}
+
+	_mstUnk47 = (MstUnk47 *)malloc(_mstHdr.unk0x34 * sizeof(MstUnk47));
+	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
+		_mstUnk47[i].offset = fp->readUint32();
+		_mstUnk47[i].count  = fp->readUint32();
+	}
+	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
+		fp->seek(_mstUnk47[i].count * 20, SEEK_CUR);
+	}
+
 	// TODO:
 }
 
