@@ -57,7 +57,27 @@ void Game::startMstCode() {
 	updateMstMoveData();
 	_mstPrevPosX = _mstPosX;
 	_mstPrevPosY = _mstPosY;
-	// TODO
+	int offset = 0;
+	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
+		offset += 948;
+		_res->_mstHeightMapData[offset - 0x20] = _mstPosX - _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x1C] = _mstPosX + _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x24] = _res->_mstHeightMapData[offset - 0x20] - _res->_mstHeightMapData[offset - 0x34];
+		_res->_mstHeightMapData[offset - 0x18] = _res->_mstHeightMapData[offset - 0x1C] + _res->_mstHeightMapData[offset - 0x34];
+		_res->_mstHeightMapData[offset - 0x10] = _mstPosY - _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x0C] = _mstPosY + _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x14] = _res->_mstHeightMapData[offset - 0x10] - _res->_mstHeightMapData[offset - 0x34];
+		_res->_mstHeightMapData[offset - 0x08] = _res->_mstHeightMapData[offset - 0x0C] + _res->_mstHeightMapData[offset - 0x34];
+	}
+	if (_res->_currentScreenResourceNum < _res->_mstHdr.unk0x14) {
+		uint32_t codeData = _res->_mstCodeData_screenInit[_res->_currentScreenResourceNum];
+		if (codeData != kNone) {
+			Task *t = createTask(_res->_mstCodeData + codeData * 4);
+			if (t) {
+				while ((this->*(t->run))(t) == 0);
+			}
+		}
+	}
 }
 
 template <typename T>
@@ -310,9 +330,14 @@ int Game::runTask_default(Task *t) {
 				createTask(_res->_mstCodeData + codeData * 4);
 			}
 			break;
+		case 242:
+			warning("Partial implementation for opcode 242 in runTask_default");
+			removeTask(&_tasksListTail, t);
+			ret = 1;
+			break;
 		default:
 			warning("Unhandled opcode %d in runTask_default", *p);
-			return 1;
+			break;
 		}
 		p += 4;
 		if ((t->runningState & 2) != 0) {

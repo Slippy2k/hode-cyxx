@@ -372,6 +372,9 @@ struct Resource {
 
 	MstPointOffset *_mstPointOffsets;
 	MstUnk35 *_mstUnk35;
+	uint32_t _mstUnk37_unk0;
+	uint32_t _mstUnk37_unk4;
+	uint32_t *_mstCodeData_screenInit;
 	MstScreenAreaCode *_mstScreenAreaCodes;
 	uint32_t *_mstUnk39;
 	uint32_t *_mstUnk40;
