@@ -459,7 +459,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 	}
 	if ((ptr->actionKeyMask & 4) != 0 && sameScreen && (ptr->flags0 & 0x300) == 0x300) {
 		if (clipLvlObjectsBoundingBox(_andyObject, ptr, 10)) {
-			_mstGlobalFlags |= 0x80000000;
+			_mstFlags |= 0x80000000;
 			resetAndyLvlObjectPlasmaCannonKeyMask(0x80);
 		}
 	}

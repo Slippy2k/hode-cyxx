@@ -1239,7 +1239,7 @@ void Game::restartLevel() {
 		resetMstCode();
 		startMstCode();
 	} else {
-		_mstGlobalFlags = 0;
+		_mstFlags = 0;
 	}
 	if (_res->_sssHdr.dataUnk1Count) {
 		resetSound();
@@ -1619,7 +1619,7 @@ int Game::updateAndyLvlObject() {
 		resetMstCode();
 		startMstCode();
 	} else {
-		_mstGlobalFlags = 0;
+		_mstFlags = 0;
 	}
 	if (_res->_sssHdr.dataUnk1Count) {
 		resetSound();
@@ -2140,7 +2140,7 @@ void Game::updateAndyMonsterObjects() {
 		updateAndyObject(ptr);
 		_actionDirectionKeyMaskIndex = 0;
 		_hideAndyObjectSprite = false;
-		_mstGlobalFlags |= 0x80000000;
+		_mstFlags |= 0x80000000;
 		_dl = 1;
 		break;
 	default:
@@ -2221,7 +2221,7 @@ void Game::levelMainLoop() {
 		resetMstCode();
 		startMstCode();
 	} else {
-		_mstGlobalFlags = 0;
+		_mstFlags = 0;
 	}
 	if (_res->_sssHdr.dataUnk1Count != 0) {
 		resetSound();
@@ -2259,7 +2259,7 @@ void Game::levelMainLoop() {
 				resetMstCode();
 				startMstCode();
 			} else {
-				_mstGlobalFlags = 0;
+				_mstFlags = 0;
 			}
 			if (_res->_sssHdr.dataUnk1Count != 0) {
 				resetSound();

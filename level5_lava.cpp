@@ -10,7 +10,7 @@
 void Game::postScreenUpdate_lava_helper(int yPos) {
 	const uint8_t flags = (_andyObject->flags0) & 0x1F;
 	if (!_hideAndyObjectSprite) {
-		if ((_mstGlobalFlags & 0x80000000) == 0) {
+		if ((_mstFlags & 0x80000000) == 0) {
 			uint8_t mask = 0;
 			const int y = _andyObject->yPos;
 			if (_andyObject->posTable[5].y + y >= yPos || _andyObject->posTable[4].y + y >= yPos) {
@@ -24,7 +24,7 @@ void Game::postScreenUpdate_lava_helper(int yPos) {
 				_plasmaCannonKeyMaskCounter = 0;
 			}
 		} else if (flags == 0xB) {
-			_mstGlobalFlags &= 0x7FFFFFFF;
+			_mstFlags &= 0x7FFFFFFF;
 		}
 	}
 }

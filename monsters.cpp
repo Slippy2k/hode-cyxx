@@ -26,7 +26,7 @@ static const uint8_t _mstLookupTable5[] = {
 };
 
 void Game::initMstCode() {
-	memset(_mstGlobalVars, 0, sizeof(_mstGlobalVars));
+	memset(_mstVars, 0, sizeof(_mstVars));
 	if (_mstLogicDisabled) {
 		return;
 	}
@@ -38,7 +38,7 @@ void Game::resetMstCode() {
 	if (_mstLogicDisabled) {
 		return;
 	}
-	_mstGlobalFlags = 0;
+	_mstFlags = 0;
 	// TODO
 	clearLvlObjectsList1();
 	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
@@ -47,11 +47,14 @@ void Game::resetMstCode() {
 	// TODO
 	_rnd.initTable();
 	// TODO
-	memset(_mstGlobalVars, 0, sizeof(_mstGlobalVars));
+	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
+	// TODO
+	updateMstMoveData();
 }
 
 void Game::startMstCode() {
+	updateMstMoveData();
 }
 
 template <typename T>
@@ -132,8 +135,39 @@ void Game::executeMstCode() {
 		return;
 	}
 	++_executeMstLogicCounter;
+	// TODO
+
+	if (_mstVars[31] > 0) {
+		--_mstVars[31];
+		if (_mstVars[31] == 0) {
+			// TODO
+		}
+	}
+	MstScreenAreaCode *msac;
+	while ((msac = _res->findMstCodeForPos(_currentScreen, _mstPosX, _mstPosY)) != 0) {
+		_res->flagMstCodeForPos(msac->unk0x1C, 0);
+		// createTask(_mstCodeData + ac->codeData * 4);
+		warning(".mst bytecode trigger for %d,%d", _mstPosX, _mstPosY);
+	}
+	if (_andyCurrentLevelScreenNum != _currentScreen) {
+		_andyCurrentLevelScreenNum = _currentScreen;
+	}
 }
 
+void Game::updateMstMoveData() {
+	if (_andyObject) {
+		_mstRefPosX = _andyObject->xPos + _andyObject->posTable[3].x;
+		_mstRefPosY = _andyObject->yPos + _andyObject->posTable[3].y;
+		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
+		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
+	} else {
+		_mstRefPosX = 128;
+		_mstRefPosY = 96;
+		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[0].xOffset;
+		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[0].yOffset;
+        }
+	// TODO
+}
 
 Task *Game::findFreeTask() {
 	for (int i = 0; i < 128; ++i) {

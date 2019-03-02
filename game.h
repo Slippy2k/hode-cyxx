@@ -137,8 +137,8 @@ struct Game {
 	uint32_t _gameMstLogicHelper1TestValue;
 	uint32_t _gameMstLogicHelper1TestMask;
 	int _runTaskOpcodesCount;
-	int32_t _mstGlobalVars[40];
-	uint32_t _mstGlobalFlags;
+	int32_t _mstVars[40];
+	uint32_t _mstFlags;
 	int _clipBoxOffsetX, _clipBoxOffsetY;
 	Task *_gameMstResToLoad1Pri, *_gameMstResToLoad2Pri;
 	Task *_currentTask;
@@ -159,6 +159,10 @@ struct Game {
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
 	Task _tasksTable[128];
 	Task *_tasksListTail;
+	int _mstPosX;
+	int _mstPosY;
+	int _mstRefPosX;
+	int _mstRefPosY;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -504,6 +508,7 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+	void updateMstMoveData();
 
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
