@@ -186,7 +186,7 @@ struct Game {
 	void removeSound(LvlObject *ptr);
 	void setupBackgroundBitmap();
 	void addToSpriteList(LvlObject *ptr);
-	int16_t fixScreenPos(int16_t xPos, int16_t yPos, int num);
+	int16_t calcScreenMaskDy(int16_t xPos, int16_t yPos, int num);
 	void setupScreenPosTable(uint8_t num);
 	void setupScreenMask(uint8_t num);
 	void resetScreenMask();
@@ -254,7 +254,7 @@ struct Game {
 	void lvlObjectType1Init(LvlObject *ptr);
 	void lvlObjectTypeInit(LvlObject *ptr);
 	void lvlObjectType0CallbackHelper1();
-	int lvlObjectType0CallbackHelper2(int x, int y, int num);
+	int calcScreenMaskDx(int x, int y, int num);
 	void lvlObjectType0CallbackHelper3(LvlObject *ptr);
 	void lvlObjectType0CallbackHelper4(LvlObject *ptr);
 	int lvlObjectType0Callback(LvlObject *ptr);

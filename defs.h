@@ -122,8 +122,8 @@ struct LvlObject {
 	uint16_t anim;
 	uint8_t type;
 	uint8_t data0x2988; /* shootType */
-	uint16_t flags0;
-	uint16_t flags1;
+	uint16_t flags0; // hFlags
+	uint16_t flags1; // vFlags
 	uint16_t flags2; /* spriteType */
 	uint8_t stateValue;
 	uint8_t stateCounter;

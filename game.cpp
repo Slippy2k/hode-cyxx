@@ -302,7 +302,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 	}
 }
 
-int16_t Game::fixScreenPos(int16_t xPos, int16_t yPos, int num) {
+int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 	if (xPos < 0) {
 		xPos += 256;
 		num = _res->_screensGrid[num * 4 + kPosLeftScreen];
@@ -324,8 +324,8 @@ int16_t Game::fixScreenPos(int16_t xPos, int16_t yPos, int num) {
 	}
 	int __esi = _res->_screensBasePos[num].v + yPos; // y
 	int __eax = _res->_screensBasePos[num].u + xPos; // x
-	int _esi = ((__esi << 6) & ~511) + (__eax >> 3); // screenMaskPos
-	int _edi = ((yPos & ~7) << 2) + (xPos >> 3); // screenPos
+	int _esi = ((__esi << 6) & ~511) + (__eax >> 3); // screenMaskPos (8x8)
+	int _edi = ((yPos & ~7) << 2) + (xPos >> 3); // screenPos (8x8)
 	if (_screenMaskBuffer[_esi - 512] & 1) {
 		_edi -= 32;
 		var1 -= 8;
@@ -1926,7 +1926,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	}
 	if ((ptr->flags1 & 6) == 2) {
 		const int index = (15 < ptr->data0x2988) ? 5 : 7;
-		ptr->yPos += fixScreenPos(ptr->xPos + ptr->posTable[index].x, ptr->yPos + ptr->posTable[index].y, ptr->screenNum);
+		ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[index].x, ptr->yPos + ptr->posTable[index].y, ptr->screenNum);
 	}
 	if (ptr->bitmapBits == 0) {
 		return o;
@@ -2720,10 +2720,11 @@ void Game::lvlObjectType0CallbackHelper1() {
 	_andyObject->directionKeyMask = (_bl & _andyDirectionKeyMaskAnd) | _andyDirectionKeyMaskOr;
 }
 
-int Game::lvlObjectType0CallbackHelper2(int x, int y, int num) {
-	const int offset = ((y & 7) << 6) + (x >> 3);
+int Game::calcScreenMaskDx(int x, int y, int num) {
+	const int offset = ((y & ~7) << 6) + (x >> 3); // screenMaskPos (8x8)
 	int ret = -(x & 7);
 	if (num & 1) {
+		ret += 8;
 		if (_screenMaskBuffer[offset] & 2) {
 			return ret;
 		} else if (_screenMaskBuffer[offset - 1] & 2) {
@@ -2929,9 +2930,9 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 		if ((ptr->flags0 & 0x300) == 0x100) {
 			const int y = _res->_screensBasePos[_res->_currentScreenResourceNum].v + ptr->posTable[3].y + ptr->yPos;
 			const int x = _res->_screensBasePos[_res->_currentScreenResourceNum].u + ptr->posTable[3].x + ptr->xPos;
-			ptr->xPos += lvlObjectType0CallbackHelper2(x, y, (ptr->flags1 >> 4) & 3);
+			ptr->xPos += calcScreenMaskDx(x, y, (ptr->flags1 >> 4) & 3);
 		} else if ((ptr->flags1 & 6) == 2) {
-			ptr->yPos += fixScreenPos(ptr->posTable[7].x + ptr->xPos, ptr->posTable[7].y + ptr->yPos, ptr->screenNum);
+			ptr->yPos += calcScreenMaskDy(ptr->posTable[7].x + ptr->xPos, ptr->posTable[7].y + ptr->yPos, ptr->screenNum);
 		}
 	} else if (ptr->linkObjPtr) {
 		assert(_currentMonsterObject);
