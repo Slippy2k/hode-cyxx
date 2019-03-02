@@ -603,7 +603,10 @@ void Game::shuffleArray(uint8_t *p, int count) {
 }
 
 void Game::destroyLvlObject(LvlObject *o) {
-	assert(o);
+	if (!o) {
+		warning("destroyLvlObject called with NULL lvlObject");
+		return;
+	}
 	if (o->type == 8) {
 		_res->decLevelData0x2988RefCounter(o);
 		o->nextPtr = _declaredLvlObjectsListHead;
