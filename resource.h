@@ -386,7 +386,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
-	uint32_t *_mstCodeData;
+	uint8_t *_mstCodeData;
 
 	bool _isDemoData;
 

@@ -1250,11 +1250,9 @@ void Resource::loadMstData(File *fp) {
 	fp->seek(_mstHdr.unk0x78 * 16, SEEK_CUR); // _mstOpcodeData
 	bytesRead += _mstHdr.unk0x78 * 16;
 
-	_mstCodeData = (uint32_t *)malloc(_mstHdr.codeSize * sizeof(uint32_t));
-	for (int i = 0; i < _mstHdr.codeSize; ++i) {
-		_mstCodeData[i] = fp->readUint32();
-		bytesRead += 4;
-	}
+	_mstCodeData = (uint8_t *)malloc(_mstHdr.codeSize * 4);
+	fp->read(_mstCodeData, _mstHdr.codeSize * 4);
+	bytesRead += _mstHdr.codeSize * 4;
 
 	if (bytesRead != _mstHdr.dataSize) {
 		warning("Unexpected .mst bytesRead %d dataSize %d", bytesRead, _mstHdr.dataSize);

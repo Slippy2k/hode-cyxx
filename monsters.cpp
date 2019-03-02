@@ -148,13 +148,19 @@ void Game::executeMstCode() {
 	}
 	MstScreenAreaCode *msac;
 	while ((msac = _res->findMstCodeForPos(_currentScreen, _mstPosX, _mstPosY)) != 0) {
-		_res->flagMstCodeForPos(msac->unk0x1C, 0);
-		// createTask(_mstCodeData + ac->codeData * 4);
 		warning(".mst bytecode trigger for %d,%d", _mstPosX, _mstPosY);
+		_res->flagMstCodeForPos(msac->unk0x1C, 0);
+		assert(msac->codeData != kNone);
+		createTask(_res->_mstCodeData + msac->codeData * 4);
 	}
 	if (_andyCurrentLevelScreenNum != _currentScreen) {
 		_andyCurrentLevelScreenNum = _currentScreen;
 	}
+	for (Task *t = _tasksListTail; t; t = t->prev) {
+		_runTaskOpcodesCount = 0;
+		while ((this->*(t->run))(t) == 0);
+	}
+	// TODO
 }
 
 void Game::updateMstMoveData() {
@@ -187,7 +193,7 @@ Task *Game::createTask(const uint8_t *codeData) {
 		Task *t = &_tasksTable[i];
 		if (!t->codeData) {
 			memset(t, 0, sizeof(Task));
-			// resetTask(t, codeData);
+			resetTask(t, codeData);
 			t->next = 0;
 			t->prev = _tasksListTail;
 			if (_tasksListTail) {
@@ -205,6 +211,7 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
 	t->localVars[12] = 0;
+	// TODO:
 }
 
 void Game::removeTask(Task **tasksList, Task *t) {
@@ -279,5 +286,26 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 }
 
 int Game::runTask_default(Task *t) {
-	return 0;
+	int ret = 0;
+	t->runningState &= ~2;
+	const uint8_t *p = t->codeData;
+	do {
+		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
+		assert(((p - t->codeData) & 3) == 0);
+		switch (*p) {
+		default:
+			warning("Unhandled opcode %d in runTask_default", *p);
+			return 1;
+		}
+		p += 4;
+		if ((t->runningState & 2) != 0) {
+			t->runningState &= ~2;
+			p = t->codeData;
+		}
+		++_runTaskOpcodesCount;
+	} while (_runTaskOpcodesCount <= 128 && ret == 0);
+	if (t->codeData) {
+		t->codeData = p;
+	}
+	return 1;
 }
