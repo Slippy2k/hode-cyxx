@@ -305,14 +305,14 @@ void Resource::loadLevelData0x470C() {
 	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + 1280;
 }
 
-static const uint32_t lvlHdrTag = 0x484F4400;
+static const uint32_t kLvlHdrTag = 0x484F4400; // 'HOD\x00'
 
 void Resource::loadLvlData(File *fp) {
 
 	assert(fp == _lvlFile);
 
 	const uint32_t tag = _lvlFile->readUint32();
-	assert(tag == lvlHdrTag);
+	assert(tag == kLvlHdrTag);
 
 	_lvlHdr.screensCount = _lvlFile->readByte();
 	_lvlHdr.staticLvlObjectsCount = _lvlFile->readByte();
