@@ -94,7 +94,7 @@ struct MstHdr {
 	int unk0x70;
 	int unk0x74;
 	int unk0x78;
-	int unk0x7C;
+	int codeSize; // sizeof(uint32_t)
 	int pointsCount;
 };
 

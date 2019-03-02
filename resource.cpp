@@ -827,14 +827,20 @@ void Resource::loadSssData(File *fp) {
 			// _sssDataUnk3[i].codeOffset = &_sssCodeOffsets[num];
 			debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
 		} else {
-			_sssDataUnk3[i].firstCodeOffset = 0xFFFFFFFF;
+			_sssDataUnk3[i].firstCodeOffset = kNone;
 		}
 	}
-// 429C00:
-//	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
-//		if (_sssCodeOffsets[i] != 0xFFFFFFFF) {
-//		}
-//	}
+// 429C00
+	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
+		if (_sssCodeOffsets[i].codeOffset1 != kNone) {
+		}
+		if (_sssCodeOffsets[i].codeOffset2 != kNone) {
+		}
+		if (_sssCodeOffsets[i].codeOffset3 != kNone) {
+		}
+		if (_sssCodeOffsets[i].codeOffset4 != kNone) {
+		}
+	}
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
 	if (bufferSize != bytesRead) {
 		error("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
@@ -973,8 +979,9 @@ void Resource::loadMstData(File *fp) {
 	_mstHdr.unk0x70  = fp->readUint32();
 	_mstHdr.unk0x74  = fp->readUint32();
 	_mstHdr.unk0x78  = fp->readUint32();
-	_mstHdr.unk0x7C  = fp->readUint32();
+	_mstHdr.codeSize    = fp->readUint32();
 	_mstHdr.pointsCount = fp->readUint32();
+	debug(kDebug_RESOURCE, "_mstHdr.version %d _mstHdr.codeSize %d", _mstHdr.version, _mstHdr.codeSize);
 
 	fp->seek(2048, SEEK_SET);
 
@@ -1102,7 +1109,7 @@ void Resource::loadMstData(File *fp) {
 
 MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {
 	uint32_t i = _mstUnk40[num];
-	while (i != 0xFFFFFFFF) {
+	while (i != kNone) {
 		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
 		if (msac->x1 <= xPos && msac->x2 >= xPos && msac->unk0x1D != 0 && msac->y1 <= yPos && msac->y2 >= yPos) {
 			return msac;
@@ -1114,7 +1121,7 @@ MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {
 
 void Resource::flagMstCodeForPos(int num, uint8_t value) {
 	uint32_t i = _mstUnk39[num];
-	while (i != 0xFFFFFFFF) {
+	while (i != kNone) {
 		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
 		msac->unk0x1D = value;
 		i = msac->unk0x18;
