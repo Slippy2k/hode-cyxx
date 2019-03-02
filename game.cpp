@@ -153,9 +153,9 @@ void Game::transformShadowLayer(int delta) {
 		src += 6;
 	}
 	int r = -1;
-	if (_currentLevel == 2) {
+	if (_currentLevel == kLvl_pwr1) {
 		r = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
-	} else if (_currentLevel == 5) {
+	} else if (_currentLevel == kLvl_pwr2) {
 		r = _pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
 	}
 	if (!(r < 0)) {
@@ -288,7 +288,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 		if (spr->yPos >= 192 || spr->yPos + ptr->height < 0) {
 			return;
 		}
-		if (_currentLevel == 3 && ptr->data0x2988 == 2) {
+		if (_currentLevel == kLvl_isld && ptr->data0x2988 == 2) {
 			AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 			spr->xPos += dataPtr->dxPos;
 		}
@@ -1109,7 +1109,7 @@ void Game::updateScreenHelper(int num) {
 			break;
 		case 2:
 			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->flags & 0xFF];
-			if (_currentLevel == 0) {
+			if (_currentLevel == kLvl_rock) {
 				ptr->callbackFuncPtr = _callLevel_objectUpdate_rock[ptr->stateValue];
 			} else {
 				// other levels use two callbacks
@@ -1581,7 +1581,7 @@ int Game::updateAndyLvlObject() {
 	}
 	assert(_andyObject->callbackFuncPtr);
 	(this->*_andyObject->callbackFuncPtr)(_andyObject);
-	if (_currentLevel != 3) {
+	if (_currentLevel != kLvl_isld) {
 		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		_andyObject->xPos += data->dxPos;
 		_andyObject->yPos += data->dyPos;
@@ -1598,7 +1598,7 @@ int Game::updateAndyLvlObject() {
 	if (_al > 0) {
 		return 1;
 	} else if (_al == 0) {
-		if (_currentLevel != 0 && _currentLevel != 7 && _currentLevel != 9) {
+		if (_currentLevel != kLvl_rock && _currentLevel != kLvl_lar2 && _currentLevel != kLvl_test) {
 			return 0;
 		}
 		if (_plasmaExplosionObject) {
@@ -1748,7 +1748,9 @@ void Game::redrawObjects() {
 }
 
 void Game::mainLoop(int level, int checkpoint) {
-	// TODO: check bounds
+	if (level >= kLvl_test) {
+		return;
+	}
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
 	benchmarkCpu();

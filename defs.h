@@ -18,6 +18,19 @@ enum {
 	kLvlAnimHdrOffset = 0x2C
 };
 
+enum {
+	kLvl_rock, // 0
+	kLvl_fort,
+	kLvl_pwr1,
+	kLvl_isld,
+	kLvl_lava, // 4
+	kLvl_pwr2,
+	kLvl_lar1,
+	kLvl_lar2,
+	kLvl_dark, // 8
+	kLvl_test
+};
+
 struct Point8_t {
 	int8_t x;
 	int8_t y;
