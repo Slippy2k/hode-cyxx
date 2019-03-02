@@ -256,6 +256,11 @@ struct Resource {
 	MstPointOffset *_mstPointOffsets;
 	MstUnk35 *_mstUnk35;
 	MstScreenAreaCode *_mstScreenAreaCodes;
+	uint32_t *_mstUnk39;
+	uint32_t *_mstUnk40;
+	uint32_t *_mstUnk41;
+	MstUnk42 *_mstUnk42;
+	MstUnk43 *_mstUnk43;
 
 	bool _isDemoData;
 
@@ -316,6 +321,9 @@ struct Resource {
 	void clearSssLookupTable3();
 
 	void loadMstData(File *fp);
+
+	MstScreenAreaCode *findMstCodeForPos(int num, int xPos, int yPos);
+	void flagMstCodeForPos(int num, uint8_t value);
 };
 
 #endif // RESOURCE_H__

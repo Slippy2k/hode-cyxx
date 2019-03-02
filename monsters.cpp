@@ -39,7 +39,16 @@ void Game::resetMstCode() {
 		return;
 	}
 	_mstGlobalFlags = 0;
+	// TODO
 	clearLvlObjectsList1();
+	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
+		_res->_mstScreenAreaCodes[i].unk0x1D = 1;
+	}
+	// TODO
+	_rnd.initTable();
+	// TODO
+	memset(_mstGlobalVars, 0, sizeof(_mstGlobalVars));
+	memset(_tasksTable, 0, sizeof(_tasksTable));
 }
 
 void Game::startMstCode() {

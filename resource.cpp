@@ -1019,12 +1019,66 @@ void Resource::loadMstData(File *fp) {
 		msac->unk0x1E = fp->readUint16();
 		msac->codeData = fp->readUint32();
 	}
-	// fp->seek(_mstHdr.unk0x18 * 36, SEEK_CUR); // _mstUnk38
 
-	fp->seek(_mstHdr.unk0x1C * 4, SEEK_CUR); // _mstUnk39
+	_mstUnk39 = (uint32_t *)malloc(_mstHdr.unk0x1C * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.unk0x1C; ++i) {
+		_mstUnk39[i] = fp->readUint32();
+	}
 
-	fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR); // _mstUnk40
-	fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR); // _mstUnk41
+	_mstUnk40 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
+		_mstUnk40[i] = fp->readUint32();
+	}
+
+	_mstUnk41 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
+		_mstUnk41[i] = fp->readUint32();
+	}
+
+	_mstUnk42 = (MstUnk42 *)malloc(_mstHdr.unk0x20 * sizeof(MstUnk42));
+	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
+		_mstUnk42[i].offset1 = fp->readUint32();
+		_mstUnk42[i].count1  = fp->readUint32();
+		_mstUnk42[i].offset2 = fp->readUint32();
+		_mstUnk42[i].count2  = fp->readUint32();
+	}
+	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
+		fp->seek(_mstUnk42[i].count1 * 4, SEEK_CUR);
+		skipBytesAlign(fp, _mstUnk42[i].count2);
+	}
+
+	_mstUnk43 = (MstUnk43 *)malloc(_mstHdr.unk0x24 * sizeof(MstUnk43));
+	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
+		_mstUnk43[i].offset1 = fp->readUint32();
+		_mstUnk43[i].count1  = fp->readUint32();
+		_mstUnk43[i].offset2 = fp->readUint32();
+		_mstUnk43[i].count2  = fp->readUint32();
+	}
+	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
+		fp->seek(_mstUnk43[i].count1 * 4, SEEK_CUR);
+		skipBytesAlign(fp, _mstUnk43[i].count2);
+	}
 
 	// TODO:
+}
+
+MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {
+	uint32_t i = _mstUnk40[num];
+	while (i != 0xFFFFFFFF) {
+		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+		if (msac->x1 <= xPos && msac->x2 >= xPos && msac->unk0x1D != 0 && msac->y1 <= yPos && msac->y2 >= yPos) {
+			return msac;
+		}
+		i = msac->next;
+	}
+	return 0;
+}
+
+void Resource::flagMstCodeForPos(int num, uint8_t value) {
+	uint32_t i = _mstUnk39[num];
+	while (i != 0xFFFFFFFF) {
+		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+		msac->unk0x1D = value;
+		i = msac->unk0x18;
+	}
 }
