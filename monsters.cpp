@@ -46,6 +46,12 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	// TODO
+	if (_res->_mstUnk37_unk4 != kNone) {
+		_mstVars[31] = _res->_mstUnk37_unk0;
+	} else {
+		_mstVars[31] = -1;
+	}
+	// TODO
 	_mstVars[30] = 0x20;
 	// TODO
 	updateMstMoveData();
@@ -163,7 +169,12 @@ void Game::executeMstCode() {
 	if (_mstVars[31] > 0) {
 		--_mstVars[31];
 		if (_mstVars[31] == 0) {
-			// TODO
+			uint32_t codeData = _res->_mstUnk37_unk4;
+			assert(codeData != kNone);
+			Task *t = createTask(_res->_mstCodeData + codeData * 4);
+			if (t) {
+				t->runningState = 1;
+			}
 		}
 	}
 	MstScreenAreaCode *msac;

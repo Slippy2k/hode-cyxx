@@ -372,12 +372,12 @@ struct Resource {
 
 	MstPointOffset *_mstPointOffsets;
 	MstUnk35 *_mstUnk35;
-	uint32_t _mstUnk37_unk0;
-	uint32_t _mstUnk37_unk4;
-	uint32_t *_mstCodeData_screenInit;
+	uint32_t _mstUnk37_unk0; // _mstTickDelay
+	uint32_t _mstUnk37_unk4; // _mstTickCodeData
+	uint32_t *_mstCodeData_screenInit; // _mstScreenInitCodeData
 	MstScreenAreaCode *_mstScreenAreaCodes;
-	uint32_t *_mstUnk39;
-	uint32_t *_mstUnk40;
+	uint32_t *_mstUnk39; // index to _mstScreenAreaCodes
+	uint32_t *_mstUnk40; // index to _mstScreenAreaCodes
 	uint32_t *_mstUnk41;
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
@@ -389,7 +389,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
-	uint32_t *_mstUnk60;
+	uint32_t *_mstUnk60; // index to _mstCodeData
 	uint8_t *_mstCodeData;
 
 	bool _isDemoData;
