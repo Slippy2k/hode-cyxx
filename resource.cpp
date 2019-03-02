@@ -31,12 +31,12 @@ Resource::Resource(const char *dataPath)
 	if (_isDemoData) {
 		_datFile = new SectorFile;
 		_lvlFile = new SectorFile;
-		_mstFile = 0;
+		_mstFile = new SectorFile;
 		_sssFile = new SectorFile;
 	} else {
 		_datFile = new File;
 		_lvlFile = new File;
-		_mstFile = 0;
+		_mstFile = new File;
 		_sssFile = new File;
 	}
 	_loadingImageBuffer = 0;
@@ -105,6 +105,7 @@ void Resource::loadLevelData(const char *levelName) {
 			loadMstData(_mstFile);
 		} else {
 			warning("Unable to open '%s'", filename);
+			memset(&_mstHdr, 0, sizeof(_mstHdr));
 		}
 	}
 	if (_sssFile) {
@@ -941,5 +942,89 @@ void Resource::clearSssLookupTable3() {
 
 void Resource::loadMstData(File *fp) {
 	assert(fp == _mstFile);
+	_mstHdr.version  = fp->readUint32();
+	_mstHdr.dataSize = fp->readUint32();
+	_mstHdr.unk0x08  = fp->readUint32();
+	_mstHdr.unk0x0C  = fp->readUint32();
+	_mstHdr.unk0x10  = fp->readUint32();
+	_mstHdr.unk0x14  = fp->readUint32();
+	_mstHdr.screenAreaCodesCount = fp->readUint32();
+	_mstHdr.unk0x1C  = fp->readUint32();
+	_mstHdr.unk0x20  = fp->readUint32();
+	_mstHdr.unk0x24  = fp->readUint32();
+	_mstHdr.unk0x28  = fp->readUint32();
+	_mstHdr.unk0x2C  = fp->readUint32();
+	_mstHdr.unk0x30  = fp->readUint32();
+	_mstHdr.unk0x34  = fp->readUint32();
+	_mstHdr.unk0x38  = fp->readUint32();
+	_mstHdr.unk0x3C  = fp->readUint32();
+	_mstHdr.unk0x40  = fp->readUint32();
+	_mstHdr.unk0x44  = fp->readUint32();
+	_mstHdr.unk0x48  = fp->readUint32();
+	_mstHdr.unk0x4C  = fp->readUint32();
+	_mstHdr.unk0x50  = fp->readUint32();
+	_mstHdr.unk0x54  = fp->readUint32();
+	_mstHdr.unk0x58  = fp->readUint32();
+	_mstHdr.unk0x5C  = fp->readUint32();
+	_mstHdr.unk0x60  = fp->readUint32();
+	_mstHdr.unk0x64  = fp->readUint32();
+	_mstHdr.unk0x68  = fp->readUint32();
+	_mstHdr.unk0x6C  = fp->readUint32();
+	_mstHdr.unk0x70  = fp->readUint32();
+	_mstHdr.unk0x74  = fp->readUint32();
+	_mstHdr.unk0x78  = fp->readUint32();
+	_mstHdr.unk0x7C  = fp->readUint32();
+	_mstHdr.pointsCount = fp->readUint32();
+
+	fp->seek(2048, SEEK_SET);
+
+	_mstPointOffsets = (MstPointOffset *)malloc(_mstHdr.pointsCount * sizeof(MstPointOffset));
+	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
+		_mstPointOffsets[i].xOffset = fp->readUint32();
+		_mstPointOffsets[i].yOffset = fp->readUint32();
+	}
+
+	fp->seek(_mstHdr.unk0x08 * 20, SEEK_CUR); // _mstUnk34
+
+	_mstUnk35 = (MstUnk35 *)malloc(_mstHdr.unk0x0C * sizeof(MstUnk35));
+	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
+		_mstUnk35[i].ptr   = fp->readUint32();
+		_mstUnk35[i].count = fp->readUint32();
+		_mstUnk35[i].unk8  = fp->readUint32();
+		_mstUnk35[i].size  = fp->readUint32();
+	}
+	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
+		fp->seek(_mstUnk35[i].count * 4, SEEK_CUR);
+		skipBytesAlign(fp, _mstUnk35[i].size);
+	}
+
+	fp->seek(_mstHdr.unk0x10 * 12, SEEK_CUR); // _mstUnk36
+
+	fp->seek(8, SEEK_CUR); // _mstUnk37
+
+	fp->seek(_mstHdr.unk0x14 * 4, SEEK_CUR); // _resMstCodeData_screenInit
+
+	_mstScreenAreaCodes = (MstScreenAreaCode *)malloc(_mstHdr.screenAreaCodesCount * sizeof(MstScreenAreaCode)); // _mstUnk38
+	for (int i = 0; i < _mstHdr.screenAreaCodesCount; ++i) {
+		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+		msac->x1 = fp->readUint32();
+		msac->x2 = fp->readUint32();
+		msac->y1 = fp->readUint32();
+		msac->y2 = fp->readUint32();
+		msac->next = fp->readUint32();
+		msac->prev = fp->readUint32();
+		msac->unk0x18 = fp->readUint32();
+		msac->unk0x1C = fp->readByte();
+		msac->unk0x1D = fp->readByte();
+		msac->unk0x1E = fp->readUint16();
+		msac->codeData = fp->readUint32();
+	}
+	// fp->seek(_mstHdr.unk0x18 * 36, SEEK_CUR); // _mstUnk38
+
+	fp->seek(_mstHdr.unk0x1C * 4, SEEK_CUR); // _mstUnk39
+
+	fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR); // _mstUnk40
+	fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR); // _mstUnk41
+
 	// TODO:
 }

@@ -63,7 +63,52 @@ struct LvlBackgroundData {
 };
 
 struct MstHdr {
+	int version;
+	int dataSize;
+	int unk0x08;
+	int unk0x0C;
+	int unk0x10;
+	int unk0x14;
+	int screenAreaCodesCount;
+	int unk0x1C;
+	int unk0x20;
+	int unk0x24;
+	int unk0x28;
+	int unk0x2C;
+	int unk0x30;
+	int unk0x34;
+	int unk0x38;
+	int unk0x3C;
+	int unk0x40;
+	int unk0x44;
+	int unk0x48;
+	int unk0x4C;
+	int unk0x50;
+	int unk0x54;
+	int unk0x58;
+	int unk0x5C;
+	int unk0x60;
+	int unk0x64;
+	int unk0x68;
+	int unk0x6C;
+	int unk0x70;
+	int unk0x74;
+	int unk0x78;
+	int unk0x7C;
+	int pointsCount;
 };
+
+struct MstPointOffset {
+	int32_t xOffset;
+	int32_t yOffset;
+}; // sizeof == 8
+
+struct MstUnk35 {
+	uint32_t ptr;
+	uint32_t count;
+	uint32_t unk8;
+	uint32_t size;
+}; // sizeof == 16
 
 struct SssHdr {
 	int version;
@@ -207,6 +252,10 @@ struct Resource {
 	uint32_t *_sssLookupTable3[3];
 	uint8_t *_sssCodeData;
 	uint32_t _sssPreloadedPcmTotalSize;
+
+	MstPointOffset *_mstPointOffsets;
+	MstUnk35 *_mstUnk35;
+	MstScreenAreaCode *_mstScreenAreaCodes;
 
 	bool _isDemoData;
 
