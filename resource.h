@@ -103,7 +103,6 @@ struct MstPointOffset {
 	int32_t yOffset;
 }; // sizeof == 8
 
-
 struct MstScreenAreaCode {
 	int32_t x1; // 0
 	int32_t x2; // 4
@@ -372,9 +371,9 @@ struct Resource {
 
 	MstPointOffset *_mstPointOffsets;
 	MstUnk35 *_mstUnk35;
-	uint32_t _mstUnk37_unk0; // _mstTickDelay
-	uint32_t _mstUnk37_unk4; // _mstTickCodeData
-	uint32_t *_mstCodeData_screenInit; // _mstScreenInitCodeData
+	uint32_t _mstTickDelay;
+	uint32_t _mstTickCodeData;
+	uint32_t *_mstScreenInitCodeData;
 	MstScreenAreaCode *_mstScreenAreaCodes;
 	uint32_t *_mstUnk39; // index to _mstScreenAreaCodes
 	uint32_t *_mstUnk40; // index to _mstScreenAreaCodes

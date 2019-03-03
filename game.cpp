@@ -18,8 +18,8 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
 	_video = new Video(system);
-	_screen_dx = Video::kScreenWidth / 2;
-	_screen_dy = Video::kScreenHeight / 2;
+	_mstOriginPosX = Video::kScreenWidth / 2;
+	_mstOriginPosY = Video::kScreenHeight / 2;
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
@@ -2119,8 +2119,8 @@ void Game::updateAndyMonsterObjects() {
 		_hideAndyObjectSprite = false;
 		if (_actionDirectionKeyMaskIndex == 0x61) {
 			assert(_currentMonsterObject);
-			_screen_dx += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
-			_screen_dy += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
+			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
+			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 		}
 		ptr->linkObjPtr = 0;
 		break;
@@ -2128,8 +2128,8 @@ void Game::updateAndyMonsterObjects() {
 		_hideAndyObjectSprite = true;
 		if (_actionDirectionKeyMaskIndex == 0x71) {
 			assert(_currentMonsterObject);
-			_screen_dx += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
-			_screen_dy += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
+			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
+			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 			ptr->linkObjPtr = _currentMonsterObject;
 			ptr->screenNum = _currentMonsterObject->screenNum;
 		} else {
@@ -2157,7 +2157,7 @@ void Game::updateAndyMonsterObjects() {
 		ptr->frame = 0;
 		ptr->flags1 = bitmask_set(ptr->flags1, _gameMstAnimFlags1, 0x30);
 		setupLvlObjectBitmap(ptr);
-		setLvlObjectPosRelativeToPoint(ptr, 3, _screen_dx, _screen_dy);
+		setLvlObjectPosRelativeToPoint(ptr, 3, _mstOriginPosX, _mstOriginPosY);
 	}
 	_andyActionKeysFlags = 0;
 	if (ptr->data0x2988 == 2) {

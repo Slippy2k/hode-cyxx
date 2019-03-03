@@ -46,8 +46,8 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	// TODO
-	if (_res->_mstUnk37_unk4 != kNone) {
-		_mstVars[31] = _res->_mstUnk37_unk0;
+	if (_res->_mstTickCodeData != kNone) {
+		_mstVars[31] = _res->_mstTickDelay;
 	} else {
 		_mstVars[31] = -1;
 	}
@@ -76,7 +76,7 @@ void Game::startMstCode() {
 		_res->_mstHeightMapData[offset - 0x08] = _res->_mstHeightMapData[offset - 0x0C] + _res->_mstHeightMapData[offset - 0x34];
 	}
 	if (_res->_currentScreenResourceNum < _res->_mstHdr.unk0x14) {
-		uint32_t codeData = _res->_mstCodeData_screenInit[_res->_currentScreenResourceNum];
+		uint32_t codeData = _res->_mstScreenInitCodeData[_res->_currentScreenResourceNum];
 		if (codeData != kNone) {
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {
@@ -169,7 +169,7 @@ void Game::executeMstCode() {
 	if (_mstVars[31] > 0) {
 		--_mstVars[31];
 		if (_mstVars[31] == 0) {
-			uint32_t codeData = _res->_mstUnk37_unk4;
+			uint32_t codeData = _res->_mstTickCodeData;
 			assert(codeData != kNone);
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {

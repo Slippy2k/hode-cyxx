@@ -1014,13 +1014,13 @@ void Resource::loadMstData(File *fp) {
 	fp->seek(_mstHdr.unk0x10 * 12, SEEK_CUR); // _mstUnk36
 	bytesRead += _mstHdr.unk0x10 * 12;
 
-	_mstUnk37_unk0 = fp->readUint32();
-	_mstUnk37_unk4 = fp->readUint32();
+	_mstTickDelay    = fp->readUint32();
+	_mstTickCodeData = fp->readUint32();
 	bytesRead += 8;
 
-	_mstCodeData_screenInit = (uint32_t *)malloc(_mstHdr.unk0x14 * sizeof(uint32_t));
+	_mstScreenInitCodeData = (uint32_t *)malloc(_mstHdr.unk0x14 * sizeof(uint32_t));
 	for (int i = 0; i < _mstHdr.unk0x14; ++i) {
-		_mstCodeData_screenInit[i] = fp->readUint32();
+		_mstScreenInitCodeData[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
