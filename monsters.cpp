@@ -324,7 +324,16 @@ int Game::runTask_default(Task *t) {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		switch (*p) {
-		case 177: {
+		case 26:
+			_mstFlags &= ~(1 << p[1]);
+			break;
+		case 33: {
+				const int num = READ_LE_UINT16(p + 2);
+				p = _res->_mstCodeData + (num - 1) * 4;
+			}
+			break;
+		case 177:
+		case 178: {
 				const int16_t num = READ_LE_UINT16(p + 2);
 				assert(p[1] < 40);
 				arithOp(p[0] - 177, &_mstVars[p[1]], num);
