@@ -138,15 +138,15 @@ struct LvlObject {
 	uint16_t flags0; // hFlags
 	uint16_t flags1; // vFlags
 	uint16_t flags2; // spriteType
-	uint8_t stateValue;
-	uint8_t stateCounter;
-	LvlObject *linkObjPtr; /* plasma cannon object (_andyObject) */
+	uint8_t stateValue; // objectUpdateType
+	uint8_t stateCounter; // hitCount
+	LvlObject *linkObjPtr; // attachedLvlObject, plasma cannon object for _andyObject
 	uint16_t width;
 	uint16_t height;
 	uint8_t actionKeyMask;
 	uint8_t directionKeyMask;
-	uint16_t unk22; /* currentSprite */
-	uint16_t soundToPlay;
+	uint16_t unk22; // currentSprite
+	uint16_t soundToPlay; // currentSound
 	uint8_t unk26;
 	uint8_t unk27;
 	const uint8_t *bitmapBits;

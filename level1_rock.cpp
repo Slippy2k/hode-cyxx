@@ -432,7 +432,7 @@ static const uint8_t _level1OpHelper1KeyMaskTable[112] = {
 	8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 8, 0, 4, 0
 };
 
-void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
+void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_helper
 	const bool sameScreen = (_andyObject->screenNum == ptr->screenNum);
 	int i = (_andyObject->width / 2 + _andyObject->xPos + (_andyObject->xPos & 7)) / 8;
 	if (i < 0 || ptr->screenNum != _res->_currentScreenResourceNum) {
@@ -442,18 +442,18 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 	}
 	LvlObject *o = ptr->linkObjPtr;
 	assert(o);
-	ptr->directionKeyMask = p[0x20 + i];
+	ptr->directionKeyMask = p[32 + i];
 	if (ptr->directionKeyMask != 0x80) {
-		p[0x43] = 0;
+		p[67] = 0;
 		ptr->actionKeyMask = p[i];
 	} else {
-		if (p[0x43] != 0) {
-			--p[0x43];
+		if (p[67] != 0) {
+			--p[67];
 		} else {
-			p[0x43] = (_rnd.getNextNumber() >> 4) + 4;
-			p[0x42] = _rnd.getNextNumber() & 7;
+			p[67] = (_rnd.getNextNumber() >> 4) + 4;
+			p[66] = _rnd.getNextNumber() & 7;
 		}
-		const int index = p[i] * 8 + p[0x42];
+		const int index = p[i] * 8 + p[66];
 		ptr->directionKeyMask = _level1OpHelper1KeyMaskTable[index * 2];
 		ptr->actionKeyMask = _level1OpHelper1KeyMaskTable[index * 2 + 1];
 	}
@@ -464,7 +464,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 		}
 	}
 	if ((ptr->directionKeyMask & 4) != 0) {
-		if (ptr->anim != 1 || ptr->frame != p[0x40]) {
+		if (ptr->anim != 1 || ptr->frame != p[64]) {
 			ptr->directionKeyMask &= ~4;
 		}
 	}
@@ -472,7 +472,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 		if (level1OpHelper2(ptr->linkObjPtr) != 0) {
 			ptr->actionKeyMask |= 0x20;
 			++ptr->stateCounter;
-			if (ptr->stateCounter > p[0x41]) {
+			if (ptr->stateCounter > p[65]) {
 				ptr->stateCounter = 0;
 				ptr->actionKeyMask |= 7;
 			}
@@ -486,17 +486,15 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) {
 	updateAndyObject(o);
 }
 
-int Game::level1OpHelper2(LvlObject *ptr) {
+int Game::level1OpHelper2(LvlObject *ptr) { // plasmaCannonHit
 	assert(ptr);
 	if (ptr->bitmapBits) {
-		int dx;
+		int dx = 0;
 		if (ptr->screenNum == _currentLeftScreen) {
 			dx = -256;
 		} else if (ptr->screenNum == _currentRightScreen) {
 			dx = 256;
-		} else if (ptr->screenNum == _currentScreen) {
-			dx = 0;
-		} else {
+		} else if (ptr->screenNum != _currentScreen) {
 			return 0;
 		}
 		if (testPlasmaCannonPointsDirection(ptr->xPos + dx, ptr->yPos, ptr->xPos + dx + ptr->width, ptr->yPos + ptr->height)) {

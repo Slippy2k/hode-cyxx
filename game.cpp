@@ -1781,7 +1781,6 @@ void Game::updateLvlObjectLists() {
 
 LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	AnimBackgroundData *_esi = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
-	assert(_esi);
 	uint8_t *_edi = _esi->currentSpriteData + 2;
 	if (_res->_currentScreenResourceNum == ptr->screenNum) {
 		if (ptr->soundToPlay != 0xFFFF) {
