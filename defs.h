@@ -295,11 +295,30 @@ struct AndyMoveData {
 	const uint8_t *unk28;
 }; // sizeof == 0x2C
 
+struct Task;
+
+struct MstUnkData {
+	int unk0;
+	LvlObject *o; // 0x10
+	Task *t; // 0xC4
+}; // sizeof == 256
+
+struct MstObject {
+	void *unk0;
+	LvlObject *o; // 4
+	MstUnkData *unk8;
+	int unk0x10;
+	int xPos; // 14
+	int yPos; // 18
+	int xMstPos; // 1C
+	int yMstPos; // 20
+}; // sizeof == 64
+
 struct Task {
 	const uint8_t *codeData;
 	Task *prev, *next; // 4,8
 	uint8_t *dataPtr; // 0xC
-	// GameMstUnk2 *unk10;
+	MstObject *mstObject; // 0x10
 	int16_t localVars[16]; // 0x14
 	uint8_t flags; // 0x34
 	uint8_t runningState; // 0x35

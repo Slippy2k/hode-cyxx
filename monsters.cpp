@@ -40,6 +40,36 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x4D, 0x4F, 0x4E, 0x90
 };
 
+void Game::resetMstUnkData(MstUnkData *m) {
+	m->unk0 = 0;
+	LvlObject *o = m->o;
+	if (o) {
+		o->dataPtr = 0;
+	}
+	for (int i = 0; i < 64; ++i) {
+		if (_mstObjectsTable[i].unk0 && _mstObjectsTable[i].unk8 == m) {
+			_mstObjectsTable[i].unk8 = 0;
+		}
+	}
+}
+
+void Game::resetMstObject(MstObject *m) {
+	m->unk0 = 0;
+	LvlObject *o = m->o;
+	if (o) {
+		o->dataPtr = 0;
+	}
+}
+
+void Game::setMstObjectDefaultPos(Task *t) {
+	MstObject *m = t->mstObject;
+	LvlObject *o = m->o;
+	m->xPos = o->xPos + o->posTable[7].x;
+	m->yPos = o->yPos + o->posTable[7].y;
+	m->xMstPos = m->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
+	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
+}
+
 void Game::initMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	if (_mstLogicDisabled) {
@@ -54,7 +84,12 @@ void Game::resetMstCode() {
 		return;
 	}
 	_mstFlags = 0;
-	// TODO
+	for (int i = 0; i < 32; ++i) {
+		resetMstUnkData(&_mstUnkDataTable[i]);
+	}
+	for (int i = 0; i < 64; ++i) {
+		resetMstObject(&_mstObjectsTable[i]);
+	}
 	clearLvlObjectsList1();
 	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
 		_res->_mstScreenAreaCodes[i].unk0x1D = 1;
@@ -357,6 +392,24 @@ int Game::runTask_default(Task *t) {
 		assert(p[0] <= 242);
 		const int code = _mstDefaultLutOp[p[0]];
 		switch (code) {
+		case 0: // 0
+			// TODO:
+			// fall-through
+		case 1: {
+				const int num = READ_LE_UINT16(p + 2);
+				const int delay = getTaskVar(t, p[1], num);
+				t->delay = delay;
+				if (delay > 0) {
+					if (p[0] == 0) {
+						t->run = &Game::runTask_waitResetInput;
+						ret = 1;
+					} else {
+						t->run = &Game::runTask_wait;
+						ret = 1;
+					}
+				}
+			}
+			break;
 		case 16: // 26
 			_mstFlags &= ~(1 << p[1]);
 			break;
@@ -434,6 +487,29 @@ int Game::runTask_default(Task *t) {
 	} while (_runTaskOpcodesCount <= 128 && ret == 0);
 	if (t->codeData) {
 		t->codeData = p;
+	}
+	return 1;
+}
+
+int Game::runTask_wait(Task *t) {
+	--t->delay;
+	if (t->delay == 0) {
+		t->run = &Game::runTask_default;
+		return 0;
+	}
+	return 1;
+}
+
+int Game::runTask_waitResetInput(Task *t) {
+	--t->delay;
+	if (t->delay == 0) {
+		t->run = &Game::runTask_default;
+		LvlObject *o = 0;
+		if (o) {
+			o->actionKeyMask = 0;
+			o->directionKeyMask = 0;
+		}
+		return 0;
 	}
 	return 1;
 }

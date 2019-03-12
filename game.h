@@ -167,6 +167,8 @@ struct Game {
 	int _mstRefPosY;
 	int _mstOp54Unk1;
 	int _mstOp54Unk2;
+	MstUnkData _mstUnkDataTable[32];
+	MstObject _mstObjectsTable[64];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -508,6 +510,10 @@ struct Game {
 
 	// monsters.cpp
 
+	void resetMstUnkData(MstUnkData *m);
+	void resetMstObject(MstObject *m);
+	void setMstObjectDefaultPos(Task *t);
+
 	void initMstCode();
 	void resetMstCode();
 	void startMstCode();
@@ -522,6 +528,8 @@ struct Game {
 	int getTaskVar(Task *t, int index, int type) const;
 	int getTaskOtherVar(int index, Task *t) const;
 	int runTask_default(Task *t);
+	int runTask_waitResetInput(Task *t);
+	int runTask_wait(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
