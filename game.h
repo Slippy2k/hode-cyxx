@@ -153,7 +153,7 @@ struct Game {
 	int _animBackgroundDataCount;
 	uint8_t _andyActionKeysFlags;
 	int _executeMstLogicCounter;
-	int _executeMstLogicLastCounter;
+	int _executeMstLogicPrevCounter;
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
