@@ -520,11 +520,13 @@ struct Game {
 	void executeMstCode();
 	void executeMstCodeHelper2();
 	void updateMstMoveData();
+	void updateMstHeightMapData();
 
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
 	void resetTask(Task *t, const uint8_t *codeData);
 	void removeTask(Task **tasksList, Task *t);
+	void prependTask(Task **tasksList, Task *t);
 	int getTaskVar(Task *t, int index, int type) const;
 	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;

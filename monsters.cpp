@@ -257,6 +257,7 @@ void Game::executeMstCode() {
 
 void Game::executeMstCodeHelper2() {
 	updateMstMoveData();
+	updateMstHeightMapData();
 	// TODO
 }
 
@@ -273,6 +274,28 @@ void Game::updateMstMoveData() {
 		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[0].yOffset;
         }
 	// TODO
+}
+
+void Game::updateMstHeightMapData() {
+	const int _mstPosDx = _mstPosX - _mstPrevPosX;
+	const int _mstPosDy = _mstPosY - _mstPrevPosY;
+	_mstPrevPosX = _mstPosX;
+	_mstPrevPosY = _mstPosY;
+	if (_mstPosDx == 0 && _mstPosDy == 0) {
+		return;
+	}
+	int offset = 0;
+	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
+		offset += 948;
+		_res->_mstHeightMapData[offset - 0x20] = _mstPosX - _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x1C] = _mstPosX + _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x24] = _res->_mstHeightMapData[offset - 0x20] - _res->_mstHeightMapData[offset - 0x34];
+		_res->_mstHeightMapData[offset - 0x18] = _res->_mstHeightMapData[offset - 0x1C] + _res->_mstHeightMapData[offset - 0x34];
+		_res->_mstHeightMapData[offset - 0x10] = _mstPosY - _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x0C] = _mstPosY + _res->_mstHeightMapData[offset - 0x30];
+		_res->_mstHeightMapData[offset - 0x14] = _res->_mstHeightMapData[offset - 0x10] - _res->_mstHeightMapData[offset - 0x34];
+		_res->_mstHeightMapData[offset - 0x08] = _res->_mstHeightMapData[offset - 0x0C] + _res->_mstHeightMapData[offset - 0x34];
+	}
 }
 
 Task *Game::findFreeTask() {
@@ -327,6 +350,23 @@ void Game::removeTask(Task **tasksList, Task *t) {
 		next->prev = t;
 	} else {
 		*tasksList = t;
+	}
+}
+
+void Game::prependTask(Task **tasksList, Task *t) {
+	Task *current = *tasksList;
+	if (!current) {
+		*tasksList = current;
+		t->prev = t->next = 0;
+	} else {
+		Task *prev = current->prev;
+		while (prev) {
+			current = prev;
+			prev = current->prev;
+		}
+		current->prev = t;
+		t->prev = 0;
+		t->next = current;
 	}
 }
 
