@@ -1266,6 +1266,17 @@ void Resource::loadMstData(File *fp) {
 	}
 
 	// TODO:
+
+	if (0) {
+		for (int i = 0; i < _lvlHdr.screensCount; ++i) {
+			uint32_t j = _mstUnk40[i];
+			while (j != kNone) {
+				MstScreenAreaCode *msac = &_mstScreenAreaCodes[j];
+				fprintf(stdout, "screen %d pos %d,%d,%d,%d\n", i, msac->x1, msac->y1, msac->x2, msac->y2);
+				j = msac->next;
+			}
+		}
+	}
 }
 
 MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {

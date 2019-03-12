@@ -165,6 +165,8 @@ struct Game {
 	int _mstPosY;
 	int _mstRefPosX;
 	int _mstRefPosY;
+	int _mstOp54Unk1;
+	int _mstOp54Unk2;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -510,6 +512,7 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+	void executeMstCodeHelper2();
 	void updateMstMoveData();
 
 	Task *findFreeTask();

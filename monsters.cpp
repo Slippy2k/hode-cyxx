@@ -65,6 +65,8 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	// TODO
+	_mstOp54Unk1 = _mstOp54Unk2 = 0;
+	// TODO
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
 	_tasksListTail = 0;
@@ -189,7 +191,7 @@ void Game::executeMstCode() {
 	}
 	++_executeMstLogicCounter;
 	// TODO
-
+	executeMstCodeHelper2();
 	if (_mstVars[31] > 0) {
 		--_mstVars[31];
 		if (_mstVars[31] == 0) {
@@ -215,6 +217,11 @@ void Game::executeMstCode() {
 		_runTaskOpcodesCount = 0;
 		while ((this->*(t->run))(t) == 0);
 	}
+	// TODO
+}
+
+void Game::executeMstCodeHelper2() {
+	updateMstMoveData();
 	// TODO
 }
 
@@ -329,8 +336,8 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _executeMstLogicCounter;
 	case 32:
 		return _executeMstLogicCounter - _executeMstLogicPrevCounter;
-//	case 34:
-//		return _res->_currentScreenResourceState;
+	case 34:
+		return _levelCheckpoint;
 	case 35:
 		return _andyCurrentLevelScreenNum;
 	default:
@@ -353,15 +360,53 @@ int Game::runTask_default(Task *t) {
 		case 16: // 26
 			_mstFlags &= ~(1 << p[1]);
 			break;
+		case 20: { // 30
+				t->delay = 3;
+				t->mstFlags = 1 << p[1];
+				if ((t->mstFlags & _mstFlags) == 0) {
+					warning("Partial implementation for opcode 30 in runTask_default");
+					ret = 1;
+				}
+			}
+			break;
 		case 23: { // 33
 				const int num = READ_LE_UINT16(p + 2);
 				p = _res->_mstCodeData + (num - 1) * 4;
+			}
+			break;
+		case 24: { // 35
+				const int num = READ_LE_UINT16(p + 2);
+				_res->flagMstCodeForPos(num, 1);
 			}
 			break;
 		case 47: { // 177
 				const int16_t num = READ_LE_UINT16(p + 2);
 				assert(p[1] < 40);
 				arithOp(p[0] - 177, &_mstVars[p[1]], num);
+			}
+			break;
+		case 50: { // 198
+				Task *child = findFreeTask();
+				if (child) {
+					memset(child, 0, sizeof(Task));
+					t->child = child;
+					const int16_t num = READ_LE_UINT16(p + 2);
+					const uint32_t codeData = _res->_mstUnk60[num];
+					assert(codeData != kNone);
+					p = _res->_mstCodeData + codeData * 4;
+					t->codeData = p;
+					t->runningState &= ~2;
+					p -= 4;
+				}
+			}
+			break;
+		case 65: { // 218
+				const int16_t val = READ_LE_UINT16(p + 2);
+				if (val != _mstOp54Unk1) {
+					_mstOp54Unk1 = val;
+					_mstOp54Unk2 = val;
+					// shuffleMstUnk43(_res->_mstUnk43 + val * 16);
+				}
 			}
 			break;
 		case 76: { // 239
