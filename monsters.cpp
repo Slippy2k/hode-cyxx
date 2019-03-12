@@ -347,6 +347,23 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 	return 0;
 }
 
+int Game::getTaskAndyVar(int index, Task *t) const {
+	switch (index) {
+	case 0:
+		return (_andyObject->flags1 >> 4) & 1;
+	case 1:
+		return (_andyObject->flags1 >> 5) & 1;
+	case 5:
+		return (_andyObject->flags0 & 0x1F) == 7;
+	case 6:
+		return (_andyObject->data0x2988 == 0);
+	default:
+		error("getTaskAndyVar unhandled index %d", index);
+		break;
+	}
+	return 0;
+}
+
 int Game::getTaskOtherVar(int index, Task *t) const {
 	switch (index) {
 	case 0:
@@ -397,7 +414,7 @@ int Game::runTask_default(Task *t) {
 			// fall-through
 		case 1: {
 				const int num = READ_LE_UINT16(p + 2);
-				const int delay = getTaskVar(t, p[1], num);
+				const int delay = getTaskVar(t, num, p[1]);
 				t->delay = delay;
 				if (delay > 0) {
 					if (p[0] == 0) {
@@ -417,7 +434,12 @@ int Game::runTask_default(Task *t) {
 				t->delay = 3;
 				t->mstFlags = 1 << p[1];
 				if ((t->mstFlags & _mstFlags) == 0) {
-					warning("Partial implementation for opcode 30 in runTask_default");
+					if (t->dataPtr) {
+						// TODO
+					} else if (t->mstObject) {
+						// TODO
+					}
+					t->run = &Game::runTask_waitFlags;
 					ret = 1;
 				}
 			}
@@ -430,6 +452,11 @@ int Game::runTask_default(Task *t) {
 		case 24: { // 35
 				const int num = READ_LE_UINT16(p + 2);
 				_res->flagMstCodeForPos(num, 1);
+			}
+			break;
+		case 25: { // 36
+				const int num = READ_LE_UINT16(p + 2);
+				_res->flagMstCodeForPos(num, 0);
 			}
 			break;
 		case 47: { // 177
@@ -512,4 +539,45 @@ int Game::runTask_waitResetInput(Task *t) {
 		return 0;
 	}
 	return 1;
+}
+
+int Game::runTask_waitFlags(Task *t) {
+	switch (t->delay) {
+	case 1:
+		if (t->mstFlags == 0) {
+			return 1;
+		}
+		break;
+	case 2:
+		if ((t->flags & (1 << t->mstFlags)) == 0) {
+			return 1;
+		}
+		break;
+	case 3:
+		if ((_mstFlags & (1 << t->mstFlags)) == 0) {
+			return 1;
+		}
+		break;
+	case 4:
+		if (getTaskAndyVar(t->mstFlags, t) == 0) {
+			return 1;
+		}
+		break;
+	case 5:
+		if (t->mstObject) {
+			// TODO
+		} else if (t->dataPtr) {
+			// TODO
+		} else {
+			return 1;
+		}
+		break;
+	}
+	t->run = &Game::runTask_default;
+	if (t->dataPtr) {
+		// TODO
+	} else if (t->mstObject) {
+		// TODO
+	}
+	return 0;
 }

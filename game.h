@@ -526,10 +526,12 @@ struct Game {
 	void resetTask(Task *t, const uint8_t *codeData);
 	void removeTask(Task **tasksList, Task *t);
 	int getTaskVar(Task *t, int index, int type) const;
+	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;
 	int runTask_default(Task *t);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
+	int runTask_waitFlags(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
