@@ -1,5 +1,5 @@
 
-ALL = bitop decode_sss dump_data hod_extract opcode_map split_paf
+ALL = bitop decode_sss dump_data dump_staticres hod_extract opcode_map split_paf
 
 all: $(ALL)
 
@@ -11,6 +11,9 @@ decode_sss: decode_sss.o
 
 dump_data: dump_data.o
 	$(CC) $^ -o $@
+
+dump_staticres: dump_staticres.o
+	$(CC) -o $@ $^ -lz
 
 hod_extract: hod_extract.o
 	$(CC) $^ -o $@
