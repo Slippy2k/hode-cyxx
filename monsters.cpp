@@ -107,7 +107,7 @@ void Game::resetMstCode() {
 	_tasksListTail = 0;
 	// TODO
 	if (_res->_mstTickCodeData != kNone) {
-		_mstVars[31] = _res->_mstTickDelay;
+		_mstVars[31] = _mstTickDelay = _res->_mstTickDelay;
 	} else {
 		_mstVars[31] = -1;
 	}
@@ -520,6 +520,18 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 54: // 202
+			runTask_default_op54();
+			break;
+		case 64: { // 217
+				const int num = READ_LE_UINT16(p + 2);
+				if (_mstOp54Unk3 != num) {
+					_mstOp54Unk3 = num;
+					// shuffleMstUnk43(_res->_mstUnk43 + val * 16);
+					_mstOp54Counter = 0;
+				}
+			}
+			break;
 		case 65: { // 218
 				const int16_t val = READ_LE_UINT16(p + 2);
 				if (val != _mstOp54Unk1) {
@@ -527,6 +539,19 @@ int Game::runTask_default(Task *t) {
 					_mstOp54Unk2 = val;
 					// shuffleMstUnk43(_res->_mstUnk43 + val * 16);
 				}
+			}
+			break;
+		case 67: { // 223
+				const int num = READ_LE_UINT16(p + 2);
+				MstUnk53 *m = &_res->_mstUnk53[num];
+				const int mask = m->unk16;
+				int a = getTaskVar(t, m->indexVar1, (mask >> 16) & 15);
+				int b = getTaskVar(t, m->indexVar2, (mask >> 12) & 15);
+				int c = getTaskVar(t, m->indexVar3, (mask >>  8) & 15);
+				int d = getTaskVar(t, m->indexVar4, (mask >>  4) & 15);
+				int e = getTaskVar(t, m->indexVar5,  mask        & 15);
+				warning("opcode 223 monster %d,%d,%d,%d,%d", a, b, c, d, e);
+				// TODO
 			}
 			break;
 		case 76: { // 239
@@ -537,9 +562,19 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 78: // 242
-			warning("Partial implementation for opcode 242 in runTask_default");
-			removeTask(&_tasksListTail, t);
-			ret = 1;
+			if (t->child) {
+				// TODO
+			} else if (t->dataPtr) {
+				// TODO
+			} else if (t->mstObject) {
+				// TODO
+			} else {
+				if ((t->runningState & 1) != 0 && _mstVars[31] == 0) {
+					_mstVars[31] = _mstTickDelay;
+				}
+				removeTask(&_tasksListTail, t);
+				ret = 1;
+			}
 			break;
 		default:
 			warning("Unhandled opcode %d (%d) in runTask_default", *p, code);
@@ -556,6 +591,27 @@ int Game::runTask_default(Task *t) {
 		t->codeData = p;
 	}
 	return 1;
+}
+
+void Game::runTask_default_op54() {
+	// TODO
+	const int x = MIN(_mstRefPosX, 255);
+	if (_mstRefPosX < 0) {
+		_mstPosXmin = x;
+		_mstPosXmax = 255 + x;
+	} else {
+		_mstPosXmin = -x;
+		_mstPosXmax = 255 - x;
+	}
+	const int y = MIN(_mstRefPosY, 191);
+	if (_mstRefPosY < 0) {
+		_mstPosYmin = y;
+		_mstPosYmax = 191 + y;
+	} else {
+		_mstPosYmin = -y;
+		_mstPosYmax = 191 - y;
+	}
+	// TODO
 }
 
 int Game::runTask_wait(Task *t) {

@@ -204,14 +204,14 @@ struct MstUnk59 {
 	uint32_t codeIndex;
 }; // SIZEOF_MstUnk59 8
 
-struct MstUnk53 {
-	int16_t index1; // typeVar1
-	int16_t index2; // 2 typeVar2
-	int16_t index3; // 4 typeVar3
-	int16_t index4; // 6 typeVar4
+struct MstUnk53 { // MstMonsterInfo
+	int16_t indexVar1;
+	int16_t indexVar2; // 2
+	int16_t indexVar3; // 4
+	int16_t indexVar4; // 6
 	uint8_t unk8; // 8
 	uint8_t unk9;
-	int8_t index5; // 10
+	int8_t indexVar5; // 10
 	int8_t unk11; // 11
 	uint16_t unk12; // 12
 	uint16_t unk14;
@@ -388,6 +388,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
+	MstUnk53 *_mstUnk53;
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	uint8_t *_mstCodeData;
 
