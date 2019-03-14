@@ -44,13 +44,11 @@ struct Game {
 		kFrameTimeStamp = 50 // 80
 	};
 
-	static const uint8_t _gameLevelStartingCutscene[]; // _levelStartingCutsceneTable
 	static const uint8_t _pointDstIndexTable[];
 	static const uint8_t _pointRandomizeShiftTable[];
 	static const uint8_t _pointSrcIndex2Table[];
 	static const uint8_t _pointSrcIndex1Table[];
 	static const uint8_t _actionDirectionKeyMaskTable[];
-	static const char *_resLevelNames[];
 	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelScreenStartData[];
 	static const uint8_t _transformBufferData1[]; // _pwr1_screenTransformData

@@ -1748,6 +1748,19 @@ void Game::redrawObjects() {
 	}
 }
 
+static const char *_levels[] = {
+	"rock_hod",
+	"fort_hod",
+	"pwr1_hod",
+	"isld_hod",
+	"lava_hod",
+	"pwr2_hod",
+	"lar1_hod",
+	"lar2_hod",
+	"dark_hod",
+	"test_hod"
+};
+
 void Game::mainLoop(int level, int checkpoint) {
 	if (level >= kLvl_test) {
 		return;
@@ -1756,7 +1769,7 @@ void Game::mainLoop(int level, int checkpoint) {
 	_levelCheckpoint = checkpoint;
 	benchmarkCpu();
 	_res->loadSetupDat();
-	_res->loadLevelData(_resLevelNames[_currentLevel]);
+	_res->loadLevelData(_levels[_currentLevel]);
 	levelMainLoop();
 }
 
@@ -2188,6 +2201,9 @@ void Game::updateInput() {
 	}
 }
 
+// cutscene number when starting a level
+static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
+
 void Game::levelMainLoop() {
 	_andyCurrentLevelScreenNum = -1;
 	initMstCode();
@@ -2208,7 +2224,7 @@ void Game::levelMainLoop() {
 	}
 //	snd_setupResampleFunc(_ecx = 1);
 	if (!_paf->_skipCutscenes && _levelCheckpoint == 0) {
-		uint8_t num = _gameLevelStartingCutscene[_currentLevel];
+		const uint8_t num = _cutscenes[_currentLevel];
 		_paf->preload(num);
 		_paf->play(num);
 		_paf->unload(num);
