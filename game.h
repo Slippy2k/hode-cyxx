@@ -456,9 +456,12 @@ struct Game {
 	// level7_lar1.cpp
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
+	void postScreenUpdate_lar1_screen0();
 	void postScreenUpdate_lar1_screen3();
 	void postScreenUpdate_lar1_screen4();
 	void postScreenUpdate_lar1_screen5();
+	void postScreenUpdate_lar1_screen8();
+	void postScreenUpdate_lar1_screen9();
 	void postScreenUpdate_lar1_screen16();
 	void postScreenUpdate_lar1_screen19();
 	void postScreenUpdate_lar1_screen20();

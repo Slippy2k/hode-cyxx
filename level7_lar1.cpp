@@ -8,12 +8,66 @@ static uint8_t byte_4525F8[] = {  2,  0, 0, 0 };
 static uint8_t byte_4525FC[] = { 18,  0, 0, 0 };
 static uint8_t byte_452600[] = { 50,  9, 2, 0 };
 static uint8_t byte_452604[] = { 50, 14, 2, 0 };
+static uint8_t byte_452608[] = {  2,  0, 0, 0 };
+static uint8_t byte_45260C[] = {  2,  3, 0, 0 };
 static uint8_t byte_452610[] = {  2,  0, 0, 0 };
 static uint8_t byte_452614[] = {  2,  0, 0, 0 };
 static uint8_t byte_452620[] = {  2,  0, 0, 0 };
 
 void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	// TODO
+}
+
+void Game::postScreenUpdate_lar1_screen0() {
+	switch (_res->_screensState[0].s0) {
+	case 0:
+		_res->_screensState[0].s0 = 3;
+		break;
+	case 1:
+		if (_res->_currentScreenResourceNum == 0) {
+			// TODO
+		}
+		break;
+	case 2:
+		if (_res->_currentScreenResourceNum == 0) {
+			BoundingBox b = { 0, 0, 14, 74 };
+			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (clipBoundingBox(&b, &data->boundingBox)) {
+				// TODO
+			}
+		}
+		break;
+	case 3:
+		++_screenCounterTable[0];
+		if (_screenCounterTable[0] < 7) {
+			_andyObject->actionKeyMask = 1;
+			_andyObject->directionKeyMask = 2;
+		} else if (_screenCounterTable[0] == 7) {
+			_res->_resLvlScreenBackgroundDataTable[0].currentMaskId = 1;
+			setupScreenMask(0);
+		} else if (_screenCounterTable[0] >= 45) {
+			_res->_screensState[0].s0 = 1;
+			_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 1;
+		} else if (_screenCounterTable[0] == 11) {
+			setShakeScreen(3, 2);
+		} else if (_screenCounterTable[0] == 13) {
+			setShakeScreen(2, 4);
+		} else if (_screenCounterTable[0] == 19) {
+			setShakeScreen(2, 4);
+		} else if (_screenCounterTable[0] == 25) {
+			setShakeScreen(2, 6);
+		}
+		break;
+	case 4:
+		++_screenCounterTable[0];
+		if (_screenCounterTable[0] >= 64) {
+			_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 2;
+			_res->_resLvlScreenBackgroundDataTable[0].currentMaskId = 2;
+			setupScreenMask(0);
+			_res->_screensState[0].s0 = 2;
+		}
+		break;
+	}
 }
 
 void Game::postScreenUpdate_lar1_screen3() {
@@ -45,6 +99,32 @@ void Game::postScreenUpdate_lar1_screen5() {
 			}
 		}
 	}
+}
+
+void Game::postScreenUpdate_lar1_screen8() {
+	LvlObject *o1 = findLvlObject(2, 0, 8);
+	postScreenUpdate_lar1_helper(o1, byte_452608, 4);
+	LvlObject *o2 = findLvlObject(2, 1, 8);
+	postScreenUpdate_lar1_helper(o2, byte_45260C, 5);
+	if (_res->_currentScreenResourceNum == 8) {
+		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
+			BoundingBox b = { 104, 0, 255, 80 };
+			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (clipBoundingBox(&b, &data->boundingBox)) {
+				_levelCheckpoint = 3;
+				const int a = (byte_452610[0] & 0xF0) != 0 ? 3 : 4;
+				_screenCounterTable[26] = a;
+				if ((byte_452614[0] & 0xF0) == 0x10) {
+					_screenCounterTable[26] = a + 2;
+				}
+			}
+		}
+	}
+}
+
+void Game::postScreenUpdate_lar1_screen9() {
+	LvlObject *o = findLvlObject(2, 0, 9);
+	postScreenUpdate_lar1_helper(o, byte_452610, 6);
 }
 
 void Game::postScreenUpdate_lar1_screen16() {
@@ -125,6 +205,9 @@ void Game::postScreenUpdate_lar1_screen24() {
 
 void Game::callLevel_postScreenUpdate_lar1(int num) {
 	switch (num) {
+	case 0:
+		postScreenUpdate_lar1_screen0();
+		break;
 	case 3:
 		postScreenUpdate_lar1_screen3();
 		break;
@@ -133,6 +216,12 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 		break;
 	case 5:
 		postScreenUpdate_lar1_screen5();
+		break;
+	case 8:
+		postScreenUpdate_lar1_screen8();
+		break;
+	case 9:
+		postScreenUpdate_lar1_screen9();
 		break;
 	case 19:
 		postScreenUpdate_lar1_screen19();
@@ -146,9 +235,6 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 	case 24:
 		postScreenUpdate_lar1_screen24();
 		break;
-	case 0:
-	case 8:
-	case 9:
 	case 12:
 	case 13:
 	case 14:
