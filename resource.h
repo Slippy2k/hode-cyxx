@@ -226,6 +226,13 @@ struct MstUnk54 {
 	uint16_t codeData;
 }; // SIZEOF_MstUnk54 8
 
+struct MstOp56Data {
+	uint32_t unk0;
+	uint32_t unk4;
+	uint32_t unk8;
+	uint32_t unkC;
+}; // sizeof == 16
+
 struct SssHdr {
 	int version;
 	int unk4;
@@ -392,6 +399,7 @@ struct Resource {
 	MstUnk54 *_mstUnk54;
 	MstUnk59 *_mstUnk59;
 	uint32_t *_mstUnk60; // index to _mstCodeData
+	MstOp56Data *_mstOp56Data;
 	uint8_t *_mstCodeData;
 
 	bool _isDemoData;

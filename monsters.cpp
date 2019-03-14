@@ -513,6 +513,9 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 13: // 23
+			_mstFlags |= (1 << p[1]);
+			break;
 		case 16: // 26
 			_mstFlags &= ~(1 << p[1]);
 			break;
@@ -590,6 +593,9 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 54: // 202
 			runTask_default_op54();
+			break;
+		case 56: // 204
+			runTask_default_op56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
 		case 62: { // 215
 				if (_mstOp54Unk3 != 0xFFFF) {
@@ -708,6 +714,60 @@ void Game::runTask_default_op54() {
 		_mstPosYmax = 191 - y;
 	}
 	// TODO
+}
+
+void Game::runTask_default_op56(Task *t, int code, int num) {
+	assert(num < _res->_mstHdr.unk0x78);
+	switch (code) {
+	case 3:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0x12);
+		break;
+	case 4:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0x80);
+		break;
+	case 5:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0xA4);
+		break;
+	case 6:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0xA3);
+		break;
+	case 7:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0x05);
+		break;
+	case 8:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0xA1);
+		break;
+	case 9:
+		resetAndyLvlObjectPlasmaCannonKeyMask(0xA2);
+		break;
+	case 10:
+		if (_res->_mstOp56Data[num].unk0 == 1) {
+			setShakeScreen(2, _res->_mstOp56Data[num].unk4 & 255);
+		} else if (_res->_mstOp56Data[num].unk0 == 2) {
+			setShakeScreen(1, _res->_mstOp56Data[num].unk4 & 255);
+		} else {
+			setShakeScreen(3, _res->_mstOp56Data[num].unk4 & 255);
+		}
+		break;
+	case 19:
+		_andyActionKeyMaskAnd    = _res->_mstOp56Data[num].unk0 & 255;
+		_andyActionKeyMaskOr     = _res->_mstOp56Data[num].unk4 & 255;
+		_andyDirectionKeyMaskAnd = _res->_mstOp56Data[num].unk8 & 255;
+		_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].unkC & 255;
+		break;
+	case 29: {
+			const uint8_t state  = _res->_mstOp56Data[num].unk4 & 255;
+			const uint8_t screen = _res->_mstOp56Data[num].unk0 & 255;
+			_res->_screensState[screen].s0 = state;
+		}
+		break;
+	case 30:
+		++_levelCheckpoint;
+		break;
+	default:
+		warning("Unhandled opcode %d in runTask_default_op56", code);
+		break;
+	}
 }
 
 int Game::runTask_wait(Task *t) {

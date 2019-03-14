@@ -2800,7 +2800,7 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 	}
 // 4097E1
 	if (!_lvlObjectsList3) {
-		warning("_lvlObjectsList3 is 0");
+		// warning("_lvlObjectsList3 is 0");
 	} else {
 		switch (_al) {
 		case 0:
