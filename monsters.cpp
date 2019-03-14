@@ -307,7 +307,7 @@ void Game::updateMstHeightMapData() {
 }
 
 Task *Game::findFreeTask() {
-	for (int i = 0; i < 128; ++i) {
+	for (int i = 0; i < kMaxTasks; ++i) {
 		Task *t = &_tasksTable[i];
 		if (!t->codeData) {
 			return t;
@@ -317,7 +317,7 @@ Task *Game::findFreeTask() {
 }
 
 Task *Game::createTask(const uint8_t *codeData) {
-	for (int i = 0; i < 128; ++i) {
+	for (int i = 0; i < kMaxTasks; ++i) {
 		Task *t = &_tasksTable[i];
 		if (!t->codeData) {
 			memset(t, 0, sizeof(Task));
@@ -351,7 +351,7 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	if (found) {
 		return current;
 	}
-	for (int i = 0; i < 128; ++i) {
+	for (int i = 0; i < kMaxTasks; ++i) {
 		Task *t = &_tasksTable[i];
 		if (!t->codeData) {
 			memset(t, 0, sizeof(Task));
@@ -569,7 +569,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 47: { // 177
 				const int16_t num = READ_LE_UINT16(p + 2);
-				assert(p[1] < 40);
+				assert(p[1] < kMaxVars);
 				arithOp(p[0] - 177, &_mstVars[p[1]], num);
 			}
 			break;

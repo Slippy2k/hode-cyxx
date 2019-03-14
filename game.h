@@ -19,12 +19,6 @@ struct Video;
 struct SystemStub;
 
 template <typename T>
-inline T *PTR(void *base, const uint8_t *offsets, int index) {
-	const uint32_t offset = READ_LE_UINT32((const uint8_t *)offsets + index * 4);
-	return offset == 0xFFFFFFFF ? 0 : (T *)(((const uint8_t *)base) + offset * sizeof(T));
-}
-
-template <typename T>
 inline const uint8_t *PTR_OFFS(const uint8_t *base, uint32_t index) {
 	return index == 0xFFFFFFFF ? 0 : (const uint8_t *)base + index * sizeof(T);
 }
@@ -45,6 +39,8 @@ struct Game {
 	};
 	enum {
 		kMaxScreens = 40,
+		kMaxTasks = 128,
+		kMaxVars = 40,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -101,7 +97,7 @@ struct Game {
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
 	LvlObject *_lvlObjectsList3;
-	uint8_t _screenCounterTable[40];
+	uint8_t _screenCounterTable[kMaxScreens];
 	uint8_t _screenPosTable[5][24 * 32];
 	uint8_t _screenTempMaskBuffer[24 * 32];
 	uint8_t _screenMaskBuffer[96 * 24 * 32];
@@ -138,7 +134,7 @@ struct Game {
 	uint32_t _gameMstLogicHelper1TestValue;
 	uint32_t _gameMstLogicHelper1TestMask;
 	int _runTaskOpcodesCount;
-	int32_t _mstVars[40];
+	int32_t _mstVars[kMaxVars];
 	uint32_t _mstFlags;
 	int _clipBoxOffsetX, _clipBoxOffsetY;
 	Task *_gameMstResToLoad1Pri, *_gameMstResToLoad2Pri;
@@ -158,7 +154,7 @@ struct Game {
 	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
-	Task _tasksTable[128];
+	Task _tasksTable[kMaxTasks];
 	Task *_tasksListTail;
 	int _mstPrevPosX;
 	int _mstPrevPosY;
