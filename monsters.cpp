@@ -70,6 +70,14 @@ void Game::setMstObjectDefaultPos(Task *t) {
 	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 }
 
+void Game::shuffleMstUnk43(MstUnk43 *p) {
+	// TODO
+//	for (int i = 0; i < (int)p->count2; ++i) {
+//		_resMstUnk43[p->offset2 + i] &= 0x7F;
+//	}
+//	shuffleArray(_resMstUnk43 + p->offset2, p->count2);
+}
+
 void Game::initMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	if (_mstLogicDisabled) {
@@ -527,7 +535,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 62: { // 215
 				if (_mstOp54Unk3 != 0xFFFF) {
-					// shuffleMstUnk43(_res->_mstUnk43 + _mstOp54Unk3 * 16);
+					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk3]);
 				}
 				_mstOp54Counter = 0;
 			}
@@ -536,17 +544,17 @@ int Game::runTask_default(Task *t) {
 				const int num = READ_LE_UINT16(p + 2);
 				if (_mstOp54Unk3 != num) {
 					_mstOp54Unk3 = num;
-					// shuffleMstUnk43(_res->_mstUnk43 + val * 16);
+					shuffleMstUnk43(&_res->_mstUnk43[num]);
 					_mstOp54Counter = 0;
 				}
 			}
 			break;
 		case 65: { // 218
-				const int16_t val = READ_LE_UINT16(p + 2);
-				if (val != _mstOp54Unk1) {
-					_mstOp54Unk1 = val;
-					_mstOp54Unk2 = val;
-					// shuffleMstUnk43(_res->_mstUnk43 + val * 16);
+				const int16_t num = READ_LE_UINT16(p + 2);
+				if (num != _mstOp54Unk1) {
+					_mstOp54Unk1 = num;
+					_mstOp54Unk2 = num;
+					shuffleMstUnk43(&_res->_mstUnk43[num]);
 				}
 			}
 			break;

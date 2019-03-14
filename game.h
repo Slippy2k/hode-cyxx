@@ -518,6 +518,7 @@ struct Game {
 	void resetMstUnkData(MstUnkData *m);
 	void resetMstObject(MstObject *m);
 	void setMstObjectDefaultPos(Task *t);
+	void shuffleMstUnk43(MstUnk43 *p);
 
 	void initMstCode();
 	void resetMstCode();
