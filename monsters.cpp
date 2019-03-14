@@ -545,6 +545,28 @@ int Game::runTask_default(Task *t) {
 				_res->flagMstCodeForPos(num, 0);
 			}
 			break;
+		case 29: { // 42
+				const int num = p[1];
+				++_mstVars[num];
+			}
+			break;
+		case 31: { // 44
+				const int num = p[1];
+				--t->localVars[num];
+			}
+			break;
+		case 43: { // 137
+				const int num = READ_LE_UINT16(p + 2);
+				assert(p[1] < 16);
+				arithOp(p[0] - 137, &t->localVars[p[1]], getTaskOtherVar(num, t));
+			}
+			break;
+		case 46: { // 168
+				const int num = READ_LE_UINT16(p + 2);
+				assert(p[1] < 16);
+				arithOp(p[0] - 167, &t->localVars[p[1]], num);
+			}
+			break;
 		case 47: { // 177
 				const int16_t num = READ_LE_UINT16(p + 2);
 				assert(p[1] < 40);

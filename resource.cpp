@@ -1296,8 +1296,21 @@ void Resource::loadMstData(File *fp) {
 			uint32_t j = _mstUnk40[i];
 			while (j != kNone) {
 				MstScreenAreaCode *msac = &_mstScreenAreaCodes[j];
-				fprintf(stdout, "screen %d pos %d,%d,%d,%d\n", i, msac->x1, msac->y1, msac->x2, msac->y2);
+				fprintf(stdout, ".mst screen %d pos %d,%d,%d,%d\n", i, msac->x1, msac->y1, msac->x2, msac->y2);
 				j = msac->next;
+			}
+		}
+	}
+
+	if (0) {
+		int histOp[256];
+		memset(histOp, 0, sizeof(histOp));
+		for (int i = 0; i < _mstHdr.codeSize; ++i) {
+			++histOp[_mstCodeData[i * 4]];
+		}
+		for (int i = 0; i < 256; ++i) {
+			if (histOp[i]) {
+				fprintf(stdout, ".mst opcode %d count %d\n", i, histOp[i]);
 			}
 		}
 	}
