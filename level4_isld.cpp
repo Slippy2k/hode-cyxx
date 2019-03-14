@@ -230,11 +230,11 @@ void Game::callLevel_initialize_isld() {
 	if (!_paf->_skipCutscenes) {
 		_paf->preload(24);
 	}
-	// TODO:
+	resetLevelTickHelperData();
 }
 
 void Game::callLevel_tick_isld() {
-	// TODO:
+	updateLevelTickHelper();
 }
 
 void Game::callLevel_terminate_isld() {

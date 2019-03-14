@@ -3265,6 +3265,14 @@ LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int index) {
 	return ptr;
 }
 
+void Game::resetLevelTickHelperData() {
+	// TODO
+}
+
+void Game::updateLevelTickHelper() {
+	// TODO
+}
+
 void Game::captureScreenshot() {
 	static int screenshot = 1;
 	char name[64];

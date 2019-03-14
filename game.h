@@ -276,6 +276,8 @@ struct Game {
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
 	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
+	void resetLevelTickHelperData();
+	void updateLevelTickHelper();
 	void captureScreenshot();
 
 	// level1_rock.cpp
@@ -462,6 +464,8 @@ struct Game {
 	void postScreenUpdate_lar1_screen5();
 	void postScreenUpdate_lar1_screen8();
 	void postScreenUpdate_lar1_screen9();
+	void postScreenUpdate_lar1_screen13();
+	void postScreenUpdate_lar1_screen15();
 	void postScreenUpdate_lar1_screen16();
 	void postScreenUpdate_lar1_screen19();
 	void postScreenUpdate_lar1_screen20();

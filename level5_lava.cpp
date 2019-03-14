@@ -288,6 +288,7 @@ void Game::callLevel_initialize_lava() {
 	const int size = decodeLZW(_transformBufferData2, _transformShadowBuffer);
 	assert(size == 256 * 192);
 	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
+	resetLevelTickHelperData();
 }
 
 static const uint8_t byte_452CD8[] = {
@@ -296,7 +297,8 @@ static const uint8_t byte_452CD8[] = {
 
 void Game::callLevel_tick_lava() {
 	_video->_displayShadowLayer = byte_452CD8[_res->_currentScreenResourceNum * 2];
-	warning("callLevel_tick_lava unimplemented");
+	// TODO
+	updateLevelTickHelper();
 }
 
 void Game::setupLvlObjects_lava_screen3() {
