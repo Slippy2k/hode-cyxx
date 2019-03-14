@@ -334,6 +334,42 @@ Task *Game::createTask(const uint8_t *codeData) {
 	return 0;
 }
 
+Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
+	Task *current = _tasksListTail;
+	bool found = false;
+	while (current) {
+		if ((current->localVars[14] | (current->localVars[15] << 16)) == num) {
+			found = true;
+			if (current != t) {
+				// TODO
+				warning("updateTask, duplicated task id %d", num);
+				break;
+			}
+		}
+		current = current->prev;
+	}
+	if (found) {
+		return current;
+	}
+	for (int i = 0; i < 128; ++i) {
+		Task *t = &_tasksTable[i];
+		if (!t->codeData) {
+			memset(t, 0, sizeof(Task));
+			resetTask(t, codeData);
+			t->next = 0;
+			t->prev = _tasksListTail;
+			if (_tasksListTail) {
+				_tasksListTail->next = t;
+			}
+			_tasksListTail = t;
+			t->localVars[14] = num & 0xFFFF;
+			t->localVars[15] = num >> 16;
+			return t;
+		}
+	}
+	return 0;
+}
+
 void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->runningState |= 2;
 	t->codeData = codeData;
@@ -567,7 +603,7 @@ int Game::runTask_default(Task *t) {
 				int c = getTaskVar(t, m->indexVar3, (mask >>  8) & 15);
 				int d = getTaskVar(t, m->indexVar4, (mask >>  4) & 15);
 				int e = getTaskVar(t, m->indexVar5,  mask        & 15);
-				warning("opcode 223 monster %d,%d,%d,%d,%d", a, b, c, d, e);
+				warning("opcode 223 %d,%d,%d,%d,%d", a, b, c, d, e);
 				// TODO
 			}
 			break;
@@ -587,6 +623,16 @@ int Game::runTask_default(Task *t) {
 				const uint32_t codeData = _res->_mstUnk60[i];
 				assert(codeData != kNone);
 				createTask(_res->_mstCodeData + codeData * 4);
+			}
+			break;
+		case 77: { // 240
+				const int num = READ_LE_UINT16(p + 2);
+				MstUnk59 *m = &_res->_mstUnk59[num];
+				if (m->codeData == kNone) {
+					warning("opcode 240 codeOffset is -1 for taskId %d", m->taskId);
+				} else {
+					updateTask(t, m->taskId, _res->_mstCodeData + m->codeData * 4);
+				}
 			}
 			break;
 		case 78: // 242

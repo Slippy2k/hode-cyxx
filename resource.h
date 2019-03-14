@@ -200,8 +200,8 @@ struct MstScreenInitCode {
 }; // SIZEOF_MstScreenInitCode 8
 
 struct MstUnk59 {
-	uint32_t unk0;
-	uint32_t codeIndex;
+	uint32_t taskId;
+	uint32_t codeData;
 }; // SIZEOF_MstUnk59 8
 
 struct MstUnk53 { // MstMonsterInfo
@@ -390,6 +390,7 @@ struct Resource {
 	MstUnk51 *_mstUnk51;
 	MstUnk53 *_mstUnk53;
 	MstUnk54 *_mstUnk54;
+	MstUnk59 *_mstUnk59;
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	uint8_t *_mstCodeData;
 
