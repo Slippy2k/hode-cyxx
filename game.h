@@ -140,6 +140,7 @@ struct Game {
 	Task *_gameMstResToLoad1Pri, *_gameMstResToLoad2Pri;
 	Task *_currentTask;
 	int _mstOp54Counter;
+	int _mstOp56Counter;
 	uint8_t _mstOp54Table[32];
 	bool _mstLogicDisabled;
 	LvlObject _declaredLvlObjectsList[160];

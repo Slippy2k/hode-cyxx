@@ -470,6 +470,8 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _andyObject->actionKeyMask;
 	case 24:
 		return _andyObject->directionKeyMask;
+	case 30:
+		return _mstOp56Counter;
 	case 31:
 		return _executeMstLogicCounter;
 	case 32:
