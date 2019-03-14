@@ -223,7 +223,7 @@ struct MstUnk54 {
 	int16_t unk2;
 	uint8_t unk4;
 	uint8_t unk5;
-	uint16_t codeIndex;
+	uint16_t codeData;
 }; // SIZEOF_MstUnk54 8
 
 struct SssHdr {
@@ -389,6 +389,7 @@ struct Resource {
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
 	MstUnk53 *_mstUnk53;
+	MstUnk54 *_mstUnk54;
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	uint8_t *_mstCodeData;
 

@@ -418,8 +418,10 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _currentScreen;
 	case 5:
 		return _res->_screensState[_currentScreen].s0;
-//	case 22:
-//		return _mstOp54Counter;
+	case 6:
+		return _difficulty;
+	case 22:
+		return _mstOp54Counter;
 	case 23:
 		return _andyObject->actionKeyMask;
 	case 24:
@@ -523,6 +525,13 @@ int Game::runTask_default(Task *t) {
 		case 54: // 202
 			runTask_default_op54();
 			break;
+		case 62: { // 215
+				if (_mstOp54Unk3 != 0xFFFF) {
+					// shuffleMstUnk43(_res->_mstUnk43 + _mstOp54Unk3 * 16);
+				}
+				_mstOp54Counter = 0;
+			}
+			break;
 		case 64: { // 217
 				const int num = READ_LE_UINT16(p + 2);
 				if (_mstOp54Unk3 != num) {
@@ -552,6 +561,17 @@ int Game::runTask_default(Task *t) {
 				int e = getTaskVar(t, m->indexVar5,  mask        & 15);
 				warning("opcode 223 monster %d,%d,%d,%d,%d", a, b, c, d, e);
 				// TODO
+			}
+			break;
+		case 69: { // 227
+				const int num = READ_LE_UINT16(p + 2);
+				MstUnk54 *m = &_res->_mstUnk54[num];
+				const int a = getTaskVar(t, m->unk0,  m->unk5       & 15);
+				const int b = getTaskVar(t, m->unk2, (m->unk5 >> 4) & 15);
+				if (compareOp(m->unk4, a, b)) {
+					assert(m->codeData != kNone);
+					t->codeData = _res->_mstCodeData + m->codeData * 4;
+				}
 			}
 			break;
 		case 76: { // 239

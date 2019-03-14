@@ -14,6 +14,7 @@
 
 Game::Game(SystemStub *system, const char *dataPath) {
 	memset(this, 0, sizeof(Game)); // TODO: proper init
+	_difficulty = 1;
 	_system = system;
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
@@ -2827,8 +2828,6 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 }
 
 void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
-	warning("lvlObjectType0CallbackHelper4 unimplemented");
-
 	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *_esi = _edi->nextPtr;
 	uint8_t _al  = ptr->flags0 & 0x1F;
@@ -2838,10 +2837,12 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 		// _esi->callbackFuncPtr = &Game::lvlObjectCallbackUnk1;
 		// uint8_t _cl = (ptr->flags1 >> 4) & 3;
 		// uint8_t _dl = _eax[0];
+		warning("lvlObjectType0CallbackHelper4 unimplemented _al == 4");
 	} else if (_al == 7) {
 // 40DD4B
 		switch (var1) {
 		case 0:
+			warning("lvlObjectType0CallbackHelper4 unimplemented _al == 7, var1 == 0");
 			// TODO
 			break;
 		case 2: {
@@ -2865,6 +2866,7 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DEEC
+				warning("lvlObjectType0CallbackHelper4 unimplemented _al == 7, var1 == 2");
 				// TODO
 			}
 			break;
@@ -2896,6 +2898,7 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DF82
+				warning("lvlObjectType0CallbackHelper4 unimplemented _al == 7, var1 == 3");
 				// TODO
 			}
 			break;

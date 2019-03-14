@@ -69,6 +69,7 @@ struct Game {
 	Video *_video;
 	SystemStub *_system;
 
+	int _difficulty;
 	LvlObject *_screenLvlObjectsList[kMaxScreens];
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
