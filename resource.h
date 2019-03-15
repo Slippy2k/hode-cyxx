@@ -199,12 +199,12 @@ struct MstScreenInitCode {
 	uint32_t codeData;
 }; // SIZEOF_MstScreenInitCode 8
 
-struct MstUnk59 {
+struct MstUnk59 { // MstOp240Data
 	uint32_t taskId;
 	uint32_t codeData;
 }; // SIZEOF_MstUnk59 8
 
-struct MstUnk53 { // MstMonsterInfo
+struct MstUnk53 { // MstOp223Data
 	int16_t indexVar1;
 	int16_t indexVar2; // 2
 	int16_t indexVar3; // 4
@@ -215,14 +215,14 @@ struct MstUnk53 { // MstMonsterInfo
 	int8_t unk11; // 11
 	uint16_t unk12; // 12
 	uint16_t unk14;
-	uint32_t unk16; // 16
+	uint32_t unk16; // maskVars // 16
 }; // SIZEOF_MstUnk53 20
 
-struct MstUnk54 {
-	int16_t unk0;
-	int16_t unk2;
+struct MstUnk54 { // MstOp227Data
+	int16_t unk0; // indexVar1 // 0
+	int16_t unk2; // indexVar2 // 2
 	uint8_t unk4;
-	uint8_t unk5;
+	uint8_t unk5; // maskVars
 	uint16_t codeData;
 }; // SIZEOF_MstUnk54 8
 

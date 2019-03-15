@@ -1284,7 +1284,7 @@ void Resource::loadMstData(File *fp) {
 		_mstOp56Data[i].unk4 = fp->readUint32();
 		_mstOp56Data[i].unk8 = fp->readUint32();
 		_mstOp56Data[i].unkC = fp->readUint32();
-		bytesRead += 8;
+		bytesRead += 16;
 	}
 
 	_mstCodeData = (uint8_t *)malloc(_mstHdr.codeSize * 4);
