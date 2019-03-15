@@ -431,6 +431,20 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 	return 0;
 }
 
+void Game::setTaskVar(Task *t, int index, int type, int value) {
+	switch (type) {
+	case 2:
+		t->localVars[index] = value;
+		break;
+	case 3:
+		_mstVars[index] = value;
+		break;
+	default:
+		error("setTaskVar unhandled index %d type %d", index, type);
+		break;
+	}
+}
+
 int Game::getTaskAndyVar(int index, Task *t) const {
 	switch (index) {
 	case 0:
@@ -749,6 +763,34 @@ void Game::runTask_default_op56(Task *t, int code, int num) {
 			setShakeScreen(1, _res->_mstOp56Data[num].unk4 & 255);
 		} else {
 			setShakeScreen(3, _res->_mstOp56Data[num].unk4 & 255);
+		}
+		break;
+	case 12: {
+			const int type1 = ((_res->_mstOp56Data[num].unkC >> 4) & 15);
+			const int hint  = getTaskVar(t, _res->_mstOp56Data[num].unk0, type1);
+			const int type2 = (_res->_mstOp56Data[num].unkC & 15);
+			const int pause = getTaskVar(t, _res->_mstOp56Data[num].unk4, type2);
+			displayHintScreen(hint, pause);
+		}
+		break;
+	case 16:
+		if (t->mstObject) {
+			// TODO
+		} else if (t->dataPtr) {
+			// TODO
+		}
+		// fall-through
+	case 17: {
+			LvlObject *o = _andyObject;
+			const int pos = _res->_mstOp56Data[num].unk8;
+			const int xPos = o->xPos + o->posTable[pos].x;
+			const int yPos = o->yPos + o->posTable[pos].y;
+			const int type1  = (_res->_mstOp56Data[num].unkC >> 4) & 15;
+			const int index1 = _res->_mstOp56Data[num].unk0;
+			setTaskVar(t, index1, type1, xPos);
+			const int type2  = _res->_mstOp56Data[num].unkC & 15;
+			const int index2 = _res->_mstOp56Data[num].unk4;
+			setTaskVar(t, index2, type2, yPos);
 		}
 		break;
 	case 19:

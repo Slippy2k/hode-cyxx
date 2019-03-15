@@ -537,6 +537,7 @@ struct Game {
 	void removeTask(Task **tasksList, Task *t);
 	void prependTask(Task **tasksList, Task *t);
 	int getTaskVar(Task *t, int index, int type) const;
+	void setTaskVar(Task *t, int index, int type, int value);
 	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;
 	int runTask_default(Task *t);
