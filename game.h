@@ -41,6 +41,7 @@ struct Game {
 		kMaxScreens = 40,
 		kMaxTasks = 128,
 		kMaxVars = 40,
+		kMaxLocals = 16,
 		kFrameTimeStamp = 50 // 80
 	};
 

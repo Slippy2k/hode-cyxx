@@ -529,11 +529,41 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 3: // 3
+			if (t->dataPtr) {
+				// TODO
+			}
+			break;
+		case 4: // 4
+			if (t->dataPtr) {
+				// TODO
+			}
+			break;
 		case 13: // 23
 			_mstFlags |= (1 << p[1]);
 			break;
+		case 14: // 24
+			t->flags |= (1 << p[1]);
+			break;
+		case 15: // 25
+			if (t->mstObject) {
+				// TODO
+			} else if (t->dataPtr) {
+				// TODO
+			}
+			break;
 		case 16: // 26
 			_mstFlags &= ~(1 << p[1]);
+			break;
+		case 17: // 27
+			t->flags &= ~(1 << p[1]);
+			break;
+		case 18: // 28
+			if (t->mstObject) {
+				// TODO
+			} else if (t->dataPtr) {
+				// TODO
+			}
 			break;
 		case 20: { // 30
 				t->delay = 3;
@@ -564,8 +594,19 @@ int Game::runTask_default(Task *t) {
 				_res->flagMstCodeForPos(num, 0);
 			}
 			break;
+		case 26: { // 39
+				if (p[1] < _res->_mstHdr.pointsCount) {
+					// TODO
+					// runTask_default_op26(_mstToLoad2Pri, p[1]);
+					// runTask_default_op26(_mstToLoad1Pri, p[1]);
+					// runTask_default_op26(_mstToLoad2Num, p[1]);
+					// runTask_default_op26(_mstToLoad1Num, p[1]);
+				}
+			}
+			break;
 		case 29: { // 42
 				const int num = p[1];
+				assert(num < kMaxVars);
 				++_mstVars[num];
 			}
 			break;
@@ -574,15 +615,34 @@ int Game::runTask_default(Task *t) {
 				--t->localVars[num];
 			}
 			break;
+		case 32: { // 45
+				const int num = p[1];
+				assert(num < kMaxVars);
+				--_mstVars[num];
+			}
+			break;
+		case 34: { // 47, 49, 50
+				const int src = p[2];
+				const int dst = p[1];
+				arithOp(p[0] - 47, &t->localVars[dst], t->localVars[src]);
+			}
+			break;
+		case 35: { // 57
+				const int src = p[2];
+				const int dst = p[1];
+				assert(dst < kMaxVars);
+				arithOp(p[0] - 57, &_mstVars[dst], t->localVars[src]);
+			}
+			break;
 		case 43: { // 137
 				const int num = READ_LE_UINT16(p + 2);
-				assert(p[1] < 16);
+				assert(p[1] < kMaxLocals);
 				arithOp(p[0] - 137, &t->localVars[p[1]], getTaskOtherVar(num, t));
 			}
 			break;
 		case 46: { // 168
 				const int num = READ_LE_UINT16(p + 2);
-				assert(p[1] < 16);
+				assert(p[1] < kMaxLocals);
 				arithOp(p[0] - 167, &t->localVars[p[1]], num);
 			}
 			break;
