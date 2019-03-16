@@ -37,7 +37,7 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x4F, 0x4F, 0x4F,
 	0x4F, 0x4F, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41, 0x42, 0x43, 0x43, 0x43, 0x43,
 	0x43, 0x43, 0x44, 0x45, 0x46, 0x17, 0x4F, 0x47, 0x47, 0x48, 0x48, 0x4F, 0x49, 0x4A, 0x4B, 0x4C,
-	0x4D, 0x4F, 0x4E, 0x90
+	0x4D, 0x4F, 0x4E
 };
 
 void Game::resetMstUnkData(MstUnkData *m) {
@@ -509,12 +509,11 @@ int Game::runTask_default(Task *t) {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		assert(p[0] <= 242);
-		const int code = _mstDefaultLutOp[p[0]];
-		switch (code) {
+		switch (p[0]) {
 		case 0: // 0
 			// TODO:
 			// fall-through
-		case 1: {
+		case 1: { // 1
 				const int num = READ_LE_UINT16(p + 2);
 				const int delay = getTaskVar(t, num, p[1]);
 				t->delay = delay;
@@ -539,33 +538,33 @@ int Game::runTask_default(Task *t) {
 				// TODO
 			}
 			break;
-		case 13: // 23
+		case 23: // 13
 			_mstFlags |= (1 << p[1]);
 			break;
-		case 14: // 24
+		case 24: // 14
 			t->flags |= (1 << p[1]);
 			break;
-		case 15: // 25
+		case 25: // 15
 			if (t->mstObject) {
 				// TODO
 			} else if (t->dataPtr) {
 				// TODO
 			}
 			break;
-		case 16: // 26
+		case 26: // 16
 			_mstFlags &= ~(1 << p[1]);
 			break;
-		case 17: // 27
+		case 27: // 17
 			t->flags &= ~(1 << p[1]);
 			break;
-		case 18: // 28
+		case 28: // 18
 			if (t->mstObject) {
 				// TODO
 			} else if (t->dataPtr) {
 				// TODO
 			}
 			break;
-		case 20: { // 30
+		case 30: { // 20
 				t->delay = 3;
 				t->mstFlags = 1 << p[1];
 				if ((t->mstFlags & _mstFlags) == 0) {
@@ -579,22 +578,22 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 23: { // 33
+		case 33: { // 23
 				const int num = READ_LE_UINT16(p + 2);
 				p = _res->_mstCodeData + (num - 1) * 4;
 			}
 			break;
-		case 24: { // 35
+		case 35: { // 24
 				const int num = READ_LE_UINT16(p + 2);
 				_res->flagMstCodeForPos(num, 1);
 			}
 			break;
-		case 25: { // 36
+		case 36: { // 25
 				const int num = READ_LE_UINT16(p + 2);
 				_res->flagMstCodeForPos(num, 0);
 			}
 			break;
-		case 26: { // 39
+		case 39: { // 26
 				if (p[1] < _res->_mstHdr.pointsCount) {
 					// TODO
 					// runTask_default_op26(_mstToLoad2Pri, p[1]);
@@ -604,55 +603,99 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 29: { // 42
+		case 42: { // 29
 				const int num = p[1];
 				assert(num < kMaxVars);
 				++_mstVars[num];
 			}
 			break;
-		case 31: { // 44
+		case 44: { // 31
 				const int num = p[1];
 				--t->localVars[num];
 			}
 			break;
-		case 32: { // 45
+		case 45: { // 32
 				const int num = p[1];
 				assert(num < kMaxVars);
 				--_mstVars[num];
 			}
 			break;
-		case 34: { // 47, 49, 50
+		case 47:
+		case 48:
+		case 49:
+		case 50:
+		case 51:
+		case 52:
+		case 53:
+		case 54:
+		case 56: { // 34
 				const int src = p[2];
 				const int dst = p[1];
 				arithOp(p[0] - 47, &t->localVars[dst], t->localVars[src]);
 			}
 			break;
-		case 35: { // 57
+		case 57:
+		case 58:
+		case 59:
+		case 60:
+		case 61:
+		case 62:
+		case 63:
+		case 64:
+		case 65:
+		case 66: { // 35
 				const int src = p[2];
 				const int dst = p[1];
 				assert(dst < kMaxVars);
 				arithOp(p[0] - 57, &_mstVars[dst], t->localVars[src]);
 			}
 			break;
-		case 43: { // 137
+		case 137:
+		case 138:
+		case 139:
+		case 140:
+		case 141:
+		case 142:
+		case 143:
+		case 144:
+		case 145:
+		case 146: { // 43
 				const int num = READ_LE_UINT16(p + 2);
 				assert(p[1] < kMaxLocals);
 				arithOp(p[0] - 137, &t->localVars[p[1]], getTaskOtherVar(num, t));
 			}
 			break;
-		case 46: { // 168
+		case 167:
+		case 168:
+		case 169:
+		case 170:
+		case 171:
+		case 172:
+		case 173:
+		case 174:
+		case 175:
+		case 176: { // 46
 				const int num = READ_LE_UINT16(p + 2);
 				assert(p[1] < kMaxLocals);
 				arithOp(p[0] - 167, &t->localVars[p[1]], num);
 			}
 			break;
-		case 47: { // 177
+		case 177:
+		case 178:
+		case 179:
+		case 180:
+		case 181:
+		case 182:
+		case 183:
+		case 184:
+		case 185:
+		case 186: { // 47
 				const int16_t num = READ_LE_UINT16(p + 2);
 				assert(p[1] < kMaxVars);
 				arithOp(p[0] - 177, &_mstVars[p[1]], num);
 			}
 			break;
-		case 50: { // 198
+		case 198: { // 50
 				Task *child = findFreeTask();
 				if (child) {
 					memset(child, 0, sizeof(Task));
@@ -667,20 +710,20 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 54: // 202
+		case 202: // 54
 			runTask_default_op54();
 			break;
-		case 56: // 204
+		case 204: // 56
 			runTask_default_op56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
-		case 62: { // 215
+		case 215: { // 62
 				if (_mstOp54Unk3 != 0xFFFF) {
 					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk3]);
 				}
 				_mstOp54Counter = 0;
 			}
 			break;
-		case 64: { // 217
+		case 217: { // 64
 				const int num = READ_LE_UINT16(p + 2);
 				if (_mstOp54Unk3 != num) {
 					_mstOp54Unk3 = num;
@@ -689,7 +732,7 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 65: { // 218
+		case 218: { // 65
 				const int16_t num = READ_LE_UINT16(p + 2);
 				if (num != _mstOp54Unk1) {
 					_mstOp54Unk1 = num;
@@ -698,7 +741,7 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 67: { // 223
+		case 223: { // 67
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk53 *m = &_res->_mstUnk53[num];
 				const int mask = m->unk16;
@@ -711,7 +754,7 @@ int Game::runTask_default(Task *t) {
 				// TODO
 			}
 			break;
-		case 69: { // 227
+		case 227: { // 69
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk54 *m = &_res->_mstUnk54[num];
 				const int a = getTaskVar(t, m->unk0,  m->unk5       & 15);
@@ -722,14 +765,14 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 76: { // 239
+		case 239: { // 76
 				const int i = READ_LE_UINT16(p + 2);
 				const uint32_t codeData = _res->_mstUnk60[i];
 				assert(codeData != kNone);
 				createTask(_res->_mstCodeData + codeData * 4);
 			}
 			break;
-		case 77: { // 240
+		case 240: { // 77
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk59 *m = &_res->_mstUnk59[num];
 				if (m->codeData == kNone) {
@@ -739,7 +782,7 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 78: // 242
+		case 242: // 78
 			if (t->child) {
 				// TODO
 			} else if (t->dataPtr) {
@@ -755,7 +798,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		default:
-			warning("Unhandled opcode %d (%d) in runTask_default", *p, code);
+			warning("Unhandled opcode %d (%d) in runTask_default", *p, _mstDefaultLutOp[*p]);
 			break;
 		}
 		p += 4;
