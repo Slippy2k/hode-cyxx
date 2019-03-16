@@ -611,6 +611,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 44: { // 31
 				const int num = p[1];
+				assert(num < kMaxLocals);
 				--t->localVars[num];
 			}
 			break;
@@ -650,6 +651,36 @@ int Game::runTask_default(Task *t) {
 				arithOp(p[0] - 57, &_mstVars[dst], t->localVars[src]);
 			}
 			break;
+		case 107:
+		case 108:
+		case 109:
+		case 110:
+		case 111:
+		case 112:
+		case 113:
+		case 114:
+		case 115:
+		case 116: { // 40
+				assert(p[1] < kMaxLocals);
+				assert(p[2] < kMaxVars);
+				arithOp(p[0] - 107, &t->localVars[p[1]], _mstVars[p[2]]);
+			}
+			break;
+		case 117:
+		case 118:
+		case 119:
+		case 120:
+		case 121:
+		case 122:
+		case 123:
+		case 124:
+		case 125:
+		case 126: { // 41
+				assert(p[1] < kMaxLocals);
+				assert(p[2] < kMaxVars);
+				arithOp(p[0] - 117, &_mstVars[p[1]], _mstVars[p[2]]);
+			}
+			break;
 		case 137:
 		case 138:
 		case 139:
@@ -660,9 +691,24 @@ int Game::runTask_default(Task *t) {
 		case 144:
 		case 145:
 		case 146: { // 43
-				const int num = READ_LE_UINT16(p + 2);
+				const int num = p[2];
 				assert(p[1] < kMaxLocals);
 				arithOp(p[0] - 137, &t->localVars[p[1]], getTaskOtherVar(num, t));
+			}
+			break;
+		case 147:
+		case 148:
+		case 149:
+		case 150:
+		case 151:
+		case 152:
+		case 153:
+		case 154:
+		case 155:
+		case 156: { // 44
+				const int num = p[2];
+				assert(p[1] < kMaxVars);
+				arithOp(p[0] - 147, &_mstVars[p[1]], getTaskOtherVar(num, t));
 			}
 			break;
 		case 167:
