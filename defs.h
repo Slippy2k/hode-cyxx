@@ -300,6 +300,8 @@ struct Task;
 struct MstUnkData {
 	int unk0;
 	LvlObject *o; // 0x10
+	int32_t vars[8]; // 0x28
+	uint8_t flags; // 0xA5
 	Task *t; // 0xC4
 }; // sizeof == 256
 
@@ -319,7 +321,7 @@ struct Task {
 	Task *prev, *next; // 4,8
 	uint8_t *dataPtr; // 0xC
 	MstObject *mstObject; // 0x10
-	int16_t localVars[16]; // 0x14
+	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34
 	uint8_t runningState; // 0x35
 	int16_t delay; // 0x36
