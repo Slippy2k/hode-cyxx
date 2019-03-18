@@ -301,7 +301,8 @@ struct MstUnkData {
 	int unk0;
 	LvlObject *o; // 0x10
 	int32_t vars[8]; // 0x28
-	uint8_t flags; // 0xA5
+	uint8_t flagsA5; // 0xA5
+	uint8_t flagsA6; // 0xA6
 	Task *t; // 0xC4
 }; // sizeof == 256
 

@@ -306,6 +306,29 @@ void Game::updateMstHeightMapData() {
 	}
 }
 
+void Game::removeMstObjectTask(Task *t) {
+	MstObject *m = t->mstObject;
+	m->unk0 = 0;
+	LvlObject *o = m->o;
+	if (o) {
+		o->dataPtr = 0;
+		removeLvlObjectNotType2List1(o);
+	}
+	Task *child = t->child;
+	if (child) {
+		child->codeData = 0;
+	}
+	Task *next = t->next;
+	t->codeData = 0;
+	Task *prev = t->prev;
+	if (prev) {
+		prev->next = next;
+	}
+	if (next) {
+		next->prev = prev;
+	}
+}
+
 Task *Game::findFreeTask() {
 	for (int i = 0; i < kMaxTasks; ++i) {
 		Task *t = &_tasksTable[i];
@@ -1047,4 +1070,8 @@ int Game::runTask_waitFlags(Task *t) {
 		// TODO
 	}
 	return 0;
+}
+
+int Game::runTask_idle(Task *t) {
+	return 1;
 }

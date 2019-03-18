@@ -531,6 +531,7 @@ struct Game {
 	void updateMstMoveData();
 	void updateMstHeightMapData();
 
+	void removeMstObjectTask(Task *t);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
 	Task *updateTask(Task *t, int num, const uint8_t *codeData);
@@ -547,6 +548,7 @@ struct Game {
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);
+	int runTask_idle(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
