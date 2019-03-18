@@ -741,6 +741,28 @@ int Game::runTask_default(Task *t) {
 				arithOp(p[0] - 177, &_mstVars[p[1]], num);
 			}
 			break;
+		case 187:
+		case 188:
+		case 189:
+		case 190:
+		case 191:
+		case 192:
+		case 193:
+		case 194:
+		case 195:
+		case 196: { // 48
+				MstUnkData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->unk8;
+				} else {
+					m = (MstUnkData *)t->dataPtr;
+				}
+				if (m) {
+					const int16_t num = READ_LE_UINT16(p + 2);
+					arithOp(p[0] < 187, &m->vars[p[1]], num);
+				}
+			}
+			break;
 		case 198: { // 50
 				Task *child = findFreeTask();
 				if (child) {
