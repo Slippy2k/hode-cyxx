@@ -626,7 +626,8 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 33: { // 23
+		case 33:
+		case 229: { // 23
 				const int num = READ_LE_UINT16(p + 2);
 				p = _res->_mstCodeData + (num - 1) * 4;
 			}
