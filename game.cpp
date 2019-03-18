@@ -1768,7 +1768,9 @@ void Game::mixAudio(int16_t *buf, int len) {
 
 void Game::updateLvlObjectList(LvlObject *list) {
 	for (LvlObject *ptr = list; ptr; ptr = ptr->nextPtr) {
-		(this->*(ptr->callbackFuncPtr))(ptr);
+		if (ptr->callbackFuncPtr) {
+			(this->*(ptr->callbackFuncPtr))(ptr);
+		}
 		if (ptr->bitmapBits) {
 			addToSpriteList(ptr);
 		}
@@ -2838,17 +2840,50 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 	uint8_t _al  = ptr->flags0 & 0x1F;
 	uint8_t var1 = (ptr->flags0 >> 5) & 7;
 	if (_al == 4) {
+// 40DB4C
 		// _eax = _esi->dataPtr;
-		// _esi->callbackFuncPtr = &Game::lvlObjectCallbackUnk1;
+		// _esi->callbackFuncPtr = &Game::lvlObjectCallbackSpecialPowers;
 		// uint8_t _cl = (ptr->flags1 >> 4) & 3;
-		// uint8_t _dl = _eax[0];
+		// uint8_t _dl = _eax->unk0;
 		warning("lvlObjectType0CallbackHelper4 unimplemented _al == 4");
 	} else if (_al == 7) {
 // 40DD4B
 		switch (var1) {
 		case 0:
-			warning("lvlObjectType0CallbackHelper4 unimplemented _al == 7, var1 == 0");
-			// TODO
+			if (!_esi) {
+				LvlObject *o = _edi->nextPtr;
+				if (!o) {
+					LvlObject *_edx = declareLvlObject(8, 3);
+					_edi->nextPtr = _edx;
+					_edx->dataPtr = _otherObjectScreenDataList;
+					if (_otherObjectScreenDataList) {
+						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
+						 memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+					}
+					_edx->xPos = ptr->xPos;
+					_edx->yPos = ptr->yPos;
+					_edx->flags &= ~0x30;
+					_edx->screenNum = ptr->screenNum;
+					_edx->anim = 7;
+					_edx->frame = 0;
+					_edx->bitmapBits = 0;
+					_edx->flags2 = (ptr->flags2 & 0xDFFF) - 1;
+					prependLvlObjectToList(&_lvlObjectsList0, _edx);
+				}
+// 40DDEE
+				AndyObjectScreenData *_edx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				_edx->unk0 = 0;
+				break;
+			} else {
+// 40DE08
+				OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+				_esi->anim = (_eax->unk0 == 0) ? 14 : 15;
+				updateAndyObject(_esi);
+				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
+				if (_currentLevel == 3) {
+					_esi->xPos += _eax->boundingBox.x1;
+				}
+			}
 			break;
 		case 2: {
 				LvlObject *_eax = _edi->nextPtr;
@@ -3084,6 +3119,12 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 		break;
 	case 1:
 		o->callbackFuncPtr = &Game::lvlObjectType1Callback;
+		break;
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+		// nop
 		break;
 	default:
 		error("lvlObjectTypeCallback unhandled case %d", o->data0x2988);
