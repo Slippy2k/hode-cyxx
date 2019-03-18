@@ -361,7 +361,7 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	Task *current = _tasksListTail;
 	bool found = false;
 	while (current) {
-		if ((current->localVars[14] | (current->localVars[15] << 16)) == num) {
+		if (current->localVars[7] == num) {
 			found = true;
 			if (current != t) {
 				// TODO
@@ -385,8 +385,7 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 				_tasksListTail->next = t;
 			}
 			_tasksListTail = t;
-			t->localVars[14] = num & 0xFFFF;
-			t->localVars[15] = num >> 16;
+			t->localVars[7] = num;
 			return t;
 		}
 	}
@@ -397,8 +396,21 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->runningState |= 2;
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
-	t->localVars[12] = 0;
-	// TODO:
+	t->localVars[7] = 0;
+	MstUnkData *m = (MstUnkData *)t->dataPtr;
+	if (m) {
+		const uint8_t mask = m->flagsA5;
+		if ((mask & 0x88) == 0 || (mask & 0xF0) == 0) {
+			if ((mask & 8) != 0) {
+				t->flags = (t->flags & ~0x40) | 0x20;
+				m->flags48 &= ~0x1C;
+			} else if ((mask & 2) != 0) {
+// 414F2A
+				m->flags48 |= 8;
+				// TODO
+			}
+		}
+	}
 }
 
 void Game::removeTask(Task **tasksList, Task *t) {
