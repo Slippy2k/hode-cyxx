@@ -970,17 +970,6 @@ int Game::addLvlObjectToList3(int num) {
 	return 0;
 }
 
-LvlObject *Game::findLvlObjectNoDataPtr(int num, int index) {
-	LvlObject *ptr = _screenLvlObjectsList[index];
-	while (ptr) {
-		if (ptr->type == 2 && ptr->data0x2988 == num && !ptr->dataPtr) {
-			break;
-		}
-		ptr = ptr->nextPtr;
-	}
-	return ptr;
-}
-
 void Game::removeLvlObject(LvlObject *ptr) {
 	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *o = dataPtr->nextPtr;
@@ -991,7 +980,7 @@ void Game::removeLvlObject(LvlObject *ptr) {
 	}
 }
 
-void Game::removeLvlObjectNotType2List1(LvlObject *o) {
+void Game::removeLvlObject2(LvlObject *o) {
 	if (o->type != 2) {
 		LvlObject *ptr = _lvlObjectsList1;
 		if (ptr) {
@@ -3113,7 +3102,7 @@ LvlObject *Game::game_unk115(int type, int y, int x, int screen, int num, int o_
 		if (screen != _currentScreen && screen != _currentLeftScreen && screen != _currentRightScreen) {
 			return 0;
 		}
-		ptr = findLvlObjectNoDataPtr(num, screen);
+		ptr = findLvlObjectType2(num, screen);
 		break;
 	case 2:
 		addLvlObjectToList3(num);
@@ -3274,6 +3263,17 @@ LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int index) {
 	LvlObject *ptr = _screenLvlObjectsList[index];
 	while (ptr) {
 		if (ptr->type == type && ptr->flags == flags) {
+			break;
+		}
+		ptr = ptr->nextPtr;
+	}
+	return ptr;
+}
+
+LvlObject *Game::findLvlObjectType2(int num, int index) {
+	LvlObject *ptr = _screenLvlObjectsList[index];
+	while (ptr) {
+		if (ptr->type == 2 && ptr->data0x2988 == num && !ptr->dataPtr) {
 			break;
 		}
 		ptr = ptr->nextPtr;

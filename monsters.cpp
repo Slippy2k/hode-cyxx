@@ -312,7 +312,7 @@ void Game::removeMstObjectTask(Task *t) {
 	LvlObject *o = m->o;
 	if (o) {
 		o->dataPtr = 0;
-		removeLvlObjectNotType2List1(o);
+		removeLvlObject2(o);
 	}
 	Task *child = t->child;
 	if (child) {

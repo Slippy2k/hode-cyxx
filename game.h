@@ -65,7 +65,7 @@ struct Game {
 	SystemStub *_system;
 
 	int _difficulty;
-	LvlObject *_screenLvlObjectsList[kMaxScreens];
+	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
 	LvlObject *_plasmaCannonObject;
@@ -215,9 +215,8 @@ struct Game {
 	void clearLvlObjectsList3();
 	LvlObject *addLvlObjectToList1(int type, int num);
 	int addLvlObjectToList3(int num);
-	LvlObject *findLvlObjectNoDataPtr(int num, int index);
 	void removeLvlObject(LvlObject *ptr);
-	void removeLvlObjectNotType2List1(LvlObject *o);
+	void removeLvlObject2(LvlObject *o);
 	void setupCurrentScreen();
 	void updateScreenHelper(int num);
 	void resetDisplay();
@@ -276,6 +275,7 @@ struct Game {
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
 	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
+	LvlObject *findLvlObjectType2(int num, int index);
 	void resetLevelTickHelperData();
 	void updateLevelTickHelper();
 	void captureScreenshot();
