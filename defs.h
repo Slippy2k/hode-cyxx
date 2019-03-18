@@ -300,7 +300,7 @@ struct Task;
 struct MstUnkData {
 	int unk0;
 	LvlObject *o; // 0x10
-	int32_t vars[8]; // 0x28
+	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
@@ -321,7 +321,7 @@ struct MstObject {
 struct Task {
 	const uint8_t *codeData;
 	Task *prev, *next; // 4,8
-	uint8_t *dataPtr; // 0xC
+	MstUnkData *dataPtr; // 0xC
 	MstObject *mstObject; // 0x10
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34

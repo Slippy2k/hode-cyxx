@@ -397,7 +397,7 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
 	t->localVars[7] = 0;
-	MstUnkData *m = (MstUnkData *)t->dataPtr;
+	MstUnkData *m = t->dataPtr;
 	if (m) {
 		const uint8_t mask = m->flagsA5;
 		if ((mask & 0x88) == 0 || (mask & 0xF0) == 0) {
@@ -459,6 +459,19 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 		return _mstVars[index];
 	case 4:
 		return getTaskOtherVar(index, t);
+	case 5:
+		{
+			MstUnkData *m = 0;
+			if (t->mstObject) {
+				m = t->mstObject->unk8;
+			} else {
+				m = t->dataPtr;
+			}
+			if (m) {
+				return m->localVars[index];
+			}
+		}
+		break;
 	default:
 		error("getTaskVar unhandled index %d type %d", index, type);
 		break;
@@ -790,11 +803,11 @@ int Game::runTask_default(Task *t) {
 				if (t->mstObject) {
 					m = t->mstObject->unk8;
 				} else {
-					m = (MstUnkData *)t->dataPtr;
+					m = t->dataPtr;
 				}
 				if (m) {
 					const int16_t num = READ_LE_UINT16(p + 2);
-					arithOp(p[0] < 187, &m->vars[p[1]], num);
+					arithOp(p[0] < 187, &m->localVars[p[1]], num);
 				}
 			}
 			break;
@@ -1065,21 +1078,29 @@ int Game::runTask_waitFlags(Task *t) {
 			return 1;
 		}
 		break;
-	case 5:
-		if (t->mstObject) {
-			// TODO
-		} else if (t->dataPtr) {
-			// TODO
-		} else {
-			return 1;
+	case 5: {
+			MstUnkData *m = 0;
+			if (t->mstObject) {
+				m = t->mstObject->unk8;
+			} else {
+				m = t->dataPtr;
+			}
+			if (!m || (m->flags48 & (1 << t->mstFlags)) == 0) {
+				return 1;
+			}
 		}
 		break;
 	}
 	t->run = &Game::runTask_default;
+	LvlObject *o = 0;
 	if (t->dataPtr) {
-		// TODO
+		o = t->dataPtr->o;
 	} else if (t->mstObject) {
-		// TODO
+		o = t->mstObject->o;
+	}
+	if (o) {
+		o->actionKeyMask = 0;
+		o->directionKeyMask = 0;
 	}
 	return 0;
 }
