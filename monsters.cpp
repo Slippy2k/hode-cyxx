@@ -830,7 +830,7 @@ int Game::runTask_default(Task *t) {
 			runTask_default_op54();
 			break;
 		case 204: // 56
-			runTask_default_op56(t, p[1], READ_LE_UINT16(p + 2));
+			ret = runTask_default_op56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
 		case 215: { // 62
 				if (_mstOp54Unk3 != 0xFFFF) {
@@ -951,7 +951,7 @@ void Game::runTask_default_op54() {
 	// TODO
 }
 
-void Game::runTask_default_op56(Task *t, int code, int num) {
+int Game::runTask_default_op56(Task *t, int code, int num) {
 	assert(num < _res->_mstHdr.unk0x78);
 	switch (code) {
 	case 3:
@@ -1031,6 +1031,7 @@ void Game::runTask_default_op56(Task *t, int code, int num) {
 		warning("Unhandled opcode %d in runTask_default_op56", code);
 		break;
 	}
+	return 0;
 }
 
 int Game::runTask_wait(Task *t) {

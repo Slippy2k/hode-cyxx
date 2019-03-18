@@ -544,7 +544,7 @@ struct Game {
 	int getTaskOtherVar(int index, Task *t) const;
 	int runTask_default(Task *t);
 	void runTask_default_op54();
-	void runTask_default_op56(Task *t, int code, int num);
+	int runTask_default_op56(Task *t, int code, int num);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);
