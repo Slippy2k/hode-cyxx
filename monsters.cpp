@@ -612,6 +612,25 @@ int Game::runTask_default(Task *t) {
 				// TODO
 			}
 			break;
+		case 29: { // 19
+				t->delay = 4;
+				t->mstFlags = p[1];
+				if (getTaskAndyVar(p[1], t) == 0) {
+					LvlObject *o = 0;
+					if (t->dataPtr) {
+						// TODO
+					} else if (t->mstObject) {
+						// TODO
+					}
+					if (o) {
+						o->actionKeyMask = 0;
+						o->directionKeyMask = 0;
+					}
+					t->run = &Game::runTask_waitFlags;
+					ret = 1;
+				}
+			}
+			break;
 		case 30: { // 20
 				t->delay = 3;
 				t->mstFlags = 1 << p[1];
