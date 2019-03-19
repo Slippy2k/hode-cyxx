@@ -262,7 +262,7 @@ struct Game {
 	void lvlObjectType0CallbackHelper1();
 	int calcScreenMaskDx(int x, int y, int num);
 	void lvlObjectType0CallbackHelper3(LvlObject *ptr);
-	void lvlObjectType0CallbackHelper4(LvlObject *ptr);
+	void setupSpecialPowers(LvlObject *ptr);
 	int lvlObjectType0Callback(LvlObject *ptr);
 	int lvlObjectType1Callback(LvlObject *ptr);
 	int lvlObjectList3Callback(LvlObject *o);

@@ -2834,19 +2834,103 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 	}
 }
 
-void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
+void Game::setupSpecialPowers(LvlObject *ptr) {
 	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *_esi = _edi->nextPtr;
-	uint8_t _al  = ptr->flags0 & 0x1F;
+	const uint8_t pos  = ptr->flags0 & 0x1F;
 	uint8_t var1 = (ptr->flags0 >> 5) & 7;
-	if (_al == 4) {
+	if (pos == 4) {
 // 40DB4C
-		// _eax = _esi->dataPtr;
+		OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
 		// _esi->callbackFuncPtr = &Game::lvlObjectCallbackSpecialPowers;
-		// uint8_t _cl = (ptr->flags1 >> 4) & 3;
-		// uint8_t _dl = _eax->unk0;
-		warning("lvlObjectType0CallbackHelper4 unimplemented _al == 4");
-	} else if (_al == 7) {
+		uint8_t _cl = (ptr->flags1 >> 4) & 3;
+		if (_eax->unk0 == 4) {
+			_eax->unk2 = 0x21;
+			switch (var1) {
+			case 0:
+				_eax->unk1 = ((_cl & 1) != 0) ? 5 : 0;
+				break;
+			case 1:
+				_eax->unk1 = ((_cl & 1) != 0) ? 3 : 1;
+				break;
+			case 2:
+				_eax->unk1 = ((_cl & 1) != 0) ? 4 : 2;
+				break;
+			case 3:
+				_eax->unk1 = ((_cl & 1) != 0) ? 1 : 3;
+				break;
+			case 4:
+				_eax->unk1 = ((_cl & 1) != 0) ? 2 : 4;
+				break;
+			case 5:
+				_eax->unk1 = ((_cl & 1) != 0) ? 0 : 5;
+				break;
+			case 6:
+				_eax->unk1 = 6;
+				break;
+			case 7:
+				_eax->unk1 = 7;
+				break;
+			}
+// 40DBCE
+			// TODO
+			_esi->anim = 10;
+		} else {
+// 40DBF4
+			_eax->unk2 = 0x11;
+			switch (var1) {
+			case 0:
+				_esi->anim = 13;
+				_eax->unk1 = ((_cl & 1) != 0) ? 5 : 0;
+				break;
+			case 1:
+				_esi->anim = 12;
+				_eax->unk1 = ((_cl & 1) != 0) ? 3 : 1;
+				_cl ^= 1;
+				break;
+			case 2:
+				_esi->anim = 12;
+				_eax->unk1 = ((_cl & 1) != 0) ? 4 : 2;
+				_cl ^= 3;
+				break;
+			case 3:
+				_esi->anim = 12;
+				_eax->unk1 = ((_cl & 1) != 0) ? 1 : 3;
+				break;
+			case 4:
+				_esi->anim = 12;
+				_eax->unk1 = ((_cl & 1) != 0) ? 2 : 4;
+				_cl ^= 2;
+				break;
+			case 5:
+				_esi->anim = 13;
+				_eax->unk1 = ((_cl & 1) != 0) ? 0 : 5;
+				_cl ^= 1;
+				break;
+			case 6:
+				_esi->anim = 11;
+				_eax->unk1 = 6;
+				break;
+			case 7:
+				_esi->anim = 11;
+				_eax->unk1 = 7;
+				_cl ^= 2;
+				break;
+			}
+// 40DCCE
+			// TODO
+		}
+// 40DCE9
+		_esi->frame = 0;
+		_esi->flags1 = (_esi->flags1 & ~0x30) | ((_cl & 3) << 4);
+		setupLvlObjectBitmap(_esi);
+		_esi->screenNum = ptr->screenNum;
+		setLvlObjectPosRelativeToObject(_esi, 7, ptr, 6);
+		if (_currentLevel == kLvl_isld) {
+			_esi->xPos += _eax->boundingBox.x1;
+		}
+		_edi->nextPtr = 0;
+	} else if (pos == 7) {
 // 40DD4B
 		switch (var1) {
 		case 0:
@@ -2871,8 +2955,10 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DDEE
-				AndyObjectScreenData *_edx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				_edx->unk0 = 0;
+				if (_esi) {
+					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+					_edx->unk0 = 0;
+				}
 				break;
 			} else {
 // 40DE08
@@ -2880,7 +2966,7 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 				_esi->anim = (_eax->unk0 == 0) ? 14 : 15;
 				updateAndyObject(_esi);
 				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
-				if (_currentLevel == 3) {
+				if (_currentLevel == kLvl_isld) {
 					_esi->xPos += _eax->boundingBox.x1;
 				}
 			}
@@ -2906,8 +2992,10 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DEEC
-				warning("lvlObjectType0CallbackHelper4 unimplemented _al == 7, var1 == 2");
-				// TODO
+				if (_esi) {
+					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+					_edx->unk0 = 0;
+				}
 			}
 			break;
 		case 1:
@@ -2916,8 +3004,7 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 				_esi->bitmapBits = 0;
 			}
 			break;
-		case 3:
-			{
+		case 3: {
 				LvlObject *_eax = _edi->nextPtr;
 				if (_eax) {
 					LvlObject *_edx = declareLvlObject(8, 3);
@@ -2938,8 +3025,10 @@ void Game::lvlObjectType0CallbackHelper4(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DF82
-				warning("lvlObjectType0CallbackHelper4 unimplemented _al == 7, var1 == 3");
-				// TODO
+				if (_esi) {
+					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+					_edx->unk0 = 0;
+				}
 			}
 			break;
 		case 4:
@@ -2993,7 +3082,7 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 		break;
 	case 9:
 		if (ptr->data0x2988 != 0) {
-			lvlObjectType0CallbackHelper4(ptr);
+			setupSpecialPowers(ptr);
 		} else {
 			setupPlasmaCannonPoints(ptr);
 		}
@@ -3007,7 +3096,7 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 	case 4:
 	case 5:
 	case 6:
-		lvlObjectType0CallbackHelper4(ptr);
+		setupSpecialPowers(ptr);
 		break;
 	}
 	if (!_hideAndyObjectSprite) {
