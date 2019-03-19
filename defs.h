@@ -126,9 +126,9 @@ struct Game;
 struct SssObject;
 
 struct LvlObject {
-	int32_t xPos;
-	int32_t yPos;
-	uint8_t screenNum;
+	int32_t xPos; // 0
+	int32_t yPos; // 4
+	uint8_t screenNum; // 8
 	uint8_t screenState;
 	uint8_t flags;
 	uint8_t frame;

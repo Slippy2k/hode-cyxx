@@ -124,11 +124,12 @@ struct Game {
 	int32_t _plasmaCannonYPointsTable1[129];
 	int32_t _plasmaCannonXPointsTable2[127];
 	int32_t _plasmaCannonYPointsTable2[127];
-	uint16_t _gameMstAnim;
-	uint16_t _gameMstAnimFlags1;
+	uint16_t _mstCurrentAnim;
+	uint16_t _mstCurrentFlags1;
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	ScreenMask _shadowScreenMasksTable[8];
+	uint8_t _mstCurrentUnkFlag;
 
 	uint32_t _gameMstLogicHelper1TestValue;
 	uint32_t _gameMstLogicHelper1TestMask;

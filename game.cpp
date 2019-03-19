@@ -2157,9 +2157,9 @@ void Game::updateAndyMonsterObjects() {
 	}
 	if (_dl & 2) {
 		_actionDirectionKeyMaskIndex = 0;
-		ptr->anim = _gameMstAnim;
+		ptr->anim = _mstCurrentAnim;
 		ptr->frame = 0;
-		ptr->flags1 = bitmask_set(ptr->flags1, _gameMstAnimFlags1, 0x30);
+		ptr->flags1 = bitmask_set(ptr->flags1, _mstCurrentFlags1, 0x30);
 		setupLvlObjectBitmap(ptr);
 		setLvlObjectPosRelativeToPoint(ptr, 3, _mstOriginPosX, _mstOriginPosY);
 	}

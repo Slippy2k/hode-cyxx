@@ -974,6 +974,36 @@ void Game::runTask_default_op54() {
 int Game::runTask_default_op56(Task *t, int code, int num) {
 	assert(num < _res->_mstHdr.unk0x78);
 	switch (code) {
+	case 0:
+		if (_mstCurrentUnkFlag == 0 && resetAndyLvlObjectPlasmaCannonKeyMask(0x71) != 0) {
+			_plasmaCannonFlags |= 1;
+			if (_andyObject->data0x2988 == 0) {
+				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
+			} else {
+				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
+			}
+// 411AB4
+			// TODO
+// 411B72
+			// TODO
+		}
+// 411BBA
+		// TODO
+		break;
+	case 1:
+		if (_mstCurrentUnkFlag != 0) {
+			if (resetAndyLvlObjectPlasmaCannonKeyMask(0x61) != 0) {
+				_plasmaCannonFlags &= ~1;
+				if (_andyObject->data0x2988 == 0) {
+					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
+				} else {
+					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
+				}
+// 4118ED
+			}
+// 4119F5
+		}
+		break;
 	case 3:
 		resetAndyLvlObjectPlasmaCannonKeyMask(0x12);
 		break;
@@ -1012,6 +1042,40 @@ int Game::runTask_default_op56(Task *t, int code, int num) {
 			displayHintScreen(hint, pause);
 		}
 		break;
+	case 15: {
+			_andyObject->anim  = _res->_mstOp56Data[num].unk0;
+			_andyObject->frame = _res->_mstOp56Data[num].unk4;
+			LvlObject *o = 0;
+			if (t->mstObject) {
+				// TODO
+			} else if (t->dataPtr) {
+				// TODO
+			} else {
+				o = _andyObject;
+			}
+			uint8_t _al = 0;
+			switch (_res->_mstOp56Data[num].unk8) {
+			case 1:
+				_al = 1;
+				break;
+			case 2:
+				_al = (o->flags1 >> 4) & 1;
+				break;
+			case 3:
+				_al = ~(o->flags1 >> 4) & 1;
+				break;
+			case 4:
+				_al = (_andyObject->flags1 >> 4) & 1;
+				break;
+			case 5:
+				_al = ~(_andyObject->flags1 >> 4) & 1;
+				break;
+			}
+			_andyObject->flags1 = ((_al & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
+			setupLvlObjectBitmap(_andyObject);
+			// TODO
+		}
+		break;
 	case 16:
 		if (t->mstObject) {
 			// TODO
@@ -1037,6 +1101,25 @@ int Game::runTask_default_op56(Task *t, int code, int num) {
 		_andyActionKeyMaskOr     = _res->_mstOp56Data[num].unk4 & 255;
 		_andyDirectionKeyMaskAnd = _res->_mstOp56Data[num].unk8 & 255;
 		_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].unkC & 255;
+		break;
+	case 27: {
+			int index1 =  _res->_mstOp56Data[num].unk0;
+			int type1  = (_res->_mstOp56Data[num].unkC >> 0xC) & 15;
+			int a      = getTaskVar(t, index1, type1);
+			int index2 =  _res->_mstOp56Data[num].unk4;
+			int type2  = (_res->_mstOp56Data[num].unkC >> 0x8) & 15;
+			int b      = getTaskVar(t, index2, type2);
+			int index3 = _res->_mstOp56Data[num].unk8;
+			int type3  = (_res->_mstOp56Data[num].unkC >> 0x4) & 15;
+			int c      = getTaskVar(t, index3, type3);
+			int index4 =  _res->_mstOp56Data[num].unkC >> 16;
+			int type4  =  _res->_mstOp56Data[num].unkC         & 15;
+			int d      = getTaskVar(t, index4, type4);
+			// TODO
+			// executeMstOp56_27(a - 16, b, a + 16, c, d);
+		}
+		break;
+	case 28:
 		break;
 	case 29: {
 			const uint8_t state  = _res->_mstOp56Data[num].unk4 & 255;
