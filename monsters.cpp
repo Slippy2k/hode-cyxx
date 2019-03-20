@@ -971,6 +971,22 @@ void Game::executeMstOp54() {
 	// TODO
 }
 
+static uint8_t getLvlObjectFlag4(int type, const LvlObject *o, const LvlObject *andyObject) {
+	switch (type) {
+	case 1:
+		return 1;
+	case 2:
+		return (o->flags1 >> 4) & 1;
+	case 3:
+		return ~(o->flags1 >> 4) & 1;
+	case 4:
+		return (andyObject->flags1 >> 4) & 1;
+	case 5:
+		return ~(andyObject->flags1 >> 4) & 1;
+	}
+	return 0;
+}
+
 int Game::executeMstOp56(Task *t, int code, int num) {
 	assert(num < _res->_mstHdr.unk0x78);
 	switch (code) {
@@ -1006,25 +1022,8 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		break;
 	case 2: {
 			LvlObject *o = t->dataPtr->o;
-			uint8_t code = 0;
-			switch (_res->_mstOp56Data[num].unk0 & 255) {
-			case 1:
-				code = 1;
-				break;
-			case 2:
-				code = (o->flags1 >> 4) & 1;
-				break;
-			case 3:
-				code = ~(o->flags >> 4) & 1;
-				break;
-			case 4:
-				code = (_andyObject->flags >> 4) & 1;
-				break;
-			case 5:
-				code = ~(_andyObject->flags >> 4) & 1;
-				break;
-			}
-			resetAndyLvlObjectPlasmaCannonKeyMask(code | 0x10);
+			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk0 & 255, o, _andyObject);
+			resetAndyLvlObjectPlasmaCannonKeyMask(flag | 0x10);
 		}
 		break;
 	case 3:
@@ -1085,25 +1084,8 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			} else {
 				o = _andyObject;
 			}
-			uint8_t _al = 0;
-			switch (_res->_mstOp56Data[num].unk8) {
-			case 1:
-				_al = 1;
-				break;
-			case 2:
-				_al = (o->flags1 >> 4) & 1;
-				break;
-			case 3:
-				_al = ~(o->flags1 >> 4) & 1;
-				break;
-			case 4:
-				_al = (_andyObject->flags1 >> 4) & 1;
-				break;
-			case 5:
-				_al = ~(_andyObject->flags1 >> 4) & 1;
-				break;
-			}
-			_andyObject->flags1 = ((_al & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
+			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk8, o, _andyObject);
+			_andyObject->flags1 = ((flag & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
 			setupLvlObjectBitmap(_andyObject);
 			// TODO
 		}
