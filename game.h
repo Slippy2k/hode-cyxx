@@ -171,6 +171,7 @@ struct Game {
 	MstUnkData _mstUnkDataTable[32];
 	MstObject _mstObjectsTable[64];
 	int _mstTickDelay;
+	uint8_t _mstUnk39;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -544,8 +545,8 @@ struct Game {
 	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;
 	int runTask_default(Task *t);
-	void runTask_default_op54();
-	int runTask_default_op56(Task *t, int code, int num);
+	void executeMstOp54();
+	int executeMstOp56(Task *t, int code, int num);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);

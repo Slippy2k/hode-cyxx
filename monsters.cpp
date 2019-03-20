@@ -664,10 +664,10 @@ int Game::runTask_default(Task *t) {
 		case 39: { // 26
 				if (p[1] < _res->_mstHdr.pointsCount) {
 					// TODO
-					// runTask_default_op26(_mstToLoad2Pri, p[1]);
-					// runTask_default_op26(_mstToLoad1Pri, p[1]);
-					// runTask_default_op26(_mstToLoad2Num, p[1]);
-					// runTask_default_op26(_mstToLoad1Num, p[1]);
+					// executeMstOp26(_mstToLoad2Pri, p[1]);
+					// executeMstOp26(_mstToLoad1Pri, p[1]);
+					// executeMstOp26(_mstToLoad2Num, p[1]);
+					// executeMstOp26(_mstToLoad1Num, p[1]);
 				}
 			}
 			break;
@@ -847,10 +847,10 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 202: // 54
-			runTask_default_op54();
+			executeMstOp54();
 			break;
 		case 204: // 56
-			ret = runTask_default_op56(t, p[1], READ_LE_UINT16(p + 2));
+			ret = executeMstOp56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
 		case 215: { // 62
 				if (_mstOp54Unk3 != 0xFFFF) {
@@ -950,7 +950,7 @@ int Game::runTask_default(Task *t) {
 	return 1;
 }
 
-void Game::runTask_default_op54() {
+void Game::executeMstOp54() {
 	// TODO
 	const int x = MIN(_mstRefPosX, 255);
 	if (_mstRefPosX < 0) {
@@ -971,7 +971,7 @@ void Game::runTask_default_op54() {
 	// TODO
 }
 
-int Game::runTask_default_op56(Task *t, int code, int num) {
+int Game::executeMstOp56(Task *t, int code, int num) {
 	assert(num < _res->_mstHdr.unk0x78);
 	switch (code) {
 	case 0:
@@ -1004,6 +1004,29 @@ int Game::runTask_default_op56(Task *t, int code, int num) {
 // 4119F5
 		}
 		break;
+	case 2: {
+			LvlObject *o = t->dataPtr->o;
+			uint8_t code = 0;
+			switch (_res->_mstOp56Data[num].unk0 & 255) {
+			case 1:
+				code = 1;
+				break;
+			case 2:
+				code = (o->flags1 >> 4) & 1;
+				break;
+			case 3:
+				code = ~(o->flags >> 4) & 1;
+				break;
+			case 4:
+				code = (_andyObject->flags >> 4) & 1;
+				break;
+			case 5:
+				code = ~(_andyObject->flags >> 4) & 1;
+				break;
+			}
+			resetAndyLvlObjectPlasmaCannonKeyMask(code | 0x10);
+		}
+		break;
 	case 3:
 		resetAndyLvlObjectPlasmaCannonKeyMask(0x12);
 		break;
@@ -1032,6 +1055,15 @@ int Game::runTask_default_op56(Task *t, int code, int num) {
 			setShakeScreen(1, _res->_mstOp56Data[num].unk4 & 255);
 		} else {
 			setShakeScreen(3, _res->_mstOp56Data[num].unk4 & 255);
+		}
+		break;
+	case 11: {
+			MstObject *m = t->mstObject;
+			const int type = _res->_mstOp56Data[num].unkC;
+			m->boundingBox.x1 = getTaskVar(t, _res->_mstOp56Data[num].unk0, (type >> 0xC) & 15);
+			m->boundingBox.x2 = getTaskVar(t, _res->_mstOp56Data[num].unk4, (type >> 0x8) & 15);
+			m->boundingBox.y1 = getTaskVar(t, _res->_mstOp56Data[num].unk8, (type >> 0x4) & 15);
+			m->boundingBox.y2 = getTaskVar(t, type >> 16                  ,  type         & 15);
 		}
 		break;
 	case 12: {
@@ -1096,11 +1128,30 @@ int Game::runTask_default_op56(Task *t, int code, int num) {
 			setTaskVar(t, index2, type2, yPos);
 		}
 		break;
+	case 18: {
+			_mstUnk39 = _res->_mstOp56Data[num].unk0 & 255;
+		}
+		break;
 	case 19:
 		_andyActionKeyMaskAnd    = _res->_mstOp56Data[num].unk0 & 255;
 		_andyActionKeyMaskOr     = _res->_mstOp56Data[num].unk4 & 255;
 		_andyDirectionKeyMaskAnd = _res->_mstOp56Data[num].unk8 & 255;
 		_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].unkC & 255;
+		break;
+	case 20: {
+			_mstUnk39 = 0;
+			t->dataPtr->flagsA6 |= 2;
+			t->run = &Game::runTask_idle;
+			t->dataPtr->o->actionKeyMask = _mstUnk39;
+			t->dataPtr->o->directionKeyMask = _andyObject->directionKeyMask;
+			return 1;
+		}
+		break;
+	case 21: {
+			t->dataPtr->flagsA6 &= ~2;
+			t->dataPtr->o->actionKeyMask = 0;
+			t->dataPtr->o->directionKeyMask = 0;
+		}
 		break;
 	case 27: {
 			int index1 =  _res->_mstOp56Data[num].unk0;
@@ -1131,7 +1182,7 @@ int Game::runTask_default_op56(Task *t, int code, int num) {
 		++_levelCheckpoint;
 		break;
 	default:
-		warning("Unhandled opcode %d in runTask_default_op56", code);
+		warning("Unhandled opcode %d in executeMstOp56", code);
 		break;
 	}
 	return 0;

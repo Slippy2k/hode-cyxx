@@ -316,6 +316,7 @@ struct MstObject {
 	int yPos; // 18
 	int xMstPos; // 1C
 	int yMstPos; // 20
+	BoundingBox boundingBox; // 28
 }; // sizeof == 64
 
 struct Task {

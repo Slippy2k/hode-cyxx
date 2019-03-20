@@ -2122,7 +2122,11 @@ void Game::updateAndyMonsterObjects() {
 	case 6:
 		_hideAndyObjectSprite = false;
 		if (_actionDirectionKeyMaskIndex == 0x61) {
-			assert(_currentMonsterObject);
+			if (!_currentMonsterObject) {
+				warning("_currentMonsterObject is NULL, _actionDirectionKeyMaskIndex 0x%x", _actionDirectionKeyMaskIndex);
+				return;
+			}
+			//assert(_currentMonsterObject);
 			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 		}
@@ -2131,7 +2135,11 @@ void Game::updateAndyMonsterObjects() {
 	case 7:
 		_hideAndyObjectSprite = true;
 		if (_actionDirectionKeyMaskIndex == 0x71) {
-			assert(_currentMonsterObject);
+			if (!_currentMonsterObject) {
+				warning("_currentMonsterObject is NULL, _actionDirectionKeyMaskIndex 0x%x", _actionDirectionKeyMaskIndex);
+				return;
+			}
+			//assert(_currentMonsterObject);
 			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 			ptr->linkObjPtr = _currentMonsterObject;
