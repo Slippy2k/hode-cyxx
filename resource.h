@@ -211,11 +211,11 @@ struct MstUnk53 { // MstOp223Data
 	int16_t indexVar4; // 6
 	uint8_t unk8; // 8
 	uint8_t unk9;
-	int8_t indexVar5; // 10
-	int8_t unk11; // 11
-	uint16_t unk12; // 12
-	uint16_t unk14;
-	uint32_t unk16; // maskVars // 16
+	int8_t indexVar5; // A
+	int8_t unkB; // B
+	uint16_t unkC; // C
+	uint16_t unkE; // E
+	uint32_t maskVars; // 0x10
 }; // SIZEOF_MstUnk53 20
 
 struct MstUnk54 { // MstOp227Data

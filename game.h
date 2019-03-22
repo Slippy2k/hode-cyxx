@@ -199,6 +199,7 @@ struct Game {
 	void setupScreenPosTable(uint8_t num);
 	void setupScreenMask(uint8_t num);
 	void resetScreenMask();
+	void setScreenMaskRect(int x1, int y1, int x2, int y2, int pos);
 	void setupLvlObjectBitmap(LvlObject *ptr);
 	void randomizeInterpolatePoints(int32_t *pts, int count);
 	int fixPlasmaCannonPointsScreenMask(int num);
@@ -269,7 +270,7 @@ struct Game {
 	int lvlObjectType1Callback(LvlObject *ptr);
 	int lvlObjectList3Callback(LvlObject *o);
 	void lvlObjectTypeCallback(LvlObject *o);
-	LvlObject *game_unk115(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);
+	LvlObject *addLvlObject(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);
 	int setLvlObjectPosInScreenGrid(LvlObject *o, int num);
 	LvlObject *declareLvlObject(uint8_t type, uint8_t num);
 	void clearDeclaredLvlObjectsList();
@@ -547,6 +548,7 @@ struct Game {
 	int runTask_default(Task *t);
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);
+	void executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);

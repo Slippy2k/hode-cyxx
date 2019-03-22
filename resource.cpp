@@ -1230,10 +1230,10 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk53[i].unk8      = fp->readByte();
 		_mstUnk53[i].unk9      = fp->readByte();
 		_mstUnk53[i].indexVar5 = fp->readByte();
-		_mstUnk53[i].unk11     = fp->readByte();
-		_mstUnk53[i].unk12     = fp->readUint16();
-		_mstUnk53[i].unk14     = fp->readUint16();
-		_mstUnk53[i].unk16     = fp->readUint32();
+		_mstUnk53[i].unkB      = fp->readByte();
+		_mstUnk53[i].unkC      = fp->readUint16();
+		_mstUnk53[i].unkE      = fp->readUint16();
+		_mstUnk53[i].maskVars  = fp->readUint32();
 		bytesRead += 20;
 	}
 

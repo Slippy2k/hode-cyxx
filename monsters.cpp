@@ -880,14 +880,70 @@ int Game::runTask_default(Task *t) {
 		case 223: { // 67
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk53 *m = &_res->_mstUnk53[num];
-				const int mask = m->unk16;
-				int a = getTaskVar(t, m->indexVar1, (mask >> 16) & 15);
-				int b = getTaskVar(t, m->indexVar2, (mask >> 12) & 15);
-				int c = getTaskVar(t, m->indexVar3, (mask >>  8) & 15);
-				int d = getTaskVar(t, m->indexVar4, (mask >>  4) & 15);
-				int e = getTaskVar(t, m->indexVar5,  mask        & 15);
-				warning("opcode 223 %d,%d,%d,%d,%d", a, b, c, d, e);
-				// TODO
+				const int mask = m->maskVars; // var8
+				int a = getTaskVar(t, m->indexVar1, (mask >> 16) & 15); // var1C
+				int b = getTaskVar(t, m->indexVar2, (mask >> 12) & 15); // var20
+				int c = getTaskVar(t, m->indexVar3, (mask >>  8) & 15); // var14, _ebx
+				int d = getTaskVar(t, m->indexVar4, (mask >>  4) & 15); // _edi
+				int e = getTaskVar(t, m->indexVar5,  mask        & 15); // _eax
+				if (a > b) {
+					SWAP(a, b);
+				}
+				if (c > d) {
+					SWAP(c, d);
+				}
+				LvlObject *o = 0;
+				if (t->mstObject) {
+					o = t->mstObject->o;
+				} else if (t->dataPtr) {
+					o = t->dataPtr->o;
+				}
+				if (e <= -2 && o) {
+					if (o->flags & 0x10) {
+
+					} else {
+// 41367F
+						a += o->xPos;
+						b += o->xPos;
+					}
+
+					c += o->yPos;
+					d += o->yPos;
+					if (e < -2) {
+						a += o->posTable[6].x;
+						b += o->posTable[6].x;
+						c += o->posTable[6].y;
+						d += o->posTable[6].y;
+					} else {
+						a += o->posTable[7].x;
+						b += o->posTable[7].x;
+						c += o->posTable[7].y;
+						d += o->posTable[7].y;
+					}
+					e = o->screenNum;
+				}
+// 4136E8
+				e = CLIP(e, -1, _res->_mstHdr.pointsCount - 1);
+				if (p[0] == 224) {
+					// TODO
+					break;
+				} else if (p[0] == 225) {
+					// TODO
+					break;
+				} else {
+					t->flags |= 0x80;
+					if (p[0] == 222 || p[0] == 220) {
+						if (e == -1) {
+							if (a >= -_mstRefPosX && a <= 255 - _mstRefPosX) {
+								break;
+							}
+						} else if (e == _currentScreen) {
+							break;
+						}
+					}
+				}
+// 4137FA
+				executeMstOp67(t, a, b, c, d, e, m->unk8, m->unk9, m->unkC, m->unkB, 0, m->unkE);
 			}
 			break;
 		case 227: { // 69
@@ -1148,8 +1204,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			int index4 =  _res->_mstOp56Data[num].unkC >> 16;
 			int type4  =  _res->_mstOp56Data[num].unkC         & 15;
 			int d      = getTaskVar(t, index4, type4);
-			// TODO
-			// executeMstOp56_27(a - 16, b, a + 16, c, d);
+			setScreenMaskRect(a - 16, b, a + 16, c, d);
 		}
 		break;
 	case 28:
@@ -1168,6 +1223,10 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		break;
 	}
 	return 0;
+}
+
+void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
+	fprintf(stdout, "%d %d 0x%x 0x%x %d %d %d\n", screen, arg10, o_flags1, o_flags2, arg1C, arg20, arg24);
 }
 
 int Game::runTask_wait(Task *t) {

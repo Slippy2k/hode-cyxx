@@ -411,6 +411,23 @@ void Game::resetScreenMask() {
 	}
 }
 
+void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int pos) {
+	const int u = _res->_screensBasePos[pos].u;
+	const int v = _res->_screensBasePos[pos].v;
+	const int screen = _res->_screensGrid[pos * 4 + kPosTopScreen];
+	if (x1 < u || y1 < v || y2 >= v + 192) {
+		if (screen != 255) {
+			if (x1 >= u && y1 >= v) {
+				if (y2 < v + 192) {
+					// (x1, y1, x2, v + 192, screen);
+				}
+			}
+		}
+	}
+// 40C111
+	// (x1, v, x2, u, screen);
+}
+
 void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	LvlObjectData *dat = ptr->levelData0x2988;
 	if (!dat) {
@@ -3229,7 +3246,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	}
 }
 
-LvlObject *Game::game_unk115(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask) {
+LvlObject *Game::addLvlObject(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask) {
 	LvlObject *ptr = 0;
 	switch (type) {
 	case 0:

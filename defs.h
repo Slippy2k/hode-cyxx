@@ -305,6 +305,8 @@ struct MstUnkData {
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
 	Task *t; // 0xC4
+	uint8_t unkC8[4]; // 0xC8
+	uint8_t unkCC[4]; // 0xCC
 }; // sizeof == 256
 
 struct MstObject {
