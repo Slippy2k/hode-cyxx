@@ -118,24 +118,24 @@ struct MstScreenAreaCode {
 }; // SIZEOF_MstScreenAreaCode 36
 
 struct MstUnk35 {
-	uint32_t ptr;
-	uint32_t count;
-	uint32_t unk8;
-	uint32_t size;
+	uint32_t ptr; // 0
+	uint32_t count; // 4
+	uint32_t unk8; // 8
+	uint32_t size; // C
 }; // sizeof == 16
 
 struct MstUnk42 {
-	uint32_t offset1; //
+	uint32_t offset1; // 0
 	uint32_t count1; // 4
 	uint32_t offset2; // 8
-	uint32_t count2; // 12
+	uint32_t count2; // C
 }; // SIZEOF_MstUnk42 16
 
 struct MstUnk43 {
 	uint32_t offset1; // indexes _resMstUnk48
 	uint32_t count1; // 4
 	uint32_t offset2; // 8
-	uint32_t count2; // 12
+	uint32_t count2; // C
 }; // SIZEOF_MstUnk43 16
 
 struct MstUnk44 {
@@ -178,9 +178,9 @@ struct MstUnk48Unk12 {
 struct MstUnk49 {
 	uint8_t pad0[8];
 	uint32_t count1; // 8
-	uint32_t offset1;
-	uint32_t count2; // 16
-	uint32_t unk0x14;
+	uint32_t offset1; // 0xC
+	uint32_t count2; // 0x10
+	uint32_t unk0x14; // 0x14
 }; // SIZEOF_MstUnk49 24
 
 struct MstUnk50 {

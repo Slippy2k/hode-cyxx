@@ -102,8 +102,38 @@ void Game::resetMstCode() {
 	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
 		_res->_mstScreenAreaCodes[i].unk0x1D = 1;
 	}
-	// TODO
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 32; ++j) {
+			_mstRandomLookupTable[i][j] = j;
+		}
+		for (int j = 0; j < 64; ++j) {
+			const int index1 = _rnd.update() & 31;
+			const int index2 = _rnd.update() & 31;
+			SWAP(_mstRandomLookupTable[i][index1], _mstRandomLookupTable[i][index2]);
+		}
+	}
 	_rnd.initTable();
+	for (int i = 0; i < _res->_mstHdr.unk0x40; ++i) {
+		const int count = _res->_mstUnk49[i].count2;
+		if (count != 0) {
+			// TODO
+			for (int j = 0; j < count * 2; ++j) {
+				// const int index1 = _rnd.update() % max;
+				// const int index2 = _rnd.update() % max;
+			}
+		}
+	}
+	for (int i = 0; i < _res->_mstHdr.unk0x0C; ++i) { // var8
+		const int count = _res->_mstUnk35[i].size;
+		if (count != 0) {
+			// TODO
+			for (int j = 0; j < count * 2; ++j) {
+				// const int index1 = _rnd.update() % max;
+				// const int index2 = _rnd.update() % max;
+			}
+		}
+	}
+
 	// TODO
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));

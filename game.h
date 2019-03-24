@@ -172,6 +172,7 @@ struct Game {
 	MstObject _mstObjectsTable[64];
 	int _mstTickDelay;
 	uint8_t _mstUnk39;
+	uint8_t _mstRandomLookupTable[8][32];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -206,6 +207,8 @@ struct Game {
 	void setupPlasmaCannonPointsHelper();
 	void destroyLvlObjectPlasmaExplosion(LvlObject *o);
 	void shuffleArray(uint8_t *p, int count);
+	void shuffleDword(uint8_t *p);
+	uint8_t shuffleFlags(uint8_t *p);
 	void destroyLvlObject(LvlObject *o);
 	void setupPlasmaCannonPoints(LvlObject *ptr);
 	int testPlasmaCannonPointsDirection(int x1, int y1, int x2, int y2);

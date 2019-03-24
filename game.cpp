@@ -620,6 +620,30 @@ void Game::shuffleArray(uint8_t *p, int count) {
 	}
 }
 
+void Game::shuffleDword(uint8_t *p) {
+	p[0] = _rnd.update() & 7;
+	p[1] = _rnd.update() & 31;
+	p[2] = 0x20;
+}
+
+uint8_t Game::shuffleFlags(uint8_t *p) {
+	const uint8_t code = _mstRandomLookupTable[p[0]][p[1]];
+	++p[1];
+	if (p[1] >= 32) {
+		p[1] = 0;
+	}
+	--p[2];
+	if (p[2] == 0) {
+		++p[0];
+		if (p[0] >= 8) {
+			p[0] = 0;
+		}
+		p[2] = 0x20;
+		p[1] = _rnd.update() & 31;
+	}
+	return code;
+}
+
 void Game::destroyLvlObject(LvlObject *o) {
 	if (!o) {
 		warning("destroyLvlObject called with NULL lvlObject");
