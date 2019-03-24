@@ -14,6 +14,7 @@ enum {
 	kDebug_ANDY     = 1 << 2,
 	kDebug_SOUND    = 1 << 3,
 	kDebug_PAF      = 1 << 4,
+	kDebug_MONSTER  = 1 << 5,
 };
 
 extern int g_debugMask;

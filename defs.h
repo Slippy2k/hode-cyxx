@@ -298,8 +298,10 @@ struct AndyMoveData {
 struct Task;
 
 struct MstUnkData {
-	int unk0;
-	LvlObject *o; // 0x10
+	LvlObject *o0;
+	void *unk4; // MstUnk42
+	void *unk8;
+	LvlObject *o16; // 0x10
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48
 	uint8_t flagsA5; // 0xA5
@@ -307,6 +309,8 @@ struct MstUnkData {
 	Task *t; // 0xC4
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
+	int unkD0; // 0xD0
+	int unkEC; // 0xEC
 }; // sizeof == 256
 
 struct MstObject {

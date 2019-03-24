@@ -41,8 +41,8 @@ static const uint8_t _mstDefaultLutOp[] = {
 };
 
 void Game::resetMstUnkData(MstUnkData *m) {
-	m->unk0 = 0;
-	LvlObject *o = m->o;
+	m->o0 = 0;
+	LvlObject *o = m->o16;
 	if (o) {
 		o->dataPtr = 0;
 	}
@@ -248,7 +248,7 @@ void Game::executeMstCode() {
 	}
 	MstScreenAreaCode *msac;
 	while ((msac = _res->findMstCodeForPos(_currentScreen, _mstPosX, _mstPosY)) != 0) {
-		warning(".mst bytecode trigger for %d,%d", _mstPosX, _mstPosY);
+		debug(kDebug_MONSTER, "trigger for %d,%d", _mstPosX, _mstPosY);
 		_res->flagMstCodeForPos(msac->unk0x1C, 0);
 		assert(msac->codeData != kNone);
 		createTask(_res->_mstCodeData + msac->codeData * 4);
@@ -896,7 +896,7 @@ int Game::runTask_default(Task *t) {
 				if (t->mstObject) {
 					o = t->mstObject->o;
 				} else if (t->dataPtr) {
-					o = t->dataPtr->o;
+					o = t->dataPtr->o16;
 				}
 				if (e <= -2 && o) {
 					if (o->flags & 0x10) {
@@ -1077,7 +1077,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		}
 		break;
 	case 2: {
-			LvlObject *o = t->dataPtr->o;
+			LvlObject *o = t->dataPtr->o16;
 			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk0 & 255, o, _andyObject);
 			resetAndyLvlObjectPlasmaCannonKeyMask(flag | 0x10);
 		}
@@ -1180,15 +1180,15 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			_mstUnk39 = 0;
 			t->dataPtr->flagsA6 |= 2;
 			t->run = &Game::runTask_idle;
-			t->dataPtr->o->actionKeyMask = _mstUnk39;
-			t->dataPtr->o->directionKeyMask = _andyObject->directionKeyMask;
+			t->dataPtr->o16->actionKeyMask = _mstUnk39;
+			t->dataPtr->o16->directionKeyMask = _andyObject->directionKeyMask;
 			return 1;
 		}
 		break;
 	case 21: {
 			t->dataPtr->flagsA6 &= ~2;
-			t->dataPtr->o->actionKeyMask = 0;
-			t->dataPtr->o->directionKeyMask = 0;
+			t->dataPtr->o16->actionKeyMask = 0;
+			t->dataPtr->o16->directionKeyMask = 0;
 		}
 		break;
 	case 27: {
@@ -1226,7 +1226,80 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 }
 
 void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
-	fprintf(stdout, "%d %d 0x%x 0x%x %d %d %d\n", screen, arg10, o_flags1, o_flags2, arg1C, arg20, arg24);
+	warning("executeMstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, arg10, o_flags1, o_flags2, arg1C, arg20, arg24);
+	if (o_flags2 == 0xFFFF) {
+		LvlObject *o = 0;
+		if (t->dataPtr) {
+			o = t->dataPtr->o16;
+		} else if (t->mstObject) {
+			o = t->mstObject->o;
+		}
+		o_flags2 = o ? o->flags2 : 0x3001;
+	}
+	if (y1 != y2) {
+		y1 += _rnd.update() % ABS(y2 - y1 + 1);
+	}
+	if (x1 != x2) {
+		x1 += _rnd.update() % ABS(x2 - x1 + 1);
+	}
+
+	// TODO
+
+	if (arg1C != -128) {
+		if (_mstVars[30] > 32) {
+			_mstVars[30] = 32;
+		}
+		int count = 0;
+		for (int i = 0; i < 32; ++i) {
+			if (_mstUnkDataTable[i].o0) {
+				++count;
+			}
+		}
+		if (count >= _mstVars[30]) {
+			return;
+		}
+		if (arg1C < 0) {
+			// TODO
+			// _res->_mstUnk42[arg24];
+		} else {
+// 415510
+		}
+// 415518
+		for (int i = 0; i < 32; ++i) {
+			if (!_mstUnkDataTable[i].o0) {
+// 415539
+				MstUnkData *m = &_mstUnkDataTable[i];
+
+				memset(m->localVars, 0, sizeof(m->localVars));
+				m->flags48 = 0x1C;
+				m->flagsA5 = 0;
+				m->unkEC = -1;
+				m->unkD0 = 0;
+				m->flagsA6 = 0;
+				m->flags48 &= ~4;
+
+				// TODO
+
+				for (int j = 0; j < 64; ++j) {
+					if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].unk8 == m) {
+						_mstObjectsTable[j].unk8 = 0;
+					}
+				}
+				break;
+			}
+		}
+		return;
+	} else {
+		for (int i = 0; i < 64; ++i) {
+			if (!_mstObjectsTable[i].unk0) {
+// 415743
+
+
+				break;
+			}
+		}
+		return;
+	}
 }
 
 int Game::runTask_wait(Task *t) {
@@ -1290,7 +1363,7 @@ int Game::runTask_waitFlags(Task *t) {
 	t->run = &Game::runTask_default;
 	LvlObject *o = 0;
 	if (t->dataPtr) {
-		o = t->dataPtr->o;
+		o = t->dataPtr->o16;
 	} else if (t->mstObject) {
 		o = t->mstObject->o;
 	}
