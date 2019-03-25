@@ -71,11 +71,10 @@ void Game::setMstObjectDefaultPos(Task *t) {
 }
 
 void Game::shuffleMstUnk43(MstUnk43 *p) {
-	// TODO
-//	for (int i = 0; i < (int)p->count2; ++i) {
-//		_resMstUnk43[p->offset2 + i] &= 0x7F;
-//	}
-//	shuffleArray(_resMstUnk43 + p->offset2, p->count2);
+	for (uint32_t i = 0; i < p->count2; ++i) {
+		p->data2[i] &= 0x7F;
+	}
+	shuffleArray(p->data2, p->count2);
 }
 
 void Game::initMstCode() {
@@ -884,6 +883,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 215: { // 62
 				if (_mstOp54Unk3 != 0xFFFF) {
+					assert(_mstOp54Unk3 < _res->_mstHdr.unk0x24);
 					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk3]);
 				}
 				_mstOp54Counter = 0;
@@ -893,6 +893,7 @@ int Game::runTask_default(Task *t) {
 				const int num = READ_LE_UINT16(p + 2);
 				if (_mstOp54Unk3 != num) {
 					_mstOp54Unk3 = num;
+					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
 					shuffleMstUnk43(&_res->_mstUnk43[num]);
 					_mstOp54Counter = 0;
 				}
@@ -903,6 +904,7 @@ int Game::runTask_default(Task *t) {
 				if (num != _mstOp54Unk1) {
 					_mstOp54Unk1 = num;
 					_mstOp54Unk2 = num;
+					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
 					shuffleMstUnk43(&_res->_mstUnk43[num]);
 				}
 			}

@@ -1075,16 +1075,22 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk43 = (MstUnk43 *)malloc(_mstHdr.unk0x24 * sizeof(MstUnk43));
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
-		_mstUnk43[i].offset1 = fp->readUint32();
-		_mstUnk43[i].count1  = fp->readUint32();
-		_mstUnk43[i].offset2 = fp->readUint32();
-		_mstUnk43[i].count2  = fp->readUint32();
+		fp->readUint32();
+		_mstUnk43[i].count1 = fp->readUint32();
+		_mstUnk43[i].data1  = (uint8_t *)malloc(_mstUnk43[i].count1 * 4);
+		fp->readUint32();
+		_mstUnk43[i].count2 = fp->readUint32();
+		_mstUnk43[i].data2  = (uint8_t *)malloc(_mstUnk43[i].count2);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
-		fp->seek(_mstUnk43[i].count1 * 4, SEEK_CUR);
-		bytesRead += _mstUnk43[i].count1 * 4;
-		bytesRead += skipBytesAlign(fp, _mstUnk43[i].count2);
+		fp->read(_mstUnk43[i].data1, _mstUnk43[i].count1 * 4);
+		fp->read(_mstUnk43[i].data2, _mstUnk43[i].count2);
+		if ((_mstUnk43[i].count2 & 3) != 0) {
+			fp->seek(4 - (_mstUnk43[i].count2 & 3), SEEK_CUR);
+		}
+		bytesRead +=  _mstUnk43[i].count1 * 4;
+		bytesRead += (_mstUnk43[i].count2 + 3) & ~3;
 	}
 
 	_mstUnk44 = (MstUnk44 *)malloc(_mstHdr.unk0x28 * sizeof(MstUnk44));

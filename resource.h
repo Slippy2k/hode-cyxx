@@ -132,9 +132,9 @@ struct MstUnk42 {
 }; // SIZEOF_MstUnk42 16
 
 struct MstUnk43 {
-	uint32_t offset1; // indexes _resMstUnk48
+	uint8_t *data1; // indexes _resMstUnk48
 	uint32_t count1; // 4
-	uint32_t offset2; // 8
+	uint8_t *data2; // 8
 	uint32_t count2; // C
 }; // SIZEOF_MstUnk43 16
 
