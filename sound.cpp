@@ -228,11 +228,31 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 	}
 }
 
+void Game::executeSssCodeOp16(SssObject *so) {
+	if ((so->flags & 2) != 0) {
+		SssObject *next = so->nextPtr; // _eax
+		SssObject *prev = so->prevPtr; // _edx
+		SssPcm *pcm = so->pcm; // _esi
+		so->pcm = 0;
+		if (next) {
+			next->prevPtr = prev;
+		}
+		if (prev) {
+			prev->nextPtr = next;
+		} else {
+			_sssObjectsList2 = next;
+		}
+		so->pcm = pcm;
+		so->flags &= ~2;
+		addSoundObjectToList(so);
+	}
+}
+
 void Game::executeSssCodeOp17(SssObject *so) {
 	if ((so->flags & 2) == 0) {
 		SssPcm *pcm = so->pcm;
-		SssObject *prev = so; // _edx
-		SssObject *next = so; // _eax
+		SssObject *prev = so->prevPtr; // _edx
+		SssObject *next = so->nextPtr; // _eax
 		so->pcm = 0;
 		if ((so->flags & 1) != 0) {
 			if (next) {
@@ -346,7 +366,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 12;
 			}
 			break;
-#if 0
 		case 6: { // jump_ge
 				--so->counter;
 				if (so->counter < 0) {
@@ -357,7 +376,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 			}
 			break;
-#endif
 		case 8: { // seek_sound
 				int _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
@@ -378,7 +396,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				}
 			}
 			break;
-#if 0
 		case 9: { // adjust_volume
 				so->unk64 += so->unk68;
 				const int volume = (so->unk64 + 0x8000) >> 16;
@@ -393,7 +410,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#endif
 		case 10: {
 				if (so->unk54 >= 0) {
 					so->unk5C += so->unk60;
@@ -410,7 +426,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#if 0
 		case 11: {
 				if (so->unk18 != code[1]) {
 					so->unk18 = code[1];
@@ -419,7 +434,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#endif
 		case 12: { // fade_out_sound
 				uint32_t _eax =  so->flags1 >> 24;
 				uint32_t _edx = (so->flags1 >> 20) & 0xF;
@@ -456,13 +470,12 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code + 12;
 			}
 			break;
-#if 0
 		case 16: { // stop_sound
 				--so->unk4C;
 				if (so->unk4C >= 0) {
 					return code;
 				}
-				// executeSssCodeOp16(so);
+				executeSssCodeOp16(so);
 				code += 4;
 				if (so->pcm == 0) {
 					return code;
@@ -470,14 +483,12 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				_sssObjectsChanged = true;
 			}
 			break;
-#endif
 		case 17: { // fade_in_sound
 				executeSssCodeOp17(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-#if 0
 		case 18: {
 				if (so->counter < 0) {
 					so->counter = READ_LE_UINT32(code + 4);
@@ -493,13 +504,11 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#endif
 		case 20: {
 				so->unk4C = READ_LE_UINT16(code + 2);
 				code += 4;
 			}
 			break;
-#if 0
 		case 21: { // dec_unk50
 				--so->unk50;
 				if (so->unk50 >= 0) {
@@ -508,7 +517,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				code += 4;
 			}
 			break;
-#endif
 		case 22: { // load_unk50
 				so->unk50 = READ_LE_UINT32(code + 4);
 				return code + 8;
@@ -527,7 +535,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code + 8;
 			}
 			break;
-#if 0
 		case 25: { // dec_unk58
 				--so->unk58;
 				if (so->unk58 >= 0) {
@@ -541,7 +548,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code + 8;
 			}
 			break;
-#endif
 		case 27: {
 				int _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
@@ -557,7 +563,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code;
 			}
 			break;
-#if 0
 		case 28: { // jump
 				uint32_t offset = READ_LE_UINT32(code + 4);
 				code -= offset;
@@ -566,7 +571,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 		case 29: // end
 			so->unk2C = 0;
 			return 0;
-#endif
 		default:
 			error("Invalid .sss opcode %d", *code);
 			break;

@@ -575,6 +575,7 @@ struct Game {
 	void updateSoundObject(SssObject *so);
 	void executeSssCodeOp4(uint32_t flags);
 	void executeSssCodeOp12(int num, uint8_t lut, uint8_t c);
+	void executeSssCodeOp16(SssObject *so);
 	void executeSssCodeOp17(SssObject *so);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code);
 	SssObject *addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b);
