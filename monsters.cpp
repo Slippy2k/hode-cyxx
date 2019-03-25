@@ -1085,9 +1085,22 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
 			}
 // 411AB4
-			// TODO
+			LvlObject *o = 0;
+			if (t->mstObject) {
+				o = t->mstObject->o;
+			} else if (t->dataPtr) {
+				o = t->dataPtr->o16;
+			}
+			if (_res->_mstOp56Data[num].unkC != 6 && o) {
+				// TODO
+			}
 // 411B72
-			// TODO
+			_mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
+			_mstCurrentScreenNum = _andyObject->screenNum;
+			_currentMonsterObject = _andyObject;
+			_mstOriginPosX = _andyObject->posTable[3].x + _andyObject->posTable[6].x;
+			_mstOriginPosY = _andyObject->posTable[3].y + _andyObject->posTable[6].y;
+			_mstCurrentUnkFlag = 1;
 		}
 // 411BBA
 		// TODO
@@ -1164,27 +1177,34 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			_andyObject->frame = _res->_mstOp56Data[num].unk4;
 			LvlObject *o = 0;
 			if (t->mstObject) {
-				// TODO
+				o = t->mstObject->o;
 			} else if (t->dataPtr) {
-				// TODO
+				o = t->dataPtr->o16;
 			} else {
 				o = _andyObject;
 			}
 			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk8, o, _andyObject);
 			_andyObject->flags1 = ((flag & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
+			const int x3 = _andyObject->posTable[3].x;
+			const int y3 = _andyObject->posTable[3].y;
 			setupLvlObjectBitmap(_andyObject);
-			// TODO
+			_andyObject->xPos += (x3 - _andyObject->posTable[3].x);
+			_andyObject->yPos += (y3 - _andyObject->posTable[3].y);
+			updateLvlObjectScreen(o);
+			updateMstMoveData();
+			updateMstHeightMapData();
 		}
 		break;
 	case 16:
-		if (t->mstObject) {
-			// TODO
-		} else if (t->dataPtr) {
-			// TODO
-		}
-		// fall-through
 	case 17: {
 			LvlObject *o = _andyObject;
+			if (code == 16) {
+				if (t->mstObject) {
+					o = t->mstObject->o;
+				} else if (t->dataPtr) {
+					o = t->dataPtr->o16;
+				}
+			}
 			const int pos = _res->_mstOp56Data[num].unk8;
 			const int xPos = o->xPos + o->posTable[pos].x;
 			const int yPos = o->yPos + o->posTable[pos].y;

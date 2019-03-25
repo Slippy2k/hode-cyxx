@@ -126,6 +126,7 @@ struct Game {
 	int32_t _plasmaCannonYPointsTable2[127];
 	uint16_t _mstCurrentAnim;
 	uint16_t _mstCurrentFlags1;
+	uint8_t _mstCurrentScreenNum;
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	ScreenMask _shadowScreenMasksTable[8];
