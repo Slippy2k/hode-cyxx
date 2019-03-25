@@ -302,6 +302,7 @@ struct MstUnkData {
 	void *unk4; // MstUnk42
 	void *unk8;
 	LvlObject *o16; // 0x10
+	int soundType; // 0x20
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48
 	uint8_t flagsA5; // 0xA5

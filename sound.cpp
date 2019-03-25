@@ -353,7 +353,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			}
 			break;
 		case 5: { // seek_sound
-				int32_t _eax = READ_LE_UINT32(code + 4);
+				const int32_t _eax = READ_LE_UINT32(code + 4);
 				if (so->unk6C < _eax) {
 					so->unk6C = _eax;
 					if (so->pcm) {
@@ -371,13 +371,13 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				if (so->counter < 0) {
 					code += 8;
 				} else {
-					uint32_t offset = READ_LE_UINT32(code + 4);
+					const int32_t offset = READ_LE_UINT32(code + 4);
 					code -= offset;
 				}
 			}
 			break;
 		case 8: { // seek_sound
-				int _eax = READ_LE_UINT32(code + 12);
+				const int32_t _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
 					return code;
 				}
@@ -444,7 +444,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			break;
 		case 13: {
 				so->unk54 = READ_LE_UINT32(code + 4) - 1;
-				int16_t value = READ_LE_UINT16(code + 2);
+				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
 					so->unk5C = so->unk18 << 16;
 				} else {
@@ -458,7 +458,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			break;
 		case 14: {
 				so->unk58 = READ_LE_UINT32(code + 8) - 1;
-				int16_t value = READ_LE_UINT16(code + 2);
+				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
 					so->unk64 = so->volume << 16;
 				} else {
@@ -564,7 +564,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 			}
 			break;
 		case 28: { // jump
-				uint32_t offset = READ_LE_UINT32(code + 4);
+				const int32_t offset = READ_LE_UINT32(code + 4);
 				code -= offset;
 			}
 			break;

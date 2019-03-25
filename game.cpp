@@ -860,18 +860,12 @@ void Game::clearLvlObjectsList1() {
 	if (!_lvlObjectsList1) {
 		return;
 	}
-#if 0
 	for (int i = 0; i < 32; ++i) {
-		if (READ_LE_UINT32(&_gameMstUnkTable1[i] + 0) {
-			clearGameMstUnk1(&_gameMstUnkTable1[i]);
-		}
+		resetMstUnkData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < 64; ++i) {
-		if (READ_LE_UINT32(&_gameMstUnkTable2[i] + 0) {
-			clearGameMstUnk2(&_gameMstUnkTable2[i]);
-		}
+		resetMstObject(&_mstObjectsTable[i]);
 	}
-#endif
 	LvlObject *ptr = _lvlObjectsList1;
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
@@ -2006,29 +2000,28 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		}
 		return o;
 	}
-	warning("updateAnimatedLvlObjectType2 TODO");
-#if 0
-	if (ptr->dataPtr < _gameMstUnkTable1_sizeof256 || ptr->dataPtr >= dword_464AA0) {
-		_eax = READ_LE_UINT32(_eax + 8);
-		if (_eax != 0) {
-			_eax = READ_LE_UINT32(_eax + 0x20);
-			_ecx = 2;
-		} else {
-			_ecx = 0;
-			_eax = 4;
+	int a, c;
+	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr <= &_mstUnkDataTable[32]) {
+		MstUnkData *m = (MstUnkData *)ptr->dataPtr;
+		if (m->flagsA6 & 2) {
+			ptr->actionKeyMask = _mstUnk39;
+			ptr->directionKeyMask = _andyObject->directionKeyMask;
 		}
+		a = m->soundType;
+		c = 1;
 	} else {
-		if (_eax[0xA6] != 2) {
-			ptr->keysToCheckMask = byte_46AA18;
-			ptr->keysPressedMask = _gameMainScreenObject->keysPressedMask;
+		MstUnkData *m = ((MstObject *)ptr->dataPtr)->unk8;
+		if (m) {
+			a = m->soundType;
+			c = 2;
+		} else {
+			a = 4;
+			c = 0;
 		}
-		_eax = READ_LE_UINT32(_eax + 0x20);
-		_ecx = 1;
 	}
 	if (ptr->soundToPlay != 0xFFFF) {
-		playSound(ptr->soundToPlay, ptr, _ecx, _eax);
+		playSound(ptr->soundToPlay, ptr, c, a);
 	}
-#endif
 	return o;
 }
 
