@@ -335,7 +335,7 @@ struct Task {
 	uint8_t flags; // 0x34
 	uint8_t runningState; // 0x35
 	int16_t delay; // 0x36
-	uint32_t mstFlags; // 0x38
+	uint32_t tempVar; // 0x38
 	int (Game::*run)(Task *t); // 0x3C
 	Task *child; // 0x40
 }; // sizeof == 0x44

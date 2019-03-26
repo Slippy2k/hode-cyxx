@@ -675,11 +675,16 @@ int Game::runTask_default(Task *t) {
 		case 24: // 14
 			t->flags |= (1 << p[1]);
 			break;
-		case 25: // 15
-			if (t->mstObject) {
-				// TODO
-			} else if (t->dataPtr) {
-				// TODO
+		case 25: { // 15
+				MstUnkData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->unk8;
+				} else {
+					m = t->dataPtr;
+				}
+				if (m) {
+					m->flags48 |= (1 << p[1]);
+				}
 			}
 			break;
 		case 26: // 16
@@ -688,16 +693,21 @@ int Game::runTask_default(Task *t) {
 		case 27: // 17
 			t->flags &= ~(1 << p[1]);
 			break;
-		case 28: // 18
-			if (t->mstObject) {
-				// TODO
-			} else if (t->dataPtr) {
-				// TODO
+		case 28: { // 18
+				MstUnkData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->unk8;
+				} else {
+					m = t->dataPtr;
+				}
+				if (m) {
+					m->flags48 &= ~(1 << p[1]);
+				}
 			}
 			break;
 		case 29: { // 19
 				t->delay = 4;
-				t->mstFlags = p[1];
+				t->tempVar = p[1];
 				if (getTaskAndyVar(p[1], t) == 0) {
 					LvlObject *o = 0;
 					if (t->dataPtr) {
@@ -716,8 +726,8 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 30: { // 20
 				t->delay = 3;
-				t->mstFlags = 1 << p[1];
-				if ((t->mstFlags & _mstFlags) == 0) {
+				t->tempVar = 1 << p[1];
+				if ((t->tempVar & _mstFlags) == 0) {
 					if (t->dataPtr) {
 						// TODO
 					} else if (t->mstObject) {
@@ -1160,7 +1170,7 @@ int Game::runTask_default(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->mstFlags = num;
+						t->tempVar = num;
 						t->run = &Game::runTask_mstUnk55_233;
 						ret = 1;
 					}
@@ -1178,7 +1188,7 @@ int Game::runTask_default(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->mstFlags = num;
+						t->tempVar = num;
 						t->run = &Game::runTask_mstUnk55_234;
 						ret = 1;
 					}
@@ -1590,22 +1600,22 @@ int Game::runTask_waitResetInput(Task *t) {
 int Game::runTask_waitFlags(Task *t) {
 	switch (t->delay) {
 	case 1:
-		if (t->mstFlags == 0) {
+		if (t->tempVar == 0) {
 			return 1;
 		}
 		break;
 	case 2:
-		if ((t->flags & (1 << t->mstFlags)) == 0) {
+		if ((t->flags & (1 << t->tempVar)) == 0) {
 			return 1;
 		}
 		break;
 	case 3:
-		if ((_mstFlags & (1 << t->mstFlags)) == 0) {
+		if ((_mstFlags & (1 << t->tempVar)) == 0) {
 			return 1;
 		}
 		break;
 	case 4:
-		if (getTaskAndyVar(t->mstFlags, t) == 0) {
+		if (getTaskAndyVar(t->tempVar, t) == 0) {
 			return 1;
 		}
 		break;
@@ -1616,7 +1626,7 @@ int Game::runTask_waitFlags(Task *t) {
 			} else {
 				m = t->dataPtr;
 			}
-			if (!m || (m->flags48 & (1 << t->mstFlags)) == 0) {
+			if (!m || (m->flags48 & (1 << t->tempVar)) == 0) {
 				return 1;
 			}
 		}
@@ -1641,7 +1651,7 @@ int Game::runTask_idle(Task *t) {
 }
 
 int Game::runTask_mstUnk55_233(Task *t) {
-	const MstUnk55 *m = &_res->_mstUnk55[t->mstFlags];
+	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (compareOp(m->compare, a, b)) {
