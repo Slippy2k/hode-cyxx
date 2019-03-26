@@ -991,22 +991,20 @@ void Game::playSoundObject(SssUnk1 *s, int a, int b) {
 		}
 	}
 // 42BA9D
-	uint32_t _ebp = 0;
-	uint32_t _edx = b << 4;
-	uint8_t _al = s->unk6;
-	_ebp = (a & 0xF) | _edx;
-	_edx = s->unk2 & 0xF;
+
+	uint32_t _ebp = (a & 15) | (b << 4);
+
+	_ebp <<= 4;
+	_ebp |= s->unk2 & 15;
+
+	_ebp <<= 4;
+	const uint8_t _al = s->unk6;
+	_ebp |= _al;
+
+	_ebp <<= 12; // lut offset
 	_ecx = s->sssUnk3;
-	_ebp <<= 4;
-	_ebp |= _edx;
-	_edx = _al;
-	_ebp <<= 4;
-	_edx &= 0xF;
-	_ebp |= _edx;
-	_edx = _ecx;
-	_ebp <<= 0xC;
-	_edx &= 0xFFF;
-	_ebp |= _edx;
+	_ebp |= _ecx & 0xFFF;
+
 	if (_al & 2) {
 		const uint32_t mask = 1 << (_ebp >> 24);
 		uint32_t *sssLut3 = _res->_sssLookupTable3[(_ebp >> 20) & 15] + _ecx;
@@ -1017,7 +1015,7 @@ void Game::playSoundObject(SssUnk1 *s, int a, int b) {
 		}
 		*sssLut2 |= mask;
 // 42BB26
-	} else if ((_al & 1) != 0) {
+	} else if (_al & 1) {
 		const uint32_t mask = 1 << (_ebp >> 24);
 		uint32_t *sssLut1 = _res->_sssLookupTable1[(_ebp >> 20) & 15] + _ecx;
 		if (*sssLut1 & mask) {
@@ -1025,26 +1023,18 @@ void Game::playSoundObject(SssUnk1 *s, int a, int b) {
 		}
 		*sssLut1 |= mask;
 // 42BB60
-	} else if ((_al & 4) != 0) {
+	} else if (_al & 4) {
 		SssObject *ptr1 = _sssObjectsList1;
 		while (ptr1) {
-			if ((ptr1->flags0 & 0xFFF) == (uint32_t)_ecx) {
-				if (((_edx >> 20) & 15) == ((ptr1->flags0 >> 20) & 15)) {
-					if ((_edx >> 24) == (ptr1->flags0 >> 24)) {
-						goto prepare;
-					}
-				}
+			if (compareSssLut(ptr1->flags0, _ebp)) {
+				goto prepare;
 			}
 			ptr1 = ptr1->nextPtr;
 		}
 		SssObject *ptr2 = _sssObjectsList2;
 		while (ptr2) {
-			if ((ptr2->flags & 0xFFF) == (uint32_t)_ecx) {
-				if (((_edx >> 20) & 15) == ((ptr2->flags0 >> 20) & 15)) {
-					if ((_edx >> 24) == (ptr2->flags0 >> 24)) {
-						goto prepare;
-					}
-				}
+			if (compareSssLut(ptr2->flags0, _ebp)) {
+				goto prepare;
 			}
 			ptr2 = ptr2->nextPtr;
 		}
