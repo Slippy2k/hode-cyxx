@@ -584,7 +584,7 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	int minIndex = -1;
 	int minPriority = -1;
 	for (int i = 0; i < 32; ++i) {
-		if (_sssObjectsTable[i].priority == 0) {
+		if (!_sssObjectsTable[i].pcm) {
 // 42A2FA
 			minPriority = 0;
 			minIndex = i;
@@ -601,10 +601,11 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	}
 	assert(minIndex != -1);
 	SssObject *so = &_sssObjectsTable[minIndex];
-	if (so && minPriority < priority) {
-		if (so->pcm) {
-			removeSoundObjectFromList(so);
-		}
+	if (so->pcm && minPriority >= priority) {
+		return 0;
+	}
+	if (so->pcm) {
+		removeSoundObjectFromList(so);
 	}
 // 42A332
 	so->flags1 = flags_a;
@@ -617,7 +618,7 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	} else {
 		so->unkB = 0;
 	}
-	so->unk78 = 0xFFFFFFFF;
+	so->unk78 = -1;
 	so->unk6C = 0;
 	so->flags = 0;
 	so->unk2C = pcm->strideCount;
@@ -631,11 +632,18 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 }
 
 void Game::prependSoundObjectToList(SssObject *so) {
-	return; // TODO
 	if (so->pcm && so->pcm->ptr) {
 		so->flags = (so->flags & ~1) | 2;
 	}
 	if (so->flags & 2) {
+		if (1) {
+			for (SssObject *current = _sssObjectsList2; current; current = current->nextPtr) {
+				if (current == so) {
+					warning("SoundObject %p already in _sssObjectsList2", so);
+					return;
+				}
+			}
+		}
 		so->prevPtr = 0;
 		so->nextPtr = _sssObjectsList2;
 		if (_sssObjectsList2) {
@@ -841,7 +849,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	if (codeOffset->unk2 != 0) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[unk3->sssFilter];
-		int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
+		int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7); // priority
 // 42B67F
 		uint32_t flags1 = flags & 0xFFF0F000;
 		flags1 |= (num & 0xFFF);
