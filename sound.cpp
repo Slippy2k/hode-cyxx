@@ -844,7 +844,8 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		int _ecx = CLIP(filter->unk24 + codeOffset->unk6, 0, 7);
 // 42B67F
 		uint32_t flags1 = flags & 0xFFF0F000;
-		flags1 |= (b << 16) | (num & 0xFFF);
+		flags1 |= (num & 0xFFF);
+
 		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
 		SssObject *so = addSoundObject(pcm, _ecx, flags1, flags);
 		if (so) {
@@ -1270,7 +1271,6 @@ void Game::mixSoundObjects17640(bool flag) {
 }
 
 void Game::mixSoundObjects() {
-	int count = 0;
 	SssObject *so = _sssObjectsList1;
 	while (so) {
 		if (so->pcm != 0) {
@@ -1280,11 +1280,6 @@ void Game::mixSoundObjects() {
 			}
 		}
 		so = so->nextPtr;
-		++count;
-		if (count > 256) {
-			warning("Infinite loop (corrupted linked list) in mixSoundObjects");
-			break;
-		}
 	}
 }
 
