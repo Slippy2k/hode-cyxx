@@ -1085,7 +1085,17 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 223: { // 67
+		case 219: { // 66
+				const int16_t num = READ_LE_UINT16(p + 2);
+				_mstOp54Unk2 = num;
+			}
+			break;
+		case 220:
+		case 221:
+		case 222:
+		case 223:
+		case 224:
+		case 225: { // 67
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk53 *m = &_res->_mstUnk53[num];
 				const int mask = m->maskVars; // var8
@@ -1591,8 +1601,6 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 		for (int i = 0; i < 64; ++i) {
 			if (!_mstObjectsTable[i].unk0) {
 // 415743
-
-
 				break;
 			}
 		}
