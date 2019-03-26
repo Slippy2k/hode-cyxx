@@ -325,7 +325,7 @@ void Game::executeSssCodeOp4(uint32_t flags) {
 	}
 }
 
-const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
+const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tempSssObject) {
 	while (1) {
 		debug(kDebug_SOUND, "executeSssCode() code %d", *code);
 		switch (*code) {
@@ -470,7 +470,11 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				return code + 12;
 			}
 			break;
-		case 16: { // stop_sound
+		case 16: { // move from list2 to list1
+				if (tempSssObject) {
+					warning("Invalid call to .sss opcode 16 with temp SssObject");
+					return 0;
+				}
 				--so->unk4C;
 				if (so->unk4C >= 0) {
 					return code;
@@ -483,7 +487,11 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code) {
 				_sssObjectsChanged = true;
 			}
 			break;
-		case 17: { // fade_in_sound
+		case 17: { // move to list2
+				if (tempSssObject) {
+					warning("Invalid call to .sss opcode 17 with temp SssObject");
+					return 0;
+				}
 				executeSssCodeOp17(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
@@ -916,7 +924,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
 	debug(kDebug_SOUND, "code %p", code);
 	if (code) {
-		// executeSssCode(&tmpObj, code);
+		executeSssCode(&tmpObj, code, true);
 	}
 
 	const uint32_t mask = 1 << (flags >> 24);
