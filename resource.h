@@ -125,14 +125,14 @@ struct MstUnk35 {
 }; // sizeof == 16
 
 struct MstUnk42 {
-	uint32_t offset1; // 0
+	uint8_t *data1; // 0 indexes _mstUnk46
 	uint32_t count1; // 4
-	uint32_t offset2; // 8
+	uint8_t *data2; // 8
 	uint32_t count2; // C
 }; // SIZEOF_MstUnk42 16
 
 struct MstUnk43 {
-	uint8_t *data1; // indexes _resMstUnk48
+	uint8_t *data1; // indexes _mstUnk48
 	uint32_t count1; // 4
 	uint8_t *data2; // 8
 	uint32_t count2; // C
@@ -145,8 +145,18 @@ struct MstUnk44 {
 	uint32_t count;
 }; // SIZEOF_MstUnk44 16
 
+struct MstUnk46Unk1 {
+	uint32_t indexHeight; // 0, indexes mstHeightMapData
+	uint32_t unk4; // 4
+	uint32_t unkC; // 0xC
+	uint32_t indexUnk51; // 0x1C indexes _mstUnk51
+	uint32_t indexUnk44; // 0x20 indexes _mstUnk44
+	uint32_t indexUnk47; // 0x24 indexes _mstUnk47
+	uint32_t codeData; // 0x28 indexes _mstCodeData
+}; // sizeof == 44
+
 struct MstUnk46 {
-	uint32_t offset;
+	MstUnk46Unk1 *data;
 	uint32_t count;
 }; // SIZEOF_MstUnk46 8
 

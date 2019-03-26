@@ -1219,7 +1219,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		}
 		break;
 	case 18: {
-			_mstUnk39 = _res->_mstOp56Data[num].unk0 & 255;
+			_mstCurrentActionKeyMask = _res->_mstOp56Data[num].unk0 & 255;
 		}
 		break;
 	case 19:
@@ -1229,10 +1229,10 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].unkC & 255;
 		break;
 	case 20: {
-			_mstUnk39 = 0;
+			_mstCurrentActionKeyMask = 0;
 			t->dataPtr->flagsA6 |= 2;
 			t->run = &Game::runTask_idle;
-			t->dataPtr->o16->actionKeyMask = _mstUnk39;
+			t->dataPtr->o16->actionKeyMask = _mstCurrentActionKeyMask;
 			t->dataPtr->o16->directionKeyMask = _andyObject->directionKeyMask;
 			return 1;
 		}
@@ -1321,16 +1321,30 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 			if (!_mstUnkDataTable[i].o0) {
 // 415539
 				MstUnkData *m = &_mstUnkDataTable[i];
-
 				memset(m->localVars, 0, sizeof(m->localVars));
 				m->flags48 = 0x1C;
 				m->flagsA5 = 0;
 				m->unkEC = -1;
 				m->unkD0 = 0;
 				m->flagsA6 = 0;
-				m->flags48 &= ~4;
+
+				const int j = READ_LE_UINT32(_res->_mstUnk42[arg24].data1 + arg1C * 4);
+				// m->0 = &_res->_mstUnk46[j]
+				// m->4 = &_res->_mstUnk46[j].data[arg20];
+
+				MstUnk46Unk1 *m1 = &_res->_mstUnk46[j].data[arg20];
+
+				m->localVars[7] = m1->unkC;
+
+				if (m1->indexUnk51 == kNone) {
+					m->flags48 &= ~4;
+				}
 
 				// TODO
+// _esi + 4 // _ecx
+const uint8_t *ptr = _res->_mstHeightMapData + m1->indexHeight * 948; // _esi + 8
+int anim = 0; // READ_LE_UINT16(_ecx + 4)
+addLvlObject(ptr[945], y2, x1, screen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 
 				for (int j = 0; j < 64; ++j) {
 					if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].unk8 == m) {

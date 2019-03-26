@@ -2004,7 +2004,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr <= &_mstUnkDataTable[32]) {
 		MstUnkData *m = (MstUnkData *)ptr->dataPtr;
 		if (m->flagsA6 & 2) {
-			ptr->actionKeyMask = _mstUnk39;
+			ptr->actionKeyMask = _mstCurrentActionKeyMask;
 			ptr->directionKeyMask = _andyObject->directionKeyMask;
 		}
 		a = m->soundType;
@@ -3188,6 +3188,41 @@ int Game::lvlObjectType1Callback(LvlObject *ptr) {
 	return 0;
 }
 
+int Game::lvlObjectType8Callback(LvlObject *ptr) {
+	if (_mstLogicDisabled) {
+		ptr->actionKeyMask = _andyObject->actionKeyMask;
+		ptr->directionKeyMask = _andyObject->directionKeyMask;
+		if (_andyObject->data0x2988 == 2 && _lvlObjectsList0) {
+			// game_unk24
+		}
+		updateAndyObject(ptr);
+		setLvlObjectPosInScreenGrid(ptr, 7);
+		if ((ptr->flags1 & 6) == 2) {
+			ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
+		}
+	} else {
+		const void *dataPtr = ptr->dataPtr;
+		if (dataPtr) {
+			if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
+				MstUnkData *m = (MstUnkData *)ptr->dataPtr;
+				if (m->flagsA6 & 2) {
+					m->o16->actionKeyMask = _mstCurrentActionKeyMask;
+					m->o16->directionKeyMask = _andyObject->directionKeyMask;
+				}
+				if (m->flagsA6 & 8) {
+					ptr->bitmapBits = 0;
+				}
+			} else {
+				// MstUnkData *m = ((MstObject *)dataPtr)->unk8;
+// 402B9F
+			}
+		} else {
+			ptr->bitmapBits = 0;
+		}
+	}
+	return 0;
+}
+
 int Game::lvlObjectList3Callback(LvlObject *o) {
 	if ((o->data0x2988 <= 7 && (o->flags0 & 0x1F) == 0xB) || o->flags0 == 0x1F) {
 		if (_lvlObjectsList3 && o) {
@@ -3255,10 +3290,39 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 4:
 	case 5:
 	case 6:
+	case 30:
+	case 31:
+	case 32:
+	case 33:
+	case 34:
 		// nop
 		break;
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	case 16:
+	case 17:
+	case 18:
+	case 19:
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+	case 26:
+	case 27:
+	case 28:
+	case 29: // objects driven by .mst code
+		o->callbackFuncPtr = &Game::lvlObjectType8Callback;
+		break;
 	default:
-		error("lvlObjectTypeCallback unhandled case %d", o->data0x2988);
+		warning("lvlObjectTypeCallback unhandled case %d", o->data0x2988);
 		break;
 	}
 }

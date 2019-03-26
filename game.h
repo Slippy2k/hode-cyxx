@@ -172,7 +172,7 @@ struct Game {
 	MstUnkData _mstUnkDataTable[32];
 	MstObject _mstObjectsTable[64];
 	int _mstTickDelay;
-	uint8_t _mstUnk39;
+	uint8_t _mstCurrentActionKeyMask;
 	uint8_t _mstRandomLookupTable[8][32];
 
 	Game(SystemStub *system, const char *dataPath);
@@ -272,6 +272,7 @@ struct Game {
 	void setupSpecialPowers(LvlObject *ptr);
 	int lvlObjectType0Callback(LvlObject *ptr);
 	int lvlObjectType1Callback(LvlObject *ptr);
+	int lvlObjectType8Callback(LvlObject *o);
 	int lvlObjectList3Callback(LvlObject *o);
 	void lvlObjectTypeCallback(LvlObject *o);
 	LvlObject *addLvlObject(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);

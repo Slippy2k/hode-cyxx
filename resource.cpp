@@ -1061,16 +1061,22 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk42 = (MstUnk42 *)malloc(_mstHdr.unk0x20 * sizeof(MstUnk42));
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
-		_mstUnk42[i].offset1 = fp->readUint32();
-		_mstUnk42[i].count1  = fp->readUint32();
-		_mstUnk42[i].offset2 = fp->readUint32();
-		_mstUnk42[i].count2  = fp->readUint32();
+		fp->readUint32();
+		_mstUnk42[i].count1 = fp->readUint32();
+		_mstUnk42[i].data1  = (uint8_t *)malloc(_mstUnk42[i].count1 * 4);
+		fp->readUint32();
+		_mstUnk42[i].count2 = fp->readUint32();
+		_mstUnk42[i].data2  = (uint8_t *)malloc(_mstUnk42[i].count2);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
-		fp->seek(_mstUnk42[i].count1 * 4, SEEK_CUR);
-		bytesRead += _mstUnk42[i].count1 * 4;
-		bytesRead += skipBytesAlign(fp, _mstUnk42[i].count2);
+		fp->read(_mstUnk42[i].data1, _mstUnk42[i].count1 * 4);
+		fp->read(_mstUnk42[i].data2, _mstUnk42[i].count2);
+		if ((_mstUnk42[i].count2 & 3) != 0) {
+			fp->seek(4 - (_mstUnk42[i].count2 & 3), SEEK_CUR);
+		}
+		bytesRead +=  _mstUnk42[i].count1 * 4;
+		bytesRead += (_mstUnk42[i].count2 + 3) & ~3;
 	}
 
 	_mstUnk43 = (MstUnk43 *)malloc(_mstHdr.unk0x24 * sizeof(MstUnk43));
@@ -1119,13 +1125,24 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk46 = (MstUnk46 *)malloc(_mstHdr.unk0x30 * sizeof(MstUnk46));
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
-		_mstUnk46[i].offset = fp->readUint32();
-		_mstUnk46[i].count  = fp->readUint32();
+		fp->readUint32();
+		_mstUnk46[i].count = fp->readUint32();
+		_mstUnk46[i].data  = (MstUnk46Unk1 *)malloc(_mstUnk46[i].count * sizeof(MstUnk46Unk1));
 		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
-		fp->seek(_mstUnk46[i].count * 44, SEEK_CUR);
-		bytesRead += _mstUnk46[i].count * 44;
+		for (uint32_t j = 0; j < _mstUnk46[i].count; ++j) {
+			uint8_t data[44];
+			fp->read(data, sizeof(data));
+			bytesRead += 44;
+			_mstUnk46[i].data[j].indexHeight = READ_LE_UINT32(data);
+			_mstUnk46[i].data[j].unk4        = READ_LE_UINT32(data + 0x04);
+			_mstUnk46[i].data[j].unkC        = READ_LE_UINT32(data + 0x0C);
+			_mstUnk46[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
+			_mstUnk46[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);
+			_mstUnk46[i].data[j].indexUnk47  = READ_LE_UINT32(data + 0x24);
+			_mstUnk46[i].data[j].codeData    = READ_LE_UINT32(data + 0x28);
+		}
 	}
 
 	_mstUnk47 = (MstUnk47 *)malloc(_mstHdr.unk0x34 * sizeof(MstUnk47));
