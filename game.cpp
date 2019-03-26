@@ -437,9 +437,9 @@ void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	LvlAnimSeqHeader *ash = (LvlAnimSeqHeader *)(dat->animsInfoData + ah->seqOffset) + ptr->frame;
 
 	ptr->soundToPlay = ash->sound;
-	ptr->flags0 = bitmask_set(ptr->flags0, ash->flags0, 0x3FF);
-	ptr->flags1 = bitmask_set(ptr->flags1, ash->flags1, 6);
-	ptr->flags1 = bitmask_set(ptr->flags1, ash->flags1, 8);
+	ptr->flags0 = merge_bits(ptr->flags0, ash->flags0, 0x3FF);
+	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 6);
+	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 8);
 	ptr->unk22 = ash->firstFrame;
 
 	ptr->bitmapBits = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
@@ -2133,8 +2133,8 @@ void Game::updatePlasmaCannonExplosionLvlObject(LvlObject *ptr) {
 	}
 	updateAndyObject(ptr);
 	ptr->screenNum = _andyObject->screenNum;
-	ptr->flags2 = bitmask_set(ptr->flags2, _andyObject->flags2, 0x18);
-	ptr->flags2 = bitmask_set(ptr->flags2, _andyObject->flags2 + 1, 7);
+	ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2, 0x18);
+	ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2 + 1, 7);
 	addToSpriteList(ptr);
 }
 
@@ -2201,7 +2201,7 @@ void Game::updateAndyMonsterObjects() {
 		_actionDirectionKeyMaskIndex = 0;
 		ptr->anim = _mstCurrentAnim;
 		ptr->frame = 0;
-		ptr->flags1 = bitmask_set(ptr->flags1, _mstCurrentFlags1, 0x30);
+		ptr->flags1 = merge_bits(ptr->flags1, _mstCurrentFlags1, 0x30);
 		setupLvlObjectBitmap(ptr);
 		setLvlObjectPosRelativeToPoint(ptr, 3, _mstOriginPosX, _mstOriginPosY);
 	}
@@ -2684,7 +2684,7 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 	o->anim = 13;
 	o->frame = 0;
 	o->screenNum = ptr->screenNum;
-	o->flags1 = bitmask_set(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
+	o->flags1 = merge_bits(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
 	o->flags2 = ptr->flags2 & ~0x2000;
 	setupLvlObjectBitmap(o);
 	prependLvlObjectToList(&_plasmaExplosionObject, o);
@@ -2697,7 +2697,7 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 	o->anim = 5;
 	o->frame = 0;
 	o->screenNum = ptr->screenNum;
-	o->flags1 = bitmask_set(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
+	o->flags1 = merge_bits(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
 	o->flags2 = ptr->flags2 & ~0x2000;
 	setupLvlObjectBitmap(o);
 	prependLvlObjectToList(&_plasmaExplosionObject, o);
@@ -3182,8 +3182,8 @@ int Game::lvlObjectType1Callback(LvlObject *ptr) {
 		}
 		setLvlObjectPosRelativeToPoint(ptr, 0, _gameXPosTable[_plasmaCannonFirstIndex], _gameYPosTable[_plasmaCannonFirstIndex]);
 		updateAndyObject(ptr);
-		ptr->flags2 = bitmask_set(ptr->flags2, _andyObject->flags2, 0x18);
-		ptr->flags2 = bitmask_set(ptr->flags2, _andyObject->flags2 + 1, 7);
+		ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2, 0x18);
+		ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2 + 1, 7);
 	}
 	return 0;
 }

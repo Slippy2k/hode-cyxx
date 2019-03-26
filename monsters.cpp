@@ -1097,7 +1097,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				// TODO
 			}
 // 411B72
-			_mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
+			_mstCurrentFlags1 = merge_bits(_mstCurrentFlags1, _andyObject->flags1, 0x30); // _mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
 			_mstCurrentScreenNum = _andyObject->screenNum;
 			_currentMonsterObject = _andyObject;
 			_mstOriginPosX = _andyObject->posTable[3].x + _andyObject->posTable[6].x;

@@ -1639,9 +1639,9 @@ sameAnim:
 		playSound(ptr->soundToPlay, ptr, 0, 0);
 	}
 
-	ptr->flags0 = bitmask_set(ptr->flags0, ash->flags0, 0x3FF);
-	ptr->flags1 = bitmask_set(ptr->flags1, ash->flags1, 6);
-	ptr->flags1 = bitmask_set(ptr->flags1, ash->flags1, 8);
+	ptr->flags0 = merge_bits(ptr->flags0, ash->flags0, 0x3FF);
+	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 6);
+	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 8);
 
 	ptr->unk22 = ash->firstFrame;
 

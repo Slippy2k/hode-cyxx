@@ -95,7 +95,7 @@ inline void SWAP(T &a, T &b) {
 	T tmp = a; a = b; b = tmp;
 }
 
-inline int bitmask_set(int dbit, int sbit, int mask) {
+inline int merge_bits(int dbit, int sbit, int mask) {
 	return ((sbit ^ dbit) & mask) ^ dbit;
 //	return (dbit & ~mask) | (sbit & mask);
 }
