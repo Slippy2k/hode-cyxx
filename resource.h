@@ -228,7 +228,7 @@ struct MstUnk53 { // MstOp223Data
 	uint32_t maskVars; // 0x10
 }; // SIZEOF_MstUnk53 20
 
-struct MstUnk54 { // MstCompareOpData
+struct MstUnk54 { // MstOpCompareData
 	int16_t indexVar1; // 0
 	int16_t indexVar2; // 2
 	uint8_t compare; // 4
@@ -401,7 +401,7 @@ struct Resource {
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;
-	uint8_t *_mstHeightMapData;
+	uint8_t *_mstHeightMapData; // _mstMonsterStateData
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;

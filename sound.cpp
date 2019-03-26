@@ -244,7 +244,7 @@ void Game::executeSssCodeOp16(SssObject *so) {
 		}
 		so->pcm = pcm;
 		so->flags &= ~2;
-		addSoundObjectToList(so);
+		prependSoundObjectToList(so);
 	}
 }
 
@@ -289,7 +289,7 @@ void Game::executeSssCodeOp17(SssObject *so) {
 		}
 		so->pcm = pcm;
 		so->flags = (so->flags & ~1) | 2;
-		addSoundObjectToList(so);
+		prependSoundObjectToList(so);
 	}
 }
 
@@ -626,11 +626,11 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 		so->flags |= 2;
 	}
 	so->flags0 = flags_b;
-	addSoundObjectToList(so);
+	prependSoundObjectToList(so);
 	return so->pcm ? so : 0;
 }
 
-void Game::addSoundObjectToList(SssObject *so) {
+void Game::prependSoundObjectToList(SssObject *so) {
 	return; // TODO
 	if (so->pcm && so->pcm->ptr) {
 		so->flags = (so->flags & ~1) | 2;
