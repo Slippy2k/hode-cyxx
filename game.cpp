@@ -3193,6 +3193,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		ptr->actionKeyMask = _andyObject->actionKeyMask;
 		ptr->directionKeyMask = _andyObject->directionKeyMask;
 		if (_andyObject->data0x2988 == 2 && _lvlObjectsList0) {
+			// TODO
 			// game_unk24
 		}
 		updateAndyObject(ptr);
@@ -3201,6 +3202,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
 		}
 	} else {
+//		warning("lvlObjectType8Callback unimplemented");
 		const void *dataPtr = ptr->dataPtr;
 		if (dataPtr) {
 			if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
@@ -3212,12 +3214,14 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 				if (m->flagsA6 & 8) {
 					ptr->bitmapBits = 0;
 				}
+				// TODO
 			} else {
 				// MstUnkData *m = ((MstObject *)dataPtr)->unk8;
 // 402B9F
+				// TODO
 			}
 		} else {
-			ptr->bitmapBits = 0;
+//			ptr->bitmapBits = 0;
 		}
 	}
 	return 0;

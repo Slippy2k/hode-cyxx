@@ -746,9 +746,9 @@ int Game::runTask_default(Task *t) {
 		case 53:
 		case 54:
 		case 56: { // 34
-				const int src = p[2];
-				const int dst = p[1];
-				arithOp(p[0] - 47, &t->localVars[dst], t->localVars[src]);
+				assert(p[1] < kMaxLocals);
+				assert(p[2] < kMaxLocals);
+				arithOp(p[0] - 47, &t->localVars[p[1]], t->localVars[p[2]]);
 			}
 			break;
 		case 57:
@@ -761,10 +761,9 @@ int Game::runTask_default(Task *t) {
 		case 64:
 		case 65:
 		case 66: { // 35
-				const int src = p[2];
-				const int dst = p[1];
-				assert(dst < kMaxVars);
-				arithOp(p[0] - 57, &_mstVars[dst], t->localVars[src]);
+				assert(p[1] < kMaxVars);
+				assert(p[2] < kMaxLocals);
+				arithOp(p[0] - 57, &_mstVars[p[1]], t->localVars[p[2]]);
 			}
 			break;
 		case 107:
@@ -1371,10 +1370,10 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 				}
 
 				// TODO
-// _esi + 4 // _ecx
-const uint8_t *ptr = _res->_mstHeightMapData + m1->indexHeight * 948; // _esi + 8
-int anim = 0; // READ_LE_UINT16(_ecx + 4)
-addLvlObject(ptr[945], y2, x1, screen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
+				// _esi + 4 // _ecx
+				const uint8_t *ptr = _res->_mstHeightMapData + m1->indexHeight * 948; // _esi + 8
+				int anim = 0; // READ_LE_UINT16(_ecx + 4)
+				addLvlObject(ptr[945], y2, x1, screen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 
 				for (int j = 0; j < 64; ++j) {
 					if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].unk8 == m) {
