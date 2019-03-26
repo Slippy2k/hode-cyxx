@@ -201,7 +201,7 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 	_res->_sssLookupTable1[lut][num] &= ~mask;
 	SssObject *so = _sssObjectsList1;
 	while (so) {
-		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == lut) {
+		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == c) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -213,7 +213,7 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 	}
 	so = _sssObjectsList2;
 	while (so) {
-		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == lut) {
+		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == c) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
