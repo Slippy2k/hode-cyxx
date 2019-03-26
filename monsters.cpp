@@ -675,7 +675,7 @@ int Game::runTask_default(Task *t) {
 					SWAP(a, b);
 				}
 				a += _rnd.update() % (b - a + 1);
-				setTaskVar(t, m->unk9, m->unkA, a);
+				setTaskVar(t, m->unkA, m->unk9, a);
 			}
 			break;
 		case 3: // 3
@@ -781,6 +781,11 @@ int Game::runTask_default(Task *t) {
 					// executeMstOp26(_mstToLoad2Num, p[1]);
 					// executeMstOp26(_mstToLoad1Num, p[1]);
 				}
+			}
+			break;
+		case 41: { // 28
+				assert(p[1] < kMaxLocals);
+				++t->localVars[p[1]];
 			}
 			break;
 		case 42: { // 29
