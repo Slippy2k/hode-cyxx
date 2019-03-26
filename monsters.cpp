@@ -137,9 +137,11 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	// TODO
-	_mstOp54Unk1 = _mstOp54Unk2 = 0;
+	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = -1;
 	// TODO
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
+	// TODO
+	_mstCurrentUnkFlag = 0;
 	// TODO
 	_tasksList = 0;
 	// TODO
@@ -1049,15 +1051,22 @@ int Game::runTask_default(Task *t) {
 			ret = executeMstOp56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
 		case 215: { // 62
-				if (_mstOp54Unk3 != 0xFFFF) {
+				if (_mstOp54Unk3 != -1) {
 					assert(_mstOp54Unk3 < _res->_mstHdr.unk0x24);
 					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk3]);
 				}
 				_mstOp54Counter = 0;
 			}
 			break;
+		case 216: { // 63
+				if (_mstOp54Unk1 != -1) {
+					assert(_mstOp54Unk1 < _res->_mstHdr.unk0x24);
+					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk1]);
+				}
+			}
+			break;
 		case 217: { // 64
-				const int num = READ_LE_UINT16(p + 2);
+				const int16_t num = READ_LE_UINT16(p + 2);
 				if (_mstOp54Unk3 != num) {
 					_mstOp54Unk3 = num;
 					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
