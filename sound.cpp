@@ -1250,8 +1250,7 @@ void Game::mixSoundObjects17640(bool flag) {
 			if (_channelMixingTable[i] != 0) {
 				continue;
 			}
-			// TODO
-			if (flag && 0) {
+			if (flag) {
 				const int mask = 1 << (so->flags1 >> 24);
 				if ((*_res->getSssLutPtr(2, so->flags1) & mask) != 0) {
 					if ((*_res->getSssLutPtr(3, so->flags1) & mask) == 0) {
