@@ -228,12 +228,12 @@ struct MstUnk53 { // MstOp223Data
 	uint32_t maskVars; // 0x10
 }; // SIZEOF_MstUnk53 20
 
-struct MstUnk54 { // MstOp227Data
-	int16_t unk0; // indexVar1 // 0
-	int16_t unk2; // indexVar2 // 2
-	uint8_t unk4;
-	uint8_t unk5; // maskVars
-	uint16_t codeData;
+struct MstUnk54 { // MstCompareOpData
+	int16_t indexVar1; // 0
+	int16_t indexVar2; // 2
+	uint8_t compare; // 4
+	uint8_t maskVars; // 5
+	uint16_t codeData; // 6
 }; // SIZEOF_MstUnk54 8
 
 struct MstOp56Data {

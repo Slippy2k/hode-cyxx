@@ -550,6 +550,7 @@ struct Game {
 	void setTaskVar(Task *t, int index, int type, int value);
 	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;
+	int getTaskFlag(Task *t, int index, int type) const;
 	int runTask_default(Task *t);
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);

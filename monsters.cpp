@@ -502,7 +502,7 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 		}
 		break;
 	default:
-		error("getTaskVar unhandled index %d type %d", index, type);
+		warning("getTaskVar unhandled index %d type %d", index, type);
 		break;
 	}
 	return 0;
@@ -517,7 +517,7 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 		_mstVars[index] = value;
 		break;
 	default:
-		error("setTaskVar unhandled index %d type %d", index, type);
+		warning("setTaskVar unhandled index %d type %d", index, type);
 		break;
 	}
 }
@@ -533,7 +533,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 	case 6:
 		return (_andyObject->data0x2988 == 0);
 	default:
-		error("getTaskAndyVar unhandled index %d", index);
+		warning("getTaskAndyVar unhandled index %d", index);
 		break;
 	}
 	return 0;
@@ -572,7 +572,26 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 	case 35:
 		return _andyCurrentLevelScreenNum;
 	default:
-		error("getTaskOtherVar unhandled index %d", index);
+		warning("getTaskOtherVar unhandled index %d", index);
+		break;
+	}
+	return 0;
+}
+
+int Game::getTaskFlag(Task *t, int num, int type) const {
+	switch (type) {
+	case 1:
+		return num;
+//	case 2:
+//		// sbb, neg, sbb
+//		return (1 << num) & t->flags;
+//	case 3:
+//		// sbb, neg, sbb
+//		return (1 << num) & _mstFlags;
+	case 4:
+		return getTaskAndyVar(num, t);
+	default:
+		warning("getTaskFlag unhandled type %d num %d", type, num);
 		break;
 	}
 	return 0;
@@ -980,10 +999,21 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 227: { // 69
 				const int num = READ_LE_UINT16(p + 2);
-				MstUnk54 *m = &_res->_mstUnk54[num];
-				const int a = getTaskVar(t, m->unk0,  m->unk5       & 15);
-				const int b = getTaskVar(t, m->unk2, (m->unk5 >> 4) & 15);
-				if (compareOp(m->unk4, a, b)) {
+				const MstUnk54 *m = &_res->_mstUnk54[num];
+				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
+				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
+				if (compareOp(m->compare, a, b)) {
+					assert(m->codeData != kNone);
+					t->codeData = _res->_mstCodeData + m->codeData * 4;
+				}
+			}
+			break;
+		case 228: { // 70
+				const int num = READ_LE_UINT16(p + 2);
+				const MstUnk54 *m = &_res->_mstUnk54[num];
+				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
+				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
+				if (compareOp(m->compare, a, b)) {
 					assert(m->codeData != kNone);
 					t->codeData = _res->_mstCodeData + m->codeData * 4;
 				}
