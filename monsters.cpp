@@ -1105,6 +1105,51 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 233:
+		case 234: { // 72
+				const int num = READ_LE_UINT16(p + 2);
+				const MstUnk55 *m = &_res->_mstUnk55[num];
+				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
+				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
+				if (compareOp(m->compare, a, b)) {
+					if (p[0] == 233) {
+						LvlObject *o = 0;
+						if (t->dataPtr) {
+							if ((t->dataPtr->flagsA6 & 2) == 0) {
+								o = t->dataPtr->o16;
+							}
+						} else if (t->mstObject) {
+							o = t->mstObject->o;
+						}
+						if (o) {
+							o->actionKeyMask = 0;
+							o->directionKeyMask = 0;
+						}
+						t->mstFlags = num;
+						t->run = &Game::runTask_mstUnk55_233;
+						ret = 1;
+					}
+				} else {
+					if (p[0] == 234) {
+						LvlObject *o = 0;
+						if (t->dataPtr) {
+							if ((t->dataPtr->flagsA6 & 2) == 0) {
+								o = t->dataPtr->o16;
+							}
+						} else if (t->mstObject) {
+							o = t->mstObject->o;
+						}
+						if (o) {
+							o->actionKeyMask = 0;
+							o->directionKeyMask = 0;
+						}
+						t->mstFlags = num;
+						t->run = &Game::runTask_mstUnk55_234;
+						ret = 1;
+					}
+				}
+			}
+			break;
 		case 239: { // 76
 				const int i = READ_LE_UINT16(p + 2);
 				const uint32_t codeData = _res->_mstUnk60[i];
@@ -1557,5 +1602,31 @@ int Game::runTask_waitFlags(Task *t) {
 }
 
 int Game::runTask_idle(Task *t) {
+	return 1;
+}
+
+int Game::runTask_mstUnk55_233(Task *t) {
+	const MstUnk55 *m = &_res->_mstUnk55[t->mstFlags];
+	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
+	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
+	if (compareOp(m->compare, a, b)) {
+		t->run = &Game::runTask_default;
+		LvlObject *o = 0;
+		if (t->dataPtr) {
+			o = t->dataPtr->o16;
+		} else if (t->mstObject) {
+			o = t->mstObject->o;
+		}
+		if (o) {
+			o->actionKeyMask = 0;
+			o->directionKeyMask = 0;
+		}
+		return 0;
+	}
+	return 1;
+}
+
+int Game::runTask_mstUnk55_234(Task *t) {
+	// TODO
 	return 1;
 }

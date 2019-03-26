@@ -559,6 +559,8 @@ struct Game {
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);
 	int runTask_idle(Task *t);
+	int runTask_mstUnk55_233(Task *t);
+	int runTask_mstUnk55_234(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
