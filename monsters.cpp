@@ -516,6 +516,17 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 	case 3:
 		_mstVars[index] = value;
 		break;
+	case 5: {
+			MstUnkData *m = 0;
+			if (t->mstObject) {
+				m = t->mstObject->unk8;
+			} else {
+				m = t->dataPtr;
+			}
+			if (m) {
+				m->localVars[index] = value;
+			}
+		}
 	default:
 		warning("setTaskVar unhandled index %d type %d", index, type);
 		break;
@@ -606,8 +617,20 @@ int Game::runTask_default(Task *t) {
 		assert(((p - t->codeData) & 3) == 0);
 		assert(p[0] <= 242);
 		switch (p[0]) {
-		case 0: // 0
-			// TODO:
+		case 0: { // 0
+				LvlObject *o = 0;
+				if (t->dataPtr) {
+					if ((t->dataPtr->flagsA6 & 2) == 0) {
+						o = t->dataPtr->o16;
+					}
+				} else if (t->mstObject) {
+					o = t->mstObject->o;
+				}
+				if (o) {
+					o->actionKeyMask = 0;
+					o->directionKeyMask = 0;
+				}
+			}
 			// fall-through
 		case 1: { // 1
 				const int num = READ_LE_UINT16(p + 2);
@@ -622,6 +645,18 @@ int Game::runTask_default(Task *t) {
 						ret = 1;
 					}
 				}
+			}
+			break;
+		case 2: { // 2
+				const int num = READ_LE_UINT16(p + 2);
+				MstUnk56 *m = &_res->_mstUnk56[num];
+				int a = getTaskVar(t, m->indexVar1, m->maskVars >> 4); // _ebx
+				int b = getTaskVar(t, m->indexVar2, m->maskVars & 15); // _esi
+				if (a > b) {
+					SWAP(a, b);
+				}
+				a += _rnd.update() % (b - a + 1);
+				setTaskVar(t, m->unk9, m->unkA, a);
 			}
 			break;
 		case 3: // 3

@@ -244,6 +244,15 @@ struct MstUnk55 { // MstOp234Data
 	uint32_t codeData;
 }; // sizeof == 8
 
+struct MstUnk56 {
+	int32_t indexVar1; // 0
+	int32_t indexVar2; // 4
+	uint8_t maskVars; // 8
+	uint8_t unk9;
+	uint8_t unkA;
+	uint8_t unkB;
+}; // sizeof == 12
+
 struct MstOp56Data {
 	uint32_t unk0;
 	uint32_t unk4;
@@ -416,6 +425,7 @@ struct Resource {
 	MstUnk53 *_mstUnk53;
 	MstUnk54 *_mstUnk54;
 	MstUnk55 *_mstUnk55;
+	MstUnk56 *_mstUnk56;
 	MstUnk59 *_mstUnk59;
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	MstOp56Data *_mstOp56Data;
