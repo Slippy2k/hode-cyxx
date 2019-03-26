@@ -1118,7 +1118,7 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 			if (obj->screenNum == _currentRightScreen) {
 				return 129;
 			}
-			if (obj->screenNum == _currentScreen || (_currentLevel == kLvl_lar2 && obj->data0x2988 == 27) || (_currentLevel == kLvl_isld && obj->data0x2988 == 26)) {
+			if (obj->screenNum == _currentScreen || (_currentLevel == kLvl_lar2 && obj->spriteNum == 27) || (_currentLevel == kLvl_isld && obj->spriteNum == 26)) {
 				const int dist = (obj->xPos + obj->width / 2) / 2;
 				return CLIP(dist, 0, 128);
 			}

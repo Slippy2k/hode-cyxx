@@ -1417,7 +1417,7 @@ void Game::setupAndyObjectMoveData(LvlObject *ptr) {
 	_andyPosX = _res->_screensBasePos[ptr->screenNum].u + _andyMoveData.xPos;
 	_andyPosY = _res->_screensBasePos[ptr->screenNum].v + _andyMoveData.yPos;
 	_andyMoveData.anim = ptr->anim;
-	_andyMoveData.unkA = ptr->unk22;
+	_andyMoveData.unkA = ptr->currentSprite;
 	_andyMoveData.frame = ptr->frame;
 	_andyMoveData.flags0 = ptr->flags0;
 	_andyMoveData.flags1 = ptr->flags1;
@@ -1634,16 +1634,16 @@ sameAnim:
 	ptr->anim = currentAnim;
 	ptr->frame = currentAnimFrame;
 
-	ptr->soundToPlay = ash->sound;
-	if (ptr->soundToPlay != 0xFFFF && ptr->type == 8 && ptr->data0x2988 < 5) {
-		playSound(ptr->soundToPlay, ptr, 0, 0);
+	ptr->currentSound = ash->sound;
+	if (ptr->currentSound != 0xFFFF && ptr->type == 8 && ptr->spriteNum < 5) {
+		playSound(ptr->currentSound, ptr, 0, 0);
 	}
 
 	ptr->flags0 = merge_bits(ptr->flags0, ash->flags0, 0x3FF);
 	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 6);
 	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 8);
 
-	ptr->unk22 = ash->firstFrame;
+	ptr->currentSprite = ash->firstFrame;
 
 	ptr->bitmapBits = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
 

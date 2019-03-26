@@ -275,7 +275,7 @@ void Game::callLevel_preScreenUpdate_lava(int num) {
 static LvlObject *findLvlObject_lava(LvlObject *o) {
 	LvlObject *cur = o->nextPtr;
 	while (cur) {
-		if (o->type == cur->type && o->data0x2988 == cur->data0x2988 && o->screenNum == cur->screenNum) {
+		if (o->type == cur->type && o->spriteNum == cur->spriteNum && o->screenNum == cur->screenNum) {
 			return cur;
 		}
 		cur = cur->nextPtr;
@@ -285,7 +285,7 @@ static LvlObject *findLvlObject_lava(LvlObject *o) {
 
 void Game::callLevel_initialize_lava() {
 	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(_transformBufferData2, _transformShadowBuffer);
+	const int size = decodeLZW(_pwr2_screenTransformData, _transformShadowBuffer);
 	assert(size == 256 * 192);
 	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
 	resetLevelTickHelperData();

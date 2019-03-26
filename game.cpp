@@ -289,7 +289,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 		if (spr->yPos >= 192 || spr->yPos + ptr->height < 0) {
 			return;
 		}
-		if (_currentLevel == kLvl_isld && ptr->data0x2988 == 2) {
+		if (_currentLevel == kLvl_isld && ptr->spriteNum == 2) {
 			AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 			spr->xPos += dataPtr->dxPos;
 		}
@@ -436,11 +436,11 @@ void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	LvlAnimHeader *ah = (LvlAnimHeader *)(dat->animsInfoData + kLvlAnimHdrOffset) + ptr->anim;
 	LvlAnimSeqHeader *ash = (LvlAnimSeqHeader *)(dat->animsInfoData + ah->seqOffset) + ptr->frame;
 
-	ptr->soundToPlay = ash->sound;
+	ptr->currentSound = ash->sound;
 	ptr->flags0 = merge_bits(ptr->flags0, ash->flags0, 0x3FF);
 	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 6);
 	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 8);
-	ptr->unk22 = ash->firstFrame;
+	ptr->currentSprite = ash->firstFrame;
 
 	ptr->bitmapBits = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
 
@@ -450,7 +450,7 @@ void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	const int w = ptr->width - 1;
 	const int h = ptr->height - 1;
 
-	if (ptr->type == 8 && (ptr->data0x2988 == 2 || ptr->data0x2988 == 0)) {
+	if (ptr->type == 8 && (ptr->spriteNum == 2 || ptr->spriteNum == 0)) {
 		AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 		dataPtr->boundingBox.x1 = ptr->xPos;
 		dataPtr->boundingBox.y1 = ptr->yPos;
@@ -654,7 +654,7 @@ void Game::destroyLvlObject(LvlObject *o) {
 		o->nextPtr = _declaredLvlObjectsListHead;
 		--_declaredLvlObjectsListCount;
 		_declaredLvlObjectsListHead = o;
-		switch (o->data0x2988) {
+		switch (o->spriteNum) {
 		case 0:
 		case 2:
 			o->dataPtr = 0;
@@ -874,7 +874,7 @@ void Game::clearLvlObjectsList1() {
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
-			switch (ptr->data0x2988) {
+			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
 				ptr->dataPtr = 0;
@@ -906,7 +906,7 @@ void Game::clearLvlObjectsList2() {
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
-			switch (ptr->data0x2988) {
+			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
 				ptr->dataPtr = 0;
@@ -938,7 +938,7 @@ void Game::clearLvlObjectsList3() {
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
-			switch (ptr->data0x2988) {
+			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
 				ptr->dataPtr = 0;
@@ -966,13 +966,13 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
 		++_declaredLvlObjectsListCount;
-		ptr->data0x2988 = num;
+		ptr->spriteNum = num;
 		ptr->type = type;
 		if (type == 8) {
 			_res->incLevelData0x2988RefCounter(ptr);
 			lvlObjectTypeCallback(ptr);
 		}
-		ptr->unk22 = 0;
+		ptr->currentSprite = 0;
 		ptr->sssObj = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
@@ -990,10 +990,10 @@ int Game::addLvlObjectToList3(int num) {
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
 		assert(ptr);
 		++_declaredLvlObjectsListCount;
-		ptr->data0x2988 = 1;
+		ptr->spriteNum = 1;
 		ptr->type = 8;
 		_res->incLevelData0x2988RefCounter(ptr);
-		ptr->unk22 = 0;
+		ptr->currentSprite = 0;
 		ptr->sssObj = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
@@ -1039,7 +1039,7 @@ void Game::removeLvlObject2(LvlObject *o) {
 		_declaredLvlObjectsListHead = o;
 		--_declaredLvlObjectsListCount;
 	} else {
-		switch (o->data0x2988) {
+		switch (o->spriteNum) {
 		case 0:
 		case 2:
 			o->dataPtr = 0;
@@ -1068,7 +1068,7 @@ void Game::setupCurrentScreen() {
 	_plasmaCannonFlags = 0;
 	_actionDirectionKeyMaskIndex = 0;
 	_andyCurrentLevelScreenNum = ptr->screenNum;
-	if (dat[9] != ptr->data0x2988) {
+	if (dat[9] != ptr->spriteNum) {
 		switch (dat[9]) {
 		case 0:
 			removeLvlObject(ptr);
@@ -1104,7 +1104,7 @@ void Game::setupCurrentScreen() {
 	setupLvlObjectBitmap(ptr);
 	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	dataPtr->unk6 = 0;
-	if (ptr->data0x2988 == 2) {
+	if (ptr->spriteNum == 2) {
 		removeLvlObject(ptr);
 	} else {
 		destroyLvlObjectPlasmaExplosion(ptr);
@@ -1120,7 +1120,7 @@ void Game::updateScreenHelper(int num) {
 				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->flags & 0xFF];
 				assert(data);
 				p->framesCount = READ_LE_UINT16(data); data += 2;
-				ptr->soundToPlay = READ_LE_UINT16(data); data += 2;
+				ptr->currentSound = READ_LE_UINT16(data); data += 2;
 				p->currentSpriteData = p->otherSpriteData = data;
 				p->currentFrame = 0;
 				p->firstSpriteData = READ_LE_UINT16(data + 4) + data + 4;
@@ -1128,17 +1128,17 @@ void Game::updateScreenHelper(int num) {
 			break;
 		case 1: {
 				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
-				ptr->soundToPlay = READ_LE_UINT16(data); data += 2;
+				ptr->currentSound = READ_LE_UINT16(data); data += 2;
 				ptr->dataPtr = data;
 			}
 			break;
 		case 2:
 			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->flags & 0xFF];
 			if (_currentLevel == kLvl_rock) {
-				ptr->callbackFuncPtr = _callLevel_objectUpdate_rock[ptr->stateValue];
+				ptr->callbackFuncPtr = _callLevel_objectUpdate_rock[ptr->objectUpdateType];
 			} else {
 				// other levels use two callbacks
-				switch (ptr->stateValue) {
+				switch (ptr->objectUpdateType) {
 				case 0:
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case0;
 					break;
@@ -1146,7 +1146,7 @@ void Game::updateScreenHelper(int num) {
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case3;
 					break;
 				default:
-					warning("updateScreenHelper unimplemented for level %d, state %d", _currentLevel, ptr->stateValue);
+					warning("updateScreenHelper unimplemented for level %d, state %d", _currentLevel, ptr->objectUpdateType);
 					break;
 				}
 			}
@@ -1274,7 +1274,7 @@ void Game::restartLevel() {
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
-	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
+	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
@@ -1295,7 +1295,7 @@ void Game::playAndyFallingCutscene(int type) {
 	if (!_paf->_skipCutscenes && play) {
 		switch (_currentLevel) {
 		case 0:
-			if (_andyObject->data0x2988 == 0) {
+			if (_andyObject->spriteNum == 0) {
 				_paf->play(22); // Andy falls with cannon
 			} else {
 				_paf->play(23); // Andy falls without cannon
@@ -1386,7 +1386,7 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 			_fadePaletteCounter = 10;
 			_plasmaCannonFlags |= 1;
 		} else {
-			if (_andyObject->data0x2988 == 2 && _actionDirectionKeyMaskIndex >= 16) {
+			if (_andyObject->spriteNum == 2 && _actionDirectionKeyMaskIndex >= 16) {
 				removeLvlObject(_andyObject);
 			}
 			_andyActionKeysFlags = 0;
@@ -1526,7 +1526,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj2.x2 = obj2.x1 + ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		if (clipBoundingBox(&obj1, &obj2)) {
-			updateBoundingBoxClippingOffset(&obj1, &obj2, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->unk22), (ptr->flags1 >> 4) & 3);
+			updateBoundingBoxClippingOffset(&obj1, &obj2, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 		break;
 	case 16:
@@ -1549,7 +1549,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		if (clipBoundingBox(&obj1, &obj2)) {
-			return updateBoundingBoxClippingOffset(&obj1, &obj2, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->unk22), (ptr->flags1 >> 4) & 3);
+			return updateBoundingBoxClippingOffset(&obj1, &obj2, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 		break;
 	case 19:
@@ -1560,7 +1560,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj2.y1 += ptr->posTable[0].y;
 		obj2.y2 += ptr->posTable[1].y;
 		if (clipBoundingBox(&obj2, &obj1)) {
-			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->unk22), (ptr->flags1 >> 4) & 3);
+			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 		break;
 	case 3:
@@ -1569,7 +1569,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj2.x2 = obj2.x1 + ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		if (clipBoundingBox(&obj2, &obj1)) {
-			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->unk22), (ptr->flags1 >> 4) & 3);
+			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 		break;
 	case 51:
@@ -1591,7 +1591,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj2.y2 += ptr->height - 13;
 		obj2.y1 += 6;
 		if (clipBoundingBox(&obj2, &obj1)) {
-			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->unk22), (ptr->flags1 >> 4) & 3);
+			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 	}
 	return 0;
@@ -1612,7 +1612,7 @@ int Game::updateAndyLvlObject() {
 		_andyObject->yPos += data->dyPos;
 	}
 	if ((_andyObject->flags0 & 0x1F) == 0xB) {
-		if (_andyObject->data0x2988 == 2) {
+		if (_andyObject->spriteNum == 2) {
 			removeLvlObject(_andyObject);
 		}
 		if ((_andyObject->flags0 & ~0x1F) == 0x40) {
@@ -1632,7 +1632,7 @@ int Game::updateAndyLvlObject() {
 			if (_andyObject->actionKeyMask & 4) {
 				addToSpriteList(_plasmaExplosionObject);
 			}
-		} else if (_andyObject->data0x2988 == 0) {
+		} else if (_andyObject->spriteNum == 0) {
 			lvlObjectType1Init(_andyObject);
 		}
 		return 0;
@@ -1654,7 +1654,7 @@ int Game::updateAndyLvlObject() {
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
-	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
+	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
@@ -1720,7 +1720,7 @@ void Game::redrawObjects() {
 			}
 		}
 	}
-	if (_andyObject->data0x2988 == 0 && (_andyObject->flags2 & 0x1F) == 4) {
+	if (_andyObject->spriteNum == 0 && (_andyObject->flags2 & 0x1F) == 4) {
 		if (_plasmaCannonFirstIndex < _plasmaCannonLastIndex2) {
 			drawPlasmaCannon();
 		}
@@ -1758,7 +1758,7 @@ void Game::redrawObjects() {
 			}
 		}
 	}
-	if (_andyObject->data0x2988 == 0 && (_andyObject->flags2 & 0x1F) == 0xC) {
+	if (_andyObject->spriteNum == 0 && (_andyObject->flags2 & 0x1F) == 0xC) {
 		if (_plasmaCannonFirstIndex < _plasmaCannonLastIndex2) {
 			drawPlasmaCannon();
 		}
@@ -1823,9 +1823,9 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	AnimBackgroundData *_esi = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
 	uint8_t *_edi = _esi->currentSpriteData + 2;
 	if (_res->_currentScreenResourceNum == ptr->screenNum) {
-		if (ptr->soundToPlay != 0xFFFF) {
-			playSound(ptr->soundToPlay, ptr, 0, 3);
-			ptr->soundToPlay = 0xFFFF;
+		if (ptr->currentSound != 0xFFFF) {
+			playSound(ptr->currentSound, ptr, 0, 3);
+			ptr->currentSound = 0xFFFF;
 		}
 		uint8_t *_edx = _edi + 2;
 		Sprite *spr = _gameSpriteListHead;
@@ -1842,19 +1842,19 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	}
 	int16_t soundNum = -1;
 	uint8_t *_eax = READ_LE_UINT16(_edi + 2) + _edi + 2; // nextSpriteData
-	switch (ptr->stateValue - 1) {
+	switch (ptr->objectUpdateType - 1) {
 	case 6:
 		_esi->currentSpriteData = _esi->firstSpriteData;
 		if (_esi->currentFrame == 0) {
 			_esi->currentFrame = 1;
 			soundNum = READ_LE_UINT16(_esi->firstSpriteData);
 		}
-		ptr->stateValue = 4;
+		ptr->objectUpdateType = 4;
 		break;
 	case 5:
 		_esi->currentFrame = 0;
 		_esi->currentSpriteData = _esi->otherSpriteData;
-		ptr->stateValue = 1;
+		ptr->objectUpdateType = 1;
 		break;
 	case 3:
 		++_esi->currentFrame;
@@ -1864,7 +1864,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		} else {
 			_esi->currentFrame = 0;
 			_esi->currentSpriteData = _esi->otherSpriteData;
-			ptr->stateValue = 1;
+			ptr->objectUpdateType = 1;
 			soundNum = READ_LE_UINT16(_esi->currentSpriteData);
 		}
 		break;
@@ -1876,7 +1876,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		} else {
 			_esi->currentFrame = 0;
 			_esi->currentSpriteData = _esi->otherSpriteData;
-			ptr->stateValue = 1;
+			ptr->objectUpdateType = 1;
 			soundNum = READ_LE_UINT16(_esi->currentSpriteData);
 		}
 		break;
@@ -1892,7 +1892,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			if (_esi->currentFrame > _esi->framesCount) {
 				_esi->currentFrame = _esi->framesCount;
 			}
-			ptr->stateValue = 1;
+			ptr->objectUpdateType = 1;
 			return ptr->nextPtr;
 		}
 		break;
@@ -1900,7 +1900,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		return ptr->nextPtr;
 	default:
 		soundNum = READ_LE_UINT16(_esi->currentSpriteData);
-		if (ptr->stateCounter == 0) {
+		if (ptr->hitCount == 0) {
 			++_esi->currentFrame;
 			if (_esi->currentFrame >= _esi->framesCount) {
 				_esi->currentSpriteData = _esi->firstSpriteData;
@@ -1909,7 +1909,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 				_esi->currentSpriteData = _eax;
 			}
 		} else {
-			--ptr->stateCounter;
+			--ptr->hitCount;
 		}
 		break;
 	}
@@ -1922,9 +1922,9 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 	if (ptr->screenNum == _res->_currentScreenResourceNum) {
 		if (_res->_screensState[_res->_currentScreenResourceNum].s0 == ptr->screenState || ptr->screenState == 0xFF) {
-			if (ptr->soundToPlay != 0xFFFF) {
-				playSound(ptr->soundToPlay, 0, 0, 3);
-				ptr->soundToPlay = 0xFFFF;
+			if (ptr->currentSound != 0xFFFF) {
+				playSound(ptr->currentSound, 0, 0, 3);
+				ptr->currentSound = 0xFFFF;
 			}
 			uint8_t *data = (uint8_t *)getLvlObjectDataPtr(ptr, kObjectDataTypeLvlBackgroundSound);
 			Sprite *spr = _gameSpriteListHead;
@@ -1946,7 +1946,7 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	LvlObject *next, *o;
 
-	uint8_t _al = ptr->data0x2988;
+	uint8_t _al = ptr->spriteNum;
 	o = next = ptr->nextPtr;
 	if ((_al > 15 && ptr->dataPtr == 0) || ptr->levelData0x2988 == 0) {
 		if (ptr->linkObjPtr) {
@@ -1966,7 +1966,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		}
 	}
 	if ((ptr->flags1 & 6) == 2) {
-		const int index = (15 < ptr->data0x2988) ? 5 : 7;
+		const int index = (15 < ptr->spriteNum) ? 5 : 7;
 		ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[index].x, ptr->yPos + ptr->posTable[index].y, ptr->screenNum);
 	}
 	if (ptr->bitmapBits == 0) {
@@ -1994,9 +1994,9 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 			_gameSpriteListPtrTable[index] = spr;
 		}
 	}
-	if (ptr->data0x2988 <= 15 || ptr->dataPtr == 0) {
-		if (ptr->soundToPlay != 0xFFFF) {
-			playSound(ptr->soundToPlay, ptr, 0, 3);
+	if (ptr->spriteNum <= 15 || ptr->dataPtr == 0) {
+		if (ptr->currentSound != 0xFFFF) {
+			playSound(ptr->currentSound, ptr, 0, 3);
 		}
 		return o;
 	}
@@ -2019,8 +2019,8 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 			c = 0;
 		}
 	}
-	if (ptr->soundToPlay != 0xFFFF) {
-		playSound(ptr->soundToPlay, ptr, c, a);
+	if (ptr->currentSound != 0xFFFF) {
+		playSound(ptr->currentSound, ptr, c, a);
 	}
 	return o;
 }
@@ -2206,7 +2206,7 @@ void Game::updateAndyMonsterObjects() {
 		setLvlObjectPosRelativeToPoint(ptr, 3, _mstOriginPosX, _mstOriginPosY);
 	}
 	_andyActionKeysFlags = 0;
-	if (ptr->data0x2988 == 2) {
+	if (ptr->spriteNum == 2) {
 		removeLvlObject(ptr);
 	}
 }
@@ -2282,7 +2282,7 @@ void Game::levelMainLoop() {
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 	preloadLevelScreenData(num, 0xFF);
-	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
+	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
@@ -2320,7 +2320,7 @@ void Game::levelMainLoop() {
 			}
 			const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
 			preloadLevelScreenData(num, 0xFF);
-			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->data0x2988];
+			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 			resetScreen();
 			if (_andyObject->screenNum != num) {
 				preloadLevelScreenData(_andyObject->screenNum, 0xFF);
@@ -2352,7 +2352,7 @@ void Game::levelMainLoop() {
 		((AndyObjectScreenData *)_andyObject->dataPtr)->dyPos = 0;
 		updateAnimatedLvlObjectsLeftRightCurrentScreens();
 		if (_currentLevel == 0 || _currentLevel == 7 || _currentLevel == 9) {
-			if (_andyObject->data0x2988 == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
+			if (_andyObject->spriteNum == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
 				updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
 			}
 		}
@@ -2656,7 +2656,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 }
 
 void Game::lvlObjectType0Init(LvlObject *ptr) {
-	uint8_t num = ptr->data0x2988;
+	uint8_t num = ptr->spriteNum;
 	if (_currentLevel == 0 && _levelCheckpoint >= 5) {
 		num = 2;
 	}
@@ -2704,7 +2704,7 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 }
 
 void Game::lvlObjectTypeInit(LvlObject *o) {
-	switch (o->data0x2988) {
+	switch (o->spriteNum) {
 	case 0:
 	case 2:
 		lvlObjectType0Init(o);
@@ -2713,7 +2713,7 @@ void Game::lvlObjectTypeInit(LvlObject *o) {
 		lvlObjectType1Init(o);
 		break;
 	default:
-		error("lvlObjectTypeInit unhandled case %d", o->data0x2988);
+		error("lvlObjectTypeInit unhandled case %d", o->spriteNum);
 		break;
 	}
 }
@@ -2753,7 +2753,7 @@ void Game::lvlObjectType0CallbackHelper1() {
 	if (_andyActionKeysFlags & 4) {
 		_bl |= 4;
 	}
-	if (_andyObject->data0x2988 == 2 && (_bl & 5) == 5) {
+	if (_andyObject->spriteNum == 2 && (_bl & 5) == 5) {
 		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		LvlObject *o = data->nextPtr;
 		if (o) {
@@ -3118,12 +3118,12 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 	switch (_currentLevel) {
 	case 0:
 	case 7:
-		if (ptr->data0x2988 == 0) {
+		if (ptr->spriteNum == 0) {
 			setupPlasmaCannonPoints(ptr);
 		}
 		break;
 	case 9:
-		if (ptr->data0x2988 != 0) {
+		if (ptr->spriteNum != 0) {
 			setupSpecialPowers(ptr);
 		} else {
 			setupPlasmaCannonPoints(ptr);
@@ -3192,7 +3192,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 	if (_mstLogicDisabled) {
 		ptr->actionKeyMask = _andyObject->actionKeyMask;
 		ptr->directionKeyMask = _andyObject->directionKeyMask;
-		if (_andyObject->data0x2988 == 2 && _lvlObjectsList0) {
+		if (_andyObject->spriteNum == 2 && _lvlObjectsList0) {
 			// TODO
 			// game_unk24
 		}
@@ -3228,7 +3228,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 }
 
 int Game::lvlObjectList3Callback(LvlObject *o) {
-	if ((o->data0x2988 <= 7 && (o->flags0 & 0x1F) == 0xB) || o->flags0 == 0x1F) {
+	if ((o->spriteNum <= 7 && (o->flags0 & 0x1F) == 0xB) || o->flags0 == 0x1F) {
 		if (_lvlObjectsList3 && o) {
 			if (o != _lvlObjectsList3) {
 				LvlObject *prev = 0;
@@ -3249,7 +3249,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = o;
 		} else {
-			switch (o->data0x2988) {
+			switch (o->spriteNum) {
 			case 0:
 			case 2:
 				o->dataPtr = 0;
@@ -3271,8 +3271,8 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 		updateAndyObject(o);
 		o->actionKeyMask = 0;
 		o->directionKeyMask = 0;
-		if (o->soundToPlay != 0xFFFF) {
-			playSound(o->soundToPlay, o, 0, 3);
+		if (o->currentSound != 0xFFFF) {
+			playSound(o->currentSound, o, 0, 3);
 		}
 		if (o->bitmapBits) {
 			addToSpriteList(o);
@@ -3282,7 +3282,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 }
 
 void Game::lvlObjectTypeCallback(LvlObject *o) {
-	switch (o->data0x2988) {
+	switch (o->spriteNum) {
 	case 0:
 	case 2:
 		o->callbackFuncPtr = &Game::lvlObjectType0Callback;
@@ -3326,7 +3326,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 		o->callbackFuncPtr = &Game::lvlObjectType8Callback;
 		break;
 	default:
-		warning("lvlObjectTypeCallback unhandled case %d", o->data0x2988);
+		warning("lvlObjectTypeCallback unhandled case %d", o->spriteNum);
 		break;
 	}
 }
@@ -3410,13 +3410,13 @@ LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 			_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
 			assert(ptr);
 			++_declaredLvlObjectsListCount;
-			ptr->data0x2988 = num;
+			ptr->spriteNum = num;
 			ptr->type = type;
 			if (type == 8) {
 				_res->incLevelData0x2988RefCounter(ptr);
 				lvlObjectTypeCallback(ptr);
 			}
-			ptr->unk22 = 0;
+			ptr->currentSprite = 0;
 			ptr->sssObj = 0;
 			ptr->nextPtr = 0;
 			ptr->bitmapBits = 0;
@@ -3482,7 +3482,7 @@ void Game::initLvlObjects() {
 void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) {
 	if (ptr->type == 8) {
 		_res->decLevelData0x2988RefCounter(ptr);
-		ptr->data0x2988 = num;
+		ptr->spriteNum = num;
 		ptr->type = type;
 		_res->incLevelData0x2988RefCounter(ptr);
 	}
@@ -3491,7 +3491,7 @@ void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) 
 LvlObject *Game::findLvlObject(uint8_t type, uint8_t num, int index) {
 	LvlObject *ptr = _screenLvlObjectsList[index];
 	while (ptr) {
-		if (ptr->type == type && ptr->data0x2988 == num) {
+		if (ptr->type == type && ptr->spriteNum == num) {
 			break;
 		}
 		ptr = ptr->nextPtr;
@@ -3513,7 +3513,7 @@ LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int index) {
 LvlObject *Game::findLvlObjectType2(int num, int index) {
 	LvlObject *ptr = _screenLvlObjectsList[index];
 	while (ptr) {
-		if (ptr->type == 2 && ptr->data0x2988 == num && !ptr->dataPtr) {
+		if (ptr->type == 2 && ptr->spriteNum == num && !ptr->dataPtr) {
 			break;
 		}
 		ptr = ptr->nextPtr;

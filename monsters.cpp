@@ -542,7 +542,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 	case 5:
 		return (_andyObject->flags0 & 0x1F) == 7;
 	case 6:
-		return (_andyObject->data0x2988 == 0);
+		return (_andyObject->spriteNum == 0);
 	default:
 		warning("getTaskAndyVar unhandled index %d", index);
 		break;
@@ -1277,7 +1277,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 	case 0:
 		if (_mstCurrentUnkFlag == 0 && resetAndyLvlObjectPlasmaCannonKeyMask(0x71) != 0) {
 			_plasmaCannonFlags |= 1;
-			if (_andyObject->data0x2988 == 0) {
+			if (_andyObject->spriteNum == 0) {
 				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
 			} else {
 				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
@@ -1307,7 +1307,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		if (_mstCurrentUnkFlag != 0) {
 			if (resetAndyLvlObjectPlasmaCannonKeyMask(0x61) != 0) {
 				_plasmaCannonFlags &= ~1;
-				if (_andyObject->data0x2988 == 0) {
+				if (_andyObject->spriteNum == 0) {
 					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
 				} else {
 					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;

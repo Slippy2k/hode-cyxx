@@ -153,12 +153,12 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->frame = _lvlFile->readByte();
 	dat->anim = _lvlFile->readUint16();
 	dat->type = _lvlFile->readByte();
-	dat->data0x2988 = _lvlFile->readByte();
+	dat->spriteNum = _lvlFile->readByte();
 	dat->flags0 = _lvlFile->readUint16();
 	dat->flags1 = _lvlFile->readUint16();
 	dat->flags2 = _lvlFile->readUint16();
-	dat->stateValue = _lvlFile->readByte();
-	dat->stateCounter = _lvlFile->readByte();
+	dat->objectUpdateType = _lvlFile->readByte();
+	dat->hitCount = _lvlFile->readByte();
 	const uint32_t objRef = _lvlFile->readUint32();
 	if (objRef) {
 		dat->linkObjPtr = &_dummyObject;
@@ -168,8 +168,8 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->height = _lvlFile->readUint16();
 	dat->directionKeyMask = _lvlFile->readByte();
 	dat->actionKeyMask = _lvlFile->readByte();
-	dat->unk22 = _lvlFile->readUint16();
-	dat->soundToPlay = _lvlFile->readUint16();
+	dat->currentSprite = _lvlFile->readUint16();
+	dat->currentSound = _lvlFile->readUint16();
 	dat->unk26 = _lvlFile->readByte();
 	dat->unk27 = _lvlFile->readByte();
 	dat->bitmapBits = 0; _lvlFile->readUint32();
@@ -443,14 +443,14 @@ bool Resource::isLevelData0x2B88Loaded(int num) {
 }
 
 void Resource::incLevelData0x2988RefCounter(LvlObject *ptr) {
-	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->data0x2988];
+	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->spriteNum];
 	assert(dat);
 	++dat->refCount;
 	ptr->levelData0x2988 = dat;
 }
 
 void Resource::decLevelData0x2988RefCounter(LvlObject *ptr) {
-	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->data0x2988];
+	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->spriteNum];
 	if (dat) {
 		--dat->refCount;
 	}

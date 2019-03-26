@@ -471,9 +471,9 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 	if (_plasmaCannonDirection && (ptr->flags0 & 0x1F) != 0xB) {
 		if (level1OpHelper2(ptr->linkObjPtr) != 0) {
 			ptr->actionKeyMask |= 0x20;
-			++ptr->stateCounter;
-			if (ptr->stateCounter > p[65]) {
-				ptr->stateCounter = 0;
+			++ptr->hitCount;
+			if (ptr->hitCount > p[65]) {
+				ptr->hitCount = 0;
 				ptr->actionKeyMask |= 7;
 			}
 			_plasmaCannonExplodeFlag = 1;
@@ -828,7 +828,7 @@ void Game::callLevel_preScreenUpdate_rock(int num) {
 
 void Game::callLevel_initialize_rock() {
 	if (!_paf->_skipCutscenes) {
-		if (_andyObject->data0x2988 == 0) {
+		if (_andyObject->spriteNum == 0) {
 			_paf->preload(22);
 		} else {
 			_paf->preload(23);
@@ -844,7 +844,7 @@ void Game::callLevel_tick_rock() {
 
 void Game::callLevel_terminate_rock() {
 	if (!_paf->_skipCutscenes) {
-		if (_andyObject->data0x2988 == 0) {
+		if (_andyObject->spriteNum == 0) {
 			_paf->unload(22);
 		} else {
 			_paf->unload(23);

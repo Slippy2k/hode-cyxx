@@ -14,7 +14,7 @@
 void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
 	LvlObject *o = _lvlObjectsList3;
 	while (o) {
-		if (o->data0x2988 == 4 && o->anim <= 9) {
+		if (o->spriteNum == 4 && o->anim <= 9) {
 			BoundingBox b2;
 			b2.x1 = o->posTable[3].x + o->xPos - 1;
 			b2.x2 = o->posTable[3].x + o->xPos + 1;
@@ -401,7 +401,7 @@ void Game::callLevel_preScreenUpdate_pwr1(int num) {
 
 void Game::callLevel_initialize_pwr1() {
 	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(_transformBufferData1, _transformShadowBuffer);
+	const int size = decodeLZW(_pwr1_screenTransformData, _transformShadowBuffer);
 	assert(size == 256 * 192);
 	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
 	resetLevelTickHelperData();

@@ -52,8 +52,8 @@ struct Game {
 	static const uint8_t _actionDirectionKeyMaskTable[];
 	static const uint8_t *_levelCheckpointData[];
 	static const uint8_t *_levelScreenStartData[];
-	static const uint8_t _transformBufferData1[]; // _pwr1_screenTransformData
-	static const uint8_t _transformBufferData2[]; // _pwr2_screenTransformData
+	static const uint8_t _pwr1_screenTransformData[];
+	static const uint8_t _pwr2_screenTransformData[];
 	static const uint8_t _pwr1_screenTransformLut[];
 	static const uint8_t _pwr2_screenTransformLut[];
 

@@ -134,19 +134,19 @@ struct LvlObject {
 	uint8_t frame;
 	uint16_t anim;
 	uint8_t type;
-	uint8_t data0x2988; // spriteNum
+	uint8_t spriteNum;
 	uint16_t flags0; // hFlags
 	uint16_t flags1; // vFlags
 	uint16_t flags2; // spriteType
-	uint8_t stateValue; // objectUpdateType
-	uint8_t stateCounter; // hitCount
+	uint8_t objectUpdateType;
+	uint8_t hitCount;
 	LvlObject *linkObjPtr; // attachedLvlObject, plasma cannon object for _andyObject
 	uint16_t width;
 	uint16_t height;
 	uint8_t actionKeyMask;
 	uint8_t directionKeyMask;
-	uint16_t unk22; // currentSprite
-	uint16_t soundToPlay; // currentSound
+	uint16_t currentSprite;
+	uint16_t currentSound;
 	uint8_t unk26;
 	uint8_t unk27;
 	const uint8_t *bitmapBits;
@@ -335,7 +335,7 @@ struct Task {
 	uint8_t flags; // 0x34
 	uint8_t runningState; // 0x35
 	int16_t delay; // 0x36
-	uint32_t mstFlags; // mstFlags
+	uint32_t mstFlags; // 0x38
 	int (Game::*run)(Task *t); // 0x3C
 	Task *child; // 0x40
 }; // sizeof == 0x44
