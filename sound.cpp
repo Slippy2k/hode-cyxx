@@ -923,7 +923,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		}
 		so = _sssObjectsList2;
 		while (so) {
-			if (compareSssLut(so->flags, flags)) {
+			if (compareSssLut(so->flags0, flags)) {
 				*sssLut2 &= ~mask;
 				return 0;
 			}
