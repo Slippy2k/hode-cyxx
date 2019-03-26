@@ -157,7 +157,7 @@ struct Game {
 	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
 	Task _tasksTable[kMaxTasks];
-	Task *_tasksListTail;
+	Task *_tasksList;
 	int _mstPrevPosX;
 	int _mstPrevPosY;
 	int _mstPosX;

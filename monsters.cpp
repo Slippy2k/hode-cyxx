@@ -141,7 +141,7 @@ void Game::resetMstCode() {
 	// TODO
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
-	_tasksListTail = 0;
+	_tasksList = 0;
 	// TODO
 	if (_res->_mstTickCodeData != kNone) {
 		_mstVars[31] = _mstTickDelay = _res->_mstTickDelay;
@@ -285,7 +285,7 @@ void Game::executeMstCode() {
 	if (_andyCurrentLevelScreenNum != _currentScreen) {
 		_andyCurrentLevelScreenNum = _currentScreen;
 	}
-	for (Task *t = _tasksListTail; t; t = t->prev) {
+	for (Task *t = _tasksList; t; t = t->prev) {
 		_runTaskOpcodesCount = 0;
 		while ((this->*(t->run))(t) == 0);
 	}
@@ -375,11 +375,11 @@ Task *Game::createTask(const uint8_t *codeData) {
 			memset(t, 0, sizeof(Task));
 			resetTask(t, codeData);
 			t->next = 0;
-			t->prev = _tasksListTail;
-			if (_tasksListTail) {
-				_tasksListTail->next = t;
+			t->prev = _tasksList;
+			if (_tasksList) {
+				_tasksList->next = t;
 			}
-			_tasksListTail = t;
+			_tasksList = t;
 			return t;
 		}
 	}
@@ -387,15 +387,32 @@ Task *Game::createTask(const uint8_t *codeData) {
 }
 
 Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
-	Task *current = _tasksListTail;
+	Task *current = _tasksList;
 	bool found = false;
 	while (current) {
 		if (current->localVars[7] == num) {
 			found = true;
 			if (current != t) {
-				// TODO
-				warning("updateTask, duplicated task id %d", num);
-				break;
+				if (!codeData) {
+					if (current->child) {
+						current->child->codeData = 0;
+						current->child = 0;
+					}
+					Task *next = current->next;
+					current->codeData = 0;
+					Task *prev = current->prev;
+					if (prev) {
+						prev->next = next;
+					}
+					if (next) {
+						next->prev = prev;
+					} else {
+						_tasksList = prev;
+					}
+				} else {
+					t->codeData = codeData;
+					t->run = &Game::runTask_default;
+				}
 			}
 		}
 		current = current->prev;
@@ -409,11 +426,11 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 			memset(t, 0, sizeof(Task));
 			resetTask(t, codeData);
 			t->next = 0;
-			t->prev = _tasksListTail;
-			if (_tasksListTail) {
-				_tasksListTail->next = t;
+			t->prev = _tasksList;
+			if (_tasksList) {
+				_tasksList->next = t;
 			}
-			_tasksListTail = t;
+			_tasksList = t;
 			t->localVars[7] = num;
 			return t;
 		}
@@ -1223,7 +1240,7 @@ int Game::runTask_default(Task *t) {
 				if ((t->runningState & 1) != 0 && _mstVars[31] == 0) {
 					_mstVars[31] = _mstTickDelay;
 				}
-				removeTask(&_tasksListTail, t);
+				removeTask(&_tasksList, t);
 				ret = 1;
 			}
 			break;
