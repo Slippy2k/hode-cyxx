@@ -422,6 +422,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
+	uint8_t *_mstUnk52;
 	MstUnk53 *_mstUnk53;
 	MstUnk54 *_mstUnk54;
 	MstUnk55 *_mstUnk55;
