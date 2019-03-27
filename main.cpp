@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 	}
 	_system = SystemStub_SDL_create();
 	atexit(exitMain);
-	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND;
+	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND | kDebug_MONSTER;
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);

@@ -254,10 +254,10 @@ struct MstUnk56 {
 }; // sizeof == 12
 
 struct MstOp56Data {
-	uint32_t unk0;
-	uint32_t unk4;
-	uint32_t unk8;
-	uint32_t unkC;
+	uint32_t unk0; // arg0 // 0
+	uint32_t unk4; // arg1 // 4
+	uint32_t unk8; // arg2 // 8
+	uint32_t unkC; // arg3 // C
 }; // sizeof == 16
 
 struct SssHdr {

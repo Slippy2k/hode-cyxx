@@ -502,8 +502,10 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 	case 1:
 		return index;
 	case 2:
+		assert(index < kMaxLocals);
 		return t->localVars[index];
 	case 3:
+		assert(index < kMaxVars);
 		return _mstVars[index];
 	case 4:
 		return getTaskOtherVar(index, t);
@@ -530,9 +532,11 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 void Game::setTaskVar(Task *t, int index, int type, int value) {
 	switch (type) {
 	case 2:
+		assert(index < kMaxLocals);
 		t->localVars[index] = value;
 		break;
 	case 3:
+		assert(index < kMaxVars);
 		_mstVars[index] = value;
 		break;
 	case 5: {
@@ -546,6 +550,7 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 				m->localVars[index] = value;
 			}
 		}
+		break;
 	default:
 		warning("setTaskVar unhandled index %d type %d", index, type);
 		break;
@@ -634,6 +639,7 @@ int Game::runTask_default(Task *t) {
 	do {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
+		debug(kDebug_MONSTER, "executeMstCode code %d", p[0]);
 		assert(p[0] <= 242);
 		switch (p[0]) {
 		case 0: { // 0
@@ -992,7 +998,7 @@ int Game::runTask_default(Task *t) {
 		case 174:
 		case 175:
 		case 176: { // 46
-				const int num = READ_LE_UINT16(p + 2);
+				const int16_t num = READ_LE_UINT16(p + 2);
 				assert(p[1] < kMaxLocals);
 				arithOp(p[0] - 167, &t->localVars[p[1]], num);
 			}
@@ -1176,7 +1182,7 @@ int Game::runTask_default(Task *t) {
 				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
 					assert(m->codeData != kNone);
-					t->codeData = _res->_mstCodeData + m->codeData * 4;
+					p = _res->_mstCodeData + m->codeData * 4 - 4;
 				}
 			}
 			break;
@@ -1187,7 +1193,7 @@ int Game::runTask_default(Task *t) {
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
 					assert(m->codeData != kNone);
-					t->codeData = _res->_mstCodeData + m->codeData * 4;
+					p = _res->_mstCodeData + m->codeData * 4 - 4;
 				}
 			}
 			break;
@@ -1324,6 +1330,7 @@ static uint8_t getLvlObjectFlag4(int type, const LvlObject *o, const LvlObject *
 
 int Game::executeMstOp56(Task *t, int code, int num) {
 	assert(num < _res->_mstHdr.unk0x78);
+	debug(kDebug_MONSTER, "executeMstOp56 code %d", code);
 	switch (code) {
 	case 0:
 		if (_mstCurrentUnkFlag == 0 && resetAndyLvlObjectPlasmaCannonKeyMask(0x71) != 0) {
