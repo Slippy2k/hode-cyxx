@@ -12,6 +12,7 @@ extern int test_andnegsbb(int) __attribute__((stdcall));
 extern int test_mullongintlongint(int,int,int,int) __attribute__((stdcall));
 extern int test_cdq(int) __attribute__((stdcall));
 extern int test_0042E910(int) __attribute__((stdcall));
+extern int test_neg_sbb_neg(int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -39,6 +40,10 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < 255; ++i) {
 		const int res = (i != 0) ? -1 : 0;
 		assert(test_negsbb(i) == res);
+	}
+	for (i = 0; i < 255; ++i) {
+		const int res = (i != 0) ? 1 : 0;
+		assert(test_neg_sbb_neg(i) == res);
 	}
 	assert(test_andnegsbb(2) == -512);
 	assert(test_andnegsbb(1) ==  512);

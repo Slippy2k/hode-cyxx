@@ -297,7 +297,7 @@ struct AndyMoveData {
 
 struct Task;
 
-struct MstUnkData {
+struct MstUnkData { // MstTaskData
 	LvlObject *o0;
 	void *unk4; // MstUnk42
 	void *unk8;
@@ -317,7 +317,7 @@ struct MstUnkData {
 struct MstObject {
 	void *unk0;
 	LvlObject *o; // 4
-	MstUnkData *unk8;
+	MstUnkData *unk8; // mstTaskData // 8
 	int unk0x10;
 	int xPos; // 14
 	int yPos; // 18
@@ -329,7 +329,7 @@ struct MstObject {
 struct Task {
 	const uint8_t *codeData;
 	Task *prev, *next; // 4,8
-	MstUnkData *dataPtr; // 0xC
+	MstUnkData *dataPtr; // mstTaskData 0xC
 	MstObject *mstObject; // 0x10
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34

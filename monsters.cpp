@@ -615,14 +615,23 @@ int Game::getTaskFlag(Task *t, int num, int type) const {
 	switch (type) {
 	case 1:
 		return num;
-//	case 2:
-//		// sbb, neg, sbb
-//		return (1 << num) & t->flags;
-//	case 3:
-//		// sbb, neg, sbb
-//		return (1 << num) & _mstFlags;
+	case 2:
+		return ((t->flags & (1 << num)) != 0) ? 1 : 0;
+	case 3:
+		return ((_mstFlags & (1 << num)) != 0) ? 1 : 0;
 	case 4:
 		return getTaskAndyVar(num, t);
+	case 5: {
+			MstUnkData *m = 0;
+			if (t->mstObject) {
+				m = t->mstObject->unk8;
+			} else {
+				m = t->dataPtr;
+			}
+			if (m) {
+				return ((m->flags48 & (1 << num)) != 0) ? 1 : 0;
+			}
+		}
 	default:
 		warning("getTaskFlag unhandled type %d num %d", type, num);
 		break;

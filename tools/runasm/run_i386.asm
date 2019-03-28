@@ -8,6 +8,7 @@ GLOBAL test_andnegsbb
 GLOBAL test_mullongintlongint
 GLOBAL test_cdq
 GLOBAL test_0042E910
+GLOBAL test_neg_sbb_neg
 
 SECTION .text
 
@@ -142,8 +143,8 @@ test_mullongintlongint:
    pop ebp
    ret
 
-# http://www.vnsecurity.net/research/2007/05/29/interesting-arithmetic-assembly-sequences.html
-# Taking remainder of a division by a power of 2
+; http://www.vnsecurity.net/research/2007/05/29/interesting-arithmetic-assembly-sequences.html
+; Taking remainder of a division by a power of 2
 
 test_cdq:
 
@@ -166,13 +167,25 @@ test_0042E910:
 
   push ebp
   mov ebp, esp
-  push edx
 
     mov eax, [ebp + arg0]
     neg eax
     shl eax, 1
     and eax, 3
 
-  pop edx
+  pop ebp
+  ret
+
+
+test_neg_sbb_neg:
+
+  push ebp
+  mov ebp, esp
+
+    mov eax, [ebp + arg0]
+    neg eax
+    sbb eax, eax
+    neg eax
+
   pop ebp
   ret
