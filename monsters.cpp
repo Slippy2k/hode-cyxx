@@ -186,8 +186,7 @@ void Game::startMstCode() {
 	_executeMstLogicPrevCounter = _executeMstLogicCounter;
 }
 
-template <typename T>
-static bool compareOp(int op, T num1, T num2) {
+static bool compareOp(int op, int num1, int num2) {
 	switch (op) {
 	case 0:
 		return num1 != num2;
@@ -214,8 +213,7 @@ static bool compareOp(int op, T num1, T num2) {
 	return false;
 }
 
-template <typename T>
-static void arithOp(int op, T *p, int num) {
+static void arithOp(int op, int *p, int num) {
 	switch (op) {
 	case 0:
 		*p = num;
