@@ -1438,6 +1438,70 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			displayHintScreen(hint, pause);
 		}
 		break;
+	case 13:
+	case 14:
+	case 22:
+	case 23:
+	case 24:
+	case 25: {
+			const MstOp56Data *dat = &_res->_mstOp56Data[num];
+			const int mask = dat->unkC;
+			int xPos = getTaskVar(t, dat->unk0, (mask >> 8) & 15); // _edi
+			int yPos = getTaskVar(t, dat->unk4, (mask >> 4) & 15); // _esi
+			int c = getTaskVar(t, dat->unk8, mask & 15); // _eax
+			LvlObject *o = 0;
+			if (t->mstObject) {
+				o = t->mstObject->o;
+			} else if (t->dataPtr) {
+				o = t->dataPtr->o16;
+			}
+			if (c < 0) {
+				// TODO
+				if (c == -2) {
+
+				} else if (c == -1) {
+
+				} else {
+// 4114B3
+					xPos += o->posTable[6].x - o->posTable[7].x;
+					yPos += o->posTable[6].y - o->posTable[7].y;
+				}
+			} else {
+// 411545
+				if (c >= _res->_mstHdr.pointsCount) {
+					c = _res->_mstHdr.pointsCount - 1;
+				}
+				xPos += _res->_mstPointOffsets[c].xOffset;
+				yPos += _res->_mstPointOffsets[c].yOffset;
+				if (code == 13) {
+// 411562
+					// TODO
+				} else if (code == 14) {
+					if (_andyObject) {
+						const int pos = dat->unkC >> 16;
+						xPos -= _res->_mstPointOffsets[c].xOffset;
+						xPos -= _andyObject->posTable[pos].x;
+						_andyObject->xPos = xPos;
+						yPos -= _res->_mstPointOffsets[c].yOffset;
+						yPos -= _andyObject->posTable[pos].y;
+						_andyObject->yPos = yPos;
+						updateLvlObjectScreen(_andyObject);
+						updateMstMoveData();
+						updateMstHeightMapData();
+					}
+				} else if (code == 22) {
+					updateScreenMaskBuffer(xPos, yPos, 1);
+				} else if (code == 24) {
+					updateScreenMaskBuffer(xPos, yPos, 2);
+				} else if (code == 25) {
+					updateScreenMaskBuffer(xPos, yPos, 3);
+				} else {
+					assert(code == 23);
+					updateScreenMaskBuffer(xPos, yPos, 0);
+				}
+			}
+		}
+		break;
 	case 15: {
 			_andyObject->anim  = _res->_mstOp56Data[num].unk0;
 			_andyObject->frame = _res->_mstOp56Data[num].unk4;

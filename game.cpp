@@ -428,6 +428,30 @@ void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int pos) {
 	// (x1, v, x2, u, screen);
 }
 
+void Game::updateScreenMaskBuffer(int x, int y, int type) {
+	uint8_t *p = _screenMaskBuffer + ((y & ~7) << 6) + (x >> 3);
+	switch (type) {
+	case 0:
+		p[0] &= ~8;
+		break;
+	case 1:
+		p[0] |= 8;
+		break;
+	case 2:
+		p[0] |= 8;
+		p[-1] = 0;
+		p[-2] = 0;
+		p[-3] = 0;
+		break;
+	case 3:
+		p[0] |= 8;
+		p[1] = 0;
+		p[2] = 0;
+		p[3] = 0;
+		break;
+	}
+}
+
 void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	LvlObjectData *dat = ptr->levelData0x2988;
 	if (!dat) {

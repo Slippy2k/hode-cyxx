@@ -202,6 +202,7 @@ struct Game {
 	void setupScreenMask(uint8_t num);
 	void resetScreenMask();
 	void setScreenMaskRect(int x1, int y1, int x2, int y2, int pos);
+	void updateScreenMaskBuffer(int x, int y, int type);
 	void setupLvlObjectBitmap(LvlObject *ptr);
 	void randomizeInterpolatePoints(int32_t *pts, int count);
 	int fixPlasmaCannonPointsScreenMask(int num);
