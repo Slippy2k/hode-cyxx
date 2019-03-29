@@ -1068,6 +1068,9 @@ int Game::runTask_default(Task *t) {
 		case 204: // 56
 			ret = executeMstOp56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
+		case 211: // 58
+			executeMstOp58(t, READ_LE_UINT16(p + 2));
+			break;
 		case 215: { // 62
 				if (_mstOp54Unk3 != -1) {
 					assert(_mstOp54Unk3 < _res->_mstHdr.unk0x24);
@@ -1536,6 +1539,45 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		break;
 	}
 	return 0;
+}
+
+void Game::executeMstOp58(Task *t, int num) {
+	const MstOp58Data *dat = &_res->_mstOp58Data[num];
+	const int mask = dat->unkE;
+	int xPos = getTaskVar(t, dat->indexVar1, (mask >> 8) & 15); // _ebx
+	int yPos = getTaskVar(t, dat->indexVar2, (mask >> 4) & 15); // _ebp
+	const int type = getTaskVar(t, dat->unkC, mask & 15) & 255; // _eax
+	LvlObject *o = 0;
+	if (t->mstObject) {
+		o = t->mstObject->o;
+	} else if (t->dataPtr) {
+		o = t->dataPtr->o16;
+	}
+	uint8_t screen = type;
+	if (type == 0xFB) { // -5
+		if (!o) {
+			return;
+		}
+		xPos += o->xPos + o->posTable[6].x;
+		yPos += o->yPos + o->posTable[6].y;
+		screen = o->screenNum;
+	} else if (type == 0xFE) { // -2
+		if (!o) {
+			return;
+		}
+		xPos += o->xPos + o->posTable[7].x;
+		yPos += o->yPos + o->posTable[7].y;
+		screen = o->screenNum;
+	} else if (type == 0xFF) { // -1
+		xPos += _mstRefPosX; // _ebx
+		yPos += _mstRefPosY; // _ebp
+		screen = _currentScreen;
+	}
+	uint16_t flags = (dat->unk6 == -1 && o) ? o->flags2 : 0x3001;
+	o = addLvlObject(2, xPos, yPos, screen, dat->unk8, dat->unk4, dat->unkB, flags, dat->unk9, dat->unkA);
+	if (o) {
+		o->dataPtr = 0;
+	}
 }
 
 void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {

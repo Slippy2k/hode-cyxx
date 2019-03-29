@@ -556,6 +556,7 @@ struct Game {
 	int runTask_default(Task *t);
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);
+	void executeMstOp58(Task *t, int num);
 	void executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);

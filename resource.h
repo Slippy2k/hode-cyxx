@@ -260,6 +260,20 @@ struct MstOp56Data {
 	uint32_t unkC; // arg3 // C
 }; // sizeof == 16
 
+struct MstOp58Data {
+	uint16_t indexVar1; // 0
+	uint16_t indexVar2; // 2
+	uint16_t unk4; // 4
+	int16_t unk6; // 6
+	uint8_t unk8; // 8
+	uint8_t unk9; // 9
+	uint8_t unkA; // A
+	uint8_t unkB; // B
+	uint8_t unkC; // C
+	uint8_t unkD; // D
+	uint16_t unkE; // E
+}; // sizeof == 16
+
 struct SssHdr {
 	int version;
 	int unk4;
@@ -427,6 +441,7 @@ struct Resource {
 	MstUnk54 *_mstUnk54;
 	MstUnk55 *_mstUnk55;
 	MstUnk56 *_mstUnk56;
+	MstOp58Data *_mstOp58Data;
 	MstUnk59 *_mstUnk59;
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	MstOp56Data *_mstOp56Data;
