@@ -3521,6 +3521,11 @@ LvlObject *Game::findLvlObjectType2(int num, int index) {
 	return ptr;
 }
 
+LvlObject *Game::findLvlObjectBoundingBox(const BoundingBox *box) {
+	// TODO
+	return 0;
+}
+
 void Game::resetLevelTickHelperData() {
 	// TODO
 }

@@ -39,6 +39,54 @@ void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
 	}
 }
 
+void Game::postScreenUpdate_pwr1_screen6() {
+	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[6];
+	switch (_res->_screensState[6].s0) {
+	case 0: {
+			BoundingBox b = { 185, 78, 225, 136 };
+			LvlObject *o = findLvlObjectBoundingBox(&b);
+			if (o) {
+				OtherObjectScreenData *oosd = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+				if (oosd->unk0 == 6) {
+					_res->_screensState[6].s0 = 4;
+					dat->currentMaskId = 2;
+				}
+			}
+		}
+		break;
+	case 2:
+		++_screenCounterTable[6];
+		if (_screenCounterTable[6] >= 41) {
+			_res->_screensState[6].s0 = 1;
+			dat->currentMaskId = 1;
+			dat->currentBackgroundId = 1;
+			if (_levelCheckpoint == 0) {
+				_levelCheckpoint = 1;
+			}
+		}
+		break;
+	case 3:
+		++_screenCounterTable[6];
+		if (_screenCounterTable[6] >= 54) {
+			_res->_screensState[6].s0 = 2;
+			dat->currentBackgroundId = 1;
+		}
+		break;
+	default: {
+			BoundingBox b = { 93, 17, 255, 156 };
+			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (clipBoundingBox(&b, &data->boundingBox)) {
+				_res->_screensState[6].s0 = 3;
+				setShakeScreen(3, 31);
+			}
+		}
+		break;
+	}
+	if (_res->_screensState[6].s3 != dat->currentMaskId) {
+		setupScreenMask(6);
+	}
+}
+
 void Game::postScreenUpdate_pwr1_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		BoundingBox b1 = { 50, 0, 100, 122 };
@@ -202,7 +250,7 @@ void Game::postScreenUpdate_pwr1_screen35() {
 void Game::callLevel_postScreenUpdate_pwr1(int num) {
 	switch (num) {
 	case 6:
-		warning("callLevel_postScreenUpdate_pwr1 %d unimplemented", num);
+		postScreenUpdate_pwr1_screen6();
 		break;
 	case 10:
 		postScreenUpdate_pwr1_screen10();

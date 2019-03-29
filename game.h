@@ -284,6 +284,7 @@ struct Game {
 	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
 	LvlObject *findLvlObjectType2(int num, int index);
+	LvlObject *findLvlObjectBoundingBox(const BoundingBox *box);
 	void resetLevelTickHelperData();
 	void updateLevelTickHelper();
 	void captureScreenshot();
@@ -368,6 +369,7 @@ struct Game {
 
 	// level3_pwr1.cpp
 	void postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy);
+	void postScreenUpdate_pwr1_screen6();
 	void postScreenUpdate_pwr1_screen10();
 	void postScreenUpdate_pwr1_screen12();
 	void postScreenUpdate_pwr1_screen14();
