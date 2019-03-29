@@ -1050,9 +1050,9 @@ int Game::runTask_default(Task *t) {
 		case 198: { // 50
 				Task *child = findFreeTask();
 				if (child) {
-					memset(child, 0, sizeof(Task));
+					memcpy(child, t, sizeof(Task));
 					t->child = child;
-					const int16_t num = READ_LE_UINT16(p + 2);
+					const uint16_t num = READ_LE_UINT16(p + 2);
 					const uint32_t codeData = _res->_mstUnk60[num];
 					assert(codeData != kNone);
 					p = _res->_mstCodeData + codeData * 4;
@@ -1271,7 +1271,21 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 242: // 78
 			if (t->child) {
-				// TODO
+				Task *child = t->child;
+				child->next = t->next;
+				child->prev = t->prev;
+				memcpy(t, child, sizeof(Task));
+				t->child = 0;
+				t->runningState &= ~2;
+				child->codeData = 0;
+				MstUnkData *m = t->dataPtr;
+				if (m) {
+					m->flagsA5 &= ~0x70;
+					if ((m->flagsA5 & 8) != 0) {
+						// TODO
+					}
+				}
+				return 0;
 			} else if (t->dataPtr) {
 				// TODO
 			} else if (t->mstObject) {
