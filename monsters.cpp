@@ -846,6 +846,9 @@ int Game::runTask_default(Task *t) {
 				assert(p[1] < kMaxVars);
 				assert(p[2] < kMaxLocals);
 				arithOp(p[0] - 57, &_mstVars[p[1]], t->localVars[p[2]]);
+				if (p[1] == 31 && _mstVars[31] > 0) {
+					_mstTickDelay = _mstVars[31];
+				}
 			}
 			break;
 		case 67:
@@ -911,6 +914,9 @@ int Game::runTask_default(Task *t) {
 				if (m) {
 					assert(p[1] < kMaxVars);
 					arithOp(p[0] - 87, &_mstVars[p[1]], m->localVars[p[2]]);
+					if (p[1] == 31 && _mstVars[31] > 0) {
+						_mstTickDelay = _mstVars[31];
+					}
 				}
 			}
 			break;
@@ -993,6 +999,9 @@ int Game::runTask_default(Task *t) {
 				const int num = p[2];
 				assert(p[1] < kMaxVars);
 				arithOp(p[0] - 147, &_mstVars[p[1]], getTaskOtherVar(num, t));
+				if (p[1] == 31 && _mstVars[31] > 0) {
+					_mstTickDelay = _mstVars[31];
+				}
 			}
 			break;
 		case 167:
@@ -1023,6 +1032,9 @@ int Game::runTask_default(Task *t) {
 				const int16_t num = READ_LE_UINT16(p + 2);
 				assert(p[1] < kMaxVars);
 				arithOp(p[0] - 177, &_mstVars[p[1]], num);
+				if (p[1] == 31 && _mstVars[31] > 0) {
+					_mstTickDelay = _mstVars[31];
+				}
 			}
 			break;
 		case 187:
