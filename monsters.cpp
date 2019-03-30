@@ -781,9 +781,11 @@ int Game::runTask_default(Task *t) {
 				if (getTaskAndyVar(p[1], t) == 0) {
 					LvlObject *o = 0;
 					if (t->dataPtr) {
-						// TODO
+						if ((t->dataPtr->flagsA6 & 2) == 0) {
+							o = t->dataPtr->o16;
+						}
 					} else if (t->mstObject) {
-						// TODO
+						o = t->mstObject->o;
 					}
 					if (o) {
 						o->actionKeyMask = 0;
@@ -798,10 +800,17 @@ int Game::runTask_default(Task *t) {
 				t->delay = 3;
 				t->tempVar = 1 << p[1];
 				if ((t->tempVar & _mstFlags) == 0) {
+					LvlObject *o = 0;
 					if (t->dataPtr) {
-						// TODO
+						if ((t->dataPtr->flagsA6 & 2) == 0) {
+							o = t->dataPtr->o16;
+						}
 					} else if (t->mstObject) {
-						// TODO
+						o = t->mstObject->o;
+					}
+					if (o) {
+						o->actionKeyMask = 0;
+						o->directionKeyMask = 0;
 					}
 					t->run = &Game::runTask_waitFlags;
 					ret = 1;
