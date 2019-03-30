@@ -386,6 +386,11 @@ Task *Game::createTask(const uint8_t *codeData) {
 	return 0;
 }
 
+int Game::changeTask(Task *t, int num, int value) {
+	// TODO
+	return 0;
+}
+
 Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	Task *current = _tasksList;
 	bool found = false;
@@ -693,12 +698,45 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 3: // 3
 			if (t->dataPtr) {
-				// TODO
+				const int num = READ_LE_UINT16(p + 2);
+				const int arg = _res->_mstUnk52[num * 4 + 3];
+				t->codeData = p;
+				ret = changeTask(t, num, (arg == 0xFF) ? -1 : arg);
 			}
 			break;
 		case 4: // 4
 			if (t->dataPtr) {
-				// TODO
+				const int num = READ_LE_UINT16(p + 2);
+				const int arg = _res->_mstUnk52[num * 4 + 3];
+				t->codeData = p;
+				assert(arg < kMaxLocals);
+				ret = changeTask(t, num, t->localVars[arg]);
+			}
+			break;
+		case 5: // 5
+			if (t->dataPtr) {
+				const int num = READ_LE_UINT16(p + 2);
+				const int arg = _res->_mstUnk52[num * 4 + 3];
+				t->codeData = p;
+				assert(arg < kMaxVars);
+				ret = changeTask(t, num, _mstVars[arg]);
+			}
+			break;
+		case 6: // 6
+			if (t->dataPtr) {
+				const int num = READ_LE_UINT16(p + 2);
+				const int arg = _res->_mstUnk52[num * 4 + 3];
+				t->codeData = p;
+				ret = changeTask(t, num, getTaskOtherVar(arg, t));
+			}
+			break;
+		case 7: // 7
+			if (t->dataPtr) {
+				const int num = READ_LE_UINT16(p + 2);
+				const int arg = _res->_mstUnk52[num * 4 + 3];
+				t->codeData = p;
+				assert(arg < kMaxLocals);
+				ret = changeTask(t, num, t->dataPtr->localVars[arg]);
 			}
 			break;
 		case 23: // 13
@@ -1276,6 +1314,7 @@ int Game::runTask_default(Task *t) {
 				MstUnk59 *m = &_res->_mstUnk59[num];
 				if (m->codeData == kNone) {
 					warning("opcode 240 codeOffset is -1 for taskId %d", m->taskId);
+					// TODO
 				} else {
 					updateTask(t, m->taskId, _res->_mstCodeData + m->codeData * 4);
 				}

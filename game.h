@@ -545,6 +545,7 @@ struct Game {
 	void removeMstObjectTask(Task *t);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
+	int changeTask(Task *t, int num, int value);
 	Task *updateTask(Task *t, int num, const uint8_t *codeData);
 	void resetTask(Task *t, const uint8_t *codeData);
 	void removeTask(Task **tasksList, Task *t);
