@@ -169,7 +169,7 @@ struct Game {
 	int _mstOp54Unk3;
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
-	MstUnkData _mstUnkDataTable[32];
+	MstTaskData _mstUnkDataTable[32];
 	MstObject _mstObjectsTable[64];
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
@@ -529,7 +529,7 @@ struct Game {
 
 	// monsters.cpp
 
-	void resetMstUnkData(MstUnkData *m);
+	void resetMstTaskData(MstTaskData *m);
 	void resetMstObject(MstObject *m);
 	void setMstObjectDefaultPos(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);

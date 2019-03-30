@@ -40,15 +40,15 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x4D, 0x4F, 0x4E
 };
 
-void Game::resetMstUnkData(MstUnkData *m) {
+void Game::resetMstTaskData(MstTaskData *m) {
 	m->o0 = 0;
 	LvlObject *o = m->o16;
 	if (o) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < 64; ++i) {
-		if (_mstObjectsTable[i].unk0 && _mstObjectsTable[i].unk8 == m) {
-			_mstObjectsTable[i].unk8 = 0;
+		if (_mstObjectsTable[i].unk0 && _mstObjectsTable[i].mstTaskData == m) {
+			_mstObjectsTable[i].mstTaskData = 0;
 		}
 	}
 }
@@ -92,7 +92,7 @@ void Game::resetMstCode() {
 	}
 	_mstFlags = 0;
 	for (int i = 0; i < 32; ++i) {
-		resetMstUnkData(&_mstUnkDataTable[i]);
+		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < 64; ++i) {
 		resetMstObject(&_mstObjectsTable[i]);
@@ -448,7 +448,7 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
 	t->localVars[7] = 0;
-	MstUnkData *m = t->dataPtr;
+	MstTaskData *m = t->dataPtr;
 	if (m) {
 		const uint8_t mask = m->flagsA5;
 		if ((mask & 0x88) == 0 || (mask & 0xF0) == 0) {
@@ -514,9 +514,9 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 		return getTaskOtherVar(index, t);
 	case 5:
 		{
-			MstUnkData *m = 0;
+			MstTaskData *m = 0;
 			if (t->mstObject) {
-				m = t->mstObject->unk8;
+				m = t->mstObject->mstTaskData;
 			} else {
 				m = t->dataPtr;
 			}
@@ -543,9 +543,9 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 		_mstVars[index] = value;
 		break;
 	case 5: {
-			MstUnkData *m = 0;
+			MstTaskData *m = 0;
 			if (t->mstObject) {
-				m = t->mstObject->unk8;
+				m = t->mstObject->mstTaskData;
 			} else {
 				m = t->dataPtr;
 			}
@@ -627,9 +627,9 @@ int Game::getTaskFlag(Task *t, int num, int type) const {
 	case 4:
 		return getTaskAndyVar(num, t);
 	case 5: {
-			MstUnkData *m = 0;
+			MstTaskData *m = 0;
 			if (t->mstObject) {
-				m = t->mstObject->unk8;
+				m = t->mstObject->mstTaskData;
 			} else {
 				m = t->dataPtr;
 			}
@@ -746,9 +746,9 @@ int Game::runTask_default(Task *t) {
 			t->flags |= (1 << p[1]);
 			break;
 		case 25: { // 15
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -764,9 +764,9 @@ int Game::runTask_default(Task *t) {
 			t->flags &= ~(1 << p[1]);
 			break;
 		case 28: { // 18
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -908,9 +908,9 @@ int Game::runTask_default(Task *t) {
 		case 74:
 		case 75:
 		case 76: { // 36
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -930,9 +930,9 @@ int Game::runTask_default(Task *t) {
 		case 84:
 		case 85:
 		case 86: { // 37
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -952,9 +952,9 @@ int Game::runTask_default(Task *t) {
 		case 94:
 		case 95:
 		case 96: { // 38
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -977,9 +977,9 @@ int Game::runTask_default(Task *t) {
 		case 104:
 		case 105:
 		case 106: { // 39
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -1094,9 +1094,9 @@ int Game::runTask_default(Task *t) {
 		case 194:
 		case 195:
 		case 196: { // 48
-				MstUnkData *m = 0;
+				MstTaskData *m = 0;
 				if (t->mstObject) {
-					m = t->mstObject->unk8;
+					m = t->mstObject->mstTaskData;
 				} else {
 					m = t->dataPtr;
 				}
@@ -1338,7 +1338,7 @@ int Game::runTask_default(Task *t) {
 				t->child = 0;
 				t->runningState &= ~2;
 				child->codeData = 0;
-				MstUnkData *m = t->dataPtr;
+				MstTaskData *m = t->dataPtr;
 				if (m) {
 					m->flagsA5 &= ~0x70;
 					if ((m->flagsA5 & 8) != 0) {
@@ -1761,7 +1761,7 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 		for (int i = 0; i < 32; ++i) {
 			if (!_mstUnkDataTable[i].o0) {
 // 415539
-				MstUnkData *m = &_mstUnkDataTable[i];
+				MstTaskData *m = &_mstUnkDataTable[i];
 				memset(m->localVars, 0, sizeof(m->localVars));
 				m->flags48 = 0x1C;
 				m->flagsA5 = 0;
@@ -1788,8 +1788,8 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 				addLvlObject(ptr[945], y2, x1, screen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 
 				for (int j = 0; j < 64; ++j) {
-					if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].unk8 == m) {
-						_mstObjectsTable[j].unk8 = 0;
+					if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].mstTaskData == m) {
+						_mstObjectsTable[j].mstTaskData = 0;
 					}
 				}
 				break;
@@ -1853,9 +1853,9 @@ int Game::runTask_waitFlags(Task *t) {
 		}
 		break;
 	case 5: {
-			MstUnkData *m = 0;
+			MstTaskData *m = 0;
 			if (t->mstObject) {
-				m = t->mstObject->unk8;
+				m = t->mstObject->mstTaskData;
 			} else {
 				m = t->dataPtr;
 			}

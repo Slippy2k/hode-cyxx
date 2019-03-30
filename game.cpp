@@ -885,7 +885,7 @@ void Game::clearLvlObjectsList1() {
 		return;
 	}
 	for (int i = 0; i < 32; ++i) {
-		resetMstUnkData(&_mstUnkDataTable[i]);
+		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < 64; ++i) {
 		resetMstObject(&_mstObjectsTable[i]);
@@ -2026,7 +2026,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	}
 	int a, c;
 	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr <= &_mstUnkDataTable[32]) {
-		MstUnkData *m = (MstUnkData *)ptr->dataPtr;
+		MstTaskData *m = (MstTaskData *)ptr->dataPtr;
 		if (m->flagsA6 & 2) {
 			ptr->actionKeyMask = _mstCurrentActionKeyMask;
 			ptr->directionKeyMask = _andyObject->directionKeyMask;
@@ -2034,7 +2034,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		a = m->soundType;
 		c = 1;
 	} else {
-		MstUnkData *m = ((MstObject *)ptr->dataPtr)->unk8;
+		MstTaskData *m = ((MstObject *)ptr->dataPtr)->mstTaskData;
 		if (m) {
 			a = m->soundType;
 			c = 2;
@@ -3230,7 +3230,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		const void *dataPtr = ptr->dataPtr;
 		if (dataPtr) {
 			if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
-				MstUnkData *m = (MstUnkData *)ptr->dataPtr;
+				MstTaskData *m = (MstTaskData *)ptr->dataPtr;
 				if (m->flagsA6 & 2) {
 					m->o16->actionKeyMask = _mstCurrentActionKeyMask;
 					m->o16->directionKeyMask = _andyObject->directionKeyMask;
@@ -3240,7 +3240,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 				}
 				// TODO
 			} else {
-				// MstUnkData *m = ((MstObject *)dataPtr)->unk8;
+				// MstTaskData *m = ((MstObject *)dataPtr)->unk8;
 // 402B9F
 				// TODO
 			}
