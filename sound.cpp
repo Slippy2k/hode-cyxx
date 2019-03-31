@@ -640,10 +640,11 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 }
 
 void Game::prependSoundObjectToList(SssObject *so) {
-	if (so->pcm && so->pcm->ptr) {
+	if (!so->pcm || !so->pcm->ptr) {
 		so->flags = (so->flags & ~1) | 2;
 	}
 	if (so->flags & 2) {
+		debug(kDebug_SOUND, "Adding so %p to list2 flags 0x%x", so, so->flags);
 		if (1) {
 			for (SssObject *current = _sssObjectsList2; current; current = current->nextPtr) {
 				if (current == so) {
@@ -659,6 +660,15 @@ void Game::prependSoundObjectToList(SssObject *so) {
 		}
 		_sssObjectsList2 = so;
 	} else {
+		debug(kDebug_SOUND, "Adding so %p to list1 flags 0x%x", so, so->flags);
+		if (1) {
+			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
+				if (current == so) {
+					warning("SoundObject %p already in _sssObjectsList1", so);
+					return;
+				}
+			}
+		}
 // 429185
 		SssObject *stopSo = so; // _edi
 		if (so->pcm && so->pcm->ptr) {
@@ -690,6 +700,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 				}
 			} else {
 // 4291E8
+				stopSo = 0;
 				++_playingSssObjectsCount;
 				so->nextPtr = _sssObjectsList1;
 				so->prevPtr = 0;
