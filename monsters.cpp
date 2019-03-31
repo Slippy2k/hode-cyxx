@@ -41,7 +41,7 @@ static const uint8_t _mstDefaultLutOp[] = {
 };
 
 void Game::resetMstTaskData(MstTaskData *m) {
-	m->o0 = 0;
+	m->unk0 = 0;
 	LvlObject *o = m->o16;
 	if (o) {
 		o->dataPtr = 0;
@@ -144,7 +144,10 @@ void Game::resetMstCode() {
 	_mstCurrentUnkFlag = 0;
 	// TODO
 	_tasksList = 0;
-	// TODO
+	_mstTasksList1 = 0;
+	_mstTasksList2 = 0;
+	_mstTasksList3 = 0;
+	_mstTasksList4 = 0;
 	if (_res->_mstTickCodeData != kNone) {
 		_mstVars[31] = _mstTickDelay = _res->_mstTickDelay;
 	} else {
@@ -290,12 +293,34 @@ void Game::executeMstCode() {
 		while ((this->*(t->run))(t) == 0);
 	}
 	// TODO
+	for (Task *t = _mstTasksList1; t; t = t->prev) {
+		_runTaskOpcodesCount = 0;
+		if (executeMstCodeHelper3(t) == 0) {
+			while ((this->*(t->run))(t) == 0);
+		}
+	}
+	for (Task *t = _mstTasksList2; t; t = t->prev) {
+		_runTaskOpcodesCount = 0;
+		if (executeMstCodeHelper4(t) == 0) {
+			while ((this->*(t->run))(t) == 0);
+		}
+	}
 }
 
 void Game::executeMstCodeHelper2() {
 	updateMstMoveData();
 	updateMstHeightMapData();
 	// TODO
+}
+
+int Game::executeMstCodeHelper3(Task *t) {
+	// TODO
+	return 0;
+}
+
+int Game::executeMstCodeHelper4(Task *t) {
+	// TODO
+	return 0;
 }
 
 void Game::updateMstMoveData() {
@@ -384,6 +409,86 @@ Task *Game::createTask(const uint8_t *codeData) {
 		}
 	}
 	return 0;
+}
+
+void Game::setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bool load) {
+	Task *current = *tasksList1;
+	while (current) {
+		Task *tmp = current->prev;
+		MstTaskData *m = current->dataPtr;
+		if (m) {
+			// _edi = m->8
+			if (1) { // if (_edi[945] != 0 && m->o16) {
+				LvlObject *o = m->o16;
+				if (o->screenNum == num) {
+					if (load) {
+						m->flagsA6 |= 8;
+					} else {
+						m->flagsA6 &= ~8;
+						o->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[o->flags & 255];
+					}
+					// remove
+					Task *_esi = current->prev;
+					Task *_edi = current->next;
+					if (_esi) {
+						_esi->next = _edi;
+					}
+					if (_edi) {
+						_edi->prev = _esi;
+					} else {
+						*tasksList1 = _esi;
+					}
+					// append
+					current->next = 0;
+					_esi = *tasksList2;
+					current->prev = _esi;
+					if (_esi) {
+						_esi->next = current;
+					}
+					*tasksList2 = current;
+					current = tmp;
+					continue;
+				}
+			}
+		}
+// 414BC5
+		if (current->mstObject) {
+			// _edi = current->mstObject->unk0;
+			// if (_edi[0] & 0x80)
+			if (current->mstObject->o) {
+				LvlObject *o = current->mstObject->o;
+				if (o->screenNum == num) {
+					if (load) {
+						current->mstObject->flags24 |= 8;
+					} else {
+						m->flagsA6 &= ~8;
+						o->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[o->flags & 255];
+					}
+					// remove
+					Task *_esi = current->prev;
+					Task *_edi = current->next;
+					if (_esi) {
+						_esi->next = _edi;
+					}
+					if (_edi) {
+						_edi->prev = _esi;
+					} else {
+						*tasksList1 = _esi;
+					}
+					// append
+					current->next = 0;
+					_esi = *tasksList2;
+					current->prev = _esi;
+					if (_esi) {
+						_esi->next = current;
+					}
+					*tasksList2 = current;
+				}
+			}
+		}
+
+		current = tmp;
+	}
 }
 
 int Game::changeTask(Task *t, int num, int value) {
@@ -833,14 +938,20 @@ int Game::runTask_default(Task *t) {
 				_res->flagMstCodeForPos(num, 0);
 			}
 			break;
-		case 39: { // 26
-				if (p[1] < _res->_mstHdr.pointsCount) {
-					// TODO
-					// executeMstOp26(_mstToLoad2Pri, p[1]);
-					// executeMstOp26(_mstToLoad1Pri, p[1]);
-					// executeMstOp26(_mstToLoad2Num, p[1]);
-					// executeMstOp26(_mstToLoad1Num, p[1]);
-				}
+		case 39: // 26
+			if (p[1] < _res->_mstHdr.pointsCount) {
+				executeMstOp26(&_mstTasksList1, p[1]);
+				executeMstOp26(&_mstTasksList2, p[1]);
+				executeMstOp26(&_mstTasksList3, p[1]);
+				executeMstOp26(&_mstTasksList4, p[1]);
+			}
+			break;
+		case 40: // 29
+			if (p[1] < _res->_mstHdr.pointsCount) {
+				executeMstOp27(&_mstTasksList1, p[1], p[2]);
+				executeMstOp27(&_mstTasksList2, p[1], p[2]);
+				executeMstOp27(&_mstTasksList3, p[1], p[2]);
+				executeMstOp27(&_mstTasksList4, p[1], p[2]);
 			}
 			break;
 		case 41: { // 28
@@ -1375,6 +1486,14 @@ int Game::runTask_default(Task *t) {
 	return 1;
 }
 
+void Game::executeMstOp26(Task **tasksList, int num) {
+	// TODO
+}
+
+void Game::executeMstOp27(Task **tasksList, int num, int arg) {
+	// TODO
+}
+
 void Game::executeMstOp54() {
 	// TODO
 	const int x = MIN(_mstRefPosX, 255);
@@ -1744,7 +1863,7 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 		}
 		int count = 0;
 		for (int i = 0; i < 32; ++i) {
-			if (_mstUnkDataTable[i].o0) {
+			if (_mstUnkDataTable[i].unk0) {
 				++count;
 			}
 		}
@@ -1759,7 +1878,7 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 		}
 // 415518
 		for (int i = 0; i < 32; ++i) {
-			if (!_mstUnkDataTable[i].o0) {
+			if (!_mstUnkDataTable[i].unk0) {
 // 415539
 				MstTaskData *m = &_mstUnkDataTable[i];
 				memset(m->localVars, 0, sizeof(m->localVars));
@@ -1785,13 +1904,21 @@ void Game::executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, i
 				// _esi + 4 // _ecx
 				const uint8_t *ptr = _res->_mstHeightMapData + m1->indexHeight * 948; // _esi + 8
 				int anim = 0; // READ_LE_UINT16(_ecx + 4)
-				addLvlObject(ptr[945], y2, x1, screen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
-
-				for (int j = 0; j < 64; ++j) {
-					if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].mstTaskData == m) {
-						_mstObjectsTable[j].mstTaskData = 0;
+				LvlObject *o = addLvlObject(ptr[945], y2, x1, screen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
+				if (!o) {
+					m->unk0 = 0;
+					if (m->o16) {
+						m->o16->dataPtr = 0;
 					}
+					for (int j = 0; j < 64; ++j) {
+						if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].mstTaskData == m) {
+							_mstObjectsTable[j].mstTaskData = 0;
+						}
+					}
+					return;
 				}
+// 41562C
+				// TODO
 				break;
 			}
 		}

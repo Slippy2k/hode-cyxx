@@ -158,6 +158,10 @@ struct Game {
 	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
 	Task _tasksTable[kMaxTasks];
 	Task *_tasksList;
+	Task *_mstTasksList1;
+	Task *_mstTasksList2;
+	Task *_mstTasksList3;
+	Task *_mstTasksList4;
 	int _mstPrevPosX;
 	int _mstPrevPosY;
 	int _mstPosX;
@@ -539,12 +543,15 @@ struct Game {
 	void startMstCode();
 	void executeMstCode();
 	void executeMstCodeHelper2();
+	int executeMstCodeHelper3(Task *t);
+	int executeMstCodeHelper4(Task *t);
 	void updateMstMoveData();
 	void updateMstHeightMapData();
 
 	void removeMstObjectTask(Task *t);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
+	void setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bool load);
 	int changeTask(Task *t, int num, int value);
 	Task *updateTask(Task *t, int num, const uint8_t *codeData);
 	void resetTask(Task *t, const uint8_t *codeData);
@@ -556,6 +563,8 @@ struct Game {
 	int getTaskOtherVar(int index, Task *t) const;
 	int getTaskFlag(Task *t, int index, int type) const;
 	int runTask_default(Task *t);
+	void executeMstOp26(Task **tasksList, int num);
+	void executeMstOp27(Task **tasksList, int num, int arg);
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);
 	void executeMstOp58(Task *t, int num);

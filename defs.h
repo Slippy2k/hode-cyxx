@@ -298,7 +298,7 @@ struct AndyMoveData {
 struct Task;
 
 struct MstTaskData {
-	LvlObject *o0;
+	void *unk0;
 	void *unk4; // MstUnk42
 	void *unk8;
 	LvlObject *o16; // 0x10
@@ -323,6 +323,7 @@ struct MstObject {
 	int yPos; // 18
 	int xMstPos; // 1C
 	int yMstPos; // 20
+	uint8_t flags24; // 24
 	BoundingBox boundingBox; // 28
 }; // sizeof == 64
 
