@@ -791,7 +791,7 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 2: { // 2
+		case 2: { // 2 - set_var_random_range
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk56 *m = &_res->_mstUnk56[num];
 				int a = getTaskVar(t, m->indexVar1, m->maskVars >> 4); // _ebx
@@ -803,7 +803,7 @@ int Game::runTask_default(Task *t) {
 				setTaskVar(t, m->unkA, m->unk9, a);
 			}
 			break;
-		case 3: // 3
+		case 3: // 3 - change_task_imm
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
@@ -811,7 +811,7 @@ int Game::runTask_default(Task *t) {
 				ret = changeTask(t, num, (arg == 0xFF) ? -1 : arg);
 			}
 			break;
-		case 4: // 4
+		case 4: // 4 - change_task_local_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
@@ -820,7 +820,7 @@ int Game::runTask_default(Task *t) {
 				ret = changeTask(t, num, t->localVars[arg]);
 			}
 			break;
-		case 5: // 5
+		case 5: // 5 - change_task_global_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
@@ -829,7 +829,7 @@ int Game::runTask_default(Task *t) {
 				ret = changeTask(t, num, _mstVars[arg]);
 			}
 			break;
-		case 6: // 6
+		case 6: // 6 - change_task_other_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
@@ -837,7 +837,7 @@ int Game::runTask_default(Task *t) {
 				ret = changeTask(t, num, getTaskOtherVar(arg, t));
 			}
 			break;
-		case 7: // 7
+		case 7: // 7 - change_task_mst_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
@@ -846,13 +846,13 @@ int Game::runTask_default(Task *t) {
 				ret = changeTask(t, num, t->dataPtr->localVars[arg]);
 			}
 			break;
-		case 23: // 13
+		case 23: // 13 - set_flag_global
 			_mstFlags |= (1 << p[1]);
 			break;
-		case 24: // 14
+		case 24: // 14 - set_flag_task
 			t->flags |= (1 << p[1]);
 			break;
-		case 25: { // 15
+		case 25: { // 15 - set_flag_mst
 				MstTaskData *m = 0;
 				if (t->mstObject) {
 					m = t->mstObject->mstTaskData;
@@ -864,13 +864,13 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 26: // 16
+		case 26: // 16 - unset_flag_global
 			_mstFlags &= ~(1 << p[1]);
 			break;
-		case 27: // 17
+		case 27: // 17 - unset_flag_task
 			t->flags &= ~(1 << p[1]);
 			break;
-		case 28: { // 18
+		case 28: { // 18 - unset_flag_mst
 				MstTaskData *m = 0;
 				if (t->mstObject) {
 					m = t->mstObject->mstTaskData;
@@ -925,17 +925,17 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 33:
-		case 229: { // 23
+		case 229: { // 23 - jmp_imm
 				const int num = READ_LE_UINT16(p + 2);
 				p = _res->_mstCodeData + (num - 1) * 4;
 			}
 			break;
-		case 35: { // 24
+		case 35: { // 24 - enable_trigger
 				const int num = READ_LE_UINT16(p + 2);
 				_res->flagMstCodeForPos(num, 1);
 			}
 			break;
-		case 36: { // 25
+		case 36: { // 25 - disable_trigger
 				const int num = READ_LE_UINT16(p + 2);
 				_res->flagMstCodeForPos(num, 0);
 			}
@@ -956,24 +956,24 @@ int Game::runTask_default(Task *t) {
 				executeMstOp27(&_mstTasksList4, p[1], p[2]);
 			}
 			break;
-		case 41: { // 28
+		case 41: { // 28 - increment_local_var
 				assert(p[1] < kMaxLocals);
 				++t->localVars[p[1]];
 			}
 			break;
-		case 42: { // 29
+		case 42: { // 29 - increment_global_var
 				const int num = p[1];
 				assert(num < kMaxVars);
 				++_mstVars[num];
 			}
 			break;
-		case 44: { // 31
+		case 44: { // 31 - decrement_task_var
 				const int num = p[1];
 				assert(num < kMaxLocals);
 				--t->localVars[num];
 			}
 			break;
-		case 45: { // 32
+		case 45: { // 32 - decrement_global_var
 				const int num = p[1];
 				assert(num < kMaxVars);
 				--_mstVars[num];
@@ -987,7 +987,7 @@ int Game::runTask_default(Task *t) {
 		case 52:
 		case 53:
 		case 54:
-		case 56: { // 34
+		case 56: { // 34 - arith_local_var_local_var
 				assert(p[1] < kMaxLocals);
 				assert(p[2] < kMaxLocals);
 				arithOp(p[0] - 47, &t->localVars[p[1]], t->localVars[p[2]]);
@@ -1002,7 +1002,7 @@ int Game::runTask_default(Task *t) {
 		case 63:
 		case 64:
 		case 65:
-		case 66: { // 35
+		case 66: { // 35 - arith_global_var_local_var
 				assert(p[1] < kMaxVars);
 				assert(p[2] < kMaxLocals);
 				arithOp(p[0] - 57, &_mstVars[p[1]], t->localVars[p[2]]);
