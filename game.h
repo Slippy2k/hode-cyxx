@@ -556,7 +556,7 @@ struct Game {
 	Task *updateTask(Task *t, int num, const uint8_t *codeData);
 	void resetTask(Task *t, const uint8_t *codeData);
 	void removeTask(Task **tasksList, Task *t);
-	void prependTask(Task **tasksList, Task *t);
+	void appendTask(Task **tasksList, Task *t);
 	int getTaskVar(Task *t, int index, int type) const;
 	void setTaskVar(Task *t, int index, int type, int value);
 	int getTaskAndyVar(int index, Task *t) const;

@@ -329,7 +329,7 @@ struct MstObject {
 
 struct Task {
 	const uint8_t *codeData;
-	Task *prev, *next; // 4,8
+	Task *prevPtr, *nextPtr; // 4,8
 	MstTaskData *dataPtr; // mstTaskData 0xC
 	MstObject *mstObject; // 0x10
 	int32_t localVars[8]; // 0x14

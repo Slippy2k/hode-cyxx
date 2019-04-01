@@ -288,18 +288,18 @@ void Game::executeMstCode() {
 	if (_andyCurrentLevelScreenNum != _currentScreen) {
 		_andyCurrentLevelScreenNum = _currentScreen;
 	}
-	for (Task *t = _tasksList; t; t = t->prev) {
+	for (Task *t = _tasksList; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
 		while ((this->*(t->run))(t) == 0);
 	}
 	// TODO
-	for (Task *t = _mstTasksList1; t; t = t->prev) {
+	for (Task *t = _mstTasksList1; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
 		if (executeMstCodeHelper3(t) == 0) {
 			while ((this->*(t->run))(t) == 0);
 		}
 	}
-	for (Task *t = _mstTasksList2; t; t = t->prev) {
+	for (Task *t = _mstTasksList2; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
 		if (executeMstCodeHelper4(t) == 0) {
 			while ((this->*(t->run))(t) == 0);
@@ -372,14 +372,14 @@ void Game::removeMstObjectTask(Task *t) {
 	if (child) {
 		child->codeData = 0;
 	}
-	Task *next = t->next;
+	Task *next = t->prevPtr;
 	t->codeData = 0;
-	Task *prev = t->prev;
+	Task *prev = t->nextPtr;
 	if (prev) {
-		prev->next = next;
+		prev->prevPtr = next;
 	}
 	if (next) {
-		next->prev = prev;
+		next->nextPtr = prev;
 	}
 }
 
@@ -399,10 +399,10 @@ Task *Game::createTask(const uint8_t *codeData) {
 		if (!t->codeData) {
 			memset(t, 0, sizeof(Task));
 			resetTask(t, codeData);
-			t->next = 0;
-			t->prev = _tasksList;
+			t->prevPtr = 0;
+			t->nextPtr = _tasksList;
 			if (_tasksList) {
-				_tasksList->next = t;
+				_tasksList->prevPtr = t;
 			}
 			_tasksList = t;
 			return t;
@@ -414,7 +414,7 @@ Task *Game::createTask(const uint8_t *codeData) {
 void Game::setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bool load) {
 	Task *current = *tasksList1;
 	while (current) {
-		Task *tmp = current->prev;
+		Task *tmp = current->nextPtr;
 		MstTaskData *m = current->dataPtr;
 		if (m) {
 			// _edi = m->8
@@ -428,22 +428,22 @@ void Game::setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bo
 						o->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[o->flags & 255];
 					}
 					// remove
-					Task *_esi = current->prev;
-					Task *_edi = current->next;
+					Task *_esi = current->nextPtr;
+					Task *_edi = current->prevPtr;
 					if (_esi) {
-						_esi->next = _edi;
+						_esi->prevPtr = _edi;
 					}
 					if (_edi) {
-						_edi->prev = _esi;
+						_edi->nextPtr = _esi;
 					} else {
 						*tasksList1 = _esi;
 					}
 					// append
-					current->next = 0;
+					current->prevPtr = 0;
 					_esi = *tasksList2;
-					current->prev = _esi;
+					current->nextPtr = _esi;
 					if (_esi) {
-						_esi->next = current;
+						_esi->prevPtr = current;
 					}
 					*tasksList2 = current;
 					current = tmp;
@@ -465,22 +465,22 @@ void Game::setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bo
 						o->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[o->flags & 255];
 					}
 					// remove
-					Task *_esi = current->prev;
-					Task *_edi = current->next;
+					Task *_esi = current->nextPtr;
+					Task *_edi = current->prevPtr;
 					if (_esi) {
-						_esi->next = _edi;
+						_esi->prevPtr = _edi;
 					}
 					if (_edi) {
-						_edi->prev = _esi;
+						_edi->nextPtr = _esi;
 					} else {
 						*tasksList1 = _esi;
 					}
 					// append
-					current->next = 0;
+					current->prevPtr = 0;
 					_esi = *tasksList2;
-					current->prev = _esi;
+					current->nextPtr = _esi;
 					if (_esi) {
-						_esi->next = current;
+						_esi->prevPtr = current;
 					}
 					*tasksList2 = current;
 				}
@@ -508,14 +508,14 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 						current->child->codeData = 0;
 						current->child = 0;
 					}
-					Task *next = current->next;
+					Task *next = current->prevPtr;
 					current->codeData = 0;
-					Task *prev = current->prev;
+					Task *prev = current->nextPtr;
 					if (prev) {
-						prev->next = next;
+						prev->prevPtr = next;
 					}
 					if (next) {
-						next->prev = prev;
+						next->nextPtr = prev;
 					} else {
 						_tasksList = prev;
 					}
@@ -525,7 +525,7 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 				}
 			}
 		}
-		current = current->prev;
+		current = current->nextPtr;
 	}
 	if (found) {
 		return current;
@@ -535,10 +535,10 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 		if (!t->codeData) {
 			memset(t, 0, sizeof(Task));
 			resetTask(t, codeData);
-			t->next = 0;
-			t->prev = _tasksList;
+			t->prevPtr = 0;
+			t->nextPtr = _tasksList;
 			if (_tasksList) {
-				_tasksList->next = t;
+				_tasksList->prevPtr = t;
 			}
 			_tasksList = t;
 			t->localVars[7] = num;
@@ -575,33 +575,34 @@ void Game::removeTask(Task **tasksList, Task *t) {
 		c->codeData = 0;
 		t->child = 0;
 	}
-	Task *next = t->next;
+	Task *prev = t->prevPtr;
 	t->codeData = 0;
-	t = t->prev;
-	if (t) {
-		t->next = next;
-	}
+	Task *next = t->nextPtr;
 	if (next) {
-		next->prev = t;
+		next->prevPtr = prev;
+	}
+	if (prev) {
+		prev->nextPtr = next;
 	} else {
-		*tasksList = t;
+		*tasksList = next;
 	}
 }
 
-void Game::prependTask(Task **tasksList, Task *t) {
+void Game::appendTask(Task **tasksList, Task *t) {
 	Task *current = *tasksList;
 	if (!current) {
 		*tasksList = current;
-		t->prev = t->next = 0;
+		t->nextPtr = t->prevPtr = 0;
 	} else {
-		Task *prev = current->prev;
-		while (prev) {
-			current = prev;
-			prev = current->prev;
+		// go to last element
+		Task *next = current->nextPtr;
+		while (next) {
+			current = next;
+			next = current->nextPtr;
 		}
-		current->prev = t;
-		t->prev = 0;
-		t->next = current;
+		current->nextPtr = t;
+		t->nextPtr = 0;
+		t->prevPtr = current;
 	}
 }
 
@@ -1443,8 +1444,8 @@ int Game::runTask_default(Task *t) {
 		case 242: // 78
 			if (t->child) {
 				Task *child = t->child;
-				child->next = t->next;
-				child->prev = t->prev;
+				child->prevPtr = t->prevPtr;
+				child->nextPtr = t->nextPtr;
 				memcpy(t, child, sizeof(Task));
 				t->child = 0;
 				t->runningState &= ~2;
