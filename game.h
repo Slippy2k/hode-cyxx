@@ -280,7 +280,7 @@ struct Game {
 	int lvlObjectType8Callback(LvlObject *o);
 	int lvlObjectList3Callback(LvlObject *o);
 	void lvlObjectTypeCallback(LvlObject *o);
-	LvlObject *addLvlObject(int type, int y, int x, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);
+	LvlObject *addLvlObject(int type, int x, int y, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);
 	int setLvlObjectPosInScreenGrid(LvlObject *o, int num);
 	LvlObject *declareLvlObject(uint8_t type, uint8_t num);
 	void clearDeclaredLvlObjectsList();

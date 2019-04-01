@@ -311,6 +311,8 @@ struct MstTaskData {
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
 	int unkD0; // 0xD0
+	uint8_t unkE6;
+	int unkE8; // 0xE8
 	int unkEC; // 0xEC
 }; // sizeof == 256
 
