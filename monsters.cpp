@@ -372,14 +372,14 @@ void Game::removeMstObjectTask(Task *t) {
 	if (child) {
 		child->codeData = 0;
 	}
-	Task *next = t->prevPtr;
+	Task *prev = t->prevPtr;
 	t->codeData = 0;
-	Task *prev = t->nextPtr;
-	if (prev) {
-		prev->prevPtr = next;
-	}
+	Task *next = t->nextPtr;
 	if (next) {
-		next->nextPtr = prev;
+		next->prevPtr = prev;
+	}
+	if (prev) {
+		prev->nextPtr = next;
 	}
 }
 
@@ -492,6 +492,7 @@ void Game::setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bo
 }
 
 int Game::changeTask(Task *t, int num, int value) {
+	warning("changeTask %d %d unimplemented", num, value);
 	// TODO
 	return 0;
 }
@@ -508,16 +509,16 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 						current->child->codeData = 0;
 						current->child = 0;
 					}
-					Task *next = current->prevPtr;
+					Task *prev = current->prevPtr;
 					current->codeData = 0;
-					Task *prev = current->nextPtr;
-					if (prev) {
-						prev->prevPtr = next;
-					}
+					Task *next = current->nextPtr;
 					if (next) {
-						next->nextPtr = prev;
+						next->prevPtr = prev;
+					}
+					if (prev) {
+						prev->nextPtr = next;
 					} else {
-						_tasksList = prev;
+						_tasksList = next;
 					}
 				} else {
 					t->codeData = codeData;
@@ -1335,9 +1336,11 @@ int Game::runTask_default(Task *t) {
 // 4136E8
 				e = CLIP(e, -1, _res->_mstHdr.pointsCount - 1);
 				if (p[0] == 224) {
+					warning(".mst opcode 224 unimplemented");
 					// TODO
 					break;
 				} else if (p[0] == 225) {
+					warning(".mst opcode 225 unimplemented");
 					// TODO
 					break;
 				} else {
@@ -1459,8 +1462,10 @@ int Game::runTask_default(Task *t) {
 				}
 				return 0;
 			} else if (t->dataPtr) {
+				warning(".mst opcode 242 mstTaskData is not NULL");
 				// TODO
 			} else if (t->mstObject) {
+				warning(".mst opcode 242 mstObject is not NULL");
 				// TODO
 			} else {
 				if ((t->runningState & 1) != 0 && _mstVars[31] == 0) {
@@ -1488,10 +1493,12 @@ int Game::runTask_default(Task *t) {
 }
 
 void Game::executeMstOp26(Task **tasksList, int num) {
+	warning("executeMstOp26 %d unimplemented", num);
 	// TODO
 }
 
 void Game::executeMstOp27(Task **tasksList, int num, int arg) {
+	warning("executeMstOp27 %d %d unimplemented", num, arg);
 	// TODO
 }
 
