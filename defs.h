@@ -302,6 +302,7 @@ struct MstTaskData {
 	void *unk4; // MstUnk42
 	void *unk8;
 	LvlObject *o16; // 0x10
+	LvlObject *o20; // 0x14
 	int soundType; // 0x20
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48
@@ -327,6 +328,10 @@ struct MstObject {
 	int yMstPos; // 20
 	uint8_t flags24; // 24
 	BoundingBox boundingBox; // 28
+	uint8_t flags38;
+	uint8_t flags39;
+	uint8_t flags3A;
+	uint8_t flags3B;
 }; // sizeof == 64
 
 struct Task {

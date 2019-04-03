@@ -2007,6 +2007,13 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		}
 // 415989
 		// TODO
+// 415A89
+
+		switch (arg10) {
+		default:
+			warning("executeMstOp67 unhandled type %d", arg10);
+			break;
+		}
 	}
 // 415ADE
 	t->flags &= ~0x80;

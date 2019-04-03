@@ -3226,26 +3226,64 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
 		}
 	} else {
-//		warning("lvlObjectType8Callback unimplemented");
 		const void *dataPtr = ptr->dataPtr;
-		if (dataPtr) {
-			if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
-				MstTaskData *m = (MstTaskData *)ptr->dataPtr;
-				if (m->flagsA6 & 2) {
-					m->o16->actionKeyMask = _mstCurrentActionKeyMask;
-					m->o16->directionKeyMask = _andyObject->directionKeyMask;
-				}
-				if (m->flagsA6 & 8) {
-					ptr->bitmapBits = 0;
-				}
-				// TODO
-			} else {
-				// MstTaskData *m = ((MstObject *)dataPtr)->unk8;
-// 402B9F
-				// TODO
+		if (!dataPtr) {
+			ptr->bitmapBits = 0;
+			return 0;
+		}
+		MstTaskData *m = 0; // _ebp
+		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
+			m = (MstTaskData *)ptr->dataPtr;
+			if (m->flagsA6 & 2) {
+				m->o16->actionKeyMask = _mstCurrentActionKeyMask;
+				m->o16->directionKeyMask = _andyObject->directionKeyMask;
+			}
+			if (m->flagsA6 & 8) {
+				ptr->bitmapBits = 0;
+				return 0;
 			}
 		} else {
-//			ptr->bitmapBits = 0;
+			MstObject *mo = (MstObject *)dataPtr;
+			m = mo->mstTaskData;
+			if (m) {
+				// _ebx = 2;
+				// var4 = m->soundType;
+			} else {
+				// _ebx = 0;
+				// var4 = 4;
+			}
+			m = 0; // _ebp = 0
+			if (mo->flags24 & 8) {
+				ptr->bitmapBits = 0;
+				return 0;
+			}
+		}
+// 402BC2
+		LvlObject *o = 0; // _edi
+		updateAndyObject(ptr);
+		if (m && m->o20) {
+			o = m->o20;
+			o->actionKeyMask = ptr->actionKeyMask;
+			o->directionKeyMask = ptr->directionKeyMask;
+			updateAndyObject(o);
+			setLvlObjectPosRelativeToObject(ptr, 6, o, 6);
+			addToSpriteList(o);
+			setLvlObjectPosInScreenGrid(o, 7);
+		}
+// 402C03
+		setLvlObjectPosInScreenGrid(ptr, 7);
+		if (ptr->screenNum == _currentScreen || ptr->screenNum == _currentLeftScreen || ptr->screenNum == _currentRightScreen || o || (_currentLevel == 7 && ptr->spriteNum == 27) || (_currentLevel == 3 && ptr->spriteNum == 26)) {
+// 402C57
+			if (ptr->currentSound != 0xFFFF) {
+				playSound(ptr->currentSound, ptr, 0, 0); // _ebx, var4
+			}
+			if (o && o->currentSound != 0xFFFF) {
+				playSound(o->currentSound, o, 0, 0); // _ebx, var4
+			}
+		}
+// 402C8B
+		if ((ptr->flags1 & 6) == 2) {
+			ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
 		}
 	}
 	return 0;
