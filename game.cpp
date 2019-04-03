@@ -1510,8 +1510,8 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 	return ret;
 }
 
-int Game::game_unk16(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2) {
-	warning("game_unk16() unimplemented");
+int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2) {
+	warning("clipLvlObjectsBoundingBoxHelper() unimplemented");
 	return 0;
 }
 
@@ -1601,7 +1601,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj1.y2 += o->height - 1;
 		obj2.x2 = obj2.x1 + ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
-		return game_unk16(o, &obj1, ptr, &obj2);
+		return clipLvlObjectsBoundingBoxHelper(o, &obj1, ptr, &obj2);
 	case 115:
 		if (o->width == 3) {
 			obj1.y2 += 7;
@@ -1619,6 +1619,20 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		}
 	}
 	return 0;
+}
+
+int Game::clipLvlObjectsSmall(LvlObject *o1, LvlObject *o2, int type) {
+	if (o1->width > 3 || o1->height > 3) {
+		return clipLvlObjectsBoundingBox(o1, o2, type);
+	}
+	LvlObject tmpObject;
+	memcpy(&tmpObject, o1, sizeof(LvlObject));
+	tmpObject.type = 2;
+	if (o1->frame == 0) {
+		updateAndyObject(&tmpObject);
+	}
+	updateAndyObject(&tmpObject);
+	return clipLvlObjectsBoundingBox(&tmpObject, o2, type);
 }
 
 int Game::updateAndyLvlObject() {

@@ -70,6 +70,10 @@ void Game::setMstObjectDefaultPos(Task *t) {
 	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 }
 
+void Game::setMstTaskDataDefaultPos(Task *t) {
+	// TODO
+}
+
 void Game::shuffleMstUnk43(MstUnk43 *p) {
 	for (uint32_t i = 0; i < p->count2; ++i) {
 		p->data2[i] &= 0x7F;
@@ -1866,6 +1870,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 
 	LvlObject *o = 0; // _edi
 	MstObject *mo = 0; // _ebp
+	MstTaskData *m = 0;
 
 	if (arg1C != -128) {
 		if (_mstVars[30] > 32) {
@@ -1887,10 +1892,8 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 // 415510
 		}
 // 415518
-		MstTaskData *m = 0;
 		for (int i = 0; i < 32; ++i) {
 			if (!_mstUnkDataTable[i].unk0) {
-// 415539
 				m = &_mstUnkDataTable[i];
 				break;
 			}
@@ -1952,6 +1955,10 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (!mo) {
 			return;
 		}
+		if (!o) {
+			warning("executeMstOp67 o is NULL");
+			return;
+		}
 	}
 // 4157E8
 	if (screen < 0) {
@@ -2001,10 +2008,68 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (!t) {
 // 415952
 			// TODO
+			return;
 		}
 // 415989
 		// TODO
+		memset(t, 0, sizeof(Task));
+		// resetTask(t, 1234);
+		t->prevPtr = 0;
+		t->nextPtr = _mstTasksList1;
+		if (_mstTasksList1) {
+			_mstTasksList1->prevPtr = t;
+		}
+		// t->dataPtr = _esi;
+		t->mstObject = 0;
+		// _mstTasksList1 = t;
+		// _esi->0xC4 = t;
+		// _edi = _currentTask;
+		// _currentTask = t;
+		Task *child = t->child;
+		if (child) {
+			child->codeData = 0;
+			t->child = 0;
+		}
+/*
+		Task *next = t->nextPtr;
+		Task *prev = t->prevPtr;
+		t->codeData = 0;
+		if (next) {
+			next->prevPtr = prev;
+		}
+		if (prev) {
+			prev->nextPtr = next;
+		} else {
+			_mstTasksList1 = next;
+		}
+		if (!_mstTasksList1) {
+			_mstTasksList1 = t;
+			t->nextPtr = 0;
+			t->prevPtr = 0;
+		} else {
+			Task *current = _mstTasksList1; // _eax
+			next = current->nextPtr; // _ecx
+			while (next) {
+				current = next;
+				next = current->nextPtr;
+			}
+			current->nextPtr = t;
+			t->nextPtr = 0;
+			t->prevPtr = current;
+		}
+*/
+// 415A3C
+		// t->codeData = 1234;
+		shuffleDword(m->unkCC);
+		shuffleDword(m->unkC8);
+
+		m->unk98 = -1;
+		// m->unkC = &_res->_mstUnk44[m->unk4->indexUnk44]
+
 // 415A89
+		setMstTaskDataDefaultPos(t);
+
+		// TODO
 
 		switch (arg10) {
 		default:

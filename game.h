@@ -241,8 +241,9 @@ struct Game {
 	int resetAndyLvlObjectPlasmaCannonKeyMask(uint8_t mask);
 	int clipBoundingBox(BoundingBox *coords, BoundingBox *box);
 	int updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, const uint8_t *coords, int direction);
-	int game_unk16(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2);
+	int clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2);
 	int clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int count);
+	int clipLvlObjectsSmall(LvlObject *o, LvlObject *ptr, int count);
 	int updateAndyLvlObject();
 	void drawPlasmaCannon();
 	void redrawObjects();
@@ -536,6 +537,7 @@ struct Game {
 	void resetMstTaskData(MstTaskData *m);
 	void resetMstObject(MstObject *m);
 	void setMstObjectDefaultPos(Task *t);
+	void setMstTaskDataDefaultPos(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
 
 	void initMstCode();
