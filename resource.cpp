@@ -1063,19 +1063,21 @@ void Resource::loadMstData(File *fp) {
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		fp->readUint32();
 		_mstUnk42[i].count1 = fp->readUint32();
-		_mstUnk42[i].data1  = (uint8_t *)malloc(_mstUnk42[i].count1 * 4);
+		_mstUnk42[i].indexUnk46 = (uint32_t *)malloc(_mstUnk42[i].count1 * sizeof(uint32_t));
 		fp->readUint32();
 		_mstUnk42[i].count2 = fp->readUint32();
 		_mstUnk42[i].data2  = (uint8_t *)malloc(_mstUnk42[i].count2);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
-		fp->read(_mstUnk42[i].data1, _mstUnk42[i].count1 * 4);
+		for (uint32_t j = 0; j < _mstUnk42[i].count1; ++j) {
+			_mstUnk42[i].indexUnk46[j] = fp->readUint32();
+			bytesRead += 4;
+		}
 		fp->read(_mstUnk42[i].data2, _mstUnk42[i].count2);
 		if ((_mstUnk42[i].count2 & 3) != 0) {
 			fp->seek(4 - (_mstUnk42[i].count2 & 3), SEEK_CUR);
 		}
-		bytesRead +=  _mstUnk42[i].count1 * 4;
 		bytesRead += (_mstUnk42[i].count2 + 3) & ~3;
 	}
 
@@ -1083,19 +1085,21 @@ void Resource::loadMstData(File *fp) {
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
 		fp->readUint32();
 		_mstUnk43[i].count1 = fp->readUint32();
-		_mstUnk43[i].data1  = (uint8_t *)malloc(_mstUnk43[i].count1 * 4);
+		_mstUnk43[i].indexUnk48 = (uint32_t *)malloc(_mstUnk43[i].count1 * sizeof(uint32_t));
 		fp->readUint32();
 		_mstUnk43[i].count2 = fp->readUint32();
 		_mstUnk43[i].data2  = (uint8_t *)malloc(_mstUnk43[i].count2);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
-		fp->read(_mstUnk43[i].data1, _mstUnk43[i].count1 * 4);
+		for (uint32_t j = 0; j < _mstUnk43[i].count1; ++j) {
+			_mstUnk43[i].indexUnk48[j] = fp->readUint32();
+			bytesRead += 4;
+		}
 		fp->read(_mstUnk43[i].data2, _mstUnk43[i].count2);
 		if ((_mstUnk43[i].count2 & 3) != 0) {
 			fp->seek(4 - (_mstUnk43[i].count2 & 3), SEEK_CUR);
 		}
-		bytesRead +=  _mstUnk43[i].count1 * 4;
 		bytesRead += (_mstUnk43[i].count2 + 3) & ~3;
 	}
 
@@ -1136,7 +1140,8 @@ void Resource::loadMstData(File *fp) {
 			fp->read(data, sizeof(data));
 			bytesRead += 44;
 			_mstUnk46[i].data[j].indexHeight = READ_LE_UINT32(data);
-			_mstUnk46[i].data[j].unk4        = READ_LE_UINT32(data + 0x04);
+			_mstUnk46[i].data[j].anim        = READ_LE_UINT16(data + 0x04);
+			_mstUnk46[i].data[j].unk6        = READ_LE_UINT16(data + 0x06);
 			_mstUnk46[i].data[j].unkC        = READ_LE_UINT32(data + 0x0C);
 			_mstUnk46[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
 			_mstUnk46[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);

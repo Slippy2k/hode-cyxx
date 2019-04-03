@@ -297,9 +297,12 @@ struct AndyMoveData {
 
 struct Task;
 
+struct MstUnk46;
+struct MstUnk46Unk1;
+
 struct MstTaskData {
-	void *unk0;
-	void *unk4; // MstUnk42
+	MstUnk46 *unk0;
+	MstUnk46Unk1 *unk4;
 	void *unk8;
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14

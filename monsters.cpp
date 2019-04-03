@@ -1905,11 +1905,11 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		m->unkD0 = 0;
 		m->flagsA6 = 0;
 
-		const int j = READ_LE_UINT32(_res->_mstUnk42[arg24].data1 + arg1C * 4);
-		// m->0 = &_res->_mstUnk46[j]
-		// m->4 = &_res->_mstUnk46[j].data[arg20];
+		const int j = _res->_mstUnk42[arg24].indexUnk46[arg1C];
+		m->unk0 = &_res->_mstUnk46[j];
 
-		MstUnk46Unk1 *m1 = &_res->_mstUnk46[j].data[arg20];
+		m->unk4 = &_res->_mstUnk46[j].data[arg20];
+		MstUnk46Unk1 *m1 = &_res->_mstUnk46[j].data[arg20]; // _ecx
 
 		m->localVars[7] = m1->unkC;
 
@@ -1917,10 +1917,8 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			m->flags48 &= ~4;
 		}
 
-		// TODO
-		// _esi + 4 // _ecx
 		const uint8_t *ptr = _res->_mstHeightMapData + m1->indexHeight * 948; // _esi + 8
-		int anim = 0; // READ_LE_UINT16(_ecx + 4)
+		int anim = m1->anim; // READ_LE_UINT16(_ecx + 4)
 		o = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
 			m->unk0 = 0;
@@ -1943,7 +1941,6 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		m->unkE8 = o_flags2 & 0xFFFF;
 		m->unkE6 = _mstLut5[o_flags2 & 0x1F];
 		o->dataPtr = m;
-		// goto 4157E8
 	} else {
 		for (int i = 0; i < 64; ++i) {
 			if (!_mstObjectsTable[i].unk0) {
