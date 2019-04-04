@@ -297,6 +297,7 @@ struct AndyMoveData {
 
 struct Task;
 
+struct MstUnk35;
 struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
@@ -320,15 +321,18 @@ struct MstTaskData {
 	int yPosPrev; // 0x58
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
-	int unk98; // 0x98
+	int x1; // 0x94
+	int x2; // 0x98
+	int y1; // 0x9C
+	int y2; // 0xA0
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
 	uint8_t flagsA8; // 0xA8
 	uint8_t flagsA9; // 0xA9
-	Task *t; // 0xC4
+	Task *task; // 0xC4
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
-	void *unkD0; // 0xD0
+	MstUnk35 *unkD0; // 0xD0
 	uint8_t unkE6;
 	int unkE8; // 0xE8
 	int unkEC; // 0xEC

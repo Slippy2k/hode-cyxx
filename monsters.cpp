@@ -70,12 +70,42 @@ void Game::setMstObjectDefaultPos(Task *t) {
 	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 }
 
+void Game::initMstTaskData(MstTaskData *m) {
+	shuffleDword(m->unkCC);
+	shuffleDword(m->unkC8);
+
+	const uint8_t *ptr = m->unk8;
+	const int num = (~m->flagsA5) & 1;
+
+	m->x1 = m->unkC->unk2C[num] - READ_LE_UINT32(ptr + 904);
+	m->x2 = m->unkC->unk34[num] + READ_LE_UINT32(ptr + 904);
+	m->y1 = m->unkC->unk3C[num] - READ_LE_UINT32(ptr + 908);
+	m->y2 = m->unkC->unk44[num] + READ_LE_UINT32(ptr + 908);
+
+	const uint32_t indexUnk35 = m->unkC->indexUnk35_0x24[num];
+	m->unkD0 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
+}
+
+int Game::prepareMstTask(Task *t) {
+	MstTaskData *m = t->dataPtr;
+	assert(m);
+	MstUnk35 *mu = m->unkD0;
+	int num = 0;
+	if (mu->count2 != 0) {
+		const uint8_t code = shuffleFlags(m->unkCC);
+		num = mu->data2[code];
+	}
+	const uint32_t codeData = mu->indexCodeData[num];
+	assert(codeData != kNone);
+	resetTask(t, _res->_mstCodeData + codeData * 4);
+	const int counter = m->executeCounter;
+	m->executeCounter = _executeMstLogicCounter;
+	return m->executeCounter - counter;
+}
+
 void Game::setMstTaskDataDefaultPos(Task *t) {
 	MstTaskData *m = t->dataPtr;
-	if (!m) {
-		warning("setMstTaskDataDefaultPos MstTaskData is NULL");
-		return;
-	}
+	assert(m);
 	LvlObject *o = m->o20;
 	if (!o) {
 		o = m->o16;
@@ -162,7 +192,7 @@ void Game::resetMstCode() {
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.unk0x0C; ++i) { // var8
-		const int count = _res->_mstUnk35[i].size;
+		const int count = _res->_mstUnk35[i].count2;
 		if (count != 0) {
 			// TODO
 			for (int j = 0; j < count * 2; ++j) {
@@ -1885,7 +1915,7 @@ void Game::executeMstOp58(Task *t, int num) {
 }
 
 void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
-	warning("executeMstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, arg10, o_flags1, o_flags2, arg1C, arg20, arg24);
+	// warning("executeMstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, arg10, o_flags1, o_flags2, arg1C, arg20, arg24);
 	if (o_flags2 == 0xFFFF) {
 		LvlObject *o = 0;
 		if (t->dataPtr) {
@@ -1905,7 +1935,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 
 	LvlObject *o = 0; // _edi
 	MstObject *mo = 0; // _ebp
-	MstTaskData *m = 0;
+	MstTaskData *m = 0; // _esi
 
 	if (arg1C != -128) {
 		if (_mstVars[30] > 32) {
@@ -2065,10 +2095,10 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (_mstTasksList1) {
 			_mstTasksList1->prevPtr = t;
 		}
-		// t->dataPtr = _esi;
+		t->dataPtr = m;
 		t->mstObject = 0;
-		// _mstTasksList1 = t;
-		// _esi->0xC4 = t;
+		_mstTasksList1 = t;
+		m->task = t;
 		// _edi = _currentTask;
 		// _currentTask = t;
 		Task *child = t->child;
@@ -2109,7 +2139,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		shuffleDword(m->unkCC);
 		shuffleDword(m->unkC8);
 
-		m->unk98 = -1;
+		m->x2 = -1;
 		m->unkC = _res->_mstUnk44[m->unk4->indexUnk44].data;
 
 		if (m->unk8[946] & 4) {
@@ -2126,15 +2156,14 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		case 1:
 		case 2:
 			warning("executeMstOp67 unhandled type %d", arg10);
+			_mstTasksList1 = _mstTasksList1->nextPtr; // TEMP
 			break;
 		default:
 			m->flagsA5 = 1;
-/*
-			if (!updateMstTaskDataPosition(m)) {
+			if (1) { // !updateMstTaskDataPosition(m)) { // TODO
 				initMstTaskData(m);
 			}
 			prepareMstTask(t);
-*/
 			break;
 		}
 	}

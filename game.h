@@ -535,7 +535,9 @@ struct Game {
 	// monsters.cpp
 
 	void resetMstTaskData(MstTaskData *m);
+	void initMstTaskData(MstTaskData *m);
 	void resetMstObject(MstObject *m);
+	int prepareMstTask(Task *t);
 	void setMstObjectDefaultPos(Task *t);
 	void setMstTaskDataDefaultPos(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
