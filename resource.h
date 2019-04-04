@@ -138,8 +138,23 @@ struct MstUnk43 {
 	uint32_t count2; // C
 }; // SIZEOF_MstUnk43 16
 
+struct MstUnk44Unk1 {
+	uint32_t indexUnk34_16;
+	uint32_t indexUnk35_20;
+	uint32_t indexUnk35_24;
+	uint32_t indexUnk36_28;
+	uint32_t indexUnk36_32;
+	uint32_t indexUnk35_36;
+	uint32_t indexUnk35_40;
+	uint32_t indexUnk44_76;
+	uint32_t indexUnk44_80;
+	uint32_t indexUnk44_84;
+	uint32_t indexUnk44_88;
+	uint32_t indexUnk44_92;
+}; // sizeof == 104
+
 struct MstUnk44 {
-	uint32_t unk0;
+	MstUnk44Unk1 *data;
 	uint32_t unk4;
 	uint32_t unk8;
 	uint32_t count;

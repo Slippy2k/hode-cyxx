@@ -1105,7 +1105,7 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk44 = (MstUnk44 *)malloc(_mstHdr.unk0x28 * sizeof(MstUnk44));
 	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
-		_mstUnk44[i].unk0  = fp->readUint32();
+		fp->readUint32();
 		_mstUnk44[i].unk4  = fp->readUint32();
 		_mstUnk44[i].unk8  = fp->readUint32();
 		_mstUnk44[i].count = fp->readUint32();
@@ -1113,8 +1113,24 @@ void Resource::loadMstData(File *fp) {
 	}
 	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
 		const int count = _mstUnk44[i].count;
-		fp->seek(count * 104, SEEK_CUR);
-		bytesRead += count * 104;
+		_mstUnk44[i].data = (MstUnk44Unk1 *)malloc(sizeof(MstUnk44Unk1) * count);
+		for (int j = 0; j < count; ++j) {
+			uint8_t data[104];
+			fp->read(data, sizeof(data));
+			bytesRead += 104;
+			_mstUnk44[i].data[j].indexUnk34_16 = READ_LE_UINT32(data + 16); // sizeof == 20
+			_mstUnk44[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
+			_mstUnk44[i].data[j].indexUnk35_24 = READ_LE_UINT32(data + 24); // sizeof == 16
+			_mstUnk44[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12
+			_mstUnk44[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
+			_mstUnk44[i].data[j].indexUnk35_36 = READ_LE_UINT32(data + 36); // sizeof == 16
+			_mstUnk44[i].data[j].indexUnk35_40 = READ_LE_UINT32(data + 40); // sizeof == 16
+			_mstUnk44[i].data[j].indexUnk44_76 = READ_LE_UINT32(data + 76); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44_80 = READ_LE_UINT32(data + 80); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44_84 = READ_LE_UINT32(data + 84); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44_88 = READ_LE_UINT32(data + 88); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44_92 = READ_LE_UINT32(data + 92); // sizeof == 104
+		}
 		fp->seek(_mstHdr.pointsCount * 4, SEEK_CUR);
 		bytesRead += _mstHdr.pointsCount * 4;
 		for (int j = 0; j < count; ++j) {

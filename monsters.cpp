@@ -71,6 +71,41 @@ void Game::setMstObjectDefaultPos(Task *t) {
 }
 
 void Game::setMstTaskDataDefaultPos(Task *t) {
+	MstTaskData *m = t->dataPtr;
+	if (!m) {
+		warning("setMstTaskDataDefaultPos MstTaskData is NULL");
+		return;
+	}
+	LvlObject *o = m->o20;
+	if (!o) {
+		o = m->o16;
+	}
+	assert(o);
+	m->xPos = o->xPos + o->posTable[7].x;
+	m->yPos = o->yPos + o->posTable[7].y;
+	m->xPosPrev = m->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
+	m->yPosPrev = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
+
+	if (0) {
+		// TODO
+	}
+// 40ECBD
+	m->xDelta = _mstPosX - m->xPosPrev;
+	if (m->xDelta < 0) {
+		m->xDelta = -m->xDelta;
+		m->flags49 = 8;
+	} else {
+		m->flags49 = 2;
+	}
+	m->yDelta = _mstPosY - m->yPosPrev;
+	if (m->yDelta < 0) {
+		m->yDelta = -m->yDelta;
+		m->flags49 |= 1;
+	} else {
+		m->flags49 |= 4;
+	}
+	m->unkEC = -1;
+	m->unk1C = 0;
 	// TODO
 }
 
@@ -1913,6 +1948,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 
 		m->unk4 = &_res->_mstUnk46[j].data[arg20];
 		MstUnk46Unk1 *m1 = &_res->_mstUnk46[j].data[arg20]; // _ecx
+		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;
 
 		m->localVars[7] = m1->unkC;
 
@@ -1920,7 +1956,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			m->flags48 &= ~4;
 		}
 
-		const uint8_t *ptr = _res->_mstHeightMapData + m1->indexHeight * 948; // _esi + 8
+		const uint8_t *ptr = m->unk8;
 		int anim = m1->anim; // READ_LE_UINT16(_ecx + 4)
 		o = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
@@ -1937,8 +1973,18 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		}
 // 41562C
 		m->o16 = o;
-		if (_currentLevel == 7) {
-			// TODO
+		if (_currentLevel == 7 && m->unk8[944] == 26) {
+			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], m1->anim + 1, o_flags1, 0x3001, 0, 0);
+			if (!m->o20) {
+				// TODO
+				return;
+			}
+			if (screen < 0) {
+				m->o20->xPos += _mstRefPosX;
+				m->o20->yPos += _mstRefPosY;
+			}
+			m->o20->dataPtr = 0;
+			setLvlObjectPosRelativeToObject(m->o16, 6, m->o20, 6);
 		}
 // 4156FC
 		m->unkE8 = o_flags2 & 0xFFFF;
@@ -2064,7 +2110,12 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		shuffleDword(m->unkC8);
 
 		m->unk98 = -1;
-		// m->unkC = &_res->_mstUnk44[m->unk4->indexUnk44]
+		m->unkC = _res->_mstUnk44[m->unk4->indexUnk44].data;
+
+		if (m->unk8[946] & 4) {
+			m->flagsA8 = 0xFF;
+			m->flags49 = 0xFF;
+		}
 
 // 415A89
 		setMstTaskDataDefaultPos(t);
@@ -2072,8 +2123,18 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		// TODO
 
 		switch (arg10) {
-		default:
+		case 1:
+		case 2:
 			warning("executeMstOp67 unhandled type %d", arg10);
+			break;
+		default:
+			m->flagsA5 = 1;
+/*
+			if (!updateMstTaskDataPosition(m)) {
+				initMstTaskData(m);
+			}
+			prepareMstTask(t);
+*/
 			break;
 		}
 	}

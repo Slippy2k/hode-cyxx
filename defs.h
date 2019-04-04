@@ -299,15 +299,16 @@ struct Task;
 
 struct MstUnk46;
 struct MstUnk46Unk1;
-struct MstUnk44;
+struct MstUnk44Unk1;
 
 struct MstTaskData {
 	MstUnk46 *unk0;
 	MstUnk46Unk1 *unk4;
-	void *unk8;
-	MstUnk44 *unkC;
+	const uint8_t *unk8;
+	MstUnk44Unk1 *unkC;
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
+	int unk1C; // 0x1C
 	int soundType; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
@@ -322,6 +323,8 @@ struct MstTaskData {
 	int unk98; // 0x98
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
+	uint8_t flagsA8; // 0xA8
+	uint8_t flagsA9; // 0xA9
 	Task *t; // 0xC4
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
