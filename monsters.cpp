@@ -113,21 +113,21 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 	assert(o);
 	m->xPos = o->xPos + o->posTable[7].x;
 	m->yPos = o->yPos + o->posTable[7].y;
-	m->xPosPrev = m->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
-	m->yPosPrev = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
+	m->xMstPos = m->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
+	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 
 	if (0) {
 		// TODO
 	}
 // 40ECBD
-	m->xDelta = _mstPosX - m->xPosPrev;
+	m->xDelta = _mstPosX - m->xMstPos;
 	if (m->xDelta < 0) {
 		m->xDelta = -m->xDelta;
 		m->flags49 = 8;
 	} else {
 		m->flags49 = 2;
 	}
-	m->yDelta = _mstPosY - m->yPosPrev;
+	m->yDelta = _mstPosY - m->yMstPos;
 	if (m->yDelta < 0) {
 		m->yDelta = -m->yDelta;
 		m->flags49 |= 1;
@@ -769,12 +769,68 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _res->_screensState[_currentScreen].s0;
 	case 6:
 		return _difficulty;
+	case 12:
+		if (t->dataPtr) {
+			return t->dataPtr->xPos;
+		} else if (t->mstObject) {
+			return t->mstObject->xPos;
+		}
+		return 0;
+	case 13:
+		if (t->dataPtr) {
+			return t->dataPtr->yPos;
+		} else if (t->mstObject) {
+			return t->mstObject->yPos;
+		}
+		return 0;
+	case 14:
+		if (t->dataPtr) {
+			return t->dataPtr->o16->screenNum;
+		} else if (t->mstObject) {
+			return t->mstObject->o->screenNum;
+		}
+		return 0;
 	case 22:
 		return _mstOp54Counter;
 	case 23:
 		return _andyObject->actionKeyMask;
 	case 24:
 		return _andyObject->directionKeyMask;
+	case 25:
+		if (t->dataPtr) {
+			return t->dataPtr->xMstPos;
+		} else if (t->mstObject) {
+			return t->mstObject->xMstPos;
+		}
+		return 0;
+	case 26:
+		if (t->dataPtr) {
+			return t->dataPtr->yMstPos;
+		} else if (t->mstObject) {
+			return t->mstObject->yMstPos;
+		}
+		return 0;
+	case 27:
+		if (t->dataPtr) {
+			return t->dataPtr->o16->flags0;
+		} else if (t->mstObject) {
+			return t->mstObject->o->flags0;
+		}
+		return 0;
+	case 28:
+		if (t->dataPtr) {
+			return t->dataPtr->o16->anim;
+		} else if (t->mstObject) {
+			return t->mstObject->o->anim;
+		}
+		return 0;
+	case 29:
+		if (t->dataPtr) {
+			return t->dataPtr->o16->frame;
+		} else if (t->mstObject) {
+			return t->mstObject->o->frame;
+		}
+		return 0;
 	case 30:
 		return _mstOp56Counter;
 	case 31:

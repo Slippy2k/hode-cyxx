@@ -317,8 +317,8 @@ struct MstTaskData {
 	uint8_t flags49; // 0x49
 	int xPos; // 0x4C
 	int yPos; // 0x50
-	int xPosPrev; // 0x54
-	int yPosPrev; // 0x58
+	int xMstPos; // 0x54
+	int yMstPos; // 0x58
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
 	int x1; // 0x94
