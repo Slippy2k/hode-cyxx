@@ -1589,6 +1589,44 @@ int Game::runTask_default(Task *t) {
 			} else if (t->dataPtr) {
 				warning(".mst opcode 242 mstTaskData is not NULL");
 				// TODO
+				MstTaskData *m = t->dataPtr;
+				if (m->flagsA6 & 4) {
+					return 1;
+				}
+				if ((m->flagsA5 & 0x80) == 0) {
+					if ((m->flagsA5 & 8) == 0) {
+						m->flags48 |= 8;
+						if ((m->flagsA5 & 0x70) != 0) {
+							m->flagsA5 &= ~0x70;
+/*
+							switch (m->flagsA5 & 7) {
+							case 1:
+							case 2:
+// 413D74
+								// TODO
+								break;
+							case 3:
+							case 4:
+								// break to next opcode
+								break;
+							case 5:
+								return executeMstOp67Type1(t);
+							case 6:
+								return executeMstOp67Type2(t, 1);
+*/
+						}
+// 413DCA
+					}
+// 413FE3
+				} else if ((m->flagsA5 & 8) != 0) {
+// 413F8B
+					m->flagsA5 &= ~8;
+					const uint32_t codeData = m->unk4->codeData;
+					assert(codeData != kNone);
+					resetTask(t, _res->_mstCodeData + codeData * 4);
+				} else {
+					t->run = &Game::runTask_idle;
+				}
 			} else if (t->mstObject) {
 				warning(".mst opcode 242 mstObject is not NULL");
 				// TODO
