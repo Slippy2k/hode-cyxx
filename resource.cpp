@@ -535,7 +535,7 @@ void Resource::loadSssData(File *fp) {
 	_sssHdr.codeOffsetsCount = fp->readUint32();
 	_sssHdr.codeSize = fp->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.codeOffsetsCount %d _sssHdr.codeSize %d", _sssHdr.codeOffsetsCount, _sssHdr.codeSize);
-	if (_sssHdr.version == 10) {
+	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
 		_sssHdr.preloadData1Count = fp->readUint32() & 255; // pcm
 		_sssHdr.preloadData2Count = fp->readUint32() & 255; // sprites
 		_sssHdr.preloadData3Count = fp->readUint32() & 255; // mst
@@ -603,7 +603,7 @@ void Resource::loadSssData(File *fp) {
 	_sssCodeData = (uint8_t *)malloc(_sssHdr.codeSize);
 	fp->read(_sssCodeData, _sssHdr.codeSize);
 	bytesRead += _sssHdr.codeSize;
-	if (_sssHdr.version == 10) {
+	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
 		// _sssPreloadData1
 		for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
 			int addr = fp->readUint32();
@@ -625,7 +625,7 @@ void Resource::loadSssData(File *fp) {
 		_sssPreloadData1 = (SssPreloadData *)malloc(_sssHdr.preloadData1Count * sizeof(SssPreloadData));
 		for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
 			// _sssPreloadData1[i] = data
-			const int count = fp->readByte();
+			const int count = (_sssHdr.version == 12) ? fp->readUint16() * 2 : fp->readByte();
 			_sssPreloadData1[i].count = count;
 			_sssPreloadData1[i].ptr = (uint8_t *)malloc(count);
 			debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
@@ -670,7 +670,7 @@ void Resource::loadSssData(File *fp) {
 		debug(kDebug_RESOURCE, "DataUnk6 #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, count, offset);
 		bytesRead += 8;
 	}
-	if (_sssHdr.version == 10) {
+	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
 		static const int kSizeOfUnk4Data_V11 = 32;
 
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
