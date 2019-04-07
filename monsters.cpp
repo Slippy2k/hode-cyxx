@@ -1365,6 +1365,8 @@ int Game::runTask_default(Task *t) {
 		case 204: // 56
 			ret = executeMstOp56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
+		case 207: // 79
+			break;
 		case 211: // 58
 			executeMstOp58(t, READ_LE_UINT16(p + 2));
 			break;
@@ -1655,9 +1657,73 @@ int Game::runTask_default(Task *t) {
 	return 1;
 }
 
-void Game::executeMstOp26(Task **tasksList, int num) {
-	warning("executeMstOp26 %d unimplemented", num);
-	// TODO
+// remove references to mst tasks
+void Game::executeMstOp26(Task **tasksList, int screenNum) {
+	Task *current = *tasksList; // _esi
+	while (current) {
+		MstTaskData *m = current->dataPtr; // _ecx
+		Task *next = current->nextPtr; // _ebp
+		if (m && m->o16->screenNum == screenNum) {
+/*
+			if (_mstUnk6 != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
+				disableMstTaskData(m);
+			}
+			const uint8_t *ptr = m->unk8;
+			if (ptr[946] & 4) {
+				clearMstRectsTable(m, 0);
+				clearMstRectsTable(m, 1);
+			}
+*/
+			m->unk0 = 0;
+			m->o16->dataPtr = 0;
+			for (int i = 0; i < 64; ++i) {
+				if (_mstObjectsTable[i].unk0 != 0 && _mstObjectsTable[i].mstTaskData == m) {
+					_mstObjectsTable[i].unk0 = 0;
+				}
+			}
+			removeLvlObject2(m->o16);
+			Task *child = current->child;
+			if (child) {
+				child->codeData = 0;
+				current->child = 0;
+			}
+			Task *prevPtr = current->prevPtr;
+			current->codeData = 0;
+			Task *nextPtr = current->nextPtr;
+			if (nextPtr) {
+				nextPtr->prevPtr = prevPtr;
+			}
+			if (prevPtr) {
+				prevPtr->nextPtr = nextPtr;
+			} else {
+				*tasksList = nextPtr;
+			}
+		} else {
+			MstObject *mo = current->mstObject;
+			if (mo && mo->o->screenNum == screenNum) {
+				mo->unk0 = 0;
+				mo->o->dataPtr = 0;
+				removeLvlObject2(mo->o);
+				Task *child = current->child;
+				if (child) {
+					child->codeData = 0;
+					current->child = 0;
+				}
+				Task *prevPtr = current->prevPtr;
+				current->codeData = 0;
+				Task *nextPtr = current->nextPtr;
+				if (nextPtr) {
+					nextPtr->prevPtr = prevPtr;
+				}
+				if (prevPtr) {
+					prevPtr->nextPtr = nextPtr;
+				} else {
+					*tasksList = nextPtr;
+				}
+			}
+		}
+		current = next;
+	}
 }
 
 void Game::executeMstOp27(Task **tasksList, int num, int arg) {
