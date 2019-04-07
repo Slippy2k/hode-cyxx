@@ -116,7 +116,12 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 	m->xMstPos = m->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
 	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 
-	if (0) {
+	const uint8_t *ptr = m->unk8;
+	if (ptr[946] & 4) {
+		warning("setMstTaskDataDefaultPos ptr[946] 0x%x", ptr[946]);
+		// TODO
+	} else {
+// 40ECB4
 		// TODO
 	}
 // 40ECBD
@@ -379,15 +384,19 @@ void Game::executeMstCode() {
 void Game::executeMstCodeHelper2() {
 	updateMstMoveData();
 	updateMstHeightMapData();
-	// TODO
+	for (Task *t = _mstTasksList1; t; t = t->nextPtr) {
+		setMstTaskDataDefaultPos(t);
+	}
 }
 
 int Game::executeMstCodeHelper3(Task *t) {
+	warning("executeMstCodeHelper3 unimplemented");
 	// TODO
 	return 0;
 }
 
 int Game::executeMstCodeHelper4(Task *t) {
+	warning("executeMstCodeHelper4 unimplemented");
 	// TODO
 	return 0;
 }
@@ -2435,6 +2444,7 @@ int Game::runTask_mstUnk55_233(Task *t) {
 }
 
 int Game::runTask_mstUnk55_234(Task *t) {
+	warning("runTask_mstUnk55_234 unimplemented");
 	// TODO
 	return 1;
 }
