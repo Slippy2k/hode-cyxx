@@ -2426,7 +2426,7 @@ int Game::runTask_mstUnk55_233(Task *t) {
 	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
-	if (compareOp(m->compare, a, b)) {
+	if (!compareOp(m->compare, a, b)) {
 		t->run = &Game::runTask_default;
 		LvlObject *o = 0;
 		if (t->dataPtr) {
@@ -2444,7 +2444,22 @@ int Game::runTask_mstUnk55_233(Task *t) {
 }
 
 int Game::runTask_mstUnk55_234(Task *t) {
-	warning("runTask_mstUnk55_234 unimplemented");
-	// TODO
+	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
+	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
+	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
+	if (compareOp(m->compare, a, b)) {
+		t->run = &Game::runTask_default;
+		LvlObject *o = 0;
+		if (t->dataPtr) {
+			o = t->dataPtr->o16;
+		} else if (t->mstObject) {
+			o = t->mstObject->o;
+		}
+		if (o) {
+			o->actionKeyMask = 0;
+			o->directionKeyMask = 0;
+		}
+		return 0;
+	}
 	return 1;
 }
