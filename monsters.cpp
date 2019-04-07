@@ -86,6 +86,12 @@ void Game::initMstTaskData(MstTaskData *m) {
 	m->unkD0 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
 }
 
+int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
+	// TODO
+	warning("addMstTaskData %d unimplemented");
+	return 0;
+}
+
 int Game::prepareMstTask(Task *t) {
 	MstTaskData *m = t->dataPtr;
 	assert(m);
@@ -211,7 +217,7 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	// TODO
-	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = -1;
+	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _mstUnk6 = -1;
 	// TODO
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
@@ -1740,8 +1746,28 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 	// TODO
 }
 
+static int checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
+	warning("checkMstOp54Helper %d unimplemented", flag);
+	return 1;
+}
+
 void Game::executeMstOp54() {
-	// TODO
+	if (_mstUnk6 != -1) {
+		return;
+	}
+	MstUnk43 *m43 = 0;
+	if (_mstFlags & 0x20000000) {
+		if (_mstOp54Unk2 == -1) {
+			return;
+		}
+		m43 = &_res->_mstUnk43[_mstOp54Unk2];
+	} else {
+		if (_mstOp54Unk3 == -1) {
+			return;
+		}
+		m43 = &_res->_mstUnk43[_mstOp54Unk3];
+		_mstOp54Unk2 = _mstOp54Unk1;
+	}
 	const int x = MIN(_mstRefPosX, 255);
 	if (_mstRefPosX < 0) {
 		_mstPosXmin = x;
@@ -1759,6 +1785,63 @@ void Game::executeMstOp54() {
 		_mstPosYmax = 191 - y;
 	}
 	// TODO
+	warning("executeMstOp54 unimplemented m43->count2 %d", m43->count2);
+	// game_unk47
+	if (m43->count2 == 0) {
+// TODO
+	} else {
+// 41E3CA
+		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
+		int var4 = 0;
+		uint32_t i = 0;
+		for (; i < m43->count2; ++i) {
+			uint8_t *ptr = m43->data2;
+			uint8_t code = ptr[i];
+			if ((code & 0x80) == 0) {
+				code &= 0x7F;
+				var4 = 1;
+				if (_mstOp54Table[code] == 0) {
+					_mstOp54Table[code] = 1;
+					uint32_t indexUnk48 = m43->indexUnk48[code];
+					assert(indexUnk48 != kNone);
+					MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
+					if (m48->unk4 == 0) {
+						if (checkMstOp54Helper(m48, 0) && addMstTaskData(m48, 0)) {
+							break; // goto 41E494;
+						}
+					} else {
+						int flag = _rnd.update() & 1;
+						if (checkMstOp54Helper(m48, flag) && addMstTaskData(m48, flag)) {
+							break; // goto 41E494;
+						}
+						flag ^= 1;
+						if (checkMstOp54Helper(m48, flag) && addMstTaskData(m48, flag)) {
+							break; // goto 41E494;
+						}
+					}
+				}
+			}
+		}
+// 41E494
+		if (_mstUnk6 != -1) {
+			m43->data2[i] |= 0x80;
+		} else {
+// 41E4AC
+			if (var4 != 0) {
+				++_mstOp54Counter;
+				if (_mstOp54Counter <= 16) {
+					return;
+				}
+			}
+			_mstOp54Counter = 0;
+			if (m43->count2 != 0) {
+				for (uint32_t i = 0; i < m43->count2; ++i) {
+					m43->data2[i] &= 0x7F;
+				}
+				shuffleArray(m43->data2, m43->count2);
+			}
+		}
+	}
 }
 
 static uint8_t getLvlObjectFlag4(int type, const LvlObject *o, const LvlObject *andyObject) {

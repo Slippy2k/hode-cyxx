@@ -171,6 +171,7 @@ struct Game {
 	int _mstOp54Unk1;
 	int _mstOp54Unk2;
 	int _mstOp54Unk3;
+	int _mstUnk6;
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	MstTaskData _mstUnkDataTable[32];
@@ -536,6 +537,7 @@ struct Game {
 
 	void resetMstTaskData(MstTaskData *m);
 	void initMstTaskData(MstTaskData *m);
+	int addMstTaskData(MstUnk48 *m48, uint8_t flag);
 	void resetMstObject(MstObject *m);
 	int prepareMstTask(Task *t);
 	void setMstObjectDefaultPos(Task *t);
