@@ -848,7 +848,7 @@ void Game::preloadLevelScreenData(int num, int prev) {
 	loadLevelScreenSounds(num);
 }
 
-void Game::oadLevelScreenSounds(int num) {
+void Game::loadLevelScreenSounds(int num) {
 	if (_res->_sssHdr.pcmCount > 0 && _res->_sssPreloadData1) {
 		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
 			const int j = _res->_sssPreloadData1[num].ptr[i];
@@ -1860,18 +1860,17 @@ void Game::updateLvlObjectLists() {
 
 LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	AnimBackgroundData *_esi = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
-	uint8_t *_edi = _esi->currentSpriteData + 2;
+	const uint8_t *_edi = _esi->currentSpriteData + 2;
 	if (_res->_currentScreenResourceNum == ptr->screenNum) {
 		if (ptr->currentSound != 0xFFFF) {
 			playSound(ptr->currentSound, ptr, 0, 3);
 			ptr->currentSound = 0xFFFF;
 		}
-		uint8_t *_edx = _edi + 2;
 		Sprite *spr = _gameSpriteListHead;
-		if (spr && READ_LE_UINT16(_edx) > 8) {
-			spr->xPos = (int8_t)_edi[0];
-			spr->yPos = (int8_t)_edi[1];
-			spr->bitmapBits = _edx;
+		if (spr && READ_LE_UINT16(_edi + 2) > 8) {
+			spr->xPos = _edi[0];
+			spr->yPos = _edi[1];
+			spr->bitmapBits = _edi + 2;
 			spr->num = ptr->flags2;
 			const int index = spr->num & 0x1F;
 			_gameSpriteListHead = spr->nextPtr;
@@ -1880,7 +1879,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		}
 	}
 	int16_t soundNum = -1;
-	uint8_t *_eax = READ_LE_UINT16(_edi + 2) + _edi + 2; // nextSpriteData
+	const uint8_t *_eax = READ_LE_UINT16(_edi + 2) + _edi + 2; // nextSpriteData
 	switch (ptr->objectUpdateType - 1) {
 	case 6:
 		_esi->currentSpriteData = _esi->firstSpriteData;
