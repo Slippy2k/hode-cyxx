@@ -131,6 +131,8 @@ struct Game {
 	int16_t _mstOriginPosY;
 	ScreenMask _shadowScreenMasksTable[8];
 	uint8_t _mstCurrentUnkFlag;
+	int _mstOp67_x1, _mstOp67_x2;
+	int _mstOp67_y1, _mstOp67_y2;
 
 	uint32_t _gameMstLogicHelper1TestValue;
 	uint32_t _gameMstLogicHelper1TestMask;

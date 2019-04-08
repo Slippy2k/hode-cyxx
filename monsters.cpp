@@ -229,14 +229,20 @@ void Game::resetMstCode() {
 	}
 
 	// TODO
+	_mstOp67_x1 = -256;
+	_mstOp67_x2 = -256;
+	memset(_mstUnkDataTable, 0, sizeof(_mstUnkDataTable));
+	memset(_mstObjectsTable, 0, sizeof(_mstObjectsTable));
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
-	// TODO
 	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _mstUnk6 = -1;
 	// TODO
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
 	_mstCurrentUnkFlag = 0;
+	// TODO
+	_mstOp67_y1 = 0;
+	_mstOp67_y2 = 0;
 	// TODO
 	_tasksList = 0;
 	_mstTasksList1 = 0;
@@ -248,12 +254,19 @@ void Game::resetMstCode() {
 	} else {
 		_mstVars[31] = -1;
 	}
-	// TODO
 	_mstVars[30] = 0x20;
-	// TODO
+	for (int i = 0; i < 32; ++i) {
+		_mstUnkDataTable[i].soundType = 0;
+	}
+	for (int i = 0; i < 64; ++i) {
+		_mstObjectsTable[i].unk0x10 = 0;
+	}
 	updateMstMoveData();
 	_mstPrevPosX = _mstPosX;
 	_mstPrevPosY = _mstPosY;
+	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
+		// TODO
+	}
 }
 
 void Game::startMstCode() {
@@ -272,8 +285,8 @@ void Game::startMstCode() {
 		_res->_mstHeightMapData[offset - 0x14] = _res->_mstHeightMapData[offset - 0x10] - _res->_mstHeightMapData[offset - 0x34];
 		_res->_mstHeightMapData[offset - 0x08] = _res->_mstHeightMapData[offset - 0x0C] + _res->_mstHeightMapData[offset - 0x34];
 	}
-	if (_res->_currentScreenResourceNum < _res->_mstHdr.unk0x14) {
-		uint32_t codeData = _res->_mstScreenInitCodeData[_res->_currentScreenResourceNum];
+	if (_levelCheckpoint < _res->_mstHdr.unk0x14) {
+		const uint32_t codeData = _res->_mstScreenInitCodeData[_levelCheckpoint];
 		if (codeData != kNone) {
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {
@@ -281,7 +294,6 @@ void Game::startMstCode() {
 			}
 		}
 	}
-	_executeMstLogicPrevCounter = _executeMstLogicCounter;
 }
 
 static bool compareOp(int op, int num1, int num2) {

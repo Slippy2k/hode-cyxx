@@ -848,7 +848,7 @@ void Game::preloadLevelScreenData(int num, int prev) {
 	loadLevelScreenSounds(num);
 }
 
-void Game::loadLevelScreenSounds(int num) {
+void Game::oadLevelScreenSounds(int num) {
 	if (_res->_sssHdr.pcmCount > 0 && _res->_sssPreloadData1) {
 		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
 			const int j = _res->_sssPreloadData1[num].ptr[i];
