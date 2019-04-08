@@ -76,12 +76,12 @@ void Game::setShakeScreen(int type, int counter) {
 }
 
 void Game::fadeScreenPalette() {
-	if (_fadePalette == 0) {
+	if (!_fadePalette) {
 		assert(_fadePaletteCounter != 0);
 		for (int i = 0; i < 256 * 3; ++i) {
 			_fadePaletteBuffer[i] = _video->_displayPaletteBuffer[i] / _fadePaletteCounter;
 		}
-		_fadePalette = 1;
+		_fadePalette = true;
 	} else {
 		if (_fadePaletteCounter != 0) {
 			_snd_masterVolume -= _snd_masterVolume / _fadePaletteCounter;
@@ -92,7 +92,7 @@ void Game::fadeScreenPalette() {
 		--_fadePaletteCounter;
 	}
 	for (int i = 0; i < 256 * 3; ++i) {
-		int16_t color = _video->_displayPaletteBuffer[i] - _fadePaletteBuffer[i];
+		int color = _video->_displayPaletteBuffer[i] - _fadePaletteBuffer[i];
 		if (color < 0) {
 			 color = 0;
 		}
@@ -250,7 +250,7 @@ void Game::setupBackgroundBitmap() {
 		decodeShadowScreenMask(lvl);
 	}
 	for (int i = 0; i < 256 * 3; ++i) {
-		_video->_displayPaletteBuffer[i] = (*pal++) << 8;
+		_video->_displayPaletteBuffer[i] = pal[i] << 8;
 	}
 	_video->_paletteNeedRefresh = true;
 }
@@ -1185,7 +1185,8 @@ void Game::resetDisplay() {
 	_video->_displayShadowLayer = false;
 	_shakeScreenDuration = 0;
 	_fadePaletteCounter = 0;
-	_fadePalette = 0;
+	_fadePalette = false;
+	memset(_fadePaletteBuffer, 0, sizeof(_fadePaletteBuffer));
 //	_snd_masterVolume = _plyConfigTable[_plyConfigNumber].soundVolume;
 }
 
@@ -1406,7 +1407,7 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 		}
 	}
 	if (_actionDirectionKeyMaskIndex != 0) {
-		if (_actionDirectionKeyMaskIndex == 164 && _fadePalette == 0) {
+		if (_actionDirectionKeyMaskIndex == 164 && !_fadePalette) {
 			_fadePaletteCounter = 10;
 			_plasmaCannonFlags |= 1;
 		} else {
@@ -2343,7 +2344,7 @@ void Game::levelMainLoop() {
 		if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 			preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
 			updateScreen(_andyObject->screenNum);
-		} else if (_fadePalette != 0 && _fadePaletteCounter == 0) {
+		} else if (_fadePalette && _fadePaletteCounter == 0) {
 			setupCurrentScreen();
 			clearLvlObjectsList2();
 			clearLvlObjectsList3();

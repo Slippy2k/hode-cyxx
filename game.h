@@ -87,8 +87,8 @@ struct Game {
 	uint8_t _currentRightScreen;
 	uint8_t _currentLeftScreen;
 	uint8_t _currentScreen;
-	uint8_t _fadePaletteCounter;
-	uint8_t _fadePalette;
+	int8_t _fadePaletteCounter;
+	bool _fadePalette;
 	bool _hideAndyObjectSprite;
 	OtherObjectScreenData _otherObjectScreenDataTable[32];
 	OtherObjectScreenData *_otherObjectScreenDataList;
