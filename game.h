@@ -559,7 +559,6 @@ struct Game {
 	void removeMstObjectTask(Task *t);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
-	void setupLvlScreenTasks(Task **tasksList1, Task **tasksList2, int num, bool load);
 	int changeTask(Task *t, int num, int value);
 	Task *updateTask(Task *t, int num, const uint8_t *codeData);
 	void resetTask(Task *t, const uint8_t *codeData);
