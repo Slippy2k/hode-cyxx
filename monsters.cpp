@@ -167,9 +167,6 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 	if (ptr[946] & 4) {
 		warning("setMstTaskDataDefaultPos ptr[946] 0x%x", ptr[946]);
 		// TODO
-	} else {
-// 40ECB4
-		// TODO
 	}
 // 40ECBD
 	m->xDelta = _mstPosX - m->xMstPos;
@@ -2319,7 +2316,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		// TODO
 		setMstObjectDefaultPos(t);
 		// TODO
-		if (_currentLevel == 1) {
+		if (_currentLevel == kLvl_fort) {
 			// TODO
 		}
 	} else {
@@ -2399,8 +2396,6 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 
 // 415A89
 		setMstTaskDataDefaultPos(t);
-
-		// TODO
 
 		switch (arg10) {
 		case 1:
