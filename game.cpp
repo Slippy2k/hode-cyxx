@@ -2204,14 +2204,10 @@ void Game::updateAndyMonsterObjects() {
 		}
 		ptr->linkObjPtr = 0;
 		break;
-	case 7:
+	case 7: // grab the line in 'fort' screen #1
 		_hideAndyObjectSprite = true;
 		if (_actionDirectionKeyMaskIndex == 0x71) {
-			if (!_currentMonsterObject) {
-				warning("_currentMonsterObject is NULL, _actionDirectionKeyMaskIndex 0x%x", _actionDirectionKeyMaskIndex);
-				return;
-			}
-			//assert(_currentMonsterObject);
+			assert(_currentMonsterObject);
 			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 			ptr->linkObjPtr = _currentMonsterObject;

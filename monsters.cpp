@@ -1850,14 +1850,22 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				o = t->dataPtr->o16;
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
-				// TODO
-			}
+				LvlObject *tmpObject = t->dataPtr->o16;
+				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC, tmpObject, _andyObject);
+				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & 0xFFCF);
+				_mstCurrentScreenNum = tmpObject->screenNum;
+				_currentMonsterObject = tmpObject;
+				_mstOriginPosX = _res->_mstOp56Data[num].unk4 & 0xFFFF;
+				_mstOriginPosY = _res->_mstOp56Data[num].unk8 & 0xFFFF;
+
+			} else {
 // 411B72
-			_mstCurrentFlags1 = merge_bits(_mstCurrentFlags1, _andyObject->flags1, 0x30); // _mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
-			_mstCurrentScreenNum = _andyObject->screenNum;
-			_currentMonsterObject = _andyObject;
-			_mstOriginPosX = _andyObject->posTable[3].x + _andyObject->posTable[6].x;
-			_mstOriginPosY = _andyObject->posTable[3].y + _andyObject->posTable[6].y;
+				_mstCurrentFlags1 = merge_bits(_mstCurrentFlags1, _andyObject->flags1, 0x30); // _mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
+				_mstCurrentScreenNum = _andyObject->screenNum;
+				_currentMonsterObject = _andyObject;
+				_mstOriginPosX = _andyObject->posTable[3].x + _andyObject->posTable[6].x;
+				_mstOriginPosY = _andyObject->posTable[3].y + _andyObject->posTable[6].y;
+			}
 			_mstCurrentUnkFlag = 1;
 		}
 // 411BBA
