@@ -1876,8 +1876,10 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
 				}
 // 4118ED
+				// TODO
 			}
 // 4119F5
+			// TODO
 		}
 		break;
 	case 2: {
@@ -1943,19 +1945,19 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			const int mask = dat->unkC;
 			int xPos = getTaskVar(t, dat->unk0, (mask >> 8) & 15); // _edi
 			int yPos = getTaskVar(t, dat->unk4, (mask >> 4) & 15); // _esi
-			int c = getTaskVar(t, dat->unk8, mask & 15); // _eax
+			int screenNum = getTaskVar(t, dat->unk8, mask & 15); // _eax
 			LvlObject *o = 0;
 			if (t->mstObject) {
 				o = t->mstObject->o;
 			} else if (t->dataPtr) {
 				o = t->dataPtr->o16;
 			}
-			if (c < 0) {
-				warning(".mst op56 subopcodes 13,14,22,23,24,25 unhandled c %d", c);
+			if (screenNum < 0) {
+				warning(".mst op56 subopcodes 13,14,22,23,24,25 unhandled screen %d", screenNum);
 				// TODO
-				if (c == -2) {
+				if (screenNum == -2) {
 
-				} else if (c == -1) {
+				} else if (screenNum == -1) {
 
 				} else {
 // 4114B3
@@ -1964,23 +1966,36 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				}
 			} else {
 // 411545
-				if (c >= _res->_mstHdr.pointsCount) {
-					c = _res->_mstHdr.pointsCount - 1;
+				if (screenNum >= _res->_mstHdr.pointsCount) {
+					screenNum = _res->_mstHdr.pointsCount - 1;
 				}
-				xPos += _res->_mstPointOffsets[c].xOffset;
-				yPos += _res->_mstPointOffsets[c].yOffset;
+				xPos += _res->_mstPointOffsets[screenNum].xOffset;
+				yPos += _res->_mstPointOffsets[screenNum].yOffset;
 				if (code == 13) {
-// 411562
-					warning(".mst op56 subopcode 13 unimplemented");
-					// TODO
+					if (o) {
+						xPos -= _res->_mstPointOffsets[screenNum].xOffset;
+						xPos -= o->posTable[7].x;
+						yPos -= _res->_mstPointOffsets[screenNum].yOffset;
+						yPos -= o->posTable[7].y;
+						o->screenNum = screenNum;
+						o->xPos = xPos;
+						o->yPos = yPos;
+						setLvlObjectPosInScreenGrid(o, 7);
+						if (t->mstObject) {
+							setMstObjectDefaultPos(t);
+						} else {
+							setMstTaskDataDefaultPos(t);
+						}
+					}
 				} else if (code == 14) {
 					if (_andyObject) {
 						const int pos = dat->unkC >> 16;
-						xPos -= _res->_mstPointOffsets[c].xOffset;
+						xPos -= _res->_mstPointOffsets[screenNum].xOffset;
 						xPos -= _andyObject->posTable[pos].x;
-						_andyObject->xPos = xPos;
-						yPos -= _res->_mstPointOffsets[c].yOffset;
+						yPos -= _res->_mstPointOffsets[screenNum].yOffset;
 						yPos -= _andyObject->posTable[pos].y;
+						_andyObject->screenNum = screenNum;
+						_andyObject->xPos = xPos;
 						_andyObject->yPos = yPos;
 						updateLvlObjectScreen(_andyObject);
 						updateMstMoveData();
