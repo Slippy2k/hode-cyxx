@@ -87,11 +87,7 @@ void Game::initMstTaskData(MstTaskData *m) {
 }
 
 int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
-	// TODO
-	warning("addMstTaskData %d unimplemented", flag);
-
 	m48->unk5 = flag;
-
 	if (m48->codeData != kNone) {
 		Task *t = createTask(_res->_mstCodeData + m48->codeData * 4);
 		if (!t) {
@@ -99,9 +95,39 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 		}
 		while ((this->*(t->run))(t) == 0);
 	}
-// 41D87E
+	_mstUnk6 = m48 - _res->_mstUnk48;
+	_mstTaskDataCount = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
-		// TODO
+		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;
+		uint8_t code = unk4->unk1B;
+		if (code >= 32) {
+			warning("Invalid mstTaskData index %d", code);
+			continue;
+		}
+		if (code != 255) {
+			unk4->unk19 = flag;
+			MstTaskData *m = &_mstUnkDataTable[code];
+			m->unk18 = unk4;
+			m->flags48 |= 0x40;
+			m->flagsA5 &= 0x8A;
+			m->flagsA5 |= 0x0A;
+			initMstTaskData(m);
+			Task *current = _mstTasksList1; // _eax
+			Task *t = m->task; // _esi
+			while (current) {
+				Task *next = current->nextPtr;
+				if (current == t) {
+					removeTask(&_mstTasksList1, t);
+					appendTask(&_mstTasksList1, t);
+					break;
+				}
+				current = next;
+			}
+			const uint32_t codeData = unk4->codeData;
+			assert(codeData != kNone);
+			resetTask(t, _res->_mstCodeData + codeData * 4);
+			++_mstTasksList1;
+		}
 	}
 
 	return 0;

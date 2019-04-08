@@ -190,9 +190,15 @@ struct MstUnk47 {
 	uint32_t count;
 }; // SIZEOF_MstUnk47 8
 
+struct MstUnk48Unk12Unk4 {
+	uint32_t codeData; // 0x10
+	uint8_t unk19; // 0x19
+	uint8_t unk1B; // 0x1B
+}; // sizeof == 28
+
 struct MstUnk48Unk12 {
 	uint32_t unk0;
-	uint32_t offset; // sizeof == 28
+	MstUnk48Unk12Unk4 *data; // sizeof == 28
 	uint32_t count;
 }; // sizeof == 12
 

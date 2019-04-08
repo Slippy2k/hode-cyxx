@@ -9,6 +9,7 @@ GLOBAL test_mullongintlongint
 GLOBAL test_cdq
 GLOBAL test_0042E910
 GLOBAL test_neg_sbb_neg
+GLOBAL test_0041D87E
 
 SECTION .text
 
@@ -187,5 +188,23 @@ test_neg_sbb_neg:
     sbb eax, eax
     neg eax
 
+  pop ebp
+  ret
+
+test_0041D87E:
+
+  push ebp
+  mov ebp, esp
+  push ecx
+  push edx
+
+    mov ecx, [ebp + arg0]
+    mov eax, 0BA2E8BA3h
+    mul ecx
+    shr edx, 5
+    mov eax, edx
+
+  pop edx
+  pop ecx
   pop ebp
   ret

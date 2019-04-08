@@ -13,6 +13,7 @@ extern int test_mullongintlongint(int,int,int,int) __attribute__((stdcall));
 extern int test_cdq(int) __attribute__((stdcall));
 extern int test_0042E910(int) __attribute__((stdcall));
 extern int test_neg_sbb_neg(int) __attribute__((stdcall));
+extern int test_0041D87E(int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -55,6 +56,10 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < 32; ++i) {
 		const int res = (i & 1) != 0 ? 2 : 0;
 		assert(test_0042E910(i) == res);
+	}
+	static const int sizeOf_MstUnk48 = 44;
+	for (int i = 0; i < 64; ++i) {
+		assert(test_0041D87E(i * sizeOf_MstUnk48) == i);
 	}
 	return 0;
 }

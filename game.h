@@ -174,6 +174,7 @@ struct Game {
 	int _mstOp54Unk2;
 	int _mstOp54Unk3;
 	int _mstUnk6;
+	int _mstTaskDataCount;
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	MstTaskData _mstUnkDataTable[32];

@@ -301,6 +301,7 @@ struct MstUnk35;
 struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
+struct MstUnk48Unk12Unk4;
 
 struct MstTaskData {
 	MstUnk46 *unk0;
@@ -309,6 +310,7 @@ struct MstTaskData {
 	MstUnk44Unk1 *unkC;
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
+	MstUnk48Unk12Unk4 *unk18;
 	int unk1C; // 0x1C
 	int soundType; // 0x20
 	int executeCounter; // 0x24
