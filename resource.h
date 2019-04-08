@@ -124,6 +124,12 @@ struct MstUnk35 {
 	uint32_t count2; // C
 }; // sizeof == 16
 
+struct MstUnk36 {
+	uint32_t indexUnk49; // indexes _mstUnk49
+	uint32_t unk4;
+	uint32_t unk8;
+}; // sizeof == 12
+
 struct MstUnk42 {
 	uint32_t *indexUnk46; // 0 indexes _mstUnk46
 	uint32_t count1; // 4
@@ -143,7 +149,7 @@ struct MstUnk44Unk1 {
 	uint32_t indexUnk35_20;
 	uint32_t indexUnk35_24;
 	uint32_t indexUnk36_28;
-	uint32_t indexUnk36_32;
+	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
 	uint32_t unk2C[2]; // 0x2C
 	uint32_t unk34[2]; // 0x34
@@ -184,6 +190,12 @@ struct MstUnk47 {
 	uint32_t count;
 }; // SIZEOF_MstUnk47 8
 
+struct MstUnk48Unk12 {
+	uint32_t unk0;
+	uint32_t offset; // sizeof == 28
+	uint32_t count;
+}; // sizeof == 12
+
 struct MstUnk48 {
 	uint32_t unk0;
 	uint8_t unk4;
@@ -191,18 +203,12 @@ struct MstUnk48 {
 	uint8_t unk6;
 	uint8_t unk7;
 	uint32_t codeData; // 0x8, PTR_OFFS<uint32>(_mstCodeData, N)
-	uint32_t offsetUnk12; // MstUnk48Unk12 *
+	MstUnk48Unk12 *unk12;
 	int countUnk12; // 0x10
 	uint32_t offsets1[2]; // 0x14, 0x18
 	uint32_t offsets2[2]; // 0x1C, 0x20
 	uint32_t count[2]; // 36,40
 }; // SIZEOF_MstUnk48 44
-
-struct MstUnk48Unk12 {
-	uint32_t unk0;
-	uint32_t offset; // sizeof == 28
-	uint32_t count;
-}; // sizeof == 12
 
 struct MstUnk49 {
 	uint8_t pad0[8];
@@ -438,6 +444,7 @@ struct Resource {
 
 	MstPointOffset *_mstPointOffsets;
 	MstUnk35 *_mstUnk35;
+	MstUnk36 *_mstUnk36;
 	uint32_t _mstTickDelay;
 	uint32_t _mstTickCodeData;
 	uint32_t *_mstScreenInitCodeData;

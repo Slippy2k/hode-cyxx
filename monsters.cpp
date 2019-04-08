@@ -88,7 +88,22 @@ void Game::initMstTaskData(MstTaskData *m) {
 
 int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 	// TODO
-	warning("addMstTaskData %d unimplemented");
+	warning("addMstTaskData %d unimplemented", flag);
+
+	m48->unk5 = flag;
+
+	if (m48->codeData != kNone) {
+		Task *t = createTask(_res->_mstCodeData + m48->codeData * 4);
+		if (!t) {
+			return 0;
+		}
+		while ((this->*(t->run))(t) == 0);
+	}
+// 41D87E
+	for (int i = 0; i < m48->countUnk12; ++i) {
+		// TODO
+	}
+
 	return 0;
 }
 
@@ -1978,6 +1993,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				o = t->dataPtr->o16;
 			}
 			if (c < 0) {
+				warning(".mst op56 subopcodes 13,14,22,23,24,25 unhandled c %d", c);
 				// TODO
 				if (c == -2) {
 
@@ -1997,6 +2013,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				yPos += _res->_mstPointOffsets[c].yOffset;
 				if (code == 13) {
 // 411562
+					warning(".mst op56 subopcode 13 unimplemented");
 					// TODO
 				} else if (code == 14) {
 					if (_andyObject) {
@@ -2164,6 +2181,14 @@ void Game::executeMstOp58(Task *t, int num) {
 	if (o) {
 		o->dataPtr = 0;
 	}
+}
+
+void Game::executeMstOp67Type2(Task *t, int flag) {
+	t->flags &= ~0x80;
+	MstTaskData *m = t->dataPtr;
+	m->flagsA5 = (m->flagsA5 & ~1) | 6;
+	initMstTaskData(m);
+	// TODO
 }
 
 void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
@@ -2410,6 +2435,14 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			warning("executeMstOp67 unhandled type %d", arg10);
 			_mstTasksList1 = _mstTasksList1->nextPtr; // TEMP
 			break;
+/*
+		case 2:
+			if (m) {
+				m->flagsA6 |= 1;
+			}
+			executeMstOp67Type2(t, 0);
+			break;
+*/
 		default:
 			m->flagsA5 = 1;
 			if (1) { // !updateMstTaskDataPosition(m)) { // TODO

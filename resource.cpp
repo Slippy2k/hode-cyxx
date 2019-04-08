@@ -1019,8 +1019,15 @@ void Resource::loadMstData(File *fp) {
 		bytesRead += (_mstUnk35[i].count2 + 3) & ~3;
 	}
 
-	fp->seek(_mstHdr.unk0x10 * 12, SEEK_CUR); // _mstUnk36
-	bytesRead += _mstHdr.unk0x10 * 12;
+	_mstUnk36 = (MstUnk36 *)malloc(_mstHdr.unk0x10 * sizeof(MstUnk36));
+	if (_mstUnk36) {
+		for (int i = 0; i < _mstHdr.unk0x10; ++i) {
+			_mstUnk36[i].indexUnk49 = fp->readUint32();
+			_mstUnk36[i].unk4 = fp->readUint32();
+			_mstUnk36[i].unk8 = fp->readUint32();
+			bytesRead += 12;
+		}
+	}
 
 	_mstTickDelay    = fp->readUint32();
 	_mstTickCodeData = fp->readUint32();
@@ -1202,7 +1209,7 @@ void Resource::loadMstData(File *fp) {
 		m->unk6 = fp->readByte();
 		m->unk7 = fp->readByte();
 		m->codeData = fp->readUint32();
-		m->offsetUnk12 = fp->readUint32();
+		m->unk12 = 0; fp->readUint32();
 		m->countUnk12 = fp->readUint32();
 		m->offsets1[0] = fp->readUint32();
 		m->offsets1[1] = fp->readUint32();
@@ -1233,7 +1240,7 @@ void Resource::loadMstData(File *fp) {
 			fp->seek(m12[j].count * 28, SEEK_CUR);
 			bytesRead += m12[j].count * 28;
 		}
-		free(m12);
+		m->unk12 = m12;
 	}
 
 	const int mapDataSize = _mstHdr.unk0x3C * 948;
