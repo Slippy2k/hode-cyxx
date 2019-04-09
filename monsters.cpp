@@ -551,7 +551,7 @@ int Game::changeTask(Task *t, int num, int value) {
 	return 0;
 }
 
-Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
+void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	Task *current = _tasksList;
 	bool found = false;
 	while (current) {
@@ -583,7 +583,10 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 		current = current->nextPtr;
 	}
 	if (found) {
-		return current;
+		return;
+	}
+	if (!codeData) {
+		return;
 	}
 	for (int i = 0; i < kMaxTasks; ++i) {
 		Task *t = &_tasksTable[i];
@@ -597,10 +600,9 @@ Task *Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 			}
 			_tasksList = t;
 			t->localVars[7] = num;
-			return t;
+			break;
 		}
 	}
-	return 0;
 }
 
 void Game::resetTask(Task *t, const uint8_t *codeData) {
@@ -1548,12 +1550,8 @@ int Game::runTask_default(Task *t) {
 		case 240: { // 77
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk59 *m = &_res->_mstUnk59[num];
-				if (m->codeData == kNone) {
-					warning("opcode 240 codeOffset is -1 for taskId %d", m->taskId);
-					// TODO
-				} else {
-					updateTask(t, m->taskId, _res->_mstCodeData + m->codeData * 4);
-				}
+				const uint8_t *codeData = (m->codeData == kNone) ? 0 : _res->_mstCodeData + m->codeData * 4;
+				updateTask(t, m->taskId, codeData);
 			}
 			break;
 		case 242: // 78
@@ -1857,9 +1855,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				_currentMonsterObject = tmpObject;
 				_mstOriginPosX = _res->_mstOp56Data[num].unk4 & 0xFFFF;
 				_mstOriginPosY = _res->_mstOp56Data[num].unk8 & 0xFFFF;
-
 			} else {
-// 411B72
 				_mstCurrentFlags1 = merge_bits(_mstCurrentFlags1, _andyObject->flags1, 0x30); // _mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
 				_mstCurrentScreenNum = _andyObject->screenNum;
 				_currentMonsterObject = _andyObject;
