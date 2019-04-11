@@ -10,6 +10,7 @@ GLOBAL test_cdq
 GLOBAL test_0042E910
 GLOBAL test_neg_sbb_neg
 GLOBAL test_0041D87E
+GLOBAL test_004070C8
 
 SECTION .text
 
@@ -206,5 +207,20 @@ test_0041D87E:
 
   pop edx
   pop ecx
+  pop ebp
+  ret
+
+test_004070C8:
+
+  push ebp
+  mov ebp, esp
+
+    mov eax, [ebp + arg0]
+    and al, 0F0h
+    neg al
+    sbb al, al
+    and al, 2
+    inc al
+
   pop ebp
   ret

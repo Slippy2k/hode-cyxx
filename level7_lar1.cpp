@@ -26,7 +26,11 @@ void Game::postScreenUpdate_lar1_screen0() {
 		break;
 	case 1:
 		if (_res->_currentScreenResourceNum == 0) {
-			// TODO
+			BoundingBox b = { 0, 0, 63, 78 };
+			LvlObject *o = findLvlObjectBoundingBox(&b);
+			if (((OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther))->unk0 == 6) {
+				_res->_screensState[0].s0 = 4;
+			}
 		}
 		break;
 	case 2:
@@ -34,7 +38,12 @@ void Game::postScreenUpdate_lar1_screen0() {
 			BoundingBox b = { 0, 0, 14, 74 };
 			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (clipBoundingBox(&b, &data->boundingBox)) {
-				// TODO
+				if (!_fadePalette) {
+					_levelCheckpoint = 1;
+					_fadePaletteCounter = 6;
+				} else {
+					_andyObject->directionKeyMask = 0;
+				}
 			}
 		}
 		break;
@@ -96,7 +105,8 @@ void Game::postScreenUpdate_lar1_screen5() {
 			BoundingBox b = { 194, 0, 255, 88 };
 			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (clipBoundingBox(&b, &data->boundingBox) && (byte_452610[0] & 0xF0) == 0x10) {
-				// TODO:
+				_levelCheckpoint = 2;
+				_screenCounterTable[26] = (byte_452614[0] < 16) ? 1 : 3;
 			}
 		}
 	}
