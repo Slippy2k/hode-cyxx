@@ -264,15 +264,15 @@ struct MovingOpcodeState {
 	int32_t xPos;
 	int32_t yPos; // 4
 	BoundingBox boundingBox; // 8
-	int32_t unk0x18;
-	int32_t unk0x1C;
-	int32_t unk0x20;
-	int32_t unk0x24;
-	OtherObjectScreenData *unk0x28;
-	LvlObject *unk0x2C;
-	uint32_t unk0x30;
-	uint32_t unk0x3C;
-	uint8_t unk0x40;
+	int32_t unk18;
+	int32_t unk1C;
+	int32_t unk20;
+	int32_t unk24;
+	OtherObjectScreenData *unk28;
+	LvlObject *unk2C;
+	uint32_t unk30;
+	uint32_t unk3C;
+	uint8_t unk40;
 }; // sizeof == 0x44
 
 struct AndyMoveData {
@@ -323,6 +323,10 @@ struct MstTaskData {
 	int yMstPos; // 0x58
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
+	int unk84; // 0x84
+	int unk88; // 0x88
+	int unk8C; // 0x8C
+	int unk90; // 0x90
 	int x1; // 0x94
 	int x2; // 0x98
 	int y1; // 0x9C
@@ -338,6 +342,7 @@ struct MstTaskData {
 	uint8_t unkE6;
 	int unkE8; // 0xE8
 	int unkEC; // 0xEC
+	int unkFC; // 0xFC
 }; // sizeof == 256
 
 struct MstObject {

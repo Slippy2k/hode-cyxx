@@ -124,18 +124,18 @@ struct Game {
 	int32_t _plasmaCannonYPointsTable1[129];
 	int32_t _plasmaCannonXPointsTable2[127];
 	int32_t _plasmaCannonYPointsTable2[127];
+	ScreenMask _shadowScreenMasksTable[8];
+
 	uint16_t _mstCurrentAnim;
 	uint16_t _mstCurrentFlags1;
 	uint8_t _mstCurrentScreenNum;
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
-	ScreenMask _shadowScreenMasksTable[8];
 	uint8_t _mstCurrentUnkFlag;
 	int _mstOp67_x1, _mstOp67_x2;
 	int _mstOp67_y1, _mstOp67_y2;
-
-	uint32_t _gameMstLogicHelper1TestValue;
-	uint32_t _gameMstLogicHelper1TestMask;
+	uint32_t _mstLogicHelper1TestValue;
+	uint32_t _mstLogicHelper1TestMask;
 	int _runTaskOpcodesCount;
 	int32_t _mstVars[kMaxVars];
 	uint32_t _mstFlags;
@@ -182,6 +182,7 @@ struct Game {
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
 	uint8_t _mstRandomLookupTable[8][32];
+	MovingOpcodeState _mstMovingState[8];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();

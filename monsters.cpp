@@ -185,7 +185,28 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 	}
 	m->unkEC = -1;
 	m->unk1C = 0;
+// 40ED0D
 	// TODO
+// 40F151
+	if (m->flags49 & 8) {
+		m->unk88 = READ_LE_UINT32(ptr + 920);
+		m->unk84 = READ_LE_UINT32(ptr + 924);
+	} else {
+		m->unk88 = READ_LE_UINT32(ptr + 912);
+		m->unk84 = READ_LE_UINT32(ptr + 916);
+	}
+	if (m->flags49 & 1) {
+		m->unk90 = READ_LE_UINT32(ptr + 936);
+		m->unk8C = READ_LE_UINT32(ptr + 940);
+	} else {
+		m->unk90 = READ_LE_UINT32(ptr + 928);
+		m->unk8C = READ_LE_UINT32(ptr + 932);
+	}
+// 40F1B3
+	// TODO
+
+	m->unkFC = -1;
+	m->flags49 &= ~1;
 }
 
 void Game::shuffleMstUnk43(MstUnk43 *p) {
@@ -243,10 +264,11 @@ void Game::resetMstCode() {
 	for (int i = 0; i < _res->_mstHdr.unk0x0C; ++i) { // var8
 		const int count = _res->_mstUnk35[i].count2;
 		if (count != 0) {
-			// TODO
+			uint8_t *ptr = _res->_mstUnk35[i].data2;
 			for (int j = 0; j < count * 2; ++j) {
-				// const int index1 = _rnd.update() % max;
-				// const int index2 = _rnd.update() % max;
+				const int index1 = _rnd.update() % count;
+				const int index2 = _rnd.update() % count;
+				SWAP(ptr[index1], ptr[index2]);
 			}
 		}
 	}
@@ -266,6 +288,9 @@ void Game::resetMstCode() {
 	// TODO
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
+	// TODO
+	_mstLogicHelper1TestValue = 0;
+	_mstLogicHelper1TestMask = 0xFFFFFFFF;
 	// TODO
 	_tasksList = 0;
 	_mstTasksList1 = 0;
@@ -395,7 +420,15 @@ void Game::executeMstCode() {
 		return;
 	}
 	++_executeMstLogicCounter;
-	// TODO
+	if ((_mstLogicHelper1TestValue & _mstLogicHelper1TestMask) != 0) {
+		// TODO
+		_mstLogicHelper1TestValue = 0;
+	}
+	for (int i = 0; i < 8; ++i) {
+		_mstMovingState[i].unk28 = 0;
+		_mstMovingState[i].unk30 = 0;
+		_mstMovingState[i].unk3C = 0x1000000;
+	}
 	executeMstCodeHelper2();
 	if (_mstVars[31] > 0) {
 		--_mstVars[31];
@@ -446,6 +479,10 @@ void Game::executeMstCodeHelper2() {
 }
 
 int Game::executeMstCodeHelper3(Task *t) {
+	if (!t->run) {
+		warning("executeMstCodeHelper3 t.run is NULL");
+		return 1;
+	}
 	warning("executeMstCodeHelper3 unimplemented");
 	// TODO
 	return 0;
@@ -1572,13 +1609,12 @@ int Game::runTask_default(Task *t) {
 				}
 				return 0;
 			} else if (t->dataPtr) {
-				warning(".mst opcode 242 mstTaskData is not NULL");
-				// TODO
 				MstTaskData *m = t->dataPtr;
 				if (m->flagsA6 & 4) {
 					return 1;
 				}
 				if ((m->flagsA5 & 0x80) == 0) {
+					warning(".mst opcode 242 mstTaskData is not NULL");
 					if ((m->flagsA5 & 8) == 0) {
 						m->flags48 |= 8;
 						if ((m->flagsA5 & 0x70) != 0) {
@@ -1599,10 +1635,17 @@ int Game::runTask_default(Task *t) {
 							case 6:
 								return executeMstOp67Type2(t, 1);
 */
-						}
+						} else {
 // 413DCA
-					}
+						}
+					} else {
 // 413FE3
+						if (m->unk18) {
+							// disableMstTaskData(m);
+						}
+						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
+						// executeMstOp67Type2(t, 1);
+					}
 				} else if ((m->flagsA5 & 8) != 0) {
 // 413F8B
 					m->flagsA5 &= ~8;
