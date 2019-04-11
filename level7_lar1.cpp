@@ -28,8 +28,10 @@ void Game::postScreenUpdate_lar1_screen0() {
 		if (_res->_currentScreenResourceNum == 0) {
 			BoundingBox b = { 0, 0, 63, 78 };
 			LvlObject *o = findLvlObjectBoundingBox(&b);
-			if (((OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther))->unk0 == 6) {
-				_res->_screensState[0].s0 = 4;
+			if (o) {
+				if (((OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther))->unk0 == 6) {
+					_res->_screensState[0].s0 = 4;
+				}
 			}
 		}
 		break;

@@ -77,6 +77,11 @@ void Game::initMstTaskData(MstTaskData *m) {
 	const uint8_t *ptr = m->unk8;
 	const int num = (~m->flagsA5) & 1;
 
+	if (!m->unkC) {
+		warning("initMstTaskData m %p unkC is NULL", m);
+		return;
+	}
+
 	m->x1 = m->unkC->unk2C[num] - READ_LE_UINT32(ptr + 904);
 	m->x2 = m->unkC->unk34[num] + READ_LE_UINT32(ptr + 904);
 	m->y1 = m->unkC->unk3C[num] - READ_LE_UINT32(ptr + 908);
@@ -114,6 +119,10 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 			initMstTaskData(m);
 			Task *current = _mstTasksList1; // _eax
 			Task *t = m->task; // _esi
+			if (!t) {
+				warning("addMstTaskData m %p m->task is NULL", m);
+				return 0;
+			}
 			while (current) {
 				Task *next = current->nextPtr;
 				if (current == t) {
