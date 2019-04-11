@@ -133,6 +133,11 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 	return 0;
 }
 
+int Game::updateMstTaskDataPosition(MstTaskData *m) {
+	// TODO
+	return 0;
+}
+
 int Game::prepareMstTask(Task *t) {
 	MstTaskData *m = t->dataPtr;
 	assert(m);
@@ -2200,6 +2205,52 @@ void Game::executeMstOp58(Task *t, int num) {
 	}
 }
 
+void Game::executeMstUnk1(Task *t) {
+	MstTaskData *m = t->dataPtr;
+	t->run = &Game::runTask_default;
+	m->o16->actionKeyMask = 0;
+	m->o16->directionKeyMask = 0;
+	if ((m->flagsA5 & 4) != 0 && (m->flagsA5 & 0x28) == 0) {
+		switch (m->flagsA5 & 7) {
+		case 5:
+			m->flagsA5 = (m->flagsA5 & ~6) | 1;
+			if (updateMstTaskDataPosition(m) == 0) {
+				initMstTaskData(m);
+			}
+			prepareMstTask(t);
+			break;
+		case 4:
+			m->flagsA5 &= ~7;
+			if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
+				m->flagsA5 |= 1;
+				if (updateMstTaskDataPosition(m) == 0) {
+					initMstTaskData(m);
+				}
+				// TODO
+				// if (m->unkC->indexUnk35_20 != kNone) {
+				//	m->unkD0 = m->unkC->indexUnk35_20;
+				// }
+				prepareMstTask(t);
+			} else {
+				m->flagsA5 |= 2;
+				if (updateMstTaskDataPosition(m) == 0) {
+					initMstTaskData(m);
+				}
+				prepareMstTask(t);
+			}
+			break;
+		}
+	} else {
+		m->flagsA5 &= ~4;
+		updateMstTaskDataPosition(m);
+	}
+}
+
+int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
+	// TODO
+	return 1;
+}
+
 void Game::executeMstOp67Type2(Task *t, int flag) {
 	t->flags &= ~0x80;
 	MstTaskData *m = t->dataPtr;
@@ -2460,7 +2511,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 */
 		default:
 			m->flagsA5 = 1;
-			if (1) { // !updateMstTaskDataPosition(m)) { // TODO
+			if (updateMstTaskDataPosition(m) == 0) {
 				initMstTaskData(m);
 			}
 			prepareMstTask(t);

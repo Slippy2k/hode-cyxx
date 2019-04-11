@@ -146,7 +146,7 @@ struct MstUnk43 {
 
 struct MstUnk44Unk1 {
 	uint32_t indexUnk34_16;
-	uint32_t indexUnk35_20;
+	uint32_t indexUnk35_20; // 0x14
 	uint32_t indexUnk35_24;
 	uint32_t indexUnk36_28;
 	uint32_t indexUnk36_32; // 0x20
