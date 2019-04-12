@@ -2910,6 +2910,14 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 	}
 }
 
+static const uint8_t byte_43E660[] = {
+	0x1F, 0x00, 0xE5, 0xEE, 0xE5, 0x12, 0x1B, 0xEE, 0x1B, 0x12, 0xE1, 0x00, 0x00, 0xE1, 0x00, 0x1F
+};
+
+static const uint8_t byte_43E670[] = {
+	0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
+};
+
 void Game::setupSpecialPowers(LvlObject *ptr) {
 	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *_esi = _edi->nextPtr;
@@ -2918,7 +2926,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 	if (pos == 4) {
 // 40DB4C
 		OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
-		// _esi->callbackFuncPtr = &Game::lvlObjectCallbackSpecialPowers;
+		_esi->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
 		uint8_t _cl = (ptr->flags1 >> 4) & 3;
 		if (_eax->unk0 == 4) {
 			_eax->unk2 = 0x21;
@@ -2949,7 +2957,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DBCE
-			// TODO
+			_eax->xPos = (int8_t)byte_43E670[_eax->unk1 * 2];
+			_eax->yPos = (int8_t)byte_43E670[_eax->unk1 * 2 + 1];
 			_esi->anim = 10;
 		} else {
 // 40DBF4
@@ -2994,7 +3003,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DCCE
-			// TODO
+			_eax->xPos = (int8_t)byte_43E660[_eax->unk1 * 2];
+			_eax->yPos = (int8_t)byte_43E660[_eax->unk1 * 2 + 1];
 		}
 // 40DCE9
 		_esi->frame = 0;
@@ -3003,7 +3013,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 		_esi->screenNum = ptr->screenNum;
 		setLvlObjectPosRelativeToObject(_esi, 7, ptr, 6);
 		if (_currentLevel == kLvl_isld) {
-			_esi->xPos += _eax->boundingBox.x1;
+			_esi->xPos += _eax->dxPos;
 		}
 		_edi->nextPtr = 0;
 	} else if (pos == 7) {
@@ -3043,7 +3053,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				updateAndyObject(_esi);
 				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
 				if (_currentLevel == kLvl_isld) {
-					_esi->xPos += _eax->boundingBox.x1;
+					_esi->xPos += _eax->dxPos;
 				}
 			}
 			break;
@@ -3353,6 +3363,11 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 	return 0;
 }
 
+int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
+	// TODO
+	return 0;
+}
+
 void Game::lvlObjectTypeCallback(LvlObject *o) {
 	switch (o->spriteNum) {
 	case 0:
@@ -3593,8 +3608,22 @@ LvlObject *Game::findLvlObjectType2(int num, int index) {
 	return ptr;
 }
 
-LvlObject *Game::findLvlObjectBoundingBox(const BoundingBox *box) {
-	// TODO
+LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
+	LvlObject *ptr = _lvlObjectsList0;
+	while (ptr) {
+		if ((ptr->flags0 & 0x1F) != 0xB && (ptr->flags0 & 0xE0) != 0x40) {
+			BoundingBox b;
+			b.x1 = ptr->xPos;
+			b.x2 = ptr->xPos + ptr->width - 1;
+			b.y1 = ptr->yPos;
+			b.y2 = ptr->yPos + ptr->height - 1;
+			const uint8_t *coords = _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite);
+			if (updateBoundingBoxClippingOffset(box, &b, coords, (ptr->flags1 >> 4) & 3)) {
+				return ptr;
+			}
+		}
+		ptr = ptr->nextPtr;
+	}
 	return 0;
 }
 

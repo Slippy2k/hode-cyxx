@@ -285,6 +285,7 @@ struct Game {
 	int lvlObjectType1Callback(LvlObject *ptr);
 	int lvlObjectType8Callback(LvlObject *o);
 	int lvlObjectList3Callback(LvlObject *o);
+	int lvlObjectSpecialPowersCallback(LvlObject *o);
 	void lvlObjectTypeCallback(LvlObject *o);
 	LvlObject *addLvlObject(int type, int x, int y, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);
 	int setLvlObjectPosInScreenGrid(LvlObject *o, int num);
@@ -295,7 +296,7 @@ struct Game {
 	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
 	LvlObject *findLvlObjectType2(int num, int index);
-	LvlObject *findLvlObjectBoundingBox(const BoundingBox *box);
+	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void resetLevelTickHelperData();
 	void updateLevelTickHelper();
 	void captureScreenshot();

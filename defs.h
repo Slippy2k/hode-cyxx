@@ -240,13 +240,10 @@ struct OtherObjectScreenData {
 	uint8_t unk1;
 	uint8_t unk2;
 	uint8_t unk3;
-	uint8_t unk4;
-	uint8_t unk5;
-	uint8_t unk6;
-	uint8_t unk7;
-	BoundingBox boundingBox; // 8
-	int32_t dxPos;
-	int32_t dyPos;
+	int xPos; // 0x4
+	int yPos; // 0x8
+	int32_t dxPos; // 0x18
+	int32_t dyPos; // 0x1C
 	OtherObjectScreenData *nextPtr;
 };
 
