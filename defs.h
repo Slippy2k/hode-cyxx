@@ -242,6 +242,8 @@ struct OtherObjectScreenData {
 	uint8_t unk3;
 	int xPos; // 0x4
 	int yPos; // 0x8
+	int x2; // 0xC
+	int y2; // 0x10
 	int32_t dxPos; // 0x18
 	int32_t dyPos; // 0x1C
 	OtherObjectScreenData *nextPtr;

@@ -46,13 +46,10 @@ void Game::clearObjectScreenDataList() {
 }
 
 void Game::prependObjectScreenDataList(LvlObject *ptr) {
-	warning("prependObjectScreenDataList unimplemented");
-/*
 	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeOther);
 	dat->nextPtr = _otherObjectScreenDataList;
 	_otherObjectScreenDataList = dat;
 	ptr->dataPtr = 0;
-*/
 }
 
 void Game::setShakeScreen(int type, int counter) {
@@ -2918,6 +2915,14 @@ static const uint8_t byte_43E670[] = {
 	0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
 };
 
+static const uint8_t byte_43E700[] = {
+	0x04, 0x14, 0x03, 0x16, 0x03, 0x16, 0x03, 0x16, 0x03, 0x16, 0x04, 0x14, 0x02, 0x18, 0x02, 0x18
+};
+
+static const uint8_t byte_43E710[] = {
+	0x04, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x04, 0x08, 0x02, 0x08, 0x02, 0x08
+};
+
 void Game::setupSpecialPowers(LvlObject *ptr) {
 	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *_esi = _edi->nextPtr;
@@ -3363,8 +3368,82 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 	return 0;
 }
 
+void Game::lvlObjectSpecialPowersCallbackHelper(LvlObject *o) {
+	warning("lvlObjectSpecialPowersCallbackHelper unimplemented");
+}
+
 int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
-	// TODO
+	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+	if (!dat) {
+		return 0;
+	}
+	const uint16_t fl = o->flags0 & 0x1F;
+	if (fl == 1) {
+		if (dat->unk3 != 0x80 && dat->unk2 != 0) {
+			warning("lvlObjectSpecialPowersCallback unimplemented unk3 %d unk2 %d", dat->unk3, dat->unk2);
+			// TODO
+		}
+// 40D947
+		if (dat->unk0 == 5) {
+			dat->yPos = 0;
+			if (dat->unk3 != 0x80) {
+				lvlObjectSpecialPowersCallbackHelper(o);
+			}
+			const uint8_t *p;
+			if (dat->unk0 >= 4) {
+				p = &byte_43E710[dat->unk1 * 2];
+			} else {
+				p = &byte_43E700[dat->unk1 * 2];
+			}
+// 40D97C
+			if (dat->unk3 != 0x80 && dat->unk2 != 0) {
+				if (addLvlObjectToList3(o->spriteNum)) {
+					LvlObject *ptr = _lvlObjectsList3;
+					ptr->anim = dat->unk1;
+					if (_rnd._rndSeed & 1) {
+						++ptr->anim;
+					}
+					ptr->frame = 0;
+					setupLvlObjectBitmap(ptr);
+					setLvlObjectPosRelativeToObject(ptr, 0, o, 7);
+					o->xPos += dat->xPos;
+					o->yPos += dat->yPos;
+				}
+			} else {
+// 40D9FC
+				o->anim = *p;
+				if (dat->x2 >= 256) {
+					dat->x2 -= _res->_screensBasePos[o->screenNum].u;
+				}
+				if (dat->y2 >= 192) {
+					dat->y2 -= _res->_screensBasePos[o->screenNum].v;
+				}
+			}
+		}
+	} else if (fl == 11) {
+// 40DAB1
+		if ((o->flags0 & 0xE0) == 0x40) {
+			dat->unk2 = 0;
+		} else {
+			dat->unk2 = 1;
+		}
+	}
+// 40DAC9
+	if (dat->unk2 == 0) {
+		if (o->spriteNum == 3) {
+			removeLvlObjectFromList(&_lvlObjectsList0, o);
+		} else {
+			removeLvlObjectFromList(&_lvlObjectsList2, o);
+		}
+		destroyLvlObject(o);
+	} else {
+		--dat->unk2;
+		updateAndyObject(o);
+	}
+// 40DB00
+	if (setLvlObjectPosInScreenGrid(o, 3) < 0) {
+		dat->unk2 = 0;
+	}
 	return 0;
 }
 
