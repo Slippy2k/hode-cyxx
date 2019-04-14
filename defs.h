@@ -246,7 +246,7 @@ struct OtherObjectScreenData {
 	int y2; // 0x10
 	int32_t dxPos; // 0x18
 	int32_t dyPos; // 0x1C
-	OtherObjectScreenData *nextPtr;
+	OtherObjectScreenData *nextPtr; // next pointer to 'free' element
 };
 
 struct ScreenMask { // ShadowScreenMask

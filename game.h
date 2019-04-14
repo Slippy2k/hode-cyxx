@@ -91,7 +91,7 @@ struct Game {
 	bool _fadePalette;
 	bool _hideAndyObjectSprite;
 	OtherObjectScreenData _otherObjectScreenDataTable[32];
-	OtherObjectScreenData *_otherObjectScreenDataList;
+	OtherObjectScreenData *_otherObjectScreenDataList; // pointer to the first 'free' element
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -195,8 +195,8 @@ struct Game {
 
 	void mainLoop(int level, int checkpoint);
 	void mixAudio(int16_t *buf, int len);
-	void clearObjectScreenDataList();
-	void prependObjectScreenDataList(LvlObject *ptr);
+	void resetObjectScreenDataList();
+	void clearObjectScreenData(LvlObject *ptr);
 	void setShakeScreen(int type, int counter);
 	void fadeScreenPalette();
 	void shakeScreen();

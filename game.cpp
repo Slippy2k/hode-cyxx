@@ -37,7 +37,7 @@ Game::~Game() {
 	free(_shadowScreenMaskBuffer);
 }
 
-void Game::clearObjectScreenDataList() {
+void Game::resetObjectScreenDataList() {
 	_otherObjectScreenDataList = &_otherObjectScreenDataTable[0];
 	for (int i = 0; i < 31; ++i) {
 		_otherObjectScreenDataTable[i].nextPtr = &_otherObjectScreenDataTable[i + 1];
@@ -45,7 +45,7 @@ void Game::clearObjectScreenDataList() {
 	_otherObjectScreenDataTable[31].nextPtr = 0;
 }
 
-void Game::prependObjectScreenDataList(LvlObject *ptr) {
+void Game::clearObjectScreenData(LvlObject *ptr) {
 	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeOther);
 	dat->nextPtr = _otherObjectScreenDataList;
 	_otherObjectScreenDataList = dat;
@@ -683,7 +683,7 @@ void Game::destroyLvlObject(LvlObject *o) {
 		case 3:
 		case 7:
 			if (o->dataPtr) {
-				prependObjectScreenDataList(o);
+				clearObjectScreenData(o);
 			}
 			break;
 		}
@@ -903,7 +903,7 @@ void Game::clearLvlObjectsList1() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					prependObjectScreenDataList(ptr);
+					clearObjectScreenData(ptr);
 				}
 				break;
 			}
@@ -935,7 +935,7 @@ void Game::clearLvlObjectsList2() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					prependObjectScreenDataList(ptr);
+					clearObjectScreenData(ptr);
 				}
 				break;
 			}
@@ -967,7 +967,7 @@ void Game::clearLvlObjectsList3() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					prependObjectScreenDataList(ptr);
+					clearObjectScreenData(ptr);
 				}
 				break;
 			}
@@ -1068,7 +1068,7 @@ void Game::removeLvlObject2(LvlObject *o) {
 		case 3:
 		case 7:
 			if (o->dataPtr) {
-				prependObjectScreenDataList(o);
+				clearObjectScreenData(o);
 			}
 			break;
 		}
@@ -2297,7 +2297,7 @@ void Game::levelMainLoop() {
 		resetSound();
 	}
 	_quit = false;
-	clearObjectScreenDataList();
+	resetObjectScreenDataList();
 	callLevel_initialize();
 	setupCurrentScreen();
 	clearLvlObjectsList2();
@@ -3344,7 +3344,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 			case 3:
 			case 7:
 				if (o->dataPtr) {
-					prependObjectScreenDataList(o);
+					clearObjectScreenData(o);
 				}
 				break;
 			}
