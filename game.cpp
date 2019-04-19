@@ -2930,6 +2930,10 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 	uint8_t var1 = (ptr->flags0 >> 5) & 7;
 	if (pos == 4) {
 // 40DB4C
+		if (!_esi->dataPtr) {
+			warning("lvlObject %p with NULL dataPtr", _esi);
+			return;
+		}
 		OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
 		_esi->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
 		uint8_t _cl = (ptr->flags1 >> 4) & 3;
@@ -3026,14 +3030,15 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 		switch (var1) {
 		case 0:
 			if (!_esi) {
-				LvlObject *o = _edi->nextPtr;
-				if (!o) {
+				if (!_edi->nextPtr) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->nextPtr = _edx;
 					_edx->dataPtr = _otherObjectScreenDataList;
 					if (_otherObjectScreenDataList) {
 						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
 						 memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+					} else {
+						warning("Nothing free in _otherObjectScreenDataList");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3047,12 +3052,19 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				}
 // 40DDEE
 				if (_esi) {
+					if (!_esi->dataPtr) {
+						warning("lvlObject %p with NULL dataPtr", _esi);
+						break;
+					}
 					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
 					_edx->unk0 = 0;
 				}
-				break;
 			} else {
 // 40DE08
+				if (!_esi->dataPtr) {
+					warning("lvlObject %p with NULL dataPtr", _esi);
+					break;
+				}
 				OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
 				_esi->anim = (_eax->unk0 == 0) ? 14 : 15;
 				updateAndyObject(_esi);
@@ -3063,14 +3075,15 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 			}
 			break;
 		case 2: {
-				LvlObject *_eax = _edi->nextPtr;
-				if (_eax) {
+				if (!_edi->nextPtr) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->nextPtr = _edx;
 					_edx->dataPtr = _otherObjectScreenDataList;
 					if (_otherObjectScreenDataList) {
 						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
 						 memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+					} else {
+						warning("Nothing free in _otherObjectScreenDataList");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3084,6 +3097,10 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				}
 // 40DEEC
 				if (_esi) {
+					if (!_esi->dataPtr) {
+						warning("lvlObject %p with NULL dataPtr", _esi);
+						break;
+					}
 					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
 					_edx->unk0 = 0;
 				}
@@ -3096,14 +3113,15 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 			}
 			break;
 		case 3: {
-				LvlObject *_eax = _edi->nextPtr;
-				if (_eax) {
+				if (!_edi->nextPtr) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->nextPtr = _edx;
 					_edx->dataPtr = _otherObjectScreenDataList;
 					if (_otherObjectScreenDataList) {
 						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
 						memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+					} else {
+						warning("Nothing free in _otherObjectScreenDataList");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3117,6 +3135,10 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				}
 // 40DF82
 				if (_esi) {
+					if (!_esi->dataPtr) {
+						warning("lvlObject %p with NULL dataPtr", _esi);
+						break;
+					}
 					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
 					_edx->unk0 = 0;
 				}
@@ -3373,10 +3395,10 @@ void Game::lvlObjectSpecialPowersCallbackHelper(LvlObject *o) {
 }
 
 int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
-	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
-	if (!dat) {
+	if (!o->dataPtr) {
 		return 0;
 	}
+	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
 	const uint16_t fl = o->flags0 & 0x1F;
 	if (fl == 1) {
 		if (dat->unk3 != 0x80 && dat->unk2 != 0) {
