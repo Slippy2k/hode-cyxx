@@ -142,6 +142,16 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 	return 0;
 }
 
+void Game::disableMstTaskData(MstTaskData *m) {
+	m->flags48 &= ~0x50;
+	m->unk18->unk1B = 255;
+	m->unk18 = 0;
+	--_mstTaskDataCount;
+	if (_mstTaskDataCount <= 0) {
+		_mstUnk6 = -1;
+	}
+}
+
 int Game::updateMstTaskDataPosition(MstTaskData *m) {
 	// TODO
 	return 0;
@@ -1655,7 +1665,7 @@ int Game::runTask_default(Task *t) {
 					} else {
 // 413FE3
 						if (m->unk18) {
-							// disableMstTaskData(m);
+							disableMstTaskData(m);
 						}
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
 						// executeMstOp67Type2(t, 1);
@@ -1704,10 +1714,10 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 		MstTaskData *m = current->dataPtr; // _ecx
 		Task *next = current->nextPtr; // _ebp
 		if (m && m->o16->screenNum == screenNum) {
-/*
 			if (_mstUnk6 != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
 				disableMstTaskData(m);
 			}
+/*
 			const uint8_t *ptr = m->unk8;
 			if (ptr[946] & 4) {
 				clearMstRectsTable(m, 0);
