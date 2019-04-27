@@ -1638,9 +1638,9 @@ int Game::runTask_default(Task *t) {
 					return 1;
 				}
 				if ((m->flagsA5 & 0x80) == 0) {
-					warning(".mst opcode 242 mstTaskData is not NULL");
 					if ((m->flagsA5 & 8) == 0) {
 						m->flags48 |= 8;
+						warning(".mst opcode 242 mstTaskData is not NULL flagsA5 0x%x", m->flagsA5);
 						if ((m->flagsA5 & 0x70) != 0) {
 							m->flagsA5 &= ~0x70;
 /*
@@ -1668,7 +1668,7 @@ int Game::runTask_default(Task *t) {
 							disableMstTaskData(m);
 						}
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
-						// executeMstOp67Type2(t, 1);
+						executeMstOp67Type2(t, 1);
 					}
 				} else if ((m->flagsA5 & 8) != 0) {
 // 413F8B
@@ -1936,6 +1936,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		break;
 	case 1:
 		if (_mstCurrentUnkFlag != 0) {
+			warning("Op56 subopcode 1 unimplemented");
 			if (resetAndyLvlObjectPlasmaCannonKeyMask(0x61) != 0) {
 				_plasmaCannonFlags &= ~1;
 				if (_andyObject->spriteNum == 0) {
@@ -2021,12 +2022,16 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				o = t->dataPtr->o16;
 			}
 			if (screenNum < 0) {
-				warning(".mst op56 subopcodes 13,14,22,23,24,25 unhandled screen %d", screenNum);
-				// TODO
 				if (screenNum == -2) {
-
+					screenNum = o->screenNum;
+					if (t->mstObject) {
+						xPos += t->mstObject->xMstPos;
+						yPos += t->mstObject->yMstPos;
+					}
 				} else if (screenNum == -1) {
-
+					xPos += _mstPosX;
+					yPos += _mstPosY;
+					screenNum = _currentScreen;
 				} else {
 // 4114B3
 					xPos += o->posTable[6].x - o->posTable[7].x;
@@ -2268,6 +2273,14 @@ void Game::executeMstUnk1(Task *t) {
 int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
 	// TODO
 	return 1;
+}
+
+void Game::executeMstOp67Type1(Task *t) {
+	t->flags &= ~0x80;
+	MstTaskData *m = t->dataPtr;
+	m->flagsA5 = (m->flagsA5 & ~2) | 5;
+	initMstTaskData(m);
+	// TODO
 }
 
 void Game::executeMstOp67Type2(Task *t, int flag) {
@@ -2521,6 +2534,9 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			_mstTasksList1 = _mstTasksList1->nextPtr; // TEMP
 			break;
 /*
+		case 1:
+			executeMstOp67Type1(t);
+			break;
 		case 2:
 			if (m) {
 				m->flagsA6 |= 1;
@@ -2538,8 +2554,8 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		}
 	}
 // 415ADE
-	t->flags &= ~0x80;
 	// TODO
+	t->flags &= ~0x80;
 }
 
 int Game::runTask_wait(Task *t) {
