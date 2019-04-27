@@ -235,7 +235,7 @@ struct AndyObjectScreenData {
 	LvlObject *nextPtr; // 0x20 lvlObject
 };
 
-struct OtherObjectScreenData {
+struct OtherObjectScreenData { // SpecialPowersObjectData
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;

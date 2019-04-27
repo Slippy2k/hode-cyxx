@@ -984,6 +984,7 @@ void Game::clearLvlObjectsList3() {
 
 LvlObject *Game::addLvlObjectToList1(int type, int num) {
 	if ((type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) && _declaredLvlObjectsListCount < 160) {
+		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
 		++_declaredLvlObjectsListCount;
@@ -1009,7 +1010,6 @@ int Game::addLvlObjectToList3(int num) {
 		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
-		assert(ptr);
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = 1;
 		ptr->type = 8;
@@ -3051,12 +3051,14 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DDEE
-				if (_esi) {
-					if (!_esi->dataPtr) {
-						warning("lvlObject %p with NULL dataPtr", _esi);
+				AndyObjectScreenData *_ecx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				LvlObject *_eax = _ecx->nextPtr;
+				if (_eax) {
+					if (!_eax->dataPtr) {
+						warning("lvlObject %p with NULL dataPtr", _eax);
 						break;
 					}
-					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_eax, kObjectDataTypeOther);
 					_edx->unk0 = 0;
 				}
 			} else {
@@ -3096,12 +3098,14 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DEEC
-				if (_esi) {
-					if (!_esi->dataPtr) {
-						warning("lvlObject %p with NULL dataPtr", _esi);
+				AndyObjectScreenData *_ecx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				LvlObject *_eax = _ecx->nextPtr;
+				if (_eax) {
+					if (!_eax->dataPtr) {
+						warning("lvlObject %p with NULL dataPtr", _eax);
 						break;
 					}
-					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_eax, kObjectDataTypeOther);
 					_edx->unk0 = 0;
 				}
 			}
@@ -3134,12 +3138,14 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DF82
-				if (_esi) {
-					if (!_esi->dataPtr) {
-						warning("lvlObject %p with NULL dataPtr", _esi);
+				AndyObjectScreenData *_ecx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				LvlObject *_eax = _ecx->nextPtr;
+				if (_eax) {
+					if (!_eax->dataPtr) {
+						warning("lvlObject %p with NULL dataPtr", _eax);
 						break;
 					}
-					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_eax, kObjectDataTypeOther);
 					_edx->unk0 = 0;
 				}
 			}
