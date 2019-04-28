@@ -1650,10 +1650,6 @@ int Game::runTask_default(Task *t) {
 // 413D74
 								// TODO
 								break;
-							case 3:
-							case 4:
-								// break to next opcode
-								break;
 							case 5:
 								return executeMstOp67Type1(t);
 							case 6:
@@ -2327,11 +2323,13 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (count >= _mstVars[30]) {
 			return;
 		}
-		if (arg1C < 0) {
-			// TODO
-			// _res->_mstUnk42[arg24];
-		} else {
-// 415510
+		if (arg1C < 0) { // _edx
+			const MstUnk42 *m42 = &_res->_mstUnk42[arg24];
+			if (m42->count2 == 0) {
+				arg1C = m42->data2[0];
+			} else {
+				arg1C = m42->data2[_rnd.update() % m42->count2];
+			}
 		}
 // 415518
 		for (int i = 0; i < 32; ++i) {
@@ -2351,6 +2349,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		m->flagsA6 = 0;
 
 		const int j = _res->_mstUnk42[arg24].indexUnk46[arg1C];
+		assert(j >= 0 && j < _res->_mstHdr.unk0x30);
 		m->unk0 = &_res->_mstUnk46[j];
 
 		m->unk4 = &_res->_mstUnk46[j].data[arg20];
