@@ -1257,7 +1257,8 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk49 = (MstUnk49 *)malloc(_mstHdr.unk0x40 * sizeof(MstUnk49));
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
-		fp->read(_mstUnk49[i].pad0, 8);
+		_mstUnk49[i].unk0    = fp->readUint32();
+		_mstUnk49[i].unk4    = fp->readUint32();
 		_mstUnk49[i].count1  = fp->readUint32();
 		_mstUnk49[i].offset1 = fp->readUint32();
 		_mstUnk49[i].count2  = fp->readUint32();

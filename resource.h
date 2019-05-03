@@ -217,7 +217,8 @@ struct MstUnk48 {
 }; // SIZEOF_MstUnk48 44
 
 struct MstUnk49 {
-	uint8_t pad0[8];
+	uint32_t unk0;
+	uint32_t unk4;
 	uint32_t count1; // 8
 	uint32_t offset1; // 0xC
 	uint32_t count2; // 0x10

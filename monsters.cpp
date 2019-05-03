@@ -2271,6 +2271,47 @@ int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
 	return 1;
 }
 
+void Game::executeMstUnk7(MstTaskData *m) {
+	Task *t = m->task;
+	t->flags &= ~0x80;
+	int x = m->xMstPos;
+	if (x < m->unk74) {
+		_xMstPos1 = x = m->unk7C;
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
+			if (x > m->unk84) {
+				t->flags |= 0x80;
+				x = m->unk84;
+			}
+		}
+		if (x > m->x1) {
+			t->flags |= 0x80;
+			x = m->x1;
+		}
+		_xMstPos2 = x - m->xMstPos;
+		m->flags4A = 2;
+	} else if (x > m->unk7C) {
+// 41A2AA
+		_xMstPos1 = x = m->unk74;
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
+			if (x < m->unk88) {
+				t->flags |= 0x80;
+				x = m->unk88;
+			}
+		}
+		if (x < m->x2) {
+			t->flags |= 0x80;
+			x = m->x2;
+		}
+		_xMstPos2 = x - m->xMstPos;
+		m->flags4A = 8;
+	} else {
+// 41A2FC
+		_xMstPos1 = x;
+		_xMstPos2 = 0;
+		m->flags4A = 0;
+	}
+}
+
 void Game::executeMstOp67Type1(Task *t) {
 	t->flags &= ~0x80;
 	MstTaskData *m = t->dataPtr;
@@ -2284,7 +2325,43 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 	MstTaskData *m = t->dataPtr;
 	m->flagsA5 = (m->flagsA5 & ~1) | 6;
 	initMstTaskData(m);
-	// TODO
+	const int i = m->unkC->indexUnk36_32;
+	assert(i >= 0 && i < _res->_mstHdr.unk0x10);
+	MstUnk36 *mstUnk36 = &_res->_mstUnk36[i];
+	const int j = mstUnk36->indexUnk49;
+	assert(j >= 0 && j < _res->_mstHdr.unk0x40);
+	m->unkD8 = &_res->_mstUnk49[j];
+	if (flag != 0) {
+		m->unkDC = mstUnk36->unk8 - 1;
+	} else {
+		m->unkDC = mstUnk36->unk4;
+	}
+	if (m->unkDC < 0) {
+		if (m->unkD8->count2 == 0) {
+			m->unkDC = 0;
+		} else {
+// 41CC20
+			shuffleFlags(m->unkC8);
+			// TODO
+		}
+	}
+// 41CC44
+	m->unkD4 = m->unkD8->unk4 + m->unkDC * 16;
+	m->flags4B = 0xFD;
+	m->unkC0 = -1;
+	m->unkBC = -1;
+	m->flagsAA = 255;
+	m->flagsA7 = 255;
+	if (executeMstUnk2(m, m->xMstPos, m->yMstPos)) {
+		executeMstUnk1(t);
+		return;
+	}
+// 41CCA3
+	const uint8_t *p = m->unk8;
+	if (p[946] & 2) {
+		// TODO
+	}
+// 41CE2B
 }
 
 void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {

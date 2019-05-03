@@ -301,6 +301,7 @@ struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
 struct MstUnk48Unk12Unk4;
+struct MstUnk49;
 
 struct MstTaskData {
 	MstUnk46 *unk0;
@@ -316,12 +317,16 @@ struct MstTaskData {
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48
 	uint8_t flags49; // 0x49
+	uint8_t flags4A; // 0x4A
+	uint8_t flags4B; // 0x4B
 	int xPos; // 0x4C
 	int yPos; // 0x50
 	int xMstPos; // 0x54
 	int yMstPos; // 0x58
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
+	int unk74; // 0x74
+	int unk7C; // 0x7C
 	int unk84; // 0x84
 	int unk88; // 0x88
 	int unk8C; // 0x8C
@@ -332,13 +337,20 @@ struct MstTaskData {
 	int y2; // 0xA0
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
+	uint8_t flagsA7; // 0xA7
 	uint8_t flagsA8; // 0xA8
 	uint8_t flagsA9; // 0xA9
+	uint8_t flagsAA; // 0xAA
+	int32_t unkBC;
+	int32_t unkC0;
 	Task *task; // 0xC4
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
 	MstUnk35 *unkD0; // 0xD0
-	uint8_t unkE6;
+	int unkD4;
+	MstUnk49 *unkD8; // 0xD8
+	int unkDC; // 0xDC
+	uint8_t unkE6; // 0xE6
 	int unkE8; // 0xE8
 	int unkEC; // 0xEC
 	int unkFC; // 0xFC

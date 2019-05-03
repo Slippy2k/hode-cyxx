@@ -183,6 +183,7 @@ struct Game {
 	uint8_t _mstCurrentActionKeyMask;
 	uint8_t _mstRandomLookupTable[8][32];
 	MovingOpcodeState _mstMovingState[8];
+	int _xMstPos1, _xMstPos2;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -583,6 +584,7 @@ struct Game {
 	void executeMstOp58(Task *t, int num);
 	void executeMstUnk1(Task *t);
 	int executeMstUnk2(MstTaskData *m, int x, int y);
+	void executeMstUnk7(MstTaskData *m);
 	void executeMstOp67Type1(Task *t);
 	void executeMstOp67Type2(Task *t, int flag);
 	void executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
