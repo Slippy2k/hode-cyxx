@@ -104,12 +104,9 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 	_mstTaskDataCount = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;
-		uint8_t code = unk4->unk1B;
-		if (code >= 32) {
-			warning("Invalid mstTaskData index %d", code);
-			continue;
-		}
+		const uint8_t code = unk4->unk1B;
 		if (code != 255) {
+			assert(code < 32);
 			unk4->unk19 = flag;
 			MstTaskData *m = &_mstUnkDataTable[code];
 			m->unk18 = unk4;
@@ -606,10 +603,16 @@ Task *Game::createTask(const uint8_t *codeData) {
 	return 0;
 }
 
-int Game::changeTask(Task *t, int num, int value) {
-	warning("changeTask %d %d unimplemented", num, value);
+int Game::changeTask(Task *t, int num, int delay) {
+	warning("changeTask %d %d unimplemented", num, delay);
 	// TODO
-	return 0;
+	if (delay == -1) {
+		// TODO
+	} else {
+		t->delay = delay;
+		t->run = &Game::runTask_unk3;
+	}
+	return 1;
 }
 
 void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
@@ -1640,8 +1643,8 @@ int Game::runTask_default(Task *t) {
 				if ((m->flagsA5 & 0x80) == 0) {
 					if ((m->flagsA5 & 8) == 0) {
 						m->flags48 |= 8;
-						warning(".mst opcode 242 mstTaskData is not NULL flagsA5 0x%x", m->flagsA5);
 						if ((m->flagsA5 & 0x70) != 0) {
+							warning(".mst opcode 242 mstTaskData is not NULL flagsA5 0x%x", m->flagsA5);
 							m->flagsA5 &= ~0x70;
 /*
 							switch (m->flagsA5 & 7) {
@@ -1657,6 +1660,28 @@ int Game::runTask_default(Task *t) {
 */
 						} else {
 // 413DCA
+							MstUnk35 *m35 = m->unkD0;
+							uint32_t num = 0;
+							if (m35->count2 != 0) {
+								const uint8_t i = shuffleFlags(m->unkCC);
+								num = m35->data2[i];
+							}
+							const uint32_t codeData = m35->indexCodeData[num];
+							assert(codeData != kNone);
+							resetTask(t, _res->_mstCodeData + codeData * 4);
+							t->runningState &= ~2;
+							const int counter = m->executeCounter;
+							m->executeCounter = _executeMstLogicCounter;
+							p = t->codeData - 4;
+							if (m->executeCounter == counter) {
+								if ((m->flagsA6 & 2) == 0) {
+									if (m->o16) {
+										m->o16->actionKeyMask = 0;
+										m->o16->directionKeyMask = 0;
+									}
+								}
+								ret = 1;
+							}
 						}
 					} else {
 // 413FE3
@@ -1779,7 +1804,7 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 
 static int checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
 	warning("checkMstOp54Helper %d unimplemented", flag);
-	return 1;
+	return 0;
 }
 
 void Game::executeMstOp54() {
@@ -1815,11 +1840,10 @@ void Game::executeMstOp54() {
 		_mstPosYmin = -y;
 		_mstPosYmax = 191 - y;
 	}
-	// TODO
-	warning("executeMstOp54 unimplemented m43->count2 %d", m43->count2);
-	// game_unk47
+	executeMstUnk12();
 	if (m43->count2 == 0) {
 // TODO
+		warning("executeMstOp54 unimplemented m43->count2 %d", m43->count2);
 	} else {
 // 41E3CA
 		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
@@ -2312,6 +2336,24 @@ void Game::executeMstUnk7(MstTaskData *m) {
 	}
 }
 
+void Game::executeMstUnk12() {
+	// TODO
+}
+
+void Game::executeMstUnk13(Task *t) {
+	t->run = &Game::runTask_default;
+	LvlObject *o = 0;
+	if (t->dataPtr) {
+		o = t->dataPtr->o16;
+	} else if (t->mstObject) {
+		o = t->mstObject->o;
+	}
+	if (o) {
+		o->actionKeyMask = 0;
+		o->directionKeyMask = 0;
+	}
+}
+
 void Game::executeMstOp67Type1(Task *t) {
 	t->flags &= ~0x80;
 	MstTaskData *m = t->dataPtr;
@@ -2753,6 +2795,40 @@ int Game::runTask_mstUnk55_234(Task *t) {
 			o->directionKeyMask = 0;
 		}
 		return 0;
+	}
+	return 1;
+}
+
+int Game::runTask_unk1(Task *t) {
+	if (t->delay == 0) {
+		updateMstTaskDataPosition(t->dataPtr);
+		executeMstUnk13(t);
+		return 0;
+	}
+	--t->delay;
+	return 1;
+}
+
+int Game::runTask_unk2(Task *t) {
+	MstTaskData *m = t->dataPtr;
+	const uint16_t flags0 = m->o16->flags0;
+	if ((flags0 & 0x100) != 0 && (flags0 & 255) == m->flagsA4) {
+		updateMstTaskDataPosition(t->dataPtr);
+		executeMstUnk13(t);
+		return 0;
+	}
+	return 1;
+}
+
+int Game::runTask_unk3(Task *t) {
+	MstTaskData *m = t->dataPtr;
+	if (m->o16->flags0 == m->flagsA4) {
+		if (t->delay > 0) {
+			t->run = &Game::runTask_unk1;
+		} else {
+			t->run = &Game::runTask_unk2;
+		}
+		return (this->*(t->run))(t);
 	}
 	return 1;
 }

@@ -335,6 +335,7 @@ struct MstTaskData {
 	int x2; // 0x98
 	int y1; // 0x9C
 	int y2; // 0xA0
+	uint8_t flagsA4; // 0xA4
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
 	uint8_t flagsA7; // 0xA7

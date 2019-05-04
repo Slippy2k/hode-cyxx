@@ -585,6 +585,8 @@ struct Game {
 	void executeMstUnk1(Task *t);
 	int executeMstUnk2(MstTaskData *m, int x, int y);
 	void executeMstUnk7(MstTaskData *m);
+	void executeMstUnk12();
+	void executeMstUnk13(Task *t);
 	void executeMstOp67Type1(Task *t);
 	void executeMstOp67Type2(Task *t, int flag);
 	void executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
@@ -594,6 +596,9 @@ struct Game {
 	int runTask_idle(Task *t);
 	int runTask_mstUnk55_233(Task *t);
 	int runTask_mstUnk55_234(Task *t);
+	int runTask_unk1(Task *t);
+	int runTask_unk2(Task *t);
+	int runTask_unk3(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];

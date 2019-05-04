@@ -209,7 +209,7 @@ struct MstUnk48 {
 	uint8_t unk6;
 	uint8_t unk7;
 	uint32_t codeData; // 0x8, PTR_OFFS<uint32>(_mstCodeData, N)
-	MstUnk48Unk12 *unk12;
+	MstUnk48Unk12 *unk12; // 0xC
 	int countUnk12; // 0x10
 	uint32_t offsets1[2]; // 0x14, 0x18
 	uint32_t offsets2[2]; // 0x1C, 0x20
