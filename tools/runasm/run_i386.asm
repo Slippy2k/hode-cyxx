@@ -11,6 +11,7 @@ GLOBAL test_0042E910
 GLOBAL test_neg_sbb_neg
 GLOBAL test_0041D87E
 GLOBAL test_004070C8
+GLOBAL test_cdqxorsub
 
 SECTION .text
 
@@ -221,6 +222,19 @@ test_004070C8:
     sbb al, al
     and al, 2
     inc al
+
+  pop ebp
+  ret
+
+test_cdqxorsub:
+
+  push ebp
+  mov ebp, esp
+
+    mov eax, [ebp + arg0]
+    cdq
+    xor eax, edx
+    sub eax, edx
 
   pop ebp
   ret

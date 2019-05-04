@@ -184,6 +184,7 @@ struct Game {
 	uint8_t _mstRandomLookupTable[8][32];
 	MovingOpcodeState _mstMovingState[8];
 	int _xMstPos1, _xMstPos2;
+	int _mstCurrentPosX, _mstCurrentPosY;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();

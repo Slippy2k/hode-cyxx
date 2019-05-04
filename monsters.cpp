@@ -2291,7 +2291,71 @@ void Game::executeMstUnk1(Task *t) {
 }
 
 int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
-	// TODO
+	_mstCurrentPosX = x; // _esi
+	_mstCurrentPosY = y;
+	const uint8_t *ptr = m->unk8;
+	const int32_t a = READ_LE_UINT32(ptr + 900);
+	int _ecx = _mstPosX - a;
+	int _edi = _mstPosX + a;
+	if (ptr[946] & 2) {
+		int _ebx = _mstPosY - a;
+		int _ebp = _mstPosY + a;
+		if (x > _ecx && x < _edi && y > _ebx && y < _ebp) {
+			if (ABS(x - _mstPosX) > ABS(y - _mstPosY)) {
+				if (x >= _mstPosX) {
+					_mstCurrentPosX = _edi;
+				} else {
+					_mstCurrentPosX = _ecx;
+				}
+				return 0;
+			}
+// 419E1D
+			if (y >= _mstPosY) {
+				_mstCurrentPosY = _ebp;
+			} else {
+				_mstCurrentPosY = _ebx;
+			}
+			return 0;
+		}
+// 419E4F
+		const int32_t b = READ_LE_UINT32(ptr + 896);
+		_ecx -= b;
+		_edi += b;
+		_ebx -= b;
+		_ebp += b;
+		if (x < _ecx) {
+			_mstCurrentPosX = _ecx;
+		} else if (x > _edi) {
+			_mstCurrentPosX = _edi;
+		}
+		if (y < _ebx) {
+			_mstCurrentPosY = _ebx;
+		} else if (y > _ebp) {
+			_mstCurrentPosY = _ebp;
+		}
+		if (_mstCurrentPosX != x || _mstCurrentPosY != y) {
+			return 0;
+		}
+		return 1;
+	}
+// 419EA7
+	if (x > _ecx && x < _edi) {
+		_mstCurrentPosX = _edi;
+		if (x < _mstPosX) {
+			_mstCurrentPosX = _ecx;
+		}
+		return 0;
+	}
+	const int32_t b = READ_LE_UINT32(ptr + 896);
+	_ecx -= b;
+	_edi += b;
+	if (x < _ecx) {
+		_mstCurrentPosX = _ecx;
+		return 0;
+	} else if (x > _edi) {
+		_mstCurrentPosX = _edi;
+		return 0;
+	}
 	return 1;
 }
 
