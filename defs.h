@@ -339,9 +339,7 @@ struct MstTaskData {
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
 	uint8_t flagsA7; // 0xA7
-	uint8_t flagsA8; // 0xA8
-	uint8_t flagsA9; // 0xA9
-	uint8_t flagsAA; // 0xAA
+	uint8_t flagsA8[4]; // 0xA8, 0xA9, 0xAA, 0xAB
 	int32_t unkBC;
 	int32_t unkC0;
 	Task *task; // 0xC4

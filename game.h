@@ -185,6 +185,8 @@ struct Game {
 	MovingOpcodeState _mstMovingState[8];
 	int _xMstPos1, _xMstPos2;
 	int _mstCurrentPosX, _mstCurrentPosY;
+	int _mstRectsCount;
+	uint8_t _mstRectsTable[1280];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -550,6 +552,8 @@ struct Game {
 	int updateMstTaskDataPosition(MstTaskData *m);
 	void resetMstObject(MstObject *m);
 	int prepareMstTask(Task *t);
+	void clearMstRectsTable(MstTaskData *m, int num);
+	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	void setMstObjectDefaultPos(Task *t);
 	void setMstTaskDataDefaultPos(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);

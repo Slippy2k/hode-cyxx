@@ -171,6 +171,54 @@ int Game::prepareMstTask(Task *t) {
 	return m->executeCounter - counter;
 }
 
+void Game::clearMstRectsTable(MstTaskData *m, int num) {
+	int r = m->flagsA8[num];
+	if (r < _mstRectsCount) {
+		uint8_t *p = _mstRectsTable + 16 + r * 20;
+		int a = *p;
+		if (a == m->soundType) {
+			*p = 255;
+			a = r;
+		}
+		do {
+			if (*p == 255) {
+				++a;
+				p += 20;
+			}
+		} while (a < _mstRectsCount);
+		if (a == _mstRectsCount) {
+			_mstRectsCount = r;
+		}
+	}
+	m->flagsA8[num] = 255;
+}
+
+int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
+	for (int i = 0; i < _mstRectsCount; ++i) {
+		const uint8_t *p = _mstRectsTable + 16 + i * 20;
+		if (p[0] != 255 && num != p[0]) {
+			const int32_t a = READ_LE_UINT32(p - 8);
+			if (a < x1) {
+				continue;
+			}
+			const int32_t b = READ_LE_UINT32(p - 16);
+			if (b > x2) {
+				continue;
+			}
+			const int32_t c = READ_LE_UINT32(p - 4);
+			if (c < y1) {
+				continue;
+			}
+			const int32_t d = READ_LE_UINT32(p - 12);
+			if (d > y2) {
+				continue;
+			}
+			return i + 1;
+		}
+	}
+	return 0;
+}
+
 void Game::setMstTaskDataDefaultPos(Task *t) {
 	MstTaskData *m = t->dataPtr;
 	assert(m);
@@ -2456,7 +2504,7 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;
-	m->flagsAA = 255;
+	m->flagsA8[2] = 255;
 	m->flagsA7 = 255;
 	if (executeMstUnk2(m, m->xMstPos, m->yMstPos)) {
 		executeMstUnk1(t);
@@ -2702,7 +2750,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		m->unkC = _res->_mstUnk44[m->unk4->indexUnk44].data;
 
 		if (m->unk8[946] & 4) {
-			m->flagsA8 = 0xFF;
+			m->flagsA8[0] = 0xFF;
 			m->flags49 = 0xFF;
 		}
 
