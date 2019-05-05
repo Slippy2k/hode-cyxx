@@ -134,13 +134,13 @@ struct Game {
 	uint8_t _mstCurrentUnkFlag;
 	int _mstOp67_x1, _mstOp67_x2;
 	int _mstOp67_y1, _mstOp67_y2;
+	uint8_t _mstOp67_screenNum;
 	uint32_t _mstLogicHelper1TestValue;
 	uint32_t _mstLogicHelper1TestMask;
 	int _runTaskOpcodesCount;
 	int32_t _mstVars[kMaxVars];
 	uint32_t _mstFlags;
 	int _clipBoxOffsetX, _clipBoxOffsetY;
-	Task *_gameMstResToLoad1Pri, *_gameMstResToLoad2Pri;
 	Task *_currentTask;
 	int _mstOp54Counter;
 	int _mstOp56Counter;
@@ -155,9 +155,6 @@ struct Game {
 	uint8_t _andyActionKeysFlags;
 	int _executeMstLogicCounter;
 	int _executeMstLogicPrevCounter;
-	int _gameMstScreenRefPosX, _gameMstScreenRefPosY;
-	int _gameMstMovingStatePosX, _gameMstMovingStatePosY;
-	int _gameMstObjectRefPointPosX, _gameMstObjectRefPointPosY;
 	Task _tasksTable[kMaxTasks];
 	Task *_tasksList;
 	Task *_mstTasksList1;
@@ -214,6 +211,7 @@ struct Game {
 	void setupScreenPosTable(uint8_t num);
 	void setupScreenMask(uint8_t num);
 	void resetScreenMask();
+	void setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum);
 	void setScreenMaskRect(int x1, int y1, int x2, int y2, int pos);
 	void updateScreenMaskBuffer(int x, int y, int type);
 	void setupLvlObjectBitmap(LvlObject *ptr);

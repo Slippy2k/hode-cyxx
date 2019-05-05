@@ -408,6 +408,12 @@ void Game::resetScreenMask() {
 	}
 }
 
+void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum) {
+	if (screenNum != 255) {
+		warning("setScreenMaskRectHelper unimplemented %d,%d,%d,%d screen %d", x1, y1, x2, y2, screenNum);
+	}
+}
+
 void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int pos) {
 	const int u = _res->_screensBasePos[pos].u;
 	const int v = _res->_screensBasePos[pos].v;
@@ -416,13 +422,13 @@ void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int pos) {
 		if (screen != 255) {
 			if (x1 >= u && y1 >= v) {
 				if (y2 < v + 192) {
-					// (x1, y1, x2, v + 192, screen);
+					setScreenMaskRectHelper(x1, y1, x2, v + 192, screen);
 				}
 			}
 		}
 	}
 // 40C111
-	// (x1, v, x2, u, screen);
+	setScreenMaskRectHelper(x1, v, x2, y2, screen);
 }
 
 void Game::updateScreenMaskBuffer(int x, int y, int type) {

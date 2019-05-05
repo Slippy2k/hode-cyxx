@@ -350,13 +350,14 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _mstUnk6 = -1;
-	// TODO
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
 	_mstCurrentUnkFlag = 0;
 	// TODO
+	_mstRectsCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
+	_mstOp67_screenNum = 0xFF;
 	// TODO
 	_mstLogicHelper1TestValue = 0;
 	_mstLogicHelper1TestMask = 0xFFFFFFFF;
@@ -1852,6 +1853,7 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 
 static int checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
 	warning("checkMstOp54Helper %d unimplemented", flag);
+	// TODO
 	return 0;
 }
 
