@@ -183,7 +183,7 @@ struct Game {
 	int _xMstPos1, _xMstPos2;
 	int _mstCurrentPosX, _mstCurrentPosY;
 	int _mstRectsCount;
-	uint8_t _mstRectsTable[1280];
+	MstRect _mstRectsTable[64];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -552,6 +552,8 @@ struct Game {
 	int prepareMstTask(Task *t);
 	void clearMstRectsTable(MstTaskData *m, int num);
 	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
+	void updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
+	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	void setMstObjectDefaultPos(Task *t);
 	void setMstTaskDataDefaultPos(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);

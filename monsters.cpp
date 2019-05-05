@@ -174,16 +174,16 @@ int Game::prepareMstTask(Task *t) {
 void Game::clearMstRectsTable(MstTaskData *m, int num) {
 	int r = m->flagsA8[num];
 	if (r < _mstRectsCount) {
-		uint8_t *p = _mstRectsTable + 16 + r * 20;
-		int a = *p;
+		MstRect *p = &_mstRectsTable[r];
+		int a = p->num;
 		if (a == m->soundType) {
-			*p = 255;
+			p->num = 255;
 			a = r;
 		}
 		do {
-			if (*p == 255) {
+			if (p->num == 255) {
 				++a;
-				p += 20;
+				++p;
 			}
 		} while (a < _mstRectsCount);
 		if (a == _mstRectsCount) {
@@ -195,26 +195,77 @@ void Game::clearMstRectsTable(MstTaskData *m, int num) {
 
 int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	for (int i = 0; i < _mstRectsCount; ++i) {
-		const uint8_t *p = _mstRectsTable + 16 + i * 20;
-		if (p[0] != 255 && num != p[0]) {
-			const int32_t a = READ_LE_UINT32(p - 8);
-			if (a < x1) {
+		const MstRect *p = &_mstRectsTable[i];
+		if (p->num != 255 && num != p->num) {
+			if (p->x2 < x1) { // 16 - 8
 				continue;
 			}
-			const int32_t b = READ_LE_UINT32(p - 16);
-			if (b > x2) {
+			if (p->x1 > x2) { // 16 - 16
 				continue;
 			}
-			const int32_t c = READ_LE_UINT32(p - 4);
-			if (c < y1) {
+			if (p->y2 < y1) { // 16 - 4
 				continue;
 			}
-			const int32_t d = READ_LE_UINT32(p - 12);
-			if (d > y2) {
+			if (p->x1 > y2) { // 16 - 12
 				continue;
 			}
 			return i + 1;
 		}
+	}
+	return 0;
+}
+
+void Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
+	if (num == 255) {
+		MstRect *p = &_mstRectsTable[0];
+		for (int i = 0; i < _mstRectsCount; ++i) {
+			if (p->num == 255) {
+				break;
+			}
+		}
+		p->x1 = x1;
+		p->y1 = y1;
+		p->x2 = x2;
+		p->y2 = y2;
+		p->num = a;
+		warning("updateMstRectsTable called with num == 255, count %d", _mstRectsCount);
+		assert(_mstRectsCount < 64);
+		++_mstRectsCount;
+	} else if (num < _mstRectsCount) {
+		MstRect *p = &_mstRectsTable[num];
+		if (p->num == a) {
+			p->x1 = x1;
+			p->y1 = y1;
+			p->x2 = x2;
+			p->y2 = y2;
+		}
+	}
+}
+
+int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
+	for (int i = 0; i < _mstRectsCount; ++i) {
+		MstRect *p = &_mstRectsTable[i];
+		if (p->num == 255 || p->num == num) {
+			continue;
+		}
+		if (p->num == 254) {
+			if (_mstUnkDataTable[num].unk8[944] != 15) {
+				continue;
+			}
+		}
+		if (p->x2 < x1) {
+			continue;
+		}
+		if (p->x1 > x2) {
+			continue;
+		}
+		if (p->y2 < y1) {
+			continue;
+		}
+		if (p->y1 > y2) {
+			continue;
+		}
+		return i + 1;
 	}
 	return 0;
 }
