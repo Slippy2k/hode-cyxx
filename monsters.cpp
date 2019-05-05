@@ -151,6 +151,7 @@ void Game::disableMstTaskData(MstTaskData *m) {
 
 int Game::updateMstTaskDataPosition(MstTaskData *m) {
 	// TODO
+	warning("updateMstTaskDataPosition m %p unimplemented", m);
 	return 0;
 }
 
@@ -326,7 +327,7 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 	// TODO
 
 	m->unkFC = -1;
-	m->flags49 &= ~1;
+	m->flags48 &= ~0x80;
 }
 
 void Game::shuffleMstUnk43(MstUnk43 *p) {
