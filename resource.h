@@ -373,15 +373,15 @@ struct SssUnk4 { // SssPreloadInfo
 
 struct SssFilter {
 	int32_t unk0;
-	int32_t unk4; // priority (0,7)
-	int32_t unk8; // priorityDelta
-	int32_t unkC; // priorityCounter
+	int32_t unk4; // volume (0,127)
+	int32_t unk8; // volumeDelta
+	int32_t unkC; // volumeSteps
 	int32_t unk10;
-	int32_t unk14; // volume (0,127)
-	int32_t unk18; // volumeDelta
-	int32_t unk1C; // volumeCounter
+	int32_t unk14; // panning (0,127)
+	int32_t unk18; // panningDelta
+	int32_t unk1C; // panningSteps
 	int32_t unk20;
-	int32_t unk24;
+	int32_t unk24; // priority (0,7)
 	int32_t unk30; // flag
 };
 

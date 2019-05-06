@@ -7,6 +7,7 @@
 enum {
 	kFlagPlaying = 1 << 0,
 	kFlagStopped = 1 << 1, // no PCM
+	kFlagNoCode  = 1 << 2, // no bytecode
 };
 
 static const bool kLimitSounds = false;
@@ -34,7 +35,7 @@ static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 }
 
 void Game::resetSound() {
-	// TODO:
+	// TODO
 	clearSoundObjects();
 }
 
@@ -407,7 +408,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				}
 			}
 			break;
-		case 9: { // adjust_volume
+		case 9: { // adjust_pan
 				so->unk64 += so->unk68;
 				const int volume = (so->unk64 + 0x8000) >> 16;
 				if (volume != so->volume) {
@@ -421,7 +422,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 10: {
+		case 10: { // set_volume
 				if (so->unk54 >= 0) {
 					so->unk5C += so->unk60;
 					int value = (so->unk5C + 0x8000) >> 16;
@@ -481,7 +482,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 12;
 			}
 			break;
-		case 16: { // move from list2 to list1
+		case 16: { // move from list2 to list1, restart_sound
 				if (tempSssObject) {
 					warning("Invalid call to .sss opcode 16 with temp SssObject");
 					return 0;
@@ -498,7 +499,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				_sssObjectsChanged = true;
 			}
 			break;
-		case 17: { // move to list2
+		case 17: { // move to list2, stop_sound
 				if (tempSssObject) {
 					warning("Invalid call to .sss opcode 17 with temp SssObject");
 					return 0;
@@ -515,7 +516,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 8;
 			}
 			break;
-		case 19: { // set_volume
+		case 19: { // set_panning
 				if (so->volume != code[1]) {
 					so->volume = code[1];
 					_sssObjectsChanged = true;
@@ -567,7 +568,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 8;
 			}
 			break;
-		case 27: {
+		case 27: { // seek_sound2
 				int _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
 					return code;
@@ -1139,7 +1140,7 @@ if (kLimitSounds) {
 	}
 }
 
-int Game::getSoundObjectVolumeByPos(SssObject *so) const {
+int Game::getSoundObjectVolumeByPos(SssObject *so) const { // getSoundObjectPanning
 	LvlObject *obj = so->lvlObject;
 	if (obj) {
 		switch (obj->type) {
@@ -1192,7 +1193,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 			}
 
 		} else {
-// 429076:
+// 429076
 			_esi = CLIP(so->volume + (so->filter->unk14 >> 16), 0, 128); // panning ?
 		}
 // 429094
@@ -1201,31 +1202,32 @@ void Game::setSoundObjectVolume(SssObject *so) {
 		}
 		int _edx = _dbVolumeTable[volume];
 		int _edi = _esi;
-		int _eax = _edx >> 7;
-		if (_edi == 0) {
-// 4290F0
+		int _eax = _edx << 7;
+		switch (_edi) {
+		case 0: // full left
 			so->panL = _eax;
 			so->panR = 0;
 			so->panType = 2;
-		} else if (_edi == 64) {
-// 4290DF
+			break;
+		case 64: // center
 			_eax /= 2;
 			so->panL = _eax;
 			so->panR = _eax;
 			so->panType = 3;
-		} else if (_edi == 128) {
-// 4290D0
+			break;
+		case 128: // full right
 			so->panL = 0;
 			so->panR = _eax;
 			so->panType = 1;
-		} else {
+			break;
+		default:
 			_edx *= _esi;
-			_eax -= _edx;
 			so->panR = _edx;
-			so->panL = _eax;
+			so->panL = _eax - _edx;
 			so->panType = 4;
+			break;
 		}
-// 4290F
+// 4290DF
 		so->panR = (so->panR * _snd_masterVolume + 64) >> 7;
 		so->panL = (so->panL * _snd_masterVolume + 64) >> 7;
 	} else {

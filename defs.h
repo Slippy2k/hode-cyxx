@@ -175,10 +175,10 @@ struct SssObject {
 	uint8_t unkB;
 	uint32_t flags0; // 0xC
 	uint32_t flags1; // 0x10
-	int32_t volume; // 0x14 volume1 default:64
+	int32_t volume; // 0x14 panning default:64
 	int32_t unk18; // 0x18 volume (db) default:128
-	int panL; // 0x1C
-	int panR; // 0x20
+	int panL; // 0x1C leftGain
+	int panR; // 0x20 rightGain
 	int panType; // 0x24
 	const int16_t *currentPcmPtr; // 0x28
 	int32_t unk2C; // 0x2C
@@ -191,12 +191,12 @@ struct SssObject {
 	int32_t counter; // 0x48 counter0, counters[8]
 	int32_t unk4C; // 0x4C repeat_count
 	int32_t unk50; // 0x50 delay
-	int32_t unk54; // 0x54 volume2_modulate_steps
-	int32_t unk58; // 0x58 volume1_modulate_steps
-	int32_t unk5C; // 0x5C volume2_modulate_current
-	int32_t unk60; // 0x60 volume2_modulate_delta
-	int32_t unk64; // 0x64 volume1_modulate_current
-	int32_t unk68; // 0x68 volume1_modulate_delta
+	int32_t unk54; // 0x54 volume_modulate_steps
+	int32_t unk58; // 0x58 panning_modulate_steps
+	int32_t unk5C; // 0x5C volume_modulate_current
+	int32_t unk60; // 0x60 volume_modulate_delta
+	int32_t unk64; // 0x64 panning_modulate_current
+	int32_t unk68; // 0x68 panning_modulate_delta
 	int32_t unk6C; // 0x6C seek_pos
 	int *volumePtr; // 0x70
 	LvlObject *lvlObject; // 0x74
