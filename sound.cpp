@@ -4,6 +4,13 @@
 #include "systemstub.h"
 #include "util.h"
 
+enum {
+	kFlagPlaying = 1 << 0,
+	kFlagStopped = 1 << 1, // no PCM
+};
+
+static const bool kLimitSounds = false;
+
 static const uint8_t _dbVolumeTable[129] = {
 	0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06,
 	0x06, 0x07, 0x07, 0x07, 0x08, 0x08, 0x09, 0x09, 0x09, 0x0A, 0x0A, 0x0B, 0x0B, 0x0C, 0x0C, 0x0C,
@@ -48,6 +55,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 			_sssObjectsList1 = next;
 		}
 
+if (kLimitSounds) {
 		// fade/remove counter
 		--_playingSssObjectsCount;
 		if (_lowPrioritySssObject != so) {
@@ -66,6 +74,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 				_lowPrioritySssObject = current;
 			}
 		}
+}
 	} else {
 
 		// remove from linked list2
@@ -263,6 +272,7 @@ void Game::executeSssCodeOp17(SssObject *so) {
 			} else {
 				_sssObjectsList1 = next;
 			}
+if (kLimitSounds) {
 			--_playingSssObjectsCount;
 			if (so == _lowPrioritySssObject || (_playingSssObjectsCount < _playingSssObjectsMax && _lowPrioritySssObject)) {
 				SssObject *prev3 = 0; // _esi
@@ -277,6 +287,7 @@ void Game::executeSssCodeOp17(SssObject *so) {
 					}
 				}
 			}
+}
 		} else {
 			if (next) {
 				next->prevPtr = prev;
@@ -672,7 +683,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 // 429185
 		SssObject *stopSo = so; // _edi
 		if (so->pcm && so->pcm->ptr) {
-			if (_playingSssObjectsCount >= _playingSssObjectsMax) {
+			if (kLimitSounds && _playingSssObjectsCount >= _playingSssObjectsMax) {
 				if (so->priority > _lowPrioritySssObject->priority) {
 
 					stopSo = _lowPrioritySssObject;
@@ -701,6 +712,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 			} else {
 // 4291E8
 				stopSo = 0;
+if (kLimitSounds) {
 				++_playingSssObjectsCount;
 				so->nextPtr = _sssObjectsList1;
 				so->prevPtr = 0;
@@ -728,6 +740,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 						// goto 4292BE
 					}
 				}
+}
 			}
 // 4292BE
 			so->flags |= 1;
@@ -1113,6 +1126,7 @@ void Game::clearSoundObjects() {
 
 void Game::setLowPrioritySoundObject(SssObject *so) {
 	if ((so->flags & 2) == 0) {
+if (kLimitSounds) {
 		_lowPrioritySssObject = 0;
 		if (_playingSssObjectsCount >= _playingSssObjectsMax) {
 			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
@@ -1121,6 +1135,7 @@ void Game::setLowPrioritySoundObject(SssObject *so) {
 				}
 			}
 		}
+}
 	}
 }
 
@@ -1151,7 +1166,7 @@ int Game::getSoundObjectVolumeByPos(SssObject *so) const {
 
 void Game::setSoundObjectVolume(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->unk18 != 0 && _snd_masterVolume != 0) {
-		int volume = ((so->filter->unk4 >> 16) * so->unk18) >> 7;
+		int volume = ((so->filter->unk4 >> 16) * so->unk18) >> 7; // indexes decibel volume table
 		int _esi = 0;
 		if (so->volumePtr) {
 			int _eax = CLIP(so->unk8 + so->filter->unk24, 0, 7); // priority
@@ -1167,7 +1182,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 			if (so->priority != _eax) {
 				so->priority = _eax;
 				_lowPrioritySssObject = 0;
-				if (_playingSssObjectsCount >= _playingSssObjectsMax) {
+				if (kLimitSounds && _playingSssObjectsCount >= _playingSssObjectsMax) {
 					for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
 						if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
 							_lowPrioritySssObject = current;
@@ -1178,7 +1193,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 
 		} else {
 // 429076:
-			_esi = CLIP(so->volume + (so->filter->unk14 >> 16), 0, 128);
+			_esi = CLIP(so->volume + (so->filter->unk14 >> 16), 0, 128); // panning ?
 		}
 // 429094
 		if (so->pcm == 0) {
@@ -1326,7 +1341,7 @@ void Game::stopSoundObjects(SssObject **sssObjectsList, int num) {
 			} else {
 				*sssObjectsList = next;
 			}
-			if (sssObjectsList != &_sssObjectsList1) {
+			if (kLimitSounds && sssObjectsList != &_sssObjectsList1) {
 				--_playingSssObjectsCount;
 				if (current == _lowPrioritySssObject || (_playingSssObjectsCount >= _playingSssObjectsMax && _lowPrioritySssObject == 0)) {
 					found = true;
@@ -1340,7 +1355,7 @@ void Game::stopSoundObjects(SssObject **sssObjectsList, int num) {
 			current = current->nextPtr;
 		}
 	}
-	if (found) {
+	if (kLimitSounds && found) {
 		_lowPrioritySssObject = 0;
 		if (_playingSssObjectsCount >= _playingSssObjectsMax) {
 			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
