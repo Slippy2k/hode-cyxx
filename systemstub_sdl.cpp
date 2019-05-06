@@ -196,11 +196,9 @@ void SystemStub_SDL::shakeScreen(int dx, int dy) {
 
 static void clearScreen(uint32_t *dst, int dstPitch, int x, int y, int w, int h) {
 	uint32_t *p = dst + (y * dstPitch + x) * _scalerMultiplier;
-	for (int j = 0; j < h; ++j) {
-		for (int i = 0; i < _scalerMultiplier; ++i) {
-			memset(p, 0, w * sizeof(uint32_t) * _scalerMultiplier);
-			p += dstPitch;
-		}
+	for (int j = 0; j < h * _scalerMultiplier; ++j) {
+		memset(p, 0, w * sizeof(uint32_t) * _scalerMultiplier);
+		p += dstPitch;
 	}
 }
 
@@ -222,8 +220,8 @@ void SystemStub_SDL::updateScreen() {
 		h -= _shakeDy;
 		dst += _shakeDy * dstPitch;
 	} else if (_shakeDy < 0) {
-		clearScreen(dst, dstPitch, 0, h + _shakeDy, w, -_shakeDy);
 		h += _shakeDy;
+		clearScreen(dst, dstPitch, 0, h, w, -_shakeDy);
 		src -= _shakeDy * srcPitch;
 	}
 	if (_shakeDx > 0) {
@@ -231,8 +229,8 @@ void SystemStub_SDL::updateScreen() {
 		w -= _shakeDx;
 		dst += _shakeDx;
 	} else if (_shakeDx < 0) {
-		clearScreen(dst, dstPitch, w + _shakeDx, 0, -_shakeDx, h);
 		w += _shakeDx;
+		clearScreen(dst, dstPitch, w, 0, -_shakeDx, h);
 		src -= _shakeDx;
 	}
 	uint32_t *p = _offscreenRgb;
@@ -245,7 +243,6 @@ void SystemStub_SDL::updateScreen() {
 	_scaler->scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
 	SDL_UnlockTexture(_texture);
 
-	//SDL_UpdateTexture(_texture, 0, _screenBuffer, _screenW * sizeof(uint32_t));
 	SDL_RenderClear(_renderer);
 	SDL_Rect r;
 	r.x = 0;
