@@ -95,7 +95,7 @@ struct MstHdr {
 	int unk0x74;
 	int unk0x78;
 	int codeSize; // sizeof(uint32_t)
-	int pointsCount;
+	int pointsCount; // 0x80
 };
 
 struct MstPointOffset {
@@ -116,6 +116,14 @@ struct MstScreenAreaCode {
 	uint16_t unk0x1E;
 	uint32_t codeData; // const uint8_t *codeData; // 0x20, offset _mstCodeData
 }; // SIZEOF_MstScreenAreaCode 36
+
+struct MstUnk34 {
+	int32_t x1; // 0
+	int32_t x2; // 4
+	int32_t y1; // 8
+	int32_t y2; // C
+	int32_t unk10; // 0x10
+}; // sizeof == 20
 
 struct MstUnk35 {
 	uint32_t *indexCodeData; // 0, offset _mstCodeData
@@ -145,7 +153,7 @@ struct MstUnk43 {
 }; // SIZEOF_MstUnk43 16
 
 struct MstUnk44Unk1 {
-	uint32_t indexUnk34_16;
+	uint32_t indexUnk34_16; // 0x10
 	uint32_t indexUnk35_20; // 0x14
 	uint32_t indexUnk35_24;
 	uint32_t indexUnk36_28;
@@ -159,12 +167,12 @@ struct MstUnk44Unk1 {
 	uint32_t indexUnk44_80;
 	uint32_t indexUnk44_84;
 	uint32_t indexUnk44_88;
-	uint32_t indexUnk44_92;
+	uint32_t indexUnk44_92; // next 0x5C
 }; // sizeof == 104
 
 struct MstUnk44 {
 	MstUnk44Unk1 *data;
-	uint32_t unk4; // indexed by screen number
+	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t unk8;
 	uint32_t count;
 }; // SIZEOF_MstUnk44 16
@@ -450,6 +458,7 @@ struct Resource {
 	uint32_t _sssPreloadedPcmTotalSize;
 
 	MstPointOffset *_mstPointOffsets;
+	MstUnk34 *_mstUnk34;
 	MstUnk35 *_mstUnk35;
 	MstUnk36 *_mstUnk36;
 	uint32_t _mstTickDelay;

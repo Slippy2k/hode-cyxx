@@ -149,10 +149,47 @@ void Game::disableMstTaskData(MstTaskData *m) {
 	}
 }
 
-int Game::updateMstTaskDataPosition(MstTaskData *m) {
+int Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
 	// TODO
-	warning("updateMstTaskDataPosition m %p unimplemented", m);
+	warning("updateMstTaskDataPositionHelper m %p unimplemented", m);
 	return 0;
+}
+
+int Game::updateMstTaskDataPosition(MstTaskData *m) {
+	const uint8_t screenNum = m->o16->screenNum;
+	MstUnk46Unk1 *m46 = m->unk4;
+	const uint32_t indexUnk44 = m46->indexUnk44;
+	assert(indexUnk44 != kNone);
+	MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44];
+	// start from screen number
+	uint32_t indexUnk44Unk1 = m44->indexUnk44Unk1[screenNum];
+	if (indexUnk44Unk1 != kNone) {
+		MstUnk44Unk1 *m44unk1 = &m44->data[indexUnk44Unk1];
+		uint32_t indexUnk34 = m44unk1->indexUnk34_16;
+		assert(indexUnk34 != kNone);
+		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		while (m34->x2 <= m->xMstPos) {
+
+			if (m34->x1 >= m->xMstPos && m34->y2 <= m->yMstPos && m34->y1 >= m->yMstPos) {
+				if (m->unkC == m44unk1) {
+					return 0;
+				}
+				m->unkC = m44unk1;
+				initMstTaskData(m);
+				return 1;
+			}
+
+			indexUnk44Unk1 = m44unk1->indexUnk44_92;
+			if (indexUnk44Unk1 == kNone) {
+				break;
+			}
+			m44unk1 = &m44->data[indexUnk44Unk1];
+			indexUnk34 = m44unk1->indexUnk34_16;
+			assert(indexUnk34 != kNone);
+			m34 = &_res->_mstUnk34[indexUnk34];
+		}
+	}
+	return updateMstTaskDataPositionHelper(m);
 }
 
 int Game::prepareMstTask(Task *t) {
