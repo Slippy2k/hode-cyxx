@@ -1536,6 +1536,7 @@ int Game::runTask_default(Task *t) {
 		case 198: { // 50
 				Task *child = findFreeTask();
 				if (child) {
+					t->codeData = p + 4;
 					memcpy(child, t, sizeof(Task));
 					t->child = child;
 					const uint16_t num = READ_LE_UINT16(p + 2);
