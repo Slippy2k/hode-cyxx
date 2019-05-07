@@ -275,7 +275,7 @@ void Game::postScreenUpdate_rock_screen18() {
 			} else {
 				++_screenCounterTable[18];
 				if (_screenCounterTable[18] == 24) {
-					_res->_screensState[16].s0 = 2;
+					_res->_screensState[18].s0 = 2;
 					_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 2;
 					setupScreenMask(18);
 				}
