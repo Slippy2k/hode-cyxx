@@ -1070,6 +1070,10 @@ int Game::runTask_default(Task *t) {
 	t->runningState &= ~2;
 	const uint8_t *p = t->codeData;
 	do {
+		if (!p) {
+			warning("runTask_default has NULL codeData");
+			return 1;
+		}
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		debug(kDebug_MONSTER, "executeMstCode code %d", p[0]);
