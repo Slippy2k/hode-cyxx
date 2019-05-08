@@ -100,7 +100,7 @@ void Game::fadeScreenPalette() {
 
 void Game::shakeScreen() {
 	if (_video->_displayShadowLayer) {
-		const int num = (_currentLevel == 4 || _currentLevel == 6) ? 1 : 4;
+		const int num = (_currentLevel == kLvl_lava || _currentLevel == kLvl_lar1) ? 1 : 4;
 		transformShadowLayer(num);
 	}
 	if (_shakeScreenDuration != 0) {
@@ -2388,7 +2388,7 @@ void Game::levelMainLoop() {
 		((AndyObjectScreenData *)_andyObject->dataPtr)->dxPos = 0;
 		((AndyObjectScreenData *)_andyObject->dataPtr)->dyPos = 0;
 		updateAnimatedLvlObjectsLeftRightCurrentScreens();
-		if (_currentLevel == 0 || _currentLevel == 7 || _currentLevel == 9) {
+		if (_currentLevel == kLvl_rock || _currentLevel == kLvl_lar2 || _currentLevel == kLvl_test) {
 			if (_andyObject->spriteNum == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
 				updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
 			}
@@ -2694,7 +2694,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 
 void Game::lvlObjectType0Init(LvlObject *ptr) {
 	uint8_t num = ptr->spriteNum;
-	if (_currentLevel == 0 && _levelCheckpoint >= 5) {
+	if (_currentLevel == kLvl_rock && _levelCheckpoint >= 5) {
 		num = 2;
 	}
 	_andyObject = declareLvlObject(ptr->type, num);
@@ -2765,7 +2765,7 @@ void Game::lvlObjectType0CallbackHelper1() {
 	_cl >>= 5;
 	_cl &= 7;
 
-	if (_currentLevel == 8 && (_bl & 4) != 0) {
+	if (_currentLevel == kLvl_dark && (_bl & 4) != 0) {
 		_bl &= ~4;
 		_bl |= 8;
 	}
@@ -3331,7 +3331,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		}
 // 402C03
 		setLvlObjectPosInScreenGrid(ptr, 7);
-		if (ptr->screenNum == _currentScreen || ptr->screenNum == _currentLeftScreen || ptr->screenNum == _currentRightScreen || o || (_currentLevel == 7 && ptr->spriteNum == 27) || (_currentLevel == 3 && ptr->spriteNum == 26)) {
+		if (ptr->screenNum == _currentScreen || ptr->screenNum == _currentLeftScreen || ptr->screenNum == _currentRightScreen || o || (_currentLevel == kLvl_lar2 && ptr->spriteNum == 27) || (_currentLevel == kLvl_isld && ptr->spriteNum == 26)) {
 // 402C57
 			if (ptr->currentSound != 0xFFFF) {
 				playSound(ptr->currentSound, ptr, 0, 0); // _ebx, var4

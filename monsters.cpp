@@ -2706,7 +2706,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		}
 // 41562C
 		m->o16 = o;
-		if (_currentLevel == 7 && m->unk8[944] == 26) {
+		if (_currentLevel == kLvl_lar2 && m->unk8[944] == 26) {
 			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], m1->anim + 1, o_flags1, 0x3001, 0, 0);
 			if (!m->o20) {
 				// TODO

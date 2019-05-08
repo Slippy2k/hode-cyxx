@@ -163,7 +163,7 @@ void Game::postScreenUpdate_rock_helper2(BoundingBox *box, int num) {
 			goto ret;
 		}
 		uint8_t _al = 0;
-		if (_currentLevel != 0) {
+		if (_currentLevel != kLvl_rock) {
 			if (_bl == 1) {
 				if (((_andyObject->flags0 >> 5) & 7) == 3) {
 					_al = 0x80;
