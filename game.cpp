@@ -1297,7 +1297,7 @@ void Game::restartLevel() {
 	} else {
 		_mstFlags = 0;
 	}
-	if (_res->_sssHdr.dataUnk1Count) {
+	if (_res->_sssHdr.dataUnk1Count != 0) {
 		resetSound();
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
@@ -1661,10 +1661,11 @@ int Game::updateAndyLvlObject() {
 			resetAndyLvlObjectPlasmaCannonKeyMask(0xA4);
 		}
 	}
-	int8_t _al = updateLvlObjectScreen(_andyObject);
-	if (_al > 0) {
+	const int ret = updateLvlObjectScreen(_andyObject);
+	if (ret > 0) {
+		// changed screen
 		return 1;
-	} else if (_al == 0) {
+	} else if (ret == 0) {
 		if (_currentLevel != kLvl_rock && _currentLevel != kLvl_lar2 && _currentLevel != kLvl_test) {
 			return 0;
 		}
@@ -1679,29 +1680,11 @@ int Game::updateAndyLvlObject() {
 		}
 		return 0;
 	}
+	// moved to invalid screen (-1), restart
 	if ((_andyObject->flags0 & 0x1F) != 0xB) {
 		playAndyFallingCutscene(0);
 	}
-	setupCurrentScreen();
-	clearLvlObjectsList2();
-	clearLvlObjectsList3();
-	if (!_mstLogicDisabled) {
-		resetMstCode();
-		startMstCode();
-	} else {
-		_mstFlags = 0;
-	}
-	if (_res->_sssHdr.dataUnk1Count) {
-		resetSound();
-	}
-	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
-	preloadLevelScreenData(num, 0xFF);
-	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
-	resetScreen();
-	if (_andyObject->screenNum != num) {
-		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
-	}
-	updateScreen(_andyObject->screenNum);
+	restartLevel();
 	return 1;
 }
 
@@ -2343,26 +2326,7 @@ void Game::levelMainLoop() {
 			preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
 			updateScreen(_andyObject->screenNum);
 		} else if (_fadePalette && _fadePaletteCounter == 0) {
-			setupCurrentScreen();
-			clearLvlObjectsList2();
-			clearLvlObjectsList3();
-			if (!_mstLogicDisabled) {
-				resetMstCode();
-				startMstCode();
-			} else {
-				_mstFlags = 0;
-			}
-			if (_res->_sssHdr.dataUnk1Count != 0) {
-				resetSound();
-			}
-			const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
-			preloadLevelScreenData(num, 0xFF);
-			_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
-			resetScreen();
-			if (_andyObject->screenNum != num) {
-				preloadLevelScreenData(_andyObject->screenNum, 0xFF);
-			}
-			updateScreen(_andyObject->screenNum);
+			restartLevel();
 		} else {
 			callLevel_postScreenUpdate(_res->_currentScreenResourceNum);
 			if (_currentLeftScreen != 0xFF) {
