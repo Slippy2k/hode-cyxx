@@ -26,28 +26,28 @@ enum {
 	/* 0x00 */
 	op_end,
 	op_invalid0x01,
-	op_startSound,
+	op_addSound,
 	op_invalid0x03,
 	/* 0x04 */
-	op_killSound,
-	op_loopSound,
+	op_removeSound,
+	op_seekSound,
 	op_jge,
 	op_invalid0x07,
 	/* 0x08 */
-	op_seekSound,
-	op_adjustVolume,
-	op_testVar0x54,
-	op_unk0x0B,
-	/* 0x0C */
-	op_fadeInSound,
-	op_unk0x0D,
-	op_unk0x0E,
-	op_unk0x0F,
-	/* 0x10 */
-	op_stopSound,
-	op_fadeOutSound,
-	op_setCounter,
+	op_seekSound2,
+	op_modulatePan,
+	op_modulateVolume,
 	op_setVolume,
+	/* 0x0C */
+	op_stopSound,
+	op_initVolume,
+	op_initPan,
+	op_invalid0x0F,
+	/* 0x10 */
+	op_restartSound,
+	op_stopSound2,
+	op_setCounter,
+	op_setPan,
 	/* 0x14 */
 	op_unk0x14,
 	op_decrementVar0x50,
@@ -73,50 +73,50 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	case op_end:
 		fprintf(_out, "// end");
 		break;
-	case op_startSound:
-		fprintf(_out, "op_startSound %d", args[0]);
+	case op_addSound:
+		fprintf(_out, "op_addSound num:%d", args[0]);
 		break;
-	case op_killSound:
-		fprintf(_out, "op_killSound %d %d", args[0], args[1]);
-		break;
-	case op_loopSound:
-		fprintf(_out, "op_loopSound %d %d", args[0], args[1]);
-		break;
-	case op_jge:
-		fprintf(_out, "op_jge %d", args[0]);
+	case op_removeSound:
+		fprintf(_out, "op_removeSound %d flags:%d", args[0], args[1]);
 		break;
 	case op_seekSound:
-		fprintf(_out, "op_seekSound %d %d %d", args[0], args[1], args[2]);
+		fprintf(_out, "op_seekSound %d pos:%d", args[0], args[1]);
 		break;
-	case op_adjustVolume:
-		fprintf(_out, "op_adjustVolume");
+	case op_jge:
+		fprintf(_out, "op_jge offset:%d", args[0]);
 		break;
-	case op_testVar0x54:
-		fprintf(_out, "op_testVar0x54");
+	case op_seekSound2:
+		fprintf(_out, "op_seekSound2 %d pos:%d %d", args[0], args[1], args[2]);
 		break;
-	case op_unk0x0B:
-		fprintf(_out, "op_unk0x0B %d %d", args[0], args[1]);
+	case op_modulatePan:
+		fprintf(_out, "op_modulatePan");
 		break;
-	case op_fadeInSound:
-		fprintf(_out, "op_fadeInSound %d", args[0]);
+	case op_modulateVolume:
+		fprintf(_out, "op_modulateVolume");
 		break;
-	case op_unk0x0D:
-		fprintf(_out, "op_unk0x0D");
-		break;
-	case op_unk0x0E:
-		fprintf(_out, "op_unk0x0E");
+	case op_setVolume:
+		fprintf(_out, "op_setVolume %d", args[0]);
 		break;
 	case op_stopSound:
-		fprintf(_out, "op_startSound %d", args[0]);
+		fprintf(_out, "op_stopSound %d", args[0]);
 		break;
-	case op_fadeOutSound:
-		fprintf(_out, "op_fadeOutSound %d", args[0]);
+	case op_initVolume:
+		fprintf(_out, "op_initVolume value:%d steps:%d", args[0], args[1]);
+		break;
+	case op_initPan:
+		fprintf(_out, "op_initPan value:%d steps:%d", args[0], args[1]);
+		break;
+	case op_restartSound:
+		fprintf(_out, "op_restartSound %d", args[0]);
+		break;
+	case op_stopSound2:
+		fprintf(_out, "op_stopSound2 %d", args[0]);
 		break;
 	case op_setCounter:
 		fprintf(_out, "op_setCounter %d", args[0]);
 		break;
-	case op_setVolume:
-		fprintf(_out, "op_adjustVolume %d", args[0]);
+	case op_setPan:
+		fprintf(_out, "op_setPan %d", args[0]);
 		break;
 	case op_unk0x14:
 		fprintf(_out, "op_unk0x14 %d", args[0]);
@@ -166,15 +166,15 @@ static int parse(const uint8_t *buf, uint32_t size) {
 		case op_end:
 			p += 4;
 			break;
-		case op_startSound:
+		case op_addSound:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op_killSound:
+		case op_removeSound:
 			a = p[1]; p += 2;
 			b = read16(p); p += 2;
 			break;
-		case op_loopSound:
+		case op_seekSound:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
@@ -183,37 +183,37 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op_seekSound:
+		case op_seekSound2:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
 			c = read32(p); p += 4;
 			break;
-		case op_adjustVolume:
+		case op_modulatePan:
 			p += 4;
 			break;
-		case op_testVar0x54:
+		case op_modulateVolume:
 			p += 4;
 			break;
-		case op_unk0x0B:
-			a = p[1]; p += 2;
-			b = read16(p); p += 2;
-			break;
-		case op_fadeInSound:
-			p += 2;
-			a = read16(p); p += 2;
-			break;
-		case op_unk0x0D:
-			p += 8;
-			break;
-		case op_unk0x0E:
-			p += 12;
+		case op_setVolume:
+			a = p[1];
+			p += 4;
 			break;
 		case op_stopSound:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op_fadeOutSound:
+		case op_initVolume:
+			p += 8;
+			break;
+		case op_initPan:
+			p += 12;
+			break;
+		case op_restartSound:
+			p += 2;
+			a = read16(p); p += 2;
+			break;
+		case op_stopSound2:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
@@ -221,7 +221,7 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op_setVolume:
+		case op_setPan:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
@@ -353,6 +353,7 @@ int main(int argc, char *argv[]) {
 						case op_invalid0x01:
 						case op_invalid0x03:
 						case op_invalid0x07:
+						case op_invalid0x0F:
 							break;
 						default:
 							fprintf(stdout, "Opcode %d not referenced\n", i);

@@ -188,8 +188,8 @@ struct SssObject {
 	const uint8_t *codeDataStage2; // 0x3C
 	const uint8_t *codeDataStage3; // 0x40
 	const uint8_t *codeDataStage4; // 0x44
-	int32_t counter; // 0x48 counter0, counters[8]
-	int32_t unk4C; // 0x4C repeat_count
+	int32_t counter; // 0x48 repeat_count
+	int32_t unk4C; // 0x4C loop_count
 	int32_t unk50; // 0x50 delay
 	int32_t unk54; // 0x54 volume_modulate_steps
 	int32_t unk58; // 0x58 panning_modulate_steps

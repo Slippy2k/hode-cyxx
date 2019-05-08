@@ -343,7 +343,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 		switch (*code) {
 		case 0:
 			return 0;
-		case 2: // start_sound
+		case 2: // add_sound
 			if (so->unk50 >= -1) {
 				LvlObject *tmp = _currentSoundLvlObject;
 				_currentSoundLvlObject = so->lvlObject;
@@ -355,7 +355,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code;
 			}
 			break;
-		case 4: {
+		case 4: { // remove_sound
 				const uint8_t _cl = code[1] & 0xF;
 				const uint16_t _dx = READ_LE_UINT16(code + 2);
 				uint32_t flags = (so->flags0 & 0xFFF0F000);
@@ -388,7 +388,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				}
 			}
 			break;
-		case 8: { // seek_sound
+		case 8: { // seek_sound2
 				const int32_t _eax = READ_LE_UINT32(code + 12);
 				if (so->unk6C <= _eax) {
 					return code;
@@ -408,7 +408,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				}
 			}
 			break;
-		case 9: { // adjust_pan
+		case 9: { // modulate_pan
 				so->unk64 += so->unk68;
 				const int volume = (so->unk64 + 0x8000) >> 16;
 				if (volume != so->volume) {
@@ -422,7 +422,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 10: { // set_volume
+		case 10: { // modulate_volume
 				if (so->unk54 >= 0) {
 					so->unk5C += so->unk60;
 					int value = (so->unk5C + 0x8000) >> 16;
@@ -438,7 +438,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 11: {
+		case 11: { // set_volume
 				if (so->unk18 != code[1]) {
 					so->unk18 = code[1];
 					_sssObjectsChanged = true;
@@ -446,7 +446,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 12: { // fade_out_sound
+		case 12: { // stop_sound
 				uint32_t _eax =  so->flags1 >> 24;
 				uint32_t _edx = (so->flags1 >> 20) & 0xF;
 				uint16_t _ecx = READ_LE_UINT16(code + 2);
@@ -454,7 +454,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 13: {
+		case 13: { // init_volume
 				so->unk54 = READ_LE_UINT32(code + 4) - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
@@ -468,7 +468,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 8;
 			}
 			break;
-		case 14: {
+		case 14: { // init_pan
 				so->unk58 = READ_LE_UINT32(code + 8) - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
@@ -499,7 +499,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				_sssObjectsChanged = true;
 			}
 			break;
-		case 17: { // move to list2, stop_sound
+		case 17: { // move to list2, stop_sound2
 				if (tempSssObject) {
 					warning("Invalid call to .sss opcode 17 with temp SssObject");
 					return 0;
