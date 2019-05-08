@@ -3539,21 +3539,19 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int num) {
 		int numPrev = o->screenNum;
 		if (x < 0) {
 			o->screenNum = num = _res->_screensGrid[num * 4 + kPosLeftScreen];
-			x += 256;
+			o->xPos = x + 256;
 		} else if (x >= 256) {
 			o->screenNum = num = _res->_screensGrid[num * 4 + kPosRightScreen];
-			x -= 256;
+			o->xPos = x - 256;
 		}
-		o->xPos = x;
 		if (y < 0 && num != 0xFF) {
 			o->screenNum = _res->_screensGrid[num * 4 + kPosTopScreen];
-			y += 192;
+			o->yPos = y + 192;
 		} else if (y >= 192) {
 			assert(num != 0xFF);
 			o->screenNum = _res->_screensGrid[num * 4 + kPosBottomScreen];
-			y -= 192;
+			o->yPos = y - 192;
 		}
-		o->yPos = y;
 		if (o->screenNum == 0xFF) {
 			o->xPos = xPrev;
 			o->yPos = yPrev;
