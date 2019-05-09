@@ -1537,6 +1537,22 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 197: // 49
+			if (t->dataPtr) {
+				const int num = READ_LE_UINT16(p + 2);
+				MstOp49Data *m = &_res->_mstOp49Data[num];
+				const uint32_t mask = m->unk8;
+				int a = getTaskVar(t, m->unk0, (mask >> 16) & 15); // var1C
+				int b = getTaskVar(t, m->unk2, (mask >> 12) & 15); // x2
+				int c = getTaskVar(t, m->unk4, (mask >>  8) & 15); // var14
+				int d = getTaskVar(t, m->unk6, (mask >>  4) & 15); // _esi
+				int e = getTaskVar(t, m->unkE,  mask        & 15); // _eax
+				if (e >= _res->_mstHdr.pointsCount) {
+					e = _res->_mstHdr.pointsCount - 1;
+				}
+				ret = executeMstOp49(a, b, c, d, e, t, num);
+			}
+			break;
 		case 198: { // 50
 				Task *child = findFreeTask();
 				if (child) {
@@ -1950,6 +1966,17 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 	warning("executeMstOp27 %d %d unimplemented", num, arg);
 	// TODO
+}
+
+int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
+	MstTaskData *m = t->dataPtr;
+	const MstOp49Data *m49 = &_res->_mstOp49Data[num];
+	m->unkD8 = &_res->_mstUnk49[m49->unkC];
+	m->unkDC = m49->unkF;
+	if (m49->unkF < 0) {
+	}
+// 41BAD4
+	return 0;
 }
 
 static int checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
