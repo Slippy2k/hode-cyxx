@@ -221,7 +221,7 @@ struct MstUnk48 {
 	int countUnk12; // 0x10
 	uint32_t offsets1[2]; // 0x14, 0x18
 	uint32_t offsets2[2]; // 0x1C, 0x20
-	uint32_t count[2]; // 36,40
+	uint32_t count[2]; // 0x24, 0x28
 }; // SIZEOF_MstUnk48 44
 
 struct MstUnk49 {

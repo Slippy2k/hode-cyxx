@@ -642,6 +642,21 @@ int Game::executeMstCodeHelper3(Task *t) {
 		warning("executeMstCodeHelper3 t.run is NULL");
 		return 1;
 	}
+	Task *_mstCurrentTask = t;
+	MstTaskData *m = t->dataPtr;
+	int _mstCurrentFlags0 = m->o16->flags0 & 255;
+	int num = _mstCurrentFlags0 * 24;
+	uint8_t _dl = m->unk8[num + 6];
+	if (_dl != 0) {
+		// TODO
+	} else {
+// 4181E1
+		m->o16->flags2 = m->unkE8;
+	}
+	if (_mstCurrentFlags0 == 31) {
+		stopMstTaskData(_mstCurrentTask, &_mstTasksList1);
+		return 1;
+	}
 	warning("executeMstCodeHelper3 unimplemented");
 	// TODO
 	return 0;
@@ -710,6 +725,45 @@ void Game::removeMstObjectTask(Task *t) {
 	}
 	if (prev) {
 		prev->nextPtr = next;
+	}
+}
+
+void Game::stopMstTaskData(Task *t, Task **tasksList) {
+	MstTaskData *m = t->dataPtr;
+	if (_mstUnk6 != -1) {
+		if ((m->flagsA5 & 8) != 0 && m->unk18) {
+			disableMstTaskData(m);
+		}
+	}
+	if (m->unk8[946] & 4) {
+		clearMstRectsTable(m, 0);
+		clearMstRectsTable(m, 1);
+	}
+	m->unk0 = 0;
+	LvlObject *o = m->o16;
+	if (o) {
+		o->dataPtr = 0;
+	}
+	for (int i = 0; i < 64; ++i) {
+		if (_mstObjectsTable[i].unk0 != 0 && _mstObjectsTable[i].mstTaskData == m) {
+			_mstObjectsTable[i].mstTaskData = 0;
+		}
+	}
+	removeLvlObject2(o);
+	if (t->child) {
+		t->child->codeData = 0;
+		t->child = 0;
+	}
+	Task *prev = t->prevPtr;
+	t->codeData = 0;
+	Task *next = t->nextPtr;
+	if (next) {
+		next->prevPtr = prev;
+	}
+	if (prev) {
+		prev->nextPtr = next;
+	} else {
+		*tasksList = next;
 	}
 }
 
@@ -1979,12 +2033,6 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 	return 0;
 }
 
-static int checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
-	warning("checkMstOp54Helper %d unimplemented", flag);
-	// TODO
-	return 0;
-}
-
 void Game::executeMstOp52() {
 	if (_mstUnk6 == -1) {
 		return;
@@ -2020,6 +2068,17 @@ void Game::executeMstOp52() {
 		++j;
 	}
 	_mstUnk6 = -1;
+}
+
+int Game::checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
+	warning("checkMstOp54Helper %d unimplemented", flag);
+	for (int i = 0; i < 2; ++i) {
+		if (m->count[i] > 0) {
+			// TODO
+		}
+	}
+	// TODO
+	return 0;
 }
 
 void Game::executeMstOp54() {

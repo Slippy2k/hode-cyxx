@@ -570,6 +570,7 @@ struct Game {
 	void updateMstHeightMapData();
 
 	void removeMstObjectTask(Task *t);
+	void stopMstTaskData(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
 	int changeTask(Task *t, int num, int value);
@@ -587,6 +588,7 @@ struct Game {
 	void executeMstOp27(Task **tasksList, int num, int arg);
 	int executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
 	void executeMstOp52();
+	int checkMstOp54Helper(MstUnk48 *m, uint8_t flag);
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);
 	void executeMstOp58(Task *t, int num);
