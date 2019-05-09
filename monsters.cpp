@@ -1553,6 +1553,13 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 200: // 52
+			if (t->dataPtr && t->dataPtr->unk18) {
+				executeMstOp52();
+				return 1;
+			}
+			executeMstOp52();
+			break;
 		case 202: // 54
 			executeMstOp54();
 			break;
@@ -1949,6 +1956,43 @@ static int checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
 	warning("checkMstOp54Helper %d unimplemented", flag);
 	// TODO
 	return 0;
+}
+
+void Game::executeMstOp52() {
+	if (_mstUnk6 == -1) {
+		return;
+	}
+	MstUnk48 *m48 = &_res->_mstUnk48[_mstUnk6];
+	int j = 0;
+	for (int i = 0; i < m48->countUnk12; ++i) {
+		MstUnk48Unk12 *m48unk12 = &m48->unk12[j];
+		const uint8_t num = m48unk12->data->unk1B;
+		if (num != 255) {
+			assert(num < 32);
+			MstTaskData *m = &_mstUnkDataTable[num];
+			m->flags48 &= ~0x50;
+			m->unk18->unk1B = 255;
+			m->unk18 = 0;
+			--_mstTaskDataCount;
+			if (_mstTaskDataCount <= 0) {
+				_mstUnk6 = -1;
+			}
+			if (m->flagsA5 & 0x70) {
+				const int a = (m->o16->flags0 & 255) * 7;
+				if (m->unk8[a * 4] != 0) {
+					// TODO
+					warning("MstOp52 t->task %p unimplemented", m->task->run);
+				} else {
+// 41D7D8
+					m->flagsA5 &= ~0xF;
+					m->flagsA5 |= 6;
+					executeMstOp67Type2(m->task, 1);
+				}
+			}
+		}
+		++j;
+	}
+	_mstUnk6 = -1;
 }
 
 void Game::executeMstOp54() {

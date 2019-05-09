@@ -585,6 +585,7 @@ struct Game {
 	int runTask_default(Task *t);
 	void executeMstOp26(Task **tasksList, int screenNum);
 	void executeMstOp27(Task **tasksList, int num, int arg);
+	void executeMstOp52();
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);
 	void executeMstOp58(Task *t, int num);
