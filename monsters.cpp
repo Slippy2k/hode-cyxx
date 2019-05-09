@@ -1636,7 +1636,9 @@ int Game::runTask_default(Task *t) {
 		case 204: // 56
 			ret = executeMstOp56(t, p[1], READ_LE_UINT16(p + 2));
 			break;
-		case 207: // 79
+		case 207:
+		case 208:
+		case 209: // 79
 			break;
 		case 211: // 58
 			executeMstOp58(t, READ_LE_UINT16(p + 2));
