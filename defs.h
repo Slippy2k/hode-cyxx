@@ -357,7 +357,7 @@ struct MstTaskData {
 	int unkD4;
 	MstUnk49 *unkD8; // 0xD8
 	int unkDC; // 0xDC
-	uint8_t unkE6; // 0xE6
+	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	int unkE8; // 0xE8
 	int unkEC; // 0xEC
 	int unkFC; // 0xFC

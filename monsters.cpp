@@ -648,21 +648,64 @@ int Game::executeMstCodeHelper3(Task *t) {
 	}
 	Task *_mstCurrentTask = t;
 	MstTaskData *m = t->dataPtr;
-	int _mstCurrentFlags0 = m->o16->flags0 & 255;
-	int num = _mstCurrentFlags0 * 24;
-	uint8_t _dl = m->unk8[num + 6];
+	LvlObject *o = m->o16;
+	int _mstCurrentFlags0 = o->flags0 & 255;
+	const uint8_t *_mstCurrentDataPtr = m->unk8 + _mstCurrentFlags0 * 24; // _ebx
+	int8_t _dl = _mstCurrentDataPtr[6];
 	if (_dl != 0) {
-		// TODO
+		const int num = CLIP(m->unkE6 + _dl, 0, 17);
+		o->flags2 = (o->flags2 & ~0x1F) | _mstLut4[num];
 	} else {
-// 4181E1
-		m->o16->flags2 = m->unkE8;
+		o->flags2 = m->unkE8;
 	}
 	if (_mstCurrentFlags0 == 31) {
 		stopMstTaskData(_mstCurrentTask, &_mstTasksList1);
 		return 1;
 	}
-	warning("executeMstCodeHelper3 unimplemented");
-	// TODO
+	const uint32_t _edi = READ_LE_UINT32(_mstCurrentDataPtr + 20);
+	if (_edi != 0) {
+		// TODO
+	}
+// 41824B
+	if ((m->flagsA5 & 0x80) == 0) {
+		warning("executeMstCodeHelper3 unimplemented");
+		if (m->localVars[7] == 0 && _mstCurrentUnkFlag == 0) {
+			m->flagsA5 |= 0x80;
+			if (m->unk8[946] & 4) {
+				clearMstRectsTable(m, 1);
+			}
+			if (t->child) {
+				t->child->codeData = 0;
+				t->child = 0;
+			}
+			if ((m->flagsA5 & 8) != 0 && m->unk18 && _mstUnk6 != -1) {
+				// initMstTaskDataType2();
+				return 0;
+			}
+			const uint32_t codeData = m->unk4->codeData;
+			if (codeData != kNone) {
+				resetTask(t, _res->_mstCodeData + codeData * 4);
+				return 0;
+			}
+			o->actionKeyMask = 7;
+			o->directionKeyMask = 0;
+			t->run = &Game::runTask_idle;
+			return 0;
+
+		} else {
+			warning("executeMstCodeHelper3 unimplemented");
+// 41833A
+//			if (t->run == &Game::runTask_unk4) {
+//				return 0;
+//			}
+			if (_mstCurrentDataPtr[0] != 0) {
+//				initMstTask(_mstCurrentDataPtr);
+				return 0;
+			} else if ((m->flagsA5 & 0x40) == 0) {
+// 418364
+			}
+		}
+	}
 	return 0;
 }
 
