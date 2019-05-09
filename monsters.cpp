@@ -447,7 +447,11 @@ void Game::resetMstCode() {
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
 	_mstOp67_screenNum = 0xFF;
-	// TODO
+	_mstOp68_x1 = 256;
+	_mstOp68_x2 = 256;
+	_mstOp68_y1 = 0;
+	_mstOp68_y2 = 0;
+	_mstOp68_screenNum = 255;
 	_mstLogicHelper1TestValue = 0;
 	_mstLogicHelper1TestMask = 0xFFFFFFFF;
 	// TODO
@@ -1736,12 +1740,24 @@ int Game::runTask_default(Task *t) {
 // 4136E8
 				e = CLIP(e, -1, _res->_mstHdr.pointsCount - 1);
 				if (p[0] == 224) {
-					warning(".mst opcode 224 unimplemented");
-					// TODO
+					_mstOp67_arg10 = m->unk8;
+					_mstOp67_flags1 = m->unk9;
+					_mstOp67_unk = m->unkC;
+					_mstOp67_x1 = a;
+					_mstOp67_x2 = b;
+					_mstOp67_y1 = c;
+					_mstOp67_y2 = d;
+					_mstOp67_screenNum = e;
 					break;
 				} else if (p[0] == 225) {
-					warning(".mst opcode 225 unimplemented");
-					// TODO
+					_mstOp68_arg8 = m->unk8;
+					_mstOp68_arg9 = m->unk9;
+					_mstOp68_flags1 = m->unkC;
+					_mstOp68_x1 = a;
+					_mstOp68_x2 = b;
+					_mstOp68_y1 = c;
+					_mstOp68_y2 = d;
+					_mstOp68_screenNum = e;
 					break;
 				} else {
 					t->flags |= 0x80;

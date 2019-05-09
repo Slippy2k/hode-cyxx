@@ -132,9 +132,15 @@ struct Game {
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	uint8_t _mstCurrentUnkFlag;
-	int _mstOp67_x1, _mstOp67_x2;
-	int _mstOp67_y1, _mstOp67_y2;
+
+	uint8_t _mstOp68_arg8, _mstOp68_arg9, _mstOp67_arg10;
+	uint8_t _mstOp67_flags1;
+	uint16_t _mstOp67_unk;
+	int _mstOp67_x1, _mstOp67_x2, _mstOp67_y1, _mstOp67_y2;
 	uint8_t _mstOp67_screenNum;
+	uint16_t _mstOp68_flags1;
+	int _mstOp68_x1, _mstOp68_x2, _mstOp68_y1, _mstOp68_y2;
+	uint8_t _mstOp68_screenNum;
 	uint32_t _mstLogicHelper1TestValue;
 	uint32_t _mstLogicHelper1TestMask;
 	int _runTaskOpcodesCount;
