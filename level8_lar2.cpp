@@ -10,6 +10,12 @@ static uint8_t byte_4528D8[4] = {  2, 0, 0, 0 };
 static uint8_t byte_4528DC[4] = { 18, 0, 0, 0 };
 static uint8_t byte_4528E0[4] = {  2, 0, 0, 0 };
 
+void Game::postScreenUpdate_lar2_screen2() {
+	LvlObject *o = findLvlObject(2, 0, 2);
+	postScreenUpdate_lar1_helper(o, byte_4528D0, 0);
+	// TODO
+}
+
 void Game::postScreenUpdate_lar2_screen3() {
 	LvlObject *o = findLvlObject(2, 0, 3);
 	postScreenUpdate_lar1_helper(o, byte_4528D4, 1);
@@ -58,8 +64,24 @@ void Game::postScreenUpdate_lar2_screen10() {
 	postScreenUpdate_lar1_helper(o, byte_4528E0, 4);
 }
 
+void Game::postScreenUpdate_lar2_screen19() {
+	if (_res->_currentScreenResourceNum == 19) {
+		if (_currentLevelCheckpoint == 10 || _levelCheckpoint == 11) {
+			if (!_paf->_skipCutscenes) {
+				_paf->play(19);
+				_paf->unload(19);
+			}
+			_video->clearPalette();
+			_quit = true;
+		}
+	}
+}
+
 void Game::callLevel_postScreenUpdate_lar2(int num) {
 	switch (num) {
+	case 2:
+		postScreenUpdate_lar2_screen2();
+		break;
 	case 3:
 		postScreenUpdate_lar2_screen3();
 		break;
@@ -69,11 +91,29 @@ void Game::callLevel_postScreenUpdate_lar2(int num) {
 	case 5:
 		postScreenUpdate_lar2_screen5();
 		break;
+	case 6:
+		// TODO
+		break;
 	case 7:
 		postScreenUpdate_lar2_screen7();
 		break;
+	case 8:
+		// TODO
+		break;
 	case 10:
 		postScreenUpdate_lar2_screen10();
+		break;
+	case 11:
+		// TODO
+		break;
+	case 12:
+		// TODO
+		break;
+	case 13:
+		// TODO
+		break;
+	case 19:
+		postScreenUpdate_lar2_screen19();
 		break;
 	}
 }
@@ -162,6 +202,16 @@ void Game::callLevel_preScreenUpdate_lar2(int num) {
 		break;
 	case 6:
 		preScreenUpdate_lar2_screen6();
+		break;
+	case 7:
+		// TODO
+		break;
+	case 8:
+	case 11:
+		// TODO
+		break;
+	case 9:
+		// TODO
 		break;
 	case 15:
 		preScreenUpdate_lar2_screen15();

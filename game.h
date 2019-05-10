@@ -521,11 +521,13 @@ struct Game {
 	void callLevel_setupLvlObjects_lar1(int num);
 
 	// level8_lar2.cpp
+	void postScreenUpdate_lar2_screen2();
 	void postScreenUpdate_lar2_screen3();
 	void postScreenUpdate_lar2_screen4();
 	void postScreenUpdate_lar2_screen5();
 	void postScreenUpdate_lar2_screen7();
 	void postScreenUpdate_lar2_screen10();
+	void postScreenUpdate_lar2_screen19();
 	void callLevel_postScreenUpdate_lar2(int num);
 
 	void preScreenUpdate_lar2_screen2();
