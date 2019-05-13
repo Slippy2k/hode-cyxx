@@ -778,7 +778,6 @@ int Game::executeMstCodeHelper3(Task *t) {
 			if (_mstMovingStateCount > 0) {
 				// TODO
 			}
-			warning("executeMstCodeHelper3 unimplemented flagsA5 0x%x flags48 0x%x", m->flagsA5, m->flags48);
 // 41882E
 			if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
 				MstUnk46Unk1 *m46 = m->unk4;
@@ -794,6 +793,8 @@ int Game::executeMstCodeHelper3(Task *t) {
 							case 2:
 							case 3:
 								// TODO
+								warning("executeMstCodeHelper3 unhandled dir %d\n", dir);
+								// fall-through
 							default:
 								x1 = m->xMstPos + (int32_t)READ_LE_UINT32(p); // _edx
 								x2 = m->xMstPos + (int32_t)READ_LE_UINT32(p + 8); // _edi
@@ -828,6 +829,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 					return 0;
 				}
 				if (_mstPosY >= m->yMstPos - m44->y1 && _mstPosY < m->yMstPos + m44->y2) {
+					warning("executeMstCodeHelper3 mstPosY %d x1 %d x2 %d screen %d", _mstPosY, m->x1, m->x2, o->screenNum);
 					if (m->x1 != -2 || m->x1 != m->x2) {
 // 418B5A
 						// TODO
@@ -841,7 +843,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 					}
 				}
 // 418BAA
-
+				warning("executeMstCodeHelper3 flagsA6 0x%x", m->flagsA6);
 				// TODO
 				if (m->flagsA6 & 1) {
 					return 0;
@@ -872,6 +874,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 			if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
 				return 0;
 			}
+			warning("executeMstCodeHelper3 unimplemented flagsA5 0x%x flags48 0x%x", m->flagsA5, m->flags48);
 			if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
 				// TODO
 			} else {
@@ -892,7 +895,7 @@ int Game::executeMstCodeHelper4(Task *t) {
 	return 0;
 }
 
-void Game::updateMstMoveData() {
+void Game::updateMstMoveData() { // collision ?
 	if (_andyObject) {
 		_mstRefPosX = _andyObject->xPos + _andyObject->posTable[3].x;
 		_mstRefPosY = _andyObject->yPos + _andyObject->posTable[3].y;
@@ -918,11 +921,67 @@ void Game::updateMstMoveData() {
 			_executeMstLogicPrevCounter = _executeMstLogicCounter;
 			return;
 		}
-		// TODO
+		_mstMovingState[0].unk1C = 512;
+		_mstMovingState[0].unk20 = 512;
+		_mstMovingState[0].unk28 = 0;
+		_mstMovingState[0].unk0x40 = 3;
+		_mstMovingState[0].unk18 = 4;
+		_mstMovingState[0].xPos = _gameXPosTable[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].xOffset;
+		_mstMovingState[0].yPos = _gameYPosTable[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].yOffset;
+		switch (_plasmaCannonDirection - 1) {
+		case 0:
+			_mstMovingState[0].unk24 = 6;
+			_mstMovingStateCount = 1;
+			break;
+		case 2:
+			_mstMovingState[0].unk24 = 3;
+			_mstMovingStateCount = 1;
+			break;
+		case 1:
+			_mstMovingState[0].unk24 = 0;
+			_mstMovingStateCount = 1;
+			break;
+		case 5:
+			_mstMovingState[0].unk24 = 4;
+			_mstMovingStateCount = 1;
+			break;
+		case 3:
+			_mstMovingState[0].unk24 = 7;
+			_mstMovingStateCount = 1;
+			break;
+		case 11:
+			_mstMovingState[0].unk24 = 2;
+			_mstMovingStateCount = 1;
+			break;
+		case 7:
+			_mstMovingState[0].unk24 = 5;
+			_mstMovingStateCount = 1;
+			break;
+		case 8:
+			_mstMovingState[0].unk24 = 1;
+			_mstMovingStateCount = 1;
+			break;
+		default:
+			_mstMovingStateCount = 1;
+			break;
+		}
 	} else {
+		MovingOpcodeState *p = _mstMovingState;
 		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
+			p->unk2C = o;
 			// TODO
 		}
+		if (_mstMovingStateCount == 0) {
+			_executeMstLogicPrevCounter = _executeMstLogicCounter;
+			return;
+		}
+	}
+	for (int i = 0; i < _mstMovingStateCount; ++i) {
+		MovingOpcodeState *p = &_mstMovingState[i];
+		p->boundingBox.x2 = p->xPos + p->unk18;
+		p->boundingBox.x1 = p->xPos - p->unk18;
+		p->boundingBox.y2 = p->yPos + p->unk18;
+		p->boundingBox.y1 = p->yPos - p->unk18;
 	}
 }
 
