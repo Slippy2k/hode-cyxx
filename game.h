@@ -132,7 +132,9 @@ struct Game {
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	uint8_t _mstCurrentUnkFlag;
-
+	int _mstUnk10;
+	MovingOpcodeState _mstMovingState[8];
+	int _mstMovingStateCount;
 	uint8_t _mstOp68_arg8, _mstOp68_arg9, _mstOp67_arg10;
 	uint8_t _mstOp67_flags1;
 	uint16_t _mstOp67_unk;
@@ -185,7 +187,6 @@ struct Game {
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
 	uint8_t _mstRandomLookupTable[8][32];
-	MovingOpcodeState _mstMovingState[8];
 	int _xMstPos1, _xMstPos2;
 	int _mstCurrentPosX, _mstCurrentPosY;
 	int _mstRectsCount;
@@ -564,7 +565,7 @@ struct Game {
 	int prepareMstTask(Task *t);
 	void clearMstRectsTable(MstTaskData *m, int num);
 	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
-	void updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
+	int updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
 	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	void setMstObjectDefaultPos(Task *t);
 	void setMstTaskDataDefaultPos(Task *t);

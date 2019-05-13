@@ -253,11 +253,12 @@ int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-void Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
+int Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
 	if (num == 255) {
 		MstRect *p = &_mstRectsTable[0];
 		for (int i = 0; i < _mstRectsCount; ++i) {
 			if (p->num == 255) {
+				num = i;
 				break;
 			}
 		}
@@ -278,6 +279,7 @@ void Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
 			p->y2 = y2;
 		}
 	}
+	return num;
 }
 
 int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
@@ -442,7 +444,7 @@ void Game::resetMstCode() {
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
 	_mstCurrentUnkFlag = 0;
-	// TODO
+	_mstUnk10 = 255;
 	_mstRectsCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
@@ -704,9 +706,9 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 	if ((a & 0x8000) == 0 || (m->flagsA6 & 4) != 0) {
 		// TODO
 		// resetMstTask(_mstCurrentTask, m->unk18, 0x10);
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 int Game::executeMstCodeHelper3(Task *t) {
@@ -773,8 +775,10 @@ int Game::executeMstCodeHelper3(Task *t) {
 				return 0;
 			}
 // 418361
-			// TODO
-			warning("executeMstCodeHelper3 unimplemented 0xA5 0x%x", m->flagsA5);
+			if (_mstMovingStateCount > 0) {
+				// TODO
+			}
+			warning("executeMstCodeHelper3 unimplemented flagsA5 0x%x flags48 0x%x", m->flagsA5, m->flags48);
 // 41882E
 			if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
 				MstUnk46Unk1 *m46 = m->unk4;
@@ -819,13 +823,56 @@ int Game::executeMstCodeHelper3(Task *t) {
 			uint8_t dir = m->flagsA5 & 3;
 			if (dir == 1) {
 // 418AC6
+				MstUnk44Unk1 *m44 = m->unkC;
+				if (m44->indexUnk35_24 == kNone) {
+					return 0;
+				}
+				if (_mstPosY >= m->yMstPos - m44->y1 && _mstPosY < m->yMstPos + m44->y2) {
+					if (m->x1 != -2 || m->x1 != m->x2) {
+// 418B5A
+						// TODO
+					}
+					if (o->screenNum == _currentScreen) {
+						if (m->flagsA6 != 1) {
+							// goto 418BA5
+						}
+// 418B23
+						// TODO
+					}
+				}
+// 418BAA
+
+				// TODO
+				if (m->flagsA6 & 1) {
+					return 0;
+				}
+				const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
+				assert(indexUnk35 != kNone);
+				if (!m->unkD0) {
+					_mstCurrentTaskData->unkD0 = &_res->_mstUnk35[indexUnk35];
+					_mstCurrentTaskData->unkCC[0] = _rnd.update() & 7;
+					_mstCurrentTaskData->unkCC[2] = 0x20;
+					_mstCurrentTaskData->unkCC[1] = _rnd.update() & 31;
+					prepareMstTask(_mstCurrentTask);
+					return 0;
+				}
+// 418C1D
+				if (m->flagsA5 & 4) {
+					m->flagsA5 &= ~4;
+					if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
+						initMstTaskData(_mstCurrentTaskData);
+					}
+					_mstCurrentTaskData->unkD0 = &_res->_mstUnk35[indexUnk35];
+					prepareMstTask(_mstCurrentTask);
+				}
+				return 0;
 			} else if (dir != 2) {
 				return 0;
 			}
 			if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
 				return 0;
 			}
-			if ((m->flagsA5 & 8) == 0) {
+			if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
 				// TODO
 			} else {
 // 418A9A
@@ -851,13 +898,32 @@ void Game::updateMstMoveData() {
 		_mstRefPosY = _andyObject->yPos + _andyObject->posTable[3].y;
 		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
 		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
+		if (!_mstCurrentUnkFlag) {
+			_mstUnk10 = updateMstRectsTable(_mstUnk10, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1) & 0xFF;
+		}
+		_mstRefPosX += _andyObject->posTable[3].x;
+		_mstRefPosY += _andyObject->posTable[3].y;
+		_mstPosX += _andyObject->posTable[3].x;
+		_mstPosY += _andyObject->posTable[3].y;
 	} else {
 		_mstRefPosX = 128;
 		_mstRefPosY = 96;
 		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[0].xOffset;
 		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[0].yOffset;
         }
-	// TODO
+	_mstMovingStateCount = 0;
+	_mstMovingState[0].unk0x40 = 0;
+	if (!_lvlObjectsList0) {
+		if (_plasmaCannonDirection == 0) {
+			_executeMstLogicPrevCounter = _executeMstLogicCounter;
+			return;
+		}
+		// TODO
+	} else {
+		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
+			// TODO
+		}
+	}
 }
 
 void Game::updateMstHeightMapData() {

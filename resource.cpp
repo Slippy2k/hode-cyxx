@@ -1140,6 +1140,10 @@ void Resource::loadMstData(File *fp) {
 			uint8_t data[104];
 			fp->read(data, sizeof(data));
 			bytesRead += 104;
+			_mstUnk44[i].data[j].x1 = READ_LE_UINT32(data);
+			_mstUnk44[i].data[j].x2 = READ_LE_UINT32(data + 4);
+			_mstUnk44[i].data[j].y1 = READ_LE_UINT32(data + 8);
+			_mstUnk44[i].data[j].y2 = READ_LE_UINT32(data + 12);
 			_mstUnk44[i].data[j].indexUnk34_16 = READ_LE_UINT32(data + 16); // sizeof == 20
 			_mstUnk44[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
 			_mstUnk44[i].data[j].indexUnk35_24 = READ_LE_UINT32(data + 24); // sizeof == 16

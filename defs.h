@@ -271,7 +271,7 @@ struct MovingOpcodeState {
 	LvlObject *unk2C;
 	uint32_t unk30;
 	uint32_t unk3C;
-	uint8_t unk40;
+	uint8_t unk0x40;
 }; // sizeof == 0x44
 
 struct AndyMoveData {

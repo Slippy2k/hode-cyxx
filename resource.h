@@ -153,9 +153,13 @@ struct MstUnk43 {
 }; // SIZEOF_MstUnk43 16
 
 struct MstUnk44Unk1 {
+	int32_t x1; // 0
+	int32_t x2; // 4
+	int32_t y1; // 8
+	int32_t y2; // 0xC
 	uint32_t indexUnk34_16; // 0x10
 	uint32_t indexUnk35_20; // 0x14
-	uint32_t indexUnk35_24;
+	uint32_t indexUnk35_24; // 0x18
 	uint32_t indexUnk36_28;
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
