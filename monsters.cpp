@@ -641,13 +641,82 @@ void Game::executeMstCodeHelper2() {
 	}
 }
 
+bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
+	if ((flags & 1) != 0 && (m->o16->flags0 & 200) == 0) {
+		return false;
+	} else if ((flags & 8) != 0 && (m->flags48 & 0x20) == 0) {
+		return false;
+	} else if ((flags & 0x100) != 0 && (_mstFlags & 0x80000000) != 0) {
+		return false;
+	} else if ((flags & 0x200) != 0 && (_mstFlags & 0x40000000) != 0) {
+		return false;
+	} else if ((flags & 0x40) != 0) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x80) != 0) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+		return false;
+	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x100000) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0X200000) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 4) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 2) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x4000) != 0) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x1000) != 0) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x20) != 0 && (m->o16->flags0 & 0x100) == 0) {
+		return false;
+	} else if ((flags & 0x10000) != 0) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x20000) != 0) {
+		warning("executeMstUnk20 flags 0x%x", flags);
+		// TODO
+	} else if ((flags & 0x40000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 36))) {
+		return false;
+	} else if ((flags & 0x80000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 20))) {
+		return false;
+	}
+	return true;
+}
+
+bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
+	const uint32_t a = READ_LE_UINT32(p + 0x10);
+	if (a == 0 || !executeMstUnk20(m, a)) {
+		return false;
+	}
+	warning("executeMstUnk27 unimplemented");
+	if ((a & 0x8000) == 0 || (m->flagsA6 & 4) != 0) {
+		// TODO
+		// resetMstTask(_mstCurrentTask, m->unk18, 0x10);
+		return 1;
+	}
+	return 0;
+}
+
 int Game::executeMstCodeHelper3(Task *t) {
 	if (!t->run) {
 		warning("executeMstCodeHelper3 t.run is NULL");
 		return 1;
 	}
-	Task *_mstCurrentTask = t;
+	_mstCurrentTask = t;
 	MstTaskData *m = t->dataPtr;
+	MstTaskData *_mstCurrentTaskData = m;
 	LvlObject *o = m->o16;
 	int _mstCurrentFlags0 = o->flags0 & 255;
 	const uint8_t *_mstCurrentDataPtr = m->unk8 + _mstCurrentFlags0 * 24; // _ebx
@@ -668,7 +737,6 @@ int Game::executeMstCodeHelper3(Task *t) {
 	}
 // 41824B
 	if ((m->flagsA5 & 0x80) == 0) {
-		warning("executeMstCodeHelper3 unimplemented");
 		if (m->localVars[7] == 0 && _mstCurrentUnkFlag == 0) {
 			m->flagsA5 |= 0x80;
 			if (m->unk8[946] & 4) {
@@ -693,16 +761,78 @@ int Game::executeMstCodeHelper3(Task *t) {
 			return 0;
 
 		} else {
-			warning("executeMstCodeHelper3 unimplemented");
 // 41833A
-//			if (t->run == &Game::runTask_unk4) {
-//				return 0;
-//			}
-			if (_mstCurrentDataPtr[0] != 0) {
-//				initMstTask(_mstCurrentDataPtr);
+			if (t->run == &Game::runTask_unk4) {
 				return 0;
-			} else if ((m->flagsA5 & 0x40) == 0) {
-// 418364
+			}
+			if (_mstCurrentDataPtr[0] != 0) {
+				executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
+				return 0;
+			}
+			if ((m->flagsA5 & 0x40) != 0) {
+				return 0;
+			}
+// 418361
+			// TODO
+			warning("executeMstCodeHelper3 unimplemented 0xA5 0x%x", m->flagsA5);
+// 41882E
+			if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
+				MstUnk46Unk1 *m46 = m->unk4;
+				if (m46->indexUnk47 != kNone) {
+					MstUnk47 *m47 = &_res->_mstUnk47[m46->indexUnk47];
+					if (m47->count > 0) {
+						const uint8_t dir = (o->flags1 >> 4) & 3;
+						const uint8_t *p = m47->data;
+						for (uint32_t i = 0; i < m47->count; ++i) {
+							int x1, x2, y1, y2;
+							switch (dir) {
+							case 1:
+							case 2:
+							case 3:
+								// TODO
+							default:
+								x1 = m->xMstPos + (int32_t)READ_LE_UINT32(p); // _edx
+								x2 = m->xMstPos + (int32_t)READ_LE_UINT32(p + 8); // _edi
+								y1 = m->yMstPos + (int32_t)READ_LE_UINT32(p + 4); // _esi
+								y2 = m->yMstPos + (int32_t)READ_LE_UINT32(p + 12); // _ebp
+								break;
+							}
+
+							if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
+								// resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
+								executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
+								return 0;
+							}
+
+							p += 20;
+						}
+					}
+				}
+			}
+// 418939
+			if (executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr)) {
+				return 0;
+			}
+			if ((m->flagsA6 & 2) != 0 || (m->flagsA5 & 0x30) != 0) {
+				return 0;
+			}
+			uint8_t dir = m->flagsA5 & 3;
+			if (dir == 1) {
+// 418AC6
+			} else if (dir != 2) {
+				return 0;
+			}
+			if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
+				return 0;
+			}
+			if ((m->flagsA5 & 8) == 0) {
+				// TODO
+			} else {
+// 418A9A
+				if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
+					executeMstOp67Type2(t, 1);
+				}
+				return 0;
 			}
 		}
 	}
@@ -3228,6 +3358,19 @@ int Game::runTask_unk3(Task *t) {
 			t->run = &Game::runTask_unk2;
 		}
 		return (this->*(t->run))(t);
+	}
+	return 1;
+}
+
+int Game::runTask_unk4(Task *t) {
+	MstTaskData *m = t->dataPtr;
+	const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
+	assert(offset % 948 == 0);
+	const uint32_t num = offset / 948;
+	if (t->tempVar != num) {
+		updateMstTaskDataPosition(m);
+		executeMstUnk13(t);
+		return 0;
 	}
 	return 1;
 }

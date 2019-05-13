@@ -194,7 +194,7 @@ struct MstUnk46 {
 }; // SIZEOF_MstUnk46 8
 
 struct MstUnk47 {
-	uint32_t offset;
+	uint8_t *data; // sizeof == 20
 	uint32_t count;
 }; // SIZEOF_MstUnk47 8
 

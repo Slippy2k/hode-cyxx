@@ -190,6 +190,7 @@ struct Game {
 	int _mstCurrentPosX, _mstCurrentPosY;
 	int _mstRectsCount;
 	MstRect _mstRectsTable[64];
+	Task *_mstCurrentTask;
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -574,6 +575,8 @@ struct Game {
 	void startMstCode();
 	void executeMstCode();
 	void executeMstCodeHelper2();
+	bool executeMstUnk20(MstTaskData *m, uint32_t flags);
+	bool executeMstUnk27(MstTaskData *m, const uint8_t *p);
 	int executeMstCodeHelper3(Task *t);
 	int executeMstCodeHelper4(Task *t);
 	void updateMstMoveData();
@@ -619,6 +622,7 @@ struct Game {
 	int runTask_unk1(Task *t);
 	int runTask_unk2(Task *t);
 	int runTask_unk3(Task *t);
+	int runTask_unk4(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[32];
