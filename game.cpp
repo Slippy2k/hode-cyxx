@@ -1054,8 +1054,11 @@ void Game::removeLvlObject2(LvlObject *o) {
 					prev = ptr;
 					ptr = ptr->nextPtr;
 				} while (ptr && ptr != o);
-				assert(ptr);
-				prev->nextPtr = ptr->nextPtr;
+				if (!ptr) {
+					warning("removeLvlObject2 o %p is not in _lvlObjectsList1", o);
+				} else {
+					prev->nextPtr = ptr->nextPtr;
+				}
 			}
 		}
 	}
