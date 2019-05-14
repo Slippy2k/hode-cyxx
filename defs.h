@@ -271,7 +271,7 @@ struct MovingOpcodeState {
 	LvlObject *unk2C;
 	uint32_t unk30;
 	uint32_t unk3C;
-	uint8_t unk0x40;
+	uint8_t unk40;
 }; // sizeof == 0x44
 
 struct AndyMoveData {
@@ -358,8 +358,11 @@ struct MstTaskData {
 	MstUnk49 *unkD8; // 0xD8
 	int unkDC; // 0xDC
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
+	uint8_t directionKeyMask;
 	int unkE8; // 0xE8
 	int unkEC; // 0xEC
+	int unkF0; // 0xF0
+	int unkF4; // 0xF4
 	int unkFC; // 0xFC
 }; // sizeof == 256
 

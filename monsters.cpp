@@ -149,9 +149,14 @@ void Game::disableMstTaskData(MstTaskData *m) {
 	}
 }
 
-bool Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
+void Game::initMstTaskDataType2(Task *t) {
+	warning("initMstTaskDataType2 %p unimplemented", t);
 	// TODO
+}
+
+bool Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
 	warning("updateMstTaskDataPositionHelper m %p unimplemented", m);
+	// TODO
 	return false;
 }
 
@@ -346,7 +351,11 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 	m->unkEC = -1;
 	m->unk1C = 0;
 // 40ED0D
-	// TODO
+	if (_mstMovingStateCount != 0 && !_mstCurrentUnkFlag && (o->flags1 & 6) != 6) {
+		if (m->localVars[7] > 0 || m->localVars[7] < -1) {
+			// TODO
+		}
+	}
 // 40F151
 	if (m->flags49 & 8) {
 		m->unk88 = READ_LE_UINT32(ptr + 920);
@@ -363,10 +372,12 @@ void Game::setMstTaskDataDefaultPos(Task *t) {
 		m->unk8C = READ_LE_UINT32(ptr + 932);
 	}
 // 40F1B3
-	// TODO
-
-	m->unkFC = -1;
-	m->flags48 &= ~0x80;
+	if (_mstMovingState[0].unk40 == 3 && m->unkF4 != 0 && _mstMovingState[0].unk24 == m->unkFC && m->directionKeyMask == _andyObject->directionKeyMask) {
+		m->flags48 |= 0x80;
+	} else {
+		m->unkFC = -1;
+		m->flags48 &= ~0x80;
+	}
 }
 
 void Game::shuffleMstUnk43(MstUnk43 *p) {
@@ -752,8 +763,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 				t->child = 0;
 			}
 			if ((m->flagsA5 & 8) != 0 && m->unk18 && _mstUnk6 != -1) {
-				// TODO
-				// initMstTaskDataType2();
+				initMstTaskDataType2(_mstCurrentTask);
 				return 0;
 			}
 			const uint32_t codeData = m->unk4->codeData;
@@ -797,7 +807,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 							case 2:
 							case 3:
 								// TODO
-								warning("executeMstCodeHelper3 unhandled dir %d\n", dir);
+								warning("executeMstCodeHelper3 unhandled dir %d", dir);
 								// fall-through
 							default:
 								x1 = m->xMstPos + (int32_t)READ_LE_UINT32(p); // _edx
@@ -919,7 +929,7 @@ void Game::updateMstMoveData() { // collision ?
 		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[0].yOffset;
         }
 	_mstMovingStateCount = 0;
-	_mstMovingState[0].unk0x40 = 0;
+	_mstMovingState[0].unk40 = 0;
 	if (!_lvlObjectsList0) {
 		if (_plasmaCannonDirection == 0) {
 			_executeMstLogicPrevCounter = _executeMstLogicCounter;
@@ -928,7 +938,7 @@ void Game::updateMstMoveData() { // collision ?
 		_mstMovingState[0].unk1C = 512;
 		_mstMovingState[0].unk20 = 512;
 		_mstMovingState[0].unk28 = 0;
-		_mstMovingState[0].unk0x40 = 3;
+		_mstMovingState[0].unk40 = 3;
 		_mstMovingState[0].unk18 = 4;
 		_mstMovingState[0].xPos = _gameXPosTable[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].xOffset;
 		_mstMovingState[0].yPos = _gameYPosTable[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].yOffset;
@@ -2180,6 +2190,7 @@ int Game::runTask_default(Task *t) {
 				if (m) {
 					m->flagsA5 &= ~0x70;
 					if ((m->flagsA5 & 8) != 0) {
+						warning(".mst opcode 242 t->child flagsA5 0x%x", m->flagsA5);
 						// TODO
 					}
 				}
@@ -2193,7 +2204,7 @@ int Game::runTask_default(Task *t) {
 					if ((m->flagsA5 & 8) == 0) {
 						m->flags48 |= 8;
 						if ((m->flagsA5 & 0x70) != 0) {
-							warning(".mst opcode 242 mstTaskData is not NULL flagsA5 0x%x", m->flagsA5);
+							warning(".mst opcode 242 t->dataPtr flagsA5 0x%x", m->flagsA5);
 							m->flagsA5 &= ~0x70;
 /*
 							switch (m->flagsA5 & 7) {
@@ -2288,13 +2299,11 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 			if (_mstUnk6 != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
 				disableMstTaskData(m);
 			}
-/*
 			const uint8_t *ptr = m->unk8;
 			if (ptr[946] & 4) {
 				clearMstRectsTable(m, 0);
 				clearMstRectsTable(m, 1);
 			}
-*/
 			m->unk0 = 0;
 			m->o16->dataPtr = 0;
 			for (int i = 0; i < 64; ++i) {
@@ -2524,6 +2533,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 	debug(kDebug_MONSTER, "executeMstOp56 code %d", code);
 	switch (code) {
 	case 0:
+		warning("executeMstOp56 so 0 unimplemented");
 		if (_mstCurrentUnkFlag == 0 && resetAndyLvlObjectPlasmaCannonKeyMask(0x71) != 0) {
 			_plasmaCannonFlags |= 1;
 			if (_andyObject->spriteNum == 0) {
@@ -2559,8 +2569,8 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		// TODO
 		break;
 	case 1:
+		warning("executeMstOp56 so 1 unimplemented");
 		if (_mstCurrentUnkFlag != 0) {
-			warning("Op56 subopcode 1 unimplemented");
 			if (resetAndyLvlObjectPlasmaCannonKeyMask(0x61) != 0) {
 				_plasmaCannonFlags &= ~1;
 				if (_andyObject->spriteNum == 0) {
@@ -2874,10 +2884,10 @@ void Game::executeMstUnk1(Task *t) {
 				if (!updateMstTaskDataPosition(m)) {
 					initMstTaskData(m);
 				}
-				// TODO
-				// if (m->unkC->indexUnk35_20 != kNone) {
-				//	m->unkD0 = m->unkC->indexUnk35_20;
-				// }
+				uint32_t indexUnk35 = m->unkC->indexUnk35_20;
+				if (indexUnk35 != kNone) {
+					m->unkD0 = &_res->_mstUnk35[indexUnk35];
+				}
 				prepareMstTask(t);
 			} else {
 				m->flagsA5 |= 2;
@@ -3005,6 +3015,7 @@ void Game::executeMstUnk7(MstTaskData *m) {
 }
 
 void Game::executeMstUnk12() {
+	warning("executeMstUnk12 unimplemented");
 	// TODO
 }
 
@@ -3316,12 +3327,13 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		setMstTaskDataDefaultPos(t);
 
 		switch (type) {
+#if 1
 		case 1:
 		case 2:
 			warning("executeMstOp67 unhandled type %d", type);
 			_mstTasksList1 = _mstTasksList1->nextPtr; // TEMP
 			break;
-/*
+#else
 		case 1:
 			executeMstOp67Type1(t);
 			break;
@@ -3331,7 +3343,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			}
 			executeMstOp67Type2(t, 0);
 			break;
-*/
+#endif
 		default:
 			m->flagsA5 = 1;
 			if (!updateMstTaskDataPosition(m)) {
@@ -3347,6 +3359,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 }
 
 int Game::runTask_wait(Task *t) {
+	debug(kDebug_MONSTER, "runTask_wait t %p", t);
 	--t->delay;
 	if (t->delay == 0) {
 		t->run = &Game::runTask_default;
@@ -3356,6 +3369,7 @@ int Game::runTask_wait(Task *t) {
 }
 
 int Game::runTask_waitResetInput(Task *t) {
+	debug(kDebug_MONSTER, "runTask_waitResetInput t %p", t);
 	--t->delay;
 	if (t->delay == 0) {
 		t->run = &Game::runTask_default;
@@ -3375,6 +3389,7 @@ int Game::runTask_waitResetInput(Task *t) {
 }
 
 int Game::runTask_waitFlags(Task *t) {
+	debug(kDebug_MONSTER, "runTask_waitFlags t %p", t);
 	switch (t->delay) {
 	case 1:
 		if (t->tempVar == 0) {
@@ -3424,10 +3439,12 @@ int Game::runTask_waitFlags(Task *t) {
 }
 
 int Game::runTask_idle(Task *t) {
+	debug(kDebug_MONSTER, "runTask_idle t %p", t);
 	return 1;
 }
 
 int Game::runTask_mstUnk55_233(Task *t) {
+	debug(kDebug_MONSTER, "runTask_mstUnk55_233 t %p", t);
 	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
@@ -3449,6 +3466,7 @@ int Game::runTask_mstUnk55_233(Task *t) {
 }
 
 int Game::runTask_mstUnk55_234(Task *t) {
+	debug(kDebug_MONSTER, "runTask_mstUnk55_234 t %p", t);
 	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
@@ -3470,6 +3488,7 @@ int Game::runTask_mstUnk55_234(Task *t) {
 }
 
 int Game::runTask_unk1(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk1 t %p", t);
 	if (t->delay == 0) {
 		updateMstTaskDataPosition(t->dataPtr);
 		executeMstUnk13(t);
@@ -3480,6 +3499,7 @@ int Game::runTask_unk1(Task *t) {
 }
 
 int Game::runTask_unk2(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk2 t %p", t);
 	MstTaskData *m = t->dataPtr;
 	const uint16_t flags0 = m->o16->flags0;
 	if ((flags0 & 0x100) != 0 && (flags0 & 255) == m->flagsA4) {
@@ -3491,6 +3511,7 @@ int Game::runTask_unk2(Task *t) {
 }
 
 int Game::runTask_unk3(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk3 t %p", t);
 	MstTaskData *m = t->dataPtr;
 	if (m->o16->flags0 == m->flagsA4) {
 		if (t->delay > 0) {
@@ -3504,6 +3525,7 @@ int Game::runTask_unk3(Task *t) {
 }
 
 int Game::runTask_unk4(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk4 t %p", t);
 	MstTaskData *m = t->dataPtr;
 	const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
 	assert(offset % 948 == 0);
