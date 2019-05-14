@@ -135,7 +135,7 @@ struct Game {
 	int _mstUnk10;
 	MovingOpcodeState _mstMovingState[8];
 	int _mstMovingStateCount;
-	uint8_t _mstOp68_arg8, _mstOp68_arg9, _mstOp67_arg10;
+	uint8_t _mstOp68_arg8, _mstOp68_arg9, _mstOp67_type;
 	uint8_t _mstOp67_flags1;
 	uint16_t _mstOp67_unk;
 	int _mstOp67_x1, _mstOp67_x2, _mstOp67_y1, _mstOp67_y2;
@@ -559,8 +559,8 @@ struct Game {
 	void initMstTaskData(MstTaskData *m);
 	int addMstTaskData(MstUnk48 *m48, uint8_t flag);
 	void disableMstTaskData(MstTaskData *m);
-	int updateMstTaskDataPositionHelper(MstTaskData *m);
-	int updateMstTaskDataPosition(MstTaskData *m);
+	bool updateMstTaskDataPositionHelper(MstTaskData *m);
+	bool updateMstTaskDataPosition(MstTaskData *m);
 	void resetMstObject(MstObject *m);
 	int prepareMstTask(Task *t);
 	void clearMstRectsTable(MstTaskData *m, int num);
@@ -613,7 +613,7 @@ struct Game {
 	void executeMstUnk13(Task *t);
 	void executeMstOp67Type1(Task *t);
 	void executeMstOp67Type2(Task *t, int flag);
-	void executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int arg10, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
+	void executeMstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);
