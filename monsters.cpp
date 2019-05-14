@@ -1593,7 +1593,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 30: { // 20
 				t->delay = 3;
-				t->tempVar = 1 << p[1];
+				t->tempVar = p[1];
 				if ((t->tempVar & _mstFlags) == 0) {
 					LvlObject *o = 0;
 					if (t->dataPtr) {
@@ -3502,7 +3502,7 @@ int Game::runTask_unk2(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk2 t %p", t);
 	MstTaskData *m = t->dataPtr;
 	const uint16_t flags0 = m->o16->flags0;
-	if ((flags0 & 0x100) != 0 && (flags0 & 255) == m->flagsA4) {
+	if ((flags0 & 0x100) != 0 && (flags0 & 0xFF) == m->flagsA4) {
 		updateMstTaskDataPosition(t->dataPtr);
 		executeMstUnk13(t);
 		return 0;
@@ -3513,7 +3513,8 @@ int Game::runTask_unk2(Task *t) {
 int Game::runTask_unk3(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk3 t %p", t);
 	MstTaskData *m = t->dataPtr;
-	if (m->o16->flags0 == m->flagsA4) {
+	const uint16_t flags0 = m->o16->flags0;
+	if ((flags0 & 0xFF) == m->flagsA4) {
 		if (t->delay > 0) {
 			t->run = &Game::runTask_unk1;
 		} else {
