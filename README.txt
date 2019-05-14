@@ -51,11 +51,13 @@ What is working :
 * Level screens
 * Hint screens
 
-What is missing/incomplete :
-* Monsters and game logic (.mst files)
-* Sound playback
-* Menus
+What is incomplete :
+* Monsters logic (MST)
+* Sound playback (SSS)
 * Special Powers
+
+What is missing :
+* Menus
 
 
 Credits:
