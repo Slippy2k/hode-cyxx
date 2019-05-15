@@ -656,6 +656,22 @@ void Game::executeMstCodeHelper2() {
 	}
 }
 
+bool Game::executeMstUnk17(MstTaskData *m, int num) {
+	warning("executeMstUnk17 unimplemented");
+	LvlObject *o = m->o16;
+	// uint8_t _bl = _res->_mstUnk52[num * 4 + 2];
+	uint8_t var8 = (o->flags1 >> 4) & 3;
+	uint32_t _ecx = 0;
+	// TODO
+	if (o->flags1 & 2) {
+		var8 |= 1;
+	} else {
+		var8 |= 4;
+	}
+	// TODO
+	return (var8 & _ecx) != 0 ? 0 : 1;
+}
+
 bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
 	if ((flags & 1) != 0 && (m->o16->flags0 & 200) == 0) {
 		return false;
@@ -1113,9 +1129,45 @@ Task *Game::createTask(const uint8_t *codeData) {
 
 int Game::changeTask(Task *t, int num, int delay) {
 	warning("changeTask %d %d unimplemented", num, delay);
+	uint8_t var4 = _res->_mstUnk52[num * 4];
+	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
+	MstTaskData *m = t->dataPtr;
+	LvlObject *o = m->o16;
+	const uint8_t *ptr = m->unk8 + var4 * 28;
 	// TODO
-	if (delay == -1) {
+	o->actionKeyMask |= _res->_mstUnk52[num * 4 + 1];
+	t->flags &= ~0x80;
+	int _edi = (int8_t)ptr[4];
+	int _ebp = (int8_t)ptr[5];
+	if (_edi != 0 || _ebp != 0) {
+// 40E8E2
 		// TODO
+	} else {
+		if ((m->unk8[946] & 4) == 0 || ptr[14] == 0) {
+// 40EAD0
+			// TODO
+		}
+	}
+// 40EA40
+	_edi = m->xMstPos + (int8_t)ptr[12] /* + _ebp */ ;
+	_ebp = m->yMstPos + (int8_t)ptr[13] /* + _eax */ ;
+	if ((var8 & 0xE0) == 0x60) {
+/*
+		if (clearMstRectsTable(m->soundType, _edi, ) {
+			t->flags |= 0x80;
+			return 0;
+		}
+*/
+	}
+// 40EAA0
+	// TODO
+// 40EAD0
+	m->flagsA4 = var4;
+	if (delay == -1) {
+		const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
+		assert((offset % 948) == 0);
+		t->tempVar = offset / 948;
+		t->run = &Game::runTask_unk4;
 	} else {
 		t->delay = delay;
 		t->run = &Game::runTask_unk3;
@@ -1532,6 +1584,16 @@ int Game::runTask_default(Task *t) {
 				t->codeData = p;
 				assert(arg < kMaxLocals);
 				ret = changeTask(t, num, t->dataPtr->localVars[arg]);
+			}
+			break;
+		case 13: // 8
+			if (t->dataPtr) {
+				const int num = READ_LE_UINT16(p + 2);
+				if (executeMstUnk17(t->dataPtr, num)) {
+					const int arg = _res->_mstUnk52[num * 4 + 3];
+					t->codeData = p;
+					ret = changeTask(t, num, (arg == 0xFF) ? -1 : arg);
+				}
 			}
 			break;
 		case 23: // 13 - set_flag_global

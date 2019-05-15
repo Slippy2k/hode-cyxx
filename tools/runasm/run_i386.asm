@@ -12,6 +12,7 @@ GLOBAL test_neg_sbb_neg
 GLOBAL test_0041D87E
 GLOBAL test_004070C8
 GLOBAL test_cdqxorsub
+GLOBAL test_negsbbinc
 
 SECTION .text
 
@@ -238,3 +239,16 @@ test_cdqxorsub:
 
   pop ebp
   ret
+
+test_negsbbinc:
+
+    push ebp
+    mov ebp, esp
+
+	mov eax, [ebp + arg0]
+	neg eax
+	sbb eax, eax
+        inc eax
+
+    pop ebp
+    ret
