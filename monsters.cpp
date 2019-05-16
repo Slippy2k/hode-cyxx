@@ -657,27 +657,30 @@ void Game::executeMstCodeHelper2() {
 }
 
 bool Game::executeMstUnk17(MstTaskData *m, int num) {
-	warning("executeMstUnk17 unimplemented");
 	LvlObject *o = m->o16;
 	uint8_t _al = _res->_mstUnk52[num * 4];
 	uint8_t _bl = _res->_mstUnk52[num * 4 + 2];
 	const uint8_t *var4 = m->unk8 + _al * 24;
-	uint8_t var8 = (o->flags1 >> 4) & 3;
-	uint32_t _ecx = 0;
-	// TODO
+	uint8_t _dl = (o->flags1 >> 4) & 3;
+	uint8_t _ecx = (((_dl & 1) != 0 ? -1 : 0) & 6) + 2;
+	uint8_t var8 = _ecx;
 	if (o->flags1 & 2) {
-		var8 |= 1;
-	} else {
 		var8 |= 4;
+	} else {
+		var8 |= 1;
 	}
+	_dl = _bl;
 	_ecx = _bl & 15;
 	if ((_bl & 0x10) == 0) {
 		uint32_t _ebp = _bl & 0xE0;
 		uint32_t _eax = _ebp - 32;
-		if (_eax > 160) {
+		if (_eax <= 160) {
+// 40E52A
 			// TODO
-
+			warning("executeMstUnk17 unimplemented _eax %d", _eax);
 		}
+// 40E5BA
+		_ecx |= var8;
 	}
 // 40E5C0
 	_bl &= 0xE0;
@@ -704,7 +707,7 @@ bool Game::executeMstUnk22(LvlObject *o, int type) {
 }
 
 bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
-	if ((flags & 1) != 0 && (m->o16->flags0 & 200) == 0) {
+	if ((flags & 1) != 0 && (m->o16->flags0 & 0x200) == 0) {
 		return false;
 	} else if ((flags & 8) != 0 && (m->flags48 & 0x20) == 0) {
 		return false;
@@ -1284,9 +1287,14 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 				t->flags = (t->flags & ~0x40) | 0x20;
 				m->flags48 &= ~0x1C;
 			} else if ((mask & 2) != 0) {
-// 414F2A
 				m->flags48 |= 8;
-				// TODO
+				const MstUnk46Unk1 *m46unk1 = m->unk4;
+				if (m46unk1->indexUnk51 != kNone) {
+					m->flags48 |= 4;
+				}
+				if (m46unk1->indexUnk47 != kNone) {
+					m->flags48 |= 0x10;
+				}
 			}
 		}
 	}
@@ -1698,7 +1706,7 @@ int Game::runTask_default(Task *t) {
 		case 30: { // 20
 				t->delay = 3;
 				t->tempVar = p[1];
-				if ((t->tempVar & _mstFlags) == 0) {
+				if (((1 << p[1]) & _mstFlags) == 0) {
 					LvlObject *o = 0;
 					if (t->dataPtr) {
 						if ((t->dataPtr->flagsA6 & 2) == 0) {
