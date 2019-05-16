@@ -688,6 +688,21 @@ bool Game::executeMstUnk17(MstTaskData *m, int num) {
 	return (var8 & _ecx) != 0 ? 0 : 1;
 }
 
+bool Game::executeMstUnk19(LvlObject *o, int type) {
+	warning("executeMstUnk19 unimplemented");
+	return false;
+}
+
+bool Game::executeMstUnk21(LvlObject *o, int type) {
+	warning("executeMstUnk21 unimplemented");
+	return false;
+}
+
+bool Game::executeMstUnk22(LvlObject *o, int type) {
+	warning("executeMstUnk22 unimplemented");
+	return false;
+}
+
 bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
 	if ((flags & 1) != 0 && (m->o16->flags0 & 200) == 0) {
 		return false;
@@ -703,29 +718,27 @@ bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
 	} else if ((flags & 0x80) != 0) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 0))) {
 		return false;
-	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 1))) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 0x100000) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+	} else if ((flags & 0x100000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk22(m->o16, 0))) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 0x200000) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+	} else if ((flags & 0x200000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk22(m->o16, 1))) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 4) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+	} else if ((flags & 4) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk21(m->o16, 0))) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 2) != 0 && (m->o16->screenNum != _andyObject->screenNum /* || .. */)) {
+	} else if ((flags & 2) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk21(m->o16, 1))) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 0x4000) != 0) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
-	} else if ((flags & 0x1000) != 0) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+	} else if ((flags & 0x4000) != 0 && !executeMstUnk19(m->o16, 0x4000)) {
+		return false;
+	} else if ((flags & 0x1000) != 0 && !executeMstUnk21(m->o16, 0x1000)) {
+		return false;
 	} else if ((flags & 0x20) != 0 && (m->o16->flags0 & 0x100) == 0) {
 		return false;
 	} else if ((flags & 0x10000) != 0) {

@@ -578,6 +578,9 @@ struct Game {
 	void executeMstCode();
 	void executeMstCodeHelper2();
 	bool executeMstUnk17(MstTaskData *m, int num);
+	bool executeMstUnk19(LvlObject *o, int type);
+	bool executeMstUnk21(LvlObject *o, int type);
+	bool executeMstUnk22(LvlObject *o, int type);
 	bool executeMstUnk20(MstTaskData *m, uint32_t flags);
 	bool executeMstUnk27(MstTaskData *m, const uint8_t *p);
 	int executeMstCodeHelper3(Task *t);
