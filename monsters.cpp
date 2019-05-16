@@ -676,16 +676,45 @@ bool Game::executeMstUnk17(MstTaskData *m, int num) {
 		uint32_t _eax = _ebp - 32;
 		if (_eax <= 160) {
 // 40E52A
-			// TODO
-			warning("executeMstUnk17 unimplemented _eax %d", _eax);
-		}
+			switch (_eax) {
+			case 0:
+				if (_ebp == 192) {
+					_ecx |= m->flags49 & ~5;
+				} else {
+					_dl = m->flags49;
+					_ecx |= _dl;
+					if (m->unk8[946] & 2) {
+						if (_ebp == 160 && _mstLut1[_ecx] != 1) {
+							if (m->xDelta >= m->yDelta) {
+								_ecx &= ~5;
+							} else {
+								_ecx &= ~0xA;
+							}
+						} else {
+							if (m->xDelta >= 2 * m->yDelta) {
+								_ecx &= ~5;
+							} else if (m->yDelta >= 2 * m->xDelta) {
+								_ecx &= ~0xA;
+							}
+
+						}
+					}
+				}
+				break;
+			default:
+				// TODO
+				warning("executeMstUnk17 unimplemented _eax %d _ebp %d", _eax, _ebp);
+				break;
+			}
+		} else {
 // 40E5BA
-		_ecx |= var8;
+			_ecx |= var8;
+		}
 	}
 // 40E5C0
 	_bl &= 0xE0;
 	_ecx &= var4[2];
-	if ((_bl == 0x40) == 0) {
+	if (_bl == 0x40) {
 		_ecx ^= 0xA;
 	}
 	return (var8 & _ecx) != 0 ? 0 : 1;
@@ -1186,6 +1215,10 @@ int Game::changeTask(Task *t, int num, int delay) {
 	int _ebp = (int8_t)ptr[5];
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
+		uint8_t var11 = ptr[2];
+		if ((var11 & 0xA) == 0xA) {
+
+		}
 		// TODO
 	} else {
 		if ((m->unk8[946] & 4) == 0 || ptr[14] == 0) {
@@ -1196,16 +1229,12 @@ int Game::changeTask(Task *t, int num, int delay) {
 // 40EA40
 	_edi = m->xMstPos + (int8_t)ptr[12] /* + _ebp */ ;
 	_ebp = m->yMstPos + (int8_t)ptr[13] /* + _eax */ ;
-	if ((var8 & 0xE0) == 0x60) {
-/*
-		if (clearMstRectsTable(m->soundType, _edi, ) {
-			t->flags |= 0x80;
-			return 0;
-		}
-*/
+	if ((var8 & 0xE0) == 0x60 /* && checkMstRectsTable(m->soundType, _edi, _ebp, (_edx & 255) + _edi - 1, ptr[15] + _ebp - 1) */ ) {
+		t->flags |= 0x80;
+		return 0;
 	}
 // 40EAA0
-	// TODO
+	m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 // 40EAD0
 	m->flagsA4 = var4;
 	if (delay == -1) {
