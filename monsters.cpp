@@ -2140,6 +2140,29 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 157:
+		case 158:
+		case 159:
+		case 160:
+		case 161:
+		case 162:
+		case 163:
+		case 164:
+		case 165:
+		case 166: { // 45
+				MstTaskData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->mstTaskData;
+				} else {
+					m = t->dataPtr;
+				}
+				if (m) {
+					const int num = p[2];
+					assert(p[1] < kMaxLocals);
+					arithOp(p[0] - 157, &m->localVars[p[1]], getTaskOtherVar(num, t));
+				}
+			}
+			break;
 		case 167:
 		case 168:
 		case 169:
