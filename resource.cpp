@@ -27,8 +27,7 @@ Resource::Resource(const char *dataPath)
 	memset(_resLvlScreenBackgroundDataPtrTable, 0, sizeof(_resLvlScreenBackgroundDataPtrTable));
 	memset(_resLvlScreenObjectDataTable, 0, sizeof(_resLvlScreenObjectDataTable));
 	memset(&_dummyObject, 0, sizeof(_dummyObject));
-	_isDemoData = detectGameData();
-	if (_isDemoData) {
+	if (sectorAlignedGameData()) {
 		_datFile = new SectorFile;
 		_lvlFile = new SectorFile;
 		_mstFile = new SectorFile;
@@ -42,23 +41,16 @@ Resource::Resource(const char *dataPath)
 	_loadingImageBuffer = 0;
 }
 
-bool Resource::detectGameData() {
-	static const uint32_t _sizes[] = {
-		5804032, // hod_demo-weben1_2.exe
-		5867520, // HOD_Demo-WebFr1.2.exe
-		0
-	};
+bool Resource::sectorAlignedGameData() {
 	File f;
 	if (!_fs.openFile("SETUP.DAT", &f)) {
 		error("Unable to open 'SETUP.DAT'");
 		return false;
 	}
-	if (f.readUint32() == 11) {
-		const uint32_t size = f.getSize();
-		for (int i = 0; _sizes[i]; ++i) {
-			if (size == _sizes[i]) {
-				return true;
-			}
+	uint8_t buf[2048];
+	if (f.read(buf, sizeof(buf)) == sizeof(buf)) {
+		if (fioUpdateCRC(0, buf, sizeof(buf)) == 0) {
+			return true;
 		}
 	}
 	return false;

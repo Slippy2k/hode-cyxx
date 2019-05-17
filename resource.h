@@ -505,11 +505,9 @@ struct Resource {
 	MstOp56Data *_mstOp56Data;
 	uint8_t *_mstCodeData;
 
-	bool _isDemoData;
-
 	Resource(const char *dataPath);
 
-	bool detectGameData();
+	bool sectorAlignedGameData();
 
 	void loadLevelData(const char *levelName);
 
