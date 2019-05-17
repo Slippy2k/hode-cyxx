@@ -591,7 +591,7 @@ struct Game {
 	void updateMstMoveData();
 	void updateMstHeightMapData();
 
-	void removeMstObjectTask(Task *t);
+	void removeMstObjectTask(Task *t, Task **tasksList);
 	void stopMstTaskData(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);

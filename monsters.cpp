@@ -1194,7 +1194,7 @@ void Game::updateMstHeightMapData() {
 	}
 }
 
-void Game::removeMstObjectTask(Task *t) {
+void Game::removeMstObjectTask(Task *t, Task **tasksList) {
 	MstObject *m = t->mstObject;
 	m->unk0 = 0;
 	LvlObject *o = m->o;
@@ -1214,6 +1214,8 @@ void Game::removeMstObjectTask(Task *t) {
 	}
 	if (prev) {
 		prev->nextPtr = next;
+	} else {
+		*tasksList = next;
 	}
 }
 
@@ -1394,6 +1396,7 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 }
 
 void Game::resetTask(Task *t, const uint8_t *codeData) {
+	assert(codeData);
 	t->runningState |= 2;
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
@@ -1441,7 +1444,7 @@ void Game::removeTask(Task **tasksList, Task *t) {
 void Game::appendTask(Task **tasksList, Task *t) {
 	Task *current = *tasksList;
 	if (!current) {
-		*tasksList = current;
+		*tasksList = t;
 		t->nextPtr = t->prevPtr = 0;
 	} else {
 		// go to last element
@@ -1450,6 +1453,7 @@ void Game::appendTask(Task **tasksList, Task *t) {
 			current = next;
 			next = current->nextPtr;
 		}
+		assert(!current->nextPtr);
 		current->nextPtr = t;
 		t->nextPtr = 0;
 		t->prevPtr = current;
@@ -1710,14 +1714,14 @@ int Game::getTaskFlag(Task *t, int num, int type) const {
 }
 
 int Game::runTask_default(Task *t) {
+	if (!t->codeData) {
+		warning("runTask_default has NULL codeData t %p", t);
+		return 1;
+	}
 	int ret = 0;
 	t->runningState &= ~2;
 	const uint8_t *p = t->codeData;
 	do {
-		if (!p) {
-			warning("runTask_default has NULL codeData");
-			return 1;
-		}
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		debug(kDebug_MONSTER, "executeMstCode code %d", p[0]);
@@ -3618,7 +3622,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		case 1:
 		case 2:
 			warning("executeMstOp67 unhandled type %d", type);
-			_mstTasksList1 = _mstTasksList1->nextPtr; // TEMP
+			removeTask(&_mstTasksList1, t); // TEMP
 			break;
 #else
 		case 1:
