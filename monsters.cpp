@@ -763,8 +763,34 @@ bool Game::executeMstUnk19(LvlObject *o, int type) {
 }
 
 bool Game::executeMstUnk21(LvlObject *o, int type) {
-	warning("executeMstUnk21 unimplemented");
-	return false;
+	int _esi, _edi, _ebx, _ebp;
+	if (type != 1 && type != 0x1000) {
+		_esi = o->xPos;
+		_edi = o->yPos;
+		_ebx = _esi + o->width  - 1;
+		_ebp = _edi + o->height - 1;
+	} else {
+		_esi = o->xPos + o->posTable[0].x;
+		_ebx = o->xPos + o->posTable[1].x;
+		_edi = o->yPos + o->posTable[0].y;
+		_ebp = o->yPos + o->posTable[1].y;
+		if (_esi > _ebx) {
+			SWAP(_esi, _ebx);
+		}
+		if (_edi > _ebp) {
+			SWAP(_edi, _ebp);
+		}
+		if (type == 0x1000 && _andyObject->screenNum != o->screenNum) {
+			const int dx = _res->_mstPointOffsets[_andyObject->screenNum].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
+			_esi += dx;
+			_ebx += dx;
+			const int dy = _res->_mstPointOffsets[_andyObject->screenNum].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
+			_edi += dy;
+			_ebp += dy;
+		}
+	}
+// 417D2B
+	return (_andyObject->xPos + _andyObject->width - 1 >= _esi && _andyObject->xPos <= _ebx && _andyObject->yPos + _andyObject->height - 1 >= _edi && _andyObject->yPos <= _ebp);
 }
 
 bool Game::executeMstUnk22(LvlObject *o, int type) {
@@ -919,19 +945,35 @@ int Game::executeMstCodeHelper3(Task *t) {
 						const uint8_t dir = (o->flags1 >> 4) & 3;
 						const uint8_t *p = m47->data;
 						for (uint32_t i = 0; i < m47->count; ++i) {
+							int32_t a = READ_LE_UINT32(p);
+							int32_t b = READ_LE_UINT32(p + 4);
+							int32_t c = READ_LE_UINT32(p + 8);
+							int32_t d = READ_LE_UINT32(p + 12);
 							int x1, x2, y1, y2;
 							switch (dir) {
 							case 1:
+								x1 = m->xMstPos - c; // _edx
+								x2 = m->xMstPos - a; // _edi
+								y1 = m->yMstPos + b; // _esi
+								y2 = m->yMstPos + d; // _ebp;
+								break;
 							case 2:
+								x1 = m->xMstPos + a; // _edx
+								x2 = m->xMstPos + c; // _edi
+								y1 = m->yMstPos - d; // _esi
+								y2 = m->yMstPos - b; // _ebp
+								break;
 							case 3:
-								// TODO
-								warning("executeMstCodeHelper3 unhandled dir %d", dir);
-								// fall-through
+								x1 = m->xMstPos - c;
+								x2 = m->xMstPos - a;
+								y1 = m->yMstPos - d;
+								y2 = m->yMstPos - b;
+								break;
 							default:
-								x1 = m->xMstPos + (int32_t)READ_LE_UINT32(p); // _edx
-								x2 = m->xMstPos + (int32_t)READ_LE_UINT32(p + 8); // _edi
-								y1 = m->yMstPos + (int32_t)READ_LE_UINT32(p + 4); // _esi
-								y2 = m->yMstPos + (int32_t)READ_LE_UINT32(p + 12); // _ebp
+								x1 = m->xMstPos + a; // _edx
+								x2 = m->xMstPos + c; // _edi
+								y1 = m->yMstPos + b; // _esi
+								y2 = m->yMstPos + d; // _ebp
 								break;
 							}
 
