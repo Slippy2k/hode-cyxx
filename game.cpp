@@ -12,6 +12,22 @@
 #include "util.h"
 #include "video.h"
 
+// cutscene number when starting a level
+static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
+
+static const char *_levels[] = {
+	"rock_hod",
+	"fort_hod",
+	"pwr1_hod",
+	"isld_hod",
+	"lava_hod",
+	"pwr2_hod",
+	"lar1_hod",
+	"lar2_hod",
+	"dark_hod",
+	"test_hod"
+};
+
 Game::Game(SystemStub *system, const char *dataPath) {
 	memset(this, 0, sizeof(Game)); // TODO: proper init
 	_difficulty = 1;
@@ -1723,7 +1739,7 @@ void Game::drawPlasmaCannon() {
 	_plasmaCannonObject = 0;
 }
 
-void Game::redrawObjects() {
+void Game::drawScreen() {
 	memcpy(_video->_frontLayer, _video->_backgroundLayer, 256 * 192);
 
 	// redraw background animation sprites
@@ -1799,19 +1815,6 @@ void Game::redrawObjects() {
 		}
 	}
 }
-
-static const char *_levels[] = {
-	"rock_hod",
-	"fort_hod",
-	"pwr1_hod",
-	"isld_hod",
-	"lava_hod",
-	"pwr2_hod",
-	"lar1_hod",
-	"lar2_hod",
-	"dark_hod",
-	"test_hod"
-};
 
 void Game::mainLoop(int level, int checkpoint) {
 	if (level >= kLvl_test) {
@@ -2257,9 +2260,6 @@ void Game::updateInput() {
 	}
 }
 
-// cutscene number when starting a level
-static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
-
 void Game::levelMainLoop() {
 	_andyCurrentLevelScreenNum = -1;
 	initMstCode();
@@ -2394,7 +2394,7 @@ void Game::levelMainLoop() {
 			_video->_paletteNeedRefresh = false;
 			_video->refreshGamePalette(_video->_displayPaletteBuffer);
 		}
-		redrawObjects();
+		drawScreen();
 		if (_system->inp.screenshot) {
 			_system->inp.screenshot = false;
 			captureScreenshot();
@@ -2665,7 +2665,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 void Game::lvlObjectType0Init(LvlObject *ptr) {
 	uint8_t num = ptr->spriteNum;
 	if (_currentLevel == kLvl_rock && _levelCheckpoint >= 5) {
-		num = 2;
+		num = 2; // sprite without 'plasma cannon'
 	}
 	_andyObject = declareLvlObject(ptr->type, num);
 	assert(_andyObject);
@@ -2712,8 +2712,8 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 
 void Game::lvlObjectTypeInit(LvlObject *o) {
 	switch (o->spriteNum) {
-	case 0:
-	case 2:
+	case 0: // Andy with plasma cannon and helmet
+	case 2: // Andy
 		lvlObjectType0Init(o);
 		break;
 	case 1:
@@ -3175,11 +3175,11 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 			setupPlasmaCannonPoints(ptr);
 		}
 		break;
-	case 9:
-		if (ptr->spriteNum != 0) {
-			setupSpecialPowers(ptr);
-		} else {
+	case 9: // test_hod
+		if (ptr->spriteNum == 0) {
 			setupPlasmaCannonPoints(ptr);
+		} else {
+			setupSpecialPowers(ptr);
 		}
 		break;
 	case 2:
@@ -3192,6 +3192,9 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 	case 5:
 	case 6:
 		setupSpecialPowers(ptr);
+		break;
+	case 1:
+	case 8:
 		break;
 	}
 	if (!_hideAndyObjectSprite) {
@@ -3246,8 +3249,8 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		ptr->actionKeyMask = _andyObject->actionKeyMask;
 		ptr->directionKeyMask = _andyObject->directionKeyMask;
 		if (_andyObject->spriteNum == 2 && _lvlObjectsList0) {
-			// TODO
-			// game_unk24
+			warning("lvlObjectType8CallbackHelper unimplemented");
+			// lvlObjectType8CallbackHelper(ptr);
 		}
 		updateAndyObject(ptr);
 		setLvlObjectPosInScreenGrid(ptr, 7);
@@ -3260,9 +3263,12 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			ptr->bitmapBits = 0;
 			return 0;
 		}
+		int _ebx, var4;
 		MstTaskData *m = 0; // _ebp
 		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
 			m = (MstTaskData *)ptr->dataPtr;
+			_ebx = 1;
+			var4 = m->soundType;
 			if (m->flagsA6 & 2) {
 				m->o16->actionKeyMask = _mstCurrentActionKeyMask;
 				m->o16->directionKeyMask = _andyObject->directionKeyMask;
@@ -3275,11 +3281,11 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			MstObject *mo = (MstObject *)dataPtr;
 			m = mo->mstTaskData;
 			if (m) {
-				// _ebx = 2;
-				// var4 = m->soundType;
+				_ebx = 2;
+				var4 = m->soundType;
 			} else {
-				// _ebx = 0;
-				// var4 = 4;
+				_ebx = 0;
+				var4 = 4;
 			}
 			m = 0; // _ebp = 0
 			if (mo->flags24 & 8) {
@@ -3304,10 +3310,10 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		if (ptr->screenNum == _currentScreen || ptr->screenNum == _currentLeftScreen || ptr->screenNum == _currentRightScreen || o || (_currentLevel == kLvl_lar2 && ptr->spriteNum == 27) || (_currentLevel == kLvl_isld && ptr->spriteNum == 26)) {
 // 402C57
 			if (ptr->currentSound != 0xFFFF) {
-				playSound(ptr->currentSound, ptr, 0, 0); // _ebx, var4
+				playSound(ptr->currentSound, ptr, _ebx, var4);
 			}
 			if (o && o->currentSound != 0xFFFF) {
-				playSound(o->currentSound, o, 0, 0); // _ebx, var4
+				playSound(o->currentSound, o, _ebx, var4);
 			}
 		}
 // 402C8B

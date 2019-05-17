@@ -506,6 +506,7 @@ struct Resource {
 	uint8_t *_mstCodeData;
 
 	Resource(const char *dataPath);
+	~Resource();
 
 	bool sectorAlignedGameData();
 

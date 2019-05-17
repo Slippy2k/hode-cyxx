@@ -41,6 +41,9 @@ Resource::Resource(const char *dataPath)
 	_loadingImageBuffer = 0;
 }
 
+Resource::~Resource() {
+}
+
 bool Resource::sectorAlignedGameData() {
 	File f;
 	if (!_fs.openFile("SETUP.DAT", &f)) {

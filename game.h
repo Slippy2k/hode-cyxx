@@ -262,7 +262,7 @@ struct Game {
 	int clipLvlObjectsSmall(LvlObject *o, LvlObject *ptr, int count);
 	int updateAndyLvlObject();
 	void drawPlasmaCannon();
-	void redrawObjects();
+	void drawScreen();
 	void updateLvlObjectList(LvlObject *list);
 	void updateLvlObjectLists();
 	LvlObject *updateAnimatedLvlObjectType0(LvlObject *ptr);
