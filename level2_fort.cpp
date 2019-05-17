@@ -28,7 +28,7 @@ void Game::postScreenUpdate_fort_screen1() {
 
 void Game::postScreenUpdate_fort_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 0, 43, 191 };
 		if (!clipBoundingBox(&b, &data->boundingBox)) {
 			_andyObject->actionKeyMask &= ~3;
@@ -74,7 +74,7 @@ void Game::postScreenUpdate_fort_screen7() {
 
 void Game::postScreenUpdate_fort_screen8() {
 	if (_res->_currentScreenResourceNum == 8) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 138, 0, 255, 191 };
 		if (!clipBoundingBox(&b, &data->boundingBox)) {
 			_andyObject->actionKeyMask &= ~3;
@@ -100,7 +100,7 @@ void Game::postScreenUpdate_fort_screen8() {
 void Game::postScreenUpdate_fort_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
 		if (_res->_screensState[16].s0 == 1) {
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			BoundingBox b = { 150, 0, 187, 60 };
                 	if (!clipBoundingBox(&b, &data->boundingBox)) {
 				return;

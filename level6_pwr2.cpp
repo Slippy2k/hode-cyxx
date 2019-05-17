@@ -76,7 +76,7 @@ void Game::preScreenUpdate_pwr2_screen2() {
 
 void Game::preScreenUpdate_pwr2_screen3() {
 	if (_res->_currentScreenResourceNum == 3 && _levelCheckpoint != 0) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 103, 122, 191 };
 		if (clipBoundingBox(&b, &data->boundingBox)) {
 			_levelCheckpoint = 1;

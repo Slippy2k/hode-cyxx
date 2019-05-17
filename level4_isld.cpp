@@ -34,7 +34,7 @@ void Game::postScreenUpdate_isld_screen3() {
 			LvlObject *o = findLvlObject2(0, 1, 3);
 			if (o) {
 				AnimBackgroundData *backgroundData = (AnimBackgroundData *)getLvlObjectDataPtr(o, kObjectDataTypeAnimBackgroundData);
-				AndyObjectScreenData *andyData = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+				AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 				andyData->dxPos += byte_451DE8[backgroundData->currentFrame];
 			}
 		}
@@ -47,7 +47,7 @@ void Game::postScreenUpdate_isld_screen4() {
 			LvlObject *o = findLvlObject2(0, 1, 4);
 			if (o) {
 				AnimBackgroundData *backgroundData = (AnimBackgroundData *)getLvlObjectDataPtr(o, kObjectDataTypeAnimBackgroundData);
-				AndyObjectScreenData *andyData = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+				AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 				andyData->dxPos += byte_451DE8[backgroundData->currentFrame];
 			}
 		}

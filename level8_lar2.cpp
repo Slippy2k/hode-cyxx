@@ -59,7 +59,7 @@ void Game::postScreenUpdate_lar2_screen2() {
 				}
 			}
 		}
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		if (postScreenUpdate_lar2_screen2_helper(&data->boundingBox) == 0) {
 			BoundingBox b = { 107, 77, 117, 81 };
 			if (clipBoundingBox(&b, &data->boundingBox)) {

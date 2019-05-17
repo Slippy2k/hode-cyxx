@@ -227,7 +227,7 @@ void Game::postScreenUpdate_rock_screen16() {
 			if ((_andyObject->flags0 & 0x1F) == 2) {
 				break;
 			}
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (data->unk4 != 2 || _andyObject->xPos <= 155 || _andyObject->yPos >= 87) {
 				break;
 			}
@@ -301,7 +301,7 @@ void Game::postScreenUpdate_rock_screen18() {
 				break;
 			}
 			BoundingBox box = { 24, 98, 108, 165 };
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (!clipBoundingBox(&box, &data->boundingBox)) {
 				return;
 			}
@@ -321,7 +321,7 @@ void Game::postScreenUpdate_rock_screen19() {
 	switch (_res->_screensState[19].s0) {
 	case 0: {
 			BoundingBox box = { 155, 69, 210, 88 };
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (!clipBoundingBox(&box, &data->boundingBox)) {
 				return;
 			}

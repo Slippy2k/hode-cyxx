@@ -1512,11 +1512,11 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 		return (_andyObject->spriteNum == 0);
 	case 7:
 		if ((_andyObject->flags0 & 0x1F) == 7) {
-			AndyObjectScreenData *andyData = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (andyData) {
-				LvlObject *o = andyData->nextPtr;
+				LvlObject *o = andyData->shootLvlObject;
 				if (o) {
-					OtherObjectScreenData *data = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+					ShootLvlObjectData *data = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 					if (data) {
 						return (data->unk0 == 4) ? 1 : 0;
 					}
@@ -1526,11 +1526,11 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 		break;
 	case 8:
 		if ((_andyObject->flags0 & 0x1F) == 7) {
-			AndyObjectScreenData *andyData = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (andyData) {
-				LvlObject *o = andyData->nextPtr;
+				LvlObject *o = andyData->shootLvlObject;
 				if (o) {
-					OtherObjectScreenData *data = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+					ShootLvlObjectData *data = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 					if (data) {
 						return (data->unk0 == 0) ? 1 : 0;
 					}

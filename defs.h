@@ -152,7 +152,7 @@ struct LvlObject {
 	const uint8_t *bitmapBits;
 	int (Game::*callbackFuncPtr)(LvlObject *ptr);
 	void *dataPtr;
-// ptr->data0x2988==0:AndyObjectScreenData
+// ptr->data0x2988==0:AndyLvlObjectData
 // ptr->type==0: AnimBackgroundData * / _animBackgroundDataTable
 // ptr->type==1: _resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
 // ptr->type==8(_andyObject): &_gameUnkList1Element
@@ -221,7 +221,7 @@ struct BoundingBox {
 	int32_t y2; // C
 };
 
-struct AndyObjectScreenData {
+struct AndyLvlObjectData {
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;
@@ -232,10 +232,10 @@ struct AndyObjectScreenData {
 	BoundingBox boundingBox; // 0x8
 	int32_t dxPos; // 0x18
 	int32_t dyPos; // 0x1C
-	LvlObject *nextPtr; // 0x20 lvlObject
+	LvlObject *shootLvlObject; // 0x20 'cannon plasma' or 'special powers'
 };
 
-struct OtherObjectScreenData { // SpecialPowersObjectData
+struct ShootLvlObjectData {
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;
@@ -246,7 +246,7 @@ struct OtherObjectScreenData { // SpecialPowersObjectData
 	int y2; // 0x10
 	int32_t dxPos; // 0x18
 	int32_t dyPos; // 0x1C
-	OtherObjectScreenData *nextPtr; // next pointer to 'free' element
+	ShootLvlObjectData *nextPtr; // next pointer to 'free' element
 };
 
 struct ScreenMask { // ShadowScreenMask
@@ -267,7 +267,7 @@ struct MovingOpcodeState {
 	int32_t unk1C;
 	int32_t unk20;
 	int32_t unk24;
-	OtherObjectScreenData *unk28;
+	ShootLvlObjectData *unk28;
 	LvlObject *unk2C;
 	uint32_t unk30;
 	uint32_t unk3C;

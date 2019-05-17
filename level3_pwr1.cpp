@@ -33,7 +33,7 @@ void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
 	b2.y1 = _andyObject->posTable[3].y + _andyObject->yPos - 1;
 	b2.y2 = _andyObject->posTable[3].y + _andyObject->yPos + 1;
 	if (clipBoundingBox(b, &b2)) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		data->dxPos += dx;
 		data->dyPos += dy;
 	}
@@ -46,7 +46,7 @@ void Game::postScreenUpdate_pwr1_screen6() {
 			BoundingBox b = { 185, 78, 225, 136 };
 			LvlObject *o = findLvlObjectBoundingBox(&b);
 			if (o) {
-				OtherObjectScreenData *oosd = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+				ShootLvlObjectData *oosd = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 				if (oosd->unk0 == 6) {
 					_res->_screensState[6].s0 = 4;
 					dat->currentMaskId = 2;
@@ -74,7 +74,7 @@ void Game::postScreenUpdate_pwr1_screen6() {
 		break;
 	default: {
 			BoundingBox b = { 93, 17, 255, 156 };
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (clipBoundingBox(&b, &data->boundingBox)) {
 				_res->_screensState[6].s0 = 3;
 				setShakeScreen(3, 31);
@@ -159,7 +159,7 @@ void Game::postScreenUpdate_pwr1_screen18() {
 	if (_res->_currentScreenResourceNum == 18) {
 		if (_levelCheckpoint == 3) {
 			BoundingBox b = { 0, 0, 123, 125 };
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (clipBoundingBox(&b, &data->boundingBox)) {
 				++_levelCheckpoint;
 			}
@@ -184,7 +184,7 @@ void Game::postScreenUpdate_pwr1_screen23() {
 	case 0:
 		if (_res->_currentScreenResourceNum == 23) {
 			BoundingBox b = { 26, 94, 63, 127 };
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (clipBoundingBox(&b, &data->boundingBox)) {
 				uint8_t flags = _andyObject->flags0;
 				if ((flags & 0x1F) == 0 && (flags & 0xE0) == 0xE0) {
@@ -226,7 +226,7 @@ void Game::postScreenUpdate_pwr1_screen27() {
 
 void Game::postScreenUpdate_pwr1_screen35() {
 	if (_res->_currentScreenResourceNum == 35) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 0, 193, 88 };
 		if (clipBoundingBox(&b, &data->boundingBox)) {
 			_andyObject->actionKeyMask &= ~3;

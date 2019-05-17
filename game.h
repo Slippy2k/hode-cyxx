@@ -33,7 +33,7 @@ struct Game {
 		// LvlObject.type == 0
 		kObjectDataTypeAnimBackgroundData,
 		// LvlObject.type == 8
-		kObjectDataTypeOther,
+		kObjectDataTypeShoot,
 		// LvlObject.type == 1
 		kObjectDataTypeLvlBackgroundSound,
 		kObjectDataTypeMonster
@@ -91,8 +91,8 @@ struct Game {
 	int8_t _fadePaletteCounter;
 	bool _fadePalette;
 	bool _hideAndyObjectSprite;
-	OtherObjectScreenData _otherObjectScreenDataTable[32];
-	OtherObjectScreenData *_otherObjectScreenDataList; // pointer to the first 'free' element
+	ShootLvlObjectData _otherObjectScreenDataTable[32];
+	ShootLvlObjectData *_otherObjectScreenDataList; // pointer to the first 'free' element
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -158,7 +158,7 @@ struct Game {
 	LvlObject _declaredLvlObjectsList[160];
 	LvlObject *_declaredLvlObjectsListHead;
 	int _declaredLvlObjectsListCount;
-	AndyObjectScreenData _andyObjectScreenData;
+	AndyLvlObjectData _andyObjectScreenData;
 	AnimBackgroundData _animBackgroundDataTable[64];
 	int _animBackgroundDataCount;
 	uint8_t _andyActionKeysFlags;

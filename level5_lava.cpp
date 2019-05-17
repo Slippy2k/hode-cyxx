@@ -67,7 +67,7 @@ void Game::postScreenUpdate_lava_screen7() {
 	if (_res->_currentScreenResourceNum == 7) {
 		if (_levelCheckpoint == 2) {
 			BoundingBox b = { 104, 0, 239, 50 };
-                        AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+                        AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
                         if (clipBoundingBox(&b, &data->boundingBox)) {
 				_levelCheckpoint = 3;
 			}

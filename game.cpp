@@ -46,7 +46,7 @@ void Game::resetObjectScreenDataList() {
 }
 
 void Game::clearObjectScreenData(LvlObject *ptr) {
-	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeOther);
+	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
 	dat->nextPtr = _otherObjectScreenDataList;
 	_otherObjectScreenDataList = dat;
 	ptr->dataPtr = 0;
@@ -287,7 +287,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 			return;
 		}
 		if (_currentLevel == kLvl_isld && ptr->spriteNum == 2) {
-			AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+			AndyLvlObjectData *dataPtr = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 			spr->xPos += dataPtr->dxPos;
 		}
 		if (READ_LE_UINT16(ptr->bitmapBits) > 8) {
@@ -478,7 +478,7 @@ void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	const int h = ptr->height - 1;
 
 	if (ptr->type == 8 && (ptr->spriteNum == 2 || ptr->spriteNum == 0)) {
-		AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+		AndyLvlObjectData *dataPtr = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 		dataPtr->boundingBox.x1 = ptr->xPos;
 		dataPtr->boundingBox.y1 = ptr->yPos;
 		dataPtr->boundingBox.x2 = ptr->xPos + w;
@@ -628,9 +628,9 @@ void Game::setupPlasmaCannonPointsHelper() {
 }
 
 void Game::destroyLvlObjectPlasmaExplosion(LvlObject *o) {
-	AndyObjectScreenData *l = (AndyObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeAndy);
-	if (l->nextPtr) {
-		l->nextPtr = 0;
+	AndyLvlObjectData *l = (AndyLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeAndy);
+	if (l->shootLvlObject) {
+		l->shootLvlObject = 0;
 		assert(_plasmaExplosionObject);
 		removeLvlObjectFromList(&_plasmaExplosionObject, _plasmaExplosionObject->nextPtr);
 		destroyLvlObject(_plasmaExplosionObject->nextPtr);
@@ -1033,10 +1033,10 @@ int Game::addLvlObjectToList3(int num) {
 }
 
 void Game::removeLvlObject(LvlObject *ptr) {
-	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-	LvlObject *o = dataPtr->nextPtr;
+	AndyLvlObjectData *dataPtr = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	LvlObject *o = dataPtr->shootLvlObject;
 	if (o) {
-		dataPtr->nextPtr = 0;
+		dataPtr->shootLvlObject = 0;
 		removeLvlObjectFromList(&_lvlObjectsList0, o);
 		destroyLvlObject(o);
 	}
@@ -1132,7 +1132,7 @@ void Game::setupCurrentScreen() {
 	_currentRightScreen = _res->_screensGrid[_currentScreen * 4 + kPosRightScreen];
 	ptr->frame = 0;
 	setupLvlObjectBitmap(ptr);
-	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	AndyLvlObjectData *dataPtr = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	dataPtr->unk6 = 0;
 	if (ptr->spriteNum == 2) {
 		removeLvlObject(ptr);
@@ -1380,7 +1380,7 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 		} else if (ptr->screenNum != num) {
 			debug(kDebug_GAME, "Changing screen from %d to %d, pos=%d,%d", num, ptr->screenNum, xPos, yPos);
 			ret = 1;
-			AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 			data->boundingBox.x1 = ptr->xPos;
 			data->boundingBox.x2 = ptr->xPos + ptr->width - 1;
 			data->boundingBox.y1 = ptr->yPos;
@@ -1652,7 +1652,7 @@ int Game::updateAndyLvlObject() {
 	assert(_andyObject->callbackFuncPtr);
 	(this->*_andyObject->callbackFuncPtr)(_andyObject);
 	if (_currentLevel != kLvl_isld) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		_andyObject->xPos += data->dxPos;
 		_andyObject->yPos += data->dyPos;
 	}
@@ -2352,8 +2352,8 @@ void Game::levelMainLoop() {
 		if (!_hideAndyObjectSprite) {
 			addToSpriteList(_andyObject);
 		}
-		((AndyObjectScreenData *)_andyObject->dataPtr)->dxPos = 0;
-		((AndyObjectScreenData *)_andyObject->dataPtr)->dyPos = 0;
+		((AndyLvlObjectData *)_andyObject->dataPtr)->dxPos = 0;
+		((AndyLvlObjectData *)_andyObject->dataPtr)->dyPos = 0;
 		updateAnimatedLvlObjectsLeftRightCurrentScreens();
 		if (_currentLevel == kLvl_rock || _currentLevel == kLvl_lar2 || _currentLevel == kLvl_test) {
 			if (_andyObject->spriteNum == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
@@ -2647,7 +2647,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 	case kObjectDataTypeAnimBackgroundData:
 		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[64]);
 		break;
-	case kObjectDataTypeOther:
+	case kObjectDataTypeShoot:
 		assert(o->dataPtr >= &_otherObjectScreenDataTable[0] && o->dataPtr < &_otherObjectScreenDataTable[32]);
 		break;
 	case kObjectDataTypeLvlBackgroundSound:
@@ -2680,8 +2680,8 @@ void Game::lvlObjectType0Init(LvlObject *ptr) {
 }
 
 void Game::lvlObjectType1Init(LvlObject *ptr) {
-	AndyObjectScreenData *dataPtr = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-	if (dataPtr->nextPtr) {
+	AndyLvlObjectData *dataPtr = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	if (dataPtr->shootLvlObject) {
 		return;
 	}
 	LvlObject *o = declareLvlObject(8, 1);
@@ -2698,7 +2698,7 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 
 	o = declareLvlObject(8, 1);
 	assert(o);
-	dataPtr->nextPtr = o;
+	dataPtr->shootLvlObject = o;
 	o->xPos = ptr->xPos;
 	o->yPos = ptr->yPos;
 	o->anim = 5;
@@ -2761,10 +2761,10 @@ void Game::lvlObjectType0CallbackHelper1() {
 		_bl |= 4;
 	}
 	if (_andyObject->spriteNum == 2 && (_bl & 5) == 5) {
-		AndyObjectScreenData *data = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-		LvlObject *o = data->nextPtr;
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		LvlObject *o = data->shootLvlObject;
 		if (o) {
-			OtherObjectScreenData *dataUnk1 = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+			ShootLvlObjectData *dataUnk1 = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 			if (dataUnk1->unk0 < 4) {
 				_bl |= 0xC0;
 			}
@@ -2803,7 +2803,7 @@ int Game::calcScreenMaskDx(int x, int y, int num) {
 
 void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 
-	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	AndyLvlObjectData *_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 
 	int xPos = ptr->xPos + ptr->posTable[7].x;
 	int yPos = ptr->yPos + ptr->posTable[7].y;
@@ -2900,8 +2900,8 @@ static const uint8_t byte_43E710[] = {
 };
 
 void Game::setupSpecialPowers(LvlObject *ptr) {
-	AndyObjectScreenData *_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-	LvlObject *_esi = _edi->nextPtr;
+	AndyLvlObjectData *_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+	LvlObject *_esi = _edi->shootLvlObject;
 	const uint8_t pos  = ptr->flags0 & 0x1F;
 	uint8_t var1 = (ptr->flags0 >> 5) & 7;
 	if (pos == 4) {
@@ -2910,7 +2910,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 			warning("lvlObject %p with NULL dataPtr", _esi);
 			return;
 		}
-		OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+		ShootLvlObjectData *_eax = (ShootLvlObjectData *)getLvlObjectDataPtr(_esi, kObjectDataTypeShoot);
 		_esi->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
 		uint8_t _cl = (ptr->flags1 >> 4) & 3;
 		if (_eax->unk0 == 4) {
@@ -3000,19 +3000,19 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 		if (_currentLevel == kLvl_isld) {
 			_esi->xPos += _eax->dxPos;
 		}
-		_edi->nextPtr = 0;
+		_edi->shootLvlObject = 0;
 	} else if (pos == 7) {
 // 40DD4B
 		switch (var1) {
 		case 0:
 			if (!_esi) {
-				if (!_edi->nextPtr) {
+				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
-					_edi->nextPtr = _edx;
+					_edi->shootLvlObject = _edx;
 					_edx->dataPtr = _otherObjectScreenDataList;
 					if (_otherObjectScreenDataList) {
 						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
-						 memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+						 memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
 						warning("Nothing free in _otherObjectScreenDataList");
 					}
@@ -3027,14 +3027,14 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DDEE
-				AndyObjectScreenData *_ecx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				LvlObject *_eax = _ecx->nextPtr;
+				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				LvlObject *_eax = _ecx->shootLvlObject;
 				if (_eax) {
 					if (!_eax->dataPtr) {
 						warning("lvlObject %p with NULL dataPtr", _eax);
 						break;
 					}
-					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_eax, kObjectDataTypeOther);
+					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
 					_edx->unk0 = 0;
 				}
 			} else {
@@ -3043,7 +3043,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					warning("lvlObject %p with NULL dataPtr", _esi);
 					break;
 				}
-				OtherObjectScreenData *_eax = (OtherObjectScreenData *)getLvlObjectDataPtr(_esi, kObjectDataTypeOther);
+				ShootLvlObjectData *_eax = (ShootLvlObjectData *)getLvlObjectDataPtr(_esi, kObjectDataTypeShoot);
 				_esi->anim = (_eax->unk0 == 0) ? 14 : 15;
 				updateAndyObject(_esi);
 				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
@@ -3053,13 +3053,13 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 			}
 			break;
 		case 2: {
-				if (!_edi->nextPtr) {
+				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
-					_edi->nextPtr = _edx;
+					_edi->shootLvlObject = _edx;
 					_edx->dataPtr = _otherObjectScreenDataList;
 					if (_otherObjectScreenDataList) {
 						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
-						 memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+						 memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
 						warning("Nothing free in _otherObjectScreenDataList");
 					}
@@ -3074,14 +3074,14 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DEEC
-				AndyObjectScreenData *_ecx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				LvlObject *_eax = _ecx->nextPtr;
+				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				LvlObject *_eax = _ecx->shootLvlObject;
 				if (_eax) {
 					if (!_eax->dataPtr) {
 						warning("lvlObject %p with NULL dataPtr", _eax);
 						break;
 					}
-					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_eax, kObjectDataTypeOther);
+					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
 					_edx->unk0 = 0;
 				}
 			}
@@ -3093,13 +3093,13 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 			}
 			break;
 		case 3: {
-				if (!_edi->nextPtr) {
+				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
-					_edi->nextPtr = _edx;
+					_edi->shootLvlObject = _edx;
 					_edx->dataPtr = _otherObjectScreenDataList;
 					if (_otherObjectScreenDataList) {
 						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
-						memset(_edx->dataPtr, 0, sizeof(OtherObjectScreenData));
+						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
 						warning("Nothing free in _otherObjectScreenDataList");
 					}
@@ -3114,21 +3114,21 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DF82
-				AndyObjectScreenData *_ecx = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				LvlObject *_eax = _ecx->nextPtr;
+				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				LvlObject *_eax = _ecx->shootLvlObject;
 				if (_eax) {
 					if (!_eax->dataPtr) {
 						warning("lvlObject %p with NULL dataPtr", _eax);
 						break;
 					}
-					OtherObjectScreenData *_edx = (OtherObjectScreenData *)getLvlObjectDataPtr(_eax, kObjectDataTypeOther);
+					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
 					_edx->unk0 = 0;
 				}
 			}
 			break;
 		case 4:
 			if (_esi) {
-				_edi->nextPtr = 0;
+				_edi->shootLvlObject = 0;
 				removeLvlObjectFromList(&_lvlObjectsList0, _esi);
 				destroyLvlObject(_esi);
 			}
@@ -3138,9 +3138,9 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 }
 
 int Game::lvlObjectType0Callback(LvlObject *ptr) {
-	AndyObjectScreenData *_edi = 0;
+	AndyLvlObjectData *_edi = 0;
 	if (!_hideAndyObjectSprite) {
-		_edi = (AndyObjectScreenData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+		_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 		_edi->unk4 = ptr->flags0 & 0x1F;
 		_edi->unk5 = (ptr->flags0 >> 5) & 7;
 		lvlObjectType0CallbackHelper1();
@@ -3380,7 +3380,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 	if (!o->dataPtr) {
 		return 0;
 	}
-	OtherObjectScreenData *dat = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 	const uint16_t fl = o->flags0 & 0x1F;
 	if (fl == 1) {
 		if (dat->unk3 != 0x80 && dat->unk2 != 0) {
