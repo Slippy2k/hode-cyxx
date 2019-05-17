@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 			}
 			_plyChecksum ^= buf[208];
 			printf("Current Player Config %d\n", buf[209]);
-			printf("Player Configuration Data Checksum 0x%X/0x%X\n", buf[211], _plyChecksum);
+			printf("Player Configuration Data Checksum 0x%X (expected 0x%X)\n", buf[211], _plyChecksum);
 			fclose(fp);
 		}
 	}
