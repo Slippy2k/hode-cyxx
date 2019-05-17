@@ -656,6 +656,43 @@ void Game::executeMstCodeHelper2() {
 	}
 }
 
+void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2) {
+	o->actionKeyMask = ptr[1];
+	uint8_t _al = mask1 & 15;
+	o->directionKeyMask = _al;
+	MstTaskData *m = (MstTaskData *)o->dataPtr;
+	if ((mask1 & 0x10) == 0) {
+		int _edi = mask1 & 0xE0;
+		int _ebp = _edi - 32;
+		if (_ebp <= 192) {
+			switch (_ebp) {
+			case 0:
+				if (_edi == 192) {
+					o->directionKeyMask = _al | (m->flags49 & ~5);
+				} else {
+					uint8_t _bl = m->flags49 | _al;
+					o->directionKeyMask = _bl;
+					if ((m->unk8[946] & 2) != 0) {
+						warning("executeMstUnk10 unimplemented ptr[946] 0x%x", m->unk8[946]);
+					}
+				}
+				break;
+			default:
+				// TODO
+				warning("executeMstUnk10 unimplemented 0x%x 0x%x %d", mask1, mask2, _ebp);
+				break;
+			}
+		} else {
+			o->actionKeyMask = _al | mask2;
+		}
+	}
+// 40E3B3
+	o->directionKeyMask &= ptr[2];
+	if ((mask1 & 0xE0) == 0x40) {
+		o->directionKeyMask ^= 0xA;
+	}
+}
+
 bool Game::executeMstUnk17(MstTaskData *m, int num) {
 	LvlObject *o = m->o16;
 	uint8_t _al = _res->_mstUnk52[num * 4];
@@ -664,7 +701,7 @@ bool Game::executeMstUnk17(MstTaskData *m, int num) {
 	uint8_t _dl = (o->flags1 >> 4) & 3;
 	uint8_t _ecx = (((_dl & 1) != 0 ? -1 : 0) & 6) + 2;
 	uint8_t var8 = _ecx;
-	if (o->flags1 & 2) {
+	if (_dl & 2) {
 		var8 |= 4;
 	} else {
 		var8 |= 1;
@@ -735,6 +772,11 @@ bool Game::executeMstUnk22(LvlObject *o, int type) {
 	return false;
 }
 
+bool Game::executeMstUnk28(LvlObject *o, int type) {
+	warning("executeMstUnk28 unimplemented");
+	return false;
+}
+
 bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
 	if ((flags & 1) != 0 && (m->o16->flags0 & 0x200) == 0) {
 		return false;
@@ -776,9 +818,8 @@ bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
 	} else if ((flags & 0x10000) != 0) {
 		warning("executeMstUnk20 flags 0x%x", flags);
 		// TODO
-	} else if ((flags & 0x20000) != 0) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+	} else if ((flags & 0x20000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk28(m->o16, 0))) {
+		return false;
 	} else if ((flags & 0x40000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 36))) {
 		return false;
 	} else if ((flags & 0x80000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 20))) {
@@ -1202,39 +1243,46 @@ Task *Game::createTask(const uint8_t *codeData) {
 }
 
 int Game::changeTask(Task *t, int num, int delay) {
-	warning("changeTask %d %d unimplemented", num, delay);
 	uint8_t var4 = _res->_mstUnk52[num * 4];
 	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
 	MstTaskData *m = t->dataPtr;
 	LvlObject *o = m->o16;
 	const uint8_t *ptr = m->unk8 + var4 * 28;
-	// TODO
+	uint8_t _al = (o->flags1 >> 4) & 3;
+	uint8_t _cl = (((_al & 1) != 0 ? -1 : 0) & 6) + 2;
+	if (_al & 2) {
+		_cl |= 4;
+	} else {
+		_cl |= 1;
+	}
+	executeMstUnk10(o, ptr, var8, _cl);
 	o->actionKeyMask |= _res->_mstUnk52[num * 4 + 1];
 	t->flags &= ~0x80;
 	int _edi = (int8_t)ptr[4];
 	int _ebp = (int8_t)ptr[5];
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
+		warning("changeTask %d unimplemented %d %d", num, _edi, _ebp);
 		uint8_t var11 = ptr[2];
 		if ((var11 & 0xA) == 0xA) {
 
 		}
 		// TODO
+// 40EA40
+		_edi = m->xMstPos + (int8_t)ptr[12] /* + _ebp */ ;
+		_ebp = m->yMstPos + (int8_t)ptr[13] /* + _eax */ ;
+		if ((var8 & 0xE0) == 0x60 /* && checkMstRectsTable(m->soundType, _edi, _ebp, (_edx & 255) + _edi - 1, ptr[15] + _ebp - 1) */ ) {
+			t->flags |= 0x80;
+			return 0;
+		}
+// 40EAA0
+		m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 	} else {
-		if ((m->unk8[946] & 4) == 0 || ptr[14] == 0) {
-// 40EAD0
+		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
+			warning("changeTask %d unimplemented ptr[14] %d", num, ptr[14]);
 			// TODO
 		}
 	}
-// 40EA40
-	_edi = m->xMstPos + (int8_t)ptr[12] /* + _ebp */ ;
-	_ebp = m->yMstPos + (int8_t)ptr[13] /* + _eax */ ;
-	if ((var8 & 0xE0) == 0x60 /* && checkMstRectsTable(m->soundType, _edi, _ebp, (_edx & 255) + _edi - 1, ptr[15] + _ebp - 1) */ ) {
-		t->flags |= 0x80;
-		return 0;
-	}
-// 40EAA0
-	m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 // 40EAD0
 	m->flagsA4 = var4;
 	if (delay == -1) {
