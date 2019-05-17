@@ -660,7 +660,7 @@ void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint
 	o->actionKeyMask = ptr[1];
 	uint8_t _al = mask1 & 15;
 	o->directionKeyMask = _al;
-	MstTaskData *m = (MstTaskData *)o->dataPtr;
+	MstTaskData *m = (MstTaskData *)getLvlObjectDataPtr(o, kObjectDataTypeMonster);
 	if ((mask1 & 0x10) == 0) {
 		int _edi = mask1 & 0xE0;
 		int _ebp = _edi - 32;
@@ -1480,10 +1480,63 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 		return (_andyObject->flags1 >> 4) & 1;
 	case 1:
 		return (_andyObject->flags1 >> 5) & 1;
+	case 2: {
+			MstTaskData *m = t->dataPtr;
+			if (m) {
+				return ((m->o16->flags1 & 0x10) != 0) ? 1 : 0;
+			} else if (t->mstObject) {
+				return ((t->mstObject->o->flags1 & 0x10) != 0) ? 1 : 0;
+			}
+		}
+		break;
+	case 3: {
+			MstTaskData *m = t->dataPtr;
+			if (m) {
+				return ((m->o16->flags1 & 0x20) != 0) ? 1 : 0;
+			} else if (t->mstObject) {
+				return ((t->mstObject->o->flags1 & 0x20) != 0) ? 1 : 0;
+			}
+		}
+	case 4: {
+			MstTaskData *m = t->dataPtr;
+			if (m) {
+				return ((m->o16->flags0 & 0x200) != 0) ? 1 : 0;
+			} else if (t->mstObject) {
+				return ((t->mstObject->o->flags0 & 0x200) != 0) ? 1 : 0;
+			}
+		}
+		break;
 	case 5:
 		return (_andyObject->flags0 & 0x1F) == 7;
 	case 6:
 		return (_andyObject->spriteNum == 0);
+	case 7:
+		if ((_andyObject->flags0 & 0x1F) == 7) {
+			AndyObjectScreenData *andyData = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (andyData) {
+				LvlObject *o = andyData->nextPtr;
+				if (o) {
+					OtherObjectScreenData *data = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+					if (data) {
+						return (data->unk0 == 4) ? 1 : 0;
+					}
+				}
+			}
+		}
+		break;
+	case 8:
+		if ((_andyObject->flags0 & 0x1F) == 7) {
+			AndyObjectScreenData *andyData = (AndyObjectScreenData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (andyData) {
+				LvlObject *o = andyData->nextPtr;
+				if (o) {
+					OtherObjectScreenData *data = (OtherObjectScreenData *)getLvlObjectDataPtr(o, kObjectDataTypeOther);
+					if (data) {
+						return (data->unk0 == 0) ? 1 : 0;
+					}
+				}
+			}
+		}
 	default:
 		warning("getTaskAndyVar unhandled index %d", index);
 		break;

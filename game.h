@@ -35,7 +35,8 @@ struct Game {
 		// LvlObject.type == 8
 		kObjectDataTypeOther,
 		// LvlObject.type == 1
-		kObjectDataTypeLvlBackgroundSound
+		kObjectDataTypeLvlBackgroundSound,
+		kObjectDataTypeMonster
 	};
 	enum {
 		kMaxScreens = 40,
@@ -283,7 +284,7 @@ struct Game {
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
 	void removeLvlObjectFromList(LvlObject **list, LvlObject *ptr);
-	void *getLvlObjectDataPtr(LvlObject *o, int type);
+	void *getLvlObjectDataPtr(LvlObject *o, int type) const;
 	void lvlObjectType0Init(LvlObject *ptr);
 	void lvlObjectType1Init(LvlObject *ptr);
 	void lvlObjectTypeInit(LvlObject *ptr);

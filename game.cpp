@@ -2638,7 +2638,7 @@ void Game::removeLvlObjectFromList(LvlObject **list, LvlObject *ptr) {
 	}
 }
 
-void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
+void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 	switch (type) {
 	case kObjectDataTypeAndy:
 		assert(o == _andyObject);
@@ -2654,6 +2654,9 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) {
 		assert(o->type == 1);
 		// dataPtr is _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable + 2
 		assert(o->dataPtr);
+		break;
+	case kObjectDataTypeMonster:
+		assert(o->dataPtr >= &_mstUnkDataTable[0] && o->dataPtr < &_mstUnkDataTable[32]);
 		break;
 	}
 	return o->dataPtr;
