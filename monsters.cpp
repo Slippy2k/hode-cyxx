@@ -821,29 +821,23 @@ bool Game::executeMstUnk20(MstTaskData *m, uint32_t flags) {
 	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 0))) {
 		return false;
 	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 1))) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+		return false;
 	} else if ((flags & 0x100000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk22(m->o16, 0))) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+		return false;
 	} else if ((flags & 0x200000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk22(m->o16, 1))) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+		return false;
 	} else if ((flags & 4) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk21(m->o16, 0))) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+		return false;
 	} else if ((flags & 2) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk21(m->o16, 1))) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+		return false;
 	} else if ((flags & 0x4000) != 0 && !executeMstUnk19(m->o16, 0x4000)) {
 		return false;
 	} else if ((flags & 0x1000) != 0 && !executeMstUnk21(m->o16, 0x1000)) {
 		return false;
 	} else if ((flags & 0x20) != 0 && (m->o16->flags0 & 0x100) == 0) {
 		return false;
-	} else if ((flags & 0x10000) != 0) {
-		warning("executeMstUnk20 flags 0x%x", flags);
-		// TODO
+	} else if ((flags & 0x10000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk28(m->o16, 1))) {
+		return false;
 	} else if ((flags & 0x20000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk28(m->o16, 0))) {
 		return false;
 	} else if ((flags & 0x40000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 36))) {
@@ -859,13 +853,30 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 	if (a == 0 || !executeMstUnk20(m, a)) {
 		return false;
 	}
-	warning("executeMstUnk27 unimplemented");
-	if ((a & 0x8000) == 0 || (m->flagsA6 & 4) != 0) {
-		// TODO
-		// resetMstTask(_mstCurrentTask, m->unk18, 0x10);
+	if ((a & 0x8000) != 0 && (m->flagsA6 & 4) == 0) {
+		warning("executeMstUnk27 unimplemented a 0x%x A6 0x%x", a, m->flagsA6);
+		Task t;
+		memcpy(&t, _mstCurrentTask, sizeof(Task));
+		t.child = 0;
+		const uint32_t codeData = READ_LE_UINT32(p + 0x18);
+		assert(codeData != kNone);
+		t.codeData = _res->_mstCodeData + codeData * 4;
+		t.run = &Game::runTask_default;
+		t.dataPtr->flagsA6 |= 4;
+		runTask_default(_mstCurrentTask);
+		t.dataPtr->flagsA6 &= ~4;
+		t.nextPtr = _mstCurrentTask->nextPtr;
+		t.prevPtr = _mstCurrentTask->prevPtr;
+		memcpy(_mstCurrentTask, &t, sizeof(Task));
+		_mstCurrentTask->run = &Game::runTask_idle;
+		if ((_mstCurrentTask->dataPtr->flagsA6 & 2) == 0) {
+			_mstCurrentTask->run = &Game::runTask_default;
+		}
+		return false;
+	} else {
+		resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 0x18), 0x10);
 		return true;
 	}
-	return false;
 }
 
 int Game::executeMstCodeHelper3(Task *t) {
@@ -1256,6 +1267,42 @@ void Game::stopMstTaskData(Task *t, Task **tasksList) {
 	} else {
 		*tasksList = next;
 	}
+}
+
+void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
+	MstTaskData *m = t->dataPtr;
+	m->flagsA5 = (m->flagsA5 & ~0x70) | flags;
+	Task *c = t->child;
+	if (m->flagsA5 & 8) {
+		if (c) {
+			t->child = 0;
+			c->codeData = 0;
+		}
+		Task *n = findFreeTask();
+		if (n) {
+			memcpy(n, t, sizeof(Task));
+			t->child = n;
+			if (t->run != &Game::runTask_waitResetInput) {
+				const uint8_t *p = n->codeData - 4;
+				if ((t->flags & 0x40) != 0 || p[0] == 203 || ((flags & 0x10) != 0 && (t->run == &Game::runTask_unk1 || t->run == &Game::runTask_unk2 || t->run == &Game::runTask_unk3 || t->run == &Game::runTask_unk4))) {
+					p += 4;
+				}
+				n->codeData = p;
+				n->run = &Game::runTask_default;
+				assert(codeData != kNone);
+				resetTask(t, _res->_mstCodeData + codeData * 4);
+			}
+		}
+	} else {
+// 417A1A
+		if (c) {
+			t->child = 0;
+			c->codeData = 0;
+		}
+	}
+// 417A2B
+	assert(codeData != kNone);
+	resetTask(t, _res->_mstCodeData + codeData * 4);
 }
 
 Task *Game::findFreeTask() {
@@ -2515,20 +2562,34 @@ int Game::runTask_default(Task *t) {
 					if ((m->flagsA5 & 8) == 0) {
 						m->flags48 |= 8;
 						if ((m->flagsA5 & 0x70) != 0) {
-							warning(".mst opcode 242 t->dataPtr flagsA5 0x%x", m->flagsA5);
 							m->flagsA5 &= ~0x70;
-/*
 							switch (m->flagsA5 & 7) {
-							case 1:
+							case 1: {
+									MstUnk35 *m35 = m->unkD0;
+									uint32_t num = 0;
+									if (m35->count2 != 0) {
+										const uint8_t i = shuffleFlags(m->unkCC);
+										num = m35->data2[i];
+									}
+									const uint32_t codeData = m35->indexCodeData[num];
+									assert(codeData != kNone);
+									resetTask(t, _res->_mstCodeData + codeData * 4);
+									t->runningState &= ~2;
+									p = t->codeData - 4;
+								}
+								break;
+							default:
+								warning(".mst opcode 242 t->dataPtr flagsA5 0x%x", m->flagsA5);
+								break;
+							}
+/*
 							case 2:
 // 413D74
-								// TODO
 								break;
 							case 5:
 								return executeMstOp67Type1(t);
 							case 6:
 								return executeMstOp67Type2(t, 1);
-							}
 */
 						} else {
 // 413DCA

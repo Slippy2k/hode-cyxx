@@ -592,6 +592,7 @@ struct Game {
 	void updateMstHeightMapData();
 
 	void removeMstObjectTask(Task *t, Task **tasksList);
+	void resetMstTask(Task *t, uint32_t codeData, uint8_t flags);
 	void stopMstTaskData(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
