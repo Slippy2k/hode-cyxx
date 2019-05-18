@@ -312,7 +312,7 @@ struct MstUnk48Unk12Unk4;
 struct MstUnk49;
 
 struct MstTaskData {
-	MstUnk46 *unk0;
+	MstUnk46 *m46;
 	MstUnk46Unk1 *unk4;
 	const uint8_t *unk8;
 	MstUnk44Unk1 *unkC;
