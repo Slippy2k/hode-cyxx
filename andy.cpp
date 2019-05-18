@@ -1274,7 +1274,7 @@ int Game::moveAndyObjectOp3(int op) {
 	case 99: {
 			const int *p = (_andyMoveMask & 1) == 0 ? _andyMoveTable6 : _andyMoveTable7;
 			for (int i = 0; i < 6; ++i) {
-				if ((_screenMaskBuffer[p[i]] & 6) != 0) {
+				if ((_screenMaskBuffer[p[i] + _andyMaskBufferPos0] & 6) != 0) {
 					return 0;
 				}
 			}
@@ -1557,7 +1557,7 @@ void Game::updateAndyObject(LvlObject *ptr) {
 		xPos = ptr->posTable[7].x + ptr->xPos;
 		yPos = ptr->posTable[7].y + ptr->yPos;
 	}
-	if (mask == 1) {
+	if (mask) {
 
 		assert(count < ash->count);
 		currentAnimFrame = asfh[count].frame;

@@ -358,8 +358,7 @@ void Game::postScreenUpdate_rock_screen19() {
 		++_screenCounterTable[19];
 		if (_screenCounterTable[19] == 1) {
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
-			warning("Workaround Andy position in Level 1 Screen 19");
-			/// setupScreenMask(19);
+			setupScreenMask(19);
 			setAndySpecialAnimation(0x12);
 		} else if (_screenCounterTable[19] > 12) {
 			_res->_screensState[19].s0 = 1;
