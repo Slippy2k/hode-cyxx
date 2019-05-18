@@ -21,7 +21,7 @@ void Game::postScreenUpdate_lava_helper(int yPos) {
 			}
 			if (mask != 0 && _actionDirectionKeyMaskIndex > 0) {
 				_actionDirectionKeyMaskIndex = mask;
-				_plasmaCannonKeyMaskCounter = 0;
+				_actionDirectionKeyMaskCounter = 0;
 			}
 		} else if (flags == 0xB) {
 			_mstFlags &= 0x7FFFFFFF;

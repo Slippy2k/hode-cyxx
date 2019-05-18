@@ -1410,21 +1410,25 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 }
 
 void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
-	if (_plasmaCannonKeyMaskCounter == 0) {
+	if (_actionDirectionKeyMaskCounter == 0) {
 		switch (_actionDirectionKeyMaskIndex >> 4) {
 		case 0:
-			_plasmaCannonKeyMaskCounter = 6;
+			_actionDirectionKeyMaskCounter = 6;
 			break;
 		case 1:
 		case 8:
 		case 10:
-			_plasmaCannonKeyMaskCounter = 2;
+			_actionDirectionKeyMaskCounter = 2;
 			break;
 		case 2:
 		case 3:
 		case 4:
 		case 5:
-			_plasmaCannonKeyMaskCounter = 1;
+			_actionDirectionKeyMaskCounter = 1;
+			break;
+		case 6:
+		case 7:
+		case 9:
 			break;
 		}
 	}
@@ -1441,16 +1445,16 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 		_andyObject->actionKeyMask = _actionDirectionKeyMaskTable[_actionDirectionKeyMaskIndex * 2];
 		_andyObject->directionKeyMask = _actionDirectionKeyMaskTable[_actionDirectionKeyMaskIndex * 2 + 1];
 	}
-	--_plasmaCannonKeyMaskCounter;
-	if (_plasmaCannonKeyMaskCounter == 0) {
+	--_actionDirectionKeyMaskCounter;
+	if (_actionDirectionKeyMaskCounter == 0) {
 		_actionDirectionKeyMaskIndex = 0;
 	}
 }
 
-int Game::resetAndyLvlObjectPlasmaCannonKeyMask(uint8_t mask) {
+int Game::setAndySpecialAnimation(uint8_t mask) {
 	if (mask > _actionDirectionKeyMaskIndex) {
 		_actionDirectionKeyMaskIndex = mask;
-		_plasmaCannonKeyMaskCounter = 0;
+		_actionDirectionKeyMaskCounter = 0;
 		return 1;
 	}
 	return 0;
@@ -1677,7 +1681,7 @@ int Game::updateAndyLvlObject() {
 			removeLvlObject(_andyObject);
 		}
 		if ((_andyObject->flags0 & ~0x1F) == 0x40) {
-			resetAndyLvlObjectPlasmaCannonKeyMask(0xA4);
+			setAndySpecialAnimation(0xA4);
 		}
 	}
 	const int ret = updateLvlObjectScreen(_andyObject);
@@ -2836,7 +2840,7 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 		if (_al == 3) {
 			if (_actionDirectionKeyMaskIndex < 1) {
 				_actionDirectionKeyMaskIndex = 1;
-				_plasmaCannonKeyMaskCounter = 0;
+				_actionDirectionKeyMaskCounter = 0;
 			}
 		}
 	} else if (_dl == 3) {
@@ -2844,14 +2848,14 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 		if (_al == 4) {
 			if (_actionDirectionKeyMaskIndex < 2) {
 				_actionDirectionKeyMaskIndex = 2;
-				_plasmaCannonKeyMaskCounter = 0;
+				_actionDirectionKeyMaskCounter = 0;
 			}
 		}
 	} else if (_dl == 4 && _edi->unk6 >= 1250) {
 // 4097BD
 		if (_actionDirectionKeyMaskIndex < 160) {
 			_actionDirectionKeyMaskIndex = 160;
-			_plasmaCannonKeyMaskCounter = 0;
+			_actionDirectionKeyMaskCounter = 0;
 		}
 	}
 // 4097E1

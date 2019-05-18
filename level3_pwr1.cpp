@@ -190,7 +190,7 @@ void Game::postScreenUpdate_pwr1_screen23() {
 				if ((flags & 0x1F) == 0 && (flags & 0xE0) == 0xE0) {
 					_res->_screensState[23].s0 = 2;
 				} else {
-					resetAndyLvlObjectPlasmaCannonKeyMask(3);
+					setAndySpecialAnimation(3);
 				}
 			}
 		}

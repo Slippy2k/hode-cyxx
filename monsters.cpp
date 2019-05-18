@@ -798,8 +798,33 @@ bool Game::executeMstUnk22(LvlObject *o, int type) {
 	return false;
 }
 
-bool Game::executeMstUnk28(LvlObject *o, int type) {
-	warning("executeMstUnk28 unimplemented");
+bool Game::executeMstUnk28(LvlObject *o, int type) const {
+	int x1, y1, x2, y2;
+	if (type != 1) {
+		x1 = o->xPos; // _edx
+		y1 = o->yPos; // _edi
+		x2 = o->xPos + o->width  - 1; // _ebx
+		y2 = o->yPos + o->height - 1;
+	} else {
+		x1 = o->xPos + o->posTable[0].x; // _edx
+		y1 = o->yPos + o->posTable[0].y; // _edi
+		x2 = o->xPos + o->posTable[1].x; // _ebx
+		y2 = o->yPos + o->posTable[1].y;
+		if (x1 > x2) {
+			SWAP(x1, x2);
+		}
+		if (y1 > y2) {
+			SWAP(y1, y2);
+		}
+		static const uint8_t indexes[] = { 1, 2, 4, 5 };
+		for (int i = 0; i < 4; ++i) {
+			const int xPos = _andyObject->xPos + _andyObject->posTable[indexes[i]].x;
+			const int yPos = _andyObject->yPos + _andyObject->posTable[indexes[i]].y;
+			if (xPos >= x1 && xPos <= x2 && yPos >= y1 && yPos <= y2) {
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -2905,8 +2930,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 	debug(kDebug_MONSTER, "executeMstOp56 code %d", code);
 	switch (code) {
 	case 0:
-		warning("executeMstOp56 so 0 unimplemented");
-		if (_mstCurrentUnkFlag == 0 && resetAndyLvlObjectPlasmaCannonKeyMask(0x71) != 0) {
+		if (_mstCurrentUnkFlag == 0 && setAndySpecialAnimation(0x71) != 0) {
 			_plasmaCannonFlags |= 1;
 			if (_andyObject->spriteNum == 0) {
 				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
@@ -2932,18 +2956,20 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				_mstCurrentFlags1 = merge_bits(_mstCurrentFlags1, _andyObject->flags1, 0x30); // _mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
 				_mstCurrentScreenNum = _andyObject->screenNum;
 				_currentMonsterObject = _andyObject;
-				_mstOriginPosX = _andyObject->posTable[3].x + _andyObject->posTable[6].x;
-				_mstOriginPosY = _andyObject->posTable[3].y + _andyObject->posTable[6].y;
+				_mstOriginPosX = _andyObject->posTable[3].x - _andyObject->posTable[6].x;
+				_mstOriginPosY = _andyObject->posTable[3].y - _andyObject->posTable[6].y;
 			}
 			_mstCurrentUnkFlag = 1;
 		}
 // 411BBA
-		// TODO
+		if (_mstUnk10 != 255) {
+			_mstRectsTable[_mstUnk10].num = 255;
+		}
 		break;
 	case 1:
 		warning("executeMstOp56 so 1 unimplemented");
 		if (_mstCurrentUnkFlag != 0) {
-			if (resetAndyLvlObjectPlasmaCannonKeyMask(0x61) != 0) {
+			if (setAndySpecialAnimation(0x61) != 0) {
 				_plasmaCannonFlags &= ~1;
 				if (_andyObject->spriteNum == 0) {
 					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
@@ -2960,29 +2986,29 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 	case 2: {
 			LvlObject *o = t->dataPtr->o16;
 			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk0 & 255, o, _andyObject);
-			resetAndyLvlObjectPlasmaCannonKeyMask(flag | 0x10);
+			setAndySpecialAnimation(flag | 0x10);
 		}
 		break;
 	case 3:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0x12);
+		setAndySpecialAnimation(0x12);
 		break;
 	case 4:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0x80);
+		setAndySpecialAnimation(0x80);
 		break;
 	case 5:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0xA4);
+		setAndySpecialAnimation(0xA4);
 		break;
 	case 6:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0xA3);
+		setAndySpecialAnimation(0xA3);
 		break;
 	case 7:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0x05);
+		setAndySpecialAnimation(0x05);
 		break;
 	case 8:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0xA1);
+		setAndySpecialAnimation(0xA1);
 		break;
 	case 9:
-		resetAndyLvlObjectPlasmaCannonKeyMask(0xA2);
+		setAndySpecialAnimation(0xA2);
 		break;
 	case 10:
 		if (_res->_mstOp56Data[num].unk0 == 1) {

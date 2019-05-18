@@ -186,7 +186,7 @@ void Game::postScreenUpdate_rock_helper2(BoundingBox *box, int num) {
 		}
 		if (_al != 0 && _al > _actionDirectionKeyMaskIndex) {
 			_actionDirectionKeyMaskIndex = _al;
-			_plasmaCannonKeyMaskCounter = 0;
+			_actionDirectionKeyMaskCounter = 0;
 		}
 	}
 ret:
@@ -360,7 +360,7 @@ void Game::postScreenUpdate_rock_screen19() {
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
 			warning("Workaround Andy position in Level 1 Screen 19");
 			/// setupScreenMask(19);
-			resetAndyLvlObjectPlasmaCannonKeyMask(18);
+			setAndySpecialAnimation(0x12);
 		} else if (_screenCounterTable[19] > 12) {
 			_res->_screensState[19].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
@@ -460,7 +460,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 	if ((ptr->actionKeyMask & 4) != 0 && sameScreen && (ptr->flags0 & 0x300) == 0x300) {
 		if (clipLvlObjectsBoundingBox(_andyObject, ptr, 10)) {
 			_mstFlags |= 0x80000000;
-			resetAndyLvlObjectPlasmaCannonKeyMask(0x80);
+			setAndySpecialAnimation(0x80);
 		}
 	}
 	if ((ptr->directionKeyMask & 4) != 0) {

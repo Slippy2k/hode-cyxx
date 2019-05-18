@@ -113,7 +113,7 @@ struct Game {
 	uint8_t _plasmaCannonFirstIndex;
 	uint8_t _plasmaCannonLastIndex2;
 	uint8_t _plasmaCannonFlags;
-	uint8_t _plasmaCannonKeyMaskCounter;
+	uint8_t _actionDirectionKeyMaskCounter;
 	bool _fallingAndyFlag;
 	uint8_t _fallingAndyCounter;
 	uint8_t _actionDirectionKeyMaskIndex;
@@ -254,7 +254,7 @@ struct Game {
 	void playAndyFallingCutscene(int type);
 	int8_t updateLvlObjectScreen(LvlObject *ptr);
 	void setAndyLvlObjectPlasmaCannonKeyMask();
-	int resetAndyLvlObjectPlasmaCannonKeyMask(uint8_t mask);
+	int setAndySpecialAnimation(uint8_t mask);
 	int clipBoundingBox(BoundingBox *coords, BoundingBox *box);
 	int updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, const uint8_t *coords, int direction);
 	int clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2);
@@ -582,7 +582,7 @@ struct Game {
 	bool executeMstUnk17(MstTaskData *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);
-	bool executeMstUnk28(LvlObject *o, int type);
+	bool executeMstUnk28(LvlObject *o, int type) const;
 	bool executeMstUnk22(LvlObject *o, int type);
 	bool executeMstUnk20(MstTaskData *m, uint32_t flags);
 	bool executeMstUnk27(MstTaskData *m, const uint8_t *p);

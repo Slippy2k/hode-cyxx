@@ -109,7 +109,7 @@ void Game::postScreenUpdate_fort_screen16() {
 				_res->_screensState[16].s0 = 1;
 				_screenCounterTable[16] = 0;
 			} else {
-				resetAndyLvlObjectPlasmaCannonKeyMask(3);
+				setAndySpecialAnimation(3);
 			}
 		} else {
 			++_screenCounterTable[16];
