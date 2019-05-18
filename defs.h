@@ -353,9 +353,9 @@ struct MstTaskData {
 	Task *task; // 0xC4
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
-	MstUnk35 *unkD0; // 0xD0
+	MstUnk35 *m35; // 0xD0
 	int unkD4;
-	MstUnk49 *unkD8; // 0xD8
+	MstUnk49 *m49; // 0xD8
 	int unkDC; // 0xDC
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;

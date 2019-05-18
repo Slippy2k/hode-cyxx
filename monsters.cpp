@@ -99,7 +99,7 @@ void Game::initMstTaskData(MstTaskData *m) {
 	m->y2 = m->unkC->unk44[num] + READ_LE_UINT32(ptr + 908);
 
 	const uint32_t indexUnk35 = m->unkC->indexUnk35_0x24[num];
-	m->unkD0 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
+	m->m35 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
 }
 
 int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
@@ -215,7 +215,7 @@ bool Game::updateMstTaskDataPosition(MstTaskData *m) {
 int Game::prepareMstTask(Task *t) {
 	MstTaskData *m = t->dataPtr;
 	assert(m);
-	MstUnk35 *mu = m->unkD0;
+	MstUnk35 *mu = m->m35;
 	int num = 0;
 	if (mu->count2 != 0) {
 		const uint8_t code = shuffleFlags(m->unkCC);
@@ -1114,7 +1114,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 					if ((m->flagsA5 & 4) == 0) {
 						const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
 						assert(indexUnk35 != kNone);
-						m->unkD0 = &_res->_mstUnk35[indexUnk35];
+						m->m35 = &_res->_mstUnk35[indexUnk35];
 					}
 					return 0;
 				} else if (_ebp == 1) {
@@ -1129,7 +1129,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 
 						uint32_t indexUnk35 = m->unkC->indexUnk35_20;
 						assert(indexUnk35 != kNone);
-						m->unkD0 = &_res->_mstUnk35[indexUnk35];
+						m->m35 = &_res->_mstUnk35[indexUnk35];
 						if (m->flagsA5 & 4) {
 							m->flagsA5 &= ~4;
 							if (updateMstTaskDataPosition(m) == 0) {
@@ -1137,7 +1137,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 							}
 							uint32_t indexUnk35 = m->unkC->indexUnk35_20;
 							assert(indexUnk35 != kNone);
-							m->unkD0 = &_res->_mstUnk35[indexUnk35];
+							m->m35 = &_res->_mstUnk35[indexUnk35];
 							prepareMstTask(_mstCurrentTask);
 						}
 
@@ -1152,8 +1152,8 @@ int Game::executeMstCodeHelper3(Task *t) {
 				}
 				const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
 				assert(indexUnk35 != kNone);
-				if (!m->unkD0) {
-					_mstCurrentTaskData->unkD0 = &_res->_mstUnk35[indexUnk35];
+				if (!m->m35) {
+					_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
 					_mstCurrentTaskData->unkCC[0] = _rnd.update() & 7;
 					_mstCurrentTaskData->unkCC[2] = 0x20;
 					_mstCurrentTaskData->unkCC[1] = _rnd.update() & 31;
@@ -1166,7 +1166,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 					if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
 						initMstTaskData(_mstCurrentTaskData);
 					}
-					_mstCurrentTaskData->unkD0 = &_res->_mstUnk35[indexUnk35];
+					_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
 					prepareMstTask(_mstCurrentTask);
 				}
 				return 0;
@@ -2669,7 +2669,7 @@ int Game::runTask_default(Task *t) {
 							m->flagsA5 &= ~0x70;
 							switch (m->flagsA5 & 7) {
 							case 1: {
-									MstUnk35 *m35 = m->unkD0;
+									MstUnk35 *m35 = m->m35;
 									uint32_t num = 0;
 									if (m35->count2 != 0) {
 										const uint8_t i = shuffleFlags(m->unkCC);
@@ -2697,7 +2697,7 @@ int Game::runTask_default(Task *t) {
 */
 						} else {
 // 413DCA
-							MstUnk35 *m35 = m->unkD0;
+							MstUnk35 *m35 = m->m35;
 							uint32_t num = 0;
 							if (m35->count2 != 0) {
 								const uint8_t i = shuffleFlags(m->unkCC);
@@ -2840,7 +2840,7 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 	MstTaskData *m = t->dataPtr;
 	const MstOp49Data *m49 = &_res->_mstOp49Data[num];
-	m->unkD8 = &_res->_mstUnk49[m49->unkC];
+	m->m49 = &_res->_mstUnk49[m49->unkC];
 	m->unkDC = m49->unkF;
 	if (m49->unkF < 0) {
 	}
@@ -3363,7 +3363,7 @@ void Game::executeMstUnk1(Task *t) {
 				}
 				uint32_t indexUnk35 = m->unkC->indexUnk35_20;
 				if (indexUnk35 != kNone) {
-					m->unkD0 = &_res->_mstUnk35[indexUnk35];
+					m->m35 = &_res->_mstUnk35[indexUnk35];
 				}
 				prepareMstTask(t);
 			} else {
@@ -3542,14 +3542,14 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 	MstUnk36 *mstUnk36 = &_res->_mstUnk36[i];
 	const int j = mstUnk36->indexUnk49;
 	assert(j >= 0 && j < _res->_mstHdr.unk0x40);
-	m->unkD8 = &_res->_mstUnk49[j];
+	m->m49 = &_res->_mstUnk49[j];
 	if (flag != 0) {
 		m->unkDC = mstUnk36->unk8 - 1;
 	} else {
 		m->unkDC = mstUnk36->unk4;
 	}
 	if (m->unkDC < 0) {
-		if (m->unkD8->count2 == 0) {
+		if (m->m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
 // 41CC20
@@ -3559,7 +3559,7 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CC44
-	m->unkD4 = m->unkD8->unk4 + m->unkDC * 16;
+	m->unkD4 = m->m49->unk4 + m->unkDC * 16;
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;
@@ -3636,7 +3636,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		m->flags48 = 0x1C;
 		m->flagsA5 = 0;
 		m->unkEC = -1;
-		m->unkD0 = 0;
+		m->m35 = 0;
 		m->flagsA6 = 0;
 
 		const int j = _res->_mstUnk42[arg24].indexUnk46[arg1C];
