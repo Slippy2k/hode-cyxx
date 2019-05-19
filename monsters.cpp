@@ -1764,21 +1764,35 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		} else if (t->mstObject) {
 			return t->mstObject->xPos;
 		}
-		return 0;
+		break;
 	case 13:
 		if (t->dataPtr) {
 			return t->dataPtr->yPos;
 		} else if (t->mstObject) {
 			return t->mstObject->yPos;
 		}
-		return 0;
+		break;
 	case 14:
 		if (t->dataPtr) {
 			return t->dataPtr->o16->screenNum;
 		} else if (t->mstObject) {
 			return t->mstObject->o->screenNum;
 		}
-		return 0;
+		break;
+	case 15:
+		if (t->dataPtr) {
+			return t->dataPtr->xDelta;
+		} else if (t->mstObject) {
+			return ABS(_mstPosX - t->mstObject->xMstPos);
+		}
+		break;
+	case 16:
+		if (t->dataPtr) {
+			return t->dataPtr->yDelta;
+		} else if (t->mstObject) {
+			return ABS(_mstPosY - t->mstObject->yMstPos);
+		}
+		break;
 	case 22:
 		return _mstOp54Counter;
 	case 23:
@@ -1791,35 +1805,35 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		} else if (t->mstObject) {
 			return t->mstObject->xMstPos;
 		}
-		return 0;
+		break;
 	case 26:
 		if (t->dataPtr) {
 			return t->dataPtr->yMstPos;
 		} else if (t->mstObject) {
 			return t->mstObject->yMstPos;
 		}
-		return 0;
+		break;
 	case 27:
 		if (t->dataPtr) {
 			return t->dataPtr->o16->flags0;
 		} else if (t->mstObject) {
 			return t->mstObject->o->flags0;
 		}
-		return 0;
+		break;
 	case 28:
 		if (t->dataPtr) {
 			return t->dataPtr->o16->anim;
 		} else if (t->mstObject) {
 			return t->mstObject->o->anim;
 		}
-		return 0;
+		break;
 	case 29:
 		if (t->dataPtr) {
 			return t->dataPtr->o16->frame;
 		} else if (t->mstObject) {
 			return t->mstObject->o->frame;
 		}
-		return 0;
+		break;
 	case 30:
 		return _mstOp56Counter;
 	case 31:
