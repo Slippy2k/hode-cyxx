@@ -714,9 +714,9 @@ bool Game::executeMstUnk17(MstTaskData *m, int num) {
 	LvlObject *o = m->o16;
 	uint8_t _al = _res->_mstUnk52[num * 4];
 	uint8_t _bl = _res->_mstUnk52[num * 4 + 2];
-	const uint8_t *var4 = m->unk8 + _al * 24;
+	const uint8_t *var4 = m->unk8 + _al * 28;
 	uint8_t _dl = (o->flags1 >> 4) & 3;
-	uint8_t _ecx = (((_dl & 1) != 0 ? -1 : 0) & 6) + 2;
+	uint8_t _ecx = ((_dl & 1) != 0 ? 6 : 0) + 2;
 	uint8_t var8 = _ecx;
 	if (_dl & 2) {
 		var8 |= 4;
@@ -953,7 +953,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 	MstTaskData *_mstCurrentTaskData = m;
 	LvlObject *o = m->o16;
 	int _mstCurrentFlags0 = o->flags0 & 255;
-	const uint8_t *_mstCurrentDataPtr = m->unk8 + _mstCurrentFlags0 * 24; // _ebx
+	const uint8_t *_mstCurrentDataPtr = m->unk8 + _mstCurrentFlags0 * 28; // _ebx
 	int8_t _dl = _mstCurrentDataPtr[6];
 	if (_dl != 0) {
 		const int num = CLIP(m->unkE6 + _dl, 0, 17);
@@ -1119,12 +1119,10 @@ int Game::executeMstCodeHelper3(Task *t) {
 					return 0;
 				} else if (_ebp == 1) {
 // 418C73
-					warning("executeMstCodeHelper3 _ebp 1");
-					// TODO
-
 					m->flagsA6 |= 1;
 					if (executeMstUnk2(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
 
+						warning("executeMstCodeHelper3 418CB2");
 						// TODO
 
 						uint32_t indexUnk35 = m->unkC->indexUnk35_20;
@@ -1144,6 +1142,9 @@ int Game::executeMstCodeHelper3(Task *t) {
 						return 0;
 					}
 // 418D41
+					warning("executeMstCodeHelper3 418D41");
+					// TODO
+
 					return 0;
 				}
 				assert(_ebp == 2);
@@ -1444,7 +1445,7 @@ int Game::changeTask(Task *t, int num, int delay) {
 	LvlObject *o = m->o16;
 	const uint8_t *ptr = m->unk8 + var4 * 28;
 	uint8_t _al = (o->flags1 >> 4) & 3;
-	uint8_t _cl = (((_al & 1) != 0 ? -1 : 0) & 6) + 2;
+	uint8_t _cl = ((_al & 1) != 0 ? 6 : 0) + 2;
 	if (_al & 2) {
 		_cl |= 4;
 	} else {
