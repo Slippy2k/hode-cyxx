@@ -132,7 +132,7 @@ struct Game {
 	uint8_t _mstCurrentScreenNum;
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
-	uint8_t _mstCurrentUnkFlag;
+	bool _mstCurrentUnkFlag;
 	int _mstUnk10;
 	MovingOpcodeState _mstMovingState[8];
 	int _mstMovingStateCount;

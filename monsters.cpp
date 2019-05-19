@@ -471,7 +471,7 @@ void Game::resetMstCode() {
 	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _mstUnk6 = -1;
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// TODO
-	_mstCurrentUnkFlag = 0;
+	_mstCurrentUnkFlag = false;
 	_mstUnk10 = 255;
 	_mstRectsCount = 0;
 	_mstOp67_y1 = 0;
@@ -972,7 +972,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 	}
 // 41824B
 	if ((m->flagsA5 & 0x80) == 0) {
-		if (m->localVars[7] == 0 && _mstCurrentUnkFlag == 0) {
+		if (m->localVars[7] == 0 && !_mstCurrentUnkFlag) {
 			m->flagsA5 |= 0x80;
 			if (m->unk8[946] & 4) {
 				clearMstRectsTable(m, 1);
@@ -3010,7 +3010,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 	debug(kDebug_MONSTER, "executeMstOp56 code %d", code);
 	switch (code) {
 	case 0:
-		if (_mstCurrentUnkFlag == 0 && setAndySpecialAnimation(0x71) != 0) {
+		if (!_mstCurrentUnkFlag && setAndySpecialAnimation(0x71) != 0) {
 			_plasmaCannonFlags |= 1;
 			if (_andyObject->spriteNum == 0) {
 				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
@@ -3039,7 +3039,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				_mstOriginPosX = _andyObject->posTable[3].x - _andyObject->posTable[6].x;
 				_mstOriginPosY = _andyObject->posTable[3].y - _andyObject->posTable[6].y;
 			}
-			_mstCurrentUnkFlag = 1;
+			_mstCurrentUnkFlag = true;
 		}
 // 411BBA
 		if (_mstUnk10 != 255) {
@@ -3047,21 +3047,42 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		}
 		break;
 	case 1:
-		warning("executeMstOp56 so 1 unimplemented");
-		if (_mstCurrentUnkFlag != 0) {
-			if (setAndySpecialAnimation(0x61) != 0) {
-				_plasmaCannonFlags &= ~1;
-				if (_andyObject->spriteNum == 0) {
-					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
-				} else {
-					_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
-				}
-// 4118ED
-				// TODO
-			}
-// 4119F5
-			// TODO
+		if (!_mstCurrentUnkFlag) {
+			break;
 		}
+		if (setAndySpecialAnimation(0x61) != 0) {
+			_plasmaCannonFlags &= ~1;
+			if (_andyObject->spriteNum == 0) {
+				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 & 0xFFFF;
+			} else {
+				_mstCurrentAnim = _res->_mstOp56Data[num].unk0 >> 16;
+			}
+// 4118ED
+			LvlObject *o = 0;
+			if (t->mstObject) {
+				o = t->mstObject->o;
+			} else if (t->dataPtr) {
+				o = t->dataPtr->o16;
+			}
+			if (_res->_mstOp56Data[num].unkC != 6 && o) {
+				LvlObject *tmpObject = t->dataPtr->o16;
+				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC, tmpObject, _andyObject);
+				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & 0xFFCF);
+				_mstCurrentScreenNum = tmpObject->screenNum;
+				_currentMonsterObject = tmpObject;
+				_mstOriginPosX = _res->_mstOp56Data[num].unk4 & 0xFFFF;
+				_mstOriginPosY = _res->_mstOp56Data[num].unk8 & 0xFFFF;
+			} else {
+				_mstCurrentFlags1 = merge_bits(_mstCurrentFlags1, _andyObject->flags1, 0x30); // _mstCurrentFlags1 ^= (_mstCurrentFlags1 ^ _andyObject->flags1) & 0x30;
+				_mstCurrentScreenNum = _andyObject->screenNum;
+				_currentMonsterObject = _andyObject;
+				_mstOriginPosX = _andyObject->posTable[3].x - _andyObject->posTable[6].x;
+				_mstOriginPosY = _andyObject->posTable[3].y - _andyObject->posTable[6].y;
+			}
+			_mstCurrentUnkFlag = false;
+		}
+// 4119F5
+		_mstUnk10 = updateMstRectsTable(_mstUnk10, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1);
 		break;
 	case 2: {
 			LvlObject *o = t->dataPtr->o16;
