@@ -1121,30 +1121,59 @@ int Game::executeMstCodeHelper3(Task *t) {
 // 418C73
 					m->flagsA6 |= 1;
 					if (executeMstUnk2(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
-
-						warning("executeMstCodeHelper3 418CB2");
-						// TODO
-
-						uint32_t indexUnk35 = m->unkC->indexUnk35_20;
-						assert(indexUnk35 != kNone);
-						m->m35 = &_res->_mstUnk35[indexUnk35];
-						if (m->flagsA5 & 4) {
-							m->flagsA5 &= ~4;
-							if (updateMstTaskDataPosition(m) == 0) {
-								initMstTaskData(m);
-							}
+						if (_mstCurrentPosX > m->xMstPos && (_mstCurrentPosX < m->unkC->unk2C[1] || _mstCurrentPosX < m->unkC->unk34[1])) {
 							uint32_t indexUnk35 = m->unkC->indexUnk35_20;
-							assert(indexUnk35 != kNone);
-							m->m35 = &_res->_mstUnk35[indexUnk35];
-							prepareMstTask(_mstCurrentTask);
+							if (indexUnk35 != kNone) {
+								m->m35 = &_res->_mstUnk35[indexUnk35];
+							}
+							if (m->flagsA5 & 4) {
+								m->flagsA5 &= ~4;
+								if (updateMstTaskDataPosition(m) == 0) {
+									initMstTaskData(m);
+								}
+								indexUnk35 = m->unkC->indexUnk35_20;
+								if (indexUnk35 != kNone) {
+									m->m35 = &_res->_mstUnk35[indexUnk35];
+									prepareMstTask(_mstCurrentTask);
+								}
+							}
+							return 0;
 						}
-
-						return 0;
 					}
 // 418D41
-					warning("executeMstCodeHelper3 418D41");
-					// TODO
-
+					if ((m->unk8[946] & 2) == 0) {
+						MstUnk44Unk1 *m44 = m->unkC;
+						int _edi = READ_LE_UINT32(m->unk8 + 904);
+						int _ebx = MAX(m->unk88, m44->unk34[1] + _edi);
+						int _eax = MIN(m->unk84, m44->unk2C[1] - _edi);
+						uint32_t indexUnk36 = m44->indexUnk36_32;
+						assert(indexUnk36 != kNone);
+						uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
+						assert(indexUnk49 != kNone);
+						uint8_t _bl = _res->_mstUnk49[indexUnk49].unk0x14 & 0xFF;
+						if (ABS(_eax - _ebx) <= _bl) {
+							uint32_t indexUnk35 = m44->indexUnk35_20;
+							if (indexUnk35 != kNone) {
+								m->m35 = &_res->_mstUnk35[indexUnk35];
+							}
+							if ((m->flagsA5 & 4) == 0) {
+								return 0;
+							}
+							m->flagsA5 &= ~4;
+							if (updateMstTaskDataPosition(_mstCurrentTaskData) == 0) {
+								initMstTaskData(_mstCurrentTaskData);
+							}
+							m44 = _mstCurrentTaskData->unkC;
+							indexUnk35 = m44->indexUnk35_20;
+							if (indexUnk35 != kNone) {
+								m->m35 = &_res->_mstUnk35[indexUnk35];
+							}
+							prepareMstTask(_mstCurrentTask);
+							return 0;
+						}
+					}
+// 418DEA
+					executeMstOp67Type2(_mstCurrentTask, 0);
 					return 0;
 				}
 				assert(_ebp == 2);
