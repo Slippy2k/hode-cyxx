@@ -654,6 +654,10 @@ void Resource::loadSssData(File *fp) {
 			bytesRead += count + 1;
 		}
 		// _sssDataUnk4 = data;
+	} else {
+		_sssPreloadData1 = 0;
+		_sssPreloadData2 = 0;
+		_sssPreloadData3 = 0;
 	}
 // 429A20
 	// data += _sssHdr.preloadInfoCount * 8;
