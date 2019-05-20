@@ -967,8 +967,8 @@ int Game::executeMstCodeHelper3(Task *t) {
 	}
 	const uint32_t _edi = READ_LE_UINT32(_mstCurrentDataPtr + 20);
 	if (_edi != 0) {
+		warning("executeMstCodeHelper3 _edi 0x%x", _edi);
 		// TODO
-		// warning("executeMstCodeHelper3 _edi 0x%x", _edi);
 	}
 // 41824B
 	if ((m->flagsA5 & 0x80) == 0) {
@@ -1053,6 +1053,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 							}
 
 							if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
+								warning("executeMstCodeHelper3 missing call to resetMstTask");
 								// resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
 								executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
 								return 0;
@@ -1128,14 +1129,14 @@ int Game::executeMstCodeHelper3(Task *t) {
 							}
 							if (m->flagsA5 & 4) {
 								m->flagsA5 &= ~4;
-								if (updateMstTaskDataPosition(m) == 0) {
+								if (!updateMstTaskDataPosition(m)) {
 									initMstTaskData(m);
 								}
 								indexUnk35 = m->unkC->indexUnk35_20;
 								if (indexUnk35 != kNone) {
 									m->m35 = &_res->_mstUnk35[indexUnk35];
-									prepareMstTask(_mstCurrentTask);
 								}
+								prepareMstTask(_mstCurrentTask);
 							}
 							return 0;
 						}
@@ -1156,19 +1157,18 @@ int Game::executeMstCodeHelper3(Task *t) {
 							if (indexUnk35 != kNone) {
 								m->m35 = &_res->_mstUnk35[indexUnk35];
 							}
-							if ((m->flagsA5 & 4) == 0) {
-								return 0;
+							if (m->flagsA5 & 4) {
+								m->flagsA5 &= ~4;
+								if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
+									initMstTaskData(_mstCurrentTaskData);
+								}
+								m44 = _mstCurrentTaskData->unkC;
+								indexUnk35 = m44->indexUnk35_20;
+								if (indexUnk35 != kNone) {
+									m->m35 = &_res->_mstUnk35[indexUnk35];
+								}
+								prepareMstTask(_mstCurrentTask);
 							}
-							m->flagsA5 &= ~4;
-							if (updateMstTaskDataPosition(_mstCurrentTaskData) == 0) {
-								initMstTaskData(_mstCurrentTaskData);
-							}
-							m44 = _mstCurrentTaskData->unkC;
-							indexUnk35 = m44->indexUnk35_20;
-							if (indexUnk35 != kNone) {
-								m->m35 = &_res->_mstUnk35[indexUnk35];
-							}
-							prepareMstTask(_mstCurrentTask);
 							return 0;
 						}
 					}
