@@ -333,6 +333,8 @@ struct MstTaskData {
 	int yMstPos; // 0x58
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
+	int unk64; // 0x64
+	int unk68; // 0x68
 	int unk74; // 0x74
 	int unk7C; // 0x7C
 	int unk84; // 0x84
@@ -357,6 +359,7 @@ struct MstTaskData {
 	int unkD4;
 	MstUnk49 *m49; // 0xD8
 	int unkDC; // 0xDC
+	uint8_t unkE4;
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;
 	int unkE8; // 0xE8

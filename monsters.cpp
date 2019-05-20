@@ -3634,12 +3634,29 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 		return;
 	}
 // 41CCA3
-	warning("executeMstOp67Type2 t %p flag %d", t, flag);
 	const uint8_t *p = m->unk8;
+	warning("executeMstOp67Type2 t %p flag %d p[946] %x", t, flag, p[946]);
 	if (p[946] & 2) {
+		m->unkE4 = 255;
 		// TODO
 	}
 // 41CE2B
+	int32_t _ebp = READ_LE_UINT32(p + 900);
+	int32_t _ecx = READ_LE_UINT32(p + 896);
+	int r = (_ecx + 3) / 4;
+	m->unk64 = _ebp + r;
+	m->unk68 = _ecx + _ebp - r;
+	if (r != 0) {
+		r = _rnd.update() % r;
+	}
+	m->unk74 = m->unk64 + r;
+	m->unk64 += r;
+	m->unk68 -= r;
+	m->unk7C = m->unk68;
+	if (m->flags4B == 0) {
+		// TODO
+	}
+// 41CEA1
 }
 
 void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
