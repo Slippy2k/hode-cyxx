@@ -944,10 +944,6 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 }
 
 int Game::executeMstCodeHelper3(Task *t) {
-	if (!t->run) {
-		warning("executeMstCodeHelper3 t.run is NULL");
-		return 1;
-	}
 	_mstCurrentTask = t;
 	MstTaskData *m = t->dataPtr;
 	MstTaskData *_mstCurrentTaskData = m;
@@ -1059,8 +1055,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 							}
 
 							if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
-								warning("executeMstCodeHelper3 missing call to resetMstTask");
-								// resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
+								resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
 								executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
 								return 0;
 							}
