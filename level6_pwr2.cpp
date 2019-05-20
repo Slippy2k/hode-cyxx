@@ -122,9 +122,10 @@ void Game::callLevel_initialize_pwr2() {
 }
 
 const uint8_t Game::_pwr2_screenTransformLut[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 void Game::callLevel_tick_pwr2() {
-	_video->_displayShadowLayer = _pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2];
+	_video->_displayShadowLayer = _pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
 }

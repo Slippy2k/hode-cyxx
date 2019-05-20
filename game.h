@@ -56,6 +56,7 @@ struct Game {
 	static const uint8_t _pwr1_screenTransformData[];
 	static const uint8_t _pwr2_screenTransformData[];
 	static const uint8_t _pwr1_screenTransformLut[];
+	static const uint8_t _lava_screenTransformLut[];
 	static const uint8_t _pwr2_screenTransformLut[];
 
 	Mixer _mix;

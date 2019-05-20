@@ -439,7 +439,7 @@ void Game::callLevel_tick_lar1() {
 		_plasmaCannonFlags |= 2;
 	}
 	if (_res->_currentScreenResourceNum == 12) {
-		_video->_displayShadowLayer = 1;
+		_video->_displayShadowLayer = true;
 	}
 }
 

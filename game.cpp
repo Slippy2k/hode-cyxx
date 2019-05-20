@@ -166,13 +166,14 @@ void Game::transformShadowLayer(int delta) {
 		dst += 6;
 		src += 6;
 	}
-	int r = -1;
+	uint8_t r = 0;
 	if (_currentLevel == kLvl_pwr1) {
 		r = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
 	} else if (_currentLevel == kLvl_pwr2) {
 		r = _pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
 	}
-	if (!(r < 0)) {
+	if (r != 0) {
+		assert(r < ARRAYSIZE(_screenTransformRects));
 		const BoundingBox *b = &_screenTransformRects[r];
 		const int offset = b->y1 * 256 + b->x1;
 		src = _video->_frontLayer + offset;

@@ -463,6 +463,6 @@ const uint8_t Game::_pwr1_screenTransformLut[] = {
 };
 
 void Game::callLevel_tick_pwr1() {
-	_video->_displayShadowLayer = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2];
+	_video->_displayShadowLayer = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
 	updateLevelTickHelper();
 }

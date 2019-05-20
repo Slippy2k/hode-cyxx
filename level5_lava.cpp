@@ -291,12 +291,14 @@ void Game::callLevel_initialize_lava() {
 	resetLevelTickHelperData();
 }
 
-static const uint8_t byte_452CD8[] = {
-	0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+const uint8_t Game::_lava_screenTransformLut[] = {
+	0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+	0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 void Game::callLevel_tick_lava() {
-	_video->_displayShadowLayer = byte_452CD8[_res->_currentScreenResourceNum * 2];
+	_video->_displayShadowLayer = _lava_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
+	assert(_lava_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1] == 0);
 	// TODO
 	updateLevelTickHelper();
 }
