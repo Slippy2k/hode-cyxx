@@ -232,7 +232,7 @@ struct MstUnk49 {
 	uint32_t unk0;
 	uint32_t unk4;
 	uint32_t count1; // 8
-	uint32_t offset1; // 0xC
+	uint8_t *data2; // 0xC
 	uint32_t count2; // 0x10
 	uint32_t unk0x14; // 0x14
 }; // SIZEOF_MstUnk49 24

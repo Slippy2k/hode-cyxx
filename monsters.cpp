@@ -966,9 +966,15 @@ int Game::executeMstCodeHelper3(Task *t) {
 		return 1;
 	}
 	const uint32_t _edi = READ_LE_UINT32(_mstCurrentDataPtr + 20);
-	if (_edi != 0) {
-		warning("executeMstCodeHelper3 _edi 0x%x", _edi);
-		// TODO
+	if (_edi != kNone) {
+		MstUnk46 *m46 = _mstCurrentTaskData->m46;
+		for (uint32_t i = 0; i < m46->count; ++i) {
+			if (m46->data[i].indexHeight == _edi) {
+				warning("executeMstCodeHelper3 missing call to copyMstTaskData");
+				// copyMstTaskData(_mstCurrentTask, _mstCurrentTaskData, &m46->data[i]);
+				return 0;
+			}
+		}
 	}
 // 41824B
 	if ((m->flagsA5 & 0x80) == 0) {
@@ -3617,10 +3623,8 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 		if (m->m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-// 41CC20
-			shuffleFlags(m->unkC8);
-			warning("executeMstOp67Type2 t %p unkDC %d", t, m->unkDC);
-			// TODO
+			uint8_t _al = shuffleFlags(m->unkC8);
+			m->unkDC = m->m49->data2[_al];
 		}
 	}
 // 41CC44

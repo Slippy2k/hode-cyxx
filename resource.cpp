@@ -1274,15 +1274,17 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk49[i].unk0    = fp->readUint32();
 		_mstUnk49[i].unk4    = fp->readUint32();
 		_mstUnk49[i].count1  = fp->readUint32();
-		_mstUnk49[i].offset1 = fp->readUint32();
+		fp->readUint32();
 		_mstUnk49[i].count2  = fp->readUint32();
+		_mstUnk49[i].data2   = (uint8_t *)malloc(_mstUnk49[i].count2);
 		_mstUnk49[i].unk0x14 = fp->readUint32();
 		bytesRead += 24;
 	}
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		fp->seek(_mstUnk49[i].count1 * 16, SEEK_CUR);
 		bytesRead += _mstUnk49[i].count1 * 16;
-		bytesRead += skipBytesAlign(fp, _mstUnk49[i].count2);
+		fp->read(_mstUnk49[i].data2, _mstUnk49[i].count2);
+		bytesRead += _mstUnk49[i].count2;
 	}
 
 	_mstUnk50 = (MstUnk50 *)malloc(_mstHdr.unk0x44 * sizeof(MstUnk50));
