@@ -2615,6 +2615,53 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 231:
+		case 232: { // 71
+				const int num = READ_LE_UINT16(p + 2);
+				const MstUnk55 *m = &_res->_mstUnk55[num];
+				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
+				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
+				if (compareOp(m->compare, a, b)) {
+					if (p[0] == 231) {
+						LvlObject *o = 0;
+						MstTaskData *m = t->dataPtr;
+						if (m) {
+							if ((m->flagsA6 & 2) == 0) {
+								o = m->o16;
+							}
+						} else if (t->mstObject) {
+							o = t->mstObject->o;
+						}
+						if (o) {
+							o->actionKeyMask = 0;
+							o->directionKeyMask = 0;
+						}
+						t->tempVar = num;
+						t->run = &Game::runTask_mstOp231;
+						ret = 1;
+					}
+				} else {
+					if (p[0] == 232) {
+						LvlObject *o = 0;
+						MstTaskData *m = t->dataPtr;
+						if (m) {
+							if ((m->flagsA6 & 2) == 0) {
+								o = m->o16;
+							}
+						} else if (t->mstObject) {
+							o = t->mstObject->o;
+						}
+						if (o) {
+							o->actionKeyMask = 0;
+							o->directionKeyMask = 0;
+						}
+						t->tempVar = num;
+						t->run = &Game::runTask_mstOp232;
+						ret = 1;
+					}
+				}
+			}
+			break;
 		case 233:
 		case 234: { // 72
 				const int num = READ_LE_UINT16(p + 2);
@@ -2636,7 +2683,7 @@ int Game::runTask_default(Task *t) {
 							o->directionKeyMask = 0;
 						}
 						t->tempVar = num;
-						t->run = &Game::runTask_mstUnk55_233;
+						t->run = &Game::runTask_mstOp233;
 						ret = 1;
 					}
 				} else {
@@ -2654,7 +2701,7 @@ int Game::runTask_default(Task *t) {
 							o->directionKeyMask = 0;
 						}
 						t->tempVar = num;
-						t->run = &Game::runTask_mstUnk55_234;
+						t->run = &Game::runTask_mstOp234;
 						ret = 1;
 					}
 				}
@@ -2726,19 +2773,15 @@ int Game::runTask_default(Task *t) {
 									p = t->codeData - 4;
 								}
 								break;
-							default:
-								warning(".mst opcode 242 t->dataPtr flagsA5 0x%x", m->flagsA5);
-								break;
-							}
-/*
-							case 2:
-// 413D74
-								break;
 							case 5:
 								return executeMstOp67Type1(t);
 							case 6:
 								return executeMstOp67Type2(t, 1);
-*/
+							default:
+// 413D6D
+								warning(".mst opcode 242 t->dataPtr flagsA5 0x%x", m->flagsA5);
+								break;
+							}
 						} else {
 // 413DCA
 							MstUnk35 *m35 = m->m35;
@@ -3612,16 +3655,17 @@ void Game::executeMstUnk13(Task *t) {
 	}
 }
 
-void Game::executeMstOp67Type1(Task *t) {
+int Game::executeMstOp67Type1(Task *t) {
 	t->flags &= ~0x80;
 	MstTaskData *m = t->dataPtr;
 	m->flagsA5 = (m->flagsA5 & ~2) | 5;
 	initMstTaskData(m);
 	warning("executeMstOp67Type1 t %p", t);
 	// TODO
+	return 0;
 }
 
-void Game::executeMstOp67Type2(Task *t, int flag) {
+int Game::executeMstOp67Type2(Task *t, int flag) {
 	t->flags &= ~0x80;
 	MstTaskData *m = t->dataPtr;
 	m->flagsA5 = (m->flagsA5 & ~1) | 6;
@@ -3654,7 +3698,7 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 	m->flagsA7 = 255;
 	if (executeMstUnk2(m, m->xMstPos, m->yMstPos)) {
 		executeMstUnk1(t);
-		return;
+		return 0;
 	}
 // 41CCA3
 	const uint8_t *p = m->unk8;
@@ -3680,6 +3724,7 @@ void Game::executeMstOp67Type2(Task *t, int flag) {
 		// TODO
 	}
 // 41CEA1
+	return 0;
 }
 
 void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
@@ -4040,8 +4085,38 @@ int Game::runTask_idle(Task *t) {
 	return 1;
 }
 
-int Game::runTask_mstUnk55_233(Task *t) {
-	debug(kDebug_MONSTER, "runTask_mstUnk55_233 t %p", t);
+int Game::runTask_mstOp231(Task *t) {
+	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
+	const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
+	const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
+	if (!compareOp(m->compare, a, b)) {
+		LvlObject *o = 0;
+		MstTaskData *m = t->dataPtr;
+		if (m) {
+			if ((m->flagsA6 & 2) == 0) {
+				o = m->o16;
+			}
+		} else if (t->mstObject) {
+			o = t->mstObject->o;
+		}
+		if (o) {
+			o->actionKeyMask = 0;
+			o->directionKeyMask = 0;
+		}
+		t->run = &Game::runTask_default;
+		return 0;
+	}
+	return 1;
+}
+
+int Game::runTask_mstOp232(Task *t) {
+	warning("runTask_mstOp232 unimplemented");
+	t->run = &Game::runTask_default;
+	return 0;
+}
+
+int Game::runTask_mstOp233(Task *t) {
+	debug(kDebug_MONSTER, "runTask_mstOp233 t %p", t);
 	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
@@ -4062,8 +4137,8 @@ int Game::runTask_mstUnk55_233(Task *t) {
 	return 1;
 }
 
-int Game::runTask_mstUnk55_234(Task *t) {
-	debug(kDebug_MONSTER, "runTask_mstUnk55_234 t %p", t);
+int Game::runTask_mstOp234(Task *t) {
+	debug(kDebug_MONSTER, "runTask_mstOp234 t %p", t);
 	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
