@@ -72,7 +72,7 @@ void Game::resetMstObject(MstObject *m) {
 	}
 }
 
-void Game::setMstObjectDefaultPos(Task *t) {
+void Game::setMstObjectDefaultPos(Task *t) { // mstTaskSetScreenPosition
 	MstObject *m = t->mstObject;
 	LvlObject *o = m->o;
 	m->xPos = o->xPos + o->posTable[7].x;
@@ -93,10 +93,10 @@ void Game::initMstTaskData(MstTaskData *m) {
 		return;
 	}
 
-	m->x1 = m->unkC->unk2C[num] - READ_LE_UINT32(ptr + 904);
-	m->x2 = m->unkC->unk34[num] + READ_LE_UINT32(ptr + 904);
-	m->y1 = m->unkC->unk3C[num] - READ_LE_UINT32(ptr + 908);
-	m->y2 = m->unkC->unk44[num] + READ_LE_UINT32(ptr + 908);
+	m->x1 = m->unkC->unk2C[num] - READ_LE_UINT32(ptr + 904); // x2 ?
+	m->x2 = m->unkC->unk34[num] + READ_LE_UINT32(ptr + 904); // x1 ?
+	m->y1 = m->unkC->unk3C[num] - READ_LE_UINT32(ptr + 908); // y2 ?
+	m->y2 = m->unkC->unk44[num] + READ_LE_UINT32(ptr + 908); // y1 ?
 
 	const uint32_t indexUnk35 = m->unkC->indexUnk35_0x24[num];
 	m->m35 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
@@ -330,7 +330,7 @@ int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-void Game::setMstTaskDataDefaultPos(Task *t) {
+void Game::setMstTaskDataDefaultPos(Task *t) { // mstTaskUpdateScreenPosition
 	MstTaskData *m = t->dataPtr;
 	assert(m);
 	LvlObject *o = m->o20;
@@ -674,7 +674,7 @@ void Game::executeMstCodeHelper2() {
 	}
 }
 
-void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2) {
+void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2) { // mstLvlObjectSetActionDirection
 	o->actionKeyMask = ptr[1];
 	uint8_t _al = mask1 & 15;
 	o->directionKeyMask = _al;
@@ -1467,7 +1467,7 @@ Task *Game::createTask(const uint8_t *codeData) {
 	return 0;
 }
 
-int Game::changeTask(Task *t, int num, int delay) {
+int Game::changeTask(Task *t, int num, int delay) { // mstTaskSetActionDirection
 	uint8_t var4 = _res->_mstUnk52[num * 4];
 	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
 	MstTaskData *m = t->dataPtr;
@@ -2621,6 +2621,8 @@ int Game::runTask_default(Task *t) {
 				const MstUnk55 *m = &_res->_mstUnk55[num];
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
+				// TODO: mstOp231 & mstOp232 are duplicating code
+				// could we simply break and leave the codeData pointer to the same opcode ?
 				if (compareOp(m->compare, a, b)) {
 					if (p[0] == 231) {
 						LvlObject *o = 0;
