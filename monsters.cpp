@@ -442,10 +442,11 @@ void Game::resetMstCode() {
 	for (int i = 0; i < _res->_mstHdr.unk0x40; ++i) {
 		const int count = _res->_mstUnk49[i].count2;
 		if (count != 0) {
-			// TODO
+			uint8_t *ptr = _res->_mstUnk49[i].data2;
 			for (int j = 0; j < count * 2; ++j) {
-				// const int index1 = _rnd.update() % max;
-				// const int index2 = _rnd.update() % max;
+				const int index1 = _rnd.update() % count;
+				const int index2 = _rnd.update() % count;
+				SWAP(ptr[index1], ptr[index2]);
 			}
 		}
 	}
