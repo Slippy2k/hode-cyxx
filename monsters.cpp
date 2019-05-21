@@ -950,9 +950,9 @@ int Game::executeMstCodeHelper3(Task *t) {
 	LvlObject *o = m->o16;
 	int _mstCurrentFlags0 = o->flags0 & 255;
 	const uint8_t *_mstCurrentDataPtr = m->unk8 + _mstCurrentFlags0 * 28; // _ebx
-	int8_t _dl = _mstCurrentDataPtr[6];
-	if (_dl != 0) {
-		const int num = CLIP(m->unkE6 + _dl, 0, 17);
+	int8_t a = _mstCurrentDataPtr[6];
+	if (a != 0) {
+		const int num = CLIP(m->unkE6 + a, 0, 17);
 		o->flags2 = (o->flags2 & ~0x1F) | _mstLut4[num];
 	} else {
 		o->flags2 = m->unkE8;
@@ -973,251 +973,249 @@ int Game::executeMstCodeHelper3(Task *t) {
 		}
 	}
 // 41824B
-	if ((m->flagsA5 & 0x80) == 0) {
-		if (m->localVars[7] == 0 && !_mstCurrentUnkFlag) {
-			m->flagsA5 |= 0x80;
-			if (m->unk8[946] & 4) {
-				clearMstRectsTable(m, 1);
-			}
-			if (t->child) {
-				t->child->codeData = 0;
-				t->child = 0;
-			}
-			if ((m->flagsA5 & 8) != 0 && m->unk18 && _mstUnk6 != -1) {
-				initMstTaskDataType2(_mstCurrentTask);
-				return 0;
-			}
-			const uint32_t codeData = m->unk4->codeData;
-			if (codeData != kNone) {
-				resetTask(t, _res->_mstCodeData + codeData * 4);
-				return 0;
-			}
-			o->actionKeyMask = 7;
-			o->directionKeyMask = 0;
-			t->run = &Game::runTask_idle;
+	if ((m->flagsA5 & 0x80) != 0) {
+		return 0;
+	}
+	if (m->localVars[7] == 0 && !_mstCurrentUnkFlag) {
+		m->flagsA5 |= 0x80;
+		if (m->unk8[946] & 4) {
+			clearMstRectsTable(m, 1);
+		}
+		if (t->child) {
+			t->child->codeData = 0;
+			t->child = 0;
+		}
+		if ((m->flagsA5 & 8) != 0 && m->unk18 && _mstUnk6 != -1) {
+			initMstTaskDataType2(_mstCurrentTask);
 			return 0;
-
-		} else {
+		}
+		const uint32_t codeData = m->unk4->codeData;
+		if (codeData != kNone) {
+			resetTask(t, _res->_mstCodeData + codeData * 4);
+			return 0;
+		}
+		o->actionKeyMask = 7;
+		o->directionKeyMask = 0;
+		t->run = &Game::runTask_idle;
+		return 0;
+	}
 // 41833A
-			if (t->run == &Game::runTask_unk4) {
-				return 0;
-			}
-			if (_mstCurrentDataPtr[0] != 0) {
-				executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
-				return 0;
-			}
-			if ((m->flagsA5 & 0x40) != 0) {
-				return 0;
-			}
-// 418361
-			if (_mstMovingStateCount > 0) {
-				// TODO
-			}
+	if (t->run == &Game::runTask_unk4) {
+		return 0;
+	}
+	if (_mstCurrentDataPtr[0] != 0) {
+		executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
+		return 0;
+	}
+	if ((m->flagsA5 & 0x40) != 0) {
+		return 0;
+	}
+// 41831
+	if (_mstMovingStateCount > 0) {
+		// TODO
+	}
 // 41882E
-			if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
-				MstUnk46Unk1 *m46 = m->unk4;
-				if (m46->indexUnk47 != kNone) {
-					MstUnk47 *m47 = &_res->_mstUnk47[m46->indexUnk47];
-					if (m47->count > 0) {
-						const uint8_t dir = (o->flags1 >> 4) & 3;
-						const uint8_t *p = m47->data;
-						for (uint32_t i = 0; i < m47->count; ++i) {
-							int32_t a = READ_LE_UINT32(p);
-							int32_t b = READ_LE_UINT32(p + 4);
-							int32_t c = READ_LE_UINT32(p + 8);
-							int32_t d = READ_LE_UINT32(p + 12);
-							int x1, x2, y1, y2;
-							switch (dir) {
-							case 1:
-								x1 = m->xMstPos - c; // _edx
-								x2 = m->xMstPos - a; // _edi
-								y1 = m->yMstPos + b; // _esi
-								y2 = m->yMstPos + d; // _ebp;
-								break;
-							case 2:
-								x1 = m->xMstPos + a; // _edx
-								x2 = m->xMstPos + c; // _edi
-								y1 = m->yMstPos - d; // _esi
-								y2 = m->yMstPos - b; // _ebp
-								break;
-							case 3:
-								x1 = m->xMstPos - c;
-								x2 = m->xMstPos - a;
-								y1 = m->yMstPos - d;
-								y2 = m->yMstPos - b;
-								break;
-							default:
-								x1 = m->xMstPos + a; // _edx
-								x2 = m->xMstPos + c; // _edi
-								y1 = m->yMstPos + b; // _esi
-								y2 = m->yMstPos + d; // _ebp
-								break;
-							}
+	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
+		MstUnk46Unk1 *m46 = m->unk4;
+		if (m46->indexUnk47 != kNone) {
+			MstUnk47 *m47 = &_res->_mstUnk47[m46->indexUnk47];
+			if (m47->count > 0) {
+				const uint8_t dir = (o->flags1 >> 4) & 3;
+				const uint8_t *p = m47->data;
+				for (uint32_t i = 0; i < m47->count; ++i) {
+					int32_t a = READ_LE_UINT32(p);
+					int32_t b = READ_LE_UINT32(p + 4);
+					int32_t c = READ_LE_UINT32(p + 8);
+					int32_t d = READ_LE_UINT32(p + 12);
+					int x1, x2, y1, y2;
+					switch (dir) {
+					case 1:
+						x1 = m->xMstPos - c; // _edx
+						x2 = m->xMstPos - a; // _edi
+						y1 = m->yMstPos + b; // _esi
+						y2 = m->yMstPos + d; // _ebp;
+						break;
+					case 2:
+						x1 = m->xMstPos + a; // _edx
+						x2 = m->xMstPos + c; // _edi
+						y1 = m->yMstPos - d; // _esi
+						y2 = m->yMstPos - b; // _ebp
+						break;
+					case 3:
+						x1 = m->xMstPos - c;
+						x2 = m->xMstPos - a;
+						y1 = m->yMstPos - d;
+						y2 = m->yMstPos - b;
+						break;
+					default:
+						x1 = m->xMstPos + a; // _edx
+						x2 = m->xMstPos + c; // _edi
+						y1 = m->yMstPos + b; // _esi
+						y2 = m->yMstPos + d; // _ebp
+						break;
+					}
 
-							if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
-								resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
-								executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
-								return 0;
-							}
+					if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
+						resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
+						executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
+						return 0;
+					}
 
-							p += 20;
-						}
-					}
+					p += 20;
 				}
-			}
-// 418939
-			if (executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr)) {
-				return 0;
-			}
-			uint8_t _al = _mstCurrentTaskData->flagsA6;
-			uint8_t _dl = _mstCurrentTaskData->flagsA5;
-			if ((_al & 2) != 0 || (_dl & 0x30) != 0) {
-				return 0;
-			}
-			uint8_t dir = _dl & 3;
-			if (dir == 1) {
-// 418AC6
-				MstUnk44Unk1 *m44 = _mstCurrentTaskData->unkC;
-				if (m44->indexUnk35_24 == kNone) {
-					return 0;
-				}
-				int _ebp = 0;
-				if (_mstPosY >= m->yMstPos - m44->y1 && _mstPosY < m->yMstPos + m44->y2) {
-					if (m->x1 != -2 || m->x1 != m->x2) {
-// 418B5A
-						if (m->xDelta <= m->x1) {
-							if (_al & 1) {
-								_ebp = 1;
-							} else {
-								_al = getBits23(m->flags49) & 1;
-								_dl = (_mstCurrentTaskData->o16->flags1 >> 4) & 1;
-								if (_dl == _al) {
-									_ebp = 1;
-								} else if (_mstCurrentTaskData->unk8[946] & 4) {
-									_ebp = 1;
-								} else if (m->xDelta <= _mstCurrentTaskData->unkC->x2) {
-									_ebp = 2;
-								}
-							}
-						}
-// 418BAA
-					} else if (o->screenNum == _currentScreen) {
-						if (m->flagsA6 & 1) {
-							_ebp = 1;
-						} else {
-							warning("executeMstCodeHelper3 mstPosY %d x1 %d x2 %d screen %d", _mstPosY, m->x1, m->x2, o->screenNum);
-							// TODO
-						}
-					}
-				}
-// 418BAA
-				if (_ebp == 0) {
-					m->flagsA6 &= ~1;
-					if ((m->flagsA5 & 4) == 0) {
-						const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
-						assert(indexUnk35 != kNone);
-						m->m35 = &_res->_mstUnk35[indexUnk35];
-					}
-					return 0;
-				} else if (_ebp == 1) {
-// 418C73
-					m->flagsA6 |= 1;
-					if (executeMstUnk2(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
-						if (_mstCurrentPosX > m->xMstPos && (_mstCurrentPosX < m->unkC->unk2C[1] || _mstCurrentPosX < m->unkC->unk34[1])) {
-							uint32_t indexUnk35 = m->unkC->indexUnk35_20;
-							if (indexUnk35 != kNone) {
-								m->m35 = &_res->_mstUnk35[indexUnk35];
-							}
-							if (m->flagsA5 & 4) {
-								m->flagsA5 &= ~4;
-								if (!updateMstTaskDataPosition(m)) {
-									initMstTaskData(m);
-								}
-								indexUnk35 = m->unkC->indexUnk35_20;
-								if (indexUnk35 != kNone) {
-									m->m35 = &_res->_mstUnk35[indexUnk35];
-								}
-								prepareMstTask(_mstCurrentTask);
-							}
-							return 0;
-						}
-					}
-// 418D41
-					if ((m->unk8[946] & 2) == 0) {
-						MstUnk44Unk1 *m44 = m->unkC;
-						int _edi = READ_LE_UINT32(m->unk8 + 904);
-						int _ebx = MAX(m->unk88, m44->unk34[1] + _edi);
-						int _eax = MIN(m->unk84, m44->unk2C[1] - _edi);
-						uint32_t indexUnk36 = m44->indexUnk36_32;
-						assert(indexUnk36 != kNone);
-						uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
-						assert(indexUnk49 != kNone);
-						uint8_t _bl = _res->_mstUnk49[indexUnk49].unk0x14 & 0xFF;
-						if (ABS(_eax - _ebx) <= _bl) {
-							uint32_t indexUnk35 = m44->indexUnk35_20;
-							if (indexUnk35 != kNone) {
-								m->m35 = &_res->_mstUnk35[indexUnk35];
-							}
-							if (m->flagsA5 & 4) {
-								m->flagsA5 &= ~4;
-								if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
-									initMstTaskData(_mstCurrentTaskData);
-								}
-								m44 = _mstCurrentTaskData->unkC;
-								indexUnk35 = m44->indexUnk35_20;
-								if (indexUnk35 != kNone) {
-									m->m35 = &_res->_mstUnk35[indexUnk35];
-								}
-								prepareMstTask(_mstCurrentTask);
-							}
-							return 0;
-						}
-					}
-// 418DEA
-					executeMstOp67Type2(_mstCurrentTask, 0);
-					return 0;
-				}
-				assert(_ebp == 2);
-				if (m->flagsA6 & 1) {
-					return 0;
-				}
-				const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
-				assert(indexUnk35 != kNone);
-				if (!m->m35) {
-					_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
-					_mstCurrentTaskData->unkCC[0] = _rnd.update() & 7;
-					_mstCurrentTaskData->unkCC[2] = 0x20;
-					_mstCurrentTaskData->unkCC[1] = _rnd.update() & 31;
-					prepareMstTask(_mstCurrentTask);
-					return 0;
-				}
-// 418C1D
-				if (m->flagsA5 & 4) {
-					m->flagsA5 &= ~4;
-					if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
-						initMstTaskData(_mstCurrentTaskData);
-					}
-					_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
-					prepareMstTask(_mstCurrentTask);
-				}
-				return 0;
-			} else if (dir != 2) {
-				return 0;
-			}
-			if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
-				return 0;
-			}
-			warning("executeMstCodeHelper3 unimplemented flagsA5 0x%x flags48 0x%x", m->flagsA5, m->flags48);
-			if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
-				// TODO
-			} else {
-// 418A9A
-				if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
-					executeMstOp67Type2(t, 1);
-				}
-				return 0;
 			}
 		}
+	}
+// 418939
+	if (executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr)) {
+		return 0;
+	}
+	uint8_t _al = _mstCurrentTaskData->flagsA6;
+	uint8_t _dl = _mstCurrentTaskData->flagsA5;
+	if ((_al & 2) != 0 || (_dl & 0x30) != 0) {
+		return 0;
+	}
+	uint8_t dir = _dl & 3;
+	if (dir == 1) {
+// 418AC6
+		MstUnk44Unk1 *m44 = _mstCurrentTaskData->unkC;
+		if (m44->indexUnk35_24 == kNone) {
+			return 0;
+		}
+		int _ebp = 0;
+		if (_mstPosY >= m->yMstPos - m44->y1 && _mstPosY < m->yMstPos + m44->y2) {
+			if (m->x1 != -2 || m->x1 != m->x2) {
+				if (m->xDelta <= m->x1) {
+					if (_al & 1) {
+						_ebp = 1;
+					} else {
+						_al = getBits23(m->flags49) & 1;
+						_dl = (_mstCurrentTaskData->o16->flags1 >> 4) & 1;
+						if (_dl == _al) {
+							_ebp = 1;
+						} else if (_mstCurrentTaskData->unk8[946] & 4) {
+							_ebp = 1;
+						} else if (m->xDelta <= _mstCurrentTaskData->unkC->x2) {
+							_ebp = 2;
+						}
+					}
+				}
+// 418BAA
+			} else if (o->screenNum == _currentScreen) {
+				if (m->flagsA6 & 1) {
+					_ebp = 1;
+				} else {
+					warning("executeMstCodeHelper3 mstPosY %d x1 %d x2 %d screen %d", _mstPosY, m->x1, m->x2, o->screenNum);
+					// TODO
+				}
+			}
+		}
+// 418BAA
+		if (_ebp == 0) {
+			m->flagsA6 &= ~1;
+			if ((m->flagsA5 & 4) == 0) {
+				const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
+				assert(indexUnk35 != kNone);
+				m->m35 = &_res->_mstUnk35[indexUnk35];
+			}
+			return 0;
+		} else if (_ebp == 1) {
+// 418C73
+			m->flagsA6 |= 1;
+			if (executeMstUnk2(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
+				if (_mstCurrentPosX > m->xMstPos && (_mstCurrentPosX < m->unkC->unk2C[1] || _mstCurrentPosX < m->unkC->unk34[1])) {
+					uint32_t indexUnk35 = m->unkC->indexUnk35_20;
+					if (indexUnk35 != kNone) {
+						m->m35 = &_res->_mstUnk35[indexUnk35];
+					}
+					if (m->flagsA5 & 4) {
+						m->flagsA5 &= ~4;
+						if (!updateMstTaskDataPosition(m)) {
+							initMstTaskData(m);
+						}
+						indexUnk35 = m->unkC->indexUnk35_20;
+						if (indexUnk35 != kNone) {
+							m->m35 = &_res->_mstUnk35[indexUnk35];
+						}
+						prepareMstTask(_mstCurrentTask);
+					}
+					return 0;
+				}
+			}
+// 418D41
+			if ((m->unk8[946] & 2) == 0) {
+				MstUnk44Unk1 *m44 = m->unkC;
+				int _edi = READ_LE_UINT32(m->unk8 + 904);
+				int _ebx = MAX(m->unk88, m44->unk34[1] + _edi);
+				int _eax = MIN(m->unk84, m44->unk2C[1] - _edi);
+				uint32_t indexUnk36 = m44->indexUnk36_32;
+				assert(indexUnk36 != kNone);
+				uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
+				assert(indexUnk49 != kNone);
+				uint8_t _bl = _res->_mstUnk49[indexUnk49].unk0x14 & 0xFF;
+				if (ABS(_eax - _ebx) <= _bl) {
+					uint32_t indexUnk35 = m44->indexUnk35_20;
+					if (indexUnk35 != kNone) {
+						m->m35 = &_res->_mstUnk35[indexUnk35];
+					}
+					if (m->flagsA5 & 4) {
+						m->flagsA5 &= ~4;
+						if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
+							initMstTaskData(_mstCurrentTaskData);
+						}
+						m44 = _mstCurrentTaskData->unkC;
+						indexUnk35 = m44->indexUnk35_20;
+						if (indexUnk35 != kNone) {
+							m->m35 = &_res->_mstUnk35[indexUnk35];
+						}
+						prepareMstTask(_mstCurrentTask);
+					}
+					return 0;
+				}
+			}
+// 418DEA
+			executeMstOp67Type2(_mstCurrentTask, 0);
+			return 0;
+		}
+		assert(_ebp == 2);
+		if (m->flagsA6 & 1) {
+			return 0;
+		}
+		const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
+		assert(indexUnk35 != kNone);
+		if (!m->m35) {
+			_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
+			_mstCurrentTaskData->unkCC[0] = _rnd.update() & 7;
+			_mstCurrentTaskData->unkCC[2] = 0x20;
+			_mstCurrentTaskData->unkCC[1] = _rnd.update() & 31;
+			prepareMstTask(_mstCurrentTask);
+			return 0;
+		}
+// 418C1D
+		if (m->flagsA5 & 4) {
+			m->flagsA5 &= ~4;
+			if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
+				initMstTaskData(_mstCurrentTaskData);
+			}
+			_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
+			prepareMstTask(_mstCurrentTask);
+		}
+		return 0;
+	} else if (dir != 2) {
+		return 0;
+	}
+	if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
+		return 0;
+	}
+	warning("executeMstCodeHelper3 unimplemented flagsA5 0x%x flags48 0x%x", m->flagsA5, m->flags48);
+	if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
+		// TODO
+	} else {
+// 418A9A
+		if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
+			executeMstOp67Type2(t, 1);
+		}
+		return 0;
 	}
 	return 0;
 }
@@ -3570,7 +3568,31 @@ void Game::executeMstUnk12() {
 		if (!m->m46) {
 			continue;
 		}
-		if (m->flagsA5 & 2) {
+		uint8_t _bl = m->flagsA5;
+		if ((_bl & 2) != 0 || ((_bl & 1) != 0 && m->m35 == &_res->_mstUnk35[m->unkC->indexUnk35_20])) {
+			if ((_bl & 0xB0) != 0) {
+				continue;
+			}
+			const uint8_t *p = m->unk8 + (m->o16->flags0 & 255) * 28;
+			if (p[0] != 0) {
+				continue;
+			}
+			if (m->task->run == &Game::runTask_unk4) {
+				continue;
+			}
+			uint8_t _al = m->flagsA6;
+			if (_al & 2) {
+				continue;
+			}
+			assert(m->task->dataPtr == m);
+			if ((_al & 8) == 0 || m->unk8[945] != 0) {
+
+				int _ecx = m->unk8 - _res->_mstHeightMapData;
+				_al = m->xMstPos < _mstPosX;
+
+				// TODO
+
+			}
 		}
 	}
 }
