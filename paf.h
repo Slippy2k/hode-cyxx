@@ -22,9 +22,32 @@ struct PafHeader {
 	uint32_t maxAudioFrameBlocksCount;
 };
 
+// names taken from the PSX version
 enum {
+	kPafAnimation_intro = 0,
+	kPafAnimation_cine14l = 1,
+	kPafAnimation_rapt = 2,
+	kPafAnimation_glisse = 3,
+	kPafAnimation_meeting = 4,
+	kPafAnimation_island = 5,
+	kPafAnimation_islefall = 6,
+	kPafAnimation_vicious = 7,
+	kPafAnimation_together = 8,
+	kPafAnimation_power = 9,
+	kPafAniamtion_back = 10,
+	kPafAnimation_dogfree1 = 11,
+	kPafAnimation_dogfree2 = 12,
+	kPafAnimation_meteor = 13,
+	kPafAnimation_cookie = 14,
+	kPafAnimation_plot = 15,
+	kPafAnimation_puzzle = 16,
+	kPafAnimation_lstpiece = 17,
+	kPafAnimation_dogfall = 18,
+	kPafAnimation_lastfall = 19,
+	kPafAnimation_end = 20,
+	kPafAnimation_cinema = 21,
 	kPafAnimation_AndyFallingCannon = 22,
-	kPafAnimation_AndyFailling = 23,
+	kPafAnimation_AndyFalling = 23,
 };
 
 struct FileSystem;
