@@ -468,7 +468,7 @@ static void DecodeMenuData(File *f) {
 	}
 }
 
-static void writeBenchmarkData(const char *filename, const uint8_t *data) {
+static void writeBenchmarkData(uint32_t addr, const uint8_t *data) {
 	uint8_t paletteBuffer[256 * 3];
 	for (int i = 0; i < 16; ++i) {
 		const uint8_t color = i * 16;
@@ -477,12 +477,22 @@ static void writeBenchmarkData(const char *filename, const uint8_t *data) {
 	memset(paletteBuffer + 16 * 3, 0, (256 - 240) * 3);
 	const int sz = UnpackData(9, data, decodeBuffer);
 	assert(sz == 256 * 192);
+
+	char filename[256];
+	snprintf(filename, sizeof(filename), "data_%X.png", addr);
 	savePNG(filename, 256, 192, decodeBuffer, paletteBuffer, 0);
+
+	snprintf(filename, sizeof(filename), "%08x.bin", addr);
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		fwrite(decodeBuffer, 1, sz, fp);
+		fclose(fp);
+	}
 }
 
 static void DecodeBenchmarkData() {
-	writeBenchmarkData("data_43D960.png", byte_43D960);
-	writeBenchmarkData("data_43EA78.png", byte_43EA78);
+	writeBenchmarkData(0x43D960, byte_43D960);
+	writeBenchmarkData(0x43EA78, byte_43EA78);
 }
 
 int main(int argc, char *argv[]) {
