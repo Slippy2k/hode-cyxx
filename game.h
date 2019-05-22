@@ -194,6 +194,7 @@ struct Game {
 	int _mstRectsCount;
 	MstRect _mstRectsTable[64];
 	Task *_mstCurrentTask;
+	MstCollision _mstCollisionTable[2][32];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();

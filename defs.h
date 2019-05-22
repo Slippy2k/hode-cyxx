@@ -302,16 +302,22 @@ struct MstRect {
 	int num; // 16
 }; // sizeof == 0x20
 
+struct MstUnk46;
+
+struct MstCollision {
+	MstUnk46 *m46; // 0x00
+	int32_t unk80; // 0x80
+}; // sizeof == 132
+
 struct Task;
 
 struct MstUnk35;
-struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
 struct MstUnk48Unk12Unk4;
 struct MstUnk49;
 
-struct MstTaskData {
+struct MstTaskData { // MonsterObject
 	MstUnk46 *m46;
 	MstUnk46Unk1 *unk4;
 	const uint8_t *unk8;
@@ -369,7 +375,7 @@ struct MstTaskData {
 	int unkFC; // 0xFC
 }; // sizeof == 256
 
-struct MstObject {
+struct MstObject { // MonsterObject2
 	void *unk0;
 	LvlObject *o; // 4
 	MstTaskData *mstTaskData; // 8
@@ -389,8 +395,8 @@ struct MstObject {
 struct Task {
 	const uint8_t *codeData;
 	Task *prevPtr, *nextPtr; // 4,8
-	MstTaskData *dataPtr; // mstTaskData 0xC
-	MstObject *mstObject; // 0x10
+	MstTaskData *dataPtr; // 0xC monster
+	MstObject *mstObject; // 0x10 monster2
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34
 	uint8_t runningState; // 0x35

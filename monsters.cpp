@@ -3602,11 +3602,11 @@ void Game::executeMstUnk7(MstTaskData *m) {
 }
 
 void Game::executeMstUnk12() {
-	warning("executeMstUnk12 unimplemented");
-	// TODO
-
 	const int count = MIN(_res->_mstHdr.unk0x3C, 32);
-	for (int i = 0; i < count; ++i) {
+	for (int i = 0; i < 2; ++i) {
+		for (int j = 0; j < count; ++j) {
+			_mstCollisionTable[i][j].unk80 = 0;
+		}
 	}
 
 	for (int i = 0; i < 32; ++i) {
@@ -3632,12 +3632,12 @@ void Game::executeMstUnk12() {
 			}
 			assert(m->task->dataPtr == m);
 			if ((_al & 8) == 0 || m->unk8[945] != 0) {
-
-				int _ecx = m->unk8 - _res->_mstHeightMapData;
+				const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
+				assert(offset % 948 == 0);
+				const uint32_t _ecx = offset / 948;
 				_al = m->xMstPos < _mstPosX;
-
-				// TODO
-
+				++_mstCollisionTable[_al][_ecx].unk80;
+				_mstCollisionTable[_al][_ecx].m46 = m->m46;
 			}
 		}
 	}
