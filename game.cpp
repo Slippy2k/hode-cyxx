@@ -158,13 +158,20 @@ void Game::transformShadowLayer(int delta) {
 	uint8_t *dst = _video->_shadowLayer; // _eax
 	_transformShadowLayerDelta += delta; // overflow/wrap at 255
 	for (int y = 0; y < 192; ++y) {
-		for (int x = 0; x < 250; ++x) {
-			const int offset = x + *src++;
-			*dst++ = _video->_frontLayer[y * 256 + offset];
+		if (0) {
+			for (int x = 0; x < 250; ++x) {
+				const int offset = x + *src++;
+				*dst++ = _video->_frontLayer[y * 256 + offset];
+			}
+			memset(dst, 0xC4, 6);
+			dst += 6;
+			src += 6;
+		} else {
+			for (int x = 0; x < 256; ++x) {
+				const int offset = MIN(255, x + *src++);
+				*dst++ = _video->_frontLayer[y * 256 + offset];
+			}
 		}
-		memset(dst, 0xC4, 6);
-		dst += 6;
-		src += 6;
 	}
 	uint8_t r = 0;
 	if (_currentLevel == kLvl_pwr1) {
