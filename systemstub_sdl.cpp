@@ -12,6 +12,9 @@
 
 static const char *kIconBmp = "icon.bmp";
 
+static const int kJoystickIndex = 0;
+static const int kJoystickCommitValue = 3200;
+
 static int _scalerMultiplier = 3;
 static const Scaler *_scaler = &scaler_xbr;
 static const float _gamma = 1.f;
@@ -54,6 +57,8 @@ struct SystemStub_SDL : SystemStub {
 	AudioCallback _audioCb;
 	bool _paletteGrayScale;
 	uint8_t _gammaLut[256];
+	SDL_GameController *_controller;
+	SDL_Joystick *_joystick;
 
 	SystemStub_SDL();
 	virtual ~SystemStub_SDL() {}
@@ -100,6 +105,7 @@ void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
 	SDL_ShowCursor(SDL_DISABLE);
 	setupDefaultKeyMappings();
 	memset(&inp, 0, sizeof(inp));
+	memset(&pad, 0, sizeof(pad));
 	_screenW = w;
 	_screenH = h;
 	_shakeDx = _shakeDy = 0;
@@ -115,6 +121,17 @@ void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
 	}
 	memset(_offscreenLut, 0, offscreenSize);
 	prepareScaledGfx(title, fullscreen);
+	_joystick = 0;
+	_controller = 0;
+	if (SDL_NumJoysticks() > 0) {
+		SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+		if (SDL_IsGameController(kJoystickIndex)) {
+			_controller = SDL_GameControllerOpen(kJoystickIndex);
+		}
+		if (!_controller) {
+			_joystick = SDL_JoystickOpen(kJoystickIndex);
+		}
+	}
 }
 
 void SystemStub_SDL::destroy() {
@@ -122,6 +139,15 @@ void SystemStub_SDL::destroy() {
 	_offscreenLut = 0;
 	free(_offscreenRgb);
 	_offscreenRgb = 0;
+
+	if (_controller) {
+		SDL_GameControllerClose(_controller);
+		_controller = 0;
+	}
+	if (_joystick) {
+		SDL_JoystickClose(_joystick);
+		_joystick = 0;
+	}
 }
 
 void SystemStub_SDL::setScaler(const char *name, int multiplier) {
@@ -256,11 +282,175 @@ void SystemStub_SDL::updateScreen() {
 
 void SystemStub_SDL::processEvents() {
 	SDL_Event ev;
+	pad.prevMask = pad.mask;
 	while (SDL_PollEvent(&ev)) {
 		switch (ev.type) {
 		case SDL_KEYUP:
 			if (ev.key.keysym.sym == SDLK_s) {
 				inp.screenshot = true;
+			}
+			break;
+		case SDL_JOYHATMOTION:
+			if (_joystick) {
+				pad.mask = 0;
+				if (ev.jhat.value & SDL_HAT_UP) {
+					pad.mask |= SYS_INP_UP;
+				}
+				if (ev.jhat.value & SDL_HAT_DOWN) {
+					pad.mask |= SYS_INP_DOWN;
+				}
+				if (ev.jhat.value & SDL_HAT_LEFT) {
+					pad.mask |= SYS_INP_LEFT;
+				}
+				if (ev.jhat.value & SDL_HAT_RIGHT) {
+					pad.mask |= SYS_INP_RIGHT;
+				}
+			}
+			break;
+		case SDL_JOYAXISMOTION:
+			if (_joystick) {
+				switch (ev.jaxis.axis) {
+				case 0:
+					pad.mask &= ~(SYS_INP_RIGHT | SYS_INP_LEFT);
+					if (ev.jaxis.value > kJoystickCommitValue) {
+						pad.mask |= SYS_INP_RIGHT;
+					} else if (ev.jaxis.value < -kJoystickCommitValue) {
+						pad.mask |= SYS_INP_LEFT;
+					}
+					break;
+				case 1:
+					pad.mask &= ~(SYS_INP_UP | SYS_INP_DOWN);
+					if (ev.jaxis.value > kJoystickCommitValue) {
+						pad.mask |= SYS_INP_DOWN;
+					} else if (ev.jaxis.value < -kJoystickCommitValue) {
+						pad.mask |= SYS_INP_UP;
+					}
+					break;
+				}
+			}
+			break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			if (_joystick) {
+				const bool pressed = (ev.jbutton.state == SDL_PRESSED);
+				switch (ev.jbutton.button) {
+				case 0:
+					if (pressed) {
+						pad.mask |= SYS_INP_RUN;
+					} else {
+						pad.mask &= ~SYS_INP_RUN;
+					}
+					break;
+				case 1:
+					if (pressed) {
+						pad.mask |= SYS_INP_JUMP;
+					} else {
+						pad.mask &= ~SYS_INP_JUMP;
+					}
+					break;
+				case 2:
+					if (pressed) {
+						pad.mask |= SYS_INP_SHOOT;
+					} else {
+						pad.mask &= ~SYS_INP_SHOOT;
+					}
+					break;
+				}
+			}
+			break;
+		case SDL_CONTROLLERAXISMOTION:
+			if (_controller) {
+				switch (ev.caxis.axis) {
+				case SDL_CONTROLLER_AXIS_LEFTX:
+				case SDL_CONTROLLER_AXIS_RIGHTX:
+					if (ev.caxis.value < -kJoystickCommitValue) {
+						pad.mask |= SYS_INP_LEFT;
+					} else {
+						pad.mask &= ~SYS_INP_LEFT;
+					}
+					if (ev.caxis.value > kJoystickCommitValue) {
+						pad.mask |= SYS_INP_RIGHT;
+					} else {
+						pad.mask &= ~SYS_INP_RIGHT;
+					}
+					break;
+				case SDL_CONTROLLER_AXIS_LEFTY:
+				case SDL_CONTROLLER_AXIS_RIGHTY:
+					if (ev.caxis.value < -kJoystickCommitValue) {
+						pad.mask |= SYS_INP_UP;
+					} else {
+						pad.mask &= ~SYS_INP_UP;
+					}
+					if (ev.caxis.value > kJoystickCommitValue) {
+						pad.mask |= SYS_INP_DOWN;
+					} else {
+						pad.mask &= ~SYS_INP_DOWN;
+					}
+					break;
+				}
+			}
+			break;
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_CONTROLLERBUTTONUP:
+			if (_controller) {
+				const bool pressed = (ev.cbutton.state == SDL_PRESSED);
+				switch (ev.cbutton.button) {
+				case SDL_CONTROLLER_BUTTON_A:
+					if (pressed) {
+						pad.mask |= SYS_INP_RUN;
+					} else {
+						pad.mask &= ~SYS_INP_RUN;
+					}
+					break;
+				case SDL_CONTROLLER_BUTTON_B:
+					if (pressed) {
+						pad.mask |= SYS_INP_JUMP;
+					} else {
+						pad.mask &= ~SYS_INP_JUMP;
+					}
+					break;
+				case SDL_CONTROLLER_BUTTON_X:
+					if (pressed) {
+						pad.mask |= SYS_INP_SHOOT;
+					} else {
+						pad.mask &= ~SYS_INP_SHOOT;
+					}
+					break;
+				case SDL_CONTROLLER_BUTTON_Y:
+					break;
+				case SDL_CONTROLLER_BUTTON_BACK:
+				case SDL_CONTROLLER_BUTTON_START:
+					inp.quit = pressed;
+					break;
+				case SDL_CONTROLLER_BUTTON_DPAD_UP:
+					if (pressed) {
+						pad.mask |= SYS_INP_UP;
+					} else {
+						pad.mask &= ~SYS_INP_UP;
+					}
+					break;
+				case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+					if (pressed) {
+						pad.mask |= SYS_INP_DOWN;
+					} else {
+						pad.mask &= ~SYS_INP_DOWN;
+					}
+					break;
+				case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+					if (pressed) {
+						pad.mask |= SYS_INP_LEFT;
+					} else {
+						pad.mask &= ~SYS_INP_LEFT;
+					}
+					break;
+				case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+					if (pressed) {
+						pad.mask |= SYS_INP_RIGHT;
+					} else {
+						pad.mask &= ~SYS_INP_RIGHT;
+					}
+					break;
+				}
 			}
 			break;
 		case SDL_QUIT:
@@ -381,6 +571,7 @@ void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 			inp->mask &= ~keyMap->mask;
 		}
 	}
+	inp->mask |= pad.mask;
 }
 
 void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen) {

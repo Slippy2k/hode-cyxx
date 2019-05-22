@@ -36,7 +36,7 @@ struct AudioCallback {
 };
 
 struct SystemStub {
-	PlayerInput inp;
+	PlayerInput inp, pad;
 
 	virtual ~SystemStub() {}
 
