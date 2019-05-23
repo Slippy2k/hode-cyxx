@@ -35,8 +35,8 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
 	_video = new Video(system);
-	_mstOriginPosX = Video::kScreenWidth / 2;
-	_mstOriginPosY = Video::kScreenHeight / 2;
+	_mstOriginPosX = Video::W / 2;
+	_mstOriginPosY = Video::H / 2;
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
@@ -157,19 +157,19 @@ void Game::transformShadowLayer(int delta) {
 	const uint8_t *src = _transformShadowBuffer + _transformShadowLayerDelta; // _esi
 	uint8_t *dst = _video->_shadowLayer; // _eax
 	_transformShadowLayerDelta += delta; // overflow/wrap at 255
-	for (int y = 0; y < 192; ++y) {
+	for (int y = 0; y < Video::H; ++y) {
 		if (0) {
-			for (int x = 0; x < 250; ++x) {
+			for (int x = 0; x < Video::W - 6; ++x) {
 				const int offset = x + *src++;
-				*dst++ = _video->_frontLayer[y * 256 + offset];
+				*dst++ = _video->_frontLayer[y * Video::W + offset];
 			}
 			memset(dst, 0xC4, 6);
 			dst += 6;
 			src += 6;
 		} else {
-			for (int x = 0; x < 256; ++x) {
+			for (int x = 0; x < Video::W; ++x) {
 				const int offset = MIN(255, x + *src++);
-				*dst++ = _video->_frontLayer[y * 256 + offset];
+				*dst++ = _video->_frontLayer[y * Video::W + offset];
 			}
 		}
 	}
@@ -182,15 +182,15 @@ void Game::transformShadowLayer(int delta) {
 	if (r != 0) {
 		assert(r < ARRAYSIZE(_screenTransformRects));
 		const BoundingBox *b = &_screenTransformRects[r];
-		const int offset = b->y1 * 256 + b->x1;
+		const int offset = b->y1 * Video::W + b->x1;
 		src = _video->_frontLayer + offset;
 		dst = _video->_shadowLayer + offset;
 		for (int y = b->y1; y < b->y2; ++y) {
 			for (int x = b->x1; x < b->x2; ++x) {
 				dst[x] = src[x];
 			}
-			dst += 256;
-			src += 256;
+			dst += Video::W;
+			src += Video::W;
 		}
 	}
 }
@@ -294,20 +294,20 @@ void Game::addToSpriteList(LvlObject *ptr) {
 		spr->xPos = ptr->xPos;
 		spr->yPos = ptr->yPos;
 		if (index == topScreenId) {
-			spr->yPos -= 192;
+			spr->yPos -= Video::H;
 		} else if (index == bottomScreenId) {
-			spr->yPos += 192;
+			spr->yPos += Video::H;
 		} else if (index == rightScreenId) {
-			spr->xPos += 256;
+			spr->xPos += Video::W;
 		} else if (index == leftScreenId) {
-			spr->xPos -= 256;
+			spr->xPos -= Video::W;
 		} else if (index != _res->_currentScreenResourceNum) {
 			return;
 		}
-		if (spr->xPos >= 256 || spr->xPos + ptr->width < 0) {
+		if (spr->xPos >= Video::W || spr->xPos + ptr->width < 0) {
 			return;
 		}
-		if (spr->yPos >= 192 || spr->yPos + ptr->height < 0) {
+		if (spr->yPos >= Video::H || spr->yPos + ptr->height < 0) {
 			return;
 		}
 		if (_currentLevel == kLvl_isld && ptr->spriteNum == 2) {
@@ -1752,7 +1752,7 @@ void Game::drawPlasmaCannon() {
 }
 
 void Game::drawScreen() {
-	memcpy(_video->_frontLayer, _video->_backgroundLayer, 256 * 192);
+	memcpy(_video->_frontLayer, _video->_backgroundLayer, Video::W * Video::H);
 
 	// redraw background animation sprites
 	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[_res->_currentScreenResourceNum];
@@ -1761,7 +1761,7 @@ void Game::drawScreen() {
 			_video->decodeSPR(spr->bitmapBits, _video->_backgroundLayer, spr->xPos, spr->yPos, 0);
 		}
 	}
-	memset(_video->_shadowLayer, 0, 256 * 192);
+	memset(_video->_shadowLayer, 0, Video::W * Video::H);
 	for (int i = 1; i < 8; ++i) {
 		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x2000) != 0) {
@@ -2603,7 +2603,7 @@ int Game::displayHintScreen(int num, int pause) {
 	}
 	_res->loadHintImage(num, _video->_frontLayer, _video->_palette);
 	_system->setPalette(_video->_palette, 256, 6);
-	_system->copyRect(0, 0, Video::kScreenWidth, Video::kScreenHeight, _video->_frontLayer, 256);
+	_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
 	_system->updateScreen();
 	do {
 		_system->processEvents();
@@ -2616,7 +2616,7 @@ int Game::displayHintScreen(int num, int pause) {
 				quit = kQuitYes;
 			}
 			if (currentQuit != quit) {
-				_system->copyRect(0, 0, Video::kScreenWidth, Video::kScreenHeight, quitBuffers[quit], 256);
+				_system->copyRect(0, 0, Video::W, Video::H, quitBuffers[quit], 256);
 				_system->updateScreen();
 			}
 		}
@@ -3739,13 +3739,13 @@ void Game::captureScreenshot() {
 	char name[64];
 
 	snprintf(name, sizeof(name), "screenshot-%03d-front.bmp", screenshot);
-	saveBMP(name, _video->_frontLayer, _video->_palette, Video::kScreenWidth, Video::kScreenHeight);
+	saveBMP(name, _video->_frontLayer, _video->_palette, Video::W, Video::H);
 
 	snprintf(name, sizeof(name), "screenshot-%03d-background.bmp", screenshot);
-	saveBMP(name, _video->_backgroundLayer, _video->_palette, Video::kScreenWidth, Video::kScreenHeight);
+	saveBMP(name, _video->_backgroundLayer, _video->_palette, Video::W, Video::H);
 
 	snprintf(name, sizeof(name), "screenshot-%03d-shadow.bmp", screenshot);
-	saveBMP(name, _video->_shadowLayer, _video->_palette, Video::kScreenWidth, Video::kScreenHeight);
+	saveBMP(name, _video->_shadowLayer, _video->_palette, Video::W, Video::H);
 
 	static const int kPaletteRectSize = 8;
 	uint8_t paletteBuffer[8 * 256 * 8];

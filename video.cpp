@@ -11,17 +11,17 @@ Video::Video(SystemStub *system)
 	_displayShadowLayer = false;
 	_drawLine.x1 = 0;
 	_drawLine.y1 = 0;
-	_drawLine.x2 = kScreenWidth - 1;
-	_drawLine.y2 = kScreenHeight - 1;
-	_drawLine.pitch = kScreenWidth;
-	_shadowLayer = (uint8_t *)malloc(kScreenWidth * kScreenHeight);
-	_frontLayer = (uint8_t *)malloc(kScreenWidth * kScreenHeight);
-	_backgroundLayer = (uint8_t *)malloc(kScreenWidth * kScreenHeight);
-	_spr.pitch = kScreenWidth;
+	_drawLine.x2 = W - 1;
+	_drawLine.y2 = H - 1;
+	_drawLine.pitch = W;
+	_shadowLayer = (uint8_t *)malloc(W * H);
+	_frontLayer = (uint8_t *)malloc(W * H);
+	_backgroundLayer = (uint8_t *)malloc(W * H);
+	_spr.pitch = W;
 	_spr.x = 0;
 	_spr.y = 0;
-	_spr.w = kScreenWidth;
-	_spr.h = kScreenHeight;
+	_spr.w = W;
+	_spr.h = H;
 	_shadowColorLookupTable = (uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
 	_fillColor = 0xC4;
 	_blackColor = 255;
@@ -59,13 +59,13 @@ void Video::refreshGamePalette(const uint16_t *pal) {
 
 void Video::updateGameDisplay(uint8_t *buf) {
 	if (_findBlackColor) {
-		for (int i = 0; i < kScreenHeight * kScreenWidth; ++i) {
+		for (int i = 0; i < H * W; ++i) {
 			if (buf[i] == 255) {
 				buf[i] = _blackColor;
 			}
 		}
 	}
-	_system->copyRect(0, 0, kScreenWidth, kScreenHeight, buf, 256);
+	_system->copyRect(0, 0, W, H, buf, 256);
 }
 
 void Video::updateScreen() {
@@ -357,8 +357,8 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 			if (!src2) { // no LUT
 				int offset = READ_LE_UINT16(src1); src1 += 2;
 				// Not sure if this is an issue in the original or in the rewrite
-				if (offset >= kScreenWidth * kScreenHeight) {
-					offset = kScreenWidth * kScreenWidth - 1;
+				if (offset >= W * H) {
+					offset = W * H - 1;
 				}
 				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], _shadowColorLut);
 			} else {

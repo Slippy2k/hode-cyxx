@@ -21,8 +21,8 @@ enum {
 
 struct Video {
 	enum {
-		kScreenWidth = 256,
-		kScreenHeight = 192
+		W = 256,
+		H = 192
 	};
 
 	SystemStub *_system;

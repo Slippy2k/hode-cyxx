@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);
-	_system->init(_title, Video::kScreenWidth, Video::kScreenHeight, _fullscreen);
+	_system->init(_title, Video::W, Video::H, _fullscreen);
 	g->mainLoop(level, checkpoint);
 	delete g;
 	free(dataPath);
