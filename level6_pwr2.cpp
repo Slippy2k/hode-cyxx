@@ -1,5 +1,6 @@
 
 #include "game.h"
+#include "lzw.h"
 #include "paf.h"
 #include "video.h"
 
@@ -119,6 +120,10 @@ void Game::callLevel_preScreenUpdate_pwr2(int num) {
 }
 
 void Game::callLevel_initialize_pwr2() {
+	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	const int size = decodeLZW(_pwr1_screenTransformData, _transformShadowBuffer);
+	assert(size == 256 * 192);
+	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
 }
 
 const uint8_t Game::_pwr2_screenTransformLut[] = {
