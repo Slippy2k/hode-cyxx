@@ -23,6 +23,33 @@ void Game::postScreenUpdate_pwr2_screen2() {
 	}
 }
 
+void Game::postScreenUpdate_pwr2_screen3() {
+	if (_res->_currentScreenResourceNum == 3) {
+		if ((_andyObject->flags1 & 0x30) == 0) {
+			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			BoundingBox b = { 115, 27, 127, 55 };
+			if (clipBoundingBox(&b, &data->boundingBox)) {
+				uint8_t _al = _andyObject->flags0;
+				if ((_al & 0x1F) == 0 && (_al & 0xE0) == 0xE0) {
+					LvlObject *o = findLvlObject2(0, 0, 3);
+					if (o) {
+						o->objectUpdateType = 7;
+					}
+				} else {
+					LvlObject *o = findLvlObject2(0, 0, 3);
+					if (o) {
+						if (o->objectUpdateType == 4) {
+							_res->_screensState[3].s0 = 2;
+						} else {
+							setAndySpecialAnimation(3);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void Game::postScreenUpdate_pwr2_screen5() {
 	if (_res->_screensState[5].s0 == 1) {
 		_res->_screensState[5].s0 = 2;
@@ -54,6 +81,9 @@ void Game::callLevel_postScreenUpdate_pwr2(int num) {
 	case 2:
 		postScreenUpdate_pwr2_screen2();
 		break;
+	case 3:
+		postScreenUpdate_pwr2_screen3();
+		break;
 	case 5:
 		postScreenUpdate_pwr2_screen5();
 		break;
@@ -76,7 +106,7 @@ void Game::preScreenUpdate_pwr2_screen2() {
 }
 
 void Game::preScreenUpdate_pwr2_screen3() {
-	if (_res->_currentScreenResourceNum == 3 && _levelCheckpoint != 0) {
+	if (_res->_currentScreenResourceNum == 3 && _levelCheckpoint == 0) {
 		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 103, 122, 191 };
 		if (clipBoundingBox(&b, &data->boundingBox)) {

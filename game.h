@@ -479,6 +479,7 @@ struct Game {
 
 	// level6_pwr2.cpp
 	void postScreenUpdate_pwr2_screen2();
+	void postScreenUpdate_pwr2_screen3();
 	void postScreenUpdate_pwr2_screen5();
 	void postScreenUpdate_pwr2_screen8();
 	void callLevel_postScreenUpdate_pwr2(int num);
