@@ -1,21 +1,25 @@
 
 from PIL import Image
+import sys
 
-T = '0043ea78.bin'
-STEP = 4
+if sys.argv[2] == 'water':
+	T = '0043ea78.bin'
+	STEP = 4
+else:
+	assert sys.argv[2] == 'fire'
+	T = '0043d960.bin'
+	STEP = 4
 
-PIC = 'pwr1_hod_01_0.bmp'
+PIC = sys.argv[1]
 W = 256
 H = 192
 
 def transform(input, tdata, output, start = 0):
 	for y in range(0, H):
 		for x in range(0, W):
-			offset = x + ord(tdata[start])
-			if offset > 255:
-				offset = 255
+			tx = min(255, x + ord(tdata[start]))
 			start += 1
-			output.putpixel((x, y), input.getpixel((offset, y)))
+			output.putpixel((x, y), input.getpixel((tx, y)))
 
 input  = Image.open(PIC).convert('RGB')
 tdata  = file(T).read()
