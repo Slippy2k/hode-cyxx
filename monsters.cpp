@@ -345,8 +345,16 @@ void Game::setMstTaskDataDefaultPos(Task *t) { // mstTaskUpdateScreenPosition
 
 	const uint8_t *ptr = m->unk8;
 	if (ptr[946] & 4) {
-		warning("setMstTaskDataDefaultPos ptr[946] 0x%x", ptr[946]);
-		// TODO
+		const uint8_t *ptr1 = ptr + (o->flags0 & 255) * 28; // _eax
+		if (ptr1[14] != 0) {
+			_mstTemp_x1 = m->xMstPos + (int8_t)ptr1[12];
+			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[13];
+			_mstTemp_x2 = _mstTemp_x1 + ptr1[14];
+			_mstTemp_y2 = _mstTemp_y1 + ptr1[15];
+			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
+		} else {
+			clearMstRectsTable(m, 0);
+		}
 	}
 // 40ECBD
 	m->xDelta = _mstPosX - m->xMstPos;

@@ -184,6 +184,7 @@ struct Game {
 	int _mstTaskDataCount;
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
+	int _mstTemp_x1, _mstTemp_x2, _mstTemp_y1, _mstTemp_y2;
 	MstTaskData _mstUnkDataTable[32];
 	MstObject _mstObjectsTable[64];
 	int _mstTickDelay;
