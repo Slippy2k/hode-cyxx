@@ -160,6 +160,26 @@ void Game::disableMstTaskData(MstTaskData *m) {
 	}
 }
 
+void Game::copyMstTaskData(Task *t, MstTaskData *m, int num) {
+	MstUnk46Unk1 *m46unk1 = &m->m46->data[num];
+	m->unk4 = m46unk1;
+	m->unk8 = _res->_mstHeightMapData + m46unk1->indexHeight * 948;
+	if (m46unk1->indexUnk51 == kNone) {
+		m->flags48 &= ~4;
+	}
+	m->unkC = _res->_mstUnk44[m46unk1->indexUnk44].data;
+	setMstTaskDataDefaultPos(t);
+	if (!updateMstTaskDataPosition(m)) {
+		initMstTaskData(m);
+	}
+	if (t->run == &Game::runTask_unk4) {
+		t->run = &Game::runTask_default;
+	}
+	if ((m->flagsA5 & 8) == 0 && t->run == &Game::runTask_idle) {
+		prepareMstTask(t);
+	}
+}
+
 void Game::initMstTaskDataType2(Task *t) {
 	warning("initMstTaskDataType2 %p unimplemented", t);
 	// TODO
@@ -998,8 +1018,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 		MstUnk46 *m46 = _mstCurrentTaskData->m46;
 		for (uint32_t i = 0; i < m46->count; ++i) {
 			if (m46->data[i].indexHeight == _edi) {
-				warning("executeMstCodeHelper3 missing call to copyMstTaskData");
-				// copyMstTaskData(_mstCurrentTask, _mstCurrentTaskData, &m46->data[i]);
+				copyMstTaskData(_mstCurrentTask, _mstCurrentTaskData, i);
 				return 0;
 			}
 		}
