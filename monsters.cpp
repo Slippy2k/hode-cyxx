@@ -688,28 +688,51 @@ void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint
 	o->directionKeyMask = _al;
 	MstTaskData *m = (MstTaskData *)getLvlObjectDataPtr(o, kObjectDataTypeMonster);
 	if ((mask1 & 0x10) == 0) {
-		int _edi = mask1 & 0xE0;
-		int _ebp = _edi - 32;
-		if (_ebp <= 192) {
-			switch (_ebp) {
-			case 0:
-				if (_edi == 192) {
-					o->directionKeyMask = _al | (m->flags49 & ~5);
-				} else {
-					uint8_t _bl = m->flags49 | _al;
-					o->directionKeyMask = _bl;
-					if ((m->unk8[946] & 2) != 0) {
-						warning("executeMstUnk10 unimplemented ptr[946] 0x%x", m->unk8[946]);
+		const int _edi = mask1 & 0xE0;
+		switch (_edi) {
+		case 32:
+		case 96:
+		case 160:
+		case 192:
+			if (_edi == 192) {
+				o->directionKeyMask = _al | (m->flags49 & ~5);
+			} else {
+				uint8_t _bl = m->flags49 | _al;
+				o->directionKeyMask = _bl;
+				if ((m->unk8[946] & 2) != 0) {
+					if (_edi == 160 && (_mstLut1[_al] & 1) != 0) {
+						if (m->xDelta >= m->yDelta) {
+							o->directionKeyMask = _bl & ~5;
+						} else {
+							o->directionKeyMask = _bl & ~0xA;
+						}
+					} else {
+						if (m->xDelta >= m->yDelta * 2) {
+							o->directionKeyMask = _bl & ~5;
+						} else if (m->yDelta >= m->xDelta * 2) {
+							o->directionKeyMask = _bl & ~0xA;
+						}
 					}
 				}
-				break;
-			default:
-				// TODO
-				warning("executeMstUnk10 unimplemented 0x%x 0x%x %d", mask1, mask2, _ebp);
-				break;
 			}
-		} else {
+			break;
+		case 128:
+			_al |= mask2;
+			o->directionKeyMask = _al;
+			if ((m->unk8[946] & 2) != 0 && (_mstLut1[_al] & 1) != 0) {
+				if (m->xDelta >= m->yDelta) {
+					o->directionKeyMask = _al & ~5;
+				} else {
+					o->directionKeyMask = _al & ~0xA;
+				}
+			}
+			break;
+		case 224:
+			o->directionKeyMask = m->unkF8 | _al;
+			break;
+		default:
 			o->actionKeyMask = _al | mask2;
+			break;
 		}
 	}
 // 40E3B3

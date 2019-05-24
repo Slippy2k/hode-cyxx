@@ -372,6 +372,7 @@ struct MstTaskData { // MonsterObject
 	int unkEC; // 0xEC
 	int unkF0; // 0xF0
 	int unkF4; // 0xF4
+	uint8_t unkF8; // 0xF8
 	int unkFC; // 0xFC
 }; // sizeof == 256
 

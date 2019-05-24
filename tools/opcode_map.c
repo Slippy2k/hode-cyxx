@@ -23,6 +23,20 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x4D, 0x4F, 0x4E
 };
 
+static const uint8_t _byte_40E3EC[] = {
+	0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2
+};
+
 static const int _mstDefaultLutOpCount = sizeof(_mstDefaultLutOp) / sizeof(_mstDefaultLutOp[0]);
 
 int main(int argc, char *argv[]) {
@@ -35,6 +49,12 @@ int main(int argc, char *argv[]) {
 			assert(_mstDefaultLutOp[i] == _mstDefaultLutOp[i]);
 			if (_mstDefaultLutOp[i] != 79) {
 				fprintf(stdout, "\tcase %d: // %d\n", i, _mstDefaultLutOp[i]);
+			}
+		}
+		assert(sizeof(_byte_40E3EC) == 193);
+		for (int i = 0; i < 193; ++i) {
+			if (_byte_40E3EC[i] != 3) {
+				fprintf(stdout, "_byte_40E3EC case %d: // %d\n", i + 32, _byte_40E3EC[i]);
 			}
 		}
 	}
