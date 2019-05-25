@@ -1444,7 +1444,7 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 		}
 	}
 	if (_actionDirectionKeyMaskIndex != 0) {
-		if (_actionDirectionKeyMaskIndex == 164 && !_fadePalette) {
+		if (_actionDirectionKeyMaskIndex == 0xA4 && !_fadePalette) { // game over
 			_levelRestartCounter = 10;
 			_plasmaCannonFlags |= 1;
 		} else {
@@ -1687,11 +1687,12 @@ int Game::updateAndyLvlObject() {
 		_andyObject->xPos += data->dxPos;
 		_andyObject->yPos += data->dyPos;
 	}
-	if ((_andyObject->flags0 & 0x1F) == 0xB) {
+	const uint8_t flags = _andyObject->flags0 & 255;
+	if ((flags & 0x1F) == 0xB) {
 		if (_andyObject->spriteNum == 2) {
 			removeLvlObject(_andyObject);
 		}
-		if ((_andyObject->flags0 & ~0x1F) == 0x40) {
+		if ((flags & 0xE0) == 0x40) {
 			setAndySpecialAnimation(0xA4);
 		}
 	}
@@ -2914,7 +2915,7 @@ static const uint8_t byte_43E710[] = {
 void Game::setupSpecialPowers(LvlObject *ptr) {
 	AndyLvlObjectData *_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *_esi = _edi->shootLvlObject;
-	const uint8_t pos  = ptr->flags0 & 0x1F;
+	const uint8_t pos = ptr->flags0 & 0x1F;
 	uint8_t var1 = (ptr->flags0 >> 5) & 7;
 	if (pos == 4) {
 // 40DB4C
@@ -3338,7 +3339,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 }
 
 int Game::lvlObjectList3Callback(LvlObject *o) {
-	if ((o->spriteNum <= 7 && (o->flags0 & 0x1F) == 0xB) || o->flags0 == 0x1F) {
+	if ((o->spriteNum <= 7 && (o->flags0 & 0x1F) == 0xB) || (o->flags0 & 0xFF) == 0x1F) {
 		if (_lvlObjectsList3 && o) {
 			if (o != _lvlObjectsList3) {
 				LvlObject *prev = 0;

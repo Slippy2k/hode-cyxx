@@ -1894,9 +1894,9 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		break;
 	case 27:
 		if (t->dataPtr) {
-			return t->dataPtr->o16->flags0;
+			return t->dataPtr->o16->flags0 & 0xFF;
 		} else if (t->mstObject) {
-			return t->mstObject->o->flags0;
+			return t->mstObject->o->flags0 & 0xFF;
 		}
 		break;
 	case 28:
@@ -3237,7 +3237,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 	case 4:
 		setAndySpecialAnimation(0x80);
 		break;
-	case 5:
+	case 5: // game over, restart level
 		setAndySpecialAnimation(0xA4);
 		break;
 	case 6:
