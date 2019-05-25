@@ -35,6 +35,9 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
 	_video = new Video(system);
+	_andyCurrentLevelScreenNum = -1;
+	_mstCurrentFlags1 = 0; // original only clears ~0x30
+	_mstCurrentAnim = 0;
 	_mstOriginPosX = Video::W / 2;
 	_mstOriginPosY = Video::H / 2;
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
@@ -2199,11 +2202,7 @@ void Game::updateAndyMonsterObjects() {
 	case 6:
 		_hideAndyObjectSprite = false;
 		if (_actionDirectionKeyMaskIndex == 0x61) {
-			if (!_currentMonsterObject) {
-				warning("_currentMonsterObject is NULL, _actionDirectionKeyMaskIndex 0x%x", _actionDirectionKeyMaskIndex);
-				return;
-			}
-			//assert(_currentMonsterObject);
+			assert(_currentMonsterObject);
 			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
 			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
 		}

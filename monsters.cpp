@@ -3168,7 +3168,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
 				LvlObject *tmpObject = t->dataPtr->o16;
 				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
-				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & 0xFFCF);
+				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & ~0x30);
 				_mstCurrentScreenNum = tmpObject->screenNum;
 				_currentMonsterObject = tmpObject;
 				_mstOriginPosX = _res->_mstOp56Data[num].unk4 & 0xFFFF;
