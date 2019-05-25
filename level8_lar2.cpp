@@ -9,6 +9,7 @@ static uint8_t byte_4528D4[4] = {  2, 0, 0, 0 };
 static uint8_t byte_4528D8[4] = {  2, 0, 0, 0 };
 static uint8_t byte_4528DC[4] = { 18, 0, 0, 0 };
 static uint8_t byte_4528E0[4] = {  2, 0, 0, 0 };
+static uint8_t byte_4528EC[4] = {  2, 0, 0, 0 };
 
 bool Game::postScreenUpdate_lar2_screen2_helper(BoundingBox *b) {
 	bool ret = false;
@@ -252,6 +253,22 @@ void Game::preScreenUpdate_lar2_screen7() {
 	}
 }
 
+void Game::preScreenUpdate_lar2_screen8() {
+	if (_res->_currentScreenResourceNum == 8) {
+		if (byte_4528EC[2] > 1) {
+			byte_4528EC[2] = 1;
+		}
+		LvlObject *o = findLvlObject(2, 0, 8);
+		postScreenUpdate_lar1_helper(o, byte_4528EC, 7);
+	}
+}
+
+void Game::preScreenUpdate_lar2_screen9() {
+	if (_res->_currentScreenResourceNum == 9) {
+		byte_4528EC[2] = 0x24;
+	}
+}
+
 void Game::preScreenUpdate_lar2_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
 		if (_levelCheckpoint == 9) {
@@ -289,10 +306,10 @@ void Game::callLevel_preScreenUpdate_lar2(int num) {
 		break;
 	case 8:
 	case 11:
-		// TODO
+		preScreenUpdate_lar2_screen8();
 		break;
 	case 9:
-		// TODO
+		preScreenUpdate_lar2_screen9();
 		break;
 	case 15:
 		preScreenUpdate_lar2_screen15();
