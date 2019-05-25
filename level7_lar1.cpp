@@ -42,7 +42,7 @@ void Game::postScreenUpdate_lar1_screen0() {
 			if (clipBoundingBox(&b, &data->boundingBox)) {
 				if (!_fadePalette) {
 					_levelCheckpoint = 1;
-					_fadePaletteCounter = 6;
+					_levelRestartCounter = 6;
 				} else {
 					_andyObject->directionKeyMask = 0;
 				}

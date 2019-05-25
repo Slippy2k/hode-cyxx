@@ -90,19 +90,19 @@ void Game::setShakeScreen(int type, int counter) {
 
 void Game::fadeScreenPalette() {
 	if (!_fadePalette) {
-		assert(_fadePaletteCounter != 0);
+		assert(_levelRestartCounter != 0);
 		for (int i = 0; i < 256 * 3; ++i) {
-			_fadePaletteBuffer[i] = _video->_displayPaletteBuffer[i] / _fadePaletteCounter;
+			_fadePaletteBuffer[i] = _video->_displayPaletteBuffer[i] / _levelRestartCounter;
 		}
 		_fadePalette = true;
 	} else {
-		if (_fadePaletteCounter != 0) {
-			_snd_masterVolume -= _snd_masterVolume / _fadePaletteCounter;
+		if (_levelRestartCounter != 0) {
+			_snd_masterVolume -= _snd_masterVolume / _levelRestartCounter;
 			if (_snd_masterVolume < 0) {
 				_snd_masterVolume = 0;
 			}
 		}
-		--_fadePaletteCounter;
+		--_levelRestartCounter;
 	}
 	for (int i = 0; i < 256 * 3; ++i) {
 		int color = _video->_displayPaletteBuffer[i] - _fadePaletteBuffer[i];
@@ -135,7 +135,7 @@ void Game::shakeScreen() {
 			_system->shakeScreen(dx, dy);
 		}
 	}
-	if (_fadePaletteCounter != 0) {
+	if (_levelRestartCounter != 0) {
 		fadeScreenPalette();
 	}
 }
@@ -1214,7 +1214,7 @@ void Game::resetDisplay() {
 //	_video_blitSrcPtr = _video_blitSrcPtr2;
 	_video->_displayShadowLayer = false;
 	_shakeScreenDuration = 0;
-	_fadePaletteCounter = 0;
+	_levelRestartCounter = 0;
 	_fadePalette = false;
 	memset(_fadePaletteBuffer, 0, sizeof(_fadePaletteBuffer));
 //	_snd_masterVolume = _plyConfigTable[_plyConfigNumber].soundVolume;
@@ -1442,7 +1442,7 @@ void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 	}
 	if (_actionDirectionKeyMaskIndex != 0) {
 		if (_actionDirectionKeyMaskIndex == 164 && !_fadePalette) {
-			_fadePaletteCounter = 10;
+			_levelRestartCounter = 10;
 			_plasmaCannonFlags |= 1;
 		} else {
 			if (_andyObject->spriteNum == 2 && _actionDirectionKeyMaskIndex >= 16) {
@@ -2341,7 +2341,7 @@ void Game::levelMainLoop() {
 		if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 			preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
 			updateScreen(_andyObject->screenNum);
-		} else if (_fadePalette && _fadePaletteCounter == 0) {
+		} else if (_fadePalette && _levelRestartCounter == 0) {
 			restartLevel();
 		} else {
 			callLevel_postScreenUpdate(_res->_currentScreenResourceNum);
@@ -2412,7 +2412,7 @@ void Game::levelMainLoop() {
 			_system->inp.screenshot = false;
 			captureScreenshot();
 		}
-		if (_shakeScreenDuration != 0 || _fadePaletteCounter != 0 || _video->_displayShadowLayer) {
+		if (_shakeScreenDuration != 0 || _levelRestartCounter != 0 || _video->_displayShadowLayer) {
 			shakeScreen();
 			uint8_t *p = _video->_shadowLayer;
 			if (!_video->_displayShadowLayer) {

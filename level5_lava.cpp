@@ -101,7 +101,7 @@ void Game::postScreenUpdate_lava_screen10() {
 				}
 				++_screenCounterTable[10];
 				if (_screenCounterTable[10] == 13) {
-					_fadePaletteCounter = 12;
+					_levelRestartCounter = 12;
 				} else {
 					++_screenCounterTable[10];
 					if (_screenCounterTable[10] == 37) {
