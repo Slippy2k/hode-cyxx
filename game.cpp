@@ -2046,6 +2046,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr <= &_mstUnkDataTable[32]) {
 		MstTaskData *m = (MstTaskData *)ptr->dataPtr;
 		if (m->flagsA6 & 2) {
+			assert(ptr == m->o16);
 			ptr->actionKeyMask = _mstCurrentActionKeyMask;
 			ptr->directionKeyMask = _andyObject->directionKeyMask;
 		}
@@ -3282,6 +3283,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			_ebx = 1;
 			var4 = m->soundType;
 			if (m->flagsA6 & 2) {
+				assert(ptr == m->o16);
 				m->o16->actionKeyMask = _mstCurrentActionKeyMask;
 				m->o16->directionKeyMask = _andyObject->directionKeyMask;
 			}

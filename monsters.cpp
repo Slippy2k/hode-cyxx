@@ -1279,8 +1279,8 @@ int Game::executeMstCodeHelper4(Task *t) {
 
 void Game::updateMstMoveData() { // collision ?
 	if (_andyObject) {
-		_mstRefPosX = _andyObject->xPos + _andyObject->posTable[3].x;
-		_mstRefPosY = _andyObject->yPos + _andyObject->posTable[3].y;
+		_mstRefPosX = _andyObject->xPos;
+		_mstRefPosY = _andyObject->yPos;
 		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
 		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
 		if (!_mstCurrentUnkFlag) {
@@ -3127,7 +3127,7 @@ void Game::executeMstOp54() {
 	}
 }
 
-static uint8_t getLvlObjectFlag4(int type, const LvlObject *o, const LvlObject *andyObject) {
+static uint8_t getLvlObjectFlag4(uint8_t type, const LvlObject *o, const LvlObject *andyObject) {
 	switch (type) {
 	case 1:
 		return 1;
@@ -3139,6 +3139,9 @@ static uint8_t getLvlObjectFlag4(int type, const LvlObject *o, const LvlObject *
 		return (andyObject->flags1 >> 4) & 1;
 	case 5:
 		return ~(andyObject->flags1 >> 4) & 1;
+	default:
+		warning("Unhandled LvlObject flag type %d", type);
+		break;
 	}
 	return 0;
 }
@@ -3164,7 +3167,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
 				LvlObject *tmpObject = t->dataPtr->o16;
-				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC, tmpObject, _andyObject);
+				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
 				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & 0xFFCF);
 				_mstCurrentScreenNum = tmpObject->screenNum;
 				_currentMonsterObject = tmpObject;
@@ -3204,7 +3207,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
 				LvlObject *tmpObject = t->dataPtr->o16;
-				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC, tmpObject, _andyObject);
+				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
 				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & 0xFFCF);
 				_mstCurrentScreenNum = tmpObject->screenNum;
 				_currentMonsterObject = tmpObject;
@@ -3315,46 +3318,45 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				}
 				xPos += _res->_mstPointOffsets[screenNum].xOffset;
 				yPos += _res->_mstPointOffsets[screenNum].yOffset;
-				if (code == 13) {
-					if (o) {
-						xPos -= _res->_mstPointOffsets[screenNum].xOffset;
-						xPos -= o->posTable[7].x;
-						yPos -= _res->_mstPointOffsets[screenNum].yOffset;
-						yPos -= o->posTable[7].y;
-						o->screenNum = screenNum;
-						o->xPos = xPos;
-						o->yPos = yPos;
-						setLvlObjectPosInScreenGrid(o, 7);
-						if (t->mstObject) {
-							setMstObjectDefaultPos(t);
-						} else {
-							setMstTaskDataDefaultPos(t);
-						}
-					}
-				} else if (code == 14) {
-					if (_andyObject) {
-						const int pos = dat->unkC >> 16;
-						xPos -= _res->_mstPointOffsets[screenNum].xOffset;
-						xPos -= _andyObject->posTable[pos].x;
-						yPos -= _res->_mstPointOffsets[screenNum].yOffset;
-						yPos -= _andyObject->posTable[pos].y;
-						_andyObject->screenNum = screenNum;
-						_andyObject->xPos = xPos;
-						_andyObject->yPos = yPos;
-						updateLvlObjectScreen(_andyObject);
-						updateMstMoveData();
-						updateMstHeightMapData();
-					}
-				} else if (code == 22) {
-					updateScreenMaskBuffer(xPos, yPos, 1);
-				} else if (code == 24) {
-					updateScreenMaskBuffer(xPos, yPos, 2);
-				} else if (code == 25) {
-					updateScreenMaskBuffer(xPos, yPos, 3);
+			}
+			if (code == 13) {
+				assert(o);
+				xPos -= _res->_mstPointOffsets[screenNum].xOffset;
+				xPos -= o->posTable[7].x;
+				yPos -= _res->_mstPointOffsets[screenNum].yOffset;
+				yPos -= o->posTable[7].y;
+				o->screenNum = screenNum;
+				o->xPos = xPos;
+				o->yPos = yPos;
+				setLvlObjectPosInScreenGrid(o, 7);
+				if (t->mstObject) {
+					setMstObjectDefaultPos(t);
 				} else {
-					assert(code == 23);
-					updateScreenMaskBuffer(xPos, yPos, 0);
+					setMstTaskDataDefaultPos(t);
 				}
+			} else if (code == 14) {
+				assert(_andyObject);
+				const uint16_t pos = dat->unkC >> 16;
+				assert(pos < 8);
+				xPos -= _res->_mstPointOffsets[screenNum].xOffset;
+				xPos -= _andyObject->posTable[pos].x;
+				yPos -= _res->_mstPointOffsets[screenNum].yOffset;
+				yPos -= _andyObject->posTable[pos].y;
+				_andyObject->screenNum = screenNum;
+				_andyObject->xPos = xPos;
+				_andyObject->yPos = yPos;
+				updateLvlObjectScreen(_andyObject);
+				updateMstMoveData();
+				updateMstHeightMapData();
+			} else if (code == 22) {
+				updateScreenMaskBuffer(xPos, yPos, 1);
+			} else if (code == 24) {
+				updateScreenMaskBuffer(xPos, yPos, 2);
+			} else if (code == 25) {
+				updateScreenMaskBuffer(xPos, yPos, 3);
+			} else {
+				assert(code == 23);
+				updateScreenMaskBuffer(xPos, yPos, 0);
 			}
 		}
 		break;
@@ -3369,7 +3371,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			} else {
 				o = _andyObject;
 			}
-			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk8, o, _andyObject);
+			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk8 & 255, o, _andyObject);
 			_andyObject->flags1 = ((flag & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
 			const int x3 = _andyObject->posTable[3].x;
 			const int y3 = _andyObject->posTable[3].y;
