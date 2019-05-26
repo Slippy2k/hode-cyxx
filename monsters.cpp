@@ -1933,6 +1933,11 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _res->_screensState[_currentScreen].s0;
 	case 6:
 		return _difficulty;
+	case 11:
+		if (t->dataPtr) {
+			return t->dataPtr->unkF4;
+		}
+		break;
 	case 12:
 		if (t->dataPtr) {
 			return t->dataPtr->xPos;
@@ -1966,6 +1971,31 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 			return t->dataPtr->yDelta;
 		} else if (t->mstObject) {
 			return ABS(_mstPosY - t->mstObject->yMstPos);
+		}
+		break;
+	case 17:
+		if (t->dataPtr) {
+			return t->dataPtr->unkEC;
+		}
+		break;
+	case 18:
+		if (t->dataPtr) {
+			return ABS(t->dataPtr->x2 - t->dataPtr->xMstPos);
+		}
+		break;
+	case 19:
+		if (t->dataPtr) {
+			return ABS(t->dataPtr->x1 - t->dataPtr->xMstPos);
+		}
+		break;
+	case 20:
+		if (t->dataPtr) {
+			return ABS(t->dataPtr->y2 - t->dataPtr->yMstPos);
+		}
+		break;
+	case 21:
+		if (t->dataPtr) {
+			return ABS(t->dataPtr->y1 - t->dataPtr->yMstPos);
 		}
 		break;
 	case 22:
@@ -2015,6 +2045,18 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _executeMstLogicCounter;
 	case 32:
 		return _executeMstLogicCounter - _executeMstLogicPrevCounter;
+	case 33: {
+			LvlObject *o = 0;
+			if (t->dataPtr) {
+				o = t->dataPtr->o16;
+			} else if (t->mstObject) {
+				o = t->mstObject->o;
+			}
+			if (o) {
+				return _res->_screensState[o->screenNum].s0;
+			}
+		}
+		break;
 	case 34:
 		return _levelCheckpoint;
 	case 35:
