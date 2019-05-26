@@ -37,6 +37,18 @@ static const uint8_t _byte_40E3EC[] = {
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2
 };
 
+static const uint8_t _byte_40E5F8[] = {
+	0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0
+};
+
 static const int _mstDefaultLutOpCount = sizeof(_mstDefaultLutOp) / sizeof(_mstDefaultLutOp[0]);
 
 int main(int argc, char *argv[]) {
@@ -55,6 +67,12 @@ int main(int argc, char *argv[]) {
 		for (int i = 0; i < 193; ++i) {
 			if (_byte_40E3EC[i] != 3) {
 				fprintf(stdout, "_byte_40E3EC case %d: // %d\n", i + 32, _byte_40E3EC[i]);
+			}
+		}
+		assert(sizeof(_byte_40E5F8) == 161);
+		for (int i = 0; i < 161; ++i) {
+			if (_byte_40E5F8[i] != 2) {
+				fprintf(stdout, "_byte_40E5F8 case %d: // %d\n", i + 32, _byte_40E5F8[i]);
 			}
 		}
 	}

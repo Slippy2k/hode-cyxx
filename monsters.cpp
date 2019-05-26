@@ -869,46 +869,48 @@ bool Game::executeMstUnk17(MstTaskData *m, int num) {
 	} else {
 		var8 |= 1;
 	}
-	_dl = _bl;
 	_ecx = _bl & 15;
 	if ((_bl & 0x10) == 0) {
 		uint32_t _ebp = _bl & 0xE0;
-		uint32_t _eax = _ebp - 32;
-		if (_eax <= 160) {
-// 40E52A
-			switch (_eax) {
-			case 0:
-				if (_ebp == 192) {
-					_ecx |= m->flags49 & ~5;
-				} else {
-					_dl = m->flags49;
-					_ecx |= _dl;
-					if (m->unk8[946] & 2) {
-						if (_ebp == 160 && _mstLut1[_ecx] != 1) {
-							if (m->xDelta >= m->yDelta) {
-								_ecx &= ~5;
-							} else {
-								_ecx &= ~0xA;
-							}
+		switch (_ebp) {
+		case 32:
+		case 96:
+		case 160:
+		case 192: // 0
+			if (_ebp == 192) {
+				_ecx |= m->flags49 & ~5;
+			} else {
+				_ecx |= m->flags49;
+				if (m->unk8[946] & 2) {
+					if (_ebp == 160 && _mstLut1[_ecx] != 1) {
+						if (m->xDelta >= m->yDelta) {
+							_ecx &= ~5;
 						} else {
-							if (m->xDelta >= 2 * m->yDelta) {
-								_ecx &= ~5;
-							} else if (m->yDelta >= 2 * m->xDelta) {
-								_ecx &= ~0xA;
-							}
-
+							_ecx &= ~0xA;
+						}
+					} else {
+						if (m->xDelta >= 2 * m->yDelta) {
+							_ecx &= ~5;
+						} else if (m->yDelta >= 2 * m->xDelta) {
+							_ecx &= ~0xA;
 						}
 					}
 				}
-				break;
-			default:
-				// TODO
-				warning("executeMstUnk17 unimplemented _eax %d _ebp %d", _eax, _ebp);
-				break;
 			}
-		} else {
-// 40E5BA
+			break;
+		case 128: // 1
 			_ecx |= var8;
+			if ((m->unk8[946] & 2) != 0 && _mstLut1[_ecx] != 1) {
+				if (m->xDelta >= m->yDelta) {
+					_ecx &= ~5;
+				} else {
+					_ecx &= ~0xA;
+				}
+			}
+			break;
+		default: // 2
+			_ecx |= var8;
+			break;
 		}
 	}
 // 40E5C0
