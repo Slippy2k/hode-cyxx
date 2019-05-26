@@ -845,7 +845,7 @@ void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint
 			o->directionKeyMask = m->unkF8 | _al;
 			break;
 		default:
-			o->actionKeyMask = _al | mask2;
+			o->directionKeyMask = _al | mask2;
 			break;
 		}
 	}
