@@ -189,10 +189,104 @@ void Game::initMstTaskDataType2(Task *t) {
 	}
 }
 
+void Game::updateMstLvlObjectPos(MstTaskData *m) {
+	LvlObject *o = m->o16;
+	o->xPos = m->xPos - o->posTable[7].x;
+	o->yPos = m->yPos - o->posTable[7].y;
+	m->xMstPos = _res->_mstPointOffsets[o->screenNum].xOffset;
+	m->yMstPos = _res->_mstPointOffsets[o->screenNum].yOffset;
+}
+
 bool Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
+	MstUnk46Unk1 *m46unk1 = m->unk4;
+	const uint32_t indexUnk44 = m46unk1->indexUnk44;
+	assert(indexUnk44 != kNone);
+	MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44];
+	MstUnk44Unk1 *m44unk1 = m44->data;
+
+	int x = m->xMstPos; // _ebp
+	int y = m->yMstPos; // _edx
+
+	if (m->x2 >= 0) {
+		if (x < m->x2) {
+			x = m->x2;
+		} else if (x > m->x1) {
+			x = m->x1;
+		}
+		if (y < m->y2) {
+			y = m->y2;
+		} else if (y > m->y1) {
+			y = m->y1;
+		}
+	}
+// 41E659
+	LvlObject *o = m->o16;
+
+	// abs, sub, cdq, sub eax, edx ?
+	const int a = (o->xPos - o->yPos) / 2 + o->yPos; // _ecx
+
+	int _edi = 0x1000000;
+
+	for (uint32_t i = 0; i < m44->count; ++i) {
+		m44unk1 = &m44->data[i];
+
+		uint32_t indexUnk34 = m44unk1->indexUnk34_16;
+		assert(indexUnk34 != kNone);
+		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
+		if (m34->x1 < x || m34->x2 > x || m34->y1 < y || m34->y2 > y) {
+			const int d1 = ABS(x - m34->x2);
+			if (d1 < _edi) {
+				_edi = d1;
+				// m34 =
+				// _ecx = _ebx
+			}
+			const int d2 = ABS(x - m34->x1);
+			if (d2 < _edi) {
+				_edi = d2;
+				// m34 =
+				// _ecx = _ebx
+			}
+		}
+// 41E6FD
+		// TODO
+
+	}
+// 41E70B
+
 	warning("updateMstTaskDataPositionHelper m %p unimplemented", m);
 	// TODO
-	return false;
+
+// 41E737
+	int _ecx = 0;
+	int _edx = 0;
+	// find screenNum for level position
+	int screenNum = -1;
+	int xMst;
+	int yMst;
+	for (int i = 0; i < _res->_mstHdr.pointsCount; ++i) {
+		xMst = _res->_mstPointOffsets[i].xOffset;
+		if (xMst > _ecx || xMst + 255 < _ecx) {
+			continue;
+		}
+		yMst = _res->_mstPointOffsets[i].yOffset;
+		if (yMst > _edx || yMst + 191 < _edx) {
+			continue;
+		}
+		screenNum = i;
+		break;
+	}
+	if (screenNum == -1) {
+		screenNum = 0;
+		xMst = _res->_mstPointOffsets[0].xOffset + 256 / 2;
+		yMst = _res->_mstPointOffsets[0].yOffset + 192 / 2;
+	}
+	o->screenNum = screenNum;
+	m->xPos = _ecx - xMst;
+	m->yPos = _edx - yMst;
+	updateMstLvlObjectPos(m);
+	m->unkC = m44unk1;
+	initMstTaskData(m);
+	return true;
 }
 
 bool Game::updateMstTaskDataPosition(MstTaskData *m) {
@@ -2583,6 +2677,8 @@ int Game::runTask_default(Task *t) {
 				}
 				if (e <= -2 && o) {
 					if (o->flags & 0x10) {
+						warning("Unhandled lvlObject.flags 0x%x screen %d\n", o->flags, e);
+						// TODO
 
 					} else {
 // 41367F

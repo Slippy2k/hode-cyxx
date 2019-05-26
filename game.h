@@ -568,6 +568,7 @@ struct Game {
 	void disableMstTaskData(MstTaskData *m);
 	void copyMstTaskData(Task *t, MstTaskData *m, int num);
 	void initMstTaskDataType2(Task *t);
+	void updateMstLvlObjectPos(MstTaskData *m);
 	bool updateMstTaskDataPositionHelper(MstTaskData *m);
 	bool updateMstTaskDataPosition(MstTaskData *m);
 	void resetMstObject(MstObject *m);
