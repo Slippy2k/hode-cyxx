@@ -51,6 +51,15 @@ static uint8_t getBits23(uint8_t a) {
 	return r;
 }
 
+static LvlObject *getTaskLvlObject(Task *t) {
+	if (t->dataPtr) {
+		return t->dataPtr->o16;
+	} else if (t->mstObject) {
+		return t->mstObject->o;
+	}
+	return 0;
+}
+
 void Game::resetMstTaskData(MstTaskData *m) {
 	m->m46 = 0;
 	LvlObject *o = m->o16;
@@ -4016,6 +4025,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (_currentLevel == kLvl_lar2 && m->unk8[944] == 26) {
 			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], m1->anim + 1, o_flags1, 0x3001, 0, 0);
 			if (!m->o20) {
+				warning("executeMstOp67 addLvlObject kLvl_lar2 o is NULL");
 				// TODO
 				return;
 			}
