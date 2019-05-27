@@ -3555,35 +3555,38 @@ LvlObject *Game::addLvlObject(int type, int x, int y, int screen, int num, int o
 	return ptr;
 }
 
-int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int num) {
+int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 	int ret = 0;
 	if (o->screenNum < _res->_lvlHdr.screensCount) {
 		int xPrev = o->xPos;
-		int x = o->xPos + o->posTable[num].x;
+		int x = o->xPos + o->posTable[pos].x;
 		int yPrev = o->yPos;
-		int y = o->yPos + o->posTable[num].y;
+		int y = o->yPos + o->posTable[pos].y;
 		int numPrev = o->screenNum;
+		int screenNum = o->screenNum;
 		if (x < 0) {
-			o->screenNum = num = _res->_screensGrid[num * 4 + kPosLeftScreen];
+			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosLeftScreen];
 			o->xPos = x + 256;
 		} else if (x >= 256) {
-			o->screenNum = num = _res->_screensGrid[num * 4 + kPosRightScreen];
+			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosRightScreen];
 			o->xPos = x - 256;
 		}
-		if (y < 0 && num != 0xFF) {
-			o->screenNum = _res->_screensGrid[num * 4 + kPosTopScreen];
+		screenNum = o->screenNum;
+		if (y < 0 && screenNum != 0xFF) {
+			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosTopScreen];
 			o->yPos = y + 192;
 		} else if (y >= 192) {
-			assert(num != 0xFF);
-			o->screenNum = _res->_screensGrid[num * 4 + kPosBottomScreen];
+			assert(screenNum != 0xFF);
+			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosBottomScreen];
 			o->yPos = y - 192;
 		}
-		if (o->screenNum == 0xFF) {
+		screenNum = o->screenNum;
+		if (screenNum == 0xFF) {
 			o->xPos = xPrev;
 			o->yPos = yPrev;
 			o->screenNum = numPrev;
 			ret = -1;
-		} else if (o->screenNum != num) {
+		} else if (screenNum != numPrev) {
 			ret = 1;
 		}
 	}
