@@ -2329,6 +2329,35 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 32: { // 22
+				MstTaskData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->mstTaskData;
+				} else {
+					m = t->dataPtr;
+				}
+				if (m) {
+					t->delay = 5;
+					t->tempVar = p[1];
+					if (((1 << p[1]) & m->flags48) == 0) {
+						LvlObject *o = 0;
+						if (t->dataPtr) {
+							if ((t->dataPtr->flagsA6 & 2) == 0) {
+								o = t->dataPtr->o16;
+							}
+						} else if (t->mstObject) {
+							o = t->mstObject->o;
+						}
+						if (o) {
+							o->actionKeyMask = 0;
+							o->directionKeyMask = 0;
+						}
+						t->run = &Game::runTask_waitFlags;
+						ret = 1;
+					}
+				}
+			}
+			break;
 		case 33:
 		case 229: { // 23 - jmp_imm
 				const int num = READ_LE_UINT16(p + 2);
