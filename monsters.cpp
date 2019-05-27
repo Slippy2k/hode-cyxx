@@ -229,45 +229,55 @@ bool Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
 		}
 	}
 // 41E659
-	LvlObject *o = m->o16;
 
-	// abs, sub, cdq, sub eax, edx ?
-	const int a = (o->xPos - o->yPos) / 2 + o->yPos; // _ecx
+	uint32_t indexUnk34 = m44->data[0].indexUnk34_16;
+	assert(indexUnk34 != kNone);
+	MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
+	int _ecx = (m34->x1 - m34->x2) / 2 + m34->x2;
 
 	int _edi = 0x1000000;
+	int var1C = y;
 
-	for (uint32_t i = 0; i < m44->count; ++i) {
-		m44unk1 = &m44->data[i];
+	uint32_t i = 0;
 
-		uint32_t indexUnk34 = m44unk1->indexUnk34_16;
+	for (i = 0; i < m44->count; ++i) {
+		uint32_t indexUnk34 = m44->data[i].indexUnk34_16;
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
 		if (m34->x1 < x || m34->x2 > x || m34->y1 < y || m34->y2 > y) {
 			const int d1 = ABS(x - m34->x2);
 			if (d1 < _edi) {
 				_edi = d1;
-				// m34 =
-				// _ecx = _ebx
+				m44unk1 = &m44->data[i];
+				_ecx = m34->x2;
 			}
 			const int d2 = ABS(x - m34->x1);
 			if (d2 < _edi) {
 				_edi = d2;
-				// m34 =
-				// _ecx = _ebx
+				m44unk1 = &m44->data[i];
+				_ecx = m34->x1;
 			}
-		}
+		} else {
 // 41E6FD
-		// TODO
-
+			_ecx = x;
+			var1C = y;
+			m44unk1 = &m44->data[i];
+			break;
+		}
 	}
 // 41E70B
-
-	warning("updateMstTaskDataPositionHelper m %p unimplemented", m);
-	// TODO
+	int _edx = var1C;
+	if (i == m44->count) {
+		uint32_t indexUnk34 = m44unk1->indexUnk34_16;
+		assert(indexUnk34 != kNone);
+		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
+		if (y <= m34->y1) {
+			y = (m34->y1 - m34->y2) / 2 + m34->y2;
+		}
+		_edx = var1C = y;
+	}
 
 // 41E737
-	int _ecx = 0;
-	int _edx = 0;
 	// find screenNum for level position
 	int screenNum = -1;
 	int xMst;
@@ -289,6 +299,7 @@ bool Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
 		xMst = _res->_mstPointOffsets[0].xOffset + 256 / 2;
 		yMst = _res->_mstPointOffsets[0].yOffset + 192 / 2;
 	}
+	LvlObject *o = m->o16;
 	o->screenNum = screenNum;
 	m->xPos = _ecx - xMst;
 	m->yPos = _edx - yMst;
@@ -312,7 +323,6 @@ bool Game::updateMstTaskDataPosition(MstTaskData *m) {
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
 		while (m34->x2 <= m->xMstPos) {
-
 			if (m34->x1 >= m->xMstPos && m34->y2 <= m->yMstPos && m34->y1 >= m->yMstPos) {
 				if (m->unkC == m44unk1) {
 					return false;

@@ -17,6 +17,7 @@ extern int test_0041D87E(int) __attribute__((stdcall));
 extern int test_004070C8(int) __attribute__((stdcall));
 extern int test_cdqxorsub(int) __attribute__((stdcall));
 extern int test_negsbbinc(int) __attribute__((stdcall));
+extern int test_cdqsubsar(int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -74,6 +75,9 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < 255; ++i) {
 		const int res = (i != 0) ? 0 : 1;
 		assert(test_negsbbinc(i) == res);
+	}
+	for (int i = -256; i < 256; ++i) {
+		assert(test_cdqsubsar(i) == i / 2);
 	}
 	return 0;
 }
