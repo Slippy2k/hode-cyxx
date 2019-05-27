@@ -3392,8 +3392,61 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 	return 0;
 }
 
-void Game::lvlObjectSpecialPowersCallbackHelper(LvlObject *o) {
-	warning("lvlObjectSpecialPowersCallbackHelper unimplemented");
+void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
+	warning("lvlObjectSpecialPowersCallbackHelper1 unimplemented");
+	// TODO
+}
+
+uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
+	uint8_t var2F = 0;
+	uint8_t screenNum = o->screenNum;
+	uint8_t var30 = 0;
+
+	int yPos = o->yPos; // _eax
+	if ((o->flags0 & 0xE0) != 0x20) {
+		yPos += o->posTable[6].y;
+	} else {
+		yPos += o->posTable[3].y;
+	}
+	int xPos = o->xPos + o->posTable[3].x; // _ecx
+
+	int var1C;
+	int var20;
+	int var24 = xPos;
+	if (xPos < 0) {
+		xPos += 256;
+		var20 = -256;
+		var24 = xPos;
+		screenNum = _res->_screensGrid[screenNum * 4 + 3];
+	} else if (xPos >= 256) {
+		xPos -= 256;
+		var20 = 256;
+		var24 = xPos;
+		screenNum = _res->_screensGrid[screenNum * 4 + 1];
+	} else {
+		var20 = 0;
+	}
+	if (screenNum != 0xFF && yPos < 0) {
+		yPos += 192;
+		var1C = -192;
+		screenNum = _res->_screensGrid[screenNum * 4 + 0];
+	} else if (yPos >= 192) {
+		assert(screenNum != 0xFF);
+		yPos -= 192;
+		var1C = 192;
+		screenNum = _res->_screensGrid[screenNum * 4 + 2];
+	} else {
+		var1C = 0;
+	}
+// 40D0CA
+	if (screenNum == 0xFF) {
+		return 0;
+	}
+
+	warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
+	// TODO
+
+	return 0;
 }
 
 int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
@@ -3404,14 +3457,22 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 	const uint16_t fl = o->flags0 & 0x1F;
 	if (fl == 1) {
 		if (dat->unk3 != 0x80 && dat->unk2 != 0) {
-			warning("lvlObjectSpecialPowersCallback unimplemented unk3 %d unk2 %d", dat->unk3, dat->unk2);
-			// TODO
+			uint8_t _al = lvlObjectSpecialPowersCallbackHelper2(o);
+			if (_al != 0) {
+				if (dat->unk0 == 4 && (_al & 1) != 0 && (dat->unk1 == 4 || dat->unk1 == 2)) {
+					dat->unk0 = 5;
+					_al -= 4;
+					dat->unk1 = (_al != 0) ? 5 : 0;
+				} else {
+					dat->unk3 = 0x80;
+				}
+			}
 		}
 // 40D947
 		if (dat->unk0 == 5) {
 			dat->yPos = 0;
 			if (dat->unk3 != 0x80) {
-				lvlObjectSpecialPowersCallbackHelper(o);
+				lvlObjectSpecialPowersCallbackHelper1(o);
 			}
 			const uint8_t *p;
 			if (dat->unk0 >= 4) {

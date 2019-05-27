@@ -299,7 +299,8 @@ struct Game {
 	int lvlObjectType1Callback(LvlObject *ptr);
 	int lvlObjectType8Callback(LvlObject *o);
 	int lvlObjectList3Callback(LvlObject *o);
-	void lvlObjectSpecialPowersCallbackHelper(LvlObject *o);
+	void lvlObjectSpecialPowersCallbackHelper1(LvlObject *o);
+	uint8_t lvlObjectSpecialPowersCallbackHelper2(LvlObject *o);
 	int lvlObjectSpecialPowersCallback(LvlObject *o);
 	void lvlObjectTypeCallback(LvlObject *o);
 	LvlObject *addLvlObject(int type, int x, int y, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);
@@ -619,7 +620,7 @@ struct Game {
 	void executeMstOp27(Task **tasksList, int num, int arg);
 	int executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
 	void executeMstOp52();
-	int checkMstOp54Helper(MstUnk48 *m, uint8_t flag);
+	bool checkMstOp54Helper(MstUnk48 *m, uint8_t flag);
 	void executeMstOp54();
 	int executeMstOp56(Task *t, int code, int num);
 	void executeMstOp58(Task *t, int num);

@@ -3225,7 +3225,7 @@ void Game::executeMstOp52() {
 	_mstUnk6 = -1;
 }
 
-int Game::checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
+bool Game::checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
 	warning("checkMstOp54Helper %d unimplemented", flag);
 	for (int i = 0; i < 2; ++i) {
 		if (m->count[i] > 0) {
@@ -3233,7 +3233,7 @@ int Game::checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
 		}
 	}
 	// TODO
-	return 0;
+	return false;
 }
 
 void Game::executeMstOp54() {
@@ -3977,10 +3977,16 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	m->unk64 += r;
 	m->unk68 -= r;
 	m->unk7C = m->unk68;
-	if (m->flags4B == 0) {
-		// TODO
-	}
+	if (m->flags4B == 0 && m->xMstPos < _mstPosX) {
+		m->unk74 = _mstPosX - m->unk68;
+		m->unk7C = _mstPosX - m->unk64;
+	} else {
 // 41CEA1
+		m->unk74 = _mstPosX + m->unk64;
+		m->unk7C += _mstPosX;
+	}
+// 41CEB4
+	// TODO
 	return 0;
 }
 
