@@ -3328,8 +3328,10 @@ void Game::executeMstOp54() {
 	}
 }
 
-static uint8_t getLvlObjectFlag4(uint8_t type, const LvlObject *o, const LvlObject *andyObject) {
+static uint8_t getLvlObjectFlag(uint8_t type, const LvlObject *o, const LvlObject *andyObject) {
 	switch (type) {
+	case 0:
+		return 0;
 	case 1:
 		return 1;
 	case 2:
@@ -3341,7 +3343,7 @@ static uint8_t getLvlObjectFlag4(uint8_t type, const LvlObject *o, const LvlObje
 	case 5:
 		return ~(andyObject->flags1 >> 4) & 1;
 	default:
-		warning("Unhandled LvlObject flag type %d", type);
+		warning("getLvlObjectFlag unhandled type %d", type);
 		break;
 	}
 	return 0;
@@ -3368,7 +3370,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
 				LvlObject *tmpObject = t->dataPtr->o16;
-				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
+				const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
 				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & ~0x30);
 				_mstCurrentScreenNum = tmpObject->screenNum;
 				_currentMonsterObject = tmpObject;
@@ -3408,7 +3410,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
 				LvlObject *tmpObject = t->dataPtr->o16;
-				const uint8_t flags = getLvlObjectFlag4(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
+				const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
 				_mstCurrentFlags1 = ((flags & 3) << 4) | (_mstCurrentFlags1 & 0xFFCF);
 				_mstCurrentScreenNum = tmpObject->screenNum;
 				_currentMonsterObject = tmpObject;
@@ -3428,8 +3430,8 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		break;
 	case 2: {
 			LvlObject *o = t->dataPtr->o16;
-			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk0 & 255, o, _andyObject);
-			setAndySpecialAnimation(flag | 0x10);
+			const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unk0 & 255, o, _andyObject);
+			setAndySpecialAnimation(flags | 0x10);
 		}
 		break;
 	case 3:
@@ -3572,8 +3574,8 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			} else {
 				o = _andyObject;
 			}
-			uint8_t flag = getLvlObjectFlag4(_res->_mstOp56Data[num].unk8 & 255, o, _andyObject);
-			_andyObject->flags1 = ((flag & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
+			const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unk8 & 255, o, _andyObject);
+			_andyObject->flags1 = ((flags & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
 			const int x3 = _andyObject->posTable[3].x;
 			const int y3 = _andyObject->posTable[3].y;
 			setupLvlObjectBitmap(_andyObject);
