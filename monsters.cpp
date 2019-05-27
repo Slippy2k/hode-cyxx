@@ -2945,6 +2945,21 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 237: // 74 - remove_monster_task
+			if (t->dataPtr) {
+				if (!t->mstObject) {
+					stopMstTaskData(t, &_mstTasksList1);
+					return 1;
+				}
+				removeMstObjectTask(t, &_mstTasksList2);
+				return 1;
+			} else {
+				if (t->mstObject) {
+					removeMstObjectTask(t, &_mstTasksList2);
+					return 1;
+				}
+			}
+			break;
 		case 238: { // 75
 				const int i = READ_LE_UINT16(p + 2);
 				const uint32_t codeData = _res->_mstUnk60[i];
