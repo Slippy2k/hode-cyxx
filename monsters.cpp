@@ -1652,21 +1652,48 @@ int Game::changeTask(Task *t, int num, int delay) { // mstTaskSetActionDirection
 	int _ebp = (int8_t)ptr[5];
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
-		warning("changeTask %d unimplemented %d %d", num, _edi, _ebp);
 		uint8_t var11 = ptr[2];
+		warning("changeTask %d unimplemented %d %d 0x%x", num, _edi, _ebp, var11);
 		if ((var11 & 0xA) == 0xA) {
-
+			// TODO
 		}
 		// TODO
+		int _eax = 0;
+		int _edx = 0;
+// 40E9BC
+		if ((m->unk8[946] & 4) != 0 && (_edx = ptr[14]) != 0) {
+			if (_eax == 0) {
+				_ebp = 0;
+			} else if (_mstLut1[_eax] & 1) {
+// 40E9F
+				_ebp = (int8_t)ptr[10];
+				_eax = (int8_t)ptr[11];
+			} else {
+// 40EA12
+				_ebp = (int8_t)ptr[8];
+				_eax = (int8_t)ptr[9];
+			}
+// 40EA1A
+			if (o->directionKeyMask & 8) {
+				_ebp = -_ebp;
+			} else if ((o->directionKeyMask & 2) == 0) {
+				_ebp = 0;
+			}
+			if (o->directionKeyMask & 1) {
+				_eax = -_eax;
+			} else if ((o->directionKeyMask & 4) == 0) {
+				_eax = 0;
+			}
 // 40EA40
-		_edi = m->xMstPos + (int8_t)ptr[12] /* + _ebp */ ;
-		_ebp = m->yMstPos + (int8_t)ptr[13] /* + _eax */ ;
-		if ((var8 & 0xE0) == 0x60 /* && checkMstRectsTable(m->soundType, _edi, _ebp, (_edx & 255) + _edi - 1, ptr[15] + _ebp - 1) */ ) {
-			t->flags |= 0x80;
-			return 0;
-		}
+			_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
+			_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
+			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->soundType, _edi, _ebp, (_edx & 255) + _edi - 1, ptr[15] + _ebp - 1)) {
+				t->flags |= 0x80;
+				return 0;
+			}
 // 40EAA0
-		m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+		}
 	} else {
 		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
 			warning("changeTask %d unimplemented ptr[14] %d", num, ptr[14]);
