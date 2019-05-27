@@ -1385,18 +1385,18 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 		uint8_t num = ptr->screenNum;
 		if (xPos < 0) {
 			ptr->screenNum = _res->_screensGrid[num * 4 + kPosLeftScreen];
-			ptr->xPos += 256;
+			ptr->xPos = xPosPrev + 256;
 		} else if (xPos > 256) {
 			ptr->screenNum = _res->_screensGrid[num * 4 + kPosRightScreen];
-			ptr->xPos -= 256;
+			ptr->xPos = xPosPrev - 256;
 		}
 		if (yPos < 0 && ptr->screenNum != 0xFF) {
 			ptr->screenNum = _res->_screensGrid[ptr->screenNum * 4 + kPosTopScreen];
-			ptr->yPos += 192;
+			ptr->yPos = yPosPrev + 192;
 		} else if (yPos > 192) {
 			assert(ptr->screenNum != 0xFF);
 			ptr->screenNum = _res->_screensGrid[ptr->screenNum * 4 + kPosBottomScreen];
-			ptr->yPos -= 192;
+			ptr->yPos = yPosPrev - 192;
 		}
 		if (ptr->screenNum == 0xFF) {
 			debug(kDebug_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
@@ -3566,19 +3566,19 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 		int screenNum = o->screenNum;
 		if (x < 0) {
 			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosLeftScreen];
-			o->xPos = x + 256;
+			o->xPos = xPrev + 256;
 		} else if (x >= 256) {
 			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosRightScreen];
-			o->xPos = x - 256;
+			o->xPos = xPrev - 256;
 		}
 		screenNum = o->screenNum;
 		if (y < 0 && screenNum != 0xFF) {
 			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosTopScreen];
-			o->yPos = y + 192;
+			o->yPos = yPrev + 192;
 		} else if (y >= 192) {
 			assert(screenNum != 0xFF);
 			o->screenNum = _res->_screensGrid[screenNum * 4 + kPosBottomScreen];
-			o->yPos = y - 192;
+			o->yPos = yPrev - 192;
 		}
 		screenNum = o->screenNum;
 		if (screenNum == 0xFF) {
