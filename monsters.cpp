@@ -81,7 +81,7 @@ void Game::resetMstObject(MstObject *m) {
 	}
 }
 
-void Game::setMstObjectDefaultPos(Task *t) { // mstTaskSetScreenPosition
+void Game::mstTaskSetScreenPosition(Task *t) {
 	MstObject *m = t->mstObject;
 	LvlObject *o = m->o;
 	m->xPos = o->xPos + o->posTable[7].x;
@@ -815,7 +815,7 @@ void Game::executeMstCodeHelper2() {
 	}
 }
 
-void Game::executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2) { // mstLvlObjectSetActionDirection
+void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2) {
 	o->actionKeyMask = ptr[1];
 	uint8_t _al = mask1 & 15;
 	o->directionKeyMask = _al;
@@ -1085,7 +1085,6 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 		return false;
 	}
 	if ((a & 0x8000) != 0 && (m->flagsA6 & 4) == 0) {
-		warning("executeMstUnk27 unimplemented a 0x%x A6 0x%x", a, m->flagsA6);
 		Task t;
 		memcpy(&t, _mstCurrentTask, sizeof(Task));
 		t.child = 0;
@@ -1632,7 +1631,7 @@ Task *Game::createTask(const uint8_t *codeData) {
 	return 0;
 }
 
-int Game::changeTask(Task *t, int num, int delay) { // mstTaskSetActionDirection
+int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	uint8_t var4 = _res->_mstUnk52[num * 4];
 	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
 	MstTaskData *m = t->dataPtr;
@@ -1645,15 +1644,16 @@ int Game::changeTask(Task *t, int num, int delay) { // mstTaskSetActionDirection
 	} else {
 		_cl |= 1;
 	}
-	executeMstUnk10(o, ptr, var8, _cl);
+	mstLvlObjectSetActionDirection(o, ptr, var8, _cl);
 	o->actionKeyMask |= _res->_mstUnk52[num * 4 + 1];
+	debug(kDebug_MONSTER, "mstTaskSetActionDirection m %p action 0x%x direction 0x%x", m, o->actionKeyMask, o->directionKeyMask);
 	t->flags &= ~0x80;
 	int _edi = (int8_t)ptr[4];
 	int _ebp = (int8_t)ptr[5];
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
 		uint8_t var11 = ptr[2];
-		warning("changeTask %d unimplemented %d %d 0x%x", num, _edi, _ebp, var11);
+		warning("mstTaskSetActionDirection %d unimplemented %d %d 0x%x", num, _edi, _ebp, var11);
 		if ((var11 & 0xA) == 0xA) {
 			// TODO
 		}
@@ -1696,7 +1696,7 @@ int Game::changeTask(Task *t, int num, int delay) { // mstTaskSetActionDirection
 		}
 	} else {
 		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
-			warning("changeTask %d unimplemented ptr[14] %d", num, ptr[14]);
+			warning("mstTaskSetActionDirection %d unimplemented ptr[14] %d", num, ptr[14]);
 			// TODO
 		}
 	}
@@ -2198,47 +2198,47 @@ int Game::runTask_default(Task *t) {
 				setTaskVar(t, m->unkA, m->unk9, a);
 			}
 			break;
-		case 3: // 3 - change_task_imm
+		case 3: // 3 - set_monster_action_direction_imm
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
-				ret = changeTask(t, num, (arg == 0xFF) ? -1 : arg);
+				ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
 			}
 			break;
-		case 4: // 4 - change_task_task_var
+		case 4: // 4 - set_monster_action_direction_task_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
 				assert(arg < kMaxLocals);
-				ret = changeTask(t, num, t->localVars[arg]);
+				ret = mstTaskSetActionDirection(t, num, t->localVars[arg]);
 			}
 			break;
-		case 5: // 5 - change_task_global_var
+		case 5: // 5 - set_monster_action_direction_global_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
 				assert(arg < kMaxVars);
-				ret = changeTask(t, num, _mstVars[arg]);
+				ret = mstTaskSetActionDirection(t, num, _mstVars[arg]);
 			}
 			break;
-		case 6: // 6 - change_task_other_var
+		case 6: // 6 - set_monster_action_direction_other_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
-				ret = changeTask(t, num, getTaskOtherVar(arg, t));
+				ret = mstTaskSetActionDirection(t, num, getTaskOtherVar(arg, t));
 			}
 			break;
-		case 7: // 7 - change_task_mst_var
+		case 7: // 7 - set_monster_action_direction_mst_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
 				assert(arg < kMaxLocals);
-				ret = changeTask(t, num, t->dataPtr->localVars[arg]);
+				ret = mstTaskSetActionDirection(t, num, t->dataPtr->localVars[arg]);
 			}
 			break;
 		case 13: // 8
@@ -2247,7 +2247,7 @@ int Game::runTask_default(Task *t) {
 				if (executeMstUnk17(t->dataPtr, num)) {
 					const int arg = _res->_mstUnk52[num * 4 + 3];
 					t->codeData = p;
-					ret = changeTask(t, num, (arg == 0xFF) ? -1 : arg);
+					ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
 				}
 			}
 			break;
@@ -3618,7 +3618,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				o->yPos = yPos;
 				setLvlObjectPosInScreenGrid(o, 7);
 				if (t->mstObject) {
-					setMstObjectDefaultPos(t);
+					mstTaskSetScreenPosition(t);
 				} else {
 					setMstTaskDataDefaultPos(t);
 				}
@@ -4232,7 +4232,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			_mstTasksList2->prevPtr = t;
 		}
 		// TODO
-		setMstObjectDefaultPos(t);
+		mstTaskSetScreenPosition(t);
 		// TODO
 		if (_currentLevel == kLvl_fort) {
 			// TODO

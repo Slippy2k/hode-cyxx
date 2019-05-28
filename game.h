@@ -578,7 +578,7 @@ struct Game {
 	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	int updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
 	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
-	void setMstObjectDefaultPos(Task *t);
+	void mstTaskSetScreenPosition(Task *t);
 	void setMstTaskDataDefaultPos(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
 
@@ -587,7 +587,7 @@ struct Game {
 	void startMstCode();
 	void executeMstCode();
 	void executeMstCodeHelper2();
-	void executeMstUnk10(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
+	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
 	bool executeMstUnk17(MstTaskData *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);
@@ -605,7 +605,7 @@ struct Game {
 	void stopMstTaskData(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
-	int changeTask(Task *t, int num, int value);
+	int mstTaskSetActionDirection(Task *t, int num, int value);
 	void updateTask(Task *t, int num, const uint8_t *codeData);
 	void resetTask(Task *t, const uint8_t *codeData);
 	void removeTask(Task **tasksList, Task *t);
