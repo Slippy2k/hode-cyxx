@@ -1225,10 +1225,10 @@ void Resource::loadMstData(File *fp) {
 		m->codeData = fp->readUint32();
 		m->unk12 = 0; fp->readUint32();
 		m->countUnk12 = fp->readUint32();
-		m->offsets1[0] = fp->readUint32();
-		m->offsets1[1] = fp->readUint32();
-		m->offsets2[0] = fp->readUint32();
-		m->offsets2[1] = fp->readUint32();
+		fp->readUint32();
+		fp->readUint32();
+		fp->readUint32();
+		fp->readUint32();
 		m->count[0] = fp->readUint32();
 		m->count[1] = fp->readUint32();
 		bytesRead += 44;
@@ -1236,11 +1236,18 @@ void Resource::loadMstData(File *fp) {
 	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
 		MstUnk48 *m = &_mstUnk48[i];
 		for (int j = 0; j < 2; ++j) {
-			if (m->count[j] != 0) {
-				fp->seek(m->count[j] * 4, SEEK_CUR);
-				bytesRead += m->count[j] * 4;
-				fp->seek(m->count[j] * 4, SEEK_CUR);
-				bytesRead += m->count[j] * 4;
+			const int count = m->count[j];
+			if (count != 0) {
+				m->data1[j] = (uint32_t *)malloc(count * sizeof(uint32_t));
+				for (int k = 0; k < count; ++k) {
+					m->data1[j][k] = fp->readUint32();
+				}
+				bytesRead += count * 4;
+				m->data2[j] = (uint32_t *)malloc(count * sizeof(uint32_t));
+				for (int k = 0; k < count; ++k) {
+					m->data2[j][k] = fp->readUint32();
+				}
+				bytesRead += count * 4;
 			}
 		}
 		MstUnk48Unk12 *m12 = (MstUnk48Unk12 *)malloc(m->countUnk12 * sizeof(MstUnk48Unk12));

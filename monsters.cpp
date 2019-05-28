@@ -3285,9 +3285,14 @@ void Game::executeMstOp52() {
 bool Game::checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
 	warning("checkMstOp54Helper %d unimplemented", flag);
 	for (int i = 0; i < 2; ++i) {
-		if (m->count[i] > 0) {
+		for (uint32_t j = 0; j < m->count[i]; ++j) {
+			// (i ^ flag) * 32
+
 			// TODO
 		}
+	}
+	for (int i = 0; i < m->countUnk12; ++i) {
+		// TODO
 	}
 	// TODO
 	return false;

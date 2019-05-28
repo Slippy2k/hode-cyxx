@@ -223,8 +223,8 @@ struct MstUnk48 {
 	uint32_t codeData; // 0x8, PTR_OFFS<uint32>(_mstCodeData, N)
 	MstUnk48Unk12 *unk12; // 0xC
 	int countUnk12; // 0x10
-	uint32_t offsets1[2]; // 0x14, 0x18
-	uint32_t offsets2[2]; // 0x1C, 0x20
+	uint32_t *data1[2]; // 0x14, 0x18
+	uint32_t *data2[2]; // 0x1C, 0x20
 	uint32_t count[2]; // 0x24, 0x28
 }; // SIZEOF_MstUnk48 44
 
