@@ -2206,7 +2206,7 @@ int Game::runTask_default(Task *t) {
 				ret = changeTask(t, num, (arg == 0xFF) ? -1 : arg);
 			}
 			break;
-		case 4: // 4 - change_task_local_var
+		case 4: // 4 - change_task_task_var
 			if (t->dataPtr) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
@@ -2390,7 +2390,7 @@ int Game::runTask_default(Task *t) {
 				executeMstOp27(&_mstTasksList4, p[1], p[2]);
 			}
 			break;
-		case 41: { // 28 - increment_local_var
+		case 41: { // 28 - increment_task_var
 				assert(p[1] < kMaxLocals);
 				++t->localVars[p[1]];
 			}
@@ -2399,6 +2399,20 @@ int Game::runTask_default(Task *t) {
 				const int num = p[1];
 				assert(num < kMaxVars);
 				++_mstVars[num];
+			}
+			break;
+		case 43: { // 30 - increment_monster_var
+				MstTaskData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->mstTaskData;
+				} else {
+					m = t->dataPtr;
+				}
+				if (m) {
+					const int num = p[1];
+					assert(num < kMaxLocals);
+					++m->localVars[num];
+				}
 			}
 			break;
 		case 44: { // 31 - decrement_task_var
@@ -2413,6 +2427,20 @@ int Game::runTask_default(Task *t) {
 				--_mstVars[num];
 			}
 			break;
+		case 46: { // 33 - decrement_monster_var
+				MstTaskData *m = 0;
+				if (t->mstObject) {
+					m = t->mstObject->mstTaskData;
+				} else {
+					m = t->dataPtr;
+				}
+				if (m) {
+					const int num = p[1];
+					assert(num < kMaxLocals);
+					--m->localVars[num];
+				}
+			}
+			break;
 		case 47:
 		case 48:
 		case 49:
@@ -2421,7 +2449,7 @@ int Game::runTask_default(Task *t) {
 		case 52:
 		case 53:
 		case 54:
-		case 56: { // 34 - arith_local_var_local_var
+		case 56: { // 34 - arith_task_var_task_var
 				assert(p[1] < kMaxLocals);
 				assert(p[2] < kMaxLocals);
 				arithOp(p[0] - 47, &t->localVars[p[1]], t->localVars[p[2]]);
@@ -2436,7 +2464,7 @@ int Game::runTask_default(Task *t) {
 		case 63:
 		case 64:
 		case 65:
-		case 66: { // 35 - arith_global_var_local_var
+		case 66: { // 35 - arith_global_var_task_var
 				assert(p[1] < kMaxVars);
 				assert(p[2] < kMaxLocals);
 				arithOp(p[0] - 57, &_mstVars[p[1]], t->localVars[p[2]]);
