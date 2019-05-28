@@ -3300,8 +3300,36 @@ void Game::executeMstOp54() {
 	}
 	executeMstUnk12();
 	if (m43->count2 == 0) {
-// TODO
-		warning("executeMstOp54 unimplemented m43->count2 %d", m43->count2);
+		uint32_t indexUnk48 = m43->indexUnk48[0];
+		assert(indexUnk48 != kNone);
+		MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
+		if (m48->unk4 == 0) {
+			if (checkMstOp54Helper(m48, 0)) {
+				addMstTaskData(m48, 0);
+			}
+		} else {
+			uint8_t flag = _rnd.update() & 1;
+			if (checkMstOp54Helper(m48, flag) && addMstTaskData(m48, flag)) {
+			} else {
+				flag ^= 1;
+				if (checkMstOp54Helper(m48, flag)) {
+					addMstTaskData(m48, flag);
+				}
+			}
+		}
+// 41E36E
+		if (_mstUnk6 == -1) {
+			++_mstOp54Counter;
+		}
+		if (_mstOp54Counter <= 16) {
+			return;
+		}
+		_mstOp54Counter = 0;
+		for (uint32_t i = 0; i < m43->count2; ++i) {
+			m43->data2[i] &= ~0x80;
+		}
+		shuffleArray(m43->data2, m43->count2);
+
 	} else {
 // 41E3CA
 		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
