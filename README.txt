@@ -58,6 +58,7 @@ What is incomplete :
 
 What is missing :
 * Menus
+* Shooting collisions
 
 
 Credits:

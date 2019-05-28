@@ -644,7 +644,7 @@ void Game::resetMstCode() {
 	for (int i = 0; i < 64; ++i) {
 		_mstObjectsTable[i].unk0x10 = 0;
 	}
-	updateMstMoveData();
+	mstUpdateRefPos();
 	_mstPrevPosX = _mstPosX;
 	_mstPrevPosY = _mstPosY;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
@@ -653,7 +653,7 @@ void Game::resetMstCode() {
 }
 
 void Game::startMstCode() {
-	updateMstMoveData();
+	mstUpdateRefPos();
 	_mstPrevPosX = _mstPosX;
 	_mstPrevPosY = _mstPosY;
 	int offset = 0;
@@ -759,7 +759,7 @@ void Game::executeMstCode() {
 		// TODO
 		_mstLogicHelper1TestValue = 0;
 	}
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < kMaxMovingStates; ++i) {
 		_mstMovingState[i].unk28 = 0;
 		_mstMovingState[i].unk30 = 0;
 		_mstMovingState[i].unk3C = 0x1000000;
@@ -808,7 +808,7 @@ void Game::executeMstCode() {
 }
 
 void Game::executeMstCodeHelper2() {
-	updateMstMoveData();
+	mstUpdateRefPos();
 	updateMstHeightMapData();
 	for (Task *t = _mstTasksList1; t; t = t->nextPtr) {
 		setMstTaskDataDefaultPos(t);
@@ -1391,7 +1391,7 @@ int Game::executeMstCodeHelper4(Task *t) {
 	return 0;
 }
 
-void Game::updateMstMoveData() { // collision ?
+void Game::mstUpdateRefPos() {
 	if (_andyObject) {
 		_mstRefPosX = _andyObject->xPos;
 		_mstRefPosY = _andyObject->yPos;
@@ -1465,7 +1465,43 @@ void Game::updateMstMoveData() { // collision ?
 		MovingOpcodeState *p = _mstMovingState;
 		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
 			p->unk2C = o;
-			// TODO
+			ShootLvlObjectData *ptr = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
+			p->unk28 = ptr;
+			if (ptr->unk3 == 0x80) {
+				continue;
+			}
+			if (ptr->xPos == 0 && ptr->yPos == 0) {
+				continue;
+			}
+			p->unk1C = ptr->xPos;
+			p->unk20 = ptr->yPos;
+			p->unk24 = ptr->unk1;
+			switch (ptr->unk0) {
+			case 0:
+				p->unk40 = 1;
+				p->xPos = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset + o->posTable[7].x;
+				p->unk18 = 3;
+				p->yPos = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset + o->posTable[7].y;
+				break;
+			case 5:
+				p->unk24 |= 0x80;
+				// fall-through
+			case 4:
+				p->unk40 = 2;
+				p->xPos = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset + o->posTable[7].x;
+				p->unk18 = 7;
+				p->yPos = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset + o->posTable[7].y;
+				break;
+			default:
+				--p;
+				--_mstMovingStateCount;
+				break;
+			}
+			++p;
+			++_mstMovingStateCount;
+			if (_mstMovingStateCount >= kMaxMovingStates) {
+				break;
+			}
 		}
 		if (_mstMovingStateCount == 0) {
 			_executeMstLogicPrevCounter = _executeMstLogicCounter;
@@ -3639,7 +3675,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				_andyObject->xPos = xPos;
 				_andyObject->yPos = yPos;
 				updateLvlObjectScreen(_andyObject);
-				updateMstMoveData();
+				mstUpdateRefPos();
 				updateMstHeightMapData();
 			} else if (code == 22) {
 				updateScreenMaskBuffer(xPos, yPos, 1);
@@ -3672,7 +3708,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 			_andyObject->xPos += (x3 - _andyObject->posTable[3].x);
 			_andyObject->yPos += (y3 - _andyObject->posTable[3].y);
 			updateLvlObjectScreen(o);
-			updateMstMoveData();
+			mstUpdateRefPos();
 			updateMstHeightMapData();
 		}
 		break;

@@ -43,6 +43,7 @@ struct Game {
 		kMaxTasks = 128,
 		kMaxVars = 40,
 		kMaxLocals = 8,
+		kMaxMovingStates = 8,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -135,7 +136,7 @@ struct Game {
 	int16_t _mstOriginPosY;
 	bool _mstCurrentUnkFlag;
 	int _mstUnk10;
-	MovingOpcodeState _mstMovingState[8];
+	MovingOpcodeState _mstMovingState[kMaxMovingStates];
 	int _mstMovingStateCount;
 	uint8_t _mstOp68_arg8, _mstOp68_arg9, _mstOp67_type;
 	uint8_t _mstOp67_flags1;
@@ -597,7 +598,7 @@ struct Game {
 	bool executeMstUnk27(MstTaskData *m, const uint8_t *p);
 	int executeMstCodeHelper3(Task *t);
 	int executeMstCodeHelper4(Task *t);
-	void updateMstMoveData();
+	void mstUpdateRefPos();
 	void updateMstHeightMapData();
 
 	void removeMstObjectTask(Task *t, Task **tasksList);
