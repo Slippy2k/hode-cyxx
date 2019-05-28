@@ -13,6 +13,7 @@
 #include "mixer.h"
 #include "paf.h"
 #include "util.h"
+#include "resource.h"
 #include "systemstub.h"
 #include "video.h"
 
@@ -162,7 +163,13 @@ int main(int argc, char *argv[]) {
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);
 	_system->init(_title, Video::W, Video::H, _fullscreen);
-	g->mainLoop(level, checkpoint);
+	g->_res->loadSetupDat();
+	g->benchmarkCpu();
+	do {
+		g->mainLoop(level, checkpoint);
+		level += 1;
+		checkpoint = 0;
+	} while (!_system->inp.quit && level < kLvl_test);
 	delete g;
 	free(dataPath);
 	return 0;

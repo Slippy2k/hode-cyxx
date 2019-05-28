@@ -1833,13 +1833,9 @@ void Game::drawScreen() {
 }
 
 void Game::mainLoop(int level, int checkpoint) {
-	if (level >= kLvl_test) {
-		return;
-	}
+	assert(level < kLvl_test);
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
-	benchmarkCpu();
-	_res->loadSetupDat();
 	_res->loadLevelData(_levels[_currentLevel]);
 	levelMainLoop();
 }
