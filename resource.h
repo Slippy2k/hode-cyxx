@@ -230,8 +230,8 @@ struct MstUnk48 {
 
 struct MstUnk49 {
 	uint32_t unk0;
-	uint32_t unk4;
-	uint32_t count1; // 8
+	uint8_t *data1; // 0x4
+	uint32_t count1; // 0x8
 	uint8_t *data2; // 0xC
 	uint32_t count2; // 0x10
 	uint32_t unk0x14; // 0x14

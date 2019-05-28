@@ -329,7 +329,7 @@ struct MstTaskData { // MonsterObject
 	int soundType; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
-	uint8_t flags48; // 0x48
+	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
 	uint8_t flags49; // 0x49
 	uint8_t flags4A; // 0x4A
 	uint8_t flags4B; // 0x4B
@@ -362,7 +362,7 @@ struct MstTaskData { // MonsterObject
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
 	MstUnk35 *m35; // 0xD0
-	int unkD4;
+	const uint8_t *unkD4; // 0xD4, sizeof=16
 	MstUnk49 *m49; // 0xD8
 	int unkDC; // 0xDC
 	uint8_t unkE4;

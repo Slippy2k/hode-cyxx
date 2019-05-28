@@ -4073,7 +4073,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CC44
-	m->unkD4 = m->m49->unk4 + m->unkDC * 16;
+	m->unkD4 = m->m49->data1 + m->unkDC * 16;
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;
@@ -4112,6 +4112,50 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		m->unk7C += _mstPosX;
 	}
 // 41CEB4
+	executeMstUnk7(m);
+	int _edi = 1;
+	if (_xMstPos2 >= m->unkD4[12]) {
+		_edi = 0;
+	} else {
+		while (--m->unkDC >= 0) {
+			m->unkD4 = m->m49->data1 + m->unkDC * 16;
+			if (_xMstPos2 >= m->unkD4[12]) {
+				_edi = 0;
+				break;
+			}
+		}
+	}
+// 41CF17
+	if (_xMstPos2 <= 0) {
+		if ((m->unk8[946] & 2) == 0 /* || _mstUnk11 <= 0 */) {
+			if (m->unk8[946] & 4) {
+				uint8_t _dl = m->flagsA8[1];
+				if (_dl < _mstRectsCount && _mstRectsTable[_dl].num == m->soundType) {
+					_mstRectsTable[_dl].num = 255;
+					int i = _dl;
+					for (; i < _mstRectsCount; ++i) {
+						if (_mstRectsTable[_dl].num != 255) {
+							break;
+						}
+					}
+					if (i != _mstRectsCount) {
+						_mstRectsCount = _dl;
+					}
+				}
+// 41CF7F
+				m->flagsA8[1] = 255;
+			}
+// 41CF86
+			executeMstUnk1(t);
+			return 0;
+		}
+	}
+// 41CF99
+	if (_edi) {
+
+	}
+// 41D2D2
+
 	// TODO
 	return 0;
 }
