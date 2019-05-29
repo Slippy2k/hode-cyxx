@@ -259,6 +259,8 @@ struct ScreenMask { // ShadowScreenMask
 	uint16_t h;
 }; // sizeof == 0x14
 
+struct MstTaskData;
+
 struct MovingOpcodeState {
 	int32_t xPos;
 	int32_t yPos; // 4
@@ -268,10 +270,11 @@ struct MovingOpcodeState {
 	int32_t unk20;
 	int32_t unk24;
 	ShootLvlObjectData *unk28;
-	LvlObject *unk2C;
-	uint32_t unk30;
+	LvlObject *o; // 0x2C
+	MstTaskData *m; // 0x30
 	uint32_t unk3C;
 	uint8_t unk40;
+	uint8_t unk41;
 }; // sizeof == 0x44
 
 struct AndyMoveData {

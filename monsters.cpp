@@ -510,6 +510,7 @@ void Game::setMstTaskDataDefaultPos(Task *t) { // mstTaskUpdateScreenPosition
 	if (_mstMovingStateCount != 0 && !_mstCurrentUnkFlag && (o->flags1 & 6) != 6) {
 		if (m->localVars[7] > 0 || m->localVars[7] < -1) {
 			if ((m->flagsA5 & 0x80) == 0) {
+				warning("setMstTaskDataDefaultPos 40ED0D unimplemented");
 				// TODO
 			}
 		}
@@ -761,7 +762,7 @@ void Game::executeMstCode() {
 	}
 	for (int i = 0; i < kMaxMovingStates; ++i) {
 		_mstMovingState[i].unk28 = 0;
-		_mstMovingState[i].unk30 = 0;
+		_mstMovingState[i].m = 0;
 		_mstMovingState[i].unk3C = 0x1000000;
 	}
 	executeMstCodeHelper2();
@@ -790,8 +791,28 @@ void Game::executeMstCode() {
 		_runTaskOpcodesCount = 0;
 		while ((this->*(t->run))(t) == 0);
 	}
-	if (_mstMovingStateCount > 0) {
-		// TODO
+// 419C30
+	for (int i = 0; i < _mstMovingStateCount; ++i) {
+		MovingOpcodeState *p = &_mstMovingState[i];
+		MstTaskData *m = p->m;
+		if (!m) {
+			continue;
+		}
+		const int num = m->localVars[7];
+		if (p->unk28) {
+			warning("executeMstCode m->unk28 %p unimplemented", p->unk28);
+			// TODO
+			continue;
+		}
+// 419CC0
+		if (num > 0) {
+			m->localVars[7] = num - 1;
+			_plasmaCannonLastIndex1 = p->unk41;
+		} else if (num == -2) {
+			_plasmaCannonLastIndex1 = p->unk41;
+		} else {
+			_plasmaCannonLastIndex1 = 0;
+		}
 	}
 	for (Task *t = _mstTasksList1; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
@@ -1464,7 +1485,7 @@ void Game::mstUpdateRefPos() {
 	} else {
 		MovingOpcodeState *p = _mstMovingState;
 		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
-			p->unk2C = o;
+			p->o = o;
 			ShootLvlObjectData *ptr = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 			p->unk28 = ptr;
 			if (ptr->unk3 == 0x80) {
