@@ -177,7 +177,7 @@ void Game::copyMstTaskData(Task *t, MstTaskData *m, int num) {
 		m->flags48 &= ~4;
 	}
 	m->unkC = _res->_mstUnk44[m46unk1->indexUnk44].data;
-	setMstTaskDataDefaultPos(t);
+	mstTaskUpdateScreenPosition(t);
 	if (!updateMstTaskDataPosition(m)) {
 		initMstTaskData(m);
 	}
@@ -463,7 +463,16 @@ int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-void Game::setMstTaskDataDefaultPos(Task *t) { // mstTaskUpdateScreenPosition
+int Game::getMstDistance(int y, MovingOpcodeState *p) {
+	if (p->unk24 > 133) {
+		return -1;
+	}
+	warning("getMstDistance y %d p %p unimplemented", y, p);
+	// TODO
+	return 0;
+}
+
+void Game::mstTaskUpdateScreenPosition(Task *t) {
 	MstTaskData *m = t->dataPtr;
 	assert(m);
 	LvlObject *o = m->o20;
@@ -510,8 +519,65 @@ void Game::setMstTaskDataDefaultPos(Task *t) { // mstTaskUpdateScreenPosition
 	if (_mstMovingStateCount != 0 && !_mstCurrentUnkFlag && (o->flags1 & 6) != 6) {
 		if (m->localVars[7] > 0 || m->localVars[7] < -1) {
 			if ((m->flagsA5 & 0x80) == 0) {
-				warning("setMstTaskDataDefaultPos 40ED0D unimplemented");
-				// TODO
+				for (int i = 0; i < _mstMovingStateCount; ++i) {
+					MovingOpcodeState *p = &_mstMovingState[i];
+					if (m->xDelta > 256 || m->yDelta > 192) {
+						continue;
+					}
+					_mstTemp_x1 = o->xPos;
+					_mstTemp_y1 = o->yPos;
+					_mstTemp_x2 = o->xPos + o->width - 1;
+					_mstTemp_y2 = o->yPos + o->height - 1;
+					uint8_t _al = p->unk40;
+					if (_al == 1 || _al == 2) {
+// 40EED8
+						warning("mstTaskUpdateScreenPosition 40EED8 unimplemented");
+						// TODO
+					} else if (_al == 3 && p->unk3C > m->xDelta + m->yDelta) {
+						if (o->screenNum != _currentScreen) {
+							const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
+							const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
+							_mstTemp_x1 += dx;
+							_mstTemp_x2 += dx;
+							_mstTemp_y1 += dy;
+							_mstTemp_y2 += dy;
+						}
+// 40EE68
+						if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
+							if (testPlasmaCannonPointsDirection(_mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
+								p->unk3C = m->xDelta + m->yDelta;
+								p->m = m;
+								p->unk41 = _plasmaCannonLastIndex1;
+							}
+// 40F004
+						}
+// 40F009
+						const int dx = _res->_mstPointOffsets[_currentScreen].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
+						const int dy = _res->_mstPointOffsets[_currentScreen].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
+						_mstTemp_x1 += dx;
+						_mstTemp_x2 += dx;
+						_mstTemp_y1 += dy;
+						_mstTemp_y2 += dy;
+
+					} else {
+// 40F087
+						warning("mstTaskUpdateScreenPosition 40F087 unimplemented");
+						// TODO
+					}
+// 40F08C
+					_mstTemp_x1 += _res->_mstPointOffsets[o->screenNum].xOffset;
+					_mstTemp_y1 += _res->_mstPointOffsets[o->screenNum].yOffset;
+					_mstTemp_x2 += _res->_mstPointOffsets[o->screenNum].xOffset;
+					_mstTemp_y2 += _res->_mstPointOffsets[o->screenNum].yOffset;
+					int res = getMstDistance((m->unk8[946] & 2) != 0 ? p->boundingBox.y2 : m->yMstPos, p);
+					if (res < 0) {
+						continue;
+					}
+					if (m->unkEC == -1 || m->unkEC > res || (m->unkEC == 0 && res == 0 && (m->unk1C->unk40 & 1) == 0 && p->unk40 == 2)) {
+						m->unk1C = p;
+						m->unkEC = res;
+					}
+				}
 			}
 		}
 	}
@@ -832,7 +898,7 @@ void Game::executeMstCodeHelper2() {
 	mstUpdateRefPos();
 	updateMstHeightMapData();
 	for (Task *t = _mstTasksList1; t; t = t->nextPtr) {
-		setMstTaskDataDefaultPos(t);
+		mstTaskUpdateScreenPosition(t);
 	}
 }
 
@@ -3682,7 +3748,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 				if (t->mstObject) {
 					mstTaskSetScreenPosition(t);
 				} else {
-					setMstTaskDataDefaultPos(t);
+					mstTaskUpdateScreenPosition(t);
 				}
 			} else if (code == 14) {
 				assert(_andyObject);
@@ -4425,7 +4491,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		}
 
 // 415A89
-		setMstTaskDataDefaultPos(t);
+		mstTaskUpdateScreenPosition(t);
 
 		switch (type) {
 #if 1

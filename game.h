@@ -581,7 +581,8 @@ struct Game {
 	int updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
 	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	void mstTaskSetScreenPosition(Task *t);
-	void setMstTaskDataDefaultPos(Task *t);
+	int getMstDistance(int y, MovingOpcodeState *p);
+	void mstTaskUpdateScreenPosition(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
 
 	void initMstCode();

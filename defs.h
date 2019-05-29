@@ -272,7 +272,7 @@ struct MovingOpcodeState {
 	ShootLvlObjectData *unk28;
 	LvlObject *o; // 0x2C
 	MstTaskData *m; // 0x30
-	uint32_t unk3C;
+	int32_t unk3C;
 	uint8_t unk40;
 	uint8_t unk41;
 }; // sizeof == 0x44
@@ -328,7 +328,7 @@ struct MstTaskData { // MonsterObject
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
 	MstUnk48Unk12Unk4 *unk18;
-	int unk1C; // 0x1C
+	MovingOpcodeState *unk1C; // 0x1C
 	int soundType; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
