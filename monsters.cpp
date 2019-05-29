@@ -4085,9 +4085,9 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	}
 // 41CCA3
 	const uint8_t *p = m->unk8;
-	warning("executeMstOp67Type2 t %p flag %d p[946] %x", t, flag, p[946]);
 	if (p[946] & 2) {
 		m->unkE4 = 255;
+		warning("executeMstOp67Type2 t %p flag %d p[946] %x", t, flag, p[946]);
 		// TODO
 	}
 // 41CE2B
@@ -4127,7 +4127,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	}
 // 41CF17
 	if (_xMstPos2 <= 0) {
-		if ((m->unk8[946] & 2) == 0 /* || _mstUnk11 <= 0 */) {
+		if ((m->unk8[946] & 2) == 0 || _mstUnk11 <= 0) {
 			if (m->unk8[946] & 4) {
 				uint8_t _dl = m->flagsA8[1];
 				if (_dl < _mstRectsCount && _mstRectsTable[_dl].num == m->soundType) {
@@ -4151,6 +4151,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CF99
+	warning("executeMstOp67Type2 t %p _edi %d", t, _edi);
 	if (_edi) {
 
 	}
@@ -4161,7 +4162,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 }
 
 void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
-	// warning("executeMstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
+	debug(kDebug_MONSTER, "executeMstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
 	if (o_flags2 == 0xFFFF) {
 		LvlObject *o = 0;
 		if (t->dataPtr) {
@@ -4255,7 +4256,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (_currentLevel == kLvl_lar2 && m->unk8[944] == 26) {
 			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], m1->anim + 1, o_flags1, 0x3001, 0, 0);
 			if (!m->o20) {
-				warning("executeMstOp67 addLvlObject kLvl_lar2 o is NULL");
+				warning("mstOp67 addLvlObject kLvl_lar2 o is NULL");
 				// TODO
 				return;
 			}
@@ -4279,10 +4280,11 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 			}
 		}
 		if (!mo) {
+			warning("mstOp67 unable to find a free mstObject");
 			return;
 		}
 		if (!o) {
-			warning("executeMstOp67 o is NULL");
+			warning("mstOp67 o is NULL");
 			return;
 		}
 	}
@@ -4316,6 +4318,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		if (_mstTasksList2) {
 			_mstTasksList2->prevPtr = t;
 		}
+		warning("mstOp67 mo %p unimplemented", mo);
 		// TODO
 		mstTaskSetScreenPosition(t);
 		// TODO
@@ -4333,6 +4336,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		}
 		if (!t) {
 // 415952
+			warning("mstOp67 fail to find a free task");
 			// TODO
 			return;
 		}
@@ -4413,7 +4417,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		case 1:
 			executeMstOp67Type1(t);
 			break;
-		case 2:
+		case 2: // shadows in 'rock'
 			if (m) {
 				m->flagsA6 |= 1;
 			}
