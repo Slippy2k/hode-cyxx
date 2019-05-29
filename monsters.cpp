@@ -864,17 +864,17 @@ void Game::executeMstCode() {
 		if (!m) {
 			continue;
 		}
-		const int num = m->localVars[7];
+		const int energy = m->localVars[7];
 		if (p->unk28) {
 			warning("executeMstCode m->unk28 %p unimplemented", p->unk28);
 			// TODO
 			continue;
 		}
 // 419CC0
-		if (num > 0) {
-			m->localVars[7] = num - 1;
+		if (energy > 0) {
+			m->localVars[7] = energy - 1;
 			_plasmaCannonLastIndex1 = p->unk41;
-		} else if (num == -2) {
+		} else if (energy == -2) {
 			_plasmaCannonLastIndex1 = p->unk41;
 		} else {
 			_plasmaCannonLastIndex1 = 0;
@@ -4317,7 +4317,7 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 		MstUnk46Unk1 *m1 = &_res->_mstUnk46[j].data[arg20]; // _ecx
 		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;
 
-		m->localVars[7] = m1->unkC;
+		m->localVars[7] = m1->unkC; // energy
 
 		if (m1->indexUnk51 == kNone) {
 			m->flags48 &= ~4;
