@@ -2427,6 +2427,7 @@ void Game::levelMainLoop() {
 //				res_preload_(0, 1000);
 //			}
 			if (displayHintScreen(-1, 0)) {
+				_system->inp.quit = true;
 				break;
 			}
 		} else {
