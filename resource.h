@@ -203,6 +203,8 @@ struct MstUnk47 {
 }; // SIZEOF_MstUnk47 8
 
 struct MstUnk48Unk12Unk4 {
+	uint32_t unk8; // 0x8
+	uint32_t unkC; // 0xC
 	uint32_t codeData; // 0x10
 	uint8_t unk19; // 0x19
 	uint8_t unk1B; // 0x1B

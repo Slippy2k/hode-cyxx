@@ -2102,6 +2102,26 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _res->_screensState[_currentScreen].s0;
 	case 6:
 		return _difficulty;
+	case 7:
+		if (t->dataPtr && t->dataPtr->unk1C) {
+			return t->dataPtr->unk1C->unk40;
+		}
+		return _mstMovingState[0].unk40;
+	case 8:
+		if (t->dataPtr && t->dataPtr->unk1C) {
+			return t->dataPtr->unk1C->unk24 & 0x7F;
+		}
+		return _mstMovingState[0].unk24 & 0x7F;
+	case 9:
+		if (t->dataPtr && t->dataPtr->unk18) {
+			return t->dataPtr->unk18->unk8;
+		}
+		break;
+	case 10:
+		if (t->dataPtr && t->dataPtr->unk18) {
+			return t->dataPtr->unk18->unkC;
+		}
+		break;
 	case 11:
 		if (t->dataPtr) {
 			return t->dataPtr->unkF4;

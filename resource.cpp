@@ -1262,6 +1262,8 @@ void Resource::loadMstData(File *fp) {
 			for (uint32_t k = 0; k < m12[j].count; ++k) {
 				uint8_t data[28];
 				fp->read(data, sizeof(data));
+				m12[j].data[k].unk8 = READ_LE_UINT32(data + 0x8);
+				m12[j].data[k].unkC = READ_LE_UINT32(data + 0xC);
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);
 				m12[j].data[k].unk19 = data[0x19];
 				m12[j].data[k].unk1B = data[0x1B];
