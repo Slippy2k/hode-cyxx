@@ -85,7 +85,7 @@ void Game::postScreenUpdate_lar1_screen0() {
 void Game::postScreenUpdate_lar1_screen3() {
 	if (_res->_currentScreenResourceNum == 3) {
 		BoundingBox b = { 46, 0, 210, 106 };
-		postScreenUpdate_rock_helper2(&b, 16);
+		setAndyAnimationForArea(&b, 16);
 	}
 }
 
@@ -204,7 +204,7 @@ void Game::postScreenUpdate_lar1_screen20() {
 void Game::postScreenUpdate_lar1_screen22() {
 	if (_res->_currentScreenResourceNum == 22) {
 		BoundingBox b = { 36, 0, 208, 82 };
-		postScreenUpdate_rock_helper2(&b, 16);
+		setAndyAnimationForArea(&b, 16);
 	}
 }
 

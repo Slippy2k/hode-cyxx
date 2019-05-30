@@ -126,63 +126,17 @@ void Game::postScreenUpdate_rock_screen9() {
 	}
 }
 
-void Game::postScreenUpdate_rock_helper2(BoundingBox *box, int num) {
-	static uint8_t byte_478C6C = 0;
-	BoundingBox objBox;
-	objBox.x1 = _andyObject->xPos;
-	objBox.x2 = _andyObject->xPos + _andyObject->posTable[3].x;
-	objBox.y1 = _andyObject->yPos;
-	objBox.y2 = _andyObject->yPos + _andyObject->posTable[3].y;
-	uint8_t _bl = _andyObject->flags0 & 0x1F;
-	if (clipBoundingBox(box, &objBox)) {
-		if ((_andyObject->actionKeyMask & 1) == 0) {
-			_andyObject->actionKeyMask |= 8;
-		}
-		if (objBox.x2 < box->x1 + num || objBox.x2 > box->x2 - num) {
-			goto ret;
-		}
-		uint8_t _al = 0;
-		if (_currentLevel != kLvl_rock) {
-			if (_bl == 1) {
-				if (((_andyObject->flags0 >> 5) & 7) == 3) {
-					_al = 0x80;
-				}
-			} else {
-				if (_bl == 2) {
-					goto ret;
-				}
-			}
-		} else {
-			_andyObject->actionKeyMask &= ~1;
-			_andyObject->directionKeyMask &= ~4;
-			_andyObject->actionKeyMask |= 8;
-			if (_bl == 2) {
-				goto ret;
-			}
-		}
-		if (byte_478C6C == 2) {
-			_al = 0x80;
-		}
-		if (_al != 0 && _al > _actionDirectionKeyMaskIndex) {
-			_actionDirectionKeyMaskIndex = _al;
-			_actionDirectionKeyMaskCounter = 0;
-		}
-	}
-ret:
-	byte_478C6C = _bl;
-}
-
 void Game::postScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		BoundingBox box = { 64, 0, 267, 191 };
-		postScreenUpdate_rock_helper2(&box, 12);
+		setAndyAnimationForArea(&box, 12);
 	}
 }
 
 void Game::postScreenUpdate_rock_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		BoundingBox box = { -12, 0, 162, 191 };
-		postScreenUpdate_rock_helper2(&box, 12);
+		setAndyAnimationForArea(&box, 12);
 	}
 }
 

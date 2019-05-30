@@ -1424,6 +1424,45 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 	return ret;
 }
 
+void Game::setAndyAnimationForArea(BoundingBox *box, int dx) {
+	static uint8_t _prevAndyFlags0 = 0;
+	BoundingBox objBox;
+	objBox.x1 = _andyObject->xPos;
+	objBox.x2 = _andyObject->xPos + _andyObject->posTable[3].x;
+	objBox.y1 = _andyObject->yPos;
+	objBox.y2 = _andyObject->yPos + _andyObject->posTable[3].y;
+	const uint8_t _bl = _andyObject->flags0 & 0x1F;
+	if (clipBoundingBox(box, &objBox)) {
+		if ((_andyObject->actionKeyMask & 1) == 0) {
+			_andyObject->actionKeyMask |= 8;
+		}
+		if (objBox.x2 >= box->x1 + dx && objBox.x2 <= box->x2 - dx) {
+			uint8_t _al = 0;
+			if (_currentLevel != kLvl_rock) {
+				if (_bl == 1) {
+					if (((_andyObject->flags0 >> 5) & 7) == 3) {
+						_al = 0x80;
+					}
+				}
+			} else {
+				_andyObject->actionKeyMask &= ~1;
+				_andyObject->directionKeyMask &= ~4;
+				_andyObject->actionKeyMask |= 8;
+			}
+			if (_bl != 2) {
+				if (_prevAndyFlags0 == 2) {
+					_al = 0x80;
+				}
+				if (_al != 0 && _al > _actionDirectionKeyMaskIndex) {
+					_actionDirectionKeyMaskIndex = _al;
+					_actionDirectionKeyMaskCounter = 0;
+				}
+			}
+		}
+	}
+	_prevAndyFlags0 = _bl;
+}
+
 void Game::setAndyLvlObjectPlasmaCannonKeyMask() {
 	if (_actionDirectionKeyMaskCounter == 0) {
 		switch (_actionDirectionKeyMaskIndex >> 4) {

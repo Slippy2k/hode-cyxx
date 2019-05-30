@@ -259,6 +259,7 @@ struct Game {
 	void restartLevel();
 	void playAndyFallingCutscene(int type);
 	int8_t updateLvlObjectScreen(LvlObject *ptr);
+	void setAndyAnimationForArea(BoundingBox *box, int dx);
 	void setAndyLvlObjectPlasmaCannonKeyMask();
 	int setAndySpecialAnimation(uint8_t mask);
 	int clipBoundingBox(BoundingBox *coords, BoundingBox *box);
@@ -327,7 +328,6 @@ struct Game {
 	void postScreenUpdate_rock_screen4();
 	void postScreenUpdate_rock_screen8();
 	void postScreenUpdate_rock_screen9();
-	void postScreenUpdate_rock_helper2(BoundingBox *box, int num);
 	void postScreenUpdate_rock_screen10();
 	void postScreenUpdate_rock_screen11();
 	void postScreenUpdate_rock_screen13();
