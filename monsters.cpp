@@ -3073,7 +3073,82 @@ int Game::runTask_default(Task *t) {
 					}
 				}
 // 4137FA
-				executeMstOp67(t, a, b, c, d, e, m->unk8, m->unk9, m->unkC, m->unkB, 0, m->unkE);
+				mstOp67(t, a, b, c, d, e, m->unk8, m->unk9, m->unkC, m->unkB, 0, m->unkE);
+			}
+			break;
+		case 226: { // 68
+				const int num = READ_LE_UINT16(p + 2);
+				const MstUnk63 *m63 = &_res->_mstUnk63[num];
+				int _edi  = _res->_mstPointOffsets[_currentScreen].xOffset;
+				int var14 = _res->_mstPointOffsets[_currentScreen].yOffset;
+				int var1C = 0;
+				int var8  = 0;
+				int _ecx  = m63->unk4 * 256;
+				int _edx  = _edi + 256 + _ecx;
+				_edi -= _ecx;
+				int var20 = _edx;
+				for (int i = 0; i < 32; ++i) {
+					MstTaskData *m = &_mstUnkDataTable[i];
+					if (!m->m46) {
+						continue;
+					}
+					if (m->unk8[944] != _res->_mstHeightMapData[m63->unk0 * 948 + 944]) {
+						continue;
+					}
+					if (m->xMstPos < _edi || m->xMstPos > var20) {
+						continue;
+					}
+					if (m->yMstPos < var14 || m->yMstPos > var14 + 192) {
+						continue;
+					}
+					if (_mstPosX > m->xMstPos) {
+						++var8;
+					} else {
+						++var1C;
+					}
+				}
+				t->flags |= 0x80;
+				_edi = var1C;
+				_edx = var8;
+				int _ebx = var1C + var8;
+				if (_ebx >= m63->unk3) {
+					break;
+				}
+				_edi += var8;
+				_ecx = m63->unk3 - _edi;
+				_edi = m63->unk1;
+				if (var8 >= _edi) {
+					_edi = 0;
+				} else {
+					_edi -= var8;
+				}
+				int _esi = m63->unk2;
+				if (var1C >= _esi) {
+					_esi = 0;
+				} else {
+					_esi -= var1C;
+				}
+				if (_edi != 0) {
+					if (_mstOp67_screenNum < 0) {
+						if (_mstOp67_x2 >= -_mstRefPosX && _mstOp67_x1 <= -_mstRefPosX * 2) {
+							_edi = 0;
+						}
+					} else if (_mstOp67_screenNum == _currentScreen) {
+						_edi = 0;
+					}
+				}
+				if (_esi != 0) {
+					if (_mstOp68_screenNum < 0) {
+						if (_mstOp68_x2 >= -_mstRefPosX && _mstOp68_x1 <= -_mstRefPosX * 2) {
+							_esi = 0;
+						}
+					} else if (_mstOp68_screenNum == _currentScreen) {
+						_esi = 0;
+					}
+				}
+				if (_edi != 0 || _esi != 0) {
+					mstOp68(t, _res->_mstHeightMapData + m63->unk0 * 948, _edi, _esi, _ecx, m63->unk6);
+				}
 			}
 			break;
 		case 227: { // 69
@@ -4319,8 +4394,8 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	return 0;
 }
 
-void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
-	debug(kDebug_MONSTER, "executeMstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
+void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
+	debug(kDebug_MONSTER, "mstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
 	if (o_flags2 == 0xFFFF) {
 		LvlObject *o = 0;
 		if (t->dataPtr) {
@@ -4594,6 +4669,10 @@ void Game::executeMstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, i
 // 415ADE
 	// TODO
 	t->flags &= ~0x80;
+}
+
+void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
+	warning("mstOp68 unimplemented %d,%d,%d,%d", a, b, c, d);
 }
 
 int Game::runTask_wait(Task *t) {
