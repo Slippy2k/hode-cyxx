@@ -464,12 +464,59 @@ int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 }
 
 int Game::getMstDistance(int y, MovingOpcodeState *p) {
-	if (p->unk24 > 133) {
-		return -1;
+	switch (p->unk24) {
+	case 0:
+		if (p->boundingBox.x1 <= _mstTemp_x2 && y >= _mstTemp_y1 && y - _mstTemp_y2 <= 9) {
+			const int dx = _mstTemp_x1 - p->boundingBox.x2;
+			if (dx <= 0) {
+				return 0;
+			}
+			return dx / p->unk1C;
+		}
+		break;
+//	case 1:
+//	case 2:
+		// TODO
+	case 3: {
+			const int dx = _mstTemp_x2 - p->boundingBox.x1;
+			if (dx >= 0) {
+				const int dy = p->boundingBox.y1 - dx * 2 / 3;
+				if (dy <= _mstTemp_y2) {
+					const int dx2 = _mstTemp_x1 - p->boundingBox.x2;
+					if (dx2 <= 0) {
+						return (p->boundingBox.y2 >= _mstTemp_y1) ? -2 : -1;
+					} else {
+						const int dy2 =  p->boundingBox.y2 - dx2 * 2 / 3;
+						if (dy2 >= _mstTemp_y1) {
+							if (p->unk40 == 3) {
+								return 0;
+							}
+							return dx2 / p->unk1C;
+						}
+					}
+				}
+			}
+		}
+		break;
+//	case 4:
+//	case 5:
+		// TODO
+	case 6:
+		if (p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.x2 >= _mstTemp_x1 && p->boundingBox.x1 <= _mstTemp_x2) {
+			const int dy = p->boundingBox.y1 - _mstTemp_y2;
+			if (dy <= 0 || p->unk40 == 3) {
+				return 0;
+			}
+			return dy / p->unk20;
+		}
+		break;
+	case 7:
+	case 128: // 8
+	case 133: // 9
+		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		break;
 	}
-	warning("getMstDistance y %d p %p unimplemented", y, p);
-	// TODO
-	return 0;
+	return -1;
 }
 
 void Game::mstTaskUpdateScreenPosition(Task *t) {

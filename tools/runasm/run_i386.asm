@@ -14,6 +14,7 @@ GLOBAL test_004070C8
 GLOBAL test_cdqxorsub
 GLOBAL test_negsbbinc
 GLOBAL test_cdqsubsar
+GLOBAL test_imul0x55555556
 
 SECTION .text
 
@@ -264,5 +265,24 @@ test_cdqsubsar:
       sub eax, edx
       sar eax, 1
 
+  pop ebp
+  ret
+
+test_imul0x55555556:
+
+  push ebp
+  mov ebp, esp
+  push ecx
+
+      mov ecx, [ebp + arg0]
+      mov eax, 55555556h
+      imul ecx
+      mov eax, edx
+      shr eax, 1Fh
+      add edx, eax
+
+      mov eax, edx
+
+  pop ecx
   pop ebp
   ret
