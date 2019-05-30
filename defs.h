@@ -309,7 +309,7 @@ struct MstUnk46;
 
 struct MstCollision {
 	MstUnk46 *m46; // 0x00
-	int32_t unk80; // 0x80
+	uint32_t unk80; // 0x80
 }; // sizeof == 132
 
 struct Task;

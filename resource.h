@@ -299,6 +299,17 @@ struct MstUnk56 {
 	uint8_t unkB;
 }; // sizeof == 12
 
+struct MstUnk63 {
+	uint8_t unk0;
+	uint8_t unk1;
+	uint8_t unk2;
+	uint8_t unk3;
+	uint8_t unk4;
+	uint8_t unk5;
+	uint8_t unk6;
+	uint8_t unk7;
+}; // sizeof == 8
+
 struct MstOp56Data {
 	uint32_t unk0; // arg0 // 0
 	uint32_t unk4; // arg1 // 4
@@ -506,6 +517,7 @@ struct Resource {
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	MstOp56Data *_mstOp56Data;
 	uint8_t *_mstCodeData;
+	MstUnk63 *_mstUnk63;
 
 	Resource(const char *dataPath);
 	~Resource();

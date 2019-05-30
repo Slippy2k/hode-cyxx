@@ -3473,14 +3473,18 @@ void Game::executeMstOp52() {
 }
 
 bool Game::checkMstOp54Helper(MstUnk48 *m, uint8_t flag) {
-	warning("checkMstOp54Helper %d unimplemented", flag);
 	for (int i = 0; i < 2; ++i) {
 		for (uint32_t j = 0; j < m->count[i]; ++j) {
-			// (i ^ flag) * 32
-
-			// TODO
+			uint32_t a = (i ^ flag); // * 32; // _edx
+			uint32_t n = m->data1[i][j]; // _eax
+			if (_mstCollisionTable[a][n].unk80 < m->data2[i][j]) {
+				return 0;
+			}
 		}
 	}
+	uint8_t _op54Data[32];
+	memset(_op54Data, 0, sizeof(_op54Data));
+	warning("checkMstOp54Helper %d unimplemented", flag);
 	for (int i = 0; i < m->countUnk12; ++i) {
 		// TODO
 	}

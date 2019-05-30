@@ -3482,6 +3482,29 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	if (screenNum == 0xFF) {
 		return 0;
 	}
+	uint8_t var2C, _bl;
+	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
+	uint8_t _cl = dat->unk0;
+	if (_cl == 4) {
+		_bl = _cl;
+		var2C = (o->flags1 >> 4) & 3;
+		// TODO
+	} else {
+// 40D115
+		// TODO
+	}
+// 40D147
+	// TODO
+
+        int _edx = _res->_screensBasePos[screenNum].v + yPos;
+        int _edi = _res->_screensBasePos[screenNum].u + var24; // _edi
+	_edx = ((_edx << 6) & ~511) + (_edi >> 3);
+        int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
+
+	if (_cl >= 4) {
+
+	}
+// 40D2F1
 
 	warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
 	// TODO
