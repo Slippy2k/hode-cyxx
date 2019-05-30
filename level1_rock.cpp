@@ -91,27 +91,6 @@ void Game::postScreenUpdate_rock_screen8() {
 	}
 }
 
-void Game::postScreenUpdate_rock_helper1(int num) {
-	switch (num) {
-	case 0:
-		removeLvlObject(_andyObject);
-		setLvlObjectType8Resource(_andyObject, 8, 0);
-		_andyObject->anim = 48;
-		break;
-	case 2:
-		destroyLvlObjectPlasmaExplosion(_andyObject);
-		_plasmaCannonDirection = 0;
-		_plasmaCannonLastIndex1 = 0;
-		_plasmaCannonExplodeFlag = 0;
-		_plasmaCannonPointsMask = 0;
-		_plasmaCannonObject = 0;
-		setLvlObjectType8Resource(_andyObject, 8, 2);
-		_andyObject->anim = 232;
-		break;
-	}
-	_andyObject->frame = 0;
-}
-
 void Game::postScreenUpdate_rock_screen9() {
 	int xPos;
 	if (_res->_currentScreenResourceNum == 9) {
@@ -131,7 +110,7 @@ void Game::postScreenUpdate_rock_screen9() {
 					_levelCheckpoint = 5;
 				}
 				_res->_screensState[9].s0 = 1;
-				postScreenUpdate_rock_helper1(2);
+				setAndySprite(2);
 				_andyObject->xPos = 105;
 				_andyObject->yPos = 52;
 				_andyObject->anim = 232;

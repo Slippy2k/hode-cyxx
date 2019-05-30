@@ -1116,7 +1116,28 @@ void Game::removeLvlObject2(LvlObject *o) {
 	o->bitmapBits = 0;
 }
 
-void Game::setupCurrentScreen() {
+void Game::setAndySprite(int num) {
+	switch (num) {
+	case 0: //  Andy with plasma cannon and helmet
+		removeLvlObject(_andyObject);
+		setLvlObjectType8Resource(_andyObject, 8, 0);
+		_andyObject->anim = 48;
+		break;
+	case 2: // Andy
+		destroyLvlObjectPlasmaExplosion(_andyObject);
+		_plasmaCannonDirection = 0;
+		_plasmaCannonLastIndex1 = 0;
+		_plasmaCannonExplodeFlag = 0;
+		_plasmaCannonPointsMask = 0;
+		_plasmaCannonObject = 0;
+		setLvlObjectType8Resource(_andyObject, 8, 2);
+		_andyObject->anim = 232;
+		break;
+	}
+	_andyObject->frame = 0;
+}
+
+void Game::setupAndyLvlObject() {
 	LvlObject *ptr = _andyObject;
 	_fallingAndyFlag = false;
 	_andyActionKeysFlags = 0;
@@ -1126,24 +1147,7 @@ void Game::setupCurrentScreen() {
 	_actionDirectionKeyMaskIndex = 0;
 	_andyCurrentLevelScreenNum = ptr->screenNum;
 	if (dat[9] != ptr->spriteNum) {
-		switch (dat[9]) {
-		case 0:
-			removeLvlObject(ptr);
-			setLvlObjectType8Resource(ptr, 8, 0);
-			ptr->anim = 48;
-			break;
-		case 2:
-			destroyLvlObjectPlasmaExplosion(_andyObject);
-			setLvlObjectType8Resource(ptr, 8, 2);
-			_plasmaCannonDirection = 0;
-			_plasmaCannonLastIndex1 = 0;
-			_plasmaCannonExplodeFlag = 0;
-			_plasmaCannonPointsMask = 0;
-			_plasmaCannonObject = 0;
-			ptr->anim = 232;
-			break;
-		}
-		ptr->frame = 0;
+		setAndySprite(dat[9]);
 	}
 	ptr->linkObjPtr = 0;
 	ptr->xPos = (int16_t)READ_LE_UINT16(dat + 0);
@@ -1318,7 +1322,7 @@ void Game::resetScreen() {
 }
 
 void Game::restartLevel() {
-	setupCurrentScreen();
+	setupAndyLvlObject();
 	clearLvlObjectsList2();
 	clearLvlObjectsList3();
 	if (!_mstLogicDisabled) {
@@ -2300,7 +2304,7 @@ void Game::levelMainLoop() {
 	_quit = false;
 	resetObjectScreenDataList();
 	callLevel_initialize();
-	setupCurrentScreen();
+	setupAndyLvlObject();
 	clearLvlObjectsList2();
 	clearLvlObjectsList3();
 	if (!_mstLogicDisabled) {
@@ -3728,7 +3732,7 @@ void Game::initLvlObjects() {
 	}
 }
 
-void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) {
+void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) { // setLvlObjectSprite
 	if (ptr->type == 8) {
 		_res->decLevelData0x2988RefCounter(ptr);
 		ptr->spriteNum = num;
@@ -3737,10 +3741,10 @@ void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) 
 	}
 }
 
-LvlObject *Game::findLvlObject(uint8_t type, uint8_t num, int index) {
-	LvlObject *ptr = _screenLvlObjectsList[index];
+LvlObject *Game::findLvlObject(uint8_t type, uint8_t spriteNum, int screenNum) {
+	LvlObject *ptr = _screenLvlObjectsList[screenNum];
 	while (ptr) {
-		if (ptr->type == type && ptr->spriteNum == num) {
+		if (ptr->type == type && ptr->spriteNum == spriteNum) {
 			break;
 		}
 		ptr = ptr->nextPtr;
@@ -3748,8 +3752,8 @@ LvlObject *Game::findLvlObject(uint8_t type, uint8_t num, int index) {
 	return ptr;
 }
 
-LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int index) {
-	LvlObject *ptr = _screenLvlObjectsList[index];
+LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int screenNum) {
+	LvlObject *ptr = _screenLvlObjectsList[screenNum];
 	while (ptr) {
 		if (ptr->type == type && ptr->flags == flags) {
 			break;
@@ -3759,10 +3763,10 @@ LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int index) {
 	return ptr;
 }
 
-LvlObject *Game::findLvlObjectType2(int num, int index) {
-	LvlObject *ptr = _screenLvlObjectsList[index];
+LvlObject *Game::findLvlObjectType2(int spriteNum, int screenNum) {
+	LvlObject *ptr = _screenLvlObjectsList[screenNum];
 	while (ptr) {
-		if (ptr->type == 2 && ptr->spriteNum == num && !ptr->dataPtr) {
+		if (ptr->type == 2 && ptr->spriteNum == spriteNum && !ptr->dataPtr) {
 			break;
 		}
 		ptr = ptr->nextPtr;

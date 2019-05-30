@@ -31,6 +31,9 @@ LvlObject.flags1 = (LvlObject.flags1 & ~6) | (LvlAnimSeqHeader.flags1 & 6);
 https://en.wikipedia.org/wiki/Anaglyph_3D
 
 
+convert -delay 8 -loop 0 -layers Optimize screenshot-*-front.bmp rock_lvl_shoot_screen13.gif
+
+
 Saturn
 	file00 code ? contains the splash screen
 		Inside 'SmpPlaySingleSample', we will play an empty sample ( Sample #=%d )!!

@@ -250,7 +250,8 @@ struct Game {
 	int addLvlObjectToList3(int num);
 	void removeLvlObject(LvlObject *ptr);
 	void removeLvlObject2(LvlObject *o);
-	void setupCurrentScreen(); // setAndyFromCheckpoint
+	void setAndySprite(int num);
+	void setupAndyLvlObject();
 	void updateScreenHelper(int num);
 	void resetDisplay();
 	void updateScreen(uint8_t num);
@@ -311,9 +312,9 @@ struct Game {
 	void clearDeclaredLvlObjectsList();
 	void initLvlObjects();
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
-	LvlObject *findLvlObject(uint8_t type, uint8_t num, int index);
-	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int index);
-	LvlObject *findLvlObjectType2(int num, int index);
+	LvlObject *findLvlObject(uint8_t type, uint8_t spriteNum, int screenNum);
+	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int screenNum);
+	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void resetLevelTickHelperData();
 	void updateLevelTickHelper();
@@ -325,7 +326,6 @@ struct Game {
 	void postScreenUpdate_rock_screen0();
 	void postScreenUpdate_rock_screen4();
 	void postScreenUpdate_rock_screen8();
-	void postScreenUpdate_rock_helper1(int num);
 	void postScreenUpdate_rock_screen9();
 	void postScreenUpdate_rock_helper2(BoundingBox *box, int num);
 	void postScreenUpdate_rock_screen10();
