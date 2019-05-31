@@ -55,10 +55,10 @@ What is incomplete :
 * Monsters logic (MST)
 * Sound playback (SSS)
 * Special Powers
+* Shooting collisions
 
 What is missing :
 * Menus
-* Shooting collisions
 
 
 Credits:
@@ -72,17 +72,3 @@ URLs:
 
 [1] https://www.mobygames.com/game/heart-of-darkness
 [2] http://heartofdarkness.ca/
-
-
-Notes:
-------
-
-The datafiles of Heart of Darkness are quite interesting. Each level is made of 3 different
-files, .lvl, .sss and .mst. Each file contains several C structures, which includes pointers
-(eg. to binary data or to other structures).  When loading these files, the original engine
-needs to fixup the structure and the pointers.
-
-As the game was written for 32 bits platform, the same method cannot be directly applied on
-more modern platforms (64 bits or big-endian).
-
-Although focus has been on the PC version, PSX and Saturn appear to use a similar structure.
