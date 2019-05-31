@@ -272,6 +272,8 @@ struct MovingOpcodeState {
 	ShootLvlObjectData *unk28;
 	LvlObject *o; // 0x2C
 	MstTaskData *m; // 0x30
+	int32_t unk34;
+	int32_t unk38;
 	int32_t unk3C;
 	uint8_t unk40;
 	uint8_t unk41;

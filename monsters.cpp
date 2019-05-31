@@ -578,8 +578,36 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 					uint8_t _al = p->unk40;
 					if (_al == 1 || _al == 2) {
 // 40EED8
-						warning("mstTaskUpdateScreenPosition 40EED8 unimplemented");
-						// TODO
+						if (p->unk3C >= m->xDelta + m->yDelta) {
+							if (o->screenNum != _currentScreen) {
+								const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
+								const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
+								_mstTemp_x1 += dx;
+								_mstTemp_x2 += dx;
+								_mstTemp_y1 += dy;
+								_mstTemp_y2 += dy;
+							}
+// 40EF72
+							if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
+								const uint8_t type = m->unk8[944];
+								if (((type & 9) == 0 && clipLvlObjectsSmall(p->o, o, 132)) || ((type & 9) != 0 && clipLvlObjectsSmall(p->o, o, 20))) {
+									p->m = m;
+									p->unk3C = m->xDelta + m->yDelta;
+									p->unk34 = _clipBoxOffsetX;
+									p->unk38 = _clipBoxOffsetY;
+								}
+							}
+// 40F009
+							if (o->screenNum != _currentScreen) {
+								const int dx = _res->_mstPointOffsets[_currentScreen].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
+								const int dy = _res->_mstPointOffsets[_currentScreen].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
+								_mstTemp_x1 += dx;
+								_mstTemp_x2 += dx;
+								_mstTemp_y1 += dy;
+								_mstTemp_y2 += dy;
+							}
+						}
+// 40F087
 					} else if (_al == 3 && p->unk3C > m->xDelta + m->yDelta) {
 						if (o->screenNum != _currentScreen) {
 							const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
@@ -605,12 +633,8 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 						_mstTemp_x2 += dx;
 						_mstTemp_y1 += dy;
 						_mstTemp_y2 += dy;
-
-					} else {
-// 40F087
-						warning("mstTaskUpdateScreenPosition 40F087 unimplemented");
-						// TODO
 					}
+// 40F087
 // 40F08C
 					_mstTemp_x1 += _res->_mstPointOffsets[o->screenNum].xOffset;
 					_mstTemp_y1 += _res->_mstPointOffsets[o->screenNum].yOffset;
