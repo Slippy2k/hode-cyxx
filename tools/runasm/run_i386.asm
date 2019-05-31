@@ -15,6 +15,7 @@ GLOBAL test_cdqxorsub
 GLOBAL test_negsbbinc
 GLOBAL test_cdqsubsar
 GLOBAL test_imul0x55555556
+GLOBAL test_0040D136
 
 SECTION .text
 
@@ -282,6 +283,23 @@ test_imul0x55555556:
       add edx, eax
 
       mov eax, edx
+
+  pop ecx
+  pop ebp
+  ret
+
+test_0040D136:
+
+  push ebp
+  mov ebp, esp
+  push ecx
+
+      mov ecx, [ebp + arg0]
+      cmp cl, 2
+      setnz al
+      dec eax
+      and eax, 0FFFFFFFEh
+      add eax, 4
 
   pop ecx
   pop ebp

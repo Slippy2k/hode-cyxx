@@ -484,7 +484,7 @@ int Game::getMstDistance(int y, MovingOpcodeState *p) {
 				if (dy <= _mstTemp_y2) {
 					const int dx2 = _mstTemp_x1 - p->boundingBox.x2;
 					if (dx2 <= 0) {
-						return (p->boundingBox.y2 >= _mstTemp_y1) ? -2 : -1;
+						return (p->boundingBox.y2 >= _mstTemp_y1) ? 0 : -1;
 					} else {
 						const int dy2 =  p->boundingBox.y2 - dx2 * 2 / 3;
 						if (dy2 >= _mstTemp_y1) {

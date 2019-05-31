@@ -19,6 +19,7 @@ extern int test_cdqxorsub(int) __attribute__((stdcall));
 extern int test_negsbbinc(int) __attribute__((stdcall));
 extern int test_cdqsubsar(int) __attribute__((stdcall));
 extern int test_imul0x55555556(int) __attribute__((stdcall));
+extern int test_0040D136(int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -83,5 +84,7 @@ int main(int argc, char *argv[]) {
 	for (int i = -512; i < 512; ++i) {
 		assert(test_imul0x55555556(i) == i / 3);
 	}
+	assert(test_0040D136(2) == 2);
+	assert(test_0040D136(0) == 4);
 	return 0;
 }

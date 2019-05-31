@@ -2946,6 +2946,10 @@ static const uint8_t byte_43E670[] = {
 	0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
 };
 
+static const uint8_t byte_43E6C0[] = {
+	0, 0, 8, 0, 0, 8, 8, 8, 0, 0, 0xF8, 0, 0, 8, 0xF8, 8, 0, 0, 8, 0, 0, 0xF8, 8, 0xF8, 0, 0, 0xF8, 0, 0, 0xF8, 0xF8, 0xF8
+};
+
 static const uint8_t byte_43E700[] = {
 	0x04, 0x14, 0x03, 0x16, 0x03, 0x16, 0x03, 0x16, 0x03, 0x16, 0x04, 0x14, 0x02, 0x18, 0x02, 0x18
 };
@@ -3099,11 +3103,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					break;
 				}
 				ShootLvlObjectData *_eax = (ShootLvlObjectData *)getLvlObjectDataPtr(_esi, kObjectDataTypeShoot);
-				_esi->anim = (_eax->unk0 == 0) ? 14 : 15;
+				_esi->anim = (_eax->unk0 == 4) ? 14 : 15;
 				updateAndyObject(_esi);
 				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
 				if (_currentLevel == kLvl_isld) {
-					_esi->xPos += _eax->dxPos;
+					AndyLvlObjectData *_edx = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+					_esi->xPos += _edx->dxPos;
 				}
 			}
 			break;
@@ -3177,7 +3182,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 						break;
 					}
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
-					_edx->unk0 = 0;
+					_edx->unk0 = 4;
 				}
 			}
 			break;
@@ -3490,23 +3495,28 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	if (_cl == 4) {
 		_bl = _cl;
 		var2C = (o->flags1 >> 4) & 3;
-		// TODO
+		// var10 = byte_43E6C0 + var2C * 8;
+		// _esi = dword_43E7F0 + var2C * 16 / sizeof(uint32_t);
 	} else {
 // 40D115
-		// TODO
+		var2C = dat->unk1;
+		// var10 = byte_43E680 + var2C * 8;
+		// _esi = dword_43E770 * var2C * 16 / sizeof(uint32_t;
+		_bl = (_cl != 2) ? 4 : 2;
 	}
 // 40D147
-	// TODO
-
-        int _edx = _res->_screensBasePos[screenNum].v + yPos;
-        int _edi = _res->_screensBasePos[screenNum].u + var24; // _edi
+	int var2E = _bl;
+	int _edx = _res->_screensBasePos[screenNum].v + yPos;
+	int _edi = _res->_screensBasePos[screenNum].u + var24; // _edi
 	_edx = ((_edx << 6) & ~511) + (_edi >> 3);
-        int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
-
+	int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
 	if (_cl >= 4) {
-
+		// TODO
 	}
 // 40D2F1
+	_bl = dat->unk1;
+	uint8_t _al = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
+	int var2D = _al;
 
 	warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
 	// TODO
