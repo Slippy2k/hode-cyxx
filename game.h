@@ -73,7 +73,7 @@ struct Game {
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
 	LvlObject *_plasmaCannonObject;
-	LvlObject *_currentMonsterObject;
+	LvlObject *_specialAnimLvlObject;
 	LvlObject *_currentSoundLvlObject;
 	int _currentLevel;
 	int _levelCheckpoint;
@@ -131,11 +131,10 @@ struct Game {
 	ScreenMask _shadowScreenMasksTable[8];
 
 	uint16_t _mstCurrentAnim;
-	uint16_t _mstCurrentFlags1;
-	uint8_t _mstCurrentScreenNum;
+	uint16_t _specialAnimMask;
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
-	bool _mstCurrentUnkFlag;
+	bool _specialAnimFlag;
 	int _mstUnk10;
 	MovingOpcodeState _mstMovingState[kMaxMovingStates];
 	int _mstMovingStateCount;

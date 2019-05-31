@@ -36,7 +36,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_paf = new PafPlayer(system, &_res->_fs);
 	_video = new Video(system);
 	_andyCurrentLevelScreenNum = -1;
-	_mstCurrentFlags1 = 0; // original only clears ~0x30
+	_specialAnimMask = 0; // original only clears ~0x30
 	_mstCurrentAnim = 0;
 	_mstOriginPosX = Video::W / 2;
 	_mstOriginPosY = Video::H / 2;
@@ -2244,20 +2244,20 @@ void Game::updateAndyMonsterObjects() {
 	case 6:
 		_hideAndyObjectSprite = false;
 		if (_actionDirectionKeyMaskIndex == 0x61) {
-			assert(_currentMonsterObject);
-			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
-			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
+			assert(_specialAnimLvlObject);
+			_mstOriginPosX += _specialAnimLvlObject->posTable[6].x + _specialAnimLvlObject->xPos;
+			_mstOriginPosY += _specialAnimLvlObject->posTable[6].y + _specialAnimLvlObject->yPos;
 		}
 		ptr->linkObjPtr = 0;
 		break;
 	case 7: // grab the line in 'fort' screen #1
 		_hideAndyObjectSprite = true;
 		if (_actionDirectionKeyMaskIndex == 0x71) {
-			assert(_currentMonsterObject);
-			_mstOriginPosX += _currentMonsterObject->posTable[6].x + _currentMonsterObject->xPos;
-			_mstOriginPosY += _currentMonsterObject->posTable[6].y + _currentMonsterObject->yPos;
-			ptr->linkObjPtr = _currentMonsterObject;
-			ptr->screenNum = _currentMonsterObject->screenNum;
+			assert(_specialAnimLvlObject);
+			_mstOriginPosX += _specialAnimLvlObject->posTable[6].x + _specialAnimLvlObject->xPos;
+			_mstOriginPosY += _specialAnimLvlObject->posTable[6].y + _specialAnimLvlObject->yPos;
+			ptr->linkObjPtr = _specialAnimLvlObject;
+			ptr->screenNum = _specialAnimLvlObject->screenNum;
 		} else {
 			ptr->linkObjPtr = 0;
 		}
@@ -2281,7 +2281,7 @@ void Game::updateAndyMonsterObjects() {
 		_actionDirectionKeyMaskIndex = 0;
 		ptr->anim = _mstCurrentAnim;
 		ptr->frame = 0;
-		ptr->flags1 = merge_bits(ptr->flags1, _mstCurrentFlags1, 0x30);
+		ptr->flags1 = merge_bits(ptr->flags1, _specialAnimMask, 0x30);
 		setupLvlObjectBitmap(ptr);
 		setLvlObjectPosRelativeToPoint(ptr, 3, _mstOriginPosX, _mstOriginPosY);
 	}
@@ -3237,9 +3237,9 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 			ptr->yPos += calcScreenMaskDy(ptr->posTable[7].x + ptr->xPos, ptr->posTable[7].y + ptr->yPos, ptr->screenNum);
 		}
 	} else if (ptr->linkObjPtr) {
-		assert(_currentMonsterObject);
-		if (_currentMonsterObject->screenNum != ptr->screenNum) {
-			setLvlObjectPosRelativeToObject(ptr, 3, _currentMonsterObject, 6);
+		assert(_specialAnimLvlObject);
+		if (_specialAnimLvlObject->screenNum != ptr->screenNum) {
+			setLvlObjectPosRelativeToObject(ptr, 3, _specialAnimLvlObject, 6);
 		}
 	}
 	switch (_currentLevel) {
