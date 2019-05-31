@@ -238,15 +238,13 @@ struct AndyLvlObjectData {
 struct ShootLvlObjectData {
 	uint8_t unk0;
 	uint8_t unk1;
-	uint8_t unk2;
+	uint8_t counter; // 0x2
 	uint8_t unk3;
-	int xPos; // 0x4
-	int yPos; // 0x8
-	int x2; // 0xC
-	int y2; // 0x10
-	int32_t dxPos; // 0x18
-	int32_t dyPos; // 0x1C
-	ShootLvlObjectData *nextPtr; // next pointer to 'free' element
+	int32_t dxPos; // 0x4
+	int32_t dyPos; // 0x8
+	int32_t x2; // 0xC
+	int32_t y2; // 0x10
+	ShootLvlObjectData *nextPtr; // 0x20 next pointer to 'free' element
 };
 
 struct ScreenMask { // ShadowScreenMask

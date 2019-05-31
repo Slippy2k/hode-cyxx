@@ -2938,10 +2938,12 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 	}
 }
 
+// dx, dy
 static const uint8_t byte_43E660[] = {
 	0x1F, 0x00, 0xE5, 0xEE, 0xE5, 0x12, 0x1B, 0xEE, 0x1B, 0x12, 0xE1, 0x00, 0x00, 0xE1, 0x00, 0x1F
 };
 
+// dx, dy
 static const uint8_t byte_43E670[] = {
 	0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
 };
@@ -2950,15 +2952,18 @@ static const uint8_t byte_43E6C0[] = {
 	0, 0, 8, 0, 0, 8, 8, 8, 0, 0, 0xF8, 0, 0, 8, 0xF8, 8, 0, 0, 8, 0, 0, 0xF8, 8, 0xF8, 0, 0, 0xF8, 0, 0, 0xF8, 0xF8, 0xF8
 };
 
+// anim
 static const uint8_t byte_43E700[] = {
 	0x04, 0x14, 0x03, 0x16, 0x03, 0x16, 0x03, 0x16, 0x03, 0x16, 0x04, 0x14, 0x02, 0x18, 0x02, 0x18
 };
 
+// anim
 static const uint8_t byte_43E710[] = {
 	0x04, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x04, 0x08, 0x02, 0x08, 0x02, 0x08
 };
 
 void Game::setupSpecialPowers(LvlObject *ptr) {
+	assert(ptr == _andyObject);
 	AndyLvlObjectData *_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	LvlObject *_esi = _edi->shootLvlObject;
 	const uint8_t pos = ptr->flags0 & 0x1F;
@@ -2973,7 +2978,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 		_esi->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
 		uint8_t _cl = (ptr->flags1 >> 4) & 3;
 		if (_eax->unk0 == 4) {
-			_eax->unk2 = 0x21;
+			_eax->counter = 33;
 			switch (var1) {
 			case 0:
 				_eax->unk1 = ((_cl & 1) != 0) ? 5 : 0;
@@ -3001,12 +3006,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DBCE
-			_eax->xPos = (int8_t)byte_43E670[_eax->unk1 * 2];
-			_eax->yPos = (int8_t)byte_43E670[_eax->unk1 * 2 + 1];
+			_eax->dxPos = (int8_t)byte_43E670[_eax->unk1 * 2];
+			_eax->dyPos = (int8_t)byte_43E670[_eax->unk1 * 2 + 1];
 			_esi->anim = 10;
 		} else {
 // 40DBF4
-			_eax->unk2 = 0x11;
+			_eax->counter = 17;
 			switch (var1) {
 			case 0:
 				_esi->anim = 13;
@@ -3047,8 +3052,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DCCE
-			_eax->xPos = (int8_t)byte_43E660[_eax->unk1 * 2];
-			_eax->yPos = (int8_t)byte_43E660[_eax->unk1 * 2 + 1];
+			_eax->dxPos = (int8_t)byte_43E660[_eax->unk1 * 2];
+			_eax->dyPos = (int8_t)byte_43E660[_eax->unk1 * 2 + 1];
 		}
 // 40DCE9
 		_esi->frame = 0;
@@ -3057,7 +3062,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 		_esi->screenNum = ptr->screenNum;
 		setLvlObjectPosRelativeToObject(_esi, 7, ptr, 6);
 		if (_currentLevel == kLvl_isld) {
-			_esi->xPos += _eax->dxPos;
+			AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			_esi->xPos += _ecx->dxPos;
 		}
 		_edi->shootLvlObject = 0;
 	} else if (pos == 7) {
@@ -3531,7 +3537,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 	const uint16_t fl = o->flags0 & 0x1F;
 	if (fl == 1) {
-		if (dat->unk3 != 0x80 && dat->unk2 != 0) {
+		if (dat->unk3 != 0x80 && dat->counter != 0) {
 			uint8_t _al = lvlObjectSpecialPowersCallbackHelper2(o);
 			if (_al != 0) {
 				if (dat->unk0 == 4 && (_al & 1) != 0 && (dat->unk1 == 4 || dat->unk1 == 2)) {
@@ -3545,18 +3551,13 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 		}
 // 40D947
 		if (dat->unk0 == 5) {
-			dat->yPos = 0;
+			dat->dyPos = 0;
 			if (dat->unk3 != 0x80) {
 				lvlObjectSpecialPowersCallbackHelper1(o);
 			}
-			const uint8_t *p;
-			if (dat->unk0 >= 4) {
-				p = &byte_43E710[dat->unk1 * 2];
-			} else {
-				p = &byte_43E700[dat->unk1 * 2];
-			}
+			const uint8_t *p = (dat->unk0 >= 4) ? &byte_43E710[dat->unk1 * 2] : &byte_43E700[dat->unk1 * 2];
 // 40D97C
-			if (dat->unk3 != 0x80 && dat->unk2 != 0) {
+			if (dat->unk3 != 0x80 && dat->counter != 0) {
 				if (addLvlObjectToList3(o->spriteNum)) {
 					LvlObject *ptr = _lvlObjectsList3;
 					ptr->anim = dat->unk1;
@@ -3566,8 +3567,8 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 					ptr->frame = 0;
 					setupLvlObjectBitmap(ptr);
 					setLvlObjectPosRelativeToObject(ptr, 0, o, 7);
-					o->xPos += dat->xPos;
-					o->yPos += dat->yPos;
+					o->xPos += dat->dxPos;
+					o->yPos += dat->dyPos;
 				}
 			} else {
 // 40D9FC
@@ -3578,18 +3579,46 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 				if (dat->y2 >= 192) {
 					dat->y2 -= _res->_screensBasePos[o->screenNum].v;
 				}
+// 40DA36
+				// TODO
+				if (0) { // dat->0x1C
+
+				} else {
+// 40DA5E
+					if (dat->counter == 0) {
+						o->anim = 16;
+					}
+				}
+// 40DA6B
+				if (dat->unk0 >= 4) {
+					dat->unk0 = 6;
+					if (dat->dxPos <= 0) {
+						dat->x2 += 8;
+					}
+					if (dat->dyPos <= 0) {
+						dat->y2 += 8;
+					}
+				} else {
+					dat->unk0 = 1;
+				}
+				dat->dxPos = 0;
+				dat->dyPos = 0;
+				o->frame = 0;
+				setupLvlObjectBitmap(o);
+				setLvlObjectPosRelativeToPoint(o, 0, dat->x2, dat->y2);
+				return 0;
 			}
 		}
 	} else if (fl == 11) {
 // 40DAB1
 		if ((o->flags0 & 0xE0) == 0x40) {
-			dat->unk2 = 0;
+			dat->counter = 0;
 		} else {
-			dat->unk2 = 1;
+			dat->counter = 1;
 		}
 	}
 // 40DAC9
-	if (dat->unk2 == 0) {
+	if (dat->counter == 0) {
 		if (o->spriteNum == 3) {
 			removeLvlObjectFromList(&_lvlObjectsList0, o);
 		} else {
@@ -3597,12 +3626,12 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 		}
 		destroyLvlObject(o);
 	} else {
-		--dat->unk2;
+		--dat->counter;
 		updateAndyObject(o);
 	}
 // 40DB00
 	if (setLvlObjectPosInScreenGrid(o, 3) < 0) {
-		dat->unk2 = 0;
+		dat->counter = 0;
 	}
 	return 0;
 }

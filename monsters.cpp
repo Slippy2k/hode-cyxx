@@ -1628,11 +1628,11 @@ void Game::mstUpdateRefPos() {
 			if (ptr->unk3 == 0x80) {
 				continue;
 			}
-			if (ptr->xPos == 0 && ptr->yPos == 0) {
+			if (ptr->dxPos == 0 && ptr->dyPos == 0) {
 				continue;
 			}
-			p->unk1C = ptr->xPos;
-			p->unk20 = ptr->yPos;
+			p->unk1C = ptr->dxPos;
+			p->unk20 = ptr->dyPos;
 			p->unk24 = ptr->unk1;
 			switch (ptr->unk0) {
 			case 0:
