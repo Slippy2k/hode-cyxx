@@ -44,6 +44,7 @@ struct Game {
 		kMaxVars = 40,
 		kMaxLocals = 8,
 		kMaxMovingStates = 8,
+		kMaxShootLvlObjectData = 32,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -93,8 +94,8 @@ struct Game {
 	int8_t _levelRestartCounter;
 	bool _fadePalette;
 	bool _hideAndyObjectSprite;
-	ShootLvlObjectData _otherObjectScreenDataTable[32];
-	ShootLvlObjectData *_otherObjectScreenDataList; // pointer to the first 'free' element
+	ShootLvlObjectData _shootLvlObjectDataTable[kMaxShootLvlObjectData];
+	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the first 'free' element
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;

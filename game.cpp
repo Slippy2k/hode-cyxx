@@ -57,17 +57,17 @@ Game::~Game() {
 }
 
 void Game::resetObjectScreenDataList() {
-	_otherObjectScreenDataList = &_otherObjectScreenDataTable[0];
-	for (int i = 0; i < 31; ++i) {
-		_otherObjectScreenDataTable[i].nextPtr = &_otherObjectScreenDataTable[i + 1];
+	_shootLvlObjectDataList = &_shootLvlObjectDataTable[0];
+	for (int i = 0; i < kMaxShootLvlObjectData - 1; ++i) {
+		_shootLvlObjectDataTable[i].nextPtr = &_shootLvlObjectDataTable[i + 1];
 	}
-	_otherObjectScreenDataTable[31].nextPtr = 0;
+	_shootLvlObjectDataTable[kMaxShootLvlObjectData - 1].nextPtr = 0;
 }
 
 void Game::clearObjectScreenData(LvlObject *ptr) {
 	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
-	dat->nextPtr = _otherObjectScreenDataList;
-	_otherObjectScreenDataList = dat;
+	dat->nextPtr = _shootLvlObjectDataList;
+	_shootLvlObjectDataList = dat;
 	ptr->dataPtr = 0;
 }
 
@@ -2703,7 +2703,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[64]);
 		break;
 	case kObjectDataTypeShoot:
-		assert(o->dataPtr >= &_otherObjectScreenDataTable[0] && o->dataPtr < &_otherObjectScreenDataTable[32]);
+		assert(o->dataPtr >= &_shootLvlObjectDataTable[0] && o->dataPtr < &_shootLvlObjectDataTable[32]);
 		break;
 	case kObjectDataTypeLvlBackgroundSound:
 		assert(o->type == 1);
@@ -2948,8 +2948,16 @@ static const uint8_t byte_43E670[] = {
 	0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
 };
 
+static const uint8_t byte_43E680[] = {
+	0xFF, 0x00, 0x07, 0x00, 0x0F, 0x00, 0x17, 0x00, 0x08, 0x08, 0x00, 0x00, 0xF8, 0xF8, 0xF0, 0xF0,
+	0x08, 0xF8, 0x00, 0xFF, 0xF8, 0x07, 0xF0, 0x0F, 0xFF, 0x08, 0x07, 0x00, 0x0F, 0xF8, 0x17, 0xF0,
+	0xFF, 0xF8, 0x07, 0xFF, 0x0F, 0x07, 0x17, 0x0F, 0x08, 0x00, 0x00, 0x00, 0xF8, 0x00, 0xF0, 0x00,
+	0x00, 0x08, 0x00, 0x00, 0x00, 0xF8, 0x00, 0xF0, 0x00, 0xF8, 0x00, 0xFF, 0x00, 0x07, 0x00, 0x0F
+};
+
 static const uint8_t byte_43E6C0[] = {
-	0, 0, 8, 0, 0, 8, 8, 8, 0, 0, 0xF8, 0, 0, 8, 0xF8, 8, 0, 0, 8, 0, 0, 0xF8, 8, 0xF8, 0, 0, 0xF8, 0, 0, 0xF8, 0xF8, 0xF8
+	0x00, 0x00, 0x08, 0x00, 0x00, 0x08, 0x08, 0x08, 0x00, 0x00, 0xF8, 0x00, 0x00, 0x08, 0xF8, 0x08,
+	0x00, 0x00, 0x08, 0x00, 0x00, 0xF8, 0x08, 0xF8, 0x00, 0x00, 0xF8, 0x00, 0x00, 0xF8, 0xF8, 0xF8
 };
 
 // anim
@@ -3074,12 +3082,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _otherObjectScreenDataList;
-					if (_otherObjectScreenDataList) {
-						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
+					_edx->dataPtr = _shootLvlObjectDataList;
+					if (_shootLvlObjectDataList) {
+						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
 						 memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
-						warning("Nothing free in _otherObjectScreenDataList");
+						warning("Nothing free in _shootLvlObjectDataList");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3122,12 +3130,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _otherObjectScreenDataList;
-					if (_otherObjectScreenDataList) {
-						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
+					_edx->dataPtr = _shootLvlObjectDataList;
+					if (_shootLvlObjectDataList) {
+						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
 						 memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
-						warning("Nothing free in _otherObjectScreenDataList");
+						warning("Nothing free in _shootLvlObjectDataList");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3162,12 +3170,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _otherObjectScreenDataList;
-					if (_otherObjectScreenDataList) {
-						_otherObjectScreenDataList = _otherObjectScreenDataList->nextPtr;
+					_edx->dataPtr = _shootLvlObjectDataList;
+					if (_shootLvlObjectDataList) {
+						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
 						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
-						warning("Nothing free in _otherObjectScreenDataList");
+						warning("Nothing free in _shootLvlObjectDataList");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3498,15 +3506,16 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	uint8_t var2C, _bl;
 	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 	uint8_t _cl = dat->unk0;
+	const uint8_t *var10;
 	if (_cl == 4) {
 		_bl = _cl;
 		var2C = (o->flags1 >> 4) & 3;
-		// var10 = byte_43E6C0 + var2C * 8;
+		var10 = byte_43E6C0 + var2C * 8;
 		// _esi = dword_43E7F0 + var2C * 16 / sizeof(uint32_t);
 	} else {
 // 40D115
 		var2C = dat->unk1;
-		// var10 = byte_43E680 + var2C * 8;
+		var10 = byte_43E680 + var2C * 8;
 		// _esi = dword_43E770 * var2C * 16 / sizeof(uint32_t;
 		_bl = (_cl != 2) ? 4 : 2;
 	}
@@ -3517,17 +3526,27 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	_edx = ((_edx << 6) & ~511) + (_edi >> 3);
 	int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
 	if (_cl >= 4) {
+		if (o->screenNum != _res->_currentScreenResourceNum) {
+			dat->y2 += 4;
+			return var30;
+		}
+
+	} else {
+// 40D2F1
+		_bl = dat->unk1;
+		uint8_t _al = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
+		int var2D = _al;
+		var2C = 0;
+
+		warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
 		// TODO
 	}
-// 40D2F1
-	_bl = dat->unk1;
-	uint8_t _al = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
-	int var2D = _al;
+// 40D384
+	const int _ecx = (o->posTable[3].x + o->xPos) & 7;
+	const uint8_t *p = _res->_resLevelData0x470CTablePtrData + _ecx;
+	dat->y2 += (int8_t)p[_screenPosTable[var2C][var4] * 8];
 
-	warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
-	// TODO
-
-	return 0;
+	return var30;
 }
 
 int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
