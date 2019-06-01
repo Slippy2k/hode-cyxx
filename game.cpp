@@ -2970,6 +2970,14 @@ static const uint8_t byte_43E710[] = {
 	0x04, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x04, 0x08, 0x02, 0x08, 0x02, 0x08
 };
 
+static const int dword_43E770[] = {
+	0, 1, 1, 1, 0, -513, -513, -513, 0, 511, 511, 511, 0, -511, -511, -511, 0, 513, 513, 513, 0, -1, -1, -1, 0, -512, -512, -512, 0, 512, 512, 512
+};
+
+static const int dword_43E7F0[] = {
+	0, 1, 512, -1, 0, -1, 512, 1, 0, 1, -512, -1, 0, -1, -512, 1
+};
+
 void Game::setupSpecialPowers(LvlObject *ptr) {
 	assert(ptr == _andyObject);
 	AndyLvlObjectData *_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
@@ -3507,16 +3515,17 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 	uint8_t _cl = dat->unk0;
 	const uint8_t *var10;
+	const int *_esi;
 	if (_cl == 4) {
 		_bl = _cl;
 		var2C = (o->flags1 >> 4) & 3;
 		var10 = byte_43E6C0 + var2C * 8;
-		// _esi = dword_43E7F0 + var2C * 16 / sizeof(uint32_t);
+		_esi = dword_43E7F0 + var2C * 16 / sizeof(uint32_t);
 	} else {
 // 40D115
 		var2C = dat->unk1;
 		var10 = byte_43E680 + var2C * 8;
-		// _esi = dword_43E770 * var2C * 16 / sizeof(uint32_t;
+		_esi = dword_43E770 + var2C * 16 / sizeof(uint32_t);
 		_bl = (_cl != 2) ? 4 : 2;
 	}
 // 40D147
@@ -3526,6 +3535,55 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	_edx = ((_edx << 6) & ~511) + (_edi >> 3);
 	int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
 	if (_cl >= 4) {
+		var2C = 0;
+		_edx += *_esi;
+		int _ebp = _edx;
+		uint8_t _cl = _screenMaskBuffer[_edx];
+		uint8_t _al = 0;
+		while ((_cl & 6) == 0) {
+			++_al;
+			var2C = _al;
+			if (var2C >= _bl) {
+				break; // goto 40D1D7;
+			}
+			_edx = _esi[var2C];
+			_cl = _screenMaskBuffer[_edx];
+		}
+		if ((_cl & 6) != 0) {
+			var2F = _al = 1;
+		}
+// 40D1DB
+		uint8_t var18 = _bl = dat->unk1;
+		if (_bl != 6 && _bl != 1 && _bl != 3) {
+			_edx = _ebp;
+			++_esi;
+			var2C = 0;
+			var30 = _screenMaskBuffer[_edx];
+			while ((var30 & 1) == 0) {
+				++var2C;
+				if (var2C >= var2E) {
+					break; // goto 40D236
+				}
+				_edx += *_esi++;
+				var30 = _screenMaskBuffer[_edx];
+			}
+			if ((var30 & 1) != 0) {
+				_al = 1;
+			} else {
+				_al = var2F;
+			}
+		}
+// 40D23E
+		if (_cl & 6) {
+			var30 = _cl;
+		}
+		if (_al == 0) {
+			return 0;
+		}
+// 40D253
+		warning("lvlObjectSpecialPowersCallbackHelper2 40D253 unimplemented");
+
+// 40D35D
 		if (o->screenNum != _res->_currentScreenResourceNum) {
 			dat->y2 += 4;
 			return var30;
@@ -3537,15 +3595,27 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 		uint8_t _al = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
 		int var2D = _al;
 		var2C = 0;
+		_edx += *_esi++;
+		uint8_t var30 = _screenMaskBuffer[_edx];
+		while ((var30 & _al) == 0) {
+			++var2C;
+			if (var2C >= var2E) {
+				return var2F;
+			}
+			_edx += *_esi++;
+			var30 = _screenMaskBuffer[_edx];
+		}
+		// goto loop3 40D253
 
 		warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
 		// TODO
 	}
 // 40D384
+/*
 	const int _ecx = (o->posTable[3].x + o->xPos) & 7;
 	const uint8_t *p = _res->_resLevelData0x470CTablePtrData + _ecx;
 	dat->y2 += (int8_t)p[_screenPosTable[var2C][var4] * 8];
-
+*/
 	return var30;
 }
 
