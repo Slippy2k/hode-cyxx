@@ -1217,7 +1217,8 @@ void Resource::loadMstData(File *fp) {
 	_mstUnk48 = (MstUnk48 *)malloc(_mstHdr.unk0x38 * sizeof(MstUnk48));
 	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
 		MstUnk48 *m = &_mstUnk48[i];
-		m->unk0 = fp->readUint32();
+		m->unk0 = fp->readUint16();
+		m->unk2 = fp->readUint16();
 		m->unk4 = fp->readByte();
 		m->unk5 = fp->readByte();
 		m->unk6 = fp->readByte();
@@ -1252,7 +1253,10 @@ void Resource::loadMstData(File *fp) {
 		}
 		MstUnk48Unk12 *m12 = (MstUnk48Unk12 *)malloc(m->countUnk12 * sizeof(MstUnk48Unk12));
 		for (int j = 0; j < m->countUnk12; ++j) {
-			m12[j].unk0  = fp->readUint32();
+			m12[j].unk0  = fp->readByte();
+			fp->readByte();
+			fp->readByte();
+			fp->readByte();
 			m12[j].data  = 0; fp->readUint32();
 			m12[j].count = fp->readUint32();
 			bytesRead += 12;
@@ -1262,10 +1266,13 @@ void Resource::loadMstData(File *fp) {
 			for (uint32_t k = 0; k < m12[j].count; ++k) {
 				uint8_t data[28];
 				fp->read(data, sizeof(data));
+				m12[j].data[k].unk0 = READ_LE_UINT32(data);
 				m12[j].data[k].unk8 = READ_LE_UINT32(data + 0x8);
 				m12[j].data[k].unkC = READ_LE_UINT32(data + 0xC);
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);
+				m12[j].data[k].unk18 = data[0x18];
 				m12[j].data[k].unk19 = data[0x19];
+				m12[j].data[k].unk1A = data[0x1A];
 				m12[j].data[k].unk1B = data[0x1B];
 				bytesRead += 28;
 			}

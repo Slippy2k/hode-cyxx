@@ -305,16 +305,17 @@ struct MstRect {
 	int num; // 16
 }; // sizeof == 0x20
 
-struct MstUnk46;
+struct MstTaskData;
 
 struct MstCollision {
-	MstUnk46 *m46; // 0x00
+	MstTaskData *m; // 0x00
 	uint32_t unk80; // 0x80
 }; // sizeof == 132
 
 struct Task;
 
 struct MstUnk35;
+struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
 struct MstUnk48Unk12Unk4;

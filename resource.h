@@ -203,21 +203,25 @@ struct MstUnk47 {
 }; // SIZEOF_MstUnk47 8
 
 struct MstUnk48Unk12Unk4 {
-	uint32_t unk8; // 0x8
-	uint32_t unkC; // 0xC
+	uint32_t unk0; // 0x0
+	uint32_t unk8; // 0x8 xPos
+	uint32_t unkC; // 0xC yPos
 	uint32_t codeData; // 0x10
+	uint8_t unk18; // 0x18
 	uint8_t unk19; // 0x19
+	uint8_t unk1A; // 0x1A screenNum
 	uint8_t unk1B; // 0x1B
 }; // sizeof == 28
 
 struct MstUnk48Unk12 {
-	uint32_t unk0;
-	MstUnk48Unk12Unk4 *data; // sizeof == 28
+	uint8_t unk0;
+	MstUnk48Unk12Unk4 *data; // 0x4 sizeof == 28
 	uint32_t count;
 }; // sizeof == 12
 
 struct MstUnk48 {
-	uint32_t unk0;
+	uint16_t unk0;
+	uint16_t unk2;
 	uint8_t unk4;
 	uint8_t unk5;
 	uint8_t unk6;
