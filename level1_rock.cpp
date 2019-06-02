@@ -390,7 +390,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 		ptr->actionKeyMask = _level1OpHelper1KeyMaskTable[index * 2 + 1];
 	}
 	if ((ptr->actionKeyMask & 4) != 0 && sameScreen && (ptr->flags0 & 0x300) == 0x300) {
-		if (clipLvlObjectsBoundingBox(_andyObject, ptr, 10)) {
+		if (clipLvlObjectsBoundingBox(_andyObject, ptr, 20)) {
 			_mstFlags |= 0x80000000;
 			setAndySpecialAnimation(0x80);
 		}
