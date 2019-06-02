@@ -1548,6 +1548,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 			if (_ecx->y1 > _ebp->y1 + coords[3] || _ecx->y2 < _ebp->y1 + coords[1]) {
 				continue;
 			}
+			break;
 		}
 		break;
 	case 2:
@@ -1558,6 +1559,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 			if (_ecx->y1 > _ebp->y2 - coords[1] || _ecx->y2 < _ebp->y2 - coords[3]) {
 				continue;
 			}
+			break;
 		}
 		break;
 	case 3:
@@ -1568,6 +1570,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 			if (_ecx->y1 > _ebp->y2 - coords[1] || _ecx->y2 < _ebp->y2 - coords[3]) {
 				continue;
 			}
+			break;
 		}
 		break;
 	default:
@@ -1578,6 +1581,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 			if (_ecx->y1 > coords[3] + _ebp->y1 || _ecx->y2 < coords[1] + _ebp->y1) {
 				continue;
 			}
+			break;
 		}
 		break;
 	}
@@ -1599,6 +1603,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 
 	obj1.x1 = o->xPos + _res->_screensBasePos[o->screenNum].u;
 	obj1.y1 = obj1.y2 = o->yPos + _res->_screensBasePos[o->screenNum].v;
+
 	obj2.x1 = ptr->xPos + _res->_screensBasePos[ptr->screenNum].u;
 	obj2.y1 = obj2.y2 = ptr->yPos + _res->_screensBasePos[ptr->screenNum].v;
 
@@ -1667,7 +1672,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		}
 		break;
 	case 3:
-		obj1.x2 = obj1.x2 + o->width - 1;
+		obj1.x2 = obj1.x1 + o->width - 1;
 		obj1.y2 += o->height - 1;
 		obj2.x2 = obj2.x1 + ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
