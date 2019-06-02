@@ -158,7 +158,7 @@ struct Game {
 	uint8_t _mstOp54Table[32];
 	bool _mstLogicDisabled;
 	LvlObject _declaredLvlObjectsList[160];
-	LvlObject *_declaredLvlObjectsListHead;
+	LvlObject *_declaredLvlObjectsListHead; // pointer to the first 'free' element
 	int _declaredLvlObjectsListCount;
 	AndyLvlObjectData _andyObjectScreenData;
 	AnimBackgroundData _animBackgroundDataTable[64];
@@ -247,7 +247,7 @@ struct Game {
 	void clearLvlObjectsList2();
 	void clearLvlObjectsList3();
 	LvlObject *addLvlObjectToList1(int type, int num);
-	int addLvlObjectToList3(int num);
+	LvlObject *addLvlObjectToList3(int num);
 	void removeLvlObject(LvlObject *ptr);
 	void removeLvlObject2(LvlObject *o);
 	void setAndySprite(int num);

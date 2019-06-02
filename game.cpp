@@ -1038,15 +1038,16 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 	return 0;
 }
 
-int Game::addLvlObjectToList3(int num) {
-	if (_res->_resLevelData0x2988PtrTable[num] == 0 && _declaredLvlObjectsListCount < 160) {
+LvlObject *Game::addLvlObjectToList3(int num) {
+	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < 160) {
 		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
 		++_declaredLvlObjectsListCount;
-		ptr->spriteNum = 1;
+		ptr->spriteNum = num;
 		ptr->type = 8;
 		_res->incLevelData0x2988RefCounter(ptr);
+		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObj = 0;
 		ptr->nextPtr = 0;
@@ -1054,7 +1055,7 @@ int Game::addLvlObjectToList3(int num) {
 		ptr->nextPtr = _lvlObjectsList3;
 		_lvlObjectsList3 = ptr;
 		ptr->callbackFuncPtr = &Game::lvlObjectList3Callback;
-		return 1;
+		return ptr;
 	}
 	return 0;
 }
@@ -1081,11 +1082,8 @@ void Game::removeLvlObject2(LvlObject *o) {
 					prev = ptr;
 					ptr = ptr->nextPtr;
 				} while (ptr && ptr != o);
-				if (!ptr) {
-					warning("removeLvlObject2 o %p is not in _lvlObjectsList1", o);
-				} else {
-					prev->nextPtr = ptr->nextPtr;
-				}
+				assert(ptr);
+				prev->nextPtr = ptr->nextPtr;
 			}
 		}
 	}
@@ -1890,13 +1888,16 @@ void Game::mixAudio(int16_t *buf, int len) {
 }
 
 void Game::updateLvlObjectList(LvlObject *list) {
-	for (LvlObject *ptr = list; ptr; ptr = ptr->nextPtr) {
+	LvlObject *ptr = list;
+	while (ptr) {
+		LvlObject *next = ptr->nextPtr; // get 'next' as callback can modify linked list (eg. remove)
 		if (ptr->callbackFuncPtr) {
 			(this->*(ptr->callbackFuncPtr))(ptr);
 		}
 		if (ptr->bitmapBits) {
 			addToSpriteList(ptr);
 		}
+		ptr = next;
 	}
 }
 
@@ -3644,59 +3645,63 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 			if (dat->unk3 != 0x80) {
 				lvlObjectSpecialPowersCallbackHelper1(o);
 			}
-			const uint8_t *p = (dat->unk0 >= 4) ? &byte_43E710[dat->unk1 * 2] : &byte_43E700[dat->unk1 * 2];
+		}
+		const uint8_t *p = (dat->unk0 >= 4) ? &byte_43E710[dat->unk1 * 2] : &byte_43E700[dat->unk1 * 2];
 // 40D97C
-			if (dat->unk3 != 0x80 && dat->counter != 0) {
-				if (addLvlObjectToList3(o->spriteNum)) {
-					LvlObject *ptr = _lvlObjectsList3;
-					ptr->anim = dat->unk1;
-					if (_rnd._rndSeed & 1) {
-						++ptr->anim;
-					}
-					ptr->frame = 0;
-					setupLvlObjectBitmap(ptr);
-					setLvlObjectPosRelativeToObject(ptr, 0, o, 7);
-					o->xPos += dat->dxPos;
-					o->yPos += dat->dyPos;
+		if (dat->unk3 != 0x80 && dat->counter != 0) {
+			if (addLvlObjectToList3(o->spriteNum)) {
+				LvlObject *ptr = _lvlObjectsList3;
+				ptr->flags0 = o->flags0;
+				ptr->flags1 = o->flags1;
+				ptr->flags2 = o->flags2;
+				ptr->screenNum = o->screenNum;
+				ptr->anim = dat->unk1;
+				if (_rnd._rndSeed & 1) {
+					++ptr->anim;
+				}
+				ptr->frame = 0;
+				setupLvlObjectBitmap(ptr);
+				setLvlObjectPosRelativeToObject(ptr, 0, o, 7);
+				ptr->xPos += dat->dxPos;
+				ptr->yPos += dat->dyPos;
+			}
+		} else {
+// 40D9FC
+			o->anim = *p;
+			if (dat->x2 >= 256) {
+				dat->x2 -= _res->_screensBasePos[o->screenNum].u;
+			}
+			if (dat->y2 >= 192) {
+				dat->y2 -= _res->_screensBasePos[o->screenNum].v;
+			}
+// 40DA3
+			// TODO
+			if (0) { // dat->0x1C
+
+			} else {
+// 40DA5E
+				if (dat->counter == 0) {
+					o->anim = 16;
+				}
+			}
+// 40DA6B
+			if (dat->unk0 >= 4) {
+				dat->unk0 = 6;
+				if (dat->dxPos <= 0) {
+					dat->x2 += 8;
+				}
+				if (dat->dyPos <= 0) {
+					dat->y2 += 8;
 				}
 			} else {
-// 40D9FC
-				o->anim = *p;
-				if (dat->x2 >= 256) {
-					dat->x2 -= _res->_screensBasePos[o->screenNum].u;
-				}
-				if (dat->y2 >= 192) {
-					dat->y2 -= _res->_screensBasePos[o->screenNum].v;
-				}
-// 40DA36
-				// TODO
-				if (0) { // dat->0x1C
-
-				} else {
-// 40DA5E
-					if (dat->counter == 0) {
-						o->anim = 16;
-					}
-				}
-// 40DA6B
-				if (dat->unk0 >= 4) {
-					dat->unk0 = 6;
-					if (dat->dxPos <= 0) {
-						dat->x2 += 8;
-					}
-					if (dat->dyPos <= 0) {
-						dat->y2 += 8;
-					}
-				} else {
-					dat->unk0 = 1;
-				}
-				dat->dxPos = 0;
-				dat->dyPos = 0;
-				o->frame = 0;
-				setupLvlObjectBitmap(o);
-				setLvlObjectPosRelativeToPoint(o, 0, dat->x2, dat->y2);
-				return 0;
+				dat->unk0 = 1;
 			}
+			dat->dxPos = 0;
+			dat->dyPos = 0;
+			o->frame = 0;
+			setupLvlObjectBitmap(o);
+			setLvlObjectPosRelativeToPoint(o, 0, dat->x2, dat->y2);
+			return 0;
 		}
 	} else if (fl == 11) {
 // 40DAB1
