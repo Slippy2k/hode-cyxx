@@ -45,6 +45,7 @@ struct Game {
 		kMaxLocals = 8,
 		kMaxMovingStates = 8,
 		kMaxShootLvlObjectData = 32,
+		kMaxSssObjects = 32,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -650,11 +651,11 @@ struct Game {
 	int runTask_unk4(Task *t);
 
 	// sound.cpp
-	SssObject _sssObjectsTable[32];
+	SssObject _sssObjectsTable[kMaxSssObjects];
 	bool _sssObjectsChanged;
 	int _sssObjectsCount;
 	SssObject *_sssObjectsList1; // playing
-	SssObject *_sssObjectsList2; // paused
+	SssObject *_sssObjectsList2; // paused/idle
 	SssObject *_lowPrioritySssObject; // point to the object in _sssObjectsList1 with the highest 'priority'
 	uint8_t _channelMixingTable[32];
 	int _playingSssObjectsMax;
@@ -678,12 +679,12 @@ struct Game {
 	void playSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
 	void setLowPrioritySoundObject(SssObject *so);
-	int getSoundObjectVolumeByPos(SssObject *so) const;
+	int getSoundObjectPanning(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
 	void expireSoundObjects(int flags);
 	void mixSoundObjects17640(bool flag);
 	void mixSoundObjects();
-	void stopSoundObjects(SssObject **sssObjectsList, int num);
+	void stopSoundObject(SssObject **sssObjectsList, int num);
 
 	// andy.cpp
 

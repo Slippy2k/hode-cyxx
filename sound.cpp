@@ -5,12 +5,12 @@
 #include "util.h"
 
 enum {
-	kFlagPlaying = 1 << 0,
-	kFlagStopped = 1 << 1, // no PCM
-	kFlagNoCode  = 1 << 2, // no bytecode
+	kFlagPlaying   = 1 << 0,
+	kFlagIdle      = 1 << 1, // no PCM
+	kFlagNoTrigger = 1 << 2, // no bytecode
 };
 
-static const bool kLimitSounds = false;
+static const bool kLimitSounds = false; // limit the number of active playing sounds
 
 static const uint8_t _dbVolumeTable[129] = {
 	0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06,
@@ -119,7 +119,7 @@ void Game::updateSoundObject(SssObject *so) {
 				return;
 			}
 			if (so->volumePtr) {
-				const int volume = getSoundObjectVolumeByPos(so);
+				const int volume = getSoundObjectPanning(so);
 				if (volume != so->volume) {
 					so->volume = volume;
 					_sssObjectsChanged = true;
@@ -149,7 +149,7 @@ void Game::updateSoundObject(SssObject *so) {
 	} else if ((so->flags & 1) == 0) {
 		goto flag_case0;
 	} else if (so->volumePtr) {
-		const int volume = getSoundObjectVolumeByPos(so);
+		const int volume = getSoundObjectPanning(so);
 		if (volume != so->volume) {
 			so->volume = volume;
 			_sssObjectsChanged = true;
@@ -601,7 +601,7 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	// if (!_sss_enabled) return;
 	int minIndex = -1;
 	int minPriority = -1;
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < kMaxSssObjects; ++i) {
 		if (!_sssObjectsTable[i].pcm) {
 // 42A2FA
 			minPriority = 0;
@@ -915,7 +915,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 				if (_currentSoundLvlObject) {
 					_currentSoundLvlObject->sssObj = so;
 					so->volumePtr = &_snd_volumeMax;
-					so->volume = getSoundObjectVolumeByPos(so);
+					so->volume = getSoundObjectPanning(so);
 				} else {
 					so->volumePtr = 0;
 					so->volume = 64;
@@ -1091,7 +1091,7 @@ void Game::clearSoundObjects() {
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;
 	_lowPrioritySssObject = 0;
-	for (size_t i = 0; i < ARRAYSIZE(_sssObjectsTable); ++i) {
+	for (int i = 0; i < kMaxSssObjects; ++i) {
 		_sssObjectsTable[i].num = i;
 	}
 	_sssObjectsCount = 0;
@@ -1139,7 +1139,7 @@ void Game::setLowPrioritySoundObject(SssObject *so) {
 	}
 }
 
-int Game::getSoundObjectVolumeByPos(SssObject *so) const { // getSoundObjectPanning
+int Game::getSoundObjectPanning(SssObject *so) const {
 	LvlObject *obj = so->lvlObject;
 	if (obj) {
 		switch (obj->type) {
@@ -1326,7 +1326,7 @@ void Game::mixSoundObjects() {
 	}
 }
 
-void Game::stopSoundObjects(SssObject **sssObjectsList, int num) {
+void Game::stopSoundObject(SssObject **sssObjectsList, int num) {
 	bool found = false;
 	SssPcm *pcm = &_res->_sssPcmTable[num];
 	SssObject *current = *sssObjectsList;
@@ -1342,7 +1342,7 @@ void Game::stopSoundObjects(SssObject **sssObjectsList, int num) {
 			} else {
 				*sssObjectsList = next;
 			}
-			if (sssObjectsList != &_sssObjectsList1) {
+			if (sssObjectsList == &_sssObjectsList1) {
 				--_playingSssObjectsCount;
 				if (kLimitSounds) {
 					if (current == _lowPrioritySssObject || (_playingSssObjectsCount >= _playingSssObjectsMax && _lowPrioritySssObject == 0)) {
