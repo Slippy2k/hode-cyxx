@@ -1721,6 +1721,31 @@ int Game::clipLvlObjectsSmall(LvlObject *o1, LvlObject *o2, int type) {
 	return clipLvlObjectsBoundingBox(&tmpObject, o2, type);
 }
 
+int Game::restoreAndyCollidesSprite21() {
+	int ret = 0;
+	if (_lvlObjectsList1 && !_hideAndyObjectSprite && (_mstFlags & 0x80000000) == 0) {
+		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		for (LvlObject *o = _lvlObjectsList1; o; o = o->nextPtr) {
+			if (o->spriteNum == 21) {
+				if (o->screenNum != _res->_currentScreenResourceNum) {
+					BoundingBox b;
+					b.x1 = o->xPos + o->posTable[0].x;
+					b.x2 = o->xPos + o->posTable[1].x;
+					b.y1 = o->yPos + o->posTable[0].y;
+					b.y2 = o->yPos + o->posTable[1].y;
+					if (!clipBoundingBox(&data->boundingBox, &b)) {
+						ret = clipLvlObjectsBoundingBox(_andyObject, o, 68);
+						if (ret) {
+							setAndySpecialAnimation(0xA3);
+						}
+					}
+				}
+			}
+		}
+	}
+	return ret;
+}
+
 int Game::updateAndyLvlObject() {
 	if (!_andyObject) {
 		return 0;
