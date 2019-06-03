@@ -270,7 +270,7 @@ struct Game {
 	int updateAndyLvlObject();
 	void drawPlasmaCannon();
 	void drawScreen();
-	void updateLvlObjectList(LvlObject *list);
+	void updateLvlObjectList(LvlObject **list);
 	void updateLvlObjectLists();
 	LvlObject *updateAnimatedLvlObjectType0(LvlObject *ptr);
 	LvlObject *updateAnimatedLvlObjectType1(LvlObject *ptr);

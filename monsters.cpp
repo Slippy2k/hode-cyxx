@@ -1623,6 +1623,7 @@ void Game::mstUpdateRefPos() {
 		MovingOpcodeState *p = _mstMovingState;
 		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
 			p->o = o;
+			assert(o->dataPtr);
 			ShootLvlObjectData *ptr = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 			p->unk28 = ptr;
 			if (ptr->unk3 == 0x80) {

@@ -1892,14 +1892,14 @@ void Game::mixAudio(int16_t *buf, int len) {
 	_mix.mix(buf, len);
 }
 
-void Game::updateLvlObjectList(LvlObject *list) {
-	LvlObject *ptr = list;
+void Game::updateLvlObjectList(LvlObject **list) {
+	LvlObject *ptr = *list;
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr; // get 'next' as callback can modify linked list (eg. remove)
 		if (ptr->callbackFuncPtr) {
 			(this->*(ptr->callbackFuncPtr))(ptr);
 		}
-		if (ptr->bitmapBits) {
+		if (ptr->bitmapBits && list != &_lvlObjectsList3) {
 			addToSpriteList(ptr);
 		}
 		ptr = next;
@@ -1907,10 +1907,10 @@ void Game::updateLvlObjectList(LvlObject *list) {
 }
 
 void Game::updateLvlObjectLists() {
-	updateLvlObjectList(_lvlObjectsList0);
-	updateLvlObjectList(_lvlObjectsList1);
-	updateLvlObjectList(_lvlObjectsList2);
-	updateLvlObjectList(_lvlObjectsList3);
+	updateLvlObjectList(&_lvlObjectsList0);
+	updateLvlObjectList(&_lvlObjectsList1);
+	updateLvlObjectList(&_lvlObjectsList2);
+	updateLvlObjectList(&_lvlObjectsList3);
 }
 
 LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
@@ -2687,12 +2687,10 @@ void Game::removeLvlObjectFromList(LvlObject **list, LvlObject *ptr) {
 			*list = ptr->nextPtr;
 		} else {
 			LvlObject *prev = 0;
-			if (current != ptr) {
-				do {
-					prev = current;
-					current = current->nextPtr;
-				} while (current && current != ptr);
-			}
+			do {
+				prev = current;
+				current = current->nextPtr;
+			} while (current && current != ptr);
 			assert(prev);
 			prev->nextPtr = current->nextPtr;
 		}
@@ -3105,7 +3103,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
-					_edx->flags &= ~0x30;
+					_edx->flags1 &= ~0x30;
 					_edx->screenNum = ptr->screenNum;
 					_edx->anim = 7;
 					_edx->frame = 0;
@@ -3153,7 +3151,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
-					_edx->flags &= 0xFFCF;
+					_edx->flags1 &= ~0x30;
 					_edx->screenNum = ptr->screenNum;
 					_edx->anim = 7;
 					_edx->frame = 0;
@@ -3193,7 +3191,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
-					_edx->flags &= 0xFFCF;
+					_edx->flags1 &= ~0x30;
 					_edx->screenNum = ptr->screenNum;
 					_edx->anim = 7;
 					_edx->frame = 0;
@@ -3414,7 +3412,8 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 }
 
 int Game::lvlObjectList3Callback(LvlObject *o) {
-	if ((o->spriteNum <= 7 && (o->flags0 & 0x1F) == 0xB) || (o->flags0 & 0xFF) == 0x1F) {
+	const uint8_t flags = o->flags0 & 0xFF;
+	if ((o->spriteNum <= 7 && (flags & 0x1F) == 0xB) || (o->spriteNum > 7 && flags == 0x1F)) {
 		if (_lvlObjectsList3 && o) {
 			if (o != _lvlObjectsList3) {
 				LvlObject *prev = 0;
@@ -3434,7 +3433,6 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 			o->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = o;
-		} else {
 			switch (o->spriteNum) {
 			case 0:
 			case 2:
@@ -3660,7 +3658,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 				ptr->flags1 = o->flags1;
 				ptr->flags2 = o->flags2;
 				ptr->screenNum = o->screenNum;
-				ptr->anim = dat->unk1;
+				ptr->anim = p[1];
 				if (_rnd._rndSeed & 1) {
 					++ptr->anim;
 				}
@@ -3672,7 +3670,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 			}
 		} else {
 // 40D9FC
-			o->anim = *p;
+			o->anim = p[0];
 			if (dat->x2 >= 256) {
 				dat->x2 -= _res->_screensBasePos[o->screenNum].u;
 			}
