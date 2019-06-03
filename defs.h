@@ -116,7 +116,7 @@ struct LvlObjectData {
 	uint8_t *animsInfoData; // 0x10, LevelSprAnimInfo
 	uint8_t *movesData; // 0x14, LvlSprMoveData
 	uint8_t *framesData; // 0x18
-/*	uint32_t framesDataOffset; */ // 0x1C, not needed
+	uint32_t framesDataOffset; // 0x1C, not needed
 	uint8_t *animsData; // 0x20
 	uint8_t *coordsData; // 0x24
 	uint8_t *hotspotsData; // 0x28, LvlSprHotspotData
@@ -140,7 +140,7 @@ struct LvlObject {
 	uint16_t flags2; // spriteType
 	uint8_t objectUpdateType;
 	uint8_t hitCount;
-	LvlObject *linkObjPtr; // attachedLvlObject, plasma cannon object for _andyObject
+	LvlObject *childPtr; // _andyObject : plasma cannon object or specialAnimation
 	uint16_t width;
 	uint16_t height;
 	uint8_t actionKeyMask;
@@ -152,10 +152,6 @@ struct LvlObject {
 	const uint8_t *bitmapBits;
 	int (Game::*callbackFuncPtr)(LvlObject *ptr);
 	void *dataPtr;
-// ptr->data0x2988==0:AndyLvlObjectData
-// ptr->type==0: AnimBackgroundData * / _animBackgroundDataTable
-// ptr->type==1: _resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
-// ptr->type==8(_andyObject): &_gameUnkList1Element
 	SssObject *sssObj; // 0x34
 	LvlObjectData *levelData0x2988;
 	Point16_t posTable[8];

@@ -372,7 +372,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 	} else if (i > 31) {
 		i = 31;
 	}
-	LvlObject *o = ptr->linkObjPtr;
+	LvlObject *o = ptr->childPtr;
 	assert(o);
 	ptr->directionKeyMask = p[32 + i];
 	if (ptr->directionKeyMask != 0x80) {
@@ -401,7 +401,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 		}
 	}
 	if (_plasmaCannonDirection && (ptr->flags0 & 0x1F) != 0xB) {
-		if (level1OpHelper2(ptr->linkObjPtr) != 0) {
+		if (level1OpHelper2(ptr->childPtr) != 0) {
 			ptr->actionKeyMask |= 0x20;
 			++ptr->hitCount;
 			if (ptr->hitCount > p[65]) {
@@ -409,7 +409,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 				ptr->actionKeyMask |= 7;
 			}
 			_plasmaCannonExplodeFlag = 1;
-			_plasmaCannonObject = ptr->linkObjPtr;
+			_plasmaCannonObject = ptr->childPtr;
 		}
 	}
 	o->directionKeyMask = ptr->directionKeyMask;
@@ -473,7 +473,7 @@ int Game::objectUpdate_rock_case2(LvlObject *o) {
 		}
 	} else {
 		o->bitmapBits = 0;
-		o = o->linkObjPtr;
+		o = o->childPtr;
 		assert(o);
 		o->anim = 0;
 		o->frame = 0;
@@ -491,7 +491,7 @@ int Game::objectUpdate_rock_case3(LvlObject *o) {
 
 int Game::objectUpdate_rock_case4(LvlObject *o) {
 	updateAndyObject(o);
-	updateAndyObject(o->linkObjPtr);
+	updateAndyObject(o->childPtr);
 	return 1;
 }
 

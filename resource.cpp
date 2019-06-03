@@ -156,7 +156,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->hitCount = _lvlFile->readByte();
 	const uint32_t objRef = _lvlFile->readUint32();
 	if (objRef) {
-		dat->linkObjPtr = &_dummyObject;
+		dat->childPtr = &_dummyObject;
 		debug(kDebug_RESOURCE, "loadLvlObj num %d linkObjRef 0x%x", num, objRef);
 	}
 	dat->width = _lvlFile->readUint16();
@@ -231,6 +231,7 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 	}
 	dat->refCount = 0xFF;
 	dat->framesData = (framesDataOffset == 0) ? 0 : base + framesDataOffset;
+	dat->framesDataOffset = framesDataOffset;
 	dat->hotspotsData = (hotspotsDataOffset == 0) ? 0 : base + hotspotsDataOffset;
 	dat->movesData = (movesDataOffset == 0) ? 0 : base + movesDataOffset;
 	dat->animsData = (animsDataOffset == 0) ? 0 : base + animsDataOffset;

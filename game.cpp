@@ -1147,7 +1147,7 @@ void Game::setupAndyLvlObject() {
 	if (dat[9] != ptr->spriteNum) {
 		setAndySprite(dat[9]);
 	}
-	ptr->linkObjPtr = 0;
+	ptr->childPtr = 0;
 	ptr->xPos = (int16_t)READ_LE_UINT16(dat + 0);
 	ptr->yPos = (int16_t)READ_LE_UINT16(dat + 2);
 	ptr->flags2 = READ_LE_UINT16(dat + 4);
@@ -2042,7 +2042,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	uint8_t _al = ptr->spriteNum;
 	o = next = ptr->nextPtr;
 	if ((_al > 15 && ptr->dataPtr == 0) || ptr->levelData0x2988 == 0) {
-		if (ptr->linkObjPtr) {
+		if (ptr->childPtr) {
 			o = ptr->nextPtr;
 		}
 		return o;
@@ -2254,7 +2254,7 @@ void Game::updateAndyMonsterObjects() {
 			_mstOriginPosX += _specialAnimLvlObject->posTable[6].x + _specialAnimLvlObject->xPos;
 			_mstOriginPosY += _specialAnimLvlObject->posTable[6].y + _specialAnimLvlObject->yPos;
 		}
-		ptr->linkObjPtr = 0;
+		ptr->childPtr = 0;
 		break;
 	case 7: // grab the line in 'fort' screen #1
 		_hideAndyObjectSprite = true;
@@ -2262,10 +2262,10 @@ void Game::updateAndyMonsterObjects() {
 			assert(_specialAnimLvlObject);
 			_mstOriginPosX += _specialAnimLvlObject->posTable[6].x + _specialAnimLvlObject->xPos;
 			_mstOriginPosY += _specialAnimLvlObject->posTable[6].y + _specialAnimLvlObject->yPos;
-			ptr->linkObjPtr = _specialAnimLvlObject;
+			ptr->childPtr = _specialAnimLvlObject;
 			ptr->screenNum = _specialAnimLvlObject->screenNum;
 		} else {
-			ptr->linkObjPtr = 0;
+			ptr->childPtr = 0;
 		}
 		break;
 	case 10:
@@ -3248,7 +3248,7 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 		} else if ((ptr->flags1 & 6) == 2) {
 			ptr->yPos += calcScreenMaskDy(ptr->posTable[7].x + ptr->xPos, ptr->posTable[7].y + ptr->yPos, ptr->screenNum);
 		}
-	} else if (ptr->linkObjPtr) {
+	} else if (ptr->childPtr) {
 		assert(_specialAnimLvlObject);
 		if (_specialAnimLvlObject->screenNum != ptr->screenNum) {
 			setLvlObjectPosRelativeToObject(ptr, 3, _specialAnimLvlObject, 6);
@@ -3919,9 +3919,9 @@ void Game::initLvlObjects() {
 		case 2:
 			if (prevLvlObj == &_res->_dummyObject) {
 				prevLvlObj = 0;
-				ptr->linkObjPtr = ptr->nextPtr;
+				ptr->childPtr = ptr->nextPtr;
 			} else {
-				prevLvlObj = ptr->linkObjPtr;
+				prevLvlObj = ptr->childPtr;
 			}
 			break;
 		}
