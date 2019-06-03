@@ -271,6 +271,7 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 	case 14:
 	case 18:
 		warning("callLevel_postScreenUpdate_lar1 %d unimplemented", num);
+		// TODO
 		break;
 	}
 }
@@ -406,8 +407,17 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 	case 6:
 		preScreenUpdate_lar1_screen6();
 		break;
+	case 8:
+		// TODO
+		break;
+	case 10:
+		// TODO
+		break;
 	case 11:
 		preScreenUpdate_lar1_screen11();
+		break;
+	case 12:
+		// TODO
 		break;
 	case 13:
 		preScreenUpdate_lar1_screen13();
@@ -415,11 +425,26 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 	case 14:
 		preScreenUpdate_lar1_screen14();
 		break;
+	case 15:
+		// TODO
+		break;
 	case 16:
 		preScreenUpdate_lar1_screen16();
 		break;
+	case 17:
+		// TODO
+		break;
+	case 18:
+		// TODO
+		break;
+	case 19:
+		// TODO
+		break;
 	case 20:
 		preScreenUpdate_lar1_screen20();
+		break;
+	case 23:
+		// TODO
 		break;
 	case 24:
 		preScreenUpdate_lar1_screen24();

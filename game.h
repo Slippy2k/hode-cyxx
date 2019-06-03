@@ -432,10 +432,16 @@ struct Game {
 	// level4_isld.cpp
 	void postScreenUpdate_isld_screen0();
 	void postScreenUpdate_isld_screen1();
+	void postScreenUpdate_isld_screen2();
 	void postScreenUpdate_isld_screen3();
 	void postScreenUpdate_isld_screen4();
 	void postScreenUpdate_isld_screen8();
 	void postScreenUpdate_isld_screen9();
+	void postScreenUpdate_isld_screen13();
+	void postScreenUpdate_isld_screen15();
+	void postScreenUpdate_isld_screen19();
+	void postScreenUpdate_isld_screen20();
+	void postScreenUpdate_isld_screen21();
 	void callLevel_postScreenUpdate_isld(int num);
 
 	void preScreenUpdate_isld_screen1();

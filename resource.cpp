@@ -350,7 +350,7 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 	dat->dataUnk1Count = *src++;
 	dat->currentDataUnk1Id = *src++;
 	dat->dataUnk2Count = *src++;
-	dat->unk7 = *src++;
+	dat->currentSoundId = *src++;
 	dat->dataUnk3Count = *src++;
 	dat->unk9 = *src++;
 	dat->dataUnk45Count = *src++;
