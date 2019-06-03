@@ -658,11 +658,16 @@ void Game::destroyLvlObjectPlasmaExplosion(LvlObject *o) {
 	AndyLvlObjectData *l = (AndyLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeAndy);
 	if (l->shootLvlObject) {
 		l->shootLvlObject = 0;
+
 		assert(_plasmaExplosionObject);
-		removeLvlObjectFromList(&_plasmaExplosionObject, _plasmaExplosionObject->nextPtr);
-		destroyLvlObject(_plasmaExplosionObject->nextPtr);
-		removeLvlObjectFromList(&_plasmaExplosionObject, _plasmaExplosionObject);
-		destroyLvlObject(_plasmaExplosionObject);
+
+		LvlObject *ptr = _plasmaExplosionObject->nextPtr;
+		removeLvlObjectFromList(&_plasmaExplosionObject, ptr);
+		destroyLvlObject(ptr);
+
+		ptr = _plasmaExplosionObject;
+		removeLvlObjectFromList(&_plasmaExplosionObject, ptr);
+		destroyLvlObject(ptr);
 	}
 }
 
@@ -699,10 +704,7 @@ uint8_t Game::shuffleFlags(uint8_t *p) {
 }
 
 void Game::destroyLvlObject(LvlObject *o) {
-	if (!o) {
-		warning("destroyLvlObject called with NULL lvlObject");
-		return;
-	}
+	assert(o);
 	if (o->type == 8) {
 		_res->decLevelData0x2988RefCounter(o);
 		o->nextPtr = _declaredLvlObjectsListHead;
@@ -2746,6 +2748,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 	return o->dataPtr;
 }
 
+// Andy
 void Game::lvlObjectType0Init(LvlObject *ptr) {
 	uint8_t num = ptr->spriteNum;
 	if (_currentLevel == kLvl_rock && _levelCheckpoint >= 5) {
@@ -2763,6 +2766,7 @@ void Game::lvlObjectType0Init(LvlObject *ptr) {
 	memset(&_andyObjectScreenData, 0, sizeof(_andyObjectScreenData));
 }
 
+// Plasma cannon explosion
 void Game::lvlObjectType1Init(LvlObject *ptr) {
 	AndyLvlObjectData *dataPtr = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 	if (dataPtr->shootLvlObject) {
@@ -2800,7 +2804,7 @@ void Game::lvlObjectTypeInit(LvlObject *o) {
 	case 2: // Andy
 		lvlObjectType0Init(o);
 		break;
-	case 1:
+	case 1: // plasma cannon explosion
 		lvlObjectType1Init(o);
 		break;
 	default:
