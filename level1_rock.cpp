@@ -56,7 +56,7 @@ void Game::postScreenUpdate_rock_screen4() {
 			}
 			assert(_plasmaExplosionObject);
 			_plasmaExplosionObject->screenNum = _res->_currentScreenResourceNum;
-			_plasmaCannonExplodeFlag = 1;
+			_plasmaCannonExplodeFlag = true;
 			if (_shakeScreenDuration == 0) {
 				setShakeScreen(3, 2);
 			} else {
@@ -408,7 +408,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 				ptr->hitCount = 0;
 				ptr->actionKeyMask |= 7;
 			}
-			_plasmaCannonExplodeFlag = 1;
+			_plasmaCannonExplodeFlag = true;
 			_plasmaCannonObject = ptr->childPtr;
 		}
 	}

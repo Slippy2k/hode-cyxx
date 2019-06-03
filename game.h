@@ -111,7 +111,7 @@ struct Game {
 	uint8_t _plasmaCannonPrevDirection;
 	uint8_t _plasmaCannonPointsSetupCounter;
 	uint8_t _plasmaCannonLastIndex1;
-	uint8_t _plasmaCannonExplodeFlag;
+	bool _plasmaCannonExplodeFlag;
 	uint8_t _plasmaCannonPointsMask;
 	uint8_t _plasmaCannonFirstIndex;
 	uint8_t _plasmaCannonLastIndex2;
@@ -691,7 +691,7 @@ struct Game {
 	int32_t _andyPosX;
 	int32_t _andyPosY;
 	uint8_t _andyMoveMask;
-	uint8_t _andyUpdatePositionFlag;
+	bool _andyUpdatePositionFlag;
 	const Point16_t *_andyLevelData0x288PosTablePtr;
 	uint8_t _andyMoveState[32];
 	int _andyMaskBufferPos1;

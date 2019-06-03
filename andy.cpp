@@ -1402,7 +1402,7 @@ int Game::moveAndyObjectOp4(int op) {
 	case 4:
 		return _rnd.getNextNumber() >= 90;
 	case 5:
-		_andyUpdatePositionFlag = 1;
+		_andyUpdatePositionFlag = true;
 		return 1;
 	default:
 		error("moveAndyObjectOp4 op %d", op);
@@ -1502,7 +1502,7 @@ void Game::setupAndyObjectMoveState() {
 }
 
 void Game::updateAndyObject(LvlObject *ptr) {
-	_andyUpdatePositionFlag = 0;
+	_andyUpdatePositionFlag = false;
 	int xPos = 0;
 	int yPos = 0;
 	int mask = 0;

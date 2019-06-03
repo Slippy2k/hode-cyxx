@@ -1125,7 +1125,7 @@ void Game::setAndySprite(int num) {
 		destroyLvlObjectPlasmaExplosion(_andyObject);
 		_plasmaCannonDirection = 0;
 		_plasmaCannonLastIndex1 = 0;
-		_plasmaCannonExplodeFlag = 0;
+		_plasmaCannonExplodeFlag = false;
 		_plasmaCannonPointsMask = 0;
 		_plasmaCannonObject = 0;
 		setLvlObjectType8Resource(_andyObject, 8, 2);
@@ -1799,7 +1799,7 @@ void Game::drawPlasmaCannon() {
 	} while (index <= lastIndex);
 	_plasmaCannonLastIndex1 = 0;
 	_plasmaCannonPointsMask = 0;
-	_plasmaCannonExplodeFlag = 0;
+	_plasmaCannonExplodeFlag = false;
 	_plasmaCannonObject = 0;
 }
 
@@ -2206,7 +2206,7 @@ void Game::updatePlasmaCannonExplosionLvlObject(LvlObject *ptr) {
 		if ((_andyObject->flags0 & 0x1F) == 4 && (_andyObject->flags0 & 0xE0) == 0xC0) {
 			ptr->directionKeyMask = 1;
 		}
-		if (_plasmaCannonExplodeFlag == 1) {
+		if (_plasmaCannonExplodeFlag) {
 			ptr->actionKeyMask = 4;
 			if ((_rnd._rndSeed & 1) != 0 && addLvlObjectToList3(1)) {
 				_lvlObjectsList3->flags0 = _andyObject->flags0;
@@ -2237,7 +2237,7 @@ void Game::resetPlasmaCannonState() {
 	_plasmaCannonPrevDirection = 0;
 	_plasmaCannonPointsSetupCounter = 0;
 	_plasmaCannonLastIndex1 = 0;
-	_plasmaCannonExplodeFlag = 0;
+	_plasmaCannonExplodeFlag = false;
 	_plasmaCannonPointsMask = 0;
 	_plasmaCannonFirstIndex = 16;
 	_plasmaCannonLastIndex2 = 16;
