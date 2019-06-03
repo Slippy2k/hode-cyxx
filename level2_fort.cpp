@@ -230,8 +230,6 @@ void Game::preScreenUpdate_fort_screen16() {
 
 void Game::preScreenUpdate_fort_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
-		warning("preScreenUpdate_fort_screen17 unimplemented key inputs");
-		// TODO
 		_res->_screensState[17].s0 = _screenCounterTable[17] == 0 ? 1 : 0;
 	}
 }
