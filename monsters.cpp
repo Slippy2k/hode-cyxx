@@ -3649,7 +3649,6 @@ l1:
 				int var10 = varC->unk80;
 				if (var10 > 0) {
 					MstCollision *var20 = varC;
-					assert(var10 == 1);
 					for (int j = 0; j < var10; ++j, var20 += 4) {
 						MstTaskData *m = var20->m;
 						if (_op54Data[m->soundType] == 0 && (m12u4->unk1A < 0 || m->o16->screenNum == m12u4->unk1A)) {
@@ -3689,11 +3688,18 @@ l1:
 						}
 					}
 // 41DD80
+					if (var34 != -1) {
+// 41DDEE
+						// m12u4->unk1B =
+						// TODO
+						break;
+					}
 				}
 // 41DDA7
 				if (var1C != 2 || var4C == 1) {
 					return false;
 				}
+				_edi = 1;
 				var4C = _edi;
 				goto l1; // goto 41DB85
 			}

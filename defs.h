@@ -304,6 +304,7 @@ struct MstRect {
 struct MstTaskData;
 
 struct MstCollision {
+	uint8_t unk20; // 0x20
 	MstTaskData *m; // 0x00
 	uint32_t unk80; // 0x80
 }; // sizeof == 132
