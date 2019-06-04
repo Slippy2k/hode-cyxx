@@ -3369,9 +3369,6 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		}
 		updateAndyObject(ptr);
 		setLvlObjectPosInScreenGrid(ptr, 7);
-		if ((ptr->flags1 & 6) == 2) {
-			ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
-		}
 	} else {
 		const void *dataPtr = ptr->dataPtr;
 		if (!dataPtr) {
@@ -3432,10 +3429,10 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 				playSound(o->currentSound, o, _ebx, var4);
 			}
 		}
+	}
 // 402C8B
-		if ((ptr->flags1 & 6) == 2) {
-			ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
-		}
+	if ((ptr->flags1 & 6) == 2) {
+		ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[5].x, ptr->yPos + ptr->posTable[5].y, ptr->screenNum);
 	}
 	return 0;
 }

@@ -198,12 +198,13 @@ void Game::initMstTaskDataType2(Task *t) {
 	}
 }
 
+// set lvlObject position from monster position
 void Game::updateMstLvlObjectPos(MstTaskData *m) {
 	LvlObject *o = m->o16;
 	o->xPos = m->xPos - o->posTable[7].x;
 	o->yPos = m->yPos - o->posTable[7].y;
-	m->xMstPos = _res->_mstPointOffsets[o->screenNum].xOffset;
-	m->yMstPos = _res->_mstPointOffsets[o->screenNum].yOffset;
+	m->xMstPos = m->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
+	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 }
 
 bool Game::updateMstTaskDataPositionHelper(MstTaskData *m) {
@@ -991,7 +992,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 				uint8_t _bl = m->flags49 | _al;
 				o->directionKeyMask = _bl;
 				if ((m->unk8[946] & 2) != 0) {
-					if (_edi == 160 && (_mstLut1[_al] & 1) != 0) {
+					if (_edi == 160 && (_mstLut1[_bl] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
 							o->directionKeyMask = _bl & ~5;
 						} else {
