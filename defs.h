@@ -19,6 +19,19 @@ enum {
 };
 
 enum {
+	kActionKeyMaskRun   = 0x1,
+	kActionKeyMaskJump  = 0x2,
+	kActionKeyMaskShoot = 0x4
+};
+
+enum {
+	kDirectionKeyMaskUp    = 0x1, // climb
+	kDirectionKeyMaskRight = 0x2,
+	kDirectionKeyMaskDown  = 0x4, // crouch
+	kDirectionKeyMaskLeft  = 0x8
+};
+
+enum {
 	kLvl_rock, // 0
 	kLvl_fort,
 	kLvl_pwr1,
