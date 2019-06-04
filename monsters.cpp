@@ -3015,6 +3015,14 @@ int Game::runTask_default(Task *t) {
 		case 211: // 58
 			executeMstOp58(t, READ_LE_UINT16(p + 2));
 			break;
+		case 214: { // 61 - reset_monster_energy
+				MstTaskData *m = t->dataPtr;
+				if (m) {
+					m->flagsA5 &= ~0xC0;
+					m->localVars[7] = m->unk4->energy;
+				}
+			}
+			break;
 		case 215: { // 62
 				if (_mstOp54Unk3 != -1) {
 					assert(_mstOp54Unk3 < _res->_mstHdr.unk0x24);
@@ -4679,7 +4687,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 		m->unk4 = m1;
 		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;
 
-		m->localVars[7] = m1->unkC; // energy
+		m->localVars[7] = m1->energy;
 
 		if (m1->indexUnk51 == kNone) {
 			m->flags48 &= ~4;
