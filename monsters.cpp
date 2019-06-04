@@ -798,14 +798,22 @@ void Game::startMstCode() {
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
 		offset += 948;
-		_res->_mstHeightMapData[offset - 0x20] = _mstPosX - _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x1C] = _mstPosX + _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x24] = _res->_mstHeightMapData[offset - 0x20] - _res->_mstHeightMapData[offset - 0x34];
-		_res->_mstHeightMapData[offset - 0x18] = _res->_mstHeightMapData[offset - 0x1C] + _res->_mstHeightMapData[offset - 0x34];
-		_res->_mstHeightMapData[offset - 0x10] = _mstPosY - _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x0C] = _mstPosY + _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x14] = _res->_mstHeightMapData[offset - 0x10] - _res->_mstHeightMapData[offset - 0x34];
-		_res->_mstHeightMapData[offset - 0x08] = _res->_mstHeightMapData[offset - 0x0C] + _res->_mstHeightMapData[offset - 0x34];
+		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]);
+		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]);
+
+		const uint32_t unk20 = _mstPosX - unk30;
+		const uint32_t unk1C = _mstPosX + unk30;
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x20], unk20);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x1C], unk1C);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x24], unk20 - unk34);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x18], unk1C + unk34);
+
+		const uint32_t unk10 = _mstPosY - unk30;
+		const uint32_t unk0C = _mstPosY + unk30;
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x10], unk10);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x0C], unk0C);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x14], unk10 - unk34);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x08], unk0C + unk34);
 	}
 	if (_levelCheckpoint < _res->_mstHdr.unk0x14) {
 		const uint32_t codeData = _res->_mstScreenInitCodeData[_levelCheckpoint];
@@ -1379,6 +1387,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 					}
 
 					if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
+						// attack
 						resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
 						executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
 						return 0;
@@ -1446,7 +1455,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 // 418C73
 			m->flagsA6 |= 1;
 			if (executeMstUnk2(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
-				if (_mstCurrentPosX > m->xMstPos && (_mstCurrentPosX < m->unkC->unk2C[1] || _mstCurrentPosX < m->unkC->unk34[1])) {
+				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->unkC->unk2C[1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->unkC->unk34[1])) {
 					uint32_t indexUnk35 = m->unkC->indexUnk35_20;
 					if (indexUnk35 != kNone) {
 						m->m35 = &_res->_mstUnk35[indexUnk35];
@@ -1699,6 +1708,7 @@ void Game::mstUpdateRefPos() {
 	}
 }
 
+// update monster bounding box
 void Game::updateMstHeightMapData() {
 	const int _mstPosDx = _mstPosX - _mstPrevPosX;
 	const int _mstPosDy = _mstPosY - _mstPrevPosY;
@@ -1710,14 +1720,22 @@ void Game::updateMstHeightMapData() {
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
 		offset += 948;
-		_res->_mstHeightMapData[offset - 0x20] = _mstPosX - _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x1C] = _mstPosX + _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x24] = _res->_mstHeightMapData[offset - 0x20] - _res->_mstHeightMapData[offset - 0x34];
-		_res->_mstHeightMapData[offset - 0x18] = _res->_mstHeightMapData[offset - 0x1C] + _res->_mstHeightMapData[offset - 0x34];
-		_res->_mstHeightMapData[offset - 0x10] = _mstPosY - _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x0C] = _mstPosY + _res->_mstHeightMapData[offset - 0x30];
-		_res->_mstHeightMapData[offset - 0x14] = _res->_mstHeightMapData[offset - 0x10] - _res->_mstHeightMapData[offset - 0x34];
-		_res->_mstHeightMapData[offset - 0x08] = _res->_mstHeightMapData[offset - 0x0C] + _res->_mstHeightMapData[offset - 0x34];
+		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]);
+		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]);
+
+		const uint32_t unk20 = _mstPosX - unk30;
+		const uint32_t unk1C = _mstPosX + unk30;
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x20], unk20);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x1C], unk1C);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x24], unk20 - unk34);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x18], unk1C + unk34);
+
+		const uint32_t unk10 = _mstPosY - unk30;
+		const uint32_t unk0C = _mstPosY + unk30;
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x10], unk10);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x0C], unk0C);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x14], unk10 - unk34);
+		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x08], unk0C + unk34);
 	}
 }
 
@@ -1785,6 +1803,7 @@ void Game::stopMstTaskData(Task *t, Task **tasksList) {
 	}
 }
 
+// attack
 void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
 	MstTaskData *m = t->dataPtr;
 	m->flagsA5 = (m->flagsA5 & ~0x70) | flags;
@@ -3610,7 +3629,7 @@ bool Game::checkMstOp54Helper(MstUnk48 *m48, uint8_t flag) {
 	int var28 = 0;
 	int var18 = 0;
 	int _edi = 0;
-	for (int i = 0; i < m48->countUnk12; ++i) {
+	for (int i = 0; i < m48->countUnk12 && 0; ++i) { // TODO
 		MstUnk48Unk12 *m12 = &m48->unk12[i];
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
@@ -4650,7 +4669,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 		m->m35 = 0;
 		m->flagsA6 = 0;
 
-		assert(arg1C >= 0 && arg1C < _res->_mstUnk42[arg24].count2);
+		assert(arg1C >= 0 && arg1C < _res->_mstUnk42[arg24].count1);
 		const int j = _res->_mstUnk42[arg24].indexUnk46[arg1C];
 		assert(j >= 0 && j < _res->_mstHdr.unk0x30);
 		MstUnk46 *m46 = &_res->_mstUnk46[j];

@@ -1199,10 +1199,10 @@ void Resource::loadMstData(File *fp) {
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
 		fp->readUint32();
 		_mstUnk46[i].count = fp->readUint32();
-		_mstUnk46[i].data  = (MstUnk46Unk1 *)malloc(_mstUnk46[i].count * sizeof(MstUnk46Unk1));
 		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
+		_mstUnk46[i].data  = (MstUnk46Unk1 *)malloc(_mstUnk46[i].count * sizeof(MstUnk46Unk1));
 		for (uint32_t j = 0; j < _mstUnk46[i].count; ++j) {
 			uint8_t data[44];
 			fp->read(data, sizeof(data));
