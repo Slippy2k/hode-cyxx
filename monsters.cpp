@@ -1530,15 +1530,38 @@ int Game::executeMstCodeHelper3(Task *t) {
 	if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
 		return 0;
 	}
-	warning("executeMstCodeHelper3 unimplemented flagsA5 0x%x flags48 0x%x", m->flagsA5, m->flags48);
 	if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
-		// TODO
-	} else {
-// 418A9A
-		if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
-			executeMstOp67Type2(t, 1);
+		uint8_t _dl = m->flags49;
+		if ((_dl & 2) != 0) {
+			if (READ_LE_UINT32(m->unk8 + 916) <= m->unkC->unk34[1] || READ_LE_UINT32(m->unk8 + 912) >= m->unkC->unk2C[1]) {
+				m->flagsA6 |= 1;
+				assert(m == _mstCurrentTaskData);
+				m->flagsA5 = 1;
+				initMstTaskData(m);
+				uint32_t indexUnk35 = m->unkC->indexUnk35_20;
+				if (indexUnk35 != kNone) {
+					m->m35 = &_res->_mstUnk35[indexUnk35];
+				}
+				return 0;
+			}
+		} else if (_dl & 8) {
+// 418A37
+			if (READ_LE_UINT32(m->unk8 + 920) >= m->unkC->unk2C[1] || READ_LE_UINT32(m->unk8 + 924) <= m->unkC->unk34[1]) {
+				m->flagsA6 |= 1;
+				assert(m == _mstCurrentTaskData);
+				m->flagsA5 = 1;
+				initMstTaskData(m);
+				uint32_t indexUnk35 = m->unkC->indexUnk35_20;
+				if (indexUnk35 != kNone) {
+					m->m35 = &_res->_mstUnk35[indexUnk35];
+				}
+				return 0;
+			}
 		}
-		return 0;
+	}
+// 418A9A
+	if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
+		executeMstOp67Type2(t, 1);
 	}
 	return 0;
 }
@@ -3359,7 +3382,8 @@ int Game::runTask_default(Task *t) {
 						if ((m->flagsA5 & 0x70) != 0) {
 							m->flagsA5 &= ~0x70;
 							switch (m->flagsA5 & 7) {
-							case 1: {
+							case 1:
+							case 2: {
 									MstUnk35 *m35 = m->m35;
 									uint32_t num = 0;
 									if (m35->count2 != 0) {
@@ -3377,10 +3401,6 @@ int Game::runTask_default(Task *t) {
 								return executeMstOp67Type1(t);
 							case 6:
 								return executeMstOp67Type2(t, 1);
-							default:
-// 413D6D
-								warning(".mst opcode 242 t->dataPtr flagsA5 0x%x", m->flagsA5);
-								break;
 							}
 						} else {
 // 413DCA
@@ -4244,7 +4264,7 @@ void Game::executeMstUnk1(Task *t) {
 			}
 			prepareMstTask(t);
 			break;
-		case 4:
+		case 6:
 			m->flagsA5 &= ~7;
 			if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
 				m->flagsA5 |= 1;
