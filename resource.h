@@ -469,7 +469,6 @@ struct Resource {
 	uint8_t *_resLevelData0x470CTable;
 	uint8_t *_resLevelData0x470CTablePtrHdr;
 	uint8_t *_resLevelData0x470CTablePtrData;
-	uint8_t *_resLvlScreenSpriteDataPtrTable[32];
 	uint32_t _resLevelData0x2B88SizeTable[40];
 	uint32_t _resLevelData0x2988SizeTable[32];
 	LvlObjectData _resLevelData0x2988Table[40];

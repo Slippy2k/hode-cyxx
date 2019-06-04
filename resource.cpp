@@ -23,7 +23,6 @@ Resource::Resource(const char *dataPath)
 	_resLevelData0x470CTablePtrData = 0;
 
 	// sprites
-	memset(_resLvlScreenSpriteDataPtrTable, 0, sizeof(_resLvlScreenSpriteDataPtrTable));
 	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
 	memset(_resLevelData0x2988Table, 0, sizeof(_resLevelData0x2988Table));
 	memset(_resLevelData0x2988PtrTable, 0, sizeof(_resLevelData0x2988PtrTable));
@@ -192,7 +191,7 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 	uint8_t *base = src;
 
 	dat->unk0 = *src++;
-	dat->index = *src++;
+	dat->spriteNum = *src++;
 	dat->framesCount = READ_LE_UINT16(src); src += 2;
 	dat->hotspotsCount = READ_LE_UINT16(src); src += 2;
 	dat->movesCount = READ_LE_UINT16(src); src += 2;
@@ -282,8 +281,8 @@ void Resource::loadLvlSpriteData(int num) {
 
 	LvlObjectData *dat = &_resLevelData0x2988Table[num];
 	resFixPointersLevelData0x2988(ptr, ptr + readSize, dat);
-	_resLevelData0x2988PtrTable[dat->index] = dat;
-	_resLvlScreenSpriteDataPtrTable[num] = ptr;
+	_resLevelData0x2988PtrTable[dat->spriteNum] = dat;
+	// _resLvlScreenSpriteDataPtrTable[num] = ptr;
 	_resLevelData0x2988SizeTable[num] = size;
 }
 

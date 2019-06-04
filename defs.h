@@ -103,7 +103,7 @@ struct LvlSprHotspotData {
 
 struct LvlObjectData {
 	uint8_t unk0;
-	uint8_t index;
+	uint8_t spriteNum;
 	uint16_t framesCount;
 	uint16_t hotspotsCount;
 	uint16_t movesCount;

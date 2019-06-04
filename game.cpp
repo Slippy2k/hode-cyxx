@@ -3780,12 +3780,11 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 32:
 	case 33:
 	case 34:
-		// nop
 		break;
-	case 8:
+	case 8: // lizard
 	case 9:
-	case 10:
-	case 11:
+	case 10: // flying spectre
+	case 11: // dog
 	case 12:
 	case 13:
 	case 14:
@@ -3798,12 +3797,12 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 21:
 	case 22:
 	case 23:
-	case 24:
-	case 25:
-	case 26:
-	case 27:
+	case 24: // rope
+	case 25: // swamp serpent
+	case 26: // plant
+	case 27: // green fire-fly
 	case 28:
-	case 29: // objects driven by .mst code
+	case 29:
 		o->callbackFuncPtr = &Game::lvlObjectType8Callback;
 		break;
 	default:
