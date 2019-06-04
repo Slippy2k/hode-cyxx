@@ -1092,9 +1092,8 @@ bool Game::executeMstUnk17(MstTaskData *m, int num) {
 		}
 	}
 // 40E5C0
-	_bl &= 0xE0;
 	_ecx &= var4[2];
-	if (_bl == 0x40) {
+	if ((_bl & 0xE0) == 0x40) {
 		_ecx ^= 0xA;
 	}
 	return (var8 & _ecx) != 0 ? 0 : 1;
@@ -1864,7 +1863,9 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		_cl |= 1;
 	}
 	mstLvlObjectSetActionDirection(o, ptr, var8, _cl);
-	o->actionKeyMask |= _res->_mstUnk52[num * 4 + 1];
+	const uint8_t am = _res->_mstUnk52[num * 4 + 1];
+	o->actionKeyMask |= am;
+
 	debug(kDebug_MONSTER, "mstTaskSetActionDirection m %p action 0x%x direction 0x%x", m, o->actionKeyMask, o->directionKeyMask);
 	t->flags &= ~0x80;
 	int _edi = (int8_t)ptr[4];
@@ -3576,8 +3577,8 @@ void Game::executeMstOp52() {
 				_mstUnk6 = -1;
 			}
 			if (m->flagsA5 & 0x70) {
-				const int a = (m->o16->flags0 & 255) * 7;
-				if (m->unk8[a * 4] != 0) {
+				const int a = (m->o16->flags0 & 255) * 28;
+				if (m->unk8[a] != 0) {
 					// TODO
 					warning("MstOp52 t->task %p unimplemented", m->task->run);
 				} else {
@@ -4649,12 +4650,14 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 		m->m35 = 0;
 		m->flagsA6 = 0;
 
+		assert(arg1C >= 0 && arg1C < _res->_mstUnk42[arg24].count2);
 		const int j = _res->_mstUnk42[arg24].indexUnk46[arg1C];
 		assert(j >= 0 && j < _res->_mstHdr.unk0x30);
-		m->m46 = &_res->_mstUnk46[j];
-
-		m->unk4 = &_res->_mstUnk46[j].data[arg20];
-		MstUnk46Unk1 *m1 = &_res->_mstUnk46[j].data[arg20]; // _ecx
+		MstUnk46 *m46 = &_res->_mstUnk46[j];
+		m->m46 = m46;
+		assert(arg20 >= 0 && arg20 < m->m46->count);
+		MstUnk46Unk1 *m1 = &m46->data[arg20]; // _ecx
+		m->unk4 = m1;
 		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;
 
 		m->localVars[7] = m1->unkC; // energy

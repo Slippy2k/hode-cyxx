@@ -138,7 +138,7 @@ struct MstUnk36 {
 	uint32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk42 {
+struct MstUnk42 { // MonsterGroup
 	uint32_t *indexUnk46; // 0 indexes _mstUnk46
 	uint32_t count1; // 4
 	uint8_t *data2; // 8
@@ -189,7 +189,7 @@ struct MstUnk45 {
 	uint32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk46Unk1 {
+struct MstUnk46Unk1 { // MonsterBehaviour
 	uint32_t indexHeight; // 0, indexes mstHeightMapData
 	uint16_t anim; // 4
 	uint16_t unk6; // 6
@@ -514,7 +514,7 @@ struct Resource {
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;
-	uint8_t *_mstHeightMapData; // sizeof == 948
+	uint8_t *_mstHeightMapData; // sizeof == 948 == (32 * 28 + 54)
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
