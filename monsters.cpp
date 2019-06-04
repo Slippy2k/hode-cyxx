@@ -4806,23 +4806,25 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 		mstTaskUpdateScreenPosition(t);
 
 		switch (type) {
-#if 1
-		case 1:
-		case 2:
-			warning("executeMstOp67 unhandled type %d", type);
-			removeTask(&_mstTasksList1, t); // TEMP
-			break;
-#else
 		case 1:
 			executeMstOp67Type1(t);
+			if (!t->codeData) {
+				warning("mstOp67 no bytecode for t %p type 1", t);
+				removeTask(&_mstTasksList1, t);
+				memset(m, 0, sizeof(MstTaskData));
+			}
 			break;
-		case 2: // shadows in 'rock'
+		case 2:
 			if (m) {
 				m->flagsA6 |= 1;
 			}
 			executeMstOp67Type2(t, 0);
+			if (!t->codeData) {
+				warning("mstOp67 no bytecode for t %p type 2", t);
+				removeTask(&_mstTasksList1, t);
+				memset(m, 0, sizeof(MstTaskData));
+			}
 			break;
-#endif
 		default:
 			m->flagsA5 = 1;
 			if (!updateMstTaskDataPosition(m)) {
