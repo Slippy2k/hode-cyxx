@@ -311,6 +311,7 @@ struct MstCollision {
 struct Task;
 
 struct MstUnk35;
+struct MstUnk45;
 struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
@@ -377,7 +378,7 @@ struct MstTaskData { // MonsterObject
 }; // sizeof == 256
 
 struct MstObject { // MonsterObject2
-	void *unk0;
+	MstUnk45 *m45;
 	LvlObject *o; // 4
 	MstTaskData *mstTaskData; // 8
 	int unk0x10;

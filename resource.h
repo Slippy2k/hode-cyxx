@@ -181,6 +181,14 @@ struct MstUnk44 {
 	uint32_t count;
 }; // SIZEOF_MstUnk44 16
 
+struct MstUnk45 {
+	uint8_t unk0;
+	uint8_t unk1;
+	uint16_t unk2;
+	uint32_t unk4;
+	uint32_t unk8;
+}; // sizeof == 12
+
 struct MstUnk46Unk1 {
 	uint32_t indexHeight; // 0, indexes mstHeightMapData
 	uint16_t anim; // 4
@@ -503,6 +511,7 @@ struct Resource {
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
 	MstUnk44 *_mstUnk44;
+	MstUnk45 *_mstUnk45;
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;

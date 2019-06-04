@@ -67,14 +67,14 @@ void Game::resetMstTaskData(MstTaskData *m) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < 64; ++i) {
-		if (_mstObjectsTable[i].unk0 && _mstObjectsTable[i].mstTaskData == m) {
+		if (_mstObjectsTable[i].m45 && _mstObjectsTable[i].mstTaskData == m) {
 			_mstObjectsTable[i].mstTaskData = 0;
 		}
 	}
 }
 
 void Game::resetMstObject(MstObject *m) {
-	m->unk0 = 0;
+	m->m45 = 0;
 	LvlObject *o = m->o;
 	if (o) {
 		o->dataPtr = 0;
@@ -1723,7 +1723,7 @@ void Game::updateMstHeightMapData() {
 
 void Game::removeMstObjectTask(Task *t, Task **tasksList) {
 	MstObject *m = t->mstObject;
-	m->unk0 = 0;
+	m->m45 = 0;
 	LvlObject *o = m->o;
 	if (o) {
 		o->dataPtr = 0;
@@ -1763,7 +1763,7 @@ void Game::stopMstTaskData(Task *t, Task **tasksList) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < 64; ++i) {
-		if (_mstObjectsTable[i].unk0 != 0 && _mstObjectsTable[i].mstTaskData == m) {
+		if (_mstObjectsTable[i].m45 != 0 && _mstObjectsTable[i].mstTaskData == m) {
 			_mstObjectsTable[i].mstTaskData = 0;
 		}
 	}
@@ -3490,8 +3490,8 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 			m->m46 = 0;
 			m->o16->dataPtr = 0;
 			for (int i = 0; i < 64; ++i) {
-				if (_mstObjectsTable[i].unk0 != 0 && _mstObjectsTable[i].mstTaskData == m) {
-					_mstObjectsTable[i].unk0 = 0;
+				if (_mstObjectsTable[i].m45 != 0 && _mstObjectsTable[i].mstTaskData == m) {
+					_mstObjectsTable[i].m45 = 0;
 				}
 			}
 			removeLvlObject2(m->o16);
@@ -3514,7 +3514,7 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 		} else {
 			MstObject *mo = current->mstObject;
 			if (mo && mo->o->screenNum == screenNum) {
-				mo->unk0 = 0;
+				mo->m45 = 0;
 				mo->o->dataPtr = 0;
 				removeLvlObject2(mo->o);
 				Task *child = current->child;
@@ -4632,6 +4632,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 			}
 		}
 		if (!m) {
+			warning("mstOp67 unable to find a free MstTaskData");
 			return;
 		}
 		memset(m->localVars, 0, sizeof(m->localVars));
@@ -4664,7 +4665,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 				m->o16->dataPtr = 0;
 			}
 			for (int j = 0; j < 64; ++j) {
-				if (_mstObjectsTable[j].unk0 && _mstObjectsTable[j].mstTaskData == m) {
+				if (_mstObjectsTable[j].m45 && _mstObjectsTable[j].mstTaskData == m) {
 					_mstObjectsTable[j].mstTaskData = 0;
 				}
 			}
@@ -4692,8 +4693,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 		o->dataPtr = m;
 	} else {
 		for (int i = 0; i < 64; ++i) {
-			if (!_mstObjectsTable[i].unk0) {
-// 415743
+			if (!_mstObjectsTable[i].m45) {
 				mo = &_mstObjectsTable[i];
 				break;
 			}
@@ -4702,10 +4702,35 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 			warning("mstOp67 unable to find a free mstObject");
 			return;
 		}
+// 415743
+		mo->m45 = &_res->_mstUnk45[arg24];
+		if (t->dataPtr) {
+			mo->mstTaskData = t->dataPtr;
+		} else if (t->mstObject) {
+			mo->mstTaskData = t->mstObject->mstTaskData;
+		} else {
+			mo->mstTaskData = 0;
+		}
+
+		mo->flags24 = 0;
+
+		uint8_t _cl  = mo->m45->unk0;
+		uint16_t _ax = mo->m45->unk2; // anim
+
+		o = addLvlObject((_cl >> 7) & 1, x2, y1, objScreen, (_cl & 0x7F), _ax, o_flags1, o_flags2, 0, 0);
 		if (!o) {
-			warning("mstOp67 o is NULL");
+			mo->m45 = 0;
+			if (mo->o) {
+				mo->o->dataPtr = 0;
+			}
 			return;
 		}
+		mo->o = o;
+		o->dataPtr = mo;
+// 4157E2
+		warning("mstOp67 case -128 unimplemented");
+		// TODO
+		return;
 	}
 // 4157E8
 	if (screen < 0) {
@@ -4722,7 +4747,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 			}
 		}
 		if (!t) {
-			mo->unk0 = 0;
+			mo->m45 = 0;
 			if (mo->o) {
 				mo->o->dataPtr = 0;
 			}
