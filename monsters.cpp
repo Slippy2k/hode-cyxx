@@ -3612,7 +3612,7 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 		}
 
 	}
-	m->unkD4 = m->m49->data1 + m->unkDC * 16;
+	m->unkD4 = &m->m49->data1[m->unkDC];
 	m->flags4B = screen;
 	if (a > b) {
 		m->unk64 = b;
@@ -4639,7 +4639,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CC44
-	m->unkD4 = m->m49->data1 + m->unkDC * 16;
+	m->unkD4 = &m->m49->data1[m->unkDC];
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;
@@ -4680,12 +4680,12 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CEB4
 	executeMstUnk7(m);
 	int _edi = 1;
-	if (_xMstPos2 >= m->unkD4[12]) {
+	if (_xMstPos2 >= m->unkD4->unkC) {
 		_edi = 0;
 	} else {
 		while (--m->unkDC >= 0) {
-			m->unkD4 = m->m49->data1 + m->unkDC * 16;
-			if (_xMstPos2 >= m->unkD4[12]) {
+			m->unkD4 = &m->m49->data1[m->unkDC];
+			if (_xMstPos2 >= m->unkD4->unkC) {
 				_edi = 0;
 				break;
 			}
@@ -5259,11 +5259,11 @@ int Game::runTask_unk6(Task *t) {
 		m->unk7C = _mstPosX + m->unk68;
 	}
 	executeMstUnk7(m);
-	if (_xMstPos2 < m->unkD4[8]) {
+	if (_xMstPos2 < (m->unkD4->unk8 & 255)) {
 		if (_xMstPos2 > 0) {
 			while (--m->unkDC >= 0) {
-				m->unkD4 = m->m49->data1 + m->unkDC * 16;
-				if (_xMstPos2 >= m->unkD4[12]) {
+				m->unkD4 = &m->m49->data1[m->unkDC];
+				if (_xMstPos2 >= m->unkD4->unkC) {
 					goto set_am;
 				}
 			}

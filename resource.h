@@ -242,9 +242,19 @@ struct MstUnk48 {
 	uint32_t count[2]; // 0x24, 0x28
 }; // SIZEOF_MstUnk48 44
 
+struct MstUnk49Unk1 {
+	uint32_t unk0;
+	uint32_t unk4;
+	uint32_t unk8;
+	uint8_t unkC;
+	uint8_t unkD;
+	uint8_t unkE;
+	uint8_t unkF;
+}; // sizeof == 16
+
 struct MstUnk49 {
 	uint32_t unk0;
-	uint8_t *data1; // 0x4
+	MstUnk49Unk1 *data1; // 0x4, sizeof == 16
 	uint32_t count1; // 0x8
 	uint8_t *data2; // 0xC
 	uint32_t count2; // 0x10

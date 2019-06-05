@@ -1312,9 +1312,17 @@ void Resource::loadMstData(File *fp) {
 		bytesRead += 24;
 	}
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
-		_mstUnk49[i].data1 = (uint8_t *)malloc(_mstUnk49[i].count1 * 16);
-		fp->read(_mstUnk49[i].data1, _mstUnk49[i].count1 * 16);
-		bytesRead += _mstUnk49[i].count1 * 16;
+		_mstUnk49[i].data1 = (MstUnk49Unk1 *)malloc(_mstUnk49[i].count1 * sizeof(MstUnk49Unk1));
+		for (int j = 0; j < _mstUnk49[i].count1; ++j) {
+			_mstUnk49[i].data1[j].unk0 = fp->readUint32();
+			_mstUnk49[i].data1[j].unk4 = fp->readUint32();
+			_mstUnk49[i].data1[j].unk8 = fp->readUint32();
+			_mstUnk49[i].data1[j].unkC = fp->readByte();
+			_mstUnk49[i].data1[j].unkD = fp->readByte();
+			_mstUnk49[i].data1[j].unkE = fp->readByte();
+			_mstUnk49[i].data1[j].unkF = fp->readByte();
+			bytesRead += 16;
+		}
 		_mstUnk49[i].data2 = (uint8_t *)malloc(_mstUnk49[i].count2);
 		fp->read(_mstUnk49[i].data2, _mstUnk49[i].count2);
 		bytesRead += _mstUnk49[i].count2;

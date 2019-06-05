@@ -331,6 +331,7 @@ struct MstUnk46Unk1;
 struct MstUnk44Unk1;
 struct MstUnk48Unk12Unk4;
 struct MstUnk49;
+struct MstUnk49Unk1;
 
 struct MstTaskData { // MonsterObject
 	MstUnk46 *m46;
@@ -379,7 +380,7 @@ struct MstTaskData { // MonsterObject
 	uint8_t unkC8[4]; // 0xC8
 	uint8_t unkCC[4]; // 0xCC
 	MstUnk35 *m35; // 0xD0
-	const uint8_t *unkD4; // 0xD4, sizeof=16
+	MstUnk49Unk1 *unkD4; // 0xD4, sizeof=16
 	MstUnk49 *m49; // 0xD8
 	int unkDC; // 0xDC
 	uint8_t unkE4;
