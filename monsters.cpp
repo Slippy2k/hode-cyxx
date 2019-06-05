@@ -1042,6 +1042,31 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 	}
 }
 
+void Game::executeMstUnk4(MstTaskData *m) {
+	warning("executeMstUnk4 unimplemented");
+	// TODO
+}
+
+void Game::executeMstUnk5(MstTaskData *m) {
+	warning("executeMstUnk5 unimplemented");
+	// TODO
+}
+
+void Game::executeMstUnk8(MstTaskData *m) {
+	warning("executeMstUnk8 unimplemented");
+	// TODO
+}
+
+int Game::executeMstUnk9(Task *t, MstTaskData *m) {
+	warning("executeMstUnk9 unimplemented");
+	// TODO
+}
+
+int Game::executeMstUnk11(Task *t, MstTaskData *m) {
+	warning("executeMstUnk11 unimplemented");
+	// TODO
+}
+
 bool Game::executeMstUnk17(MstTaskData *m, int num) {
 	LvlObject *o = m->o16;
 	uint8_t _al = _res->_mstUnk52[num * 4];
@@ -3579,8 +3604,95 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 	m->m49 = &_res->_mstUnk49[m49->unkC];
 	m->unkDC = m49->unkF;
 	if (m49->unkF < 0) {
+		if (m->m49->count2 == 0) {
+			m->unkDC = 0;
+		} else {
+			const uint8_t _al = shuffleFlags(m->unkC8);
+			m->unkDC = m->m49->data2[_al];
+		}
+
 	}
-// 41BAD4
+	m->unkD4 = m->m49->data1 + m->unkDC * 16;
+	m->flags4B = screen;
+	if (a > b) {
+		m->unk64 = b;
+		m->unk68 = a;
+	} else {
+		m->unk64 = a;
+		m->unk68 = b;
+	}
+	if (c > d) {
+		m->unk6C = d;
+		m->unk70 = c;
+	} else {
+		m->unk6C = c;
+		m->unk70 = d;
+	}
+	switch (screen + 4) {
+	case 1: {
+			m->unkE4 = 255;
+			const uint8_t _al = m->unk8[946];
+			if (_al & 4) {
+				t->run = &Game::runTask_unk10;
+			} else if (_al & 2) {
+				t->run = &Game::runTask_unk8;
+			} else {
+				t->run = &Game::runTask_unk6;
+			}
+			if (m->unk68 <= 0) {
+				m->flags4B = 255;
+				if (m->xMstPos < _mstPosX) {
+					m->unk64 = -m->unk64;
+					m->unk68 = -m->unk68;
+				}
+			}
+			if ((_al & 2) != 0 && m->unk70 <= 0) {
+				m->flags4B = 255;
+				if (m->yMstPos < _mstPosY) {
+					m->unk6C = -m->unk70;
+					m->unk70 = -m->unk6C;
+				}
+			}
+			// goto 41DB34
+		}
+		break;
+	case 0: {
+			const uint8_t _al = m->unkF8;
+			if (_al & 8) {
+				b = -b;
+				a = -a;
+				m->unk64 = b;
+				m->unk68 = a;
+			} else if (_al & 2) {
+				m->unk64 = a;
+				m->unk68 = b;
+			} else {
+				m->unk64 = 0;
+				m->unk68 = 0;
+			}
+			if (_al & 1) {
+				c = -c;
+				d = -d;
+				m->unk6C = d;
+				m->unk70 = c;
+			} else if (_al & 4) {
+				m->unk6C = c;
+				m->unk70 = d;
+			} else {
+				m->unk6C = 0;
+				m->unk70 = 0;
+			}
+		}
+		// fall-through
+	case 2:
+	case 3:
+// 41BCB8
+	default:
+		warning("executeMstOp49 screen %d\n", screen + 4);
+		break;
+	}
+	warning("executeMstOp49 %d %d %d %d %d unimplemented", a, b, c, d, screen);
+	// TODO
 	return 0;
 }
 
@@ -4682,7 +4794,7 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 		assert(j >= 0 && j < _res->_mstHdr.unk0x30);
 		MstUnk46 *m46 = &_res->_mstUnk46[j];
 		m->m46 = m46;
-		assert(arg20 >= 0 && arg20 < m->m46->count);
+		assert(arg20 >= 0 && arg20 < m46->count);
 		MstUnk46Unk1 *m1 = &m46->data[arg20]; // _ecx
 		m->unk4 = m1;
 		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;
@@ -5134,4 +5246,51 @@ int Game::runTask_unk4(Task *t) {
 		return 0;
 	}
 	return 1;
+}
+
+int Game::runTask_unk6(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk6 t %p", t);
+	MstTaskData *m = t->dataPtr;
+	if (m->flags4B == 0xFD && m->xMstPos < _mstPosX) {
+		m->unk74 = _mstPosX - m->unk68;
+		m->unk7C = _mstPosX - m->unk64;
+	} else {
+		m->unk74 = _mstPosX + m->unk64;
+		m->unk7C = _mstPosX + m->unk68;
+	}
+	executeMstUnk7(m);
+	if (_xMstPos2 < m->unkD4[8]) {
+		if (_xMstPos2 > 0) {
+			while (--m->unkDC >= 0) {
+				m->unkD4 = m->m49->data1 + m->unkDC * 16;
+				if (_xMstPos2 >= m->unkD4[12]) {
+					goto set_am;
+				}
+			}
+		}
+// 41B8F2
+		return executeMstUnk9(t, m);
+	}
+// 41B8FE
+set_am:
+	warning("runTask_unk6 mstLvlObjectSetActionDirection unimplemented");
+//	uint8_t *ptr = READ_LE_UINT32(m->unkD4);
+//	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flagsA4);
+	return 1;
+}
+
+int Game::runTask_unk8(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk8 t %p", t);
+	MstTaskData *m = t->dataPtr;
+	executeMstUnk4(m);
+	executeMstUnk5(m);
+	return executeMstUnk11(t, m);
+}
+
+int Game::runTask_unk10(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk10 t %p", t);
+	MstTaskData *m = t->dataPtr;
+	executeMstUnk4(m);
+	executeMstUnk8(m);
+	return executeMstUnk11(t, m);
 }

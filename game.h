@@ -602,6 +602,11 @@ struct Game {
 	void executeMstCode();
 	void executeMstCodeHelper2();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
+	void executeMstUnk4(MstTaskData *m);
+	void executeMstUnk5(MstTaskData *m);
+	void executeMstUnk8(MstTaskData *m);
+	int executeMstUnk9(Task *t, MstTaskData *m);
+	int executeMstUnk11(Task *t, MstTaskData *m);
 	bool executeMstUnk17(MstTaskData *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);
@@ -659,6 +664,9 @@ struct Game {
 	int runTask_unk2(Task *t);
 	int runTask_unk3(Task *t);
 	int runTask_unk4(Task *t);
+	int runTask_unk6(Task *t);
+	int runTask_unk8(Task *t);
+	int runTask_unk10(Task *t);
 
 	// sound.cpp
 	SssObject _sssObjectsTable[kMaxSssObjects];

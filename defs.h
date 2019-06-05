@@ -356,6 +356,8 @@ struct MstTaskData { // MonsterObject
 	int yDelta; // 0x60
 	int unk64; // 0x64
 	int unk68; // 0x68
+	int unk6C; // 0x6C
+	int unk70; // 0x70
 	int unk74; // 0x74
 	int unk7C; // 0x7C
 	int unk84; // 0x84
