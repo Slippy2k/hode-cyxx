@@ -1538,8 +1538,9 @@ int Game::executeMstCodeHelper3(Task *t) {
 		}
 		const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
 		assert(indexUnk35 != kNone);
-		if (!m->m35) {
-			_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
+		MstUnk35 *m35 = &_res->_mstUnk35[indexUnk35];
+		if (m->m35 != m35) {
+			_mstCurrentTaskData->m35 = m35;
 			_rnd.resetMst(_mstCurrentTaskData->rnd_m35);
 			prepareMstTask(_mstCurrentTask);
 			return 0;
@@ -3596,19 +3597,19 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 
 int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 	MstTaskData *m = t->dataPtr;
-	const MstOp49Data *m49 = &_res->_mstOp49Data[num];
-	m->m49 = &_res->_mstUnk49[m49->unkC];
-	m->unkDC = m49->unkF;
-	if (m49->unkF < 0) {
-		if (m->m49->count2 == 0) {
+	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
+	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
+	m->m49 = m49;
+	m->unkDC = op49data->unkF;
+	if (m->unkDC < 0) {
+		if (m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
 			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
-			m->unkDC = m->m49->data2[_al];
+			m->unkDC = m49->data2[_al];
 		}
-
 	}
-	m->unkD4 = &m->m49->data1[m->unkDC];
+	m->unkD4 = &m49->data1[m->unkDC];
 	m->flags4B = screen;
 	if (a > b) {
 		m->unk64 = b;
