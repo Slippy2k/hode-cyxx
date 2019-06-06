@@ -5,6 +5,19 @@
 
 #include "random.h"
 
+void Random::initMstTable() {
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 32; ++j) {
+			_mstRandomTable[i][j] = j;
+		}
+		for (int j = 0; j < 64; ++j) {
+			const int index1 = update() & 31;
+			const int index2 = update() & 31;
+			SWAP(_mstRandomTable[i][index1], _mstRandomTable[i][index2]);
+		}
+	}
+}
+
 void Random::initTable() {
 	for (int i = 0; i < 100; ++i) {
 		_rndRandomTable[i] = i + 1;
@@ -42,4 +55,28 @@ uint8_t Random::getNextNumber() {
 
 uint8_t Random::getSeed() {
 	return _rndSeed & 0xFF;
+}
+
+void Random::resetMst(uint8_t *p) {
+	p[0] = update() & 7; // row
+	p[1] = update() & 31; // start
+	p[2] = 32; // count
+}
+
+uint8_t Random::getMstNextNumber(uint8_t *p) {
+	const uint8_t num = _mstRandomTable[p[0]][p[1]];
+	++p[1];
+	if (p[1] >= 32) {
+		p[1] = 0;
+	}
+	--p[2];
+	if (p[2] == 0) { // move to next row
+		++p[0];
+		if (p[0] >= 8) {
+			p[0] = 0;
+		}
+		p[1] = update() & 31;
+		p[2] = 32;
+	}
+	return num;
 }

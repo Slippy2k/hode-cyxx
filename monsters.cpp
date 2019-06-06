@@ -91,8 +91,8 @@ void Game::mstTaskSetScreenPosition(Task *t) {
 }
 
 void Game::initMstTaskData(MstTaskData *m) {
-	shuffleDword(m->unkCC);
-	shuffleDword(m->unkC8);
+	_rnd.resetMst(m->rnd_m35);
+	_rnd.resetMst(m->rnd_m49);
 
 	const uint8_t *ptr = m->unk8;
 	const int num = (~m->flagsA5) & 1;
@@ -352,7 +352,7 @@ int Game::prepareMstTask(Task *t) {
 	MstUnk35 *mu = m->m35;
 	int num = 0;
 	if (mu->count2 != 0) {
-		const uint8_t code = shuffleFlags(m->unkCC);
+		const uint8_t code = _rnd.getMstNextNumber(m->rnd_m35);
 		num = mu->data2[code];
 	}
 	const uint32_t codeData = mu->indexCodeData[num];
@@ -708,16 +708,7 @@ void Game::resetMstCode() {
 	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
 		_res->_mstScreenAreaCodes[i].unk0x1D = 1;
 	}
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 32; ++j) {
-			_mstRandomLookupTable[i][j] = j;
-		}
-		for (int j = 0; j < 64; ++j) {
-			const int index1 = _rnd.update() & 31;
-			const int index2 = _rnd.update() & 31;
-			SWAP(_mstRandomLookupTable[i][index1], _mstRandomLookupTable[i][index2]);
-		}
-	}
+	_rnd.initMstTable();
 	_rnd.initTable();
 	for (int i = 0; i < _res->_mstHdr.unk0x40; ++i) {
 		const int count = _res->_mstUnk49[i].count2;
@@ -1549,9 +1540,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 		assert(indexUnk35 != kNone);
 		if (!m->m35) {
 			_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
-			_mstCurrentTaskData->unkCC[0] = _rnd.update() & 7;
-			_mstCurrentTaskData->unkCC[2] = 0x20;
-			_mstCurrentTaskData->unkCC[1] = _rnd.update() & 31;
+			_rnd.resetMst(_mstCurrentTaskData->rnd_m35);
 			prepareMstTask(_mstCurrentTask);
 			return 0;
 		}
@@ -3448,7 +3437,7 @@ int Game::runTask_default(Task *t) {
 									MstUnk35 *m35 = m->m35;
 									uint32_t num = 0;
 									if (m35->count2 != 0) {
-										const uint8_t i = shuffleFlags(m->unkCC);
+										const uint8_t i = _rnd.getMstNextNumber(m->rnd_m35);
 										num = m35->data2[i];
 									}
 									const uint32_t codeData = m35->indexCodeData[num];
@@ -3468,7 +3457,7 @@ int Game::runTask_default(Task *t) {
 							MstUnk35 *m35 = m->m35;
 							uint32_t num = 0;
 							if (m35->count2 != 0) {
-								const uint8_t i = shuffleFlags(m->unkCC);
+								const uint8_t i = _rnd.getMstNextNumber(m->rnd_m35);
 								num = m35->data2[i];
 							}
 							const uint32_t codeData = m35->indexCodeData[num];
@@ -3614,7 +3603,7 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 		if (m->m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-			const uint8_t _al = shuffleFlags(m->unkC8);
+			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
 			m->unkDC = m->m49->data2[_al];
 		}
 
@@ -4679,7 +4668,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		if (m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-			const uint8_t _al = shuffleFlags(m->unkC8);
+			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
 			m->unkDC = m49->data2[_al];
 		}
 	}
@@ -4719,7 +4708,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		if (m->m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-			uint8_t _al = shuffleFlags(m->unkC8);
+			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
 			m->unkDC = m->m49->data2[_al];
 		}
 	}
@@ -5069,8 +5058,8 @@ void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type
 */
 // 415A3C
 		// t->codeData = 1234;
-		shuffleDword(m->unkCC);
-		shuffleDword(m->unkC8);
+		_rnd.resetMst(m->rnd_m35);
+		_rnd.resetMst(m->rnd_m49);
 
 		m->x2 = -1;
 		MstUnk46Unk1 *m46unk1 = m->unk4;

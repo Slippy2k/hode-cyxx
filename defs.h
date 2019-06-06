@@ -377,8 +377,8 @@ struct MstTaskData { // MonsterObject
 	int32_t unkBC;
 	int32_t unkC0;
 	Task *task; // 0xC4
-	uint8_t unkC8[4]; // 0xC8
-	uint8_t unkCC[4]; // 0xCC
+	uint8_t rnd_m49[4]; // 0xC8
+	uint8_t rnd_m35[4]; // 0xCC
 	MstUnk35 *m35; // 0xD0
 	MstUnk49Unk1 *unkD4; // 0xD4, sizeof=16
 	MstUnk49 *m49; // 0xD8
