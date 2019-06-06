@@ -1052,6 +1052,11 @@ void Game::executeMstUnk5(MstTaskData *m) {
 	// TODO
 }
 
+void Game::executeMstUnk6(MstTaskData *m) {
+	warning("executeMstUnk6 unimplemented");
+	// TODO
+}
+
 void Game::executeMstUnk8(MstTaskData *m) {
 	warning("executeMstUnk8 unimplemented");
 	// TODO
@@ -3687,8 +3692,20 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 	case 2:
 	case 3:
 // 41BCB8
+		warning("executeMstOp49 screen %d", screen + 4);
+		break;
 	default:
-		warning("executeMstOp49 screen %d\n", screen + 4);
+		if (m->unk8[946] & 4) {
+			t->run = &Game::runTask_unk9;
+		} else if (m->unk8[946] & 2) {
+			t->run = &Game::runTask_unk7;
+		} else {
+			t->run = &Game::runTask_unk5;
+		}
+		m->unk64 += _res->_mstPointOffsets[screen].xOffset;
+		m->unk68 += _res->_mstPointOffsets[screen].xOffset;
+		m->unk6C += _res->_mstPointOffsets[screen].yOffset;
+		m->unk70 += _res->_mstPointOffsets[screen].yOffset;
 		break;
 	}
 	warning("executeMstOp49 %d %d %d %d %d unimplemented", a, b, c, d, screen);
@@ -4609,8 +4626,61 @@ int Game::executeMstOp67Type1(Task *t) {
 	MstTaskData *m = t->dataPtr;
 	m->flagsA5 = (m->flagsA5 & ~2) | 5;
 	initMstTaskData(m);
-	warning("executeMstOp67Type1 t %p", t);
+	int y = 0;
+	int x = 0;
+	int var14 = 0;
+	if (m->unk8[946] & 2) {
+		m->unkC0 = -1;
+		m->unkBC = -1;
+		m->flagsA8[2] = 255;
+		m->flagsA7 = 255;
+		y = m->unkC->y2;
+		if (m->yMstPos < m->unkC->y2 || m->yMstPos > m->unkC->y1) {
+			var14 = 1;
+		}
+	}
+// 41C4B6
+	x = m->unkC->x2;
+	if (m->unk8[946] & 4) {
+// 41C4C9
+		warning("executeMstOp67Type1 t %p 41C4C9 unimplemented", t);
+		// TODO
+	}
+// 41C531
+	if (!var14 && m->xMstPos >= x && m->xMstPos <= m->unkC->x1) {
+		executeMstUnk1(t);
+		return 0;
+	}
+// 41C559
+	const uint32_t indexUnk36 = m->unkC->indexUnk36_28;
+	assert(indexUnk36 != kNone);
+	MstUnk36 *m36 = &_res->_mstUnk36[indexUnk36];
+	const uint32_t indexUnk49 = m36->indexUnk49;
+	assert(indexUnk49 != kNone);
+	MstUnk49 *m49 = &_res->_mstUnk49[indexUnk49];
+	m->m49 = m49;
+	m->unkDC = m36->unk4;
+	if (m->unkDC < 0) {
+		if (m49->count2 == 0) {
+			m->unkDC = 0;
+		} else {
+			const uint8_t _al = shuffleFlags(m->unkC8);
+			m->unkDC = m49->data2[_al];
+		}
+	}
+	m->unkD4 = &m49->data1[m->unkDC];
+// 41C5B1
+	warning("executeMstOp67Type1 t %p mask 0x%x", t, m->unk8[946]);
 	// TODO
+// 41C62E
+	if (m->unk8[946] & 2) {
+		// TODO
+	}
+// 41C712
+	executeMstUnk7(m);
+	// TODO
+// 41C7E3
+	executeMstUnk1(t);
 	return 0;
 }
 
@@ -5248,6 +5318,14 @@ int Game::runTask_unk4(Task *t) {
 	return 1;
 }
 
+int Game::runTask_unk5(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk5 t %p", t);
+	MstTaskData *m = t->dataPtr;
+	executeMstUnk7(m);
+	warning("runTask_unk5 unimplemented");
+	return 0;
+}
+
 int Game::runTask_unk6(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk6 t %p", t);
 	MstTaskData *m = t->dataPtr;
@@ -5279,11 +5357,25 @@ set_am:
 	return 1;
 }
 
+int Game::runTask_unk7(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk7 t %p", t);
+	MstTaskData *m = t->dataPtr;
+	executeMstUnk6(m);
+	return executeMstUnk11(t, m);
+}
+
 int Game::runTask_unk8(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk8 t %p", t);
 	MstTaskData *m = t->dataPtr;
 	executeMstUnk4(m);
 	executeMstUnk5(m);
+	return executeMstUnk11(t, m);
+}
+
+int Game::runTask_unk9(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk9 t %p", t);
+	MstTaskData *m = t->dataPtr;
+	executeMstUnk8(m);
 	return executeMstUnk11(t, m);
 }
 

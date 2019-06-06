@@ -160,7 +160,7 @@ struct MstUnk44Unk1 {
 	uint32_t indexUnk34_16; // 0x10
 	uint32_t indexUnk35_20; // 0x14
 	uint32_t indexUnk35_24; // 0x18
-	uint32_t indexUnk36_28;
+	uint32_t indexUnk36_28; // 0x1C
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
 	int32_t unk2C[2]; // 0x2C
