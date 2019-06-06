@@ -1303,7 +1303,7 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk49 = (MstUnk49 *)malloc(_mstHdr.unk0x40 * sizeof(MstUnk49));
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
-		_mstUnk49[i].unk0    = fp->readUint32();
+		_mstUnk49[i].indexHeight = fp->readUint32();
 		fp->readUint32();
 		_mstUnk49[i].count1  = fp->readUint32();
 		fp->readUint32();
@@ -1314,9 +1314,12 @@ void Resource::loadMstData(File *fp) {
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		_mstUnk49[i].data1 = (MstUnk49Unk1 *)malloc(_mstUnk49[i].count1 * sizeof(MstUnk49Unk1));
 		for (int j = 0; j < _mstUnk49[i].count1; ++j) {
-			_mstUnk49[i].data1[j].unk0 = fp->readUint32();
+			_mstUnk49[i].data1[j].indexHeight = fp->readUint32();
 			_mstUnk49[i].data1[j].unk4 = fp->readUint32();
-			_mstUnk49[i].data1[j].unk8 = fp->readUint32();
+			_mstUnk49[i].data1[j].unk8 = fp->readByte();
+			_mstUnk49[i].data1[j].unk9 = fp->readByte();
+			_mstUnk49[i].data1[j].unkA = fp->readByte();
+			_mstUnk49[i].data1[j].unkB = fp->readByte();
 			_mstUnk49[i].data1[j].unkC = fp->readByte();
 			_mstUnk49[i].data1[j].unkD = fp->readByte();
 			_mstUnk49[i].data1[j].unkE = fp->readByte();

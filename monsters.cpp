@@ -1065,11 +1065,13 @@ void Game::executeMstUnk8(MstTaskData *m) {
 int Game::executeMstUnk9(Task *t, MstTaskData *m) {
 	warning("executeMstUnk9 unimplemented");
 	// TODO
+	return 0;
 }
 
 int Game::executeMstUnk11(Task *t, MstTaskData *m) {
 	warning("executeMstUnk11 unimplemented");
 	// TODO
+	return 0;
 }
 
 bool Game::executeMstUnk17(MstTaskData *m, int num) {
@@ -3690,9 +3692,21 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 		}
 		// fall-through
 	case 2:
+		if (m->unk8[946] & 4) {
+			t->run = &Game::runTask_unk9;
+		} else if (m->unk8[946] & 2) {
+			t->run = &Game::runTask_unk7;
+		} else {
+			t->run = &Game::runTask_unk5;
+		}
+		m->unk64 += m->xMstPos;
+		m->unk68 += m->xMstPos;
+		m->unk6C += m->yMstPos;
+		m->unk70 += m->yMstPos;
+		break;
 	case 3:
 // 41BCB8
-		warning("executeMstOp49 screen %d", screen + 4);
+		warning("executeMstOp49 screen 3");
 		break;
 	default:
 		if (m->unk8[946] & 4) {
@@ -3708,6 +3722,7 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 		m->unk70 += _res->_mstPointOffsets[screen].yOffset;
 		break;
 	}
+// 41BD34
 	warning("executeMstOp49 %d %d %d %d %d unimplemented", a, b, c, d, screen);
 	// TODO
 	return 0;
@@ -4691,14 +4706,14 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	initMstTaskData(m);
 	const int i = m->unkC->indexUnk36_32;
 	assert(i >= 0 && i < _res->_mstHdr.unk0x10);
-	MstUnk36 *mstUnk36 = &_res->_mstUnk36[i];
-	const int j = mstUnk36->indexUnk49;
+	MstUnk36 *m36 = &_res->_mstUnk36[i];
+	const int j = m36->indexUnk49;
 	assert(j >= 0 && j < _res->_mstHdr.unk0x40);
 	m->m49 = &_res->_mstUnk49[j];
 	if (flag != 0) {
-		m->unkDC = mstUnk36->unk8 - 1;
+		m->unkDC = m36->unk8 - 1;
 	} else {
-		m->unkDC = mstUnk36->unk4;
+		m->unkDC = m36->unk4;
 	}
 	if (m->unkDC < 0) {
 		if (m->m49->count2 == 0) {
@@ -5337,7 +5352,7 @@ int Game::runTask_unk6(Task *t) {
 		m->unk7C = _mstPosX + m->unk68;
 	}
 	executeMstUnk7(m);
-	if (_xMstPos2 < (m->unkD4->unk8 & 255)) {
+	if (_xMstPos2 < m->unkD4->unk8) {
 		if (_xMstPos2 > 0) {
 			while (--m->unkDC >= 0) {
 				m->unkD4 = &m->m49->data1[m->unkDC];
@@ -5352,8 +5367,8 @@ int Game::runTask_unk6(Task *t) {
 // 41B8FE
 set_am:
 	warning("runTask_unk6 mstLvlObjectSetActionDirection unimplemented");
-//	uint8_t *ptr = READ_LE_UINT32(m->unkD4);
-//	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flagsA4);
+	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->indexHeight * 948;
+	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flagsA4);
 	return 1;
 }
 

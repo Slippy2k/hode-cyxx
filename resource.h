@@ -243,9 +243,12 @@ struct MstUnk48 {
 }; // SIZEOF_MstUnk48 44
 
 struct MstUnk49Unk1 {
-	uint32_t unk0;
+	uint32_t indexHeight; // 0, indexes _mstHeightMapData
 	uint32_t unk4;
-	uint32_t unk8;
+	uint8_t unk8;
+	uint8_t unk9;
+	uint8_t unkA;
+	uint8_t unkB;
 	uint8_t unkC;
 	uint8_t unkD;
 	uint8_t unkE;
@@ -253,7 +256,7 @@ struct MstUnk49Unk1 {
 }; // sizeof == 16
 
 struct MstUnk49 {
-	uint32_t unk0;
+	uint32_t indexHeight; // 0, indexes _mstHeightMapData
 	MstUnk49Unk1 *data1; // 0x4, sizeof == 16
 	uint32_t count1; // 0x8
 	uint8_t *data2; // 0xC
