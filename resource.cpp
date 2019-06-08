@@ -46,7 +46,9 @@ Resource::Resource(const char *dataPath)
 		_mstFile = new File;
 		_sssFile = new File;
 	}
+
 	_loadingImageBuffer = 0;
+	_fontBuffer = 0;
 }
 
 Resource::~Resource() {
@@ -71,20 +73,41 @@ void Resource::loadSetupDat() {
 	uint8_t hdr[512];
 	_fs.openFile("SETUP.DAT", _datFile);
 	_datFile->read(hdr, sizeof(hdr));
-	const int version = READ_LE_UINT32(hdr);
+	_datHdr.version = READ_LE_UINT32(hdr);
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
 	_datHdr.yesNoQuitImage = READ_LE_UINT32(hdr + 0x40);
 	_datHdr.loadingImageSize = READ_LE_UINT32(hdr + 0x48);
-	const int hintsCount = (version == 11) ? 46 : 20;
+	const int hintsCount = (_datHdr.version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
 		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x4C + i * 4);
 		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x4C + (hintsCount + i) * 4);
 	}
-	if (version == 11) {
-		_datFile->seek(2048, SEEK_SET); // fioAlignSizeTo2048(76)
-		_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
-		if (_loadingImageBuffer) {
-			_datFile->read(_loadingImageBuffer, _datHdr.loadingImageSize);
+	_datFile->seek(2048, SEEK_SET); // fioAlignSizeTo2048(76)
+	_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
+	if (_loadingImageBuffer) {
+		_datFile->read(_loadingImageBuffer, _datHdr.loadingImageSize);
+
+		uint32_t offset = 0;
+
+		// loading image
+		uint32_t size = READ_LE_UINT32(_loadingImageBuffer + offset); offset += 8;
+		offset += size + 768;
+
+		// loading animation
+		size = READ_LE_UINT32(_loadingImageBuffer + offset + 8); offset += 16;
+		offset += size;
+
+		// font
+		static const int kFontSize = 16 * 16 * 64;
+		_fontBuffer = (uint8_t *)malloc(kFontSize);
+		if (_fontBuffer) {
+			size = READ_LE_UINT32(_loadingImageBuffer + offset); offset += 4;
+			if (_datHdr.version == 11) {
+				const uint32_t uncompressedSize = decodeLZW(_loadingImageBuffer + offset, _fontBuffer);
+				assert(uncompressedSize == kFontSize);
+			} else {
+				memcpy(_fontBuffer, _loadingImageBuffer + offset, kFontSize);
+			}
 		}
 	}
 }

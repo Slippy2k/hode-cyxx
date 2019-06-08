@@ -10,6 +10,7 @@
 #include "intern.h"
 
 struct DatHdr {
+	uint32_t version; // 0x0
 	uint32_t sssOffset; // 0xC
 	int yesNoQuitImage; // 0x40
 	int loadingImageSize; // 0x48
@@ -473,6 +474,7 @@ struct Resource {
 	File *_sssFile;
 
 	uint8_t *_loadingImageBuffer;
+	uint8_t *_fontBuffer;
 
 	uint8_t _currentScreenResourceNum;
 
