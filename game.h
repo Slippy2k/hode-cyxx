@@ -639,8 +639,8 @@ struct Game {
 	void executeMstOp52();
 	bool checkMstOp54Helper(MstUnk48 *m, uint8_t flag);
 	void executeMstOp54();
-	int executeMstOp56(Task *t, int code, int num);
-	void executeMstOp58(Task *t, int num);
+	int mstOp56_specialAction(Task *t, int code, int num);
+	void mstOp58_addLvlObject(Task *t, int num);
 	void executeMstUnk1(Task *t);
 	int executeMstUnk2(MstTaskData *m, int x, int y);
 	void executeMstUnk7(MstTaskData *m);
@@ -648,7 +648,7 @@ struct Game {
 	void executeMstUnk13(Task *t);
 	int executeMstOp67Type1(Task *t);
 	int executeMstOp67Type2(Task *t, int flag);
-	void mstOp67(Task *t, int y1, int y2, int x1, int x2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
+	void mstOp67_addMonster(Task *t, int y1, int y2, int x1, int x2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
 	void mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);

@@ -3029,14 +3029,14 @@ int Game::runTask_default(Task *t) {
 			executeMstOp54();
 			break;
 		case 204: // 56
-			ret = executeMstOp56(t, p[1], READ_LE_UINT16(p + 2));
+			ret = mstOp56_specialAction(t, p[1], READ_LE_UINT16(p + 2));
 			break;
 		case 207:
 		case 208:
 		case 209: // 79
 			break;
 		case 211: // 58
-			executeMstOp58(t, READ_LE_UINT16(p + 2));
+			mstOp58_addLvlObject(t, READ_LE_UINT16(p + 2));
 			break;
 		case 214: { // 61 - reset_monster_energy
 				MstTaskData *m = t->dataPtr;
@@ -3173,7 +3173,7 @@ int Game::runTask_default(Task *t) {
 					}
 				}
 // 4137FA
-				mstOp67(t, a, b, c, d, e, m->unk8, m->unk9, m->unkC, m->unkB, 0, m->unkE);
+				mstOp67_addMonster(t, a, b, c, d, e, m->unk8, m->unk9, m->unkC, m->unkB, 0, m->unkE);
 			}
 			break;
 		case 226: { // 68
@@ -4162,9 +4162,9 @@ static uint8_t getLvlObjectFlag(uint8_t type, const LvlObject *o, const LvlObjec
 	return 0;
 }
 
-int Game::executeMstOp56(Task *t, int code, int num) {
+int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	assert(num < _res->_mstHdr.unk0x78);
-	debug(kDebug_MONSTER, "executeMstOp56 code %d", code);
+	debug(kDebug_MONSTER, "mstOp56_specialAction code %d", code);
 	switch (code) {
 	case 0:
 		if (!_specialAnimFlag && setAndySpecialAnimation(0x71) != 0) {
@@ -4465,6 +4465,7 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		}
 		break;
 	case 28:
+		// no-op
 		break;
 	case 29: {
 			const uint8_t state  = _res->_mstOp56Data[num].unk4 & 255;
@@ -4476,13 +4477,13 @@ int Game::executeMstOp56(Task *t, int code, int num) {
 		++_levelCheckpoint;
 		break;
 	default:
-		warning("Unhandled opcode %d in executeMstOp56", code);
+		warning("Unhandled opcode %d in mstOp56_specialAction", code);
 		break;
 	}
 	return 0;
 }
 
-void Game::executeMstOp58(Task *t, int num) {
+void Game::mstOp58_addLvlObject(Task *t, int num) {
 	const MstOp58Data *dat = &_res->_mstOp58Data[num];
 	const int mask = dat->unkE;
 	int xPos = getTaskVar(t, dat->indexVar1, (mask >> 8) & 15); // _ebx
@@ -4923,8 +4924,8 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	return 0;
 }
 
-void Game::mstOp67(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
-	debug(kDebug_MONSTER, "mstOp67 pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
+void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {
+	debug(kDebug_MONSTER, "mstOp67_addMonster pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
 	if (o_flags2 == 0xFFFF) {
 		LvlObject *o = 0;
 		if (t->dataPtr) {
