@@ -189,13 +189,14 @@ void Game::copyMstTaskData(Task *t, MstTaskData *m, int num) {
 	}
 }
 
-void Game::initMstTaskDataType2(Task *t) {
+int Game::initMstTaskDataType2(Task *t) {
 	warning("initMstTaskDataType2 %p unimplemented", t);
 	// TODO
 
 	if (_mstUnk6 == -1) {
-		return;
+		return 0;
 	}
+	return 0;
 }
 
 // set lvlObject position from monster position
@@ -1092,8 +1093,21 @@ void Game::executeMstUnk8(MstTaskData *m) {
 }
 
 int Game::executeMstUnk9(Task *t, MstTaskData *m) {
-	warning("executeMstUnk9 unimplemented");
-	// TODO
+	if (m->unk8[946] & 4) {
+		warning("executeMstUnk9 unimplemented");
+		// TODO
+	}
+	if (m->flags4B != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
+		LvlObject *o = m->o16;
+		const int bx = _res->_mstPointOffsets[_currentScreen].xOffset;
+		const int by = _res->_mstPointOffsets[_currentScreen].yOffset;
+		const int ox = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
+		const int oy = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
+		if (ox < bx || ox + o->width - 1 > bx + 255 || oy < by || oy + o->height - 1 > by + 191) {
+			return initMstTaskDataType2(t);
+		}
+	}
+	executeMstUnk1(t);
 	return 0;
 }
 
@@ -5298,7 +5312,7 @@ void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
 		if (--c == 0) {
 			return;
 		}
-		if (++j > count) {
+		if (++j >= count) {
 			j = 0;
 		}
 	}
@@ -5307,7 +5321,7 @@ void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
 		if (--c == 0) {
 			return;
 		}
-		if (++j > count) {
+		if (++j >= count) {
 			j = 0;
 		}
 	}
@@ -5542,7 +5556,7 @@ int Game::runTask_unk5(Task *t) {
 set_am:
 	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
-	return 0;
+	return 1;
 }
 
 int Game::runTask_unk6(Task *t) {
