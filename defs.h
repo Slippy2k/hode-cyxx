@@ -360,7 +360,9 @@ struct MstTaskData { // MonsterObject
 	int unk6C; // 0x6C
 	int unk70; // 0x70
 	int unk74; // 0x74
+	int unk78; // 0x78
 	int unk7C; // 0x7C
+	int unk80; // 0x80
 	int unk84; // 0x84
 	int unk88; // 0x88
 	int unk8C; // 0x8C

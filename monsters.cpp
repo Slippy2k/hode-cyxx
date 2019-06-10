@@ -1043,9 +1043,10 @@ void Game::executeMstUnk5(MstTaskData *m) {
 	// TODO
 }
 
-void Game::executeMstUnk6(MstTaskData *m) {
+bool Game::executeMstUnk6(MstTaskData *m) {
 	warning("executeMstUnk6 unimplemented");
 	// TODO
+	return false;
 }
 
 void Game::executeMstUnk8(MstTaskData *m) {
@@ -1564,7 +1565,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 	if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
 		uint8_t _dl = m->flags49;
 		if ((_dl & 2) != 0) {
-			if (READ_LE_UINT32(m->unk8 + 916) <= m->unkC->unk34[1] || READ_LE_UINT32(m->unk8 + 912) >= m->unkC->unk2C[1]) {
+			if ((int32_t)READ_LE_UINT32(m->unk8 + 916) <= m->unkC->unk34[1] || (int32_t)READ_LE_UINT32(m->unk8 + 912) >= m->unkC->unk2C[1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentTaskData);
 				m->flagsA5 = 1;
@@ -1577,7 +1578,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 			}
 		} else if (_dl & 8) {
 // 418A37
-			if (READ_LE_UINT32(m->unk8 + 920) >= m->unkC->unk2C[1] || READ_LE_UINT32(m->unk8 + 924) <= m->unkC->unk34[1]) {
+			if ((int32_t)READ_LE_UINT32(m->unk8 + 920) >= m->unkC->unk2C[1] || (int32_t)READ_LE_UINT32(m->unk8 + 924) <= m->unkC->unk34[1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentTaskData);
 				m->flagsA5 = 1;
@@ -2998,7 +2999,7 @@ int Game::runTask_default(Task *t) {
 				if (e >= _res->_mstHdr.pointsCount) {
 					e = _res->_mstHdr.pointsCount - 1;
 				}
-				ret = executeMstOp49(a, b, c, d, e, t, num);
+				ret = mstOp49(a, b, c, d, e, t, num);
 			}
 			break;
 		case 198: { // 50
@@ -3595,7 +3596,7 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 	// TODO
 }
 
-int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
+int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 	MstTaskData *m = t->dataPtr;
 	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
 	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
@@ -3696,7 +3697,7 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 		break;
 	case 3:
 // 41BCB8
-		warning("executeMstOp49 screen 3");
+		warning("mstOp49 screen 3");
 		break;
 	default:
 		if (m->unk8[946] & 4) {
@@ -3713,8 +3714,109 @@ int Game::executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int nu
 		break;
 	}
 // 41BD34
-	warning("executeMstOp49 %d %d %d %d %d unimplemented", a, b, c, d, screen);
-	// TODO
+	m->unk74 = m->unk64;
+	m->unk7C = m->unk68;
+	m->unk78 = m->unk6C;
+	m->flagsA8[2] = 255;
+	m->unkC0 = -1;
+	m->unkBC = -1;
+	m->flagsA7 = 255;
+	m->unk80 = m->unk70;
+	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+	if ((ptr[2] & 5) == 0) {
+		m->unk6C = m->yMstPos;
+		m->unk78 = m->yMstPos;
+		m->unk70 = m->yMstPos;
+		m->unk80 = m->yMstPos;
+	}
+	if ((ptr[2] & 0xA) == 0) {
+		m->unk64 = m->xMstPos;
+		m->unk74 = m->xMstPos;
+		m->unk68 = m->xMstPos;
+		m->unk7C = m->xMstPos;
+	}
+// 41BDA9
+	if (m->unk8[946] & 4) {
+		warning("mstOp49 41BDA9");
+		// TODO
+	}
+// 41BE12
+	if (m->flags4B != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
+		warning("mstOp49 41BE12");
+		// TODO
+	}
+// 41C038
+	if (m->unk8[946] & 4) {
+		warning("mstOp49 41C038");
+		// TODO
+	}
+// 41C17B
+	t->flags &= ~0x80;
+	if (m->unk8[946] & 2) {
+		if (t->run == &Game::runTask_unk10) {
+			executeMstUnk4(m);
+			executeMstUnk8(m);
+		} else if (t->run == &Game::runTask_unk8) {
+			executeMstUnk4(m);
+			executeMstUnk5(m);
+		} else if (t->run == &Game::runTask_unk9) {
+			executeMstUnk8(m);
+		} else {
+			executeMstUnk5(m);
+		}
+// 41C281
+		uint8_t _cl, _dl;
+		if (_mstLut1[m->flagsA4] & 1) {
+			_cl = m->unkD4->unkE;
+			_dl = m->unkD4->unkF;
+		} else {
+			_cl = m->unkD4->unkC;
+			_dl = m->unkD4->unkD;
+		}
+		if (_xMstPos2 < _cl && _mstUnk11 < _dl && !executeMstUnk6(m)) {
+// 41C2E6
+			goto l41C2E6;
+		}
+		goto l41C3FD;
+	} else {
+// 41C355
+		if (t->run == &Game::runTask_unk6) {
+			if (m->flags4B == 0xFD && m->xMstPos < _mstPosX) {
+				m->unk74 = _mstPosX - m->unk68;
+				m->unk7C = _mstPosX - m->unk64;
+			} else {
+				m->unk74 = _mstPosX + m->unk64;
+				m->unk7C = _mstPosX + m->unk68;
+			}
+		}
+// 41C399
+		executeMstUnk7(m);
+		if (_xMstPos2 >= m->unkD4->unkC) {
+			goto l41C3FD;
+		} else {
+			while (--m->unkDC >= 0) {
+				m->unkD4 = &m->m49->data1[m->unkDC];
+				if (_xMstPos2 >= m->unkD4->unkC) {
+					goto l41C3FD;
+				}
+			}
+		}
+		goto l41C2E6;
+	}
+// 41C3FD
+l41C3FD:
+	if (m->flags4A) {
+		return (this->*(t->run))(t);
+	}
+// 41C2E6
+l41C2E6:
+	if (m->unk8[946] & 4) {
+		warning("mstOp49 41C2E6");
+	}
+// 41C33C
+	m->flagsA8[1] = 255;
+	t->flags |= 0x80;
+	executeMstUnk1(t);
 	return 0;
 }
 
@@ -5357,7 +5459,7 @@ int Game::runTask_unk6(Task *t) {
 // 41B8FE
 set_am:
 	warning("runTask_unk6 mstLvlObjectSetActionDirection unimplemented");
-	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->indexHeight * 948;
+	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flagsA4);
 	return 1;
 }

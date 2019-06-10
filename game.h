@@ -601,7 +601,7 @@ struct Game {
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
 	void executeMstUnk4(MstTaskData *m);
 	void executeMstUnk5(MstTaskData *m);
-	void executeMstUnk6(MstTaskData *m);
+	bool executeMstUnk6(MstTaskData *m);
 	void executeMstUnk8(MstTaskData *m);
 	int executeMstUnk9(Task *t, MstTaskData *m);
 	int executeMstUnk11(Task *t, MstTaskData *m);
@@ -635,7 +635,7 @@ struct Game {
 	int runTask_default(Task *t);
 	void executeMstOp26(Task **tasksList, int screenNum);
 	void executeMstOp27(Task **tasksList, int num, int arg);
-	int executeMstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
+	int mstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
 	void executeMstOp52();
 	bool checkMstOp54Helper(MstUnk48 *m, uint8_t flag);
 	void executeMstOp54();

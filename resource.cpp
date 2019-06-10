@@ -1336,8 +1336,9 @@ void Resource::loadMstData(File *fp) {
 	}
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		_mstUnk49[i].data1 = (MstUnk49Unk1 *)malloc(_mstUnk49[i].count1 * sizeof(MstUnk49Unk1));
-		for (int j = 0; j < _mstUnk49[i].count1; ++j) {
-			_mstUnk49[i].data1[j].indexHeight = fp->readUint32();
+		const uint32_t start = _mstUnk49[i].indexHeight;
+		for (uint32_t j = 0; j < _mstUnk49[i].count1; ++j) {
+			fp->readUint32();
 			_mstUnk49[i].data1[j].unk4 = fp->readUint32();
 			_mstUnk49[i].data1[j].unk8 = fp->readByte();
 			_mstUnk49[i].data1[j].unk9 = fp->readByte();
@@ -1347,6 +1348,9 @@ void Resource::loadMstData(File *fp) {
 			_mstUnk49[i].data1[j].unkD = fp->readByte();
 			_mstUnk49[i].data1[j].unkE = fp->readByte();
 			_mstUnk49[i].data1[j].unkF = fp->readByte();
+			const uint32_t num = _mstUnk49[i].data1[j].unk4;
+			assert(num < 32);
+			_mstUnk49[i].data1[j].offsetHeight = start * 948 + num * 28;
 			bytesRead += 16;
 		}
 		_mstUnk49[i].data2 = (uint8_t *)malloc(_mstUnk49[i].count2);
