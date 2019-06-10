@@ -2,7 +2,7 @@
 #ifndef FS_H__
 #define FS_H__
 
-#include "fileio.h"
+#include <stdio.h>
 
 struct FileSystem {
 
@@ -13,8 +13,8 @@ struct FileSystem {
 	FileSystem(const char *dataPath);
 	~FileSystem();
 
-	bool openFile(const char *filename, File *);
-	void closeFile(File *);
+	FILE *openFile(const char *filename);
+	void closeFile(FILE *);
 
 	void addFilePath(const char *path);
 	void listFiles(const char *dir);

@@ -17,11 +17,20 @@ static const char *_filenames[] = {
 
 static bool openPaf(FileSystem *fs, File *f) {
 	for (int i = 0; _filenames[i]; ++i) {
-		if (fs->openFile(_filenames[i], f)) {
+		FILE *fp = fs->openFile(_filenames[i]);
+		if (fp) {
+			f->setFp(fp);
 			return true;
 		}
 	}
 	return false;
+}
+
+static void closePaf(FileSystem *fs, File *f) {
+	if (f->_fp) {
+		fs->closeFile(f->_fp);
+		f->_fp = 0;
+	}
 }
 
 PafPlayer::PafPlayer(SystemStub *system, FileSystem *fs)
@@ -39,7 +48,7 @@ PafPlayer::PafPlayer(SystemStub *system, FileSystem *fs)
 
 PafPlayer::~PafPlayer() {
 	unload();
-	_file.close();
+	closePaf(_fs, &_file);
 }
 
 void PafPlayer::preload(int num) {

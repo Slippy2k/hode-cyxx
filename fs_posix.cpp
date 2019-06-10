@@ -3,7 +3,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#include "fileio.h"
 #include "fs.h"
 #include "util.h"
 
@@ -39,19 +38,21 @@ FileSystem::~FileSystem() {
 	free(_filesList);
 }
 
-bool FileSystem::openFile(const char *name, File *f) {
+FILE *FileSystem::openFile(const char *name) {
+	FILE *fp = 0;
 	for (int i = 0; i < _filesCount; ++i) {
 		const char *p = strrchr(_filesList[i], '/');
 		assert(p);
 		if (strcasecmp(name, p + 1) == 0) {
-			return f->open(_filesList[i]);
+			fp = fopen(_filesList[i], "rb");
+			break;
 		}
 	}
-	return false;
+	return fp;
 }
 
-void FileSystem::closeFile(File *f) {
-	f->close();
+void FileSystem::closeFile(FILE *fp) {
+	fclose(fp);
 }
 
 void FileSystem::addFilePath(const char *path) {

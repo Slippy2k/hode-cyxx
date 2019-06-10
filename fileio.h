@@ -15,15 +15,14 @@ struct File {
 	File();
 	virtual ~File();
 
-	bool open(const char *filePath);
-	void close();
+	void setFp(FILE *fp);
+
 	virtual void seekAlign(int pos);
 	virtual void seek(int pos, int whence);
 	virtual int read(uint8_t *ptr, int size);
 	uint8_t readByte();
 	uint16_t readUint16();
 	uint32_t readUint32();
-	int getSize();
 	virtual void flush();
 };
 

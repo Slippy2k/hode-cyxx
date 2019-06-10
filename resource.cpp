@@ -10,6 +10,22 @@
 #include "resource.h"
 #include "util.h"
 
+static bool openDat(FileSystem &fs, const char *name, File *f) {
+	FILE *fp = fs.openFile(name);
+	if (fp) {
+		f->setFp(fp);
+		return true;
+	}
+	return false;
+}
+
+static void closeDat(FileSystem &fs, File *f) {
+	if (f->_fp) {
+		fs.closeFile(f->_fp);
+		f->setFp(0);
+	}
+}
+
 Resource::Resource(const char *dataPath)
 	: _fs(dataPath) {
 
@@ -55,23 +71,23 @@ Resource::~Resource() {
 }
 
 bool Resource::sectorAlignedGameData() {
-	File f;
-	if (!_fs.openFile("SETUP.DAT", &f)) {
+	FILE *fp = _fs.openFile("SETUP.DAT");
+	if (!fp) {
 		error("Unable to open 'SETUP.DAT'");
 		return false;
 	}
+	bool ret = false;
 	uint8_t buf[2048];
-	if (f.read(buf, sizeof(buf)) == sizeof(buf)) {
-		if (fioUpdateCRC(0, buf, sizeof(buf)) == 0) {
-			return true;
-		}
+	if (fread(buf, 1, sizeof(buf), fp) == sizeof(buf)) {
+		ret = fioUpdateCRC(0, buf, sizeof(buf)) == 0;
 	}
-	return false;
+	fclose(fp);
+	return ret;
 }
 
 void Resource::loadSetupDat() {
 	uint8_t hdr[512];
-	_fs.openFile("SETUP.DAT", _datFile);
+	openDat(_fs, "SETUP.DAT", _datFile);
 	_datFile->read(hdr, sizeof(hdr));
 	_datHdr.version = READ_LE_UINT32(hdr);
 	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
@@ -115,34 +131,30 @@ void Resource::loadSetupDat() {
 void Resource::loadLevelData(const char *levelName) {
 	char filename[32];
 
-	if (_lvlFile) {
-		_fs.closeFile(_lvlFile);
-		snprintf(filename, sizeof(filename), "%s.LVL", levelName);
-		if (_fs.openFile(filename, _lvlFile)) {
-			loadLvlData(_lvlFile);
-		} else {
-			error("Unable to open '%s'", filename);
-		}
+	closeDat(_fs, _lvlFile);
+	snprintf(filename, sizeof(filename), "%s.LVL", levelName);
+	if (openDat(_fs, filename, _lvlFile)) {
+		loadLvlData(_lvlFile);
+	} else {
+		error("Unable to open '%s'", filename);
 	}
-	if (_mstFile) {
-		_fs.closeFile(_mstFile);
-		snprintf(filename, sizeof(filename), "%s.MST", levelName);
-		if (_fs.openFile(filename, _mstFile)) {
-			loadMstData(_mstFile);
-		} else {
-			warning("Unable to open '%s'", filename);
-			memset(&_mstHdr, 0, sizeof(_mstHdr));
-		}
+
+	closeDat(_fs, _mstFile);
+	snprintf(filename, sizeof(filename), "%s.MST", levelName);
+	if (openDat(_fs, filename, _mstFile)) {
+		loadMstData(_mstFile);
+	} else {
+		warning("Unable to open '%s'", filename);
+		memset(&_mstHdr, 0, sizeof(_mstHdr));
 	}
-	if (_sssFile) {
-		_fs.closeFile(_sssFile);
-		snprintf(filename, sizeof(filename), "%s.SSS", levelName);
-		if (_fs.openFile(filename, _sssFile)) {
-			loadSssData(_sssFile);
-		} else {
-			warning("Unable to open '%s'", filename);
-			memset(&_sssHdr, 0, sizeof(_sssHdr));
-		}
+
+	closeDat(_fs, _sssFile);
+	snprintf(filename, sizeof(filename), "%s.SSS", levelName);
+	if (openDat(_fs, filename, _sssFile)) {
+		loadSssData(_sssFile);
+	} else {
+		warning("Unable to open '%s'", filename);
+		memset(&_sssHdr, 0, sizeof(_sssHdr));
 	}
 }
 
@@ -548,7 +560,7 @@ void Resource::loadSssData(File *fp) {
 	_sssHdr.version = fp->readUint32();
 	if (_sssHdr.version != 6 && _sssHdr.version != 10) {
 		warning("Unhandled .sss version %d", _sssHdr.version);
-		_fs.closeFile(_sssFile);
+		closeDat(_fs, _sssFile);
 		return;
 	}
 	_sssHdr.unk4 = fp->readUint32();

@@ -11,19 +11,10 @@ File::File()
 }
 
 File::~File() {
-	close();
 }
 
-bool File::open(const char *filePath) {
-	_fp = fopen(filePath, "rb");
-	return _fp != 0;
-}
-
-void File::close() {
-	if (_fp) {
-		fclose(_fp);
-		_fp = 0;
-	}
+void File::setFp(FILE *fp) {
+	_fp = fp;
 }
 
 void File::seekAlign(int pos) {
@@ -54,14 +45,6 @@ uint32_t File::readUint32() {
 	uint8_t buf[4];
 	read(buf, 4);
 	return READ_LE_UINT32(buf);
-}
-
-int File::getSize() {
-	const int pos = ftell(_fp);
-	fseek(_fp, 0, SEEK_END);
-	const int size = ftell(_fp);
-	fseek(_fp, pos, SEEK_SET);
-	return size;
 }
 
 void File::flush() {
