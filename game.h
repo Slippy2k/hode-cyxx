@@ -139,7 +139,7 @@ struct Game {
 	int _mstUnk10;
 	MovingOpcodeState _mstMovingState[kMaxMovingStates];
 	int _mstMovingStateCount;
-	uint8_t _mstOp68_arg8, _mstOp68_arg9, _mstOp67_type;
+	uint8_t _mstOp68_type, _mstOp68_arg9, _mstOp67_type;
 	uint8_t _mstOp67_flags1;
 	uint16_t _mstOp67_unk;
 	int _mstOp67_x1, _mstOp67_x2, _mstOp67_y1, _mstOp67_y2;
