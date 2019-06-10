@@ -4781,7 +4781,26 @@ int Game::executeMstOp67Type1(Task *t) {
 	// TODO
 // 41C62E
 	if (m->unk8[946] & 2) {
-		// TODO
+		int _edi = (m->unkC->y1 - y) / 4;
+		m->unk70 = m->unkC->y1 - _edi;
+		m->unk6C = y + _edi;
+		if (_edi != 0) {
+			_edi = _rnd.update() % _edi;
+		}
+		m->unk6C += _edi;
+		m->unk78 = m->unk6C;
+		m->unk70 -= _edi;
+		m->unk80 = m->unk70;
+		const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+		if ((ptr[2] & 5) == 0) {
+			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
+		}
+		if (m->unk8[946] & 4) {
+			executeMstUnk8(m);
+		} else {
+			executeMstUnk5(m);
+		}
+		warning("executeMstOp67Type1 41C6C0");
 	}
 // 41C712
 	executeMstUnk7(m);
@@ -4836,7 +4855,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CE2B
 	int32_t _ebp = READ_LE_UINT32(p + 900);
 	int32_t _ecx = READ_LE_UINT32(p + 896);
-	int r = (_ecx + 3) / 4;
+	int r = _ecx / 4;
 	m->unk64 = _ebp + r;
 	m->unk68 = _ecx + _ebp - r;
 	if (r != 0) {

@@ -16,6 +16,7 @@ GLOBAL test_negsbbinc
 GLOBAL test_cdqsubsar
 GLOBAL test_imul0x55555556
 GLOBAL test_0040D136
+GLOBAL test_0041C644
 
 SECTION .text
 
@@ -302,5 +303,19 @@ test_0040D136:
       add eax, 4
 
   pop ecx
+  pop ebp
+  ret
+
+test_0041C644:
+
+  push ebp
+  mov ebp, esp
+
+      mov eax, [ebp + arg0]
+      cdq
+      and     edx, 3
+      add     eax, edx
+      sar     eax, 2
+
   pop ebp
   ret
