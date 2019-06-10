@@ -183,7 +183,10 @@ struct Game {
 	int _mstOp54Unk2;
 	int _mstOp54Unk3;
 	int _mstUnk11;
+	int _mstUnk12;
 	int _mstUnk6;
+	uint8_t _mstUnk8;
+	uint32_t _mstAndyVarMask;
 	int _mstTaskDataCount;
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
@@ -597,6 +600,7 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+	void executeMstCodeHelper1();
 	void executeMstCodeHelper2();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
 	void executeMstUnk4(MstTaskData *m);

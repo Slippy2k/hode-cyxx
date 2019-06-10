@@ -732,8 +732,20 @@ void Game::resetMstCode() {
 			}
 		}
 	}
-
-	// TODO
+	for (int i = 0; i < _res->_mstHdr.unk0x24; ++i) {
+		const int count = _res->_mstUnk43[i].count2;
+		if (count != 0) {
+			uint8_t *ptr = _res->_mstUnk43[i].data2;
+			for (int j = 0; j < count; ++j) {
+				ptr[j] &= ~0x80;
+			}
+			for (int j = 0; j < count; ++j) {
+				const int index1 = _rnd.update() % count;
+				const int index2 = _rnd.update() % count;
+				SWAP(ptr[index1], ptr[index2]);
+			}
+		}
+	}
 	_mstOp67_x1 = -256;
 	_mstOp67_x2 = -256;
 	memset(_mstUnkDataTable, 0, sizeof(_mstUnkDataTable));
@@ -742,7 +754,7 @@ void Game::resetMstCode() {
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _mstUnk6 = -1;
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
-	// TODO
+	_mstUnk8 = 0;
 	_specialAnimFlag = false;
 	_mstUnk10 = 255;
 	_mstRectsCount = 0;
@@ -756,7 +768,7 @@ void Game::resetMstCode() {
 	_mstOp68_screenNum = 255;
 	_mstLogicHelper1TestValue = 0;
 	_mstLogicHelper1TestMask = 0xFFFFFFFF;
-	// TODO
+	_mstAndyVarMask = 0;
 	_tasksList = 0;
 	_mstTasksList1 = 0;
 	_mstTasksList2 = 0;
@@ -894,7 +906,8 @@ void Game::executeMstCode() {
 	}
 	++_executeMstLogicCounter;
 	if ((_mstLogicHelper1TestValue & _mstLogicHelper1TestMask) != 0) {
-		// TODO
+		_mstUnk12 = 0;
+		executeMstCodeHelper1();
 		_mstLogicHelper1TestValue = 0;
 	}
 	for (int i = 0; i < kMaxMovingStates; ++i) {
@@ -936,9 +949,29 @@ void Game::executeMstCode() {
 			continue;
 		}
 		const int energy = m->localVars[7];
-		if (p->unk28) {
-			warning("executeMstCode m->unk28 %p unimplemented", p->unk28);
-			// TODO
+		ShootLvlObjectData *dat = p->unk28;
+		if (dat) {
+			if (energy > 0) {
+				if ((p->unk40 & 2) == 0) {
+					m->localVars[7] -= 4;
+					if (m->localVars[7] < 0) {
+						m->localVars[7] = 0;
+					}
+				} else {
+// 419C75
+					--m->localVars[7];
+				}
+// 419C79
+				dat->unk3 = 0x80;
+				dat->x2 = p->unk34;
+				dat->y2 = p->unk38;
+				dat->o = m->o16;
+			} else if (energy == -2) {
+// 419CA1
+				dat->unk3 = 0x80;
+				dat->x2 = p->unk34;
+				dat->y2 = p->unk38;
+			}
 			continue;
 		}
 // 419CC0
@@ -963,6 +996,10 @@ void Game::executeMstCode() {
 			while ((this->*(t->run))(t) == 0);
 		}
 	}
+}
+
+void Game::executeMstCodeHelper1() {
+	warning("executeMstCodeHelper1 unimplemented");
 }
 
 void Game::executeMstCodeHelper2() {
