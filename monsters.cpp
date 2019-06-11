@@ -90,17 +90,14 @@ void Game::mstTaskSetScreenPosition(Task *t) {
 	m->yMstPos = m->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
 }
 
-void Game::initMstTaskData(MstTaskData *m) {
+void Game::initMstTaskData(MstTaskData *m) { // mstResetPosition
 	_rnd.resetMst(m->rnd_m35);
 	_rnd.resetMst(m->rnd_m49);
 
 	const uint8_t *ptr = m->unk8;
 	const int num = (~m->flagsA5) & 1;
 
-	if (!m->unkC) {
-		warning("initMstTaskData m %p unkC is NULL", m);
-		return;
-	}
+	assert(m->unkC);
 
 	m->x1 = m->unkC->unk2C[num] - READ_LE_UINT32(ptr + 904); // x2 ?
 	m->x2 = m->unkC->unk34[num] + READ_LE_UINT32(ptr + 904); // x1 ?
@@ -479,6 +476,8 @@ int Game::getMstDistance(int y, MovingOpcodeState *p) {
 //	case 1:
 //	case 2:
 		// TODO
+		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		break;
 	case 3: {
 			const int dx = _mstTemp_x2 - p->boundingBox.x1;
 			if (dx >= 0) {
@@ -503,6 +502,8 @@ int Game::getMstDistance(int y, MovingOpcodeState *p) {
 //	case 4:
 //	case 5:
 		// TODO
+		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		break;
 	case 6:
 		if (p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.x2 >= _mstTemp_x1 && p->boundingBox.x1 <= _mstTemp_x2) {
 			const int dy = p->boundingBox.y1 - _mstTemp_y2;

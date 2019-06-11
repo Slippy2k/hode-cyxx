@@ -12,8 +12,8 @@
 
 const Game::OpStage1Proc Game::_callLevel_objectUpdate_rock[] = {
 	&Game::objectUpdate_rock_case0,
-	&Game::objectUpdate_rock_case1,
-	&Game::objectUpdate_rock_case2,
+	&Game::objectUpdate_rock_case1, // shadow_screen2
+	&Game::objectUpdate_rock_case2, // shadow_screen3
 	&Game::objectUpdate_rock_case3,
 	&Game::objectUpdate_rock_case4,
 	&Game::objectUpdate_rock_case0

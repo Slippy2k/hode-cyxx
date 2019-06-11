@@ -179,9 +179,9 @@ struct Game {
 	int _mstPosY;
 	int _mstRefPosX;
 	int _mstRefPosY;
-	int _mstOp54Unk1;
-	int _mstOp54Unk2;
-	int _mstOp54Unk3;
+	int _mstOp54Unk1; // _m43Num1
+	int _mstOp54Unk2; // _m43Num2
+	int _mstOp54Unk3; // _m43Num3
 	int _mstUnk11;
 	int _mstUnk12;
 	int _mstUnk6;
