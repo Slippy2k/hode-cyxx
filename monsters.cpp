@@ -802,8 +802,8 @@ void Game::startMstCode() {
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
 		offset += 948;
-		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]);
-		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]);
+		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]); // 900
+		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]); // 896
 
 		const uint32_t unk20 = _mstPosX - unk30;
 		const uint32_t unk1C = _mstPosX + unk30;
@@ -1529,7 +1529,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 		} else if (_ebp == 1) {
 // 418C73
 			m->flagsA6 |= 1;
-			if (executeMstUnk2(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
+			if (mstSetCurrentPos(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
 				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->unkC->unk2C[1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->unkC->unk34[1])) {
 					uint32_t indexUnk35 = m->unkC->indexUnk35_20;
 					if (indexUnk35 != kNone) {
@@ -1570,8 +1570,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 						if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
 							initMstTaskData(_mstCurrentTaskData);
 						}
-						m44 = _mstCurrentTaskData->unkC;
-						indexUnk35 = m44->indexUnk35_20;
+						indexUnk35 = _mstCurrentTaskData->unkC->indexUnk35_20;
 						if (indexUnk35 != kNone) {
 							m->m35 = &_res->_mstUnk35[indexUnk35];
 						}
@@ -1603,6 +1602,8 @@ int Game::executeMstCodeHelper3(Task *t) {
 			if (!updateMstTaskDataPosition(_mstCurrentTaskData)) {
 				initMstTaskData(_mstCurrentTaskData);
 			}
+			const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
+			assert(indexUnk35 != kNone);
 			_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
 			prepareMstTask(_mstCurrentTask);
 		}
@@ -1643,7 +1644,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 		}
 	}
 // 418A9A
-	if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
+	if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0) {
 		executeMstOp67Type2(t, 1);
 	}
 	return 0;
@@ -1794,8 +1795,8 @@ void Game::updateMstHeightMapData() {
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
 		offset += 948;
-		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]);
-		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]);
+		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]); // 900
+		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]); // 896
 
 		const uint32_t unk20 = _mstPosX - unk30;
 		const uint32_t unk1C = _mstPosX + unk30;
@@ -1989,7 +1990,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			var10 |= 4;
 		}
 // 40E96D
-		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && executeMstUnk2(m, _edi, _ebp) == 0) {
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && mstSetCurrentPos(m, _edi, _ebp) == 0) {
 			t->flags |= 0x80;
 			return 0;
 		}
@@ -4616,7 +4617,7 @@ void Game::executeMstUnk1(Task *t) {
 			break;
 		case 6:
 			m->flagsA5 &= ~7;
-			if (executeMstUnk2(m, m->xMstPos, m->yMstPos) == 0) {
+			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0) {
 				m->flagsA5 |= 1;
 				if (!updateMstTaskDataPosition(m)) {
 					initMstTaskData(m);
@@ -4641,16 +4642,16 @@ void Game::executeMstUnk1(Task *t) {
 	}
 }
 
-int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
+int Game::mstSetCurrentPos(MstTaskData *m, int x, int y) {
 	_mstCurrentPosX = x; // _esi
 	_mstCurrentPosY = y;
 	const uint8_t *ptr = m->unk8;
 	const int32_t a = READ_LE_UINT32(ptr + 900);
-	int _ecx = _mstPosX - a;
-	int _edi = _mstPosX + a;
+	int _ecx = _mstPosX - a; // x1
+	int _edi = _mstPosX + a; // x2
 	if (ptr[946] & 2) {
-		int _ebx = _mstPosY - a;
-		int _ebp = _mstPosY + a;
+		int _ebx = _mstPosY - a; // y1
+		int _ebp = _mstPosY + a; // y2
 		if (x > _ecx && x < _edi && y > _ebx && y < _ebp) {
 			if (ABS(x - _mstPosX) > ABS(y - _mstPosY)) {
 				if (x >= _mstPosX) {
@@ -4658,13 +4659,12 @@ int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
 				} else {
 					_mstCurrentPosX = _ecx;
 				}
-				return 0;
-			}
-// 419E1D
-			if (y >= _mstPosY) {
-				_mstCurrentPosY = _ebp;
 			} else {
-				_mstCurrentPosY = _ebx;
+				if (y >= _mstPosY) {
+					_mstCurrentPosY = _ebp;
+				} else {
+					_mstCurrentPosY = _ebx;
+				}
 			}
 			return 0;
 		}
@@ -4691,10 +4691,7 @@ int Game::executeMstUnk2(MstTaskData *m, int x, int y) {
 	}
 // 419EA7
 	if (x > _ecx && x < _edi) {
-		_mstCurrentPosX = _edi;
-		if (x < _mstPosX) {
-			_mstCurrentPosX = _ecx;
-		}
+		_mstCurrentPosX = (x >= _mstPosX) ? _edi : _ecx;
 		return 0;
 	}
 	const int32_t b = READ_LE_UINT32(ptr + 896);
@@ -4730,7 +4727,7 @@ void Game::mstSetHorizontalBounds(MstTaskData *m) {
 		m->flags4A = 2;
 	} else if (x > m->unk7C) {
 // 41A2AA
-		_xMstPos1 = x = m->unk7C;
+		_xMstPos1 = x = m->unk74;
 		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
 			if (x < m->unk88) {
 				t->flags |= 0x80;
@@ -4941,7 +4938,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	m->unkBC = -1;
 	m->flagsA8[2] = 255;
 	m->flagsA7 = 255;
-	if (executeMstUnk2(m, m->xMstPos, m->yMstPos)) {
+	if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos)) {
 		executeMstUnk1(t);
 		return 0;
 	}
