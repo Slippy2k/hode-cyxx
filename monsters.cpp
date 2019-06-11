@@ -1966,11 +1966,38 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
 		uint8_t var11 = ptr[2];
-		warning("mstTaskSetActionDirection %d unimplemented %d %d 0x%x", num, _edi, _ebp, var11);
-		if ((var11 & 0xA) == 0xA) {
-			// TODO
+		if (((var11 & 0xA) == 0xA && (o->directionKeyMask & 8) != 0) || ((var11 & 0xA) != 0xA && (o->flags1 & 0x10) != 0)) {
+			_edi = m->xMstPos - _edi;
+		} else {
+			_edi = m->xMstPos + _edi;
 		}
-		// TODO
+		int var10;
+		if (_edi < m->xMstPos) {
+			var10 = 8;
+		} else {
+			var10 = (_edi <= m->xMstPos) ? 0 : 2;
+		}
+		if ((var11 & 0x5) == 0x5 && (o->directionKeyMask & 1) != 0) {
+			_ebp = m->yMstPos - _ebp;
+		} else {
+			_ebp = m->yMstPos + _ebp;
+		}
+// 40E950
+		if (_ebp < m->yMstPos) {
+			var10 |= 1;
+		} else if (_ebp > m->yMstPos) {
+			var10 |= 4;
+		}
+// 40E96D
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && executeMstUnk2(m, _edi, _ebp) == 0) {
+			t->flags |= 0x80;
+			return 0;
+		}
+		if (((var10 & 8) != 0 && _edi < m->x2) || ((var10 & 2) != 0 && _edi > m->x1) || ((var10 & 1) != 0 && (_ebp < m->y2))) {
+			t->flags |= 0x80;
+			return 0;
+		}
+
 		int _eax = 0;
 		int _edx = 0;
 // 40E9BC
@@ -3747,8 +3774,13 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 		m->unk70 += m->yMstPos;
 		break;
 	case 3:
-// 41BCB8
-		warning("mstOp49 screen 3");
+		if (m->unk8[946] & 4) {
+			t->run = &Game::runTask_unk10;
+		} else if (m->unk8[946] & 2) {
+			t->run = &Game::runTask_unk8;
+		} else {
+			t->run = &Game::runTask_unk6;
+		}
 		break;
 	default:
 		if (m->unk8[946] & 4) {
@@ -5288,11 +5320,11 @@ void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
 		int m46Index;
 	} data[16];
 	int count = 0;
-	for (int i = 0; i < m42->count1; ++i) {
+	for (uint32_t i = 0; i < m42->count1; ++i) {
 		MstUnk46 *m46 = &_res->_mstUnk46[m42->indexUnk46[i]];
-		for (int j = 0; j < m46->count; ++j) {
+		for (uint32_t j = 0; j < m46->count; ++j) {
 			MstUnk46Unk1 *m46u1 = &m46->data[j];
-			int indexHeight = p - _res->_mstHeightMapData;
+			uint32_t indexHeight = p - _res->_mstHeightMapData;
 			assert((indexHeight % 948) == 0);
 			indexHeight /= 948;
 			if (m46u1->indexHeight == indexHeight) {
