@@ -647,7 +647,7 @@ struct Game {
 	void mstOp58_addLvlObject(Task *t, int num);
 	void executeMstUnk1(Task *t);
 	int executeMstUnk2(MstTaskData *m, int x, int y);
-	void executeMstUnk7(MstTaskData *m);
+	void mstSetHorizontalBounds(MstTaskData *m);
 	void executeMstUnk12();
 	void executeMstUnk13(Task *t);
 	int executeMstOp67Type1(Task *t);
