@@ -4859,10 +4859,22 @@ int Game::executeMstOp67Type1(Task *t) {
 			m->unkDC = m49->data2[_al];
 		}
 	}
-	m->unkD4 = &m49->data1[m->unkDC];
 // 41C5B1
-	warning("executeMstOp67Type1 t %p mask 0x%x", t, m->unk8[946]);
-	// TODO
+	m->unkD4 = &m49->data1[m->unkDC];
+	int _edi = (m->unkC->x1 - x) / 4;
+	m->unk64 = x + _edi;
+	m->unk68 = m->unkC->x1 - _edi;
+	if (_edi != 0) {
+		_edi = _rnd.update() % _edi;
+	}
+	m->unk68 -= _edi;
+	m->unk74 += m->unk64;
+	m->unk7C = m->unk68;
+	m->unk64 += _edi;
+	const uint8_t *ptr1 = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+	if ((ptr1[2] & 0xA) == 0) {
+		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
+	}
 // 41C62E
 	if (m->unk8[946] & 2) {
 		int _edi = (m->unkC->y1 - y) / 4;
