@@ -48,7 +48,7 @@ static const uint8_t _byte_43E838[] = {
 	3, 3, 3, 2, 1, 1, 0, 0xFF, 2, 2, 2, 2, 1, 0, 0, 0xFF
 };
 
-static const uint8_t kInvalidMonsterByteCode[] = { 0x12, 0x34 };
+static const uint8_t kUndefinedMonsterByteCode[] = { 0x12, 0x34 };
 
 static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 	uint8_t r = 0;
@@ -2232,6 +2232,7 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 				m = t->dataPtr;
 			}
 			if (m) {
+				assert(index < kMaxLocals);
 				return m->localVars[index];
 			}
 		}
@@ -2261,6 +2262,7 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 				m = t->dataPtr;
 			}
 			if (m) {
+				assert(index < kMaxLocals);
 				m->localVars[index] = value;
 			}
 		}
@@ -2888,6 +2890,7 @@ int Game::runTask_default(Task *t) {
 					m = t->dataPtr;
 				}
 				if (m) {
+					assert(p[1] < kMaxLocals);
 					assert(p[2] < kMaxLocals);
 					arithOp(p[0] - 67, &m->localVars[p[1]], t->localVars[p[2]]);
 				}
@@ -2911,6 +2914,7 @@ int Game::runTask_default(Task *t) {
 				}
 				if (m) {
 					assert(p[1] < kMaxLocals);
+					assert(p[2] < kMaxLocals);
 					arithOp(p[0] - 77, &t->localVars[p[1]], m->localVars[p[2]]);
 				}
 			}
@@ -2933,6 +2937,7 @@ int Game::runTask_default(Task *t) {
 				}
 				if (m) {
 					assert(p[1] < kMaxVars);
+					assert(p[2] < kMaxLocals);
 					arithOp(p[0] - 87, &_mstVars[p[1]], m->localVars[p[2]]);
 					if (p[1] == 31 && _mstVars[31] > 0) {
 						_mstTickDelay = _mstVars[31];
@@ -2957,6 +2962,8 @@ int Game::runTask_default(Task *t) {
 					m = t->dataPtr;
 				}
 				if (m) {
+					assert(p[1] < kMaxLocals);
+					assert(p[2] < kMaxLocals);
 					arithOp(p[0] - 97, &m->localVars[p[1]], m->localVars[p[2]]);
 				}
 			}
@@ -2986,7 +2993,7 @@ int Game::runTask_default(Task *t) {
 		case 124:
 		case 125:
 		case 126: { // 41
-				assert(p[1] < kMaxLocals);
+				assert(p[1] < kMaxVars);
 				assert(p[2] < kMaxVars);
 				arithOp(p[0] - 117, &_mstVars[p[1]], _mstVars[p[2]]);
 			}
@@ -3098,7 +3105,8 @@ int Game::runTask_default(Task *t) {
 				}
 				if (m) {
 					const int16_t num = READ_LE_UINT16(p + 2);
-					arithOp(p[0] < 187, &m->localVars[p[1]], num);
+					assert(p[1] < kMaxLocals);
+					arithOp(p[0] - 187, &m->localVars[p[1]], num);
 				}
 			}
 			break;
@@ -5236,7 +5244,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		}
 // 41584E
 		memset(t, 0, sizeof(Task));
-		resetTask(t, kInvalidMonsterByteCode);
+		resetTask(t, kUndefinedMonsterByteCode);
 		t->monster2 = mo;
 		mo->task = t;
 		t->prevPtr = 0;
@@ -5270,7 +5278,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 // 415989
 		// TODO
 		memset(t, 0, sizeof(Task));
-		resetTask(t, kInvalidMonsterByteCode);
+		resetTask(t, kUndefinedMonsterByteCode);
 		t->prevPtr = 0;
 		t->nextPtr = _mstTasksList1;
 		if (_mstTasksList1) {
@@ -5336,7 +5344,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		switch (type) {
 		case 1:
 			executeMstOp67Type1(t);
-			if (!t->codeData || t->codeData == kInvalidMonsterByteCode) { // TEMP
+			if (!t->codeData || t->codeData == kUndefinedMonsterByteCode) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 1", t);
 				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MstTaskData));
@@ -5347,7 +5355,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				m->flagsA6 |= 1;
 			}
 			executeMstOp67Type2(t, 0);
-			if (!t->codeData || t->codeData == kInvalidMonsterByteCode) { // TEMP
+			if (!t->codeData || t->codeData == kUndefinedMonsterByteCode) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 2", t);
 				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MstTaskData));
