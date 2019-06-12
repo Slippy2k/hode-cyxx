@@ -136,7 +136,6 @@ struct Game {
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	bool _specialAnimFlag;
-	int _mstUnk10;
 	MovingOpcodeState _mstMovingState[kMaxMovingStates];
 	int _mstMovingStateCount;
 	uint8_t _mstOp68_type, _mstOp68_arg9, _mstOp67_type;
@@ -179,6 +178,7 @@ struct Game {
 	int _mstPosY; // _mstAndyLevelPosY
 	int _mstRefPosX; // _mstAndyScreenPosX
 	int _mstRefPosY; // _mstAndyScreenPosY
+	int _mstUnk10; // _mstAndyRectNum
 	int _mstOp54Unk1; // _m43Num1
 	int _mstOp54Unk2; // _m43Num2
 	int _mstOp54Unk3; // _m43Num3
@@ -587,10 +587,12 @@ struct Game {
 	bool updateMstTaskDataPosition(MstTaskData *m);
 	void resetMstObject(MstObject *m);
 	int prepareMstTask(Task *t);
+
 	void clearMstRectsTable(MstTaskData *m, int num);
 	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	int updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
 	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
+
 	void mstTaskSetScreenPosition(Task *t);
 	int getMstDistance(int y, MovingOpcodeState *p);
 	void mstTaskUpdateScreenPosition(Task *t);

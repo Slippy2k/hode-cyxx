@@ -385,7 +385,7 @@ void Game::clearMstRectsTable(MstTaskData *m, int num) {
 int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	for (int i = 0; i < _mstRectsCount; ++i) {
 		const MstRect *p = &_mstRectsTable[i];
-		if (p->num != 255 && num != p->num) {
+		if (p->num != 0xFF && num != p->num) {
 			if (p->x2 < x1) { // 16 - 8
 				continue;
 			}
@@ -405,10 +405,10 @@ int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 }
 
 int Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
-	if (num == 255) {
+	if (num == 0xFF) {
 		MstRect *p = &_mstRectsTable[0];
 		for (int i = 0; i < _mstRectsCount; ++i) {
-			if (p->num == 255) {
+			if (p->num == 0xFF) {
 				num = i;
 				break;
 			}
@@ -436,10 +436,10 @@ int Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
 int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	for (int i = 0; i < _mstRectsCount; ++i) {
 		MstRect *p = &_mstRectsTable[i];
-		if (p->num == 255 || p->num == num) {
+		if (p->num == 0xFF || p->num == num) {
 			continue;
 		}
-		if (p->num == 254) {
+		if (p->num == 0xFE) {
 			if (_mstUnkDataTable[num].unk8[944] != 15) {
 				continue;
 			}
@@ -1533,7 +1533,8 @@ int Game::executeMstCodeHelper3(Task *t) {
 		} else if (_ebp == 1) {
 // 418C73
 			m->flagsA6 |= 1;
-			if (mstSetCurrentPos(_mstCurrentTaskData, _mstCurrentTaskData->xMstPos, _mstCurrentTaskData->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
+			assert(_mstCurrentTaskData == m);
+			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
 				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->unkC->unk2C[1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->unkC->unk34[1])) {
 					uint32_t indexUnk35 = m->unkC->indexUnk35_20;
 					if (indexUnk35 != kNone) {
@@ -2004,10 +2005,9 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			return 0;
 		}
 
-		int _eax = 0;
-		int _edx = 0;
+		int _eax = var10;
 // 40E9BC
-		if ((m->unk8[946] & 4) != 0 && (_edx = ptr[14]) != 0) {
+		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
 			if (_eax == 0) {
 				_ebp = 0;
 			} else if (_mstLut1[_eax] & 1) {
@@ -2033,7 +2033,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 // 40EA40
 			_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
 			_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->soundType, _edi, _ebp, (_edx & 255) + _edi - 1, ptr[15] + _ebp - 1)) {
+			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
 				t->flags |= 0x80;
 				return 0;
 			}
@@ -4697,7 +4697,11 @@ int Game::mstSetCurrentPos(MstTaskData *m, int x, int y) {
 	}
 // 419EA7
 	if (x > _ecx && x < _edi) {
-		_mstCurrentPosX = (x >= _mstPosX) ? _edi : _ecx;
+		if (x >= _mstPosX) {
+			_mstCurrentPosX = _edi;
+		} else {
+			_mstCurrentPosX = _ecx;
+		}
 		return 0;
 	}
 	const int32_t b = READ_LE_UINT32(ptr + 896);
