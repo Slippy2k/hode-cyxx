@@ -48,6 +48,8 @@ static const uint8_t _byte_43E838[] = {
 	3, 3, 3, 2, 1, 1, 0, 0xFF, 2, 2, 2, 2, 1, 0, 0, 0xFF
 };
 
+static const uint8_t kInvalidMonsterByteCode[] = { 0x12, 0x34 };
+
 static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 	uint8_t r = 0;
 	if (a & 8) { // Andy left facing monster
@@ -5234,9 +5236,9 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		}
 // 41584E
 		memset(t, 0, sizeof(Task));
+		resetTask(t, kInvalidMonsterByteCode);
 		t->monster2 = mo;
 		mo->task = t;
-		// resetTask(t, 1234);
 		t->prevPtr = 0;
 		t->nextPtr = _mstTasksList2;
 		if (_mstTasksList2) {
@@ -5268,7 +5270,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 // 415989
 		// TODO
 		memset(t, 0, sizeof(Task));
-		// resetTask(t, 1234);
+		resetTask(t, kInvalidMonsterByteCode);
 		t->prevPtr = 0;
 		t->nextPtr = _mstTasksList1;
 		if (_mstTasksList1) {
@@ -5334,7 +5336,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		switch (type) {
 		case 1:
 			executeMstOp67Type1(t);
-			if (!t->codeData) { // TEMP
+			if (!t->codeData || t->codeData == kInvalidMonsterByteCode) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 1", t);
 				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MstTaskData));
@@ -5345,7 +5347,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				m->flagsA6 |= 1;
 			}
 			executeMstOp67Type2(t, 0);
-			if (!t->codeData) { // TEMP
+			if (!t->codeData || t->codeData == kInvalidMonsterByteCode) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 2", t);
 				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MstTaskData));
