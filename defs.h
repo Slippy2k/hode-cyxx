@@ -412,6 +412,7 @@ struct MstObject { // MonsterObject2
 	uint8_t flags39;
 	uint8_t flags3A;
 	uint8_t flags3B;
+	Task *task; // 0x3C
 }; // sizeof == 64
 
 struct Task {

@@ -1225,7 +1225,7 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk45[i].unk0 = fp->readByte();
 		_mstUnk45[i].unk1 = fp->readByte();
 		_mstUnk45[i].unk2 = fp->readUint16();
-		_mstUnk45[i].unk4 = fp->readUint32();
+		_mstUnk45[i].codeData = fp->readUint32();
 		_mstUnk45[i].unk8 = fp->readUint32();
 		bytesRead += 12;
 	}

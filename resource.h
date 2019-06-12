@@ -186,7 +186,7 @@ struct MstUnk45 {
 	uint8_t unk0;
 	uint8_t unk1;
 	uint16_t unk2;
-	uint32_t unk4;
+	uint32_t codeData;
 	uint32_t unk8;
 }; // sizeof == 12
 

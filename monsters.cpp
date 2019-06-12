@@ -5152,6 +5152,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			return;
 		}
 // 415743
+		assert(arg24 >= 0 && arg24 < _res->_mstHdr.unk0x2C);
 		mo->m45 = &_res->_mstUnk45[arg24];
 		if (t->dataPtr) {
 			mo->mstTaskData = t->dataPtr;
@@ -5166,7 +5167,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		uint8_t _cl  = mo->m45->unk0;
 		uint16_t _ax = mo->m45->unk2; // anim
 
-		o = addLvlObject((_cl >> 7) & 1, x2, y1, objScreen, (_cl & 0x7F), _ax, o_flags1, o_flags2, 0, 0);
+		o = addLvlObject((_cl >> 7) & 1, x1, y1, objScreen, (_cl & 0x7F), _ax, o_flags1, o_flags2, 0, 0);
 		if (!o) {
 			mo->m45 = 0;
 			if (mo->o) {
@@ -5176,10 +5177,6 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		}
 		mo->o = o;
 		o->dataPtr = mo;
-// 4157E2
-		warning("mstOp67 case -128 unimplemented");
-		// TODO
-		return;
 	}
 // 4157E8
 	if (screen < 0) {
@@ -5189,7 +5186,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 	setLvlObjectPosInScreenGrid(o, 7);
 	if (mo) {
 		Task *t = 0;
-		for (int i = 0; i < 64; ++i) {
+		for (int i = 0; i < kMaxTasks; ++i) {
 			if (!_tasksTable[i].codeData) {
 				t = &_tasksTable[i];
 				break;
@@ -5205,23 +5202,28 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		}
 // 41584E
 		memset(t, 0, sizeof(Task));
+		t->mstObject = mo;
+		mo->task = t;
 		// resetTask(t, 1234);
 		t->prevPtr = 0;
 		t->nextPtr = _mstTasksList2;
 		if (_mstTasksList2) {
 			_mstTasksList2->prevPtr = t;
 		}
-		warning("mstOp67 mo %p unimplemented", mo);
 		// TODO
 		mstTaskSetScreenPosition(t);
-		// TODO
+		const uint32_t codeData = mo->m45->codeData;
+		assert(codeData != kNone);
+		resetTask(t, _res->_mstCodeData + codeData * 4);
 		if (_currentLevel == kLvl_fort) {
-			// TODO
+			if (mo->m45->unk0 == 27) {
+				warning("executeMstOp67Helper1 fort type 27 unimplemented");
+			}
 		}
 	} else {
 // 41593C
 		Task *t = 0;
-		for (int i = 0; i < 64; ++i) {
+		for (int i = 0; i < kMaxTasks; ++i) {
 			if (!_tasksTable[i].codeData) {
 				t = &_tasksTable[i];
 				break;
