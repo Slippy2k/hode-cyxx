@@ -40,6 +40,14 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x4D, 0x4F, 0x4E
 };
 
+static const uint8_t _byte_43E838[] = {
+	0, 1, 2, 3, 4, 4, 4, 0xFF, 0, 1, 2, 2, 4, 4, 3, 0xFF,
+	0, 1, 1, 2, 3, 2, 3, 0xFF, 0, 1, 1, 2, 3, 3, 3, 0xFF,
+	0, 0, 1, 2, 2, 2, 2, 0xFF, 4, 4, 4, 3, 2, 1, 0, 0xFF,
+	3, 4, 4, 2, 2, 1, 0, 0xFF, 3, 2, 3, 2, 1, 1, 0, 0xFF,
+	3, 3, 3, 2, 1, 1, 0, 0xFF, 2, 2, 2, 2, 1, 0, 0, 0xFF
+};
+
 static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 	uint8_t r = 0;
 	if (a & 8) { // Andy left facing monster
@@ -71,6 +79,27 @@ void Game::resetMstTaskData(MstTaskData *m) {
 			_mstObjectsTable[i].mstTaskData = 0;
 		}
 	}
+}
+
+void Game::objectMonster2Init_fort_firefly(MonsterObject2 *m) {
+	LvlObject *o = m->o;
+	m->x1 = _res->_mstPointOffsets[o->screenNum].xOffset;
+	m->y1 = _res->_mstPointOffsets[o->screenNum].yOffset;
+	m->x2 = m->x1 + 255;
+	m->y2 = m->y1 + 191;
+	const uint32_t num = _rnd.update();
+	m->flags38 = num % 40;
+	if (_byte_43E838[m->flags38] != 0xFF) {
+		m->flags38 &= ~7;
+	}
+	m->flags39 = m->flags38;
+	if (num & 0x80) {
+		m->flags38 += 40;
+	} else {
+		m->flags39 += 40;
+	}
+	m->flags3A = (num >> 16) & 1;
+	m->flags3B = (num >> 17) & 1;
 }
 
 void Game::resetMstObject(MonsterObject2 *m) {
@@ -1350,7 +1379,7 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 	}
 }
 
-// mstUpdateTaskMonsterObject
+// mstUpdateTaskMonsterObject1
 int Game::executeMstCodeHelper3(Task *t) {
 	_mstCurrentTask = t;
 	MstTaskData *m = t->dataPtr;
@@ -4365,10 +4394,10 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	case 11: {
 			MonsterObject2 *m = t->monster2;
 			const int type = _res->_mstOp56Data[num].unkC;
-			m->boundingBox.x1 = getTaskVar(t, _res->_mstOp56Data[num].unk0, (type >> 0xC) & 15);
-			m->boundingBox.x2 = getTaskVar(t, _res->_mstOp56Data[num].unk4, (type >> 0x8) & 15);
-			m->boundingBox.y1 = getTaskVar(t, _res->_mstOp56Data[num].unk8, (type >> 0x4) & 15);
-			m->boundingBox.y2 = getTaskVar(t, type >> 16                  ,  type         & 15);
+			m->x1 = getTaskVar(t, _res->_mstOp56Data[num].unk0, (type >> 0xC) & 15);
+			m->y1 = getTaskVar(t, _res->_mstOp56Data[num].unk4, (type >> 0x8) & 15);
+			m->x2 = getTaskVar(t, _res->_mstOp56Data[num].unk8, (type >> 0x4) & 15);
+			m->y2 = getTaskVar(t, type >> 16                  ,  type         & 15);
 		}
 		break;
 	case 12: {
@@ -5215,10 +5244,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		const uint32_t codeData = mo->m45->codeData;
 		assert(codeData != kNone);
 		resetTask(t, _res->_mstCodeData + codeData * 4);
-		if (_currentLevel == kLvl_fort) {
-			if (mo->m45->unk0 == 27) {
-				warning("executeMstOp67Helper1 fort type 27 unimplemented");
-			}
+		if (_currentLevel == kLvl_fort && mo->m45->unk0 == 27) {
+			objectMonster2Init_fort_firefly(mo);
 		}
 	} else {
 // 41593C
@@ -5304,9 +5331,9 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		switch (type) {
 		case 1:
 			executeMstOp67Type1(t);
-			if (!t->codeData) {
+			if (!t->codeData) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 1", t);
-				removeTask(&_mstTasksList1, t);
+				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MstTaskData));
 			}
 			break;
@@ -5315,9 +5342,9 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				m->flagsA6 |= 1;
 			}
 			executeMstOp67Type2(t, 0);
-			if (!t->codeData) {
+			if (!t->codeData) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 2", t);
-				removeTask(&_mstTasksList1, t);
+				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MstTaskData));
 			}
 			break;

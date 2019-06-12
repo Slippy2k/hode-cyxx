@@ -407,7 +407,10 @@ struct MonsterObject2 {
 	int xMstPos; // 1C
 	int yMstPos; // 20
 	uint8_t flags24; // 24
-	BoundingBox boundingBox; // 28
+	int x1; // 28
+	int x2; // 2C
+	int y1; // 30
+	int y2; // 34
 	uint8_t flags38;
 	uint8_t flags39;
 	uint8_t flags3A;
