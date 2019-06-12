@@ -173,12 +173,12 @@ struct Game {
 	Task *_mstTasksList2;
 	Task *_mstTasksList3;
 	Task *_mstTasksList4;
-	int _mstPrevPosX;
-	int _mstPrevPosY;
-	int _mstPosX;
-	int _mstPosY;
-	int _mstRefPosX;
-	int _mstRefPosY;
+	int _mstPrevPosX; // _mstAndyLevelPrevPosX
+	int _mstPrevPosY; // _mstAndyLevelPrevPosY
+	int _mstPosX; // _mstAndyLevelPosX
+	int _mstPosY; // _mstAndyLevelPosY
+	int _mstRefPosX; // _mstAndyScreenPosX
+	int _mstRefPosY; // _mstAndyScreenPosY
 	int _mstOp54Unk1; // _m43Num1
 	int _mstOp54Unk2; // _m43Num2
 	int _mstOp54Unk3; // _m43Num3

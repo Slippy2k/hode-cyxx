@@ -40,12 +40,12 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x4D, 0x4F, 0x4E
 };
 
-static uint8_t getBits23(uint8_t a) {
+static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 	uint8_t r = 0;
-	if (a & 8) {
+	if (a & 8) { // Andy left facing monster
 		r |= 1;
 	}
-	if (a & 4) {
+	if (a & 4) { // Andy below the monster
 		r |= 2;
 	}
 	return r;
@@ -1500,7 +1500,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 					if (_al & 1) {
 						_ebp = 1;
 					} else {
-						_al = getBits23(m->flags49) & 1;
+						_al = mstGetFacingDirectionMask(m->flags49) & 1;
 						_dl = (_mstCurrentTaskData->o16->flags1 >> 4) & 1;
 						if (_dl == _al) {
 							_ebp = 1;

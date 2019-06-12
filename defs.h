@@ -352,8 +352,8 @@ struct MstTaskData { // MonsterObject
 	uint8_t flags4B; // 0x4B
 	int xPos; // 0x4C
 	int yPos; // 0x50
-	int xMstPos; // 0x54
-	int yMstPos; // 0x58
+	int xMstPos; // 0x54 xLevelPos
+	int yMstPos; // 0x58 yLevelPos
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
 	int unk64; // 0x64

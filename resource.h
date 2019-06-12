@@ -212,9 +212,9 @@ struct MstUnk47 {
 }; // SIZEOF_MstUnk47 8
 
 struct MstUnk48Unk12Unk4 {
-	uint32_t unk0; // 0x0
-	uint32_t unk8; // 0x8 xPos
-	uint32_t unkC; // 0xC yPos
+	uint32_t unk0; // 0x0, indexes _mstHeightMapData
+	int32_t unk8; // 0x8 xPos
+	int32_t unkC; // 0xC yPos
 	uint32_t codeData; // 0x10
 	uint8_t unk18; // 0x18
 	uint8_t unk19; // 0x19
