@@ -3353,7 +3353,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		}
 		int _ebx, var4;
 		MstTaskData *m = 0; // _ebp
-		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr <= &_mstUnkDataTable[32]) {
+		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr < &_mstUnkDataTable[32]) {
 			m = (MstTaskData *)ptr->dataPtr;
 			_ebx = 1;
 			var4 = m->soundType;
@@ -3367,6 +3367,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 				return 0;
 			}
 		} else {
+			assert(dataPtr >= &_mstObjectsTable[0] && dataPtr < &_mstObjectsTable[kMaxMonsterObjects2]);
 			MonsterObject2 *mo = (MonsterObject2 *)dataPtr;
 			m = mo->mstTaskData;
 			if (m) {
