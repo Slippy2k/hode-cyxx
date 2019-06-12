@@ -892,7 +892,7 @@ void Game::clearLvlObjectsList1() {
 	if (!_lvlObjectsList1) {
 		return;
 	}
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
@@ -2097,7 +2097,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		return o;
 	}
 	int a, c;
-	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr <= &_mstUnkDataTable[32]) {
+	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]) {
 		MstTaskData *m = (MstTaskData *)ptr->dataPtr;
 		if (m->flagsA6 & 2) {
 			assert(ptr == m->o16);
@@ -2107,6 +2107,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		a = m->soundType;
 		c = 1;
 	} else {
+		assert(ptr->dataPtr >= &_mstObjectsTable[0] && ptr->dataPtr < &_mstObjectsTable[kMaxMonsterObjects2]);
 		MstTaskData *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
 		if (m) {
 			a = m->soundType;
@@ -2717,8 +2718,11 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 		// dataPtr is _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable + 2
 		assert(o->dataPtr);
 		break;
-	case kObjectDataTypeMonster:
-		assert(o->dataPtr >= &_mstUnkDataTable[0] && o->dataPtr < &_mstUnkDataTable[32]);
+	case kObjectDataTypeMonster1:
+		assert(o->dataPtr >= &_mstUnkDataTable[0] && o->dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]);
+		break;
+	case kObjectDataTypeMonster2:
+		assert(o->dataPtr >= &_mstObjectsTable[0] && o->dataPtr < &_mstObjectsTable[kMaxMonsterObjects2]);
 		break;
 	}
 	return o->dataPtr;
@@ -3353,7 +3357,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		}
 		int _ebx, var4;
 		MstTaskData *m = 0; // _ebp
-		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr < &_mstUnkDataTable[32]) {
+		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]) {
 			m = (MstTaskData *)ptr->dataPtr;
 			_ebx = 1;
 			var4 = m->soundType;

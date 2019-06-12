@@ -152,7 +152,7 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;
 		const uint8_t code = unk4->unk1B;
 		if (code != 255) {
-			assert(code < 32);
+			assert(code < kMaxMonsterObjects1);
 			unk4->unk19 = flag;
 			MstTaskData *m = &_mstUnkDataTable[code];
 			m->unk18 = unk4;
@@ -728,7 +728,7 @@ void Game::resetMstCode() {
 		return;
 	}
 	_mstFlags = 0;
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
@@ -810,7 +810,7 @@ void Game::resetMstCode() {
 		_mstVars[31] = -1;
 	}
 	_mstVars[30] = 0x20;
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 		_mstUnkDataTable[i].soundType = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
@@ -1044,7 +1044,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 	o->actionKeyMask = ptr[1];
 	uint8_t _al = mask1 & 15;
 	o->directionKeyMask = _al;
-	MstTaskData *m = (MstTaskData *)getLvlObjectDataPtr(o, kObjectDataTypeMonster);
+	MstTaskData *m = (MstTaskData *)getLvlObjectDataPtr(o, kObjectDataTypeMonster1);
 	if ((mask1 & 0x10) == 0) {
 		const int _edi = mask1 & 0xE0;
 		switch (_edi) {
@@ -3300,7 +3300,7 @@ int Game::runTask_default(Task *t) {
 				int _edx  = _edi + 256 + _ecx;
 				_edi -= _ecx;
 				int var20 = _edx;
-				for (int i = 0; i < 32; ++i) {
+				for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 					MstTaskData *m = &_mstUnkDataTable[i];
 					if (!m->m46) {
 						continue;
@@ -3944,7 +3944,7 @@ void Game::executeMstOp52() {
 		MstUnk48Unk12 *m48unk12 = &m48->unk12[j];
 		const uint8_t num = m48unk12->data->unk1B;
 		if (num != 255) {
-			assert(num < 32);
+			assert(num < kMaxMonsterObjects1);
 			MstTaskData *m = &_mstUnkDataTable[num];
 			m->flags48 &= ~0x50;
 			m->unk18->unk1B = 255;
@@ -4795,7 +4795,7 @@ void Game::executeMstUnk12() {
 		}
 	}
 
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 		MstTaskData *m = &_mstUnkDataTable[i];
 		if (!m->m46) {
 			continue;
@@ -5084,7 +5084,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			_mstVars[30] = 32;
 		}
 		int count = 0;
-		for (int i = 0; i < 32; ++i) {
+		for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 			if (_mstUnkDataTable[i].m46) {
 				++count;
 			}
@@ -5101,7 +5101,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			}
 		}
 // 415518
-		for (int i = 0; i < 32; ++i) {
+		for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 			if (!_mstUnkDataTable[i].m46) {
 				m = &_mstUnkDataTable[i];
 				break;

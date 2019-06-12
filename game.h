@@ -36,7 +36,8 @@ struct Game {
 		kObjectDataTypeShoot,
 		// LvlObject.type == 1
 		kObjectDataTypeLvlBackgroundSound,
-		kObjectDataTypeMonster
+		kObjectDataTypeMonster1,
+		kObjectDataTypeMonster2
 	};
 	enum {
 		kMaxScreens = 40,
@@ -46,6 +47,7 @@ struct Game {
 		kMaxMovingStates = 8,
 		kMaxShootLvlObjectData = 32,
 		kMaxSssObjects = 32,
+		kMaxMonsterObjects1 = 32,
 		kMaxMonsterObjects2 = 64,
 		kFrameTimeStamp = 50 // 80
 	};
@@ -192,7 +194,7 @@ struct Game {
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	int _mstTemp_x1, _mstTemp_x2, _mstTemp_y1, _mstTemp_y2;
-	MstTaskData _mstUnkDataTable[32]; // _monsterObjects1Table
+	MstTaskData _mstUnkDataTable[kMaxMonsterObjects1]; // _monsterObjects1Table
 	MonsterObject2 _mstObjectsTable[kMaxMonsterObjects2]; // _monsterObjects2Table
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
