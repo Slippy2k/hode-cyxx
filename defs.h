@@ -389,7 +389,7 @@ struct MstTaskData { // MonsterObject1
 	uint8_t unkE4;
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;
-	int unkE8; // 0xE8
+	uint16_t unkE8; // 0xE8
 	int unkEC; // 0xEC
 	int unkF0; // 0xF0
 	int unkF4; // 0xF4

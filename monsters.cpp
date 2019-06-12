@@ -1413,6 +1413,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 		return 0;
 	}
 	if (m->localVars[7] == 0 && !_specialAnimFlag) {
+		// monster is dead
 		m->flagsA5 |= 0x80;
 		if (m->unk8[946] & 4) {
 			clearMstRectsTable(m, 1);
@@ -3598,7 +3599,7 @@ int Game::runTask_default(Task *t) {
 							disableMstTaskData(m);
 						}
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
-						executeMstOp67Type2(t, 1);
+						return executeMstOp67Type2(t, 1);
 					}
 				} else if ((m->flagsA5 & 8) != 0) {
 // 413F8B
@@ -3606,8 +3607,10 @@ int Game::runTask_default(Task *t) {
 					const uint32_t codeData = m->unk4->codeData;
 					assert(codeData != kNone);
 					resetTask(t, _res->_mstCodeData + codeData * 4);
+					return 0;
 				} else {
 					t->run = &Game::runTask_idle;
+					return 1;
 				}
 			} else if (t->monster2) {
 				warning(".mst opcode 242 monster2 is not NULL");
