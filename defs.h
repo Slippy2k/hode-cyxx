@@ -334,7 +334,7 @@ struct MstUnk48Unk12Unk4;
 struct MstUnk49;
 struct MstUnk49Unk1;
 
-struct MstTaskData { // MonsterObject
+struct MstTaskData { // MonsterObject1
 	MstUnk46 *m46;
 	MstUnk46Unk1 *unk4;
 	const uint8_t *unk8;
@@ -397,7 +397,7 @@ struct MstTaskData { // MonsterObject
 	int unkFC; // 0xFC
 }; // sizeof == 256
 
-struct MstObject { // MonsterObject2
+struct MonsterObject2 {
 	MstUnk45 *m45;
 	LvlObject *o; // 4
 	MstTaskData *mstTaskData; // 8
@@ -418,8 +418,8 @@ struct MstObject { // MonsterObject2
 struct Task {
 	const uint8_t *codeData;
 	Task *prevPtr, *nextPtr; // 4,8
-	MstTaskData *dataPtr; // 0xC monster
-	MstObject *mstObject; // 0x10 monster2
+	MstTaskData *dataPtr; // 0xC monster1
+	MonsterObject2 *monster2; // 0x10
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34
 	uint8_t runningState; // 0x35

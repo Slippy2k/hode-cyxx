@@ -895,7 +895,7 @@ void Game::clearLvlObjectsList1() {
 	for (int i = 0; i < 32; ++i) {
 		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
-	for (int i = 0; i < 64; ++i) {
+	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
 		resetMstObject(&_mstObjectsTable[i]);
 	}
 	LvlObject *ptr = _lvlObjectsList1;
@@ -2107,7 +2107,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		a = m->soundType;
 		c = 1;
 	} else {
-		MstTaskData *m = ((MstObject *)ptr->dataPtr)->mstTaskData;
+		MstTaskData *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
 		if (m) {
 			a = m->soundType;
 			c = 2;
@@ -3367,7 +3367,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 				return 0;
 			}
 		} else {
-			MstObject *mo = (MstObject *)dataPtr;
+			MonsterObject2 *mo = (MonsterObject2 *)dataPtr;
 			m = mo->mstTaskData;
 			if (m) {
 				_ebx = 2;

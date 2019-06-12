@@ -46,6 +46,7 @@ struct Game {
 		kMaxMovingStates = 8,
 		kMaxShootLvlObjectData = 32,
 		kMaxSssObjects = 32,
+		kMaxMonsterObjects2 = 64,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -191,8 +192,8 @@ struct Game {
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	int _mstTemp_x1, _mstTemp_x2, _mstTemp_y1, _mstTemp_y2;
-	MstTaskData _mstUnkDataTable[32];
-	MstObject _mstObjectsTable[64];
+	MstTaskData _mstUnkDataTable[32]; // _monsterObjects1Table
+	MonsterObject2 _mstObjectsTable[kMaxMonsterObjects2]; // _monsterObjects2Table
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
 	int _xMstPos1, _xMstPos2;
@@ -585,7 +586,7 @@ struct Game {
 	void updateMstLvlObjectPos(MstTaskData *m);
 	bool updateMstTaskDataPositionHelper(MstTaskData *m);
 	bool updateMstTaskDataPosition(MstTaskData *m);
-	void resetMstObject(MstObject *m);
+	void resetMstObject(MonsterObject2 *m);
 	int prepareMstTask(Task *t);
 
 	void clearMstRectsTable(MstTaskData *m, int num);
