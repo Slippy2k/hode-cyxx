@@ -135,7 +135,7 @@ struct MstUnk35 {
 
 struct MstUnk36 {
 	uint32_t indexUnk49; // indexes _mstUnk49
-	uint32_t unk4;
+	uint32_t unk4; // indexes _mstUnk49.data1
 	uint32_t unk8;
 }; // sizeof == 12
 

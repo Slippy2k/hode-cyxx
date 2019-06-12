@@ -1350,6 +1350,7 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 	}
 }
 
+// mstUpdateTaskMonsterObject
 int Game::executeMstCodeHelper3(Task *t) {
 	_mstCurrentTask = t;
 	MstTaskData *m = t->dataPtr;
@@ -1416,9 +1417,12 @@ int Game::executeMstCodeHelper3(Task *t) {
 	if ((m->flagsA5 & 0x40) != 0) {
 		return 0;
 	}
-// 41831
-	if (_mstMovingStateCount > 0) {
-		// TODO
+// 418384
+	for (int i = 0; i < _mstMovingStateCount; ++i) {
+		MovingOpcodeState *p = &_mstMovingState[i];
+		if (!p->m || p->m == _mstCurrentTaskData) {
+			// TODO
+		}
 	}
 // 41882E
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
@@ -1650,6 +1654,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 	return 0;
 }
 
+// mstUpdateTaskMonsterObject2
 int Game::executeMstCodeHelper4(Task *t) {
 	warning("executeMstCodeHelper4 unimplemented");
 	// TODO
@@ -3676,6 +3681,7 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 }
 
 int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
+	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
 	MstTaskData *m = t->dataPtr;
 	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
 	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
@@ -3685,10 +3691,10 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 		if (m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
-			m->unkDC = m49->data2[_al];
+			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
+	assert(m->unkDC >= 0 && m->unkDC < m49->count1);
 	m->unkD4 = &m49->data1[m->unkDC];
 	m->flags4B = screen;
 	if (a > b) {
@@ -4101,6 +4107,7 @@ l2:
 }
 
 void Game::executeMstOp54() {
+	debug(kDebug_MONSTER, "mstOp54 %d %d %d", _mstUnk6, _mstOp54Unk2, _mstOp54Unk3);
 	if (_mstUnk6 != -1) {
 		return;
 	}
@@ -4171,8 +4178,7 @@ void Game::executeMstOp54() {
 		int var4 = 0;
 		uint32_t i = 0;
 		for (; i < m43->count2; ++i) {
-			uint8_t *ptr = m43->data2;
-			uint8_t code = ptr[i];
+			uint8_t code = m43->data2[i];
 			if ((code & 0x80) == 0) {
 				code &= 0x7F;
 				var4 = 1;
@@ -4847,11 +4853,11 @@ int Game::executeMstOp67Type1(Task *t) {
 		if (m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
-			m->unkDC = m49->data2[_al];
+			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 // 41C5B1
+	assert(m->unkDC >= 0 && m->unkDC < m49->count1);
 	m->unkD4 = &m49->data1[m->unkDC];
 	int _edi = (m->unkC->x1 - x) / 4;
 	m->unk64 = x + _edi;
@@ -4917,22 +4923,23 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	MstUnk36 *m36 = &_res->_mstUnk36[i];
 	const int j = m36->indexUnk49;
 	assert(j >= 0 && j < _res->_mstHdr.unk0x40);
-	m->m49 = &_res->_mstUnk49[j];
+	MstUnk49 *m49 = &_res->_mstUnk49[j];
+	m->m49 = m49;
 	if (flag != 0) {
-		m->unkDC = m36->unk8 - 1;
+		m->unkDC = m49->count1 - 1;
 	} else {
 		m->unkDC = m36->unk4;
 	}
 	if (m->unkDC < 0) {
-		if (m->m49->count2 == 0) {
+		if (m49->count2 == 0) {
 			m->unkDC = 0;
 		} else {
-			const uint8_t _al = _rnd.getMstNextNumber(m->rnd_m49);
-			m->unkDC = m->m49->data2[_al];
+			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 // 41CC44
-	m->unkD4 = &m->m49->data1[m->unkDC];
+	assert(m->unkDC >= 0 && m->unkDC < m49->count1);
+	m->unkD4 = &m49->data1[m->unkDC];
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;

@@ -1348,7 +1348,8 @@ void Resource::loadMstData(File *fp) {
 	}
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		_mstUnk49[i].data1 = (MstUnk49Unk1 *)malloc(_mstUnk49[i].count1 * sizeof(MstUnk49Unk1));
-		const uint32_t start = _mstUnk49[i].indexHeight;
+		const int start = _mstUnk49[i].indexHeight;
+		assert(start < _mstHdr.unk0x3C);
 		for (uint32_t j = 0; j < _mstUnk49[i].count1; ++j) {
 			fp->readUint32();
 			_mstUnk49[i].data1[j].unk4 = fp->readUint32();

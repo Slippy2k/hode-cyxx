@@ -126,7 +126,7 @@ int Game::moveAndyObjectOp2(int op) {
 	case 19:
 		return (_actionKeyMask == 4) ? 1 : 0;
 	case 20:
-		return ((_actionKeyMask & 0xFF) >> 7);
+		return (_actionKeyMask >> 7) & 1;
 	case 21:
 		return (_actionKeyMask == 8) ? 1 : 0;
 	case 22:
@@ -160,7 +160,7 @@ int Game::moveAndyObjectOp2(int op) {
 	case 36:
 		return ((~_actionKeyMask) >> 6) & 1;
 	case 37:
-		return ((~_actionKeyMask) & 0xFF) >> 7;
+		return ((~_actionKeyMask) >> 7) & 1;
 	case 38:
 		return ((_actionKeyMask & 3) != 0) ? 1 : 0;
 	case 39:

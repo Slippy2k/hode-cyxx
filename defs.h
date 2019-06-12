@@ -347,7 +347,7 @@ struct MstTaskData { // MonsterObject
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
-	uint8_t flags49; // 0x49
+	uint8_t flags49; // 0x49 facingDirectionMask
 	uint8_t flags4A; // 0x4A
 	uint8_t flags4B; // 0x4B
 	int xPos; // 0x4C
@@ -385,7 +385,7 @@ struct MstTaskData { // MonsterObject
 	MstUnk35 *m35; // 0xD0
 	MstUnk49Unk1 *unkD4; // 0xD4, sizeof=16
 	MstUnk49 *m49; // 0xD8
-	int unkDC; // 0xDC
+	int unkDC; // 0xDC // indexes _mstUnk49.data1
 	uint8_t unkE4;
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;
