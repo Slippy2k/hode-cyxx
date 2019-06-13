@@ -14,6 +14,8 @@ static uint8_t byte_452610[] = {  2,  0, 0, 0 };
 static uint8_t byte_452614[] = {  2,  0, 0, 0 };
 static uint8_t byte_45261C[] = {  2,  0, 0, 0 };
 static uint8_t byte_452620[] = {  2,  0, 0, 0 };
+static uint8_t byte_452624[] = {  2,  0, 0, 0 };
+static uint8_t byte_452628[] = {  2,  0, 0, 0 };
 
 void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	// TODO
@@ -155,6 +157,14 @@ void Game::postScreenUpdate_lar1_screen16() {
 	postScreenUpdate_lar1_helper(o, byte_452620, 10);
 }
 
+void Game::postScreenUpdate_lar1_screen18() {
+	LvlObject *o1 = findLvlObject(2, 0, 18);
+	postScreenUpdate_lar1_helper(o1, byte_452624, 11);
+	LvlObject *o2 = findLvlObject(2, 1, 18);
+	postScreenUpdate_lar1_helper(o2, byte_452628, 12);
+	// TODO
+}
+
 void Game::postScreenUpdate_lar1_screen19() {
 	if (_screenCounterTable[19] == 0) {
 		if (_res->_currentScreenResourceNum == 19) {
@@ -246,14 +256,23 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 	case 9:
 		postScreenUpdate_lar1_screen9();
 		break;
+	case 12:
+		// TODO
+		break;
 	case 13:
 		postScreenUpdate_lar1_screen13();
+		break;
+	case 14:
+		// TODO
 		break;
 	case 15:
 		postScreenUpdate_lar1_screen15();
 		break;
 	case 16:
 		postScreenUpdate_lar1_screen16();
+		break;
+	case 18:
+		postScreenUpdate_lar1_screen18();
 		break;
 	case 19:
 		postScreenUpdate_lar1_screen19();
@@ -266,12 +285,6 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 		break;
 	case 24:
 		postScreenUpdate_lar1_screen24();
-		break;
-	case 12:
-	case 14:
-	case 18:
-		warning("callLevel_postScreenUpdate_lar1 %d unimplemented", num);
-		// TODO
 		break;
 	}
 }

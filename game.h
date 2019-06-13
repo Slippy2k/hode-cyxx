@@ -519,6 +519,7 @@ struct Game {
 	void postScreenUpdate_lar1_screen13();
 	void postScreenUpdate_lar1_screen15();
 	void postScreenUpdate_lar1_screen16();
+	void postScreenUpdate_lar1_screen18();
 	void postScreenUpdate_lar1_screen19();
 	void postScreenUpdate_lar1_screen20();
 	void postScreenUpdate_lar1_screen22();
