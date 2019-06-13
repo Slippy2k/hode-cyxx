@@ -180,7 +180,7 @@ int Game::addMstTaskData(MstUnk48 *m48, uint8_t flag) {
 			const uint32_t codeData = unk4->codeData;
 			assert(codeData != kNone);
 			resetTask(t, _res->_mstCodeData + codeData * 4);
-			++_mstTasksList1;
+			++_mstTaskDataCount;
 		}
 	}
 
@@ -1939,6 +1939,7 @@ void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
 				n->run = &Game::runTask_default;
 				assert(codeData != kNone);
 				resetTask(t, _res->_mstCodeData + codeData * 4);
+				return;
 			}
 		}
 	} else {
@@ -2096,6 +2097,7 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	Task *current = _tasksList;
 	bool found = false;
 	while (current) {
+		Task *nextPtr = current->nextPtr;
 		if (current->localVars[7] == num) {
 			found = true;
 			if (current != t) {
@@ -2121,7 +2123,7 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 				}
 			}
 		}
-		current = current->nextPtr;
+		current = nextPtr;
 	}
 	if (found) {
 		return;
@@ -2761,7 +2763,7 @@ int Game::runTask_default(Task *t) {
 		case 33:
 		case 229: { // 23 - jmp_imm
 				const int num = READ_LE_UINT16(p + 2);
-				p = _res->_mstCodeData + (num - 1) * 4;
+				p = _res->_mstCodeData + num * 4 - 4;
 			}
 			break;
 		case 35: { // 24 - enable_trigger
@@ -3525,8 +3527,8 @@ int Game::runTask_default(Task *t) {
 		case 240: { // 77
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk59 *m = &_res->_mstUnk59[num];
-				const uint8_t *codeData = (m->codeData == kNone) ? 0 : _res->_mstCodeData + m->codeData * 4;
-				updateTask(t, m->taskId, codeData);
+				const uint8_t *codeData = (m->codeData == kNone) ? 0 : (_res->_mstCodeData + m->codeData * 4);
+				updateTask(t, m->num, codeData);
 			}
 			break;
 		case 242: // 78
@@ -5295,8 +5297,6 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			child->codeData = 0;
 			t->child = 0;
 		}
-		// TODO
-/*
 		Task *next = t->nextPtr;
 		Task *prev = t->prevPtr;
 		t->codeData = 0;
@@ -5323,9 +5323,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			t->nextPtr = 0;
 			t->prevPtr = current;
 		}
-*/
 // 415A3C
-		// t->codeData = 1234;
+		t->codeData = kUndefinedMonsterByteCode;
 		_rnd.resetMst(m->rnd_m35);
 		_rnd.resetMst(m->rnd_m49);
 

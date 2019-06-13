@@ -282,7 +282,7 @@ struct MstScreenInitCode {
 }; // SIZEOF_MstScreenInitCode 8
 
 struct MstUnk59 { // MstOp240Data
-	uint32_t taskId;
+	uint32_t num;
 	uint32_t codeData;
 }; // SIZEOF_MstUnk59 8
 
