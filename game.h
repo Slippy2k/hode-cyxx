@@ -194,8 +194,8 @@ struct Game {
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	int _mstTemp_x1, _mstTemp_x2, _mstTemp_y1, _mstTemp_y2;
-	MstTaskData _mstUnkDataTable[kMaxMonsterObjects1]; // _monsterObjects1Table
-	MonsterObject2 _mstObjectsTable[kMaxMonsterObjects2]; // _monsterObjects2Table
+	MstTaskData _mstUnkDataTable[kMaxMonsterObjects1];
+	MonsterObject2 _monsterObjects2Table[kMaxMonsterObjects2];
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
 	int _xMstPos1, _xMstPos2;
@@ -622,8 +622,8 @@ struct Game {
 	bool executeMstUnk22(LvlObject *o, int type);
 	bool executeMstUnk20(MstTaskData *m, uint32_t flags);
 	bool executeMstUnk27(MstTaskData *m, const uint8_t *p);
-	int executeMstCodeHelper3(Task *t);
-	int executeMstCodeHelper4(Task *t);
+	int mstUpdateTaskMonsterObject1(Task *t);
+	int mstUpdateTaskMonsterObject2(Task *t);
 	void mstUpdateRefPos();
 	void updateMstHeightMapData();
 

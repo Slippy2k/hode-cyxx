@@ -77,8 +77,8 @@ void Game::resetMstTaskData(MstTaskData *m) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		if (_mstObjectsTable[i].m45 && _mstObjectsTable[i].mstTaskData == m) {
-			_mstObjectsTable[i].mstTaskData = 0;
+		if (_monsterObjects2Table[i].m45 && _monsterObjects2Table[i].mstTaskData == m) {
+			_monsterObjects2Table[i].mstTaskData = 0;
 		}
 	}
 }
@@ -734,7 +734,7 @@ void Game::resetMstCode() {
 		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		resetMstObject(&_mstObjectsTable[i]);
+		resetMstObject(&_monsterObjects2Table[i]);
 	}
 	clearLvlObjectsList1();
 	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
@@ -781,7 +781,7 @@ void Game::resetMstCode() {
 	_mstOp67_x1 = -256;
 	_mstOp67_x2 = -256;
 	memset(_mstUnkDataTable, 0, sizeof(_mstUnkDataTable));
-	memset(_mstObjectsTable, 0, sizeof(_mstObjectsTable));
+	memset(_monsterObjects2Table, 0, sizeof(_monsterObjects2Table));
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _mstUnk6 = -1;
@@ -816,7 +816,7 @@ void Game::resetMstCode() {
 		_mstUnkDataTable[i].soundType = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		_mstObjectsTable[i].unk0x10 = 0;
+		_monsterObjects2Table[i].unk0x10 = 0;
 	}
 	mstUpdateRefPos();
 	_mstPrevPosX = _mstPosX;
@@ -1018,13 +1018,13 @@ void Game::executeMstCode() {
 	}
 	for (Task *t = _mstTasksList1; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
-		if (executeMstCodeHelper3(t) == 0) {
+		if (mstUpdateTaskMonsterObject1(t) == 0) {
 			while ((this->*(t->run))(t) == 0);
 		}
 	}
 	for (Task *t = _mstTasksList2; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
-		if (executeMstCodeHelper4(t) == 0) {
+		if (mstUpdateTaskMonsterObject2(t) == 0) {
 			while ((this->*(t->run))(t) == 0);
 		}
 	}
@@ -1381,8 +1381,7 @@ bool Game::executeMstUnk27(MstTaskData *m, const uint8_t *p) {
 	}
 }
 
-// mstUpdateTaskMonsterObject1
-int Game::executeMstCodeHelper3(Task *t) {
+int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	_mstCurrentTask = t;
 	MstTaskData *m = t->dataPtr;
 	MstTaskData *_mstCurrentTaskData = m;
@@ -1548,7 +1547,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 				if (m->flagsA6 & 1) {
 					_ebp = 1;
 				} else {
-					warning("executeMstCodeHelper3 mstPosY %d x1 %d x2 %d screen %d", _mstPosY, m->x1, m->x2, o->screenNum);
+					warning("mstUpdateTaskMonsterObject1 mstPosY %d x1 %d x2 %d screen %d", _mstPosY, m->x1, m->x2, o->screenNum);
 					// TODO
 				}
 			}
@@ -1688,8 +1687,8 @@ int Game::executeMstCodeHelper3(Task *t) {
 }
 
 // mstUpdateTaskMonsterObject2
-int Game::executeMstCodeHelper4(Task *t) {
-	warning("executeMstCodeHelper4 unimplemented");
+int Game::mstUpdateTaskMonsterObject2(Task *t) {
+	warning("mstUpdateTaskMonsterObject2 unimplemented");
 	// TODO
 	return 0;
 }
@@ -1894,8 +1893,8 @@ void Game::stopMstTaskData(Task *t, Task **tasksList) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		if (_mstObjectsTable[i].m45 != 0 && _mstObjectsTable[i].mstTaskData == m) {
-			_mstObjectsTable[i].mstTaskData = 0;
+		if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
+			_monsterObjects2Table[i].mstTaskData = 0;
 		}
 	}
 	removeLvlObject2(o);
@@ -3670,8 +3669,8 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 			m->m46 = 0;
 			m->o16->dataPtr = 0;
 			for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-				if (_mstObjectsTable[i].m45 != 0 && _mstObjectsTable[i].mstTaskData == m) {
-					_mstObjectsTable[i].m45 = 0;
+				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
+					_monsterObjects2Table[i].m45 = 0;
 				}
 			}
 			removeLvlObject2(m->o16);
@@ -5196,8 +5195,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				m->o16->dataPtr = 0;
 			}
 			for (int j = 0; j < kMaxMonsterObjects2; ++j) {
-				if (_mstObjectsTable[j].m45 && _mstObjectsTable[j].mstTaskData == m) {
-					_mstObjectsTable[j].mstTaskData = 0;
+				if (_monsterObjects2Table[j].m45 && _monsterObjects2Table[j].mstTaskData == m) {
+					_monsterObjects2Table[j].mstTaskData = 0;
 				}
 			}
 			return;
@@ -5224,8 +5223,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		o->dataPtr = m;
 	} else {
 		for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-			if (!_mstObjectsTable[i].m45) {
-				mo = &_mstObjectsTable[i];
+			if (!_monsterObjects2Table[i].m45) {
+				mo = &_monsterObjects2Table[i];
 				break;
 			}
 		}

@@ -896,7 +896,7 @@ void Game::clearLvlObjectsList1() {
 		resetMstTaskData(&_mstUnkDataTable[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		resetMstObject(&_mstObjectsTable[i]);
+		resetMstObject(&_monsterObjects2Table[i]);
 	}
 	LvlObject *ptr = _lvlObjectsList1;
 	while (ptr) {
@@ -2107,7 +2107,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		a = m->soundType;
 		c = 1;
 	} else {
-		assert(ptr->dataPtr >= &_mstObjectsTable[0] && ptr->dataPtr < &_mstObjectsTable[kMaxMonsterObjects2]);
+		assert(ptr->dataPtr >= &_monsterObjects2Table[0] && ptr->dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
 		MstTaskData *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
 		if (m) {
 			a = m->soundType;
@@ -2722,7 +2722,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 		assert(o->dataPtr >= &_mstUnkDataTable[0] && o->dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]);
 		break;
 	case kObjectDataTypeMonster2:
-		assert(o->dataPtr >= &_mstObjectsTable[0] && o->dataPtr < &_mstObjectsTable[kMaxMonsterObjects2]);
+		assert(o->dataPtr >= &_monsterObjects2Table[0] && o->dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
 		break;
 	}
 	return o->dataPtr;
@@ -3371,7 +3371,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 				return 0;
 			}
 		} else {
-			assert(dataPtr >= &_mstObjectsTable[0] && dataPtr < &_mstObjectsTable[kMaxMonsterObjects2]);
+			assert(dataPtr >= &_monsterObjects2Table[0] && dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
 			MonsterObject2 *mo = (MonsterObject2 *)dataPtr;
 			m = mo->mstTaskData;
 			if (m) {
