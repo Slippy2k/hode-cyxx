@@ -4,6 +4,7 @@
 #include "util.h"
 #include "video.h"
 
+static uint8_t byte_4528BD[15] = { 5, 0, 9, 0xD, 7, 0xFF, 8, 0xD, 5, 1, 8, 0xD, 7, 0xFF, 9 };
 static uint8_t byte_4528D0[4] = {  2, 0, 0, 0 };
 static uint8_t byte_4528D4[4] = {  2, 0, 0, 0 };
 static uint8_t byte_4528D8[4] = {  2, 0, 0, 0 };
@@ -186,6 +187,25 @@ void Game::postScreenUpdate_lar2_screen12() {
 	}
 }
 
+void Game::postScreenUpdate_lar2_screen13() {
+	if (_res->_currentScreenResourceNum == 13) {
+		const uint8_t *p = &byte_4528BD[7];
+		if ((byte_4528BD[0] & 1) == 0 && (byte_4528BD[0] & 0x40) != 0) {
+			if ((byte_4528BD[8] & 1) == 0) {
+				p = &byte_4528BD[11];
+				byte_4528BD[8] &= ~0x40;
+				byte_4528BD[12] = (byte_4528BD[12] | 1) & ~0x40;
+			}
+		}
+		if ((p[1] & 1) == 0 && (p[1] & 0x40) != 0) {
+			if ((byte_4528BD[0] & 1) == 0) {
+				byte_4528BD[0] = (byte_4528BD[0] | 1) & ~0x40;
+				byte_4528BD[4] = (byte_4528BD[4] | 1) & ~0x40;
+			}
+		}
+	}
+}
+
 void Game::postScreenUpdate_lar2_screen19() {
 	if (_res->_currentScreenResourceNum == 19) {
 		if (_currentLevelCheckpoint == 10 && _levelCheckpoint == 11) {
@@ -232,7 +252,7 @@ void Game::callLevel_postScreenUpdate_lar2(int num) {
 		postScreenUpdate_lar2_screen12();
 		break;
 	case 13:
-		// TODO
+		postScreenUpdate_lar2_screen13();
 		break;
 	case 19:
 		postScreenUpdate_lar2_screen19();
