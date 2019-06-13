@@ -1343,7 +1343,10 @@ void Resource::loadMstData(File *fp) {
 		_mstUnk49[i].count1  = fp->readUint32();
 		fp->readUint32();
 		_mstUnk49[i].count2  = fp->readUint32();
-		_mstUnk49[i].unk0x14 = fp->readUint32();
+		_mstUnk49[i].unk14   = fp->readByte();
+		_mstUnk49[i].unk15   = fp->readByte();
+		_mstUnk49[i].unk16   = fp->readByte();
+		_mstUnk49[i].unk17   = fp->readByte();
 		bytesRead += 24;
 	}
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {

@@ -1596,7 +1596,7 @@ int Game::executeMstCodeHelper3(Task *t) {
 				assert(indexUnk36 != kNone);
 				uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
 				assert(indexUnk49 != kNone);
-				uint8_t _bl = _res->_mstUnk49[indexUnk49].unk0x14 & 0xFF;
+				uint8_t _bl = _res->_mstUnk49[indexUnk49].unk14;
 				if (ABS(_eax - _ebx) <= _bl) {
 					uint32_t indexUnk35 = m44->indexUnk35_20;
 					if (indexUnk35 != kNone) {
@@ -4002,7 +4002,7 @@ bool Game::checkMstOp54Helper(MstUnk48 *m48, uint8_t flag) {
 	int var28 = 0;
 	int var18 = 0;
 	int _edi = 0;
-	for (int i = 0; i < m48->countUnk12 && 0; ++i) { // TODO
+	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m12 = &m48->unk12[i];
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
@@ -4021,7 +4021,13 @@ l1:
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
+
+			// TODO
+			warning("checkMstOp54Helper (unk0!=0) %d [%d,%d]", _ebx, _mstPosXmin, _mstPosXmax);
+			continue;
+
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
+
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
 				if (var4D != 0 && (_esi < _mstPosYmin || _esi > _mstPosYmax)) {
 					if (var1C != 2 || _edi == 1) {
@@ -4127,6 +4133,11 @@ l2:
 			if ((var4C ^ flag) == 1) {
 				_ebx = -_ebx;
 			}
+
+			// TODO
+			warning("checkMstOp54Helper (unk0==0) %d [%d,%d]", _ebx, _mstPosXmin, _mstPosXmax);
+			continue;
+
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
 				if (var4D == 0 && _esi >= _mstPosYmin && _esi <= _mstPosYmax) {
@@ -4954,11 +4965,23 @@ int Game::executeMstOp67Type1(Task *t) {
 		}
 		m->unkD4 = &m->m49->data1[m->unkDC];
 	}
-	// TODO
-	warning("executeMstOp67Type1 41C774");
-// 41C7E3
-	executeMstUnk1(t);
-	return 0;
+// 41C774
+	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _mstUnk11 <= 0)) {
+		if (m->unk8[946] & 4) {
+			// TODO
+			warning("executeMstOp67Type1 41C799");
+		}
+		executeMstUnk1(t);
+		return 0;
+	} else {
+// 41C7F6
+		// TODO
+		warning("executeMstOp67Type1 41C7F6");
+		if (_edi != 0) {
+		}
+// 41CB2F
+		return 0;
+	}
 }
 
 int Game::executeMstOp67Type2(Task *t, int flag) {
@@ -5061,14 +5084,29 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CF99
-	warning("executeMstOp67Type2 t %p _edi %d", t, _edi);
 	if (_edi) {
+		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_mstUnk11 >= m->m49->unk15))) {
+			warning("executeMstOp67Type2 41CFD2");
 
+// 41D1CE
+			if (m->unk8[946] & 4) {
+				t->run = &Game::runTask_unk10;
+			} else if (m->unk8[946] & 2) {
+				t->run = &Game::runTask_unk8;
+			} else {
+				t->run = &Game::runTask_unk6;
+			}
+			return (this->*(t->run))(t);
+		}
 	}
 // 41D2D2
-
-	// TODO
-	return 0;
+	if (m->unk8[946] & 4) {
+		warning("executeMstOp67Type2 41D2DE");
+	}
+// 41D328
+	t->flags |= 0x80;
+	executeMstUnk1(t);
+	return -1;
 }
 
 void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24) {

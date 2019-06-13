@@ -262,7 +262,10 @@ struct MstUnk49 {
 	uint32_t count1; // 0x8
 	uint8_t *data2; // 0xC
 	uint32_t count2; // 0x10
-	uint32_t unk0x14; // 0x14
+	uint8_t unk14; // 0x14
+	uint8_t unk15; // 0x15
+	uint8_t unk16; // 0x16
+	uint8_t unk17; // 0x17
 }; // SIZEOF_MstUnk49 24
 
 struct MstUnk50 {
