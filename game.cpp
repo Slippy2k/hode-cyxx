@@ -893,10 +893,10 @@ void Game::clearLvlObjectsList1() {
 		return;
 	}
 	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
-		resetMstTaskData(&_mstUnkDataTable[i]);
+		resetMonsterObject1(&_monsterObjects1Table[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		resetMstObject(&_monsterObjects2Table[i]);
+		resetMonsterObject2(&_monsterObjects2Table[i]);
 	}
 	LvlObject *ptr = _lvlObjectsList1;
 	while (ptr) {
@@ -2097,8 +2097,8 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		return o;
 	}
 	int a, c;
-	if (ptr->dataPtr >= &_mstUnkDataTable[0] && ptr->dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]) {
-		MstTaskData *m = (MstTaskData *)ptr->dataPtr;
+	if (ptr->dataPtr >= &_monsterObjects1Table[0] && ptr->dataPtr < &_monsterObjects1Table[kMaxMonsterObjects1]) {
+		MonsterObject1 *m = (MonsterObject1 *)ptr->dataPtr;
 		if (m->flagsA6 & 2) {
 			assert(ptr == m->o16);
 			ptr->actionKeyMask = _mstCurrentActionKeyMask;
@@ -2108,7 +2108,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		c = 1;
 	} else {
 		assert(ptr->dataPtr >= &_monsterObjects2Table[0] && ptr->dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
-		MstTaskData *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
+		MonsterObject1 *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
 		if (m) {
 			a = m->soundType;
 			c = 2;
@@ -2719,7 +2719,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 		assert(o->dataPtr);
 		break;
 	case kObjectDataTypeMonster1:
-		assert(o->dataPtr >= &_mstUnkDataTable[0] && o->dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]);
+		assert(o->dataPtr >= &_monsterObjects1Table[0] && o->dataPtr < &_monsterObjects1Table[kMaxMonsterObjects1]);
 		break;
 	case kObjectDataTypeMonster2:
 		assert(o->dataPtr >= &_monsterObjects2Table[0] && o->dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
@@ -3356,9 +3356,9 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			return 0;
 		}
 		int _ebx, var4;
-		MstTaskData *m = 0; // _ebp
-		if (dataPtr >= &_mstUnkDataTable[0] && dataPtr < &_mstUnkDataTable[kMaxMonsterObjects1]) {
-			m = (MstTaskData *)ptr->dataPtr;
+		MonsterObject1 *m = 0; // _ebp
+		if (dataPtr >= &_monsterObjects1Table[0] && dataPtr < &_monsterObjects1Table[kMaxMonsterObjects1]) {
+			m = (MonsterObject1 *)ptr->dataPtr;
 			_ebx = 1;
 			var4 = m->soundType;
 			if (m->flagsA6 & 2) {

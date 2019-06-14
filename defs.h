@@ -267,7 +267,7 @@ struct ScreenMask { // ShadowScreenMask
 	uint16_t h;
 }; // sizeof == 0x14
 
-struct MstTaskData;
+struct MonsterObject1;
 
 struct MovingOpcodeState {
 	int32_t xPos;
@@ -279,7 +279,7 @@ struct MovingOpcodeState {
 	int32_t unk24;
 	ShootLvlObjectData *unk28;
 	LvlObject *o; // 0x2C
-	MstTaskData *m; // 0x30
+	MonsterObject1 *m; // 0x30
 	int32_t unk34;
 	int32_t unk38;
 	int32_t unk3C;
@@ -315,11 +315,9 @@ struct MstRect {
 	int num; // 16
 }; // sizeof == 0x20
 
-struct MstTaskData;
-
 struct MstCollision {
 	uint8_t unk20; // 0x20
-	MstTaskData *m; // 0x00
+	MonsterObject1 *m; // 0x00
 	uint32_t unk80; // 0x80
 }; // sizeof == 132
 
@@ -334,7 +332,7 @@ struct MstUnk48Unk12Unk4;
 struct MstUnk49;
 struct MstUnk49Unk1;
 
-struct MstTaskData { // MonsterObject1
+struct MonsterObject1 {
 	MstUnk46 *m46;
 	MstUnk46Unk1 *unk4;
 	const uint8_t *unk8;
@@ -400,7 +398,7 @@ struct MstTaskData { // MonsterObject1
 struct MonsterObject2 {
 	MstUnk45 *m45;
 	LvlObject *o; // 4
-	MstTaskData *mstTaskData; // 8
+	MonsterObject1 *mstTaskData; // 8
 	int unk0x10;
 	int xPos; // 14
 	int yPos; // 18
@@ -421,7 +419,7 @@ struct MonsterObject2 {
 struct Task {
 	const uint8_t *codeData;
 	Task *prevPtr, *nextPtr; // 4,8
-	MstTaskData *dataPtr; // 0xC monster1
+	MonsterObject1 *dataPtr; // 0xC monster1
 	MonsterObject2 *monster2; // 0x10
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34

@@ -194,7 +194,7 @@ struct Game {
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	int _mstTemp_x1, _mstTemp_x2, _mstTemp_y1, _mstTemp_y2;
-	MstTaskData _mstUnkDataTable[kMaxMonsterObjects1];
+	MonsterObject1 _monsterObjects1Table[kMaxMonsterObjects1];
 	MonsterObject2 _monsterObjects2Table[kMaxMonsterObjects2];
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
@@ -581,20 +581,20 @@ struct Game {
 
 	// monsters.cpp
 
-	void resetMstTaskData(MstTaskData *m);
-	void initMstTaskData(MstTaskData *m);
-	int addMstTaskData(MstUnk48 *m48, uint8_t flag);
-	void disableMstTaskData(MstTaskData *m);
-	void copyMstTaskData(Task *t, MstTaskData *m, int num);
-	int initMstTaskDataType2(Task *t);
-	void updateMstLvlObjectPos(MstTaskData *m);
-	bool updateMstTaskDataPositionHelper(MstTaskData *m);
-	bool updateMstTaskDataPosition(MstTaskData *m);
+	void resetMonsterObject1(MonsterObject1 *m);
+	void initMonsterObject1(MonsterObject1 *m);
+	int addMonsterObject1(MstUnk48 *m48, uint8_t flag);
+	void disableMonsterObject1(MonsterObject1 *m);
+	void copyMonsterObject1(Task *t, MonsterObject1 *m, int num);
+	int initMonsterObject1Type2(Task *t);
+	void updateMstLvlObjectPos(MonsterObject1 *m);
+	bool updateMonsterObject1PositionHelper(MonsterObject1 *m);
+	bool updateMonsterObject1Position(MonsterObject1 *m);
 	void objectMonster2Init_fort_firefly(MonsterObject2 *m);
-	void resetMstObject(MonsterObject2 *m);
+	void resetMonsterObject2(MonsterObject2 *m);
 	int prepareMstTask(Task *t);
 
-	void clearMstRectsTable(MstTaskData *m, int num);
+	void clearMstRectsTable(MonsterObject1 *m, int num);
 	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
 	int updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
 	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
@@ -611,19 +611,19 @@ struct Game {
 	void executeMstCodeHelper1();
 	void executeMstCodeHelper2();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
-	void executeMstUnk4(MstTaskData *m);
-	void executeMstUnk5(MstTaskData *m);
-	bool executeMstUnk6(MstTaskData *m);
-	void executeMstUnk8(MstTaskData *m);
-	int executeMstUnk9(Task *t, MstTaskData *m);
-	int executeMstUnk11(Task *t, MstTaskData *m);
-	bool executeMstUnk17(MstTaskData *m, int num);
+	void executeMstUnk4(MonsterObject1 *m);
+	void executeMstUnk5(MonsterObject1 *m);
+	bool executeMstUnk6(MonsterObject1 *m);
+	void executeMstUnk8(MonsterObject1 *m);
+	int executeMstUnk9(Task *t, MonsterObject1 *m);
+	int executeMstUnk11(Task *t, MonsterObject1 *m);
+	bool executeMstUnk17(MonsterObject1 *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);
 	bool executeMstUnk28(LvlObject *o, int type) const;
 	bool executeMstUnk22(LvlObject *o, int type);
-	bool executeMstUnk20(MstTaskData *m, uint32_t flags);
-	bool executeMstUnk27(MstTaskData *m, const uint8_t *p);
+	bool executeMstUnk20(MonsterObject1 *m, uint32_t flags);
+	bool executeMstUnk27(MonsterObject1 *m, const uint8_t *p);
 	int mstUpdateTaskMonsterObject1(Task *t);
 	int mstUpdateTaskMonsterObject2(Task *t);
 	void mstUpdateRefPos();
@@ -631,7 +631,7 @@ struct Game {
 
 	void removeMstObjectTask(Task *t, Task **tasksList);
 	void resetMstTask(Task *t, uint32_t codeData, uint8_t flags);
-	void stopMstTaskData(Task *t, Task **tasksList);
+	void stopMonsterObject1(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
 	int mstTaskSetActionDirection(Task *t, int num, int value);
@@ -654,8 +654,8 @@ struct Game {
 	int mstOp56_specialAction(Task *t, int code, int num);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void executeMstUnk1(Task *t);
-	int mstSetCurrentPos(MstTaskData *m, int x, int y);
-	void mstSetHorizontalBounds(MstTaskData *m);
+	int mstSetCurrentPos(MonsterObject1 *m, int x, int y);
+	void mstSetHorizontalBounds(MonsterObject1 *m);
 	void executeMstUnk12();
 	void executeMstUnk13(Task *t);
 	int executeMstOp67Type1(Task *t);
