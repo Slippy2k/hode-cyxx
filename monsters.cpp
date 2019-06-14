@@ -396,7 +396,7 @@ void Game::clearMstRectsTable(MonsterObject1 *m, int num) {
 	if (r < _mstRectsCount) {
 		MstRect *p = &_mstRectsTable[r];
 		int a = p->num;
-		if (a == m->soundType) {
+		if (a == m->collisionNum) {
 			p->num = 255;
 			a = r;
 		}
@@ -573,7 +573,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[13];
 			_mstTemp_x2 = _mstTemp_x1 + ptr1[14];
 			_mstTemp_y2 = _mstTemp_y1 + ptr1[15];
-			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
+			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->collisionNum, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
 		} else {
 			clearMstRectsTable(m, 0);
 		}
@@ -813,7 +813,7 @@ void Game::resetMstCode() {
 	}
 	_mstVars[30] = 0x20;
 	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
-		_monsterObjects1Table[i].soundType = 0;
+		_monsterObjects1Table[i].collisionNum = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
 		_monsterObjects2Table[i].unk0x10 = 0;
@@ -2065,12 +2065,12 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 // 40EA40
 			_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
 			_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
+			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->collisionNum, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
 				t->flags |= 0x80;
 				return 0;
 			}
 // 40EAA0
-			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->soundType, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->collisionNum, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 		}
 	} else {
 		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
@@ -3990,16 +3990,18 @@ bool Game::checkMstOp54Helper(MstUnk48 *m48, uint8_t flag) {
 		for (uint32_t j = 0; j < m48->count[i]; ++j) {
 			uint32_t a = (i ^ flag); // * 32; // _edx
 			uint32_t n = m48->data1[i][j]; // _eax
-			if (_mstCollisionTable[a][n].unk80 < m48->data2[i][j]) {
+			if (_mstCollisionTable[a][n].count < m48->data2[i][j]) {
 				return false;
 			}
 		}
 	}
+
 	uint8_t _op54Data[32];
 	memset(_op54Data, 0, sizeof(_op54Data));
+
 	int var24 = 0;
-	int var28 = 0;
-	int var18 = 0;
+	//int var28 = 0;
+	//int var18 = 0;
 	int _edi = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m12 = &m48->unk12[i];
@@ -4009,118 +4011,117 @@ bool Game::checkMstOp54Helper(MstUnk48 *m48, uint8_t flag) {
 			if (var1C != 2) {
 				_edi = var1C;
 			}
-// 41DB85
+// 41DB81
 l1:
 			int var4C = _edi;
+
 			int var8 = m12u4->unk8;
-			int _ebx = var8;
+			int _ebx = var8; // xPos
 			int var4 = m12u4->unkC;
-			int _esi = var4;
+			int _esi = var4; // yPos
+
 			int _eax = _edi ^ flag;
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
 
 			// TODO
-			warning("checkMstOp54Helper (unk0!=0) %d [%d,%d]", _ebx, _mstPosXmin, _mstPosXmax);
+			warning("checkMstOp54Helper (unk0!=0) %d %d [%d,%d]", _ebx, _esi, _mstPosXmin, _mstPosXmax);
 			continue;
 
-			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
-
-				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
-				if (var4D != 0 && (_esi < _mstPosYmin || _esi > _mstPosYmax)) {
-					if (var1C != 2 || var4C == 1) { // _edi
-						return false;
-					}
-					// _edi = 1;
-					var4C = 1;
-					goto l1; // goto 41DB85
-				}
-// 41DC19
-				MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
-
-				_ebx += _mstPosX;
-				int var44 =  _ebx;
-				_esi += _mstPosY;
-				int var38 = _esi;
-
-				int minDistY = 0x1000000;
-				int minDistX = 0x1000000;
-				int var34 = -1;
-
-				int var10 = varC->unk80;
-				if (var10 > 0) {
-					MstCollision *var20 = varC;
-					for (int j = 0; j < var10; ++j) {
-						MonsterObject1 *m = varC[j].m;
-						if (_op54Data[m->soundType] == 0 && (m12u4->unk1A < 0 || m->o16->screenNum == m12u4->unk1A)) {
-							int _ebp = var38 - m->yMstPos;
-							int _eax = ABS(_ebp);
-							int _esi = _ebx - m->xMstPos;
-							int _ecx = ABS(_esi);
-							if (_ecx > m48->unk0 || _eax > m48->unk2) {
-								continue;
-							}
-							if ((var8 || var4) && m->unk8[944] != 10 && m->unk8[944] != 16 && m->unk8[944] != 9) {
-								if (_esi <= 0) {
-									if (m->x2 > _ebx) {
-										continue;
-									}
-								} else {
-									if (m->x1 < _ebx) {
-										continue;
-									}
-								}
-								if (var4D != 0) {
-									if (_ebp <= 0) {
-										if (m->y2 > var38) {
-											continue;
-										}
-									} else {
-										if (m->y1 < var38) {
-											continue;
-										}
-									}
-								}
-							}
-// 41DD5A
-							if (_ecx <= minDistX && _eax <= minDistY) {
-								minDistY = _eax;
-								minDistX = _ecx;
-								var34 = j;
-							}
-						}
-					}
-// 41DD80
-					if (var34 != -1) {
-// 41DDEE
-						// m12u4->unk1B =
-						// TODO
-						break;
-					}
-				}
-// 41DDA7
+			if (_ebx < _mstPosXmin || _ebx > _mstPosXmax) {
+// 41DDD0
 				if (var1C != 2 || var4C == 1) {
 					return false;
 				}
 				_edi = 1;
-				var4C = _edi;
+				goto l1; // goto 41DB81
+			}
+
+			uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
+			if (var4D != 0 && (_esi < _mstPosYmin || _esi > _mstPosYmax)) {
+				if (var1C != 2 || var4C == 1) { // _edi
+					return false;
+				}
+				_edi = 1;
 				goto l1; // goto 41DB85
 			}
-// 41DDD0
+// 41DC19
+			MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
+
+			_ebx += _mstPosX;
+			int var44 =  _ebx;
+			_esi += _mstPosY;
+			int var38 = _esi;
+
+			int minDistY = 0x1000000;
+			int minDistX = 0x1000000;
+			int var34 = -1;
+
+			int var10 = varC->count;
+			if (var10 > 0) {
+				MstCollision *var20 = varC;
+				for (int j = 0; j < var10; ++j) {
+					MonsterObject1 *m = varC[j].m;
+					if (_op54Data[m->collisionNum] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
+						int _ebp = var38 - m->yMstPos;
+						int _eax = ABS(_ebp);
+						int _esi = _ebx - m->xMstPos;
+						int _ecx = ABS(_esi);
+						if (_ecx > m48->unk0 || _eax > m48->unk2) {
+							continue;
+						}
+						if ((var8 || var4) && m->unk8[944] != 10 && m->unk8[944] != 16 && m->unk8[944] != 9) {
+							if (_esi <= 0) {
+								if (m->x2 > _ebx) { // var44
+									continue;
+								}
+							} else {
+								if (m->x1 < _ebx) { // var44
+									continue;
+								}
+							}
+							if (var4D != 0) { // vertical move
+								if (_ebp <= 0) {
+									if (m->y2 > var38) {
+										continue;
+									}
+								} else {
+									if (m->y1 < var38) {
+										continue;
+									}
+								}
+							}
+						}
+						if (_ecx <= minDistX && _eax <= minDistY) {
+							minDistY = _eax;
+							minDistX = _ecx;
+							var34 = j;
+						}
+					}
+				}
+			}
+			if (var34 != -1) {
+// 41DDEE
+				const uint8_t num = varC[var34].unk20;
+				m12u4->unk1B = num;
+				_op54Data[num] = 1;
+				++var24;
+			}
+// 41DDA7
 			if (var1C != 2 || var4C == 1) {
 				return false;
 			}
 			_edi = 1;
-			var4C = 1;
+			var4C = _edi;
 			goto l1; // goto 41DB85
 		}
 // 41DE1E
-		var18 += 12;
-		++var28;
+		//var18 += 12;
+		//++var28;
 	}
-	var28 = _edi;
-	int var20 = 0;
+	//var28 = _edi;
+	//int var20 = 0;
 	for (int i = _edi; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m12 = &m48->unk12[i]; // var20
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
@@ -4159,8 +4160,8 @@ l2:
 			}
 // 41E0E4
 		}
-		var20 += 12;
-		++var28;
+		//var20 += 12;
+		//++var28;
 	}
 	return var24 != 0;
 }
@@ -4817,11 +4818,12 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 	}
 }
 
+// mstResetCollisionTable
 void Game::executeMstUnk12() {
 	const int count = MIN(_res->_mstHdr.unk0x3C, 32);
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < count; ++j) {
-			_mstCollisionTable[i][j].unk80 = 0;
+			_mstCollisionTable[i][j].count = 0;
 		}
 	}
 
@@ -4851,8 +4853,9 @@ void Game::executeMstUnk12() {
 				const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
 				assert(offset % 948 == 0);
 				const uint32_t _ecx = offset / 948;
+				assert(_ecx < 32);
 				_al = m->xMstPos < _mstPosX;
-				++_mstCollisionTable[_al][_ecx].unk80;
+				++_mstCollisionTable[_al][_ecx].count;
 				_mstCollisionTable[_al][_ecx].m = m;
 			}
 		}
@@ -5067,7 +5070,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		if ((m->unk8[946] & 2) == 0 || _mstUnk11 <= 0) {
 			if (m->unk8[946] & 4) {
 				uint8_t _dl = m->flagsA8[1];
-				if (_dl < _mstRectsCount && _mstRectsTable[_dl].num == m->soundType) {
+				if (_dl < _mstRectsCount && _mstRectsTable[_dl].num == m->collisionNum) {
 					_mstRectsTable[_dl].num = 255;
 					int i = _dl;
 					for (; i < _mstRectsCount; ++i) {

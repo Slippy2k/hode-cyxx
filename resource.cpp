@@ -1323,7 +1323,7 @@ void Resource::loadMstData(File *fp) {
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);
 				m12[j].data[k].unk18 = data[0x18];
 				m12[j].data[k].unk19 = data[0x19];
-				m12[j].data[k].unk1A = data[0x1A];
+				m12[j].data[k].screenNum = data[0x1A];
 				m12[j].data[k].unk1B = data[0x1B];
 				bytesRead += 28;
 			}

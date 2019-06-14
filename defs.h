@@ -316,9 +316,9 @@ struct MstRect {
 }; // sizeof == 0x20
 
 struct MstCollision {
-	uint8_t unk20; // 0x20
 	MonsterObject1 *m; // 0x00
-	uint32_t unk80; // 0x80
+	uint8_t unk20; // 0x20
+	int count; // 0x80
 }; // sizeof == 132
 
 struct Task;
@@ -341,7 +341,7 @@ struct MonsterObject1 {
 	LvlObject *o20; // 0x14
 	MstUnk48Unk12Unk4 *unk18;
 	MovingOpcodeState *unk1C; // 0x1C
-	int soundType; // 0x20
+	int collisionNum; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone

@@ -2104,13 +2104,13 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 			ptr->actionKeyMask = _mstCurrentActionKeyMask;
 			ptr->directionKeyMask = _andyObject->directionKeyMask;
 		}
-		a = m->soundType;
+		a = m->collisionNum;
 		c = 1;
 	} else {
 		assert(ptr->dataPtr >= &_monsterObjects2Table[0] && ptr->dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
 		MonsterObject1 *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
 		if (m) {
-			a = m->soundType;
+			a = m->collisionNum;
 			c = 2;
 		} else {
 			a = 4;
@@ -3360,7 +3360,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		if (dataPtr >= &_monsterObjects1Table[0] && dataPtr < &_monsterObjects1Table[kMaxMonsterObjects1]) {
 			m = (MonsterObject1 *)ptr->dataPtr;
 			_ebx = 1;
-			var4 = m->soundType;
+			var4 = m->collisionNum;
 			if (m->flagsA6 & 2) {
 				assert(ptr == m->o16);
 				m->o16->actionKeyMask = _mstCurrentActionKeyMask;
@@ -3376,7 +3376,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 			m = mo->mstTaskData;
 			if (m) {
 				_ebx = 2;
-				var4 = m->soundType;
+				var4 = m->collisionNum;
 			} else {
 				_ebx = 0;
 				var4 = 4;

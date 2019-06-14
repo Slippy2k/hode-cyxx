@@ -203,7 +203,7 @@ struct Game {
 	int _mstRectsCount;
 	MstRect _mstRectsTable[64];
 	Task *_mstCurrentTask;
-	MstCollision _mstCollisionTable[2][32];
+	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
