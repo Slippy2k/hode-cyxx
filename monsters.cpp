@@ -5266,13 +5266,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 	}
 	setLvlObjectPosInScreenGrid(o, 7);
 	if (mo) {
-		Task *t = 0;
-		for (int i = 0; i < kMaxTasks; ++i) {
-			if (!_tasksTable[i].codeData) {
-				t = &_tasksTable[i];
-				break;
-			}
-		}
+		Task *t = findFreeTask();
 		if (!t) {
 			mo->m45 = 0;
 			if (mo->o) {
@@ -5284,14 +5278,48 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 // 41584E
 		memset(t, 0, sizeof(Task));
 		resetTask(t, kUndefinedMonsterByteCode);
-		t->monster2 = mo;
-		mo->task = t;
 		t->prevPtr = 0;
 		t->nextPtr = _mstTasksList2;
 		if (_mstTasksList2) {
 			_mstTasksList2->prevPtr = t;
 		}
-		// TODO
+		t->monster2 = mo;
+		t->dataPtr = 0;
+		mo->task = t;
+		// _edi = _mstCurrentTask
+		// _mstCurrentTask = t;
+		Task *child = t->child;
+		if (child) {
+			child->codeData = 0;
+			t->child = 0;
+		}
+		Task *next = t->nextPtr;
+		Task *prev = t->prevPtr;
+		t->codeData = 0;
+		if (next) {
+			next->prevPtr = prev;
+		}
+		if (prev) {
+			prev->nextPtr = next;
+		} else {
+			_mstTasksList2 = next;
+		}
+		if (!_mstTasksList2) {
+			_mstTasksList2 = t;
+			t->nextPtr = 0;
+			t->prevPtr = 0;
+		} else {
+			Task *current = _mstTasksList2;
+			next = current->nextPtr;
+			while (next) {
+				current = next;
+				next = current->nextPtr;
+			}
+			current->nextPtr = t;
+			t->nextPtr = 0;
+			t->prevPtr = current;
+		}
+		t->codeData = kUndefinedMonsterByteCode;
 		mstTaskSetScreenPosition(t);
 		const uint32_t codeData = mo->m45->codeData;
 		assert(codeData != kNone);
@@ -5301,13 +5329,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		}
 	} else {
 // 41593C
-		Task *t = 0;
-		for (int i = 0; i < kMaxTasks; ++i) {
-			if (!_tasksTable[i].codeData) {
-				t = &_tasksTable[i];
-				break;
-			}
-		}
+		Task *t = findFreeTask();
 		if (!t) {
 // 415952
 			warning("mstOp67 fail to find a free task");
@@ -5315,7 +5337,6 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			return;
 		}
 // 415989
-		// TODO
 		memset(t, 0, sizeof(Task));
 		resetTask(t, kUndefinedMonsterByteCode);
 		t->prevPtr = 0;
@@ -5373,10 +5394,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			m->flagsA8[0] = 0xFF;
 			m->flagsA8[1] = 0xFF;
 		}
-
 // 415A89
 		mstTaskUpdateScreenPosition(t);
-
 		switch (type) {
 		case 1:
 			executeMstOp67Type1(t);
@@ -5407,7 +5426,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		}
 	}
 // 415ADE
-	// TODO
+	// _mstCurrentTask = _edi
 	t->flags &= ~0x80;
 }
 
