@@ -4029,31 +4029,36 @@ l1:
 
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
 				if (var4D != 0 && (_esi < _mstPosYmin || _esi > _mstPosYmax)) {
-					if (var1C != 2 || _edi == 1) {
+					if (var1C != 2 || var4C == 1) { // _edi
 						return false;
 					}
-					_edi = 1;
+					// _edi = 1;
 					var4C = 1;
 					goto l1; // goto 41DB85
 				}
 // 41DC19
 				MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
+
 				_ebx += _mstPosX;
 				int var44 =  _ebx;
 				_esi += _mstPosY;
 				int var38 = _esi;
-				int var2C = 0x1000000;
-				int var30 = 0x1000000;
+
+				int minDistY = 0x1000000;
+				int minDistX = 0x1000000;
 				int var34 = -1;
+
 				int var10 = varC->unk80;
 				if (var10 > 0) {
 					MstCollision *var20 = varC;
-					for (int j = 0; j < var10; ++j, var20 += 4) {
-						MonsterObject1 *m = var20->m;
+					for (int j = 0; j < var10; ++j) {
+						MonsterObject1 *m = varC[j].m;
 						if (_op54Data[m->soundType] == 0 && (m12u4->unk1A < 0 || m->o16->screenNum == m12u4->unk1A)) {
-							int _ebp = ABS(var38 - m->yMstPos);
-							int _ecx = ABS(_ebx  - m->xMstPos);
-							if (_ecx > m48->unk0 || _ebp > m48->unk2) {
+							int _ebp = var38 - m->yMstPos;
+							int _eax = ABS(_ebp);
+							int _esi = _ebx - m->xMstPos;
+							int _ecx = ABS(_esi);
+							if (_ecx > m48->unk0 || _eax > m48->unk2) {
 								continue;
 							}
 							if ((var8 || var4) && m->unk8[944] != 10 && m->unk8[944] != 16 && m->unk8[944] != 9) {
@@ -4079,9 +4084,9 @@ l1:
 								}
 							}
 // 41DD5A
-							if (_ecx <= var30 && _eax <= var2C) {
-								var2C = _eax;
-								var30 = _ecx;
+							if (_ecx <= minDistX && _eax <= minDistY) {
+								minDistY = _eax;
+								minDistX = _ecx;
 								var34 = j;
 							}
 						}
