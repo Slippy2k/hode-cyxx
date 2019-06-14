@@ -62,8 +62,8 @@ static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 }
 
 static LvlObject *getTaskLvlObject(Task *t) {
-	if (t->dataPtr) {
-		return t->dataPtr->o16;
+	if (t->monster1) {
+		return t->monster1->o16;
 	} else if (t->monster2) {
 		return t->monster2->o;
 	}
@@ -375,7 +375,7 @@ bool Game::updateMonsterObject1Position(MonsterObject1 *m) {
 }
 
 int Game::prepareMstTask(Task *t) {
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	assert(m);
 	MstUnk35 *mu = m->m35;
 	int num = 0;
@@ -553,7 +553,7 @@ int Game::getMstDistance(int y, MovingOpcodeState *p) {
 }
 
 void Game::mstTaskUpdateScreenPosition(Task *t) {
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	assert(m);
 	LvlObject *o = m->o20;
 	if (!o) {
@@ -1364,14 +1364,14 @@ bool Game::executeMstUnk27(MonsterObject1 *m, const uint8_t *p) {
 		assert(codeData != kNone);
 		t.codeData = _res->_mstCodeData + codeData * 4;
 		t.run = &Game::runTask_default;
-		t.dataPtr->flagsA6 |= 4;
+		t.monster1->flagsA6 |= 4;
 		runTask_default(_mstCurrentTask);
-		t.dataPtr->flagsA6 &= ~4;
+		t.monster1->flagsA6 &= ~4;
 		t.nextPtr = _mstCurrentTask->nextPtr;
 		t.prevPtr = _mstCurrentTask->prevPtr;
 		memcpy(_mstCurrentTask, &t, sizeof(Task));
 		_mstCurrentTask->run = &Game::runTask_idle;
-		if ((_mstCurrentTask->dataPtr->flagsA6 & 2) == 0) {
+		if ((_mstCurrentTask->monster1->flagsA6 & 2) == 0) {
 			_mstCurrentTask->run = &Game::runTask_default;
 		}
 		return false;
@@ -1383,7 +1383,7 @@ bool Game::executeMstUnk27(MonsterObject1 *m, const uint8_t *p) {
 
 int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	_mstCurrentTask = t;
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	MonsterObject1 *_mstCurrentTaskData = m;
 	LvlObject *o = m->o16;
 	int _mstCurrentFlags0 = o->flags0 & 255;
@@ -1877,7 +1877,7 @@ void Game::removeMstObjectTask(Task *t, Task **tasksList) {
 }
 
 void Game::stopMonsterObject1(Task *t, Task **tasksList) {
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	if (_mstUnk6 != -1) {
 		if ((m->flagsA5 & 8) != 0 && m->unk18) {
 			disableMonsterObject1(m);
@@ -1917,7 +1917,7 @@ void Game::stopMonsterObject1(Task *t, Task **tasksList) {
 
 // attack
 void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~0x70) | flags;
 	Task *c = t->child;
 	if (m->flagsA5 & 8) {
@@ -1984,7 +1984,7 @@ Task *Game::createTask(const uint8_t *codeData) {
 int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	uint8_t var4 = _res->_mstUnk52[num * 4];
 	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	LvlObject *o = m->o16;
 	const uint8_t *ptr = m->unk8 + var4 * 28;
 	uint8_t _al = (o->flags1 >> 4) & 3;
@@ -2153,7 +2153,7 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
 	t->localVars[7] = 0;
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	if (m) {
 		const uint8_t mask = m->flagsA5;
 		if ((mask & 0x88) == 0 || (mask & 0xF0) == 0) {
@@ -2230,7 +2230,7 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 			if (t->monster2) {
 				m = t->monster2->mstTaskData;
 			} else {
-				m = t->dataPtr;
+				m = t->monster1;
 			}
 			if (m) {
 				assert(index < kMaxLocals);
@@ -2260,7 +2260,7 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 			if (t->monster2) {
 				m = t->monster2->mstTaskData;
 			} else {
-				m = t->dataPtr;
+				m = t->monster1;
 			}
 			if (m) {
 				assert(index < kMaxLocals);
@@ -2281,7 +2281,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 	case 1:
 		return (_andyObject->flags1 >> 5) & 1;
 	case 2: {
-			MonsterObject1 *m = t->dataPtr;
+			MonsterObject1 *m = t->monster1;
 			if (m) {
 				return ((m->o16->flags1 & 0x10) != 0) ? 1 : 0;
 			} else if (t->monster2) {
@@ -2290,7 +2290,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 		}
 		break;
 	case 3: {
-			MonsterObject1 *m = t->dataPtr;
+			MonsterObject1 *m = t->monster1;
 			if (m) {
 				return ((m->o16->flags1 & 0x20) != 0) ? 1 : 0;
 			} else if (t->monster2) {
@@ -2298,7 +2298,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 			}
 		}
 	case 4: {
-			MonsterObject1 *m = t->dataPtr;
+			MonsterObject1 *m = t->monster1;
 			if (m) {
 				return ((m->o16->flags0 & 0x200) != 0) ? 1 : 0;
 			} else if (t->monster2) {
@@ -2361,88 +2361,88 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 	case 6:
 		return _difficulty;
 	case 7:
-		if (t->dataPtr && t->dataPtr->unk1C) {
-			return t->dataPtr->unk1C->unk40;
+		if (t->monster1 && t->monster1->unk1C) {
+			return t->monster1->unk1C->unk40;
 		}
 		return _mstMovingState[0].unk40;
 	case 8:
-		if (t->dataPtr && t->dataPtr->unk1C) {
-			return t->dataPtr->unk1C->unk24 & 0x7F;
+		if (t->monster1 && t->monster1->unk1C) {
+			return t->monster1->unk1C->unk24 & 0x7F;
 		}
 		return _mstMovingState[0].unk24 & 0x7F;
 	case 9:
-		if (t->dataPtr && t->dataPtr->unk18) {
-			return t->dataPtr->unk18->unk8;
+		if (t->monster1 && t->monster1->unk18) {
+			return t->monster1->unk18->unk8;
 		}
 		break;
 	case 10:
-		if (t->dataPtr && t->dataPtr->unk18) {
-			return t->dataPtr->unk18->unkC;
+		if (t->monster1 && t->monster1->unk18) {
+			return t->monster1->unk18->unkC;
 		}
 		break;
 	case 11:
-		if (t->dataPtr) {
-			return t->dataPtr->unkF4;
+		if (t->monster1) {
+			return t->monster1->unkF4;
 		}
 		break;
 	case 12:
-		if (t->dataPtr) {
-			return t->dataPtr->xPos;
+		if (t->monster1) {
+			return t->monster1->xPos;
 		} else if (t->monster2) {
 			return t->monster2->xPos;
 		}
 		break;
 	case 13:
-		if (t->dataPtr) {
-			return t->dataPtr->yPos;
+		if (t->monster1) {
+			return t->monster1->yPos;
 		} else if (t->monster2) {
 			return t->monster2->yPos;
 		}
 		break;
 	case 14:
-		if (t->dataPtr) {
-			return t->dataPtr->o16->screenNum;
+		if (t->monster1) {
+			return t->monster1->o16->screenNum;
 		} else if (t->monster2) {
 			return t->monster2->o->screenNum;
 		}
 		break;
 	case 15:
-		if (t->dataPtr) {
-			return t->dataPtr->xDelta;
+		if (t->monster1) {
+			return t->monster1->xDelta;
 		} else if (t->monster2) {
 			return ABS(_mstPosX - t->monster2->xMstPos);
 		}
 		break;
 	case 16:
-		if (t->dataPtr) {
-			return t->dataPtr->yDelta;
+		if (t->monster1) {
+			return t->monster1->yDelta;
 		} else if (t->monster2) {
 			return ABS(_mstPosY - t->monster2->yMstPos);
 		}
 		break;
 	case 17:
-		if (t->dataPtr) {
-			return t->dataPtr->unkEC;
+		if (t->monster1) {
+			return t->monster1->unkEC;
 		}
 		break;
 	case 18:
-		if (t->dataPtr) {
-			return ABS(t->dataPtr->x2 - t->dataPtr->xMstPos);
+		if (t->monster1) {
+			return ABS(t->monster1->x2 - t->monster1->xMstPos);
 		}
 		break;
 	case 19:
-		if (t->dataPtr) {
-			return ABS(t->dataPtr->x1 - t->dataPtr->xMstPos);
+		if (t->monster1) {
+			return ABS(t->monster1->x1 - t->monster1->xMstPos);
 		}
 		break;
 	case 20:
-		if (t->dataPtr) {
-			return ABS(t->dataPtr->y2 - t->dataPtr->yMstPos);
+		if (t->monster1) {
+			return ABS(t->monster1->y2 - t->monster1->yMstPos);
 		}
 		break;
 	case 21:
-		if (t->dataPtr) {
-			return ABS(t->dataPtr->y1 - t->dataPtr->yMstPos);
+		if (t->monster1) {
+			return ABS(t->monster1->y1 - t->monster1->yMstPos);
 		}
 		break;
 	case 22:
@@ -2452,36 +2452,36 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 	case 24:
 		return _andyObject->directionKeyMask;
 	case 25:
-		if (t->dataPtr) {
-			return t->dataPtr->xMstPos;
+		if (t->monster1) {
+			return t->monster1->xMstPos;
 		} else if (t->monster2) {
 			return t->monster2->xMstPos;
 		}
 		break;
 	case 26:
-		if (t->dataPtr) {
-			return t->dataPtr->yMstPos;
+		if (t->monster1) {
+			return t->monster1->yMstPos;
 		} else if (t->monster2) {
 			return t->monster2->yMstPos;
 		}
 		break;
 	case 27:
-		if (t->dataPtr) {
-			return t->dataPtr->o16->flags0 & 0xFF;
+		if (t->monster1) {
+			return t->monster1->o16->flags0 & 0xFF;
 		} else if (t->monster2) {
 			return t->monster2->o->flags0 & 0xFF;
 		}
 		break;
 	case 28:
-		if (t->dataPtr) {
-			return t->dataPtr->o16->anim;
+		if (t->monster1) {
+			return t->monster1->o16->anim;
 		} else if (t->monster2) {
 			return t->monster2->o->anim;
 		}
 		break;
 	case 29:
-		if (t->dataPtr) {
-			return t->dataPtr->o16->frame;
+		if (t->monster1) {
+			return t->monster1->o16->frame;
 		} else if (t->monster2) {
 			return t->monster2->o->frame;
 		}
@@ -2494,8 +2494,8 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _executeMstLogicCounter - _executeMstLogicPrevCounter;
 	case 33: {
 			LvlObject *o = 0;
-			if (t->dataPtr) {
-				o = t->dataPtr->o16;
+			if (t->monster1) {
+				o = t->monster1->o16;
 			} else if (t->monster2) {
 				o = t->monster2->o;
 			}
@@ -2530,7 +2530,7 @@ int Game::getTaskFlag(Task *t, int num, int type) const {
 			if (t->monster2) {
 				m = t->monster2->mstTaskData;
 			} else {
-				m = t->dataPtr;
+				m = t->monster1;
 			}
 			if (m) {
 				return ((m->flags48 & (1 << num)) != 0) ? 1 : 0;
@@ -2559,9 +2559,9 @@ int Game::runTask_default(Task *t) {
 		switch (p[0]) {
 		case 0: { // 0
 				LvlObject *o = 0;
-				if (t->dataPtr) {
-					if ((t->dataPtr->flagsA6 & 2) == 0) {
-						o = t->dataPtr->o16;
+				if (t->monster1) {
+					if ((t->monster1->flagsA6 & 2) == 0) {
+						o = t->monster1->o16;
 					}
 				} else if (t->monster2) {
 					o = t->monster2->o;
@@ -2600,7 +2600,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 3: // 3 - set_monster_action_direction_imm
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
@@ -2608,7 +2608,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 4: // 4 - set_monster_action_direction_task_var
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
@@ -2617,7 +2617,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 5: // 5 - set_monster_action_direction_global_var
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
@@ -2626,7 +2626,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 6: // 6 - set_monster_action_direction_other_var
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
@@ -2634,18 +2634,18 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 7: // 7 - set_monster_action_direction_mst_var
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				const int arg = _res->_mstUnk52[num * 4 + 3];
 				t->codeData = p;
 				assert(arg < kMaxLocals);
-				ret = mstTaskSetActionDirection(t, num, t->dataPtr->localVars[arg]);
+				ret = mstTaskSetActionDirection(t, num, t->monster1->localVars[arg]);
 			}
 			break;
 		case 13: // 8
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				if (executeMstUnk17(t->dataPtr, num)) {
+				if (executeMstUnk17(t->monster1, num)) {
 					const int arg = _res->_mstUnk52[num * 4 + 3];
 					t->codeData = p;
 					ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
@@ -2663,7 +2663,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					m->flags48 |= (1 << p[1]);
@@ -2681,7 +2681,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					m->flags48 &= ~(1 << p[1]);
@@ -2693,9 +2693,9 @@ int Game::runTask_default(Task *t) {
 				t->tempVar = p[1];
 				if (getTaskAndyVar(p[1], t) == 0) {
 					LvlObject *o = 0;
-					if (t->dataPtr) {
-						if ((t->dataPtr->flagsA6 & 2) == 0) {
-							o = t->dataPtr->o16;
+					if (t->monster1) {
+						if ((t->monster1->flagsA6 & 2) == 0) {
+							o = t->monster1->o16;
 						}
 					} else if (t->monster2) {
 						o = t->monster2->o;
@@ -2714,9 +2714,9 @@ int Game::runTask_default(Task *t) {
 				t->tempVar = p[1];
 				if (((1 << p[1]) & _mstFlags) == 0) {
 					LvlObject *o = 0;
-					if (t->dataPtr) {
-						if ((t->dataPtr->flagsA6 & 2) == 0) {
-							o = t->dataPtr->o16;
+					if (t->monster1) {
+						if ((t->monster1->flagsA6 & 2) == 0) {
+							o = t->monster1->o16;
 						}
 					} else if (t->monster2) {
 						o = t->monster2->o;
@@ -2735,16 +2735,16 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					t->delay = 5;
 					t->tempVar = p[1];
 					if (((1 << p[1]) & m->flags48) == 0) {
 						LvlObject *o = 0;
-						if (t->dataPtr) {
-							if ((t->dataPtr->flagsA6 & 2) == 0) {
-								o = t->dataPtr->o16;
+						if (t->monster1) {
+							if ((t->monster1->flagsA6 & 2) == 0) {
+								o = t->monster1->o16;
 							}
 						} else if (t->monster2) {
 							o = t->monster2->o;
@@ -2807,7 +2807,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					const int num = p[1];
@@ -2833,7 +2833,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					const int num = p[1];
@@ -2888,7 +2888,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					assert(p[1] < kMaxLocals);
@@ -2911,7 +2911,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					assert(p[1] < kMaxLocals);
@@ -2934,7 +2934,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					assert(p[1] < kMaxVars);
@@ -2960,7 +2960,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					assert(p[1] < kMaxLocals);
@@ -3046,7 +3046,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					const int num = p[2];
@@ -3102,7 +3102,7 @@ int Game::runTask_default(Task *t) {
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
 				} else {
-					m = t->dataPtr;
+					m = t->monster1;
 				}
 				if (m) {
 					const int16_t num = READ_LE_UINT16(p + 2);
@@ -3112,7 +3112,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 197: // 49
-			if (t->dataPtr) {
+			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				MstOp49Data *m = &_res->_mstOp49Data[num];
 				const uint32_t mask = m->unk8;
@@ -3144,7 +3144,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 200: // 52
-			if (t->dataPtr && t->dataPtr->unk18) {
+			if (t->monster1 && t->monster1->unk18) {
 				executeMstOp52();
 				return 1;
 			}
@@ -3164,7 +3164,7 @@ int Game::runTask_default(Task *t) {
 			mstOp58_addLvlObject(t, READ_LE_UINT16(p + 2));
 			break;
 		case 214: { // 61 - reset_monster_energy
-				MonsterObject1 *m = t->dataPtr;
+				MonsterObject1 *m = t->monster1;
 				if (m) {
 					m->flagsA5 &= ~0xC0;
 					m->localVars[7] = m->unk4->energy;
@@ -3234,8 +3234,8 @@ int Game::runTask_default(Task *t) {
 				LvlObject *o = 0;
 				if (t->monster2) {
 					o = t->monster2->o;
-				} else if (t->dataPtr) {
-					o = t->dataPtr->o16;
+				} else if (t->monster1) {
+					o = t->monster1->o16;
 				}
 				if (e <= -2 && o) {
 					if (o->flags & 0x10) {
@@ -3409,7 +3409,7 @@ int Game::runTask_default(Task *t) {
 				if (compareOp(m->compare, a, b)) {
 					if (p[0] == 231) {
 						LvlObject *o = 0;
-						MonsterObject1 *m = t->dataPtr;
+						MonsterObject1 *m = t->monster1;
 						if (m) {
 							if ((m->flagsA6 & 2) == 0) {
 								o = m->o16;
@@ -3428,7 +3428,7 @@ int Game::runTask_default(Task *t) {
 				} else {
 					if (p[0] == 232) {
 						LvlObject *o = 0;
-						MonsterObject1 *m = t->dataPtr;
+						MonsterObject1 *m = t->monster1;
 						if (m) {
 							if ((m->flagsA6 & 2) == 0) {
 								o = m->o16;
@@ -3456,9 +3456,9 @@ int Game::runTask_default(Task *t) {
 				if (compareOp(m->compare, a, b)) {
 					if (p[0] == 233) {
 						LvlObject *o = 0;
-						if (t->dataPtr) {
-							if ((t->dataPtr->flagsA6 & 2) == 0) {
-								o = t->dataPtr->o16;
+						if (t->monster1) {
+							if ((t->monster1->flagsA6 & 2) == 0) {
+								o = t->monster1->o16;
 							}
 						} else if (t->monster2) {
 							o = t->monster2->o;
@@ -3474,9 +3474,9 @@ int Game::runTask_default(Task *t) {
 				} else {
 					if (p[0] == 234) {
 						LvlObject *o = 0;
-						if (t->dataPtr) {
-							if ((t->dataPtr->flagsA6 & 2) == 0) {
-								o = t->dataPtr->o16;
+						if (t->monster1) {
+							if ((t->monster1->flagsA6 & 2) == 0) {
+								o = t->monster1->o16;
 							}
 						} else if (t->monster2) {
 							o = t->monster2->o;
@@ -3493,7 +3493,7 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 237: // 74 - remove_monster_task
-			if (t->dataPtr) {
+			if (t->monster1) {
 				if (!t->monster2) {
 					stopMonsterObject1(t, &_mstTasksList1);
 					return 1;
@@ -3539,7 +3539,7 @@ int Game::runTask_default(Task *t) {
 				t->child = 0;
 				t->runningState &= ~2;
 				child->codeData = 0;
-				MonsterObject1 *m = t->dataPtr;
+				MonsterObject1 *m = t->monster1;
 				if (m) {
 					m->flagsA5 &= ~0x70;
 					if ((m->flagsA5 & 8) != 0) {
@@ -3548,8 +3548,8 @@ int Game::runTask_default(Task *t) {
 					}
 				}
 				return 0;
-			} else if (t->dataPtr) {
-				MonsterObject1 *m = t->dataPtr;
+			} else if (t->monster1) {
+				MonsterObject1 *m = t->monster1;
 				if (m->flagsA6 & 4) {
 					return 1;
 				}
@@ -3655,7 +3655,7 @@ int Game::runTask_default(Task *t) {
 void Game::executeMstOp26(Task **tasksList, int screenNum) {
 	Task *current = *tasksList; // _esi
 	while (current) {
-		MonsterObject1 *m = current->dataPtr; // _ecx
+		MonsterObject1 *m = current->monster1; // _ecx
 		Task *next = current->nextPtr; // _ebp
 		if (m && m->o16->screenNum == screenNum) {
 			if (_mstUnk6 != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
@@ -3725,7 +3725,7 @@ void Game::executeMstOp27(Task **tasksList, int num, int arg) {
 
 int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
 	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
 	m->m49 = m49;
@@ -4317,11 +4317,11 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
-			} else if (t->dataPtr) {
-				o = t->dataPtr->o16;
+			} else if (t->monster1) {
+				o = t->monster1->o16;
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
-				LvlObject *tmpObject = t->dataPtr->o16;
+				LvlObject *tmpObject = t->monster1->o16;
 				const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
 				_specialAnimMask = ((flags & 3) << 4) | (_specialAnimMask & ~0x30);
 				// _specialAnimScreenNum = tmpObject->screenNum;
@@ -4357,11 +4357,11 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
-			} else if (t->dataPtr) {
-				o = t->dataPtr->o16;
+			} else if (t->monster1) {
+				o = t->monster1->o16;
 			}
 			if (_res->_mstOp56Data[num].unkC != 6 && o) {
-				LvlObject *tmpObject = t->dataPtr->o16;
+				LvlObject *tmpObject = t->monster1->o16;
 				const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unkC & 255, tmpObject, _andyObject);
 				_specialAnimMask = ((flags & 3) << 4) | (_specialAnimMask & 0xFFCF);
 				// _specialAnimScreenNum = tmpObject->screenNum;
@@ -4381,7 +4381,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		_mstUnk10 = updateMstRectsTable(_mstUnk10, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1);
 		break;
 	case 2: {
-			LvlObject *o = t->dataPtr->o16;
+			LvlObject *o = t->monster1->o16;
 			const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].unk0 & 255, o, _andyObject);
 			setAndySpecialAnimation(flags | 0x10);
 		}
@@ -4447,8 +4447,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
-			} else if (t->dataPtr) {
-				o = t->dataPtr->o16;
+			} else if (t->monster1) {
+				o = t->monster1->o16;
 			}
 			if (screenNum < 0) {
 				if (screenNum == -2) {
@@ -4456,9 +4456,9 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					if (t->monster2) {
 						xPos += t->monster2->xMstPos;
 						yPos += t->monster2->yMstPos;
-					} else if (t->dataPtr) {
-						xPos += t->dataPtr->xMstPos;
-						yPos += t->dataPtr->yMstPos;
+					} else if (t->monster1) {
+						xPos += t->monster1->xMstPos;
+						yPos += t->monster1->yMstPos;
 					}
 				} else if (screenNum == -1) {
 					xPos += _mstPosX;
@@ -4524,8 +4524,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
-			} else if (t->dataPtr) {
-				o = t->dataPtr->o16;
+			} else if (t->monster1) {
+				o = t->monster1->o16;
 			} else {
 				o = _andyObject;
 			}
@@ -4547,8 +4547,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			if (code == 16) {
 				if (t->monster2) {
 					o = t->monster2->o;
-				} else if (t->dataPtr) {
-					o = t->dataPtr->o16;
+				} else if (t->monster1) {
+					o = t->monster1->o16;
 				}
 			}
 			const int pos = _res->_mstOp56Data[num].unk8;
@@ -4574,17 +4574,17 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		break;
 	case 20: {
 			_mstCurrentActionKeyMask = 0;
-			t->dataPtr->flagsA6 |= 2;
+			t->monster1->flagsA6 |= 2;
 			t->run = &Game::runTask_idle;
-			t->dataPtr->o16->actionKeyMask = _mstCurrentActionKeyMask;
-			t->dataPtr->o16->directionKeyMask = _andyObject->directionKeyMask;
+			t->monster1->o16->actionKeyMask = _mstCurrentActionKeyMask;
+			t->monster1->o16->directionKeyMask = _andyObject->directionKeyMask;
 			return 1;
 		}
 		break;
 	case 21: {
-			t->dataPtr->flagsA6 &= ~2;
-			t->dataPtr->o16->actionKeyMask = 0;
-			t->dataPtr->o16->directionKeyMask = 0;
+			t->monster1->flagsA6 &= ~2;
+			t->monster1->o16->actionKeyMask = 0;
+			t->monster1->o16->directionKeyMask = 0;
 		}
 		break;
 	case 27: {
@@ -4631,8 +4631,8 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 	LvlObject *o = 0;
 	if (t->monster2) {
 		o = t->monster2->o;
-	} else if (t->dataPtr) {
-		o = t->dataPtr->o16;
+	} else if (t->monster1) {
+		o = t->monster1->o16;
 	}
 	uint8_t screen = type;
 	if (type == 0xFB) { // -5
@@ -4662,7 +4662,7 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 }
 
 void Game::executeMstUnk1(Task *t) {
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	t->run = &Game::runTask_default;
 	m->o16->actionKeyMask = 0;
 	m->o16->directionKeyMask = 0;
@@ -4841,7 +4841,7 @@ void Game::executeMstUnk12() {
 			if (_al & 2) {
 				continue;
 			}
-			assert(m->task->dataPtr == m);
+			assert(m->task->monster1 == m);
 			if ((_al & 8) == 0 || m->unk8[945] != 0) {
 				const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
 				assert(offset % 948 == 0);
@@ -4857,8 +4857,8 @@ void Game::executeMstUnk12() {
 void Game::executeMstUnk13(Task *t) {
 	t->run = &Game::runTask_default;
 	LvlObject *o = 0;
-	if (t->dataPtr) {
-		o = t->dataPtr->o16;
+	if (t->monster1) {
+		o = t->monster1->o16;
 	} else if (t->monster2) {
 		o = t->monster2->o;
 	}
@@ -4870,7 +4870,7 @@ void Game::executeMstUnk13(Task *t) {
 
 int Game::executeMstOp67Type1(Task *t) {
 	t->flags &= ~0x80;
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~2) | 5;
 	initMonsterObject1(m);
 	int y = 0;
@@ -4985,7 +4985,7 @@ int Game::executeMstOp67Type1(Task *t) {
 
 int Game::executeMstOp67Type2(Task *t, int flag) {
 	t->flags &= ~0x80;
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~1) | 6;
 	initMonsterObject1(m);
 	const int i = m->unkC->indexUnk36_32;
@@ -5112,8 +5112,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 	debug(kDebug_MONSTER, "mstOp67_addMonster pos %d,%d,%d,%d %d %d 0x%x 0x%x %d %d %d", y1, x1, y2, x2, screen, type, o_flags1, o_flags2, arg1C, arg20, arg24);
 	if (o_flags2 == 0xFFFF) {
 		LvlObject *o = 0;
-		if (t->dataPtr) {
-			o = t->dataPtr->o16;
+		if (t->monster1) {
+			o = t->monster1->o16;
 		} else if (t->monster2) {
 			o = t->monster2->o;
 		}
@@ -5235,8 +5235,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 // 415743
 		assert(arg24 >= 0 && arg24 < _res->_mstHdr.unk0x2C);
 		mo->m45 = &_res->_mstUnk45[arg24];
-		if (t->dataPtr) {
-			mo->mstTaskData = t->dataPtr;
+		if (t->monster1) {
+			mo->mstTaskData = t->monster1;
 		} else if (t->monster2) {
 			mo->mstTaskData = t->monster2->mstTaskData;
 		} else {
@@ -5284,7 +5284,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 			_mstTasksList2->prevPtr = t;
 		}
 		t->monster2 = mo;
-		t->dataPtr = 0;
+		t->monster1 = 0;
 		mo->task = t;
 		// _edi = _mstCurrentTask
 		// _mstCurrentTask = t;
@@ -5344,7 +5344,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		if (_mstTasksList1) {
 			_mstTasksList1->prevPtr = t;
 		}
-		t->dataPtr = m;
+		t->monster1 = m;
 		t->monster2 = 0;
 		_mstTasksList1 = t;
 		m->task = t;
@@ -5492,8 +5492,8 @@ int Game::runTask_waitResetInput(Task *t) {
 	if (t->delay == 0) {
 		t->run = &Game::runTask_default;
 		LvlObject *o = 0;
-		if (t->dataPtr) {
-			o = t->dataPtr->o16;
+		if (t->monster1) {
+			o = t->monster1->o16;
 		} else if (t->monster2) {
 			o = t->monster2->o;
 		}
@@ -5534,7 +5534,7 @@ int Game::runTask_waitFlags(Task *t) {
 			if (t->monster2) {
 				m = t->monster2->mstTaskData;
 			} else {
-				m = t->dataPtr;
+				m = t->monster1;
 			}
 			if (!m || (m->flags48 & (1 << t->tempVar)) == 0) {
 				return 1;
@@ -5544,8 +5544,8 @@ int Game::runTask_waitFlags(Task *t) {
 	}
 	t->run = &Game::runTask_default;
 	LvlObject *o = 0;
-	if (t->dataPtr) {
-		o = t->dataPtr->o16;
+	if (t->monster1) {
+		o = t->monster1->o16;
 	} else if (t->monster2) {
 		o = t->monster2->o;
 	}
@@ -5567,7 +5567,7 @@ int Game::runTask_mstOp231(Task *t) {
 	const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
 		LvlObject *o = 0;
-		MonsterObject1 *m = t->dataPtr;
+		MonsterObject1 *m = t->monster1;
 		if (m) {
 			if ((m->flagsA6 & 2) == 0) {
 				o = m->o16;
@@ -5599,8 +5599,8 @@ int Game::runTask_mstOp233(Task *t) {
 	if (!compareOp(m->compare, a, b)) {
 		t->run = &Game::runTask_default;
 		LvlObject *o = 0;
-		if (t->dataPtr) {
-			o = t->dataPtr->o16;
+		if (t->monster1) {
+			o = t->monster1->o16;
 		} else if (t->monster2) {
 			o = t->monster2->o;
 		}
@@ -5621,8 +5621,8 @@ int Game::runTask_mstOp234(Task *t) {
 	if (compareOp(m->compare, a, b)) {
 		t->run = &Game::runTask_default;
 		LvlObject *o = 0;
-		if (t->dataPtr) {
-			o = t->dataPtr->o16;
+		if (t->monster1) {
+			o = t->monster1->o16;
 		} else if (t->monster2) {
 			o = t->monster2->o;
 		}
@@ -5638,7 +5638,7 @@ int Game::runTask_mstOp234(Task *t) {
 int Game::runTask_unk1(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk1 t %p", t);
 	if (t->delay == 0) {
-		updateMonsterObject1Position(t->dataPtr);
+		updateMonsterObject1Position(t->monster1);
 		executeMstUnk13(t);
 		return 0;
 	}
@@ -5648,10 +5648,10 @@ int Game::runTask_unk1(Task *t) {
 
 int Game::runTask_unk2(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk2 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	const uint16_t flags0 = m->o16->flags0;
 	if ((flags0 & 0x100) != 0 && (flags0 & 0xFF) == m->flagsA4) {
-		updateMonsterObject1Position(t->dataPtr);
+		updateMonsterObject1Position(t->monster1);
 		executeMstUnk13(t);
 		return 0;
 	}
@@ -5660,7 +5660,7 @@ int Game::runTask_unk2(Task *t) {
 
 int Game::runTask_unk3(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk3 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	const uint16_t flags0 = m->o16->flags0;
 	if ((flags0 & 0xFF) == m->flagsA4) {
 		if (t->delay > 0) {
@@ -5675,7 +5675,7 @@ int Game::runTask_unk3(Task *t) {
 
 int Game::runTask_unk4(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk4 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
 	assert(offset % 948 == 0);
 	const uint32_t num = offset / 948;
@@ -5689,7 +5689,7 @@ int Game::runTask_unk4(Task *t) {
 
 int Game::runTask_unk5(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk5 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	mstSetHorizontalBounds(m);
 	if (_xMstPos2 < m->unkD4->unk8) {
 		if (_xMstPos2 > 0) {
@@ -5710,7 +5710,7 @@ set_am:
 
 int Game::runTask_unk6(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk6 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	if (m->flags4B == 0xFD && m->xMstPos < _mstPosX) {
 		m->unk74 = _mstPosX - m->unk68;
 		m->unk7C = _mstPosX - m->unk64;
@@ -5738,14 +5738,14 @@ set_am:
 
 int Game::runTask_unk7(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk7 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	executeMstUnk6(m);
 	return executeMstUnk11(t, m);
 }
 
 int Game::runTask_unk8(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk8 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	executeMstUnk4(m);
 	executeMstUnk5(m);
 	return executeMstUnk11(t, m);
@@ -5753,14 +5753,14 @@ int Game::runTask_unk8(Task *t) {
 
 int Game::runTask_unk9(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk9 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	executeMstUnk8(m);
 	return executeMstUnk11(t, m);
 }
 
 int Game::runTask_unk10(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk10 t %p", t);
-	MonsterObject1 *m = t->dataPtr;
+	MonsterObject1 *m = t->monster1;
 	executeMstUnk4(m);
 	executeMstUnk8(m);
 	return executeMstUnk11(t, m);

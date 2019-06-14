@@ -419,7 +419,7 @@ struct MonsterObject2 {
 struct Task {
 	const uint8_t *codeData;
 	Task *prevPtr, *nextPtr; // 4,8
-	MonsterObject1 *dataPtr; // 0xC monster1
+	MonsterObject1 *monster1; // 0xC
 	MonsterObject2 *monster2; // 0x10
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34
