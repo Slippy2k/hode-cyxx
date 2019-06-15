@@ -218,13 +218,54 @@ void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
 }
 
 int Game::initMonsterObject1Type2(Task *t) {
-	warning("initMonsterObject1Type2 %p unimplemented", t);
-	// TODO
-
 	if (_mstUnk6 == -1) {
 		return 0;
 	}
-	return 0;
+	MonsterObject1 *m = t->monster1;
+	uint8_t _al = (m->flagsA5 == 0) ? 1 : 0;
+	if ((_al & 8) == 0) {
+		return 0;
+	}
+	MstUnk48Unk12Unk4 *m48 = m->unk18;
+	if (!m48) {
+		return 0;
+	}
+	const uint32_t codeData = m48->codeData2;
+	if (codeData != kNone) {
+		resetTask(t, _res->_mstCodeData + codeData * 4);
+		m->flags48 &= ~0x50;
+		m48->unk1B = 255;
+		m->unk18 = 0;
+		--_mstTaskDataCount;
+		if (_mstTaskDataCount <= 0) {
+			_mstUnk6 = -1;
+		}
+		return 0;
+	}
+	m->flags48 &= ~0x50;
+	m48->unk1B = 255;
+	m->unk18 = 0;
+	--_mstTaskDataCount;
+	if (_mstTaskDataCount <= 0) {
+		_mstUnk6 = -1;
+	}
+	if (m->flagsA5 & 0x80) {
+		m->flagsA5 &= ~8;
+		const uint32_t codeData = m->unk4->codeData;
+		if (codeData != kNone) {
+			resetTask(t, _res->_mstCodeData + codeData * 4);
+			return 0;
+		}
+		m->o16->actionKeyMask = 7;
+		m->o16->directionKeyMask = 0;
+		t->run = &Game::runTask_idle;
+		return 0;
+	}
+	m->flagsA5 = (m->flagsA5 & ~9) | 6;
+	if (m->flagsA6 & 2) {
+		return 0;
+	}
+	return executeMstOp67Type2(t, 1);
 }
 
 // set lvlObject position from monster position
@@ -3914,8 +3955,16 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 	}
 // 41BE12
 	if (m->flags4B != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
-		warning("mstOp49 41BE12");
-		// TODO
+		if (t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk10) {
+			warning("mstOp49 41BE6C");
+			// TODO
+			return initMonsterObject1Type2(t);
+		} else {
+// 41BEF4
+			warning("mstOp49 41BEF4");
+			// TODO
+			return initMonsterObject1Type2(t);
+		}
 	}
 // 41C038
 	if (m->unk8[946] & 4) {

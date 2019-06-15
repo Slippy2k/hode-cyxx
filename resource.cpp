@@ -1321,6 +1321,7 @@ void Resource::loadMstData(File *fp) {
 				m12[j].data[k].unk8 = READ_LE_UINT32(data + 0x8);
 				m12[j].data[k].unkC = READ_LE_UINT32(data + 0xC);
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);
+				m12[j].data[k].codeData2 = READ_LE_UINT32(data + 0x14);
 				m12[j].data[k].unk18 = data[0x18];
 				m12[j].data[k].unk19 = data[0x19];
 				m12[j].data[k].screenNum = data[0x1A];
