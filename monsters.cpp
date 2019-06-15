@@ -3985,7 +3985,7 @@ void Game::executeMstOp52() {
 	_mstUnk6 = -1;
 }
 
-bool Game::checkMstOp54Helper(MstUnk48 *m48, uint8_t flag) {
+bool Game::mstCollidesDirection(MstUnk48 *m48, uint8_t flag) {
 	for (int i = 0; i < 2; ++i) {
 		for (uint32_t j = 0; j < m48->count[i]; ++j) {
 			uint32_t a = (i ^ flag); // * 32; // _edx
@@ -4005,6 +4005,7 @@ bool Game::checkMstOp54Helper(MstUnk48 *m48, uint8_t flag) {
 	int _edi = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m12 = &m48->unk12[i];
+		assert(m12->count == 1);
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
 			uint8_t var1C = m12u4->unk18;
@@ -4025,9 +4026,7 @@ l1:
 				_ebx = -_ebx;
 			}
 
-			// TODO
-			warning("checkMstOp54Helper (unk0!=0) %d %d [%d,%d]", _ebx, _esi, _mstPosXmin, _mstPosXmax);
-			continue;
+			debug(kDebug_MONSTER, "mstCollidesDirection (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 
 			if (_ebx < _mstPosXmin || _ebx > _mstPosXmax) {
 // 41DDD0
@@ -4107,6 +4106,7 @@ l1:
 				m12u4->unk1B = num;
 				_op54Data[num] = 1;
 				++var24;
+				continue;
 			}
 // 41DDA7
 			if (var1C != 2 || var4C == 1) {
@@ -4124,6 +4124,7 @@ l1:
 	//int var20 = 0;
 	for (int i = _edi; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m12 = &m48->unk12[i]; // var20
+		assert(m12->count == 1);
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
 			uint8_t var1C = m12u4->unk18;
@@ -4140,14 +4141,14 @@ l2:
 			}
 
 			// TODO
-			warning("checkMstOp54Helper (unk0==0) %d [%d,%d]", _ebx, _mstPosXmin, _mstPosXmax);
+			warning("mstCollidesDirection (unk0==0) %d [%d,%d]", _ebx, _mstPosXmin, _mstPosXmax);
 			continue;
 
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
 				if (var4D == 0 && _esi >= _mstPosYmin && _esi <= _mstPosYmax) {
 // 41DF10
-					warning("checkMstOp54Helper 41DF10 unimplemented");
+					warning("mstCollidesDirection 41DF10 unimplemented");
 					// TODO
 
 				}
@@ -4206,15 +4207,15 @@ void Game::executeMstOp54() {
 		assert(indexUnk48 != kNone);
 		MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
 		if (m48->unk4 == 0) {
-			if (checkMstOp54Helper(m48, 0)) {
+			if (mstCollidesDirection(m48, 0)) {
 				addMonsterObject1(m48, 0);
 			}
 		} else {
 			uint8_t flag = _rnd.update() & 1;
-			if (checkMstOp54Helper(m48, flag) && addMonsterObject1(m48, flag)) {
+			if (mstCollidesDirection(m48, flag) && addMonsterObject1(m48, flag)) {
 			} else {
 				flag ^= 1;
-				if (checkMstOp54Helper(m48, flag)) {
+				if (mstCollidesDirection(m48, flag)) {
 					addMonsterObject1(m48, flag);
 				}
 			}
@@ -4248,16 +4249,16 @@ void Game::executeMstOp54() {
 					assert(indexUnk48 != kNone);
 					MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
 					if (m48->unk4 == 0) {
-						if (checkMstOp54Helper(m48, 0) && addMonsterObject1(m48, 0)) {
+						if (mstCollidesDirection(m48, 0) && addMonsterObject1(m48, 0)) {
 							break; // goto 41E494;
 						}
 					} else {
 						int flag = _rnd.update() & 1;
-						if (checkMstOp54Helper(m48, flag) && addMonsterObject1(m48, flag)) {
+						if (mstCollidesDirection(m48, flag) && addMonsterObject1(m48, flag)) {
 							break; // goto 41E494;
 						}
 						flag ^= 1;
-						if (checkMstOp54Helper(m48, flag) && addMonsterObject1(m48, flag)) {
+						if (mstCollidesDirection(m48, flag) && addMonsterObject1(m48, flag)) {
 							break; // goto 41E494;
 						}
 					}

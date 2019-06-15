@@ -649,7 +649,7 @@ struct Game {
 	void executeMstOp27(Task **tasksList, int num, int arg);
 	int mstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
 	void executeMstOp52();
-	bool checkMstOp54Helper(MstUnk48 *m, uint8_t flag);
+	bool mstCollidesDirection(MstUnk48 *m, uint8_t flag);
 	void executeMstOp54();
 	int mstOp56_specialAction(Task *t, int code, int num);
 	void mstOp58_addLvlObject(Task *t, int num);
