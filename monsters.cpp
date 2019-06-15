@@ -1213,9 +1213,36 @@ bool Game::executeMstUnk17(MonsterObject1 *m, int num) {
 	return (var8 & _ecx) != 0 ? 0 : 1;
 }
 
-bool Game::executeMstUnk19(LvlObject *o, int type) {
-	warning("executeMstUnk19 unimplemented");
-	return false;
+bool Game::executeMstUnk19(LvlObject *o, int flags) {
+	int x1, y1, x2, y2;
+	if (flags != 1 && flags != 0x4000) {
+		x1 = o->xPos;
+		y1 = o->yPos;
+		x2 = x1 + o->width  - 1;
+		y2 = y1 + o->height - 1;
+	} else {
+		x1 = o->xPos + o->posTable[0].x;
+		x2 = o->xPos + o->posTable[1].x;
+		y1 = o->yPos + o->posTable[0].y;
+		y2 = o->yPos + o->posTable[1].y;
+		if (x1 > x2) {
+			SWAP(x1, x2);
+		}
+		if (y1 > y2) {
+			SWAP(y1, y2);
+		}
+		if (flags == 0x4000 && _andyObject->screenNum != o->screenNum) {
+			const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_andyObject->screenNum].xOffset;
+			x1 += dx;
+			x2 += dx;
+			const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_andyObject->screenNum].yOffset;
+			y1 += dy;
+			y2 += dy;
+		}
+	}
+	int x = _andyObject->xPos + _andyObject->width / 2;
+	int y = _andyObject->yPos + _andyObject->height / 2;
+	return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
 bool Game::executeMstUnk21(LvlObject *o, int type) {
@@ -1384,7 +1411,7 @@ bool Game::executeMstUnk27(MonsterObject1 *m, const uint8_t *p) {
 int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	_mstCurrentTask = t;
 	MonsterObject1 *m = t->monster1;
-	MonsterObject1 *_mstCurrentTaskData = m;
+	MonsterObject1 *_mstCurrentMonster1 = m;
 	LvlObject *o = m->o16;
 	int _mstCurrentFlags0 = o->flags0 & 255;
 	const uint8_t *_mstCurrentDataPtr = m->unk8 + _mstCurrentFlags0 * 28; // _ebx
@@ -1401,10 +1428,10 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	}
 	const uint32_t _edi = READ_LE_UINT32(_mstCurrentDataPtr + 20);
 	if (_edi != kNone) {
-		MstUnk46 *m46 = _mstCurrentTaskData->m46;
+		MstUnk46 *m46 = _mstCurrentMonster1->m46;
 		for (uint32_t i = 0; i < m46->count; ++i) {
 			if (m46->data[i].indexHeight == _edi) {
-				copyMonsterObject1(_mstCurrentTask, _mstCurrentTaskData, i);
+				copyMonsterObject1(_mstCurrentTask, _mstCurrentMonster1, i);
 				return 0;
 			}
 		}
@@ -1442,7 +1469,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		return 0;
 	}
 	if (_mstCurrentDataPtr[0] != 0) {
-		executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
+		executeMstUnk27(_mstCurrentMonster1, _mstCurrentDataPtr);
 		return 0;
 	}
 	if ((m->flagsA5 & 0x40) != 0) {
@@ -1451,7 +1478,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418384
 	for (int i = 0; i < _mstMovingStateCount; ++i) {
 		MovingOpcodeState *p = &_mstMovingState[i];
-		if (!p->m || p->m == _mstCurrentTaskData) {
+		if (!p->m || p->m == _mstCurrentMonster1) {
 			// TODO
 		}
 	}
@@ -1499,7 +1526,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 					if (_mstPosX >= x1 /*_edx*/ && _mstPosX <= x2 /*_edi*/ && _mstPosY >= y1 /*_esi*/ && _mstPosY <= y2 /*_ebp*/) {
 						// attack
 						resetMstTask(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
-						executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr);
+						executeMstUnk27(_mstCurrentMonster1, _mstCurrentDataPtr);
 						return 0;
 					}
 
@@ -1509,18 +1536,18 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 	}
 // 418939
-	if (executeMstUnk27(_mstCurrentTaskData, _mstCurrentDataPtr)) {
+	if (executeMstUnk27(_mstCurrentMonster1, _mstCurrentDataPtr)) {
 		return 0;
 	}
-	uint8_t _al = _mstCurrentTaskData->flagsA6;
-	uint8_t _dl = _mstCurrentTaskData->flagsA5;
+	uint8_t _al = _mstCurrentMonster1->flagsA6;
+	uint8_t _dl = _mstCurrentMonster1->flagsA5;
 	if ((_al & 2) != 0 || (_dl & 0x30) != 0) {
 		return 0;
 	}
 	uint8_t dir = _dl & 3;
 	if (dir == 1) {
 // 418AC6
-		MstUnk44Unk1 *m44 = _mstCurrentTaskData->unkC;
+		MstUnk44Unk1 *m44 = _mstCurrentMonster1->unkC;
 		if (m44->indexUnk35_24 == kNone) {
 			return 0;
 		}
@@ -1532,12 +1559,12 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 						_ebp = 1;
 					} else {
 						_al = mstGetFacingDirectionMask(m->flags49) & 1;
-						_dl = (_mstCurrentTaskData->o16->flags1 >> 4) & 1;
+						_dl = (_mstCurrentMonster1->o16->flags1 >> 4) & 1;
 						if (_dl == _al) {
 							_ebp = 1;
-						} else if (_mstCurrentTaskData->unk8[946] & 4) {
+						} else if (_mstCurrentMonster1->unk8[946] & 4) {
 							_ebp = 1;
-						} else if (m->xDelta <= _mstCurrentTaskData->unkC->x2) {
+						} else if (m->xDelta <= _mstCurrentMonster1->unkC->x2) {
 							_ebp = 2;
 						}
 					}
@@ -1564,7 +1591,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		} else if (_ebp == 1) {
 // 418C73
 			m->flagsA6 |= 1;
-			assert(_mstCurrentTaskData == m);
+			assert(_mstCurrentMonster1 == m);
 			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
 				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->unkC->unk2C[1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->unkC->unk34[1])) {
 					uint32_t indexUnk35 = m->unkC->indexUnk35_20;
@@ -1603,10 +1630,10 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 					}
 					if (m->flagsA5 & 4) {
 						m->flagsA5 &= ~4;
-						if (!updateMonsterObject1Position(_mstCurrentTaskData)) {
-							initMonsterObject1(_mstCurrentTaskData);
+						if (!updateMonsterObject1Position(_mstCurrentMonster1)) {
+							initMonsterObject1(_mstCurrentMonster1);
 						}
-						indexUnk35 = _mstCurrentTaskData->unkC->indexUnk35_20;
+						indexUnk35 = _mstCurrentMonster1->unkC->indexUnk35_20;
 						if (indexUnk35 != kNone) {
 							m->m35 = &_res->_mstUnk35[indexUnk35];
 						}
@@ -1627,20 +1654,20 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		assert(indexUnk35 != kNone);
 		MstUnk35 *m35 = &_res->_mstUnk35[indexUnk35];
 		if (m->m35 != m35) {
-			_mstCurrentTaskData->m35 = m35;
-			_rnd.resetMst(_mstCurrentTaskData->rnd_m35);
+			_mstCurrentMonster1->m35 = m35;
+			_rnd.resetMst(_mstCurrentMonster1->rnd_m35);
 			prepareMstTask(_mstCurrentTask);
 			return 0;
 		}
 // 418C1D
 		if (m->flagsA5 & 4) {
 			m->flagsA5 &= ~4;
-			if (!updateMonsterObject1Position(_mstCurrentTaskData)) {
-				initMonsterObject1(_mstCurrentTaskData);
+			if (!updateMonsterObject1Position(_mstCurrentMonster1)) {
+				initMonsterObject1(_mstCurrentMonster1);
 			}
 			const uint32_t indexUnk35 = m->unkC->indexUnk35_24;
 			assert(indexUnk35 != kNone);
-			_mstCurrentTaskData->m35 = &_res->_mstUnk35[indexUnk35];
+			_mstCurrentMonster1->m35 = &_res->_mstUnk35[indexUnk35];
 			prepareMstTask(_mstCurrentTask);
 		}
 		return 0;
@@ -1655,7 +1682,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if ((_dl & 2) != 0) {
 			if ((int32_t)READ_LE_UINT32(m->unk8 + 916) <= m->unkC->unk34[1] || (int32_t)READ_LE_UINT32(m->unk8 + 912) >= m->unkC->unk2C[1]) {
 				m->flagsA6 |= 1;
-				assert(m == _mstCurrentTaskData);
+				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
 				initMonsterObject1(m);
 				uint32_t indexUnk35 = m->unkC->indexUnk35_20;
@@ -1668,7 +1695,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418A37
 			if ((int32_t)READ_LE_UINT32(m->unk8 + 920) >= m->unkC->unk2C[1] || (int32_t)READ_LE_UINT32(m->unk8 + 924) <= m->unkC->unk34[1]) {
 				m->flagsA6 |= 1;
-				assert(m == _mstCurrentTaskData);
+				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
 				initMonsterObject1(m);
 				uint32_t indexUnk35 = m->unkC->indexUnk35_20;
@@ -3153,6 +3180,18 @@ int Game::runTask_default(Task *t) {
 		case 202: // 54
 			executeMstOp54();
 			break;
+		case 203: // 55
+			// _mstCurrentMonster1 = t->monster1;
+			if (t->monster1) {
+				const int num = READ_LE_UINT16(p + 2);
+				if (executeMstUnk20(t->monster1, _res->_mstUnk59[num].flags)) {
+					t->codeData = p + 4;
+					resetMstTask(t, _res->_mstUnk59[num].codeData, 0x10);
+					t->runningState &= ~2;
+					p = t->codeData - 4;
+				}
+			}
+			break;
 		case 204: // 56
 			ret = mstOp56_specialAction(t, p[1], READ_LE_UINT16(p + 2));
 			break;
@@ -3527,7 +3566,7 @@ int Game::runTask_default(Task *t) {
 				const int num = READ_LE_UINT16(p + 2);
 				MstUnk59 *m = &_res->_mstUnk59[num];
 				const uint8_t *codeData = (m->codeData == kNone) ? 0 : (_res->_mstCodeData + m->codeData * 4);
-				updateTask(t, m->num, codeData);
+				updateTask(t, m->flags, codeData);
 			}
 			break;
 		case 242: // 78

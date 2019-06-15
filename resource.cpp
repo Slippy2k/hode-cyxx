@@ -1491,7 +1491,7 @@ void Resource::loadMstData(File *fp) {
 
 	_mstUnk59 = (MstUnk59 *)malloc(_mstHdr.unk0x6C * sizeof(MstUnk59));
 	for (int i = 0; i < _mstHdr.unk0x6C; ++i) {
-		_mstUnk59[i].num      = fp->readUint32();
+		_mstUnk59[i].flags    = fp->readUint32();
 		_mstUnk59[i].codeData = fp->readUint32();
 		bytesRead += 8;
 	}
