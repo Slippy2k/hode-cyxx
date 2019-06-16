@@ -190,7 +190,7 @@ struct Game {
 	int _mstUnk6;
 	uint8_t _mstUnk8;
 	uint32_t _mstAndyVarMask;
-	int _mstTaskDataCount;
+	int _mstChasingMonstersCount;
 	int _mstPosXmin, _mstPosXmax;
 	int _mstPosYmin, _mstPosYmax;
 	int _mstTemp_x1, _mstTemp_x2, _mstTemp_y1, _mstTemp_y2;
@@ -583,7 +583,7 @@ struct Game {
 
 	void resetMonsterObject1(MonsterObject1 *m);
 	void initMonsterObject1(MonsterObject1 *m);
-	int addMonsterObject1(MstUnk48 *m48, uint8_t flag);
+	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);
 	void disableMonsterObject1(MonsterObject1 *m);
 	void copyMonsterObject1(Task *t, MonsterObject1 *m, int num);
 	int initMonsterObject1Type2(Task *t);

@@ -139,17 +139,17 @@ void Game::initMonsterObject1(MonsterObject1 *m) { // mstResetPosition
 	m->m35 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
 }
 
-int Game::addMonsterObject1(MstUnk48 *m48, uint8_t flag) {
+bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
 	m48->unk5 = flag;
 	if (m48->codeData != kNone) {
 		Task *t = createTask(_res->_mstCodeData + m48->codeData * 4);
 		if (!t) {
-			return 0;
+			return false;
 		}
 		while ((this->*(t->run))(t) == 0);
 	}
 	_mstUnk6 = m48 - _res->_mstUnk48;
-	_mstTaskDataCount = 0;
+	_mstChasingMonstersCount = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;
 		const uint8_t code = unk4->unk1B;
@@ -177,19 +177,18 @@ int Game::addMonsterObject1(MstUnk48 *m48, uint8_t flag) {
 			const uint32_t codeData = unk4->codeData;
 			assert(codeData != kNone);
 			resetTask(t, _res->_mstCodeData + codeData * 4);
-			++_mstTaskDataCount;
+			++_mstChasingMonstersCount;
 		}
 	}
-
-	return 0;
+	return true;
 }
 
 void Game::disableMonsterObject1(MonsterObject1 *m) {
 	m->flags48 &= ~0x50;
 	m->unk18->unk1B = 255;
 	m->unk18 = 0;
-	--_mstTaskDataCount;
-	if (_mstTaskDataCount <= 0) {
+	--_mstChasingMonstersCount;
+	if (_mstChasingMonstersCount <= 0) {
 		_mstUnk6 = -1;
 	}
 }
@@ -233,8 +232,8 @@ int Game::initMonsterObject1Type2(Task *t) {
 		m->flags48 &= ~0x50;
 		m48->unk1B = 255;
 		m->unk18 = 0;
-		--_mstTaskDataCount;
-		if (_mstTaskDataCount <= 0) {
+		--_mstChasingMonstersCount;
+		if (_mstChasingMonstersCount <= 0) {
 			_mstUnk6 = -1;
 		}
 		return 0;
@@ -242,8 +241,8 @@ int Game::initMonsterObject1Type2(Task *t) {
 	m->flags48 &= ~0x50;
 	m48->unk1B = 255;
 	m->unk18 = 0;
-	--_mstTaskDataCount;
-	if (_mstTaskDataCount <= 0) {
+	--_mstChasingMonstersCount;
+	if (_mstChasingMonstersCount <= 0) {
 		_mstUnk6 = -1;
 	}
 	if (m->flagsA5 & 0x80) {
@@ -4110,8 +4109,8 @@ void Game::executeMstOp52() {
 			m->flags48 &= ~0x50;
 			m->unk18->unk1B = 255;
 			m->unk18 = 0;
-			--_mstTaskDataCount;
-			if (_mstTaskDataCount <= 0) {
+			--_mstChasingMonstersCount;
+			if (_mstChasingMonstersCount <= 0) {
 				_mstUnk6 = -1;
 			}
 			if (m->flagsA5 & 0x70) {
@@ -4355,15 +4354,15 @@ void Game::executeMstOp54() {
 		MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
 		if (m48->unk4 == 0) {
 			if (mstCollidesDirection(m48, 0)) {
-				addMonsterObject1(m48, 0);
+				addChasingMonster(m48, 0);
 			}
 		} else {
 			uint8_t flag = _rnd.update() & 1;
-			if (mstCollidesDirection(m48, flag) && addMonsterObject1(m48, flag)) {
+			if (mstCollidesDirection(m48, flag) && addChasingMonster(m48, flag)) {
 			} else {
 				flag ^= 1;
 				if (mstCollidesDirection(m48, flag)) {
-					addMonsterObject1(m48, flag);
+					addChasingMonster(m48, flag);
 				}
 			}
 		}
@@ -4396,16 +4395,16 @@ void Game::executeMstOp54() {
 					assert(indexUnk48 != kNone);
 					MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
 					if (m48->unk4 == 0) {
-						if (mstCollidesDirection(m48, 0) && addMonsterObject1(m48, 0)) {
+						if (mstCollidesDirection(m48, 0) && addChasingMonster(m48, 0)) {
 							break; // goto 41E494;
 						}
 					} else {
 						int flag = _rnd.update() & 1;
-						if (mstCollidesDirection(m48, flag) && addMonsterObject1(m48, flag)) {
+						if (mstCollidesDirection(m48, flag) && addChasingMonster(m48, flag)) {
 							break; // goto 41E494;
 						}
 						flag ^= 1;
-						if (mstCollidesDirection(m48, flag) && addMonsterObject1(m48, flag)) {
+						if (mstCollidesDirection(m48, flag) && addChasingMonster(m48, flag)) {
 							break; // goto 41E494;
 						}
 					}

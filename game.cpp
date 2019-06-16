@@ -2260,7 +2260,7 @@ void Game::updateAndyMonsterObjects() {
 		}
 		ptr->childPtr = 0;
 		break;
-	case 7: // grab the line in 'fort' screen #1
+	case 7: // replace Andy sprite with a custom animation
 		_hideAndyObjectSprite = true;
 		if (_actionDirectionKeyMaskIndex == 0x71) {
 			assert(_specialAnimLvlObject);
@@ -3750,7 +3750,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 		o->callbackFuncPtr = &Game::lvlObjectType1Callback;
 		break;
 	case 3:
-	case 4:
+	case 4: // spectre
 	case 5:
 	case 6:
 	case 30:
