@@ -3750,7 +3750,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 		o->callbackFuncPtr = &Game::lvlObjectType1Callback;
 		break;
 	case 3:
-	case 4: // spectre
+	case 4:
 	case 5:
 	case 6:
 	case 30:
@@ -3763,7 +3763,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 9:
 	case 10: // flying spectre
 	case 11: // dog
-	case 12:
+	case 12: // spectre
 	case 13:
 	case 14:
 	case 15:
