@@ -4207,7 +4207,7 @@ l1:
 			if (var10 > 0) {
 				//MstCollision *var20 = varC;
 				for (int j = 0; j < var10; ++j) {
-					MonsterObject1 *m = varC[j].m;
+					MonsterObject1 *m = varC->monster1[j];
 					if (_op54Data[m->collisionNum] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
 						int _ebp = var38 - m->yMstPos;
 						int _eax = ABS(_ebp);
@@ -4248,7 +4248,7 @@ l1:
 			}
 			if (var34 != -1) {
 // 41DDEE
-				const uint8_t num = varC[var34].unk20;
+				const uint8_t num = varC->monster1[var34]->collisionNum;
 				m12u4->unk1B = num;
 				_op54Data[num] = 1;
 				++var24;
@@ -5002,8 +5002,9 @@ void Game::executeMstUnk12() {
 				const uint32_t _ecx = offset / 948;
 				assert(_ecx < 32);
 				_al = m->xMstPos < _mstPosX;
+				const int count = _mstCollisionTable[_al][_ecx].count;
+				_mstCollisionTable[_al][_ecx].monster1[count] = m;
 				++_mstCollisionTable[_al][_ecx].count;
-				_mstCollisionTable[_al][_ecx].m = m;
 			}
 		}
 	}

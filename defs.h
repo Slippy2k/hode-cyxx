@@ -316,8 +316,7 @@ struct MstRect {
 }; // sizeof == 0x20
 
 struct MstCollision {
-	MonsterObject1 *m; // 0x00
-	uint8_t unk20; // 0x20
+	MonsterObject1 *monster1[32]; // 0x00
 	int count; // 0x80
 }; // sizeof == 132
 
