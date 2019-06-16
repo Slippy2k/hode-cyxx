@@ -90,18 +90,18 @@ void Game::objectMonster2Init_fort_firefly(MonsterObject2 *m) {
 	m->x2 = m->x1 + 255;
 	m->y2 = m->y1 + 191;
 	const uint32_t num = _rnd.update();
-	m->flags38 = num % 40;
-	if (_byte_43E838[m->flags38] != 0xFF) {
-		m->flags38 &= ~7;
+	m->hPosIndex = num % 40;
+	if (_byte_43E838[m->hPosIndex] != 0xFF) {
+		m->hPosIndex &= ~7;
 	}
-	m->flags39 = m->flags38;
+	m->vPosIndex = m->hPosIndex;
 	if (num & 0x80) {
-		m->flags38 += 40;
+		m->hPosIndex += 40;
 	} else {
-		m->flags39 += 40;
+		m->vPosIndex += 40;
 	}
-	m->flags3A = (num >> 16) & 1;
-	m->flags3B = (num >> 17) & 1;
+	m->hDir = (num >> 16) & 1;
+	m->vDir = (num >> 17) & 1;
 }
 
 void Game::resetMonsterObject2(MonsterObject2 *m) {
@@ -164,10 +164,7 @@ int Game::addMonsterObject1(MstUnk48 *m48, uint8_t flag) {
 			initMonsterObject1(m);
 			Task *current = _mstTasksList1; // _eax
 			Task *t = m->task; // _esi
-			if (!t) {
-				warning("addMonsterObject1 m %p m->task is NULL", m);
-				return 0;
-			}
+			assert(t);
 			while (current) {
 				Task *next = current->nextPtr;
 				if (current == t) {
@@ -1754,10 +1751,55 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	return 0;
 }
 
-// mstUpdateTaskMonsterObject2
 int Game::mstUpdateTaskMonsterObject2(Task *t) {
+	mstTaskSetScreenPosition(t);
+	MonsterObject2 *m = t->monster2;
+	if (_currentLevel == 1 && m->m45->unk0 == 27) {
+		if (_byte_43E838[m->hPosIndex] == 0xFF) {
+			uint32_t r = _rnd.update();
+			uint8_t _dl = (r % 5) << 3;
+			m->vPosIndex = _dl;
+			if (m->hPosIndex >= 40) {
+				m->hPosIndex = _dl;
+				m->vPosIndex = _dl + 40;
+				m->hDir = (r >> 16) & 1;
+			} else {
+				m->hPosIndex = m->vPosIndex + 40;
+				m->vDir = (r >> 16) & 1;
+			}
+		}
+// 41911A
+		int dx = _byte_43E838[m->hPosIndex];
+		if (m->hDir == 0) {
+			dx = -dx;
+		}
+		int dy = _byte_43E838[m->vPosIndex];
+		if (m->vDir == 0) {
+			dy = -dy;
+		}
+		++m->vPosIndex;
+		++m->hPosIndex;
+		m->o->xPos += dx;
+		m->o->yPos += dy;
+		m->xMstPos += dx;
+		m->yMstPos += dy;
+		if (m->xMstPos > m->x2) {
+			m->hDir = 0;
+		} else if (m->xMstPos < m->x1) {
+			m->hDir = 1;
+		}
+		if (m->yMstPos > m->y2) {
+			m->vDir = 0;
+		} else if (m->yMstPos < m->y1) {
+			m->vDir = 1;
+		}
+	}
+// 4191B1
 	warning("mstUpdateTaskMonsterObject2 unimplemented");
 	// TODO
+	if (_mstMovingStateCount > 0) {
+		// TODO
+	}
 	return 0;
 }
 
@@ -5200,6 +5242,13 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	if (_edi) {
 		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_mstUnk11 >= m->m49->unk15))) {
 			warning("executeMstOp67Type2 41CFD2");
+			if ((m->unk8[946] & 4) != 0 && m->unkD4->unkE != 0 && m->flagsA8[0] == 0xFF) {
+				warning("executeMstOp67Type2 41D002");
+				// TODO
+			}
+// 41D115
+			warning("executeMstOp67Type2 41D115");
+			// TODO
 
 // 41D1CE
 			if (m->unk8[946] & 4) {

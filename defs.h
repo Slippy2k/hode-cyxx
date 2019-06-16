@@ -409,10 +409,10 @@ struct MonsterObject2 {
 	int x2; // 2C
 	int y1; // 30
 	int y2; // 34
-	uint8_t flags38;
-	uint8_t flags39;
-	uint8_t flags3A;
-	uint8_t flags3B;
+	uint8_t hPosIndex; // 38
+	uint8_t vPosIndex; // 39
+	uint8_t hDir; // 3A
+	uint8_t vDir; // 3B
 	Task *task; // 0x3C
 }; // sizeof == 64
 
