@@ -622,7 +622,7 @@ struct Game {
 	bool executeMstUnk21(LvlObject *o, int type);
 	bool executeMstUnk28(LvlObject *o, int type) const;
 	bool executeMstUnk22(LvlObject *o, int type);
-	bool executeMstUnk20(MonsterObject1 *m, uint32_t flags);
+	bool mstCollidesByFlags(MonsterObject1 *m, uint32_t flags);
 	bool executeMstUnk27(MonsterObject1 *m, const uint8_t *p);
 	int mstUpdateTaskMonsterObject1(Task *t);
 	int mstUpdateTaskMonsterObject2(Task *t);

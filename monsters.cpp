@@ -1374,7 +1374,7 @@ bool Game::executeMstUnk28(LvlObject *o, int type) const {
 	return false;
 }
 
-bool Game::executeMstUnk20(MonsterObject1 *m, uint32_t flags) {
+bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 	if ((flags & 1) != 0 && (m->o16->flags0 & 0x200) == 0) {
 		return false;
 	} else if ((flags & 8) != 0 && (m->flags48 & 0x20) == 0) {
@@ -1384,10 +1384,10 @@ bool Game::executeMstUnk20(MonsterObject1 *m, uint32_t flags) {
 	} else if ((flags & 0x200) != 0 && (_mstFlags & 0x40000000) != 0) {
 		return false;
 	} else if ((flags & 0x40) != 0) {
-		warning("executeMstUnk20 flags 0x%x", flags);
+		warning("mstCollidesByFlags flags 0x%x", flags);
 		// TODO
 	} else if ((flags & 0x80) != 0) {
-		warning("executeMstUnk20 flags 0x%x", flags);
+		warning("mstCollidesByFlags flags 0x%x", flags);
 		// TODO
 	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 0))) {
 		return false;
@@ -1421,7 +1421,7 @@ bool Game::executeMstUnk20(MonsterObject1 *m, uint32_t flags) {
 
 bool Game::executeMstUnk27(MonsterObject1 *m, const uint8_t *p) {
 	const uint32_t a = READ_LE_UINT32(p + 0x10);
-	if (a == 0 || !executeMstUnk20(m, a)) {
+	if (a == 0 || !mstCollidesByFlags(m, a)) {
 		return false;
 	}
 	if ((a & 0x8000) != 0 && (m->flagsA6 & 4) == 0) {
@@ -3165,7 +3165,7 @@ int Game::runTask_default(Task *t) {
 		case 193:
 		case 194:
 		case 195:
-		case 196: { // 48
+		case 196: { // 48 - arith_monster_var_imm
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
 					m = t->monster2->mstTaskData;
@@ -3225,7 +3225,7 @@ int Game::runTask_default(Task *t) {
 			// _mstCurrentMonster1 = t->monster1;
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				if (executeMstUnk20(t->monster1, _res->_mstUnk59[num].flags)) {
+				if (mstCollidesByFlags(t->monster1, _res->_mstUnk59[num].flags)) {
 					t->codeData = p + 4;
 					resetMstTask(t, _res->_mstUnk59[num].codeData, 0x10);
 					t->runningState &= ~2;
@@ -3961,6 +3961,23 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 			return initMonsterObject1Type2(t);
 		} else {
 // 41BEF4
+			int x = MIN(_mstRefPosX, 255);
+			if (x < 0) {
+				c = x;
+				d = x + 255;
+			} else {
+				c = -x;
+				d = 255 - x;
+			}
+			int y = MIN(_mstRefPosY, 191);
+			if (y < 0) {
+				// _ebp = y
+				// var4 = y + 191;
+			} else {
+				// _ebp = -y;
+				// var4 = 191 - y;
+			}
+
 			warning("mstOp49 41BEF4");
 			// TODO
 			return initMonsterObject1Type2(t);
@@ -4147,13 +4164,13 @@ l1:
 
 			int var10 = varC->count;
 			if (var10 > 0) {
-				MstCollision *var20 = varC;
+				//MstCollision *var20 = varC;
 				for (int j = 0; j < var10; ++j) {
 					MonsterObject1 *m = varC[j].m;
 					if (_op54Data[m->collisionNum] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
 						int _ebp = var38 - m->yMstPos;
 						int _eax = ABS(_ebp);
-						int _esi = _ebx - m->xMstPos;
+						int _esi = var44 - m->xMstPos;
 						int _ecx = ABS(_esi);
 						if (_ecx > m48->unk0 || _eax > m48->unk2) {
 							continue;
