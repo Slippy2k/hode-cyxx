@@ -4045,7 +4045,7 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 		}
 // 41C281
 		uint8_t _cl, _dl;
-		if (_mstLut1[m->flagsA4] & 1) {
+		if (_mstLut1[m->flags4A] & 1) {
 			_cl = m->unkD4->unkE;
 			_dl = m->unkD4->unkF;
 		} else {
@@ -4930,11 +4930,9 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 	int x = m->xMstPos;
 	if (x < m->unk74) {
 		_xMstPos1 = x = m->unk7C;
-		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
-			if (x > m->unk84) {
-				t->flags |= 0x80;
-				x = m->unk84;
-			}
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x > m->unk84) {
+			t->flags |= 0x80;
+			x = m->unk84;
 		}
 		if (x > m->x1) {
 			t->flags |= 0x80;
@@ -4945,17 +4943,15 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 	} else if (x > m->unk7C) {
 // 41A2AA
 		_xMstPos1 = x = m->unk74;
-		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
-			if (x < m->unk88) {
-				t->flags |= 0x80;
-				x = m->unk88;
-			}
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x < m->unk88) {
+			t->flags |= 0x80;
+			x = m->unk88;
 		}
 		if (x < m->x2) {
 			t->flags |= 0x80;
 			x = m->x2;
 		}
-		_xMstPos2 = x - m->xMstPos;
+		_xMstPos2 = m->xMstPos - x;
 		m->flags4A = 8;
 	} else {
 // 41A2FC
@@ -5080,9 +5076,9 @@ int Game::executeMstOp67Type1(Task *t) {
 		_edi = _rnd.update() % _edi;
 	}
 	m->unk68 -= _edi;
-	m->unk74 += m->unk64;
-	m->unk7C = m->unk68;
 	m->unk64 += _edi;
+	m->unk74 = m->unk64;
+	m->unk7C = m->unk68;
 	const uint8_t *ptr1 = _res->_mstHeightMapData + m->unkD4->offsetHeight;
 	if ((ptr1[2] & 0xA) == 0) {
 		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
@@ -5900,7 +5896,7 @@ int Game::runTask_unk6(Task *t) {
 	}
 set_am:
 	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
-	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flagsA4);
+	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
 	return 1;
 }
 
