@@ -2416,9 +2416,9 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 		}
 		break;
 	case 5:
-		return (_andyObject->flags0 & 0x1F) == 7;
+		return ((_andyObject->flags0 & 0x1F) == 7) ? 1 : 0;
 	case 6:
-		return (_andyObject->spriteNum == 0);
+		return (_andyObject->spriteNum == 0) ? 1 : 0;
 	case 7:
 		if ((_andyObject->flags0 & 0x1F) == 7) {
 			AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
@@ -2892,7 +2892,7 @@ int Game::runTask_default(Task *t) {
 				executeMstOp26(&_mstTasksList4, p[1]);
 			}
 			break;
-		case 40: // 29
+		case 40: // 27
 			if (p[1] < _res->_mstHdr.pointsCount) {
 				executeMstOp27(&_mstTasksList1, p[1], p[2]);
 				executeMstOp27(&_mstTasksList2, p[1], p[2]);
@@ -3858,7 +3858,7 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
-	assert(m->unkDC >= 0 && m->unkDC < m49->count1);
+	assert((uint32_t)m->unkDC < m49->count1);
 	m->unkD4 = &m49->data1[m->unkDC];
 	m->flags4B = screen;
 	if (a > b) {
@@ -5071,7 +5071,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		}
 	}
 // 41C5B1
-	assert(m->unkDC >= 0 && m->unkDC < m49->count1);
+	assert((uint32_t)m->unkDC < m49->count1);
 	m->unkD4 = &m49->data1[m->unkDC];
 	int _edi = (m->unkC->x1 - x) / 4;
 	m->unk64 = x + _edi;
@@ -5164,7 +5164,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CC44
-	assert(m->unkDC >= 0 && m->unkDC < m49->count1);
+	assert((uint32_t)m->unkDC < m49->count1);
 	m->unkD4 = &m49->data1[m->unkDC];
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
@@ -5338,12 +5338,12 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		m->m35 = 0;
 		m->flagsA6 = 0;
 
-		assert(arg1C >= 0 && arg1C < _res->_mstUnk42[arg24].count1);
+		assert((uint32_t)arg1C < _res->_mstUnk42[arg24].count1);
 		const int j = _res->_mstUnk42[arg24].indexUnk46[arg1C];
 		assert(j >= 0 && j < _res->_mstHdr.unk0x30);
 		MstUnk46 *m46 = &_res->_mstUnk46[j];
 		m->m46 = m46;
-		assert(arg20 >= 0 && arg20 < m46->count);
+		assert((uint32_t)arg20 < m46->count);
 		MstUnk46Unk1 *m1 = &m46->data[arg20]; // _ecx
 		m->unk4 = m1;
 		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;

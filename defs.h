@@ -317,7 +317,7 @@ struct MstRect {
 
 struct MstCollision {
 	MonsterObject1 *monster1[32]; // 0x00
-	int count; // 0x80
+	uint32_t count; // 0x80
 }; // sizeof == 132
 
 struct Task;
