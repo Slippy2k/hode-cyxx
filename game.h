@@ -187,7 +187,7 @@ struct Game {
 	int _mstOp54Unk3; // _m43Num3
 	int _mstUnk11;
 	int _mstUnk12;
-	int _mstUnk6;
+	int _m48Num;
 	uint8_t _mstUnk8;
 	uint32_t _mstAndyVarMask;
 	int _mstChasingMonstersCount;
