@@ -1379,12 +1379,10 @@ bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 		return false;
 	} else if ((flags & 0x200) != 0 && (_mstFlags & 0x40000000) != 0) {
 		return false;
-	} else if ((flags & 0x40) != 0) {
-		warning("mstCollidesByFlags flags 0x%x", flags);
-		// TODO
-	} else if ((flags & 0x80) != 0) {
-		warning("mstCollidesByFlags flags 0x%x", flags);
-		// TODO
+	} else if ((flags & 0x40) != 0 && (mstGetFacingDirectionMask(m->flags49) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->unk8[946] & 4) == 0) {
+		return false;
+	} else if ((flags & 0x80) != 0 && (mstGetFacingDirectionMask(m->flags49) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->unk8[946] & 4) != 0) {
+		return false;
 	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 0))) {
 		return false;
 	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 1))) {
