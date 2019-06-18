@@ -185,7 +185,7 @@ struct Game {
 	int _mstOp54Unk1; // _m43Num1
 	int _mstOp54Unk2; // _m43Num2
 	int _mstOp54Unk3; // _m43Num3
-	int _mstUnk11;
+	int _yMstPos;
 	int _mstUnk12;
 	int _m48Num;
 	uint8_t _mstUnk8;
@@ -612,7 +612,7 @@ struct Game {
 	void executeMstCodeHelper2();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
 	void executeMstUnk4(MonsterObject1 *m);
-	void executeMstUnk5(MonsterObject1 *m);
+	void mstSetVerticalHorizontalBounds(MonsterObject1 *m);
 	bool executeMstUnk6(MonsterObject1 *m);
 	void executeMstUnk8(MonsterObject1 *m);
 	int executeMstUnk9(Task *t, MonsterObject1 *m);
@@ -656,7 +656,7 @@ struct Game {
 	void executeMstUnk1(Task *t);
 	int mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);
-	void executeMstUnk12();
+	void mstResetCollisionTable();
 	void executeMstUnk13(Task *t);
 	int executeMstOp67Type1(Task *t);
 	int executeMstOp67Type2(Task *t, int flag);
