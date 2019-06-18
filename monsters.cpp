@@ -77,8 +77,8 @@ void Game::resetMonsterObject1(MonsterObject1 *m) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		if (_monsterObjects2Table[i].m45 && _monsterObjects2Table[i].mstTaskData == m) {
-			_monsterObjects2Table[i].mstTaskData = 0;
+		if (_monsterObjects2Table[i].m45 && _monsterObjects2Table[i].monster1 == m) {
+			_monsterObjects2Table[i].monster1 = 0;
 		}
 	}
 }
@@ -1988,8 +1988,8 @@ void Game::stopMonsterObject1(Task *t, Task **tasksList) {
 		removeLvlObject2(o);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
-			_monsterObjects2Table[i].mstTaskData = 0;
+		if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].monster1 == m) {
+			_monsterObjects2Table[i].monster1 = 0;
 		}
 	}
 	removeTask(tasksList, t);
@@ -2308,7 +2308,7 @@ int Game::getTaskVar(Task *t, int index, int type) const {
 		{
 			MonsterObject1 *m = 0;
 			if (t->monster2) {
-				m = t->monster2->mstTaskData;
+				m = t->monster2->monster1;
 			} else {
 				m = t->monster1;
 			}
@@ -2338,7 +2338,7 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 	case 5: {
 			MonsterObject1 *m = 0;
 			if (t->monster2) {
-				m = t->monster2->mstTaskData;
+				m = t->monster2->monster1;
 			} else {
 				m = t->monster1;
 			}
@@ -2608,7 +2608,7 @@ int Game::getTaskFlag(Task *t, int num, int type) const {
 	case 5: {
 			MonsterObject1 *m = 0;
 			if (t->monster2) {
-				m = t->monster2->mstTaskData;
+				m = t->monster2->monster1;
 			} else {
 				m = t->monster1;
 			}
@@ -2741,7 +2741,7 @@ int Game::runTask_default(Task *t) {
 		case 25: { // 15 - set_flag_mst
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -2759,7 +2759,7 @@ int Game::runTask_default(Task *t) {
 		case 28: { // 18 - unset_flag_mst
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -2813,7 +2813,7 @@ int Game::runTask_default(Task *t) {
 		case 32: { // 22
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -2885,7 +2885,7 @@ int Game::runTask_default(Task *t) {
 		case 43: { // 30 - increment_monster_var
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -2911,7 +2911,7 @@ int Game::runTask_default(Task *t) {
 		case 46: { // 33 - decrement_monster_var
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -2966,7 +2966,7 @@ int Game::runTask_default(Task *t) {
 		case 76: { // 36
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -2989,7 +2989,7 @@ int Game::runTask_default(Task *t) {
 		case 86: { // 37
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -3012,7 +3012,7 @@ int Game::runTask_default(Task *t) {
 		case 96: { // 38
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -3038,7 +3038,7 @@ int Game::runTask_default(Task *t) {
 		case 106: { // 39
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -3124,7 +3124,7 @@ int Game::runTask_default(Task *t) {
 		case 166: { // 45
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -3180,7 +3180,7 @@ int Game::runTask_default(Task *t) {
 		case 196: { // 48 - arith_monster_var_imm
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
-					m = t->monster2->mstTaskData;
+					m = t->monster2->monster1;
 				} else {
 					m = t->monster1;
 				}
@@ -3762,7 +3762,7 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 			m->m46 = 0;
 			m->o16->dataPtr = 0;
 			for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
+				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].monster1 == m) {
 					_monsterObjects2Table[i].m45 = 0;
 				}
 			}
@@ -3802,7 +3802,7 @@ void Game::executeMstOp27(Task **tasksList, int screenNum, int flags) {
 			m->m46 = 0;
 			m->o16->dataPtr = 0;
 			for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
+				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].monster1 == m) {
 					_monsterObjects2Table[i].m45 = 0;
 				}
 			}
@@ -5000,6 +5000,7 @@ void Game::mstResetCollisionTable() {
 	}
 }
 
+// mstSetStateMain
 void Game::executeMstUnk13(Task *t) {
 	t->run = &Game::runTask_default;
 	LvlObject *o = 0;
@@ -5353,8 +5354,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				m->o16->dataPtr = 0;
 			}
 			for (int j = 0; j < kMaxMonsterObjects2; ++j) {
-				if (_monsterObjects2Table[j].m45 && _monsterObjects2Table[j].mstTaskData == m) {
-					_monsterObjects2Table[j].mstTaskData = 0;
+				if (_monsterObjects2Table[j].m45 && _monsterObjects2Table[j].monster1 == m) {
+					_monsterObjects2Table[j].monster1 = 0;
 				}
 			}
 			return;
@@ -5394,11 +5395,11 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		assert(arg24 >= 0 && arg24 < _res->_mstHdr.unk0x2C);
 		mo->m45 = &_res->_mstUnk45[arg24];
 		if (t->monster1) {
-			mo->mstTaskData = t->monster1;
+			mo->monster1 = t->monster1;
 		} else if (t->monster2) {
-			mo->mstTaskData = t->monster2->mstTaskData;
+			mo->monster1 = t->monster2->monster1;
 		} else {
-			mo->mstTaskData = 0;
+			mo->monster1 = 0;
 		}
 
 		mo->flags24 = 0;
@@ -5690,7 +5691,7 @@ int Game::runTask_waitFlags(Task *t) {
 	case 5: {
 			MonsterObject1 *m = 0;
 			if (t->monster2) {
-				m = t->monster2->mstTaskData;
+				m = t->monster2->monster1;
 			} else {
 				m = t->monster1;
 			}

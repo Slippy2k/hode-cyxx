@@ -397,7 +397,7 @@ struct MonsterObject1 {
 struct MonsterObject2 {
 	MstUnk45 *m45;
 	LvlObject *o; // 4
-	MonsterObject1 *mstTaskData; // 8
+	MonsterObject1 *monster1; // 8
 	int unk0x10;
 	int xPos; // 14
 	int yPos; // 18

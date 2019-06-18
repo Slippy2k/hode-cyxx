@@ -2108,7 +2108,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		c = 1;
 	} else {
 		assert(ptr->dataPtr >= &_monsterObjects2Table[0] && ptr->dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
-		MonsterObject1 *m = ((MonsterObject2 *)ptr->dataPtr)->mstTaskData;
+		MonsterObject1 *m = ((MonsterObject2 *)ptr->dataPtr)->monster1;
 		if (m) {
 			a = m->collisionNum;
 			c = 2;
@@ -3373,7 +3373,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 		} else {
 			assert(dataPtr >= &_monsterObjects2Table[0] && dataPtr < &_monsterObjects2Table[kMaxMonsterObjects2]);
 			MonsterObject2 *mo = (MonsterObject2 *)dataPtr;
-			m = mo->mstTaskData;
+			m = mo->monster1;
 			if (m) {
 				_ebx = 2;
 				var4 = m->collisionNum;
