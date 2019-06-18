@@ -3635,9 +3635,9 @@ int Game::runTask_default(Task *t) {
 				MonsterObject1 *m = t->monster1;
 				if (m) {
 					m->flagsA5 &= ~0x70;
-					if ((m->flagsA5 & 8) != 0) {
-						warning(".mst opcode 242 t->child flagsA5 0x%x", m->flagsA5);
-						// TODO
+					if ((m->flagsA5 & 8) != 0 && !m->unk18) {
+						executeMstUnk23(t);
+						return 1;
 					}
 				}
 				return 0;
@@ -4108,15 +4108,14 @@ void Game::executeMstOp52() {
 			if (_mstChasingMonstersCount <= 0) {
 				_m48Num = -1;
 			}
-			if (m->flagsA5 & 0x70) {
+			if ((m->flagsA5 & 0x70) == 0) {
 				const int a = (m->o16->flags0 & 255) * 28;
 				if (m->unk8[a] != 0) {
 					// TODO
 					warning("MstOp52 t->task %p unimplemented", m->task->run);
 				} else {
 // 41D7D8
-					m->flagsA5 &= ~0xF;
-					m->flagsA5 |= 6;
+					m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
 					executeMstOp67Type2(m->task, 1);
 				}
 			}
@@ -5013,6 +5012,12 @@ void Game::executeMstUnk13(Task *t) {
 		o->actionKeyMask = 0;
 		o->directionKeyMask = 0;
 	}
+}
+
+int Game::executeMstUnk23(Task *t) {
+	MonsterObject1 *m = t->monster1;
+	m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
+	return executeMstOp67Type2(t, 1);
 }
 
 int Game::executeMstOp67Type1(Task *t) {
