@@ -2881,7 +2881,7 @@ int Game::runTask_default(Task *t) {
 				_res->flagMstCodeForPos(num, 0);
 			}
 			break;
-		case 39: // 26
+		case 39: // 26 - remove_monsters_screen
 			if (p[1] < _res->_mstHdr.pointsCount) {
 				executeMstOp26(&_mstTasksList1, p[1]);
 				executeMstOp26(&_mstTasksList2, p[1]);
@@ -2889,7 +2889,7 @@ int Game::runTask_default(Task *t) {
 				executeMstOp26(&_mstTasksList4, p[1]);
 			}
 			break;
-		case 40: // 27
+		case 40: // 27 - remove_monsters_screen_flags
 			if (p[1] < _res->_mstHdr.pointsCount) {
 				executeMstOp27(&_mstTasksList1, p[1], p[2]);
 				executeMstOp27(&_mstTasksList2, p[1], p[2]);
@@ -3770,7 +3770,7 @@ int Game::runTask_default(Task *t) {
 	return 1;
 }
 
-// remove references to mst tasks
+// mstOp26_removeMstTaskScreen
 void Game::executeMstOp26(Task **tasksList, int screenNum) {
 	Task *current = *tasksList; // _esi
 	while (current) {
@@ -3793,53 +3793,61 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 				}
 			}
 			removeLvlObject2(m->o16);
-			Task *child = current->child;
-			if (child) {
-				child->codeData = 0;
-				current->child = 0;
-			}
-			Task *prevPtr = current->prevPtr;
-			current->codeData = 0;
-			Task *nextPtr = current->nextPtr;
-			if (nextPtr) {
-				nextPtr->prevPtr = prevPtr;
-			}
-			if (prevPtr) {
-				prevPtr->nextPtr = nextPtr;
-			} else {
-				*tasksList = nextPtr;
-			}
+			removeTask(tasksList, current);
 		} else {
 			MonsterObject2 *mo = current->monster2;
 			if (mo && mo->o->screenNum == screenNum) {
 				mo->m45 = 0;
 				mo->o->dataPtr = 0;
 				removeLvlObject2(mo->o);
-				Task *child = current->child;
-				if (child) {
-					child->codeData = 0;
-					current->child = 0;
-				}
-				Task *prevPtr = current->prevPtr;
-				current->codeData = 0;
-				Task *nextPtr = current->nextPtr;
-				if (nextPtr) {
-					nextPtr->prevPtr = prevPtr;
-				}
-				if (prevPtr) {
-					prevPtr->nextPtr = nextPtr;
-				} else {
-					*tasksList = nextPtr;
-				}
+				removeTask(tasksList, current);
 			}
 		}
 		current = next;
 	}
 }
 
-void Game::executeMstOp27(Task **tasksList, int num, int arg) {
-	warning("executeMstOp27 %d %d unimplemented", num, arg);
-	// TODO
+// mstOp27_removeMstTakScreenFlags
+void Game::executeMstOp27(Task **tasksList, int screenNum, int flags) {
+	Task *current = *tasksList;
+	while (current) {
+		MonsterObject1 *m = current->monster1;
+		Task *next = current->nextPtr;
+		if (m && m->o16->screenNum == screenNum) {
+			if ((m->unk8[944] & 0x7F) != flags) {
+				continue;
+			}
+			if (_m48Num != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
+				disableMonsterObject1(m);
+			}
+			const uint8_t *ptr = m->unk8;
+			if (ptr[946] & 4) {
+				clearMstRectsTable(m, 0);
+				clearMstRectsTable(m, 1);
+			}
+			m->m46 = 0;
+			m->o16->dataPtr = 0;
+			for (int i = 0; i < kMaxMonsterObjects2; ++i) {
+				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
+					_monsterObjects2Table[i].m45 = 0;
+				}
+			}
+			removeLvlObject2(m->o16);
+			removeTask(tasksList, current);
+		} else {
+			MonsterObject2 *mo = current->monster2;
+			if (mo && mo->o->screenNum == screenNum) {
+				if ((mo->m45->unk0 & 0x7F) != flags) {
+					continue;
+				}
+				mo->m45 = 0;
+				mo->o->dataPtr = 0;
+				removeLvlObject2(mo->o);
+				removeTask(tasksList, current);
+			}
+		}
+		current = next;
+	}
 }
 
 int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
