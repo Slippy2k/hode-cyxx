@@ -1079,7 +1079,7 @@ void Game::executeMstCodeHelper2() {
 	}
 }
 
-void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2) {
+void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t dirMask2) {
 	o->actionKeyMask = ptr[1];
 	uint8_t _al = mask1 & 15;
 	o->directionKeyMask = _al;
@@ -1114,13 +1114,12 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 			}
 			break;
 		case 128:
-			_al |= mask2;
-			o->directionKeyMask = _al;
+			o->directionKeyMask = _al | dirMask2;
 			if ((m->unk8[946] & 2) != 0 && (_mstLut1[_al] & 1) != 0) {
 				if (m->xDelta >= m->yDelta) {
-					o->directionKeyMask = _al & ~5;
+					o->directionKeyMask &= ~5;
 				} else {
-					o->directionKeyMask = _al & ~0xA;
+					o->directionKeyMask &= ~0xA;
 				}
 			}
 			break;
@@ -1128,7 +1127,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 			o->directionKeyMask = m->unkF8 | _al;
 			break;
 		default:
-			o->directionKeyMask = _al | mask2;
+			o->directionKeyMask = _al | dirMask2;
 			break;
 		}
 	}
@@ -5185,9 +5184,9 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	if (r != 0) {
 		r = _rnd.update() % r;
 	}
-	m->unk74 = m->unk64 + r;
 	m->unk64 += r;
 	m->unk68 -= r;
+	m->unk74 = m->unk64;
 	m->unk7C = m->unk68;
 	if (m->flags4B == 0 && m->xMstPos < _mstPosX) {
 		m->unk74 = _mstPosX - m->unk68;
@@ -5561,7 +5560,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		switch (type) {
 		case 1:
 			executeMstOp67Type1(t);
-			if (!t->codeData || t->codeData == kUndefinedMonsterByteCode) { // TEMP
+			if (t->run == &Game::runTask_default && (!t->codeData || t->codeData == kUndefinedMonsterByteCode)) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 1", t);
 				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MonsterObject1));
@@ -5572,7 +5571,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				m->flagsA6 |= 1;
 			}
 			executeMstOp67Type2(t, 0);
-			if (!t->codeData || t->codeData == kUndefinedMonsterByteCode) { // TEMP
+			if (t->run == &Game::runTask_default && (!t->codeData || t->codeData == kUndefinedMonsterByteCode)) { // TEMP
 				warning("mstOp67 no bytecode for t %p type 2", t);
 				removeTask(mo ? &_mstTasksList2 : &_mstTasksList1, t);
 				memset(m, 0, sizeof(MonsterObject1));
