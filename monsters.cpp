@@ -3422,13 +3422,14 @@ int Game::runTask_default(Task *t) {
 		case 226: { // 68
 				const int num = READ_LE_UINT16(p + 2);
 				const MstUnk63 *m63 = &_res->_mstUnk63[num];
-				int _edi  = _res->_mstPointOffsets[_currentScreen].xOffset;
-				int var14 = _res->_mstPointOffsets[_currentScreen].yOffset;
+				int _edi  = _res->_mstPointOffsets[_currentScreen].xOffset; // xOffset
+				int var14 = _res->_mstPointOffsets[_currentScreen].yOffset; // yOffset
 				int var1C = 0;
 				int var8  = 0;
 				int _ecx  = m63->unk4 * 256;
-				int _edx  = _edi + 256 + _ecx;
+				int _edx  = _edi + 256;
 				_edi -= _ecx;
+				_edx += _ecx;
 				int var20 = _edx;
 				for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 					MonsterObject1 *m = &_monsterObjects1Table[i];
@@ -3742,8 +3743,8 @@ int Game::runTask_default(Task *t) {
 					return 1;
 				}
 			} else if (t->monster2) {
-				warning(".mst opcode 242 monster2 is not NULL");
-				// TODO
+				removeMstObjectTask(t, &_mstTasksList2);
+				ret = 1;
 			} else {
 				if ((t->runningState & 1) != 0 && _mstVars[31] == 0) {
 					_mstVars[31] = _mstTickDelay;
