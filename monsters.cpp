@@ -567,9 +567,19 @@ int Game::getMstDistance(int y, MovingOpcodeState *p) {
 		}
 		break;
 	case 4:
-	case 5:
 		// TODO
 		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		break;
+	case 5:
+		if (p->boundingBox.x2 < _mstTemp_x1 || p->boundingBox.y2 < _mstTemp_y1 || p->boundingBox.y1 > _mstTemp_y2) {
+			return -1;
+		} else {
+			const int dx = p->boundingBox.x1 - _mstTemp_x2;
+			if (dx <= 0 || p->unk40 == 3) {
+				return 0;
+			}
+			return p->unk40 / dx;
+		}
 		break;
 	case 6:
 		if (p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.x2 >= _mstTemp_x1 && p->boundingBox.x1 <= _mstTemp_x2) {
@@ -3709,9 +3719,15 @@ int Game::runTask_default(Task *t) {
 // 413F8B
 					m->flagsA5 &= ~8;
 					const uint32_t codeData = m->unk4->codeData;
-					assert(codeData != kNone);
-					resetTask(t, _res->_mstCodeData + codeData * 4);
-					return 0;
+					if (codeData != kNone) {
+						resetTask(t, _res->_mstCodeData + codeData * 4);
+						return 0;
+					} else {
+						m->o16->actionKeyMask = 7;
+						m->o16->directionKeyMask = 0;
+						t->run = &Game::runTask_idle;
+						return 1;
+					}
 				} else {
 					t->run = &Game::runTask_idle;
 					return 1;
