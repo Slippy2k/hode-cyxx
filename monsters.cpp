@@ -1957,6 +1957,7 @@ void Game::updateMstHeightMapData() {
 	}
 }
 
+// mstRemoveMonsterObject2
 void Game::removeMstObjectTask(Task *t, Task **tasksList) {
 	MonsterObject2 *m = t->monster2;
 	m->m45 = 0;
@@ -1965,23 +1966,10 @@ void Game::removeMstObjectTask(Task *t, Task **tasksList) {
 		o->dataPtr = 0;
 		removeLvlObject2(o);
 	}
-	Task *child = t->child;
-	if (child) {
-		child->codeData = 0;
-	}
-	Task *prev = t->prevPtr;
-	t->codeData = 0;
-	Task *next = t->nextPtr;
-	if (next) {
-		next->prevPtr = prev;
-	}
-	if (prev) {
-		prev->nextPtr = next;
-	} else {
-		*tasksList = next;
-	}
+	removeTask(tasksList, t);
 }
 
+// mstRemoveMonsterObject1
 void Game::stopMonsterObject1(Task *t, Task **tasksList) {
 	MonsterObject1 *m = t->monster1;
 	if (_m48Num != -1) {
@@ -1997,28 +1985,14 @@ void Game::stopMonsterObject1(Task *t, Task **tasksList) {
 	LvlObject *o = m->o16;
 	if (o) {
 		o->dataPtr = 0;
+		removeLvlObject2(o);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
 		if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].mstTaskData == m) {
 			_monsterObjects2Table[i].mstTaskData = 0;
 		}
 	}
-	removeLvlObject2(o);
-	if (t->child) {
-		t->child->codeData = 0;
-		t->child = 0;
-	}
-	Task *prev = t->prevPtr;
-	t->codeData = 0;
-	Task *next = t->nextPtr;
-	if (next) {
-		next->prevPtr = prev;
-	}
-	if (prev) {
-		prev->nextPtr = next;
-	} else {
-		*tasksList = next;
-	}
+	removeTask(tasksList, t);
 }
 
 // attack
