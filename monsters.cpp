@@ -40,7 +40,7 @@ static const uint8_t _mstDefaultLutOp[] = {
 	0x4D, 0x4F, 0x4E
 };
 
-static const uint8_t _byte_43E838[] = { // _fireflyPosData
+static const uint8_t _fireflyPosData[] = {
 	0, 1, 2, 3, 4, 4, 4, 0xFF, 0, 1, 2, 2, 4, 4, 3, 0xFF,
 	0, 1, 1, 2, 3, 2, 3, 0xFF, 0, 1, 1, 2, 3, 3, 3, 0xFF,
 	0, 0, 1, 2, 2, 2, 2, 0xFF, 4, 4, 4, 3, 2, 1, 0, 0xFF,
@@ -91,7 +91,7 @@ void Game::objectMonster2Init_fort_firefly(MonsterObject2 *m) {
 	m->y2 = m->y1 + 191;
 	const uint32_t num = _rnd.update();
 	m->hPosIndex = num % 40;
-	if (_byte_43E838[m->hPosIndex] != 0xFF) {
+	if (_fireflyPosData[m->hPosIndex] != 0xFF) {
 		m->hPosIndex &= ~7;
 	}
 	m->vPosIndex = m->hPosIndex;
@@ -1467,7 +1467,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		o->flags2 = m->unkE8;
 	}
 	if (_mstCurrentFlags0 == 31) {
-		stopMonsterObject1(_mstCurrentTask, &_mstTasksList1);
+		mstRemoveMonsterObject1(_mstCurrentTask, &_mstTasksList1);
 		return 1;
 	}
 	const uint32_t _edi = READ_LE_UINT32(_mstCurrentDataPtr + 20);
@@ -1761,7 +1761,7 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 	mstTaskSetScreenPosition(t);
 	MonsterObject2 *m = t->monster2;
 	if (_currentLevel == 1 && m->m45->unk0 == 27) {
-		if (_byte_43E838[m->hPosIndex] == 0xFF) {
+		if (_fireflyPosData[m->hPosIndex] == 0xFF) {
 			uint32_t r = _rnd.update();
 			uint8_t _dl = (r % 5) << 3;
 			m->vPosIndex = _dl;
@@ -1775,11 +1775,11 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 			}
 		}
 // 41911A
-		int dx = _byte_43E838[m->hPosIndex];
+		int dx = _fireflyPosData[m->hPosIndex];
 		if (m->hDir == 0) {
 			dx = -dx;
 		}
-		int dy = _byte_43E838[m->vPosIndex];
+		int dy = _fireflyPosData[m->vPosIndex];
 		if (m->vDir == 0) {
 			dy = -dy;
 		}
@@ -1967,8 +1967,7 @@ void Game::updateMstHeightMapData() {
 	}
 }
 
-// mstRemoveMonsterObject2
-void Game::removeMstObjectTask(Task *t, Task **tasksList) {
+void Game::mstRemoveMonsterObject2(Task *t, Task **tasksList) {
 	MonsterObject2 *m = t->monster2;
 	m->m45 = 0;
 	LvlObject *o = m->o;
@@ -1979,8 +1978,7 @@ void Game::removeMstObjectTask(Task *t, Task **tasksList) {
 	removeTask(tasksList, t);
 }
 
-// mstRemoveMonsterObject1
-void Game::stopMonsterObject1(Task *t, Task **tasksList) {
+void Game::mstRemoveMonsterObject1(Task *t, Task **tasksList) {
 	MonsterObject1 *m = t->monster1;
 	if (_m48Num != -1) {
 		if ((m->flagsA5 & 8) != 0 && m->unk18) {
@@ -2867,18 +2865,18 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 39: // 26 - remove_monsters_screen
 			if (p[1] < _res->_mstHdr.pointsCount) {
-				executeMstOp26(&_mstTasksList1, p[1]);
-				executeMstOp26(&_mstTasksList2, p[1]);
-				executeMstOp26(&_mstTasksList3, p[1]);
-				executeMstOp26(&_mstTasksList4, p[1]);
+				mstOp26_removeMstTaskScreen(&_mstTasksList1, p[1]);
+				mstOp26_removeMstTaskScreen(&_mstTasksList2, p[1]);
+				mstOp26_removeMstTaskScreen(&_mstTasksList3, p[1]);
+				mstOp26_removeMstTaskScreen(&_mstTasksList4, p[1]);
 			}
 			break;
 		case 40: // 27 - remove_monsters_screen_flags
 			if (p[1] < _res->_mstHdr.pointsCount) {
-				executeMstOp27(&_mstTasksList1, p[1], p[2]);
-				executeMstOp27(&_mstTasksList2, p[1], p[2]);
-				executeMstOp27(&_mstTasksList3, p[1], p[2]);
-				executeMstOp27(&_mstTasksList4, p[1], p[2]);
+				mstOp27_removeMstTaskScreenFlags(&_mstTasksList1, p[1], p[2]);
+				mstOp27_removeMstTaskScreenFlags(&_mstTasksList2, p[1], p[2]);
+				mstOp27_removeMstTaskScreenFlags(&_mstTasksList3, p[1], p[2]);
+				mstOp27_removeMstTaskScreenFlags(&_mstTasksList4, p[1], p[2]);
 			}
 			break;
 		case 41: { // 28 - increment_task_var
@@ -3598,14 +3596,14 @@ int Game::runTask_default(Task *t) {
 		case 237: // 74 - remove_monster_task
 			if (t->monster1) {
 				if (!t->monster2) {
-					stopMonsterObject1(t, &_mstTasksList1);
+					mstRemoveMonsterObject1(t, &_mstTasksList1);
 					return 1;
 				}
-				removeMstObjectTask(t, &_mstTasksList2);
+				mstRemoveMonsterObject2(t, &_mstTasksList2);
 				return 1;
 			} else {
 				if (t->monster2) {
-					removeMstObjectTask(t, &_mstTasksList2);
+					mstRemoveMonsterObject2(t, &_mstTasksList2);
 					return 1;
 				}
 			}
@@ -3733,7 +3731,7 @@ int Game::runTask_default(Task *t) {
 					return 1;
 				}
 			} else if (t->monster2) {
-				removeMstObjectTask(t, &_mstTasksList2);
+				mstRemoveMonsterObject2(t, &_mstTasksList2);
 				ret = 1;
 			} else {
 				if ((t->runningState & 1) != 0 && _mstVars[31] == 0) {
@@ -3760,8 +3758,7 @@ int Game::runTask_default(Task *t) {
 	return 1;
 }
 
-// mstOp26_removeMstTaskScreen
-void Game::executeMstOp26(Task **tasksList, int screenNum) {
+void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 	Task *current = *tasksList; // _esi
 	while (current) {
 		MonsterObject1 *m = current->monster1; // _ecx
@@ -3797,8 +3794,7 @@ void Game::executeMstOp26(Task **tasksList, int screenNum) {
 	}
 }
 
-// mstOp27_removeMstTakScreenFlags
-void Game::executeMstOp27(Task **tasksList, int screenNum, int flags) {
+void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int flags) {
 	Task *current = *tasksList;
 	while (current) {
 		MonsterObject1 *m = current->monster1;

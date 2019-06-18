@@ -171,8 +171,8 @@ struct Game {
 	int _executeMstLogicPrevCounter;
 	Task _tasksTable[kMaxTasks];
 	Task *_tasksList;
-	Task *_mstTasksList1;
-	Task *_mstTasksList2;
+	Task *_mstTasksList1; // _monsterObjects1List
+	Task *_mstTasksList2; // _monsterObjects2List
 	Task *_mstTasksList3;
 	Task *_mstTasksList4;
 	int _mstPrevPosX; // _mstAndyLevelPrevPosX
@@ -629,9 +629,9 @@ struct Game {
 	void mstUpdateRefPos();
 	void updateMstHeightMapData();
 
-	void removeMstObjectTask(Task *t, Task **tasksList);
+	void mstRemoveMonsterObject2(Task *t, Task **tasksList);
 	void resetMstTask(Task *t, uint32_t codeData, uint8_t flags);
-	void stopMonsterObject1(Task *t, Task **tasksList);
+	void mstRemoveMonsterObject1(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
 	int mstTaskSetActionDirection(Task *t, int num, int value);
@@ -645,8 +645,8 @@ struct Game {
 	int getTaskOtherVar(int index, Task *t) const;
 	int getTaskFlag(Task *t, int index, int type) const;
 	int runTask_default(Task *t);
-	void executeMstOp26(Task **tasksList, int screenNum);
-	void executeMstOp27(Task **tasksList, int num, int arg);
+	void mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum);
+	void mstOp27_removeMstTaskScreenFlags(Task **tasksList, int num, int arg);
 	int mstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
 	void executeMstOp52();
 	bool mstCollidesDirection(MstUnk48 *m, uint8_t flag);
