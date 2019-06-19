@@ -5179,12 +5179,30 @@ int Game::executeMstOp67Type1(Task *t) {
 		return 0;
 	} else {
 // 41C7F6
-		// TODO
-		warning("executeMstOp67Type1 41C7F6");
 		if (_edi != 0) {
-		}
+			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m->m49->unk15)) {
+				// TODO
+				warning("executeMstOp67Type1 41C833");
+
+// 41CA2D
+				if (m->unk8[946] & 4) {
+					t->run = &Game::runTask_unk9;
+				} else if (m->unk8[946] & 2) {
+					t->run = &Game::runTask_unk7;
+				} else {
+					t->run = &Game::runTask_unk5;
+				}
+				return (this->*(t->run))(t);
+			} else if (m->unk8[946] & 4) {
 // 41CB2F
-		return 0;
+				// TODO
+				warning("executeMstOp67Type1 41CB3B");
+			}
+		}
+// 41CB85
+		t->flags |= 0x80;
+		executeMstUnk1(t);
+		return -1;
 	}
 }
 
