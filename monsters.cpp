@@ -3231,6 +3231,9 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 199: // 51
+			initMonsterObject1Type2(t);
+			return 0;
 		case 200: // 52
 			if (t->monster1 && t->monster1->unk18) {
 				executeMstOp52();
