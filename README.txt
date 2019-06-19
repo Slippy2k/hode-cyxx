@@ -1,6 +1,6 @@
 
 HODe README
-Release version: 0.1.5
+Release version: 0.1.6
 -------------------------------------------------------------------------------
 
 
@@ -42,8 +42,6 @@ Display settings can be configured in the 'hode.ini' file.
 Status:
 -------
 
-The game is not completable.
-
 What is working :
 * Cinematics (PAF)
 * Andy
@@ -51,7 +49,7 @@ What is working :
 * Level screens
 * Hint screens
 
-What is incomplete :
+What is partial :
 * Monsters logic (MST)
 * Sound playback (SSS)
 * Special Powers
