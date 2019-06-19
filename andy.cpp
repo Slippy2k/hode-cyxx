@@ -619,7 +619,7 @@ int Game::moveAndyObjectOp3(int op) {
 				ret = 0;
 			}
 			for (int i = 0; i < 2; ++i) {
-				if ((_screenMaskBuffer[_andyMaskBufferPos2 + _andyMoveTable37[3 + i]] & 8) == 0) {
+				if ((_screenMaskBuffer[offset + _andyMoveTable37[3 + i]] & 8) == 0) {
 					return 0;
 				}
 			}
@@ -643,7 +643,7 @@ int Game::moveAndyObjectOp3(int op) {
 				_al = 17;
 			}
 			for (int i = 0; i < 2; ++i) {
-				if ((_screenMaskBuffer[_andyMaskBufferPos2 + _andyMoveTable37[i]] & 8) == 0) {
+				if ((_screenMaskBuffer[offset + _andyMoveTable37[i]] & 8) == 0) {
 					return 0;
 				}
 			}
