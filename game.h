@@ -600,7 +600,7 @@ struct Game {
 	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
 
 	void mstTaskSetScreenPosition(Task *t);
-	int getMstDistance(int y, MovingOpcodeState *p);
+	int getMstDistance(int y, const MovingOpcodeState *p) const;
 	void mstTaskUpdateScreenPosition(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
 

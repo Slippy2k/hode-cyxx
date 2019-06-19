@@ -529,21 +529,51 @@ int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-int Game::getMstDistance(int y, MovingOpcodeState *p) {
+int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 	switch (p->unk24) {
 	case 0:
-		if (p->boundingBox.x1 <= _mstTemp_x2 && y >= _mstTemp_y1 && y - _mstTemp_y2 <= 9) {
+		if (p->boundingBox.x1 <= _mstTemp_x2 && p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.y1 <= _mstTemp_y2) {
 			const int dx = _mstTemp_x1 - p->boundingBox.x2;
 			if (dx <= 0) {
 				return 0;
 			}
-			return dx / p->unk1C;
+			return (p->unk40 == 3) ? 0 : dx / p->unk1C;
 		}
 		break;
 	case 1:
-	case 2:
-		// TODO
-		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		{
+			const int dx = p->boundingBox.x2 - _mstTemp_x1;
+			if (dx >= 0) {
+				const int dy = p->boundingBox.y1 - dx * 2 / 3;
+				if (dy <= _mstTemp_y2) {
+					const int dx2 = p->boundingBox.x1 - _mstTemp_x2;
+					if (dx2 <= 0) {
+						return (p->boundingBox.y2 >= _mstTemp_y1) ? 0 : -1;
+					}
+					const int dy2 = p->boundingBox.y2 + dx2 * 2 / 3;
+					if (dy2 > _mstTemp_y1) {
+						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+					}
+				}
+			}
+		}
+		break;
+	case 2: {
+			const int dx = _mstTemp_x1 - p->boundingBox.x2;
+			if (dx >= 0) {
+				const int dy = p->boundingBox.y2 + dx * 2 / 3;
+				if (dy >= _mstTemp_x1) {
+					const int dx2 = p->boundingBox.x1 - _mstTemp_x2;
+					if (dx2 <= 0) {
+						return (p->boundingBox.y1 <= _mstTemp_y2) ? 0 : -1;
+					}
+					const int dy2 = p->boundingBox.y1 + dx2 * 2 / 3;
+					if (dy2 <= _mstTemp_y2) {
+						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+					}
+				}
+			}
+		}
 		break;
 	case 3: {
 			const int dx = _mstTemp_x2 - p->boundingBox.x1;
@@ -553,41 +583,49 @@ int Game::getMstDistance(int y, MovingOpcodeState *p) {
 					const int dx2 = _mstTemp_x1 - p->boundingBox.x2;
 					if (dx2 <= 0) {
 						return (p->boundingBox.y2 >= _mstTemp_y1) ? 0 : -1;
-					} else {
-						const int dy2 =  p->boundingBox.y2 - dx2 * 2 / 3;
-						if (dy2 >= _mstTemp_y1) {
-							if (p->unk40 == 3) {
-								return 0;
-							}
-							return dx2 / p->unk1C;
-						}
+					}
+					const int dy2 =  p->boundingBox.y2 - dx2 * 2 / 3;
+					if (dy2 >= _mstTemp_y1) {
+						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
 					}
 				}
 			}
 		}
 		break;
 	case 4:
-		// TODO
-		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		{
+			const int dx = _mstTemp_x2 - p->boundingBox.x1;
+			if (dx >= 0) {
+				const int dy = dx * 2 / 3 + p->boundingBox.y2;
+				if (dy >= _mstTemp_y1) {
+					const int dx2 = _mstTemp_x1 - p->boundingBox.x2;
+					if (dx2 <= 0) {
+						return (p->boundingBox.y1 <= _mstTemp_y2) ? 0 : -1;
+					}
+					const int dy2 = dx2 * 2 / 3 + + p->boundingBox.y1;
+					if (dy2 <= _mstTemp_y2) {
+						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+					}
+				}
+			}
+		}
 		break;
 	case 5:
-		if (p->boundingBox.x2 < _mstTemp_x1 || p->boundingBox.y2 < _mstTemp_y1 || p->boundingBox.y1 > _mstTemp_y2) {
-			return -1;
-		} else {
+		if (p->boundingBox.x2 >= _mstTemp_x1 && p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.y1 <= _mstTemp_y2) {
 			const int dx = p->boundingBox.x1 - _mstTemp_x2;
-			if (dx <= 0 || p->unk40 == 3) {
+			if (dx <= 0) {
 				return 0;
 			}
-			return p->unk40 / dx;
+			return (p->unk40 == 3) ? 0 : dx / p->unk1C;
 		}
 		break;
 	case 6:
 		if (p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.x2 >= _mstTemp_x1 && p->boundingBox.x1 <= _mstTemp_x2) {
 			const int dy = p->boundingBox.y1 - _mstTemp_y2;
-			if (dy <= 0 || p->unk40 == 3) {
+			if (dy <= 0) {
 				return 0;
 			}
-			return dy / p->unk20;
+			return (p->unk40 == 3) ? 0 : dy / p->unk20;
 		}
 		break;
 	case 7:
