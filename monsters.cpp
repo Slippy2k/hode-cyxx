@@ -3304,6 +3304,19 @@ int Game::runTask_default(Task *t) {
 		case 211: // 58
 			mstOp58_addLvlObject(t, READ_LE_UINT16(p + 2));
 			break;
+		case 213: { // 60 - monster_set_action_direction
+				LvlObject *o = 0;
+				if (t->monster2) {
+					o = t->monster2->o;
+				} else if (t->monster1) {
+					o = t->monster1->o16;
+				}
+				if (o) {
+					o->actionKeyMask = getTaskVar(t, p[2], p[1] >> 4);
+					o->directionKeyMask = getTaskVar(t, p[3], p[1] & 15);
+				}
+			}
+			break;
 		case 214: { // 61 - reset_monster_energy
 				MonsterObject1 *m = t->monster1;
 				if (m) {
