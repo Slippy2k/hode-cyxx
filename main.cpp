@@ -89,6 +89,7 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 		} else if (strcmp(name, "disable_mst") == 0) {
 			g->_mstLogicDisabled = configBool(value);
 		} else if (strcmp(name, "disable_sss") == 0) {
+			g->_sssDisabled = configBool(value);
 		} else if (strcmp(name, "max_active_sounds") == 0) {
 			g->_playingSssObjectsMax = atoi(value);
 		} else if (strcmp(name, "difficulty") == 0) {

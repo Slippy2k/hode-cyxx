@@ -977,6 +977,9 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 
 void Game::playSoundObject(SssUnk1 *s, int a, int b) {
 	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->sssUnk3, a, b);
+	if (_sssDisabled) {
+		return;
+	}
 	const int num = _res->_sssDataUnk3[s->sssUnk3].sssFilter;
 	debug(kDebug_SOUND, "sssFilter num %d", num);
 	SssFilter *filter = &_res->_sssFilters[num];

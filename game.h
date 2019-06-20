@@ -685,6 +685,7 @@ struct Game {
 	int runTask_unk10(Task *t);
 
 	// sound.cpp
+	bool _sssDisabled;
 	SssObject _sssObjectsTable[kMaxSssObjects];
 	bool _sssObjectsChanged;
 	int _sssObjectsCount;
