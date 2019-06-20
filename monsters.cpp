@@ -3882,13 +3882,7 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 				clearMstRectsTable(m, 0);
 				clearMstRectsTable(m, 1);
 			}
-			m->m46 = 0;
-			m->o16->dataPtr = 0;
-			for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].monster1 == m) {
-					_monsterObjects2Table[i].m45 = 0;
-				}
-			}
+			resetMonsterObject1(m);
 			removeLvlObject2(m->o16);
 			removeTask(tasksList, current);
 		} else {
@@ -3921,13 +3915,7 @@ void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int
 				clearMstRectsTable(m, 0);
 				clearMstRectsTable(m, 1);
 			}
-			m->m46 = 0;
-			m->o16->dataPtr = 0;
-			for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-				if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].monster1 == m) {
-					_monsterObjects2Table[i].m45 = 0;
-				}
-			}
+			resetMonsterObject1(m);
 			removeLvlObject2(m->o16);
 			removeTask(tasksList, current);
 		} else {
@@ -5494,15 +5482,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		int anim = m1->anim; // READ_LE_UINT16(_ecx + 4)
 		o = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
-			m->m46 = 0;
-			if (m->o16) {
-				m->o16->dataPtr = 0;
-			}
-			for (int j = 0; j < kMaxMonsterObjects2; ++j) {
-				if (_monsterObjects2Table[j].m45 && _monsterObjects2Table[j].monster1 == m) {
-					_monsterObjects2Table[j].monster1 = 0;
-				}
-			}
+			resetMonsterObject1(m);
 			return;
 		}
 // 41562C
