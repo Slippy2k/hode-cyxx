@@ -280,7 +280,7 @@ void Game::setupBackgroundBitmap() {
 }
 
 void Game::addToSpriteList(LvlObject *ptr) {
-	Sprite *spr = _gameSpriteListHead;
+	Sprite *spr = _spritesListNextPtr;
 	if (spr) {
 		uint8_t rightScreenId  = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen];
 		uint8_t topScreenId    = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosTopScreen];
@@ -319,7 +319,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 		}
 		if (READ_LE_UINT16(ptr->bitmapBits) > 8) {
 			spr->bitmapBits = ptr->bitmapBits;
-			_gameSpriteListHead = spr->nextPtr;
+			_spritesListNextPtr = spr->nextPtr;
 			index = (ptr->flags2 & 31);
 			spr->nextPtr = _gameSpriteListPtrTable[index];
 			_gameSpriteListPtrTable[index] = spr;
@@ -1984,14 +1984,14 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			playSound(ptr->currentSound, ptr, 0, 3);
 			ptr->currentSound = 0xFFFF;
 		}
-		Sprite *spr = _gameSpriteListHead;
+		Sprite *spr = _spritesListNextPtr;
 		if (spr && READ_LE_UINT16(_edi + 2) > 8) {
 			spr->xPos = _edi[0];
 			spr->yPos = _edi[1];
 			spr->bitmapBits = _edi + 2;
 			spr->num = ptr->flags2;
 			const int index = spr->num & 0x1F;
-			_gameSpriteListHead = spr->nextPtr;
+			_spritesListNextPtr = spr->nextPtr;
 			spr->nextPtr = _gameSpriteListPtrTable[index];
 			_gameSpriteListPtrTable[index] = spr;
 		}
@@ -2083,12 +2083,12 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 				ptr->currentSound = 0xFFFF;
 			}
 			uint8_t *data = (uint8_t *)getLvlObjectDataPtr(ptr, kObjectDataTypeLvlBackgroundSound);
-			Sprite *spr = _gameSpriteListHead;
+			Sprite *spr = _spritesListNextPtr;
 			if (spr && READ_LE_UINT16(data + 2) > 8) {
 				spr->bitmapBits = data + 2;
 				spr->xPos = data[0];
 				spr->yPos = data[1];
-				_gameSpriteListHead = spr->nextPtr;
+				_spritesListNextPtr = spr->nextPtr;
 				spr->num = ptr->flags2;
 				const int index = spr->num & 0x1F;
 				spr->nextPtr = _gameSpriteListPtrTable[index];
@@ -2138,14 +2138,14 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		int _edx = (ptr->flags1 >> 4) & 0xFF;
 		int _ecx = (ash->flags1 >> 4) & 0xFF;
 		_ecx = (((_ecx ^ _edx) & 3) << 14) | ptr->flags2;
-		Sprite *spr = _gameSpriteListHead;
+		Sprite *spr = _spritesListNextPtr;
 		if (spr && READ_LE_UINT16(_edi) > 8) {
 			spr->yPos = ptr->yPos;
 			spr->xPos = ptr->xPos;
 			spr->bitmapBits = _edi;
 			int index = spr->num = _ecx;
 			index &= 0x1F;
-			_gameSpriteListHead = spr->nextPtr;
+			_spritesListNextPtr = spr->nextPtr;
 			spr->nextPtr = _gameSpriteListPtrTable[index];
 			_gameSpriteListPtrTable[index] = spr;
 		}
@@ -2386,11 +2386,11 @@ void Game::updateInput() {
 
 void Game::levelMainLoop() {
 	memset(_gameSpriteListPtrTable, 0, sizeof(_gameSpriteListPtrTable));
-	_gameSpriteListHead = &_gameSpriteListTable[0];
-	for (int i = 0; i < 127; ++i) {
-		_gameSpriteListTable[i].nextPtr = &_gameSpriteListTable[i + 1];
+	_spritesListNextPtr = &_spritesTable[0];
+	for (int i = 0; i < kMaxSprites - 1; ++i) {
+		_spritesTable[i].nextPtr = &_spritesTable[i + 1];
 	}
-	_gameSpriteListTable[127].nextPtr = 0;
+	_spritesTable[kMaxSprites - 1].nextPtr = 0;
 	_directionKeyMask = 0;
 	_actionKeyMask = 0;
 	updateInput();
