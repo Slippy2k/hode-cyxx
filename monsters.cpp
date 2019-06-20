@@ -2149,19 +2149,17 @@ Task *Game::findFreeTask() {
 }
 
 Task *Game::createTask(const uint8_t *codeData) {
-	for (int i = 0; i < kMaxTasks; ++i) {
-		Task *t = &_tasksTable[i];
-		if (!t->codeData) {
-			memset(t, 0, sizeof(Task));
-			resetTask(t, codeData);
-			t->prevPtr = 0;
-			t->nextPtr = _tasksList;
-			if (_tasksList) {
-				_tasksList->prevPtr = t;
-			}
-			_tasksList = t;
-			return t;
+	Task *t = findFreeTask();
+	if (t) {
+		memset(t, 0, sizeof(Task));
+		resetTask(t, codeData);
+		t->prevPtr = 0;
+		t->nextPtr = _tasksList;
+		if (_tasksList) {
+			_tasksList->prevPtr = t;
 		}
+		_tasksList = t;
+		return t;
 	}
 	return 0;
 }
@@ -2312,12 +2310,9 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	if (found) {
 		return;
 	}
-	if (!codeData) {
-		return;
-	}
-	for (int i = 0; i < kMaxTasks; ++i) {
-		Task *t = &_tasksTable[i];
-		if (!t->codeData) {
+	if (codeData) {
+		t = findFreeTask();
+		if (t) {
 			memset(t, 0, sizeof(Task));
 			resetTask(t, codeData);
 			t->prevPtr = 0;
@@ -2327,7 +2322,6 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 			}
 			_tasksList = t;
 			t->localVars[7] = num;
-			break;
 		}
 	}
 }
