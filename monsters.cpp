@@ -1840,10 +1840,54 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 		}
 	}
 // 4191B1
-	warning("mstUpdateTaskMonsterObject2 unimplemented");
-	// TODO
-	if (_mstMovingStateCount > 0) {
-		// TODO
+	uint8_t _dl = 0;
+	for (int i = 0; i < _mstMovingStateCount; ++i) {
+		MovingOpcodeState *p = &_mstMovingState[i];
+		if (p->unk40 == 2) {
+			_dl |= 1;
+		} else if (p->unk40 == 1) {
+			_dl |= 2;
+		}
+	}
+// 4191DC
+	LvlObject *o = m->o;
+	MstUnk45 *m45 = m->m45;
+	uint8_t _bl = m45->unk1;
+	if (_bl != _dl) {
+		for (int i = 0; i < _mstMovingStateCount; ++i) {
+			MovingOpcodeState *p = &_mstMovingState[i];
+			if (p->unk40 == 2 && (_bl & 1) == 0) {
+				continue;
+			}
+			if (p->unk40 == 1 && (_bl & 2) == 0) {
+				continue;
+			}
+			if (o->screenNum != _currentScreen || p->o->screenNum != _currentScreen) {
+				continue;
+			}
+			if (!clipLvlObjectsBoundingBox(p->o, o, 20)) {
+				continue;
+			}
+			ShootLvlObjectData *s = p->unk28;
+			s->unk3 = 0x80;
+			s->x2 = o->xPos + o->width / 2;
+			s->y2 = o->yPos + o->height / 2;
+			if (p->unk40 != 2 || (_bl & 4) != 0) {
+				continue;
+			}
+			const uint32_t codeData = m45->codeData;
+			if (codeData != kNone) {
+				resetTask(t, _res->_mstCodeData + codeData * 4);
+			} else {
+				o->actionKeyMask = 7;
+				o->directionKeyMask = 0;
+				t->run = &Game::runTask_idle;
+			}
+		}
+	}
+	if ((m->o->flags0 & 0xFF) == 0x1F) {
+		mstRemoveMonsterObject2(t, &_mstTasksList2);
+		return 1;
 	}
 	return 0;
 }
