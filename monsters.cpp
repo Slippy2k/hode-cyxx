@@ -1230,7 +1230,7 @@ int Game::executeMstUnk9(Task *t, MonsterObject1 *m) {
 int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 	warning("executeMstUnk11 unimplemented");
 	// TODO
-	return 0;
+	return executeMstUnk9(t, m);
 }
 
 bool Game::executeMstUnk17(MonsterObject1 *m, int num) {
