@@ -2892,6 +2892,9 @@ int Game::runTask_default(Task *t) {
 				p = _res->_mstCodeData + num * 4 - 4;
 			}
 			break;
+		case 34:
+			// no-op
+			break;
 		case 35: { // 24 - enable_trigger
 				const int num = READ_LE_UINT16(p + 2);
 				_res->flagMstCodeForPos(num, 1);
