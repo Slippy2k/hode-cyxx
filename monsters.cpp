@@ -83,8 +83,7 @@ void Game::resetMonsterObject1(MonsterObject1 *m) {
 	}
 }
 
-// initMonsterObject2_firefly
-void Game::objectMonster2Init_fort_firefly(MonsterObject2 *m) {
+void Game::initMonsterObject2_firefly(MonsterObject2 *m) {
 	LvlObject *o = m->o;
 	m->x1 = _res->_mstPointOffsets[o->screenNum].xOffset;
 	m->y1 = _res->_mstPointOffsets[o->screenNum].yOffset;
@@ -1559,11 +1558,26 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		return 0;
 	}
 // 418384
+	assert(_mstCurrentMonster1 == m);
 	for (int i = 0; i < _mstMovingStateCount; ++i) {
 		MovingOpcodeState *p = &_mstMovingState[i];
-		if (!p->m || p->m == _mstCurrentMonster1) {
-			// TODO
+		if (p->m && p->m != m) {
+			continue;
 		}
+		if (m->unkEC < 0) {
+			continue;
+		}
+		if ((m->flags48 & 4) == 0) {
+			continue;
+		}
+		if (m->unk4->indexUnk51 == kNone) {
+			continue;
+		}
+		if (_rnd.getNextNumber() > m->unk4->unk10) {
+			continue;
+		}
+		m->unkF0 = 8;
+		warning("mstUpdateTaskMonsterObject1 4183E6");
 	}
 // 41882E
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
@@ -5621,7 +5635,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		assert(codeData != kNone);
 		resetTask(t, _res->_mstCodeData + codeData * 4);
 		if (_currentLevel == kLvl_fort && mo->m45->unk0 == 27) {
-			objectMonster2Init_fort_firefly(mo);
+			initMonsterObject2_firefly(mo);
 		}
 	} else {
 // 41593C

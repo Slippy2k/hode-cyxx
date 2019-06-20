@@ -592,7 +592,7 @@ struct Game {
 	void updateMstLvlObjectPos(MonsterObject1 *m);
 	bool updateMonsterObject1PositionHelper(MonsterObject1 *m);
 	bool updateMonsterObject1Position(MonsterObject1 *m);
-	void objectMonster2Init_fort_firefly(MonsterObject2 *m);
+	void initMonsterObject2_firefly(MonsterObject2 *m);
 	void resetMonsterObject2(MonsterObject2 *m);
 	int prepareMstTask(Task *t);
 
