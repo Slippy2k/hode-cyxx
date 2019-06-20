@@ -83,6 +83,7 @@ void Game::resetMonsterObject1(MonsterObject1 *m) {
 	}
 }
 
+// initMonsterObject2_firefly
 void Game::objectMonster2Init_fort_firefly(MonsterObject2 *m) {
 	LvlObject *o = m->o;
 	m->x1 = _res->_mstPointOffsets[o->screenNum].xOffset;
