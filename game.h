@@ -215,7 +215,7 @@ struct Game {
 
 	// game.cpp
 
-	void mainLoop(int level, int checkpoint);
+	void mainLoop(int level, int checkpoint, bool levelChanged);
 	void mixAudio(int16_t *buf, int len);
 	void resetObjectScreenDataList();
 	void clearObjectScreenData(LvlObject *ptr);

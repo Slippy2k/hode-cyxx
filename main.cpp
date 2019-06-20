@@ -167,10 +167,12 @@ int main(int argc, char *argv[]) {
 	_system->init(_title, Video::W, Video::H, _fullscreen);
 	g->_res->loadSetupDat();
 	g->benchmarkCpu();
+	bool levelChanged = false;
 	do {
-		g->mainLoop(level, checkpoint);
+		g->mainLoop(level, checkpoint, levelChanged);
 		level += 1;
 		checkpoint = 0;
+		levelChanged = true;
 	} while (!_system->inp.quit && level < kLvl_test);
 	delete g;
 	free(dataPath);

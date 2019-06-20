@@ -1883,12 +1883,72 @@ void Game::drawScreen() {
 	}
 }
 
-void Game::mainLoop(int level, int checkpoint) {
+void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	assert(level < kLvl_test);
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
 	_res->loadLevelData(_levels[_currentLevel]);
-	levelMainLoop();
+	_andyCurrentLevelScreenNum = -1;
+	initMstCode();
+//	res_initIO();
+	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8], 0xFF);
+	memset(_screenCounterTable, 0, 40);
+	clearDeclaredLvlObjectsList();
+	initLvlObjects();
+	resetPlasmaCannonState();
+	for (int i = 0; i < _res->_lvlHdr.screensCount; ++i) {
+		_res->_screensState[i].s2 = 0;
+	}
+	_res->_currentScreenResourceNum = _andyObject->screenNum;
+	_currentRightScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen]; /* right */
+	_currentLeftScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen]; /* left */
+	if (!_mstLogicDisabled) {
+		startMstCode();
+	}
+//	snd_setupResampleFunc(_ecx = 1);
+	if (!_paf->_skipCutscenes && _levelCheckpoint == 0 && !levelChanged) {
+		const uint8_t num = _cutscenes[_currentLevel];
+		_paf->preload(num);
+		_paf->play(num);
+		_paf->unload(num);
+	}
+	if (_res->_sssHdr.dataUnk1Count != 0) {
+		resetSound();
+	}
+	_quit = false;
+	resetObjectScreenDataList();
+	callLevel_initialize();
+	setupAndyLvlObject();
+	clearLvlObjectsList2();
+	clearLvlObjectsList3();
+	if (!_mstLogicDisabled) {
+		resetMstCode();
+		startMstCode();
+	} else {
+		_mstFlags = 0;
+	}
+	if (_res->_sssHdr.dataUnk1Count != 0) {
+		resetSound();
+	}
+	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
+	preloadLevelScreenData(num, 0xFF);
+	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
+	resetScreen();
+	if (_andyObject->screenNum != num) {
+		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
+	}
+	updateScreen(_andyObject->screenNum);
+	do {
+		int frameTimeStamp = _system->getTimeStamp() + kFrameTimeStamp;
+		levelMainLoop();
+		int diff = frameTimeStamp - _system->getTimeStamp();
+		if (diff < 10) {
+			diff = 10;
+		}
+		_system->sleep(diff);
+	} while (!_system->inp.quit && !_quit);
+	_animBackgroundDataCount = 0;
+	callLevel_terminate();
 }
 
 void Game::mixAudio(int16_t *buf, int len) {
@@ -2325,178 +2385,118 @@ void Game::updateInput() {
 }
 
 void Game::levelMainLoop() {
-	_andyCurrentLevelScreenNum = -1;
-	initMstCode();
-//	res_initIO();
-	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8], 0xFF);
-	memset(_screenCounterTable, 0, 40);
-	clearDeclaredLvlObjectsList();
-	initLvlObjects();
-	resetPlasmaCannonState();
-	for (int i = 0; i < _res->_lvlHdr.screensCount; ++i) {
-		_res->_screensState[i].s2 = 0;
+	memset(_gameSpriteListPtrTable, 0, sizeof(_gameSpriteListPtrTable));
+	_gameSpriteListHead = &_gameSpriteListTable[0];
+	for (int i = 0; i < 127; ++i) {
+		_gameSpriteListTable[i].nextPtr = &_gameSpriteListTable[i + 1];
 	}
-	_res->_currentScreenResourceNum = _andyObject->screenNum;
-	_currentRightScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen]; /* right */
-	_currentLeftScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen]; /* left */
-	if (!_mstLogicDisabled) {
-		startMstCode();
-	}
-//	snd_setupResampleFunc(_ecx = 1);
-	if (!_paf->_skipCutscenes && _levelCheckpoint == 0) {
-		const uint8_t num = _cutscenes[_currentLevel];
-		_paf->preload(num);
-		_paf->play(num);
-		_paf->unload(num);
-	}
-	if (_res->_sssHdr.dataUnk1Count != 0) {
-		resetSound();
-	}
-	_quit = false;
-	resetObjectScreenDataList();
-	callLevel_initialize();
-	setupAndyLvlObject();
-	clearLvlObjectsList2();
-	clearLvlObjectsList3();
-	if (!_mstLogicDisabled) {
-		resetMstCode();
-		startMstCode();
+	_gameSpriteListTable[127].nextPtr = 0;
+	_directionKeyMask = 0;
+	_actionKeyMask = 0;
+	updateInput();
+	_andyObject->directionKeyMask = _directionKeyMask;
+	_andyObject->actionKeyMask = _actionKeyMask;
+	_video->fillBackBuffer();
+	if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
+		preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
+		updateScreen(_andyObject->screenNum);
+	} else if (_fadePalette && _levelRestartCounter == 0) {
+		restartLevel();
 	} else {
-		_mstFlags = 0;
+		callLevel_postScreenUpdate(_res->_currentScreenResourceNum);
+		if (_currentLeftScreen != 0xFF) {
+			callLevel_postScreenUpdate(_currentLeftScreen);
+		}
+		if (_currentRightScreen != 0xFF) {
+			callLevel_postScreenUpdate(_currentRightScreen);
+		}
+	}
+	_currentLevelCheckpoint = _levelCheckpoint;
+	if (updateAndyLvlObject() != 0) {
+		callLevel_tick();
+//		_time_counter1 -= _time_counter2;
+		return;
+	}
+	executeMstCode();
+	updateLvlObjectLists();
+	callLevel_tick();
+	updateAndyMonsterObjects();
+	if (!_hideAndyObjectSprite) {
+		addToSpriteList(_andyObject);
+	}
+	((AndyLvlObjectData *)_andyObject->dataPtr)->dxPos = 0;
+	((AndyLvlObjectData *)_andyObject->dataPtr)->dyPos = 0;
+	updateAnimatedLvlObjectsLeftRightCurrentScreens();
+	if (_currentLevel == kLvl_rock || _currentLevel == kLvl_lar2 || _currentLevel == kLvl_test) {
+		if (_andyObject->spriteNum == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
+			updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
+		}
 	}
 	if (_res->_sssHdr.dataUnk1Count != 0) {
-		resetSound();
-	}
-	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8];
-	preloadLevelScreenData(num, 0xFF);
-	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
-	resetScreen();
-	if (_andyObject->screenNum != num) {
-		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
-	}
-	updateScreen(_andyObject->screenNum);
-	do {
-		int frameTimeStamp = _system->getTimeStamp() + kFrameTimeStamp;
-		memset(_gameSpriteListPtrTable, 0, sizeof(_gameSpriteListPtrTable));
-		_gameSpriteListHead = &_gameSpriteListTable[0];
-		for (int i = 0; i < 127; ++i) {
-			_gameSpriteListTable[i].nextPtr = &_gameSpriteListTable[i + 1];
-		}
-		_gameSpriteListTable[127].nextPtr = 0;
-		_directionKeyMask = 0;
-		_actionKeyMask = 0;
-		updateInput();
-		_andyObject->directionKeyMask = _directionKeyMask;
-		_andyObject->actionKeyMask = _actionKeyMask;
-		_video->fillBackBuffer();
-		if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
-			preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
-			updateScreen(_andyObject->screenNum);
-		} else if (_fadePalette && _levelRestartCounter == 0) {
-			restartLevel();
-		} else {
-			callLevel_postScreenUpdate(_res->_currentScreenResourceNum);
-			if (_currentLeftScreen != 0xFF) {
-				callLevel_postScreenUpdate(_currentLeftScreen);
-			}
-			if (_currentRightScreen != 0xFF) {
-				callLevel_postScreenUpdate(_currentRightScreen);
-			}
-		}
-		_currentLevelCheckpoint = _levelCheckpoint;
-		if (updateAndyLvlObject() != 0) {
-			callLevel_tick();
-//			_time_counter1 -= _time_counter2;
-			continue;
-		}
-		executeMstCode();
-		updateLvlObjectLists();
-		callLevel_tick();
-		updateAndyMonsterObjects();
-		if (!_hideAndyObjectSprite) {
-			addToSpriteList(_andyObject);
-		}
-		((AndyLvlObjectData *)_andyObject->dataPtr)->dxPos = 0;
-		((AndyLvlObjectData *)_andyObject->dataPtr)->dyPos = 0;
-		updateAnimatedLvlObjectsLeftRightCurrentScreens();
-		if (_currentLevel == kLvl_rock || _currentLevel == kLvl_lar2 || _currentLevel == kLvl_test) {
-			if (_andyObject->spriteNum == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
-				updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
-			}
-		}
-		if (_res->_sssHdr.dataUnk1Count != 0) {
 #if 1
-			/* original code had a dedicated thread for sound, that main thread/loop was signaling */
-			mixSoundObjects17640(true);
+		/* original code had a dedicated thread for sound, that main thread/loop was signaling */
+		mixSoundObjects17640(true);
 #else
-			if (_snd_numberOfBuffers != 0) {
-				SetEvent(_snd_threadEvent1);
-				while (_snd_numberOfBuffers != 0) {
-					Sleep(1);
-				}
+		if (_snd_numberOfBuffers != 0) {
+			SetEvent(_snd_threadEvent1);
+			while (_snd_numberOfBuffers != 0) {
+				Sleep(1);
 			}
-			EnterCriticalSection(_snd_mutex);
-			snd_prepareDirectSoundBuffers();
-			if (_snd_numberOfBuffersMixed == 0) {
-				_snd_numberOfBuffers = 4;
-				_snd_syncTimeOut = 55;
-				LeaveCriticalSection(_snd_mutex);
-				SetEvent(_snd_threadEvent1);
-				game_unmuteSound();
-			} else if (_snd_numberOfBuffersMixed - _snd_playbackDuration < 4) {
-				_snd_numberOfBuffers = 1;
-				LeaveCriticalSection(_snd_mutex);
-				SetEvent(_snd_threadEvent1);
-				game_unmuteSound();
-			} else {
-				LeaveCriticalSection(_snd_mutex);
-				game_unmuteSound();
-			}
-#endif
 		}
-		if (_video->_paletteNeedRefresh) {
-			_video->_paletteNeedRefresh = false;
-			_video->refreshGamePalette(_video->_displayPaletteBuffer);
-		}
-		drawScreen();
-		if (_system->inp.screenshot) {
-			_system->inp.screenshot = false;
-			captureScreenshot();
-		}
-		if (_shakeScreenDuration != 0 || _levelRestartCounter != 0 || _video->_displayShadowLayer) {
-			shakeScreen();
-			uint8_t *p = _video->_shadowLayer;
-			if (!_video->_displayShadowLayer) {
-				p = _video->_frontLayer;
-			}
-			_video->updateGameDisplay(p);
+		EnterCriticalSection(_snd_mutex);
+		snd_prepareDirectSoundBuffers();
+		if (_snd_numberOfBuffersMixed == 0) {
+			_snd_numberOfBuffers = 4;
+			_snd_syncTimeOut = 55;
+			LeaveCriticalSection(_snd_mutex);
+			SetEvent(_snd_threadEvent1);
+			game_unmuteSound();
+		} else if (_snd_numberOfBuffersMixed - _snd_playbackDuration < 4) {
+			_snd_numberOfBuffers = 1;
+			LeaveCriticalSection(_snd_mutex);
+			SetEvent(_snd_threadEvent1);
+			game_unmuteSound();
 		} else {
-			_video->updateGameDisplay(_video->_frontLayer);
+			LeaveCriticalSection(_snd_mutex);
+			game_unmuteSound();
 		}
-		_rnd.update();
-		_system->processEvents();
-		if (_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
+#endif
+	}
+	if (_video->_paletteNeedRefresh) {
+		_video->_paletteNeedRefresh = false;
+		_video->refreshGamePalette(_video->_displayPaletteBuffer);
+	}
+	drawScreen();
+	if (_system->inp.screenshot) {
+		_system->inp.screenshot = false;
+		captureScreenshot();
+	}
+	if (_shakeScreenDuration != 0 || _levelRestartCounter != 0 || _video->_displayShadowLayer) {
+		shakeScreen();
+		uint8_t *p = _video->_shadowLayer;
+		if (!_video->_displayShadowLayer) {
+			p = _video->_frontLayer;
+		}
+		_video->updateGameDisplay(p);
+	} else {
+		_video->updateGameDisplay(_video->_frontLayer);
+	}
+	_rnd.update();
+	_system->processEvents();
+	if (_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
 //			while (_res_ioStateIndex == 1) {
 //				if (!(_sync_unkCounterVar2 < _sync_unkVar1))
 //					break;
 //				res_preload_(0, 1000);
 //			}
-			if (displayHintScreen(-1, 0)) {
-				_system->inp.quit = true;
-				break;
-			}
-		} else {
-			// displayHintScreen(1, 0);
-			_video->updateScreen();
+		if (displayHintScreen(-1, 0)) {
+			_system->inp.quit = true;
+			return;
 		}
-		int diff = frameTimeStamp - _system->getTimeStamp();
-		if (diff < 10) {
-			diff = 10;
-		}
-		_system->sleep(diff);
-	} while (!_system->inp.quit && !_quit);
-	_animBackgroundDataCount = 0;
-	callLevel_terminate();
+	} else {
+		// displayHintScreen(1, 0);
+		_video->updateScreen();
+	}
 }
 
 void Game::callLevel_postScreenUpdate(int num) {
