@@ -2495,6 +2495,7 @@ void Game::levelMainLoop() {
 		}
 		_system->sleep(diff);
 	} while (!_system->inp.quit && !_quit);
+	_animBackgroundDataCount = 0;
 	callLevel_terminate();
 }
 
@@ -2708,7 +2709,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 		assert(o->dataPtr == &_andyObjectScreenData);
 		break;
 	case kObjectDataTypeAnimBackgroundData:
-		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[64]);
+		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[kMaxBackgroundAnims]);
 		break;
 	case kObjectDataTypeShoot:
 		assert(o->dataPtr >= &_shootLvlObjectDataTable[0] && o->dataPtr < &_shootLvlObjectDataTable[32]);
@@ -3907,7 +3908,7 @@ void Game::initLvlObjects() {
 		_screenLvlObjectsList[index] = ptr;
 		switch (ptr->type) {
 		case 0:
-			assert(_animBackgroundDataCount < 64);
+			assert(_animBackgroundDataCount < kMaxBackgroundAnims);
 			ptr->dataPtr = &_animBackgroundDataTable[_animBackgroundDataCount++];
 			memset(ptr->dataPtr, 0, sizeof(AnimBackgroundData));
 			break;

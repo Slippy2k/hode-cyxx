@@ -49,6 +49,7 @@ struct Game {
 		kMaxSssObjects = 32,
 		kMaxMonsterObjects1 = 32,
 		kMaxMonsterObjects2 = 64,
+		kMaxBackgroundAnims = 64,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -164,7 +165,7 @@ struct Game {
 	LvlObject *_declaredLvlObjectsListHead; // pointer to the first 'free' element
 	int _declaredLvlObjectsListCount;
 	AndyLvlObjectData _andyObjectScreenData;
-	AnimBackgroundData _animBackgroundDataTable[64];
+	AnimBackgroundData _animBackgroundDataTable[kMaxBackgroundAnims];
 	int _animBackgroundDataCount;
 	uint8_t _andyActionKeysFlags;
 	int _executeMstLogicCounter;
