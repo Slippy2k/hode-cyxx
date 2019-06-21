@@ -273,7 +273,7 @@ struct Game {
 	int clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2);
 	int clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int count);
 	int clipLvlObjectsSmall(LvlObject *o, LvlObject *ptr, int count);
-	int restoreAndyCollidesSprite21();
+	int restoreAndyCollidesLava();
 	int updateAndyLvlObject();
 	void drawPlasmaCannon();
 	void drawScreen();

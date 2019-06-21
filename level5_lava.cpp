@@ -299,7 +299,7 @@ const uint8_t Game::_lava_screenTransformLut[] = {
 void Game::callLevel_tick_lava() {
 	_video->_displayShadowLayer = _lava_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
 	assert(_lava_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1] == 0);
-	restoreAndyCollidesSprite21();
+	restoreAndyCollidesLava();
 	updateLevelTickHelper();
 }
 
