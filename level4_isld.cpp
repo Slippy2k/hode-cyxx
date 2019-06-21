@@ -107,13 +107,24 @@ void Game::postScreenUpdate_isld_screen13() {
 }
 
 void Game::postScreenUpdate_isld_screen15() {
-	if (_res->_screensState[15].s0 != 0) {
-		_res->_resLvlScreenBackgroundDataTable[15].currentSoundId = 1;
-		_res->_resLvlScreenBackgroundDataTable[15].currentBackgroundId = 1;
-		_res->_screensState[14].s0 = 1;
-	} else {
-		_res->_resLvlScreenBackgroundDataTable[15].currentSoundId = 0;
-		_res->_resLvlScreenBackgroundDataTable[15].currentBackgroundId = 0;
+	switch (_res->_screensState[15].s0) {
+	case 2:
+		++_screenCounterTable[15];
+		if (_screenCounterTable[15] >= 60) {
+			_res->_screensState[15].s0 = 1;
+		}
+		break;
+	case 0:
+		if (_res->_currentScreenResourceNum == 15 && (_andyObject->flags0 & 0x1F) == 1 && (_andyObject->flags0 & 0x30) == 0) {
+			BoundingBox b = { 72, 108, 110, 162 };
+			AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (clipBoundingBox(&b, &andyData->boundingBox)) {
+				setAndySpecialAnimation(3);
+				_res->_screensState[15].s0 = 2;
+				_res->_screensState[14].s0 = 1;
+			}
+		}
+		break;
 	}
 }
 
