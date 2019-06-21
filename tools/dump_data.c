@@ -139,6 +139,10 @@ int main(int argc, char* argv[]) {
 //		dumpInt(fp, "_level9UpdateData2", 0x58A40, 8, "0x%02X", UNSIGNED_8BITS);
 		dumpInt(fp, "Game::_transformBufferData1", 0x51DA8, 4536, "0x%02X", UNSIGNED_8BITS, 0x4545A8);
 		dumpInt(fp, "Game::_transformBufferData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS, 0x452D00);
+		dumpInt(fp, "byte_452898", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
+		dumpInt(fp, "byte_4528D0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
+		dumpInt(fp, "byte_4528F8", 0x500F8, 17, "0x%02X", UNSIGNED_8BITS, 0);
+		dumpInt(fp, "_lar2_checkpointData", 0x50109, 39, "0x%02X", UNSIGNED_8BITS, 0);
 
 		fclose(fp);
 	}

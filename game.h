@@ -554,6 +554,7 @@ struct Game {
 	void postScreenUpdate_lar2_screen7();
 	void postScreenUpdate_lar2_screen8();
 	void postScreenUpdate_lar2_screen10();
+	void postScreenUpdate_lar2_screen11();
 	void postScreenUpdate_lar2_screen12();
 	void postScreenUpdate_lar2_screen13();
 	void postScreenUpdate_lar2_screen19();
@@ -572,6 +573,7 @@ struct Game {
 
 	void callLevel_tick_lar2();
 
+	void setupLvlObjects_lar2_screen19();
 	void callLevel_setupLvlObjects_lar2(int num);
 
 	// level9_dark.cpp
