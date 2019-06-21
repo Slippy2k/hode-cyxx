@@ -109,7 +109,6 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->pcm == 0) {
 				return;
 			}
-			goto flag_case0;
 		} else {
 //42B1B9:
 			if (so->codeDataStage1) {
@@ -141,30 +140,22 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->pcm == 0) {
 				return;
 			}
-			if (!_sssObjectsChanged || (so->flags & 1) == 0) {
-				goto flag_case0;
+			if (_sssObjectsChanged && (so->flags & 1) != 0) {
+				setSoundObjectVolume(so);
 			}
-			goto flag_case1;
 		}
 	} else if ((so->flags & 1) == 0) {
-		goto flag_case0;
+
 	} else if (so->volumePtr) {
 		const int volume = getSoundObjectPanning(so);
 		if (volume != so->volume) {
 			so->volume = volume;
 			_sssObjectsChanged = true;
-			goto flag_case1;
+			setSoundObjectVolume(so);
 		}
+	} else if (_sssObjectsChanged) {
+		setSoundObjectVolume(so);
 	}
-	if (_sssObjectsChanged) {
-		goto flag_case1;
-	} else {
-		goto flag_case0;
-	}
-
-flag_case1:
-	setSoundObjectVolume(so);
-flag_case0:
 	if (so->unk2C != 0) {
 		--so->unk2C;
 		if ((so->flags & 2) == 0) {
