@@ -10,15 +10,6 @@
 #include "util.h"
 #include "video.h"
 
-const Game::OpStage1Proc Game::_callLevel_objectUpdate_rock[] = {
-	&Game::objectUpdate_rock_case0,
-	&Game::objectUpdate_rock_case1, // shadow_screen2
-	&Game::objectUpdate_rock_case2, // shadow_screen3
-	&Game::objectUpdate_rock_case3,
-	&Game::objectUpdate_rock_case4,
-	&Game::objectUpdate_rock_case0
-};
-
 void Game::postScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:

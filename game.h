@@ -24,10 +24,6 @@ inline const uint8_t *PTR_OFFS(const uint8_t *base, uint32_t index) {
 }
 
 struct Game {
-	typedef int (Game::*OpStage1Proc)(LvlObject *o);
-	typedef void (Game::*CallLevelProc1)(int);
-	typedef void (Game::*CallLevelProc0)();
-
 	enum {
 		kObjectDataTypeAndy,
 		// LvlObject.type == 0
@@ -329,8 +325,6 @@ struct Game {
 	void captureScreenshot();
 
 	// level1_rock.cpp
-	static const OpStage1Proc _callLevel_objectUpdate_rock[];
-
 	void postScreenUpdate_rock_screen0();
 	void postScreenUpdate_rock_screen4();
 	void postScreenUpdate_rock_screen8();

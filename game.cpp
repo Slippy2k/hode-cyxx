@@ -1172,7 +1172,27 @@ void Game::updateScreenHelper(int num) {
 		case 2:
 			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->flags & 0xFF];
 			if (_currentLevel == kLvl_rock) {
-				ptr->callbackFuncPtr = _callLevel_objectUpdate_rock[ptr->objectUpdateType];
+				switch (ptr->objectUpdateType) {
+				case 0:
+				case 5:
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case0;
+					break;
+				case 1: // shadow_screen2
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case1;
+					break;
+				case 2: // shadow_screen2
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case2;
+					break;
+				case 3:
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case3;
+					break;
+				case 4:
+					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case4;
+					break;
+				default:
+					warning("updateScreenHelper unimplemented for level %d, state %d", _currentLevel, ptr->objectUpdateType);
+					break;
+				}
 			} else {
 				// other levels use two callbacks
 				switch (ptr->objectUpdateType) {
