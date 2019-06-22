@@ -3357,6 +3357,12 @@ int Game::runTask_default(Task *t) {
 		case 208:
 		case 209: // 79
 			break;
+		case 210: // 57
+			{
+				MonsterObject1 *m = t->monster1;
+				mstOp57_addSprite(m->xPos + (int8_t)p[2], m->yPos + (int8_t)p[3], m->o16->screenNum);
+			}
+			break;
 		case 211: // 58
 			mstOp58_addLvlObject(t, READ_LE_UINT16(p + 2));
 			break;
@@ -4877,6 +4883,10 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		break;
 	}
 	return 0;
+}
+
+void Game::mstOp57_addSprite(int x, int y, int screenNum) {
+	warning("mstOp57_addSprite unimplemented");
 }
 
 void Game::mstOp58_addLvlObject(Task *t, int num) {

@@ -452,7 +452,7 @@ void Game::callLevel_initialize_pwr1() {
 	const int size = decodeLZW(_pwr1_screenTransformData, _transformShadowBuffer);
 	assert(size == 256 * 192);
 	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
-	resetLevelTickHelperData();
+	resetMstOp57Sprites();
 }
 
 const uint8_t Game::_pwr1_screenTransformLut[] = {
@@ -464,5 +464,5 @@ const uint8_t Game::_pwr1_screenTransformLut[] = {
 
 void Game::callLevel_tick_pwr1() {
 	_video->_displayShadowLayer = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
-	updateLevelTickHelper();
+	updateMstOp57Sprites();
 }

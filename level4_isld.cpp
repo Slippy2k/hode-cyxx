@@ -348,11 +348,11 @@ void Game::callLevel_initialize_isld() {
 	if (!_paf->_skipCutscenes) {
 		_paf->preload(24);
 	}
-	resetLevelTickHelperData();
+	resetMstOp57Sprites();
 }
 
 void Game::callLevel_tick_isld() {
-	updateLevelTickHelper();
+	updateMstOp57Sprites();
 }
 
 void Game::callLevel_terminate_isld() {

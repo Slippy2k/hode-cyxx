@@ -1293,8 +1293,7 @@ void Game::resetScreen() {
 			break;
 		}
 	}
-//	memset(byte_472400, 0, 66 * 4);
-//	byte_47309C = 0;
+	resetMstOp57Sprites();
 }
 
 void Game::restartLevel() {
@@ -3999,11 +3998,11 @@ LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 	return 0;
 }
 
-void Game::resetLevelTickHelperData() {
+void Game::resetMstOp57Sprites() {
 	// TODO
 }
 
-void Game::updateLevelTickHelper() {
+void Game::updateMstOp57Sprites() {
 	// TODO
 }
 

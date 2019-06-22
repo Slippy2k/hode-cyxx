@@ -288,7 +288,7 @@ void Game::callLevel_initialize_lava() {
 	const int size = decodeLZW(_pwr2_screenTransformData, _transformShadowBuffer);
 	assert(size == 256 * 192);
 	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
-	resetLevelTickHelperData();
+	resetMstOp57Sprites();
 }
 
 const uint8_t Game::_lava_screenTransformLut[] = {
@@ -300,7 +300,7 @@ void Game::callLevel_tick_lava() {
 	_video->_displayShadowLayer = _lava_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
 	assert(_lava_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1] == 0);
 	restoreAndyCollidesLava();
-	updateLevelTickHelper();
+	updateMstOp57Sprites();
 }
 
 void Game::setupLvlObjects_lava_screen3() {

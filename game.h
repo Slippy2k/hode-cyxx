@@ -324,8 +324,8 @@ struct Game {
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int screenNum);
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
-	void resetLevelTickHelperData();
-	void updateLevelTickHelper();
+	void resetMstOp57Sprites();
+	void updateMstOp57Sprites();
 	void captureScreenshot();
 
 	// level1_rock.cpp
@@ -656,6 +656,7 @@ struct Game {
 	bool mstCollidesDirection(MstUnk48 *m, uint8_t flag);
 	void executeMstOp54();
 	int mstOp56_specialAction(Task *t, int code, int num);
+	void mstOp57_addSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void executeMstUnk1(Task *t);
 	int mstSetCurrentPos(MonsterObject1 *m, int x, int y);

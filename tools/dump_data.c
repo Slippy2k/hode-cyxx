@@ -27,10 +27,10 @@ static uint16_t freadUint16LE(FILE *fp) {
 	return (b << 8) | a;
 }
 
-static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, const char *fmt, enum DataDumpType type, uint32_t addr) {
+static void dumpInt(FILE *fp, const char *name, uint32_t offset, int size, const char *fmt, enum DataDumpType type, uint32_t addr) {
 	int i;
 
-	printf("%s[%d] = {", tableName, size);
+	printf("%s[%d] = {", name, size);
 	fseek(fp, offset, SEEK_SET);
 	for (i = 0; i < size; ++i) {
 		int num = 0;
@@ -48,18 +48,16 @@ static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, 
 			num = (int16_t)freadUint16LE(fp);
 			break;
 		default:
-			num = freadUint32LE(fp);
+			assert(0);
 			break;
 		}
 		if ((i % 16) == 0) {
 			printf("\n\t");
+		} else {
+			printf(" ");
 		}
 		printf(fmt, num);
-		if ((i % 16) == 15) {
-			printf(",");
-		} else {
-			printf(", ");
-		}
+		printf(",");
 	}
 	printf("\n};\n");
 	if (addr) {
@@ -82,10 +80,10 @@ static void dumpInt(FILE *fp, const char *tableName, uint32_t offset, int size, 
 	}
 }
 
-static void fillInt(const char *tableName, int size, const char *fmt, int num) {
+static void fillInt(const char *name, int size, const char *fmt, int num) {
 	int i;
 
-	printf("%s[%d] = {", tableName, size);
+	printf("%s[%d] = {", name, size);
 	for (i = 0; i < size; ++i) {
 		if ((i % 16) == 0) {
 			printf("\n\t");
