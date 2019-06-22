@@ -2454,6 +2454,10 @@ void Game::setTaskVar(Task *t, int index, int type, int value) {
 }
 
 int Game::getTaskAndyVar(int index, Task *t) const {
+	if (index & 0x80) {
+		const int mask = 1 << (index & 0x7F);
+		return ((mask & _mstAndyVarMask) != 0) ? 1 : 0;
+	}
 	switch (index) {
 	case 0:
 		return (_andyObject->flags1 >> 4) & 1;
