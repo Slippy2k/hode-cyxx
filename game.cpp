@@ -2870,64 +2870,73 @@ int Game::calcScreenMaskDx(int x, int y, int num) {
 	return 0;
 }
 
-void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
+void Game::lvlObjectType0CallbackBreathBubbles(LvlObject *ptr) {
 
 	AndyLvlObjectData *_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 
-	int xPos = ptr->xPos + ptr->posTable[7].x;
-	int yPos = ptr->yPos + ptr->posTable[7].y;
+	BoundingBox b;
+	b.x1 = b.x2 = ptr->xPos + ptr->posTable[7].x;
+	b.y1 = b.y2 = ptr->yPos + ptr->posTable[7].y;
 
-// 409657
-	// TODO: clipping with transformed screen
-
-	if (addLvlObjectToList3(4)) {
-		_lvlObjectsList3->xPos = xPos;
-		_lvlObjectsList3->yPos = yPos + 24;
-		_lvlObjectsList3->screenNum = ptr->screenNum;
-		_lvlObjectsList3->anim = 0;
-		_lvlObjectsList3->frame = 0;
-		_lvlObjectsList3->flags2 += 1;
-		_lvlObjectsList3->flags0 = (_lvlObjectsList3->flags0 & 0xFFE6) | 6;
-		_lvlObjectsList3->flags1 &= ~0x20;
-	}
-
-	uint8_t _dl = _edi->unk3;
-	static const int16_t word_43E53C[] = { 625, 937, 1094, 1250 };
-// 40973C
-	int _al = 0;
-	while (_al < 4 && _edi->unk6 >= word_43E53C[_al]) {
-		++_al;
-	}
-	_edi->unk3 = _al;
-	static const uint8_t byte_43E534[] = { 22, 20, 18, 16, 14 };
-	_edi->unk2 = byte_43E534[_al];
-	if (_dl == 1) {
-		if (_al == 3) {
-			if (_actionDirectionKeyMaskIndex < 1) {
-				_actionDirectionKeyMaskIndex = 1;
-				_actionDirectionKeyMaskCounter = 0;
-			}
-		}
-	} else if (_dl == 3) {
-// 4097A2
-		if (_al == 4) {
-			if (_actionDirectionKeyMaskIndex < 2) {
-				_actionDirectionKeyMaskIndex = 2;
-				_actionDirectionKeyMaskCounter = 0;
-			}
-		}
-	} else if (_dl == 4 && _edi->unk6 >= 1250) {
-// 4097BD
-		if (_actionDirectionKeyMaskIndex < 160) {
-			_actionDirectionKeyMaskIndex = 160;
-			_actionDirectionKeyMaskCounter = 0;
-		}
-	}
-// 4097E1
-	if (!_lvlObjectsList3) {
-		// warning("_lvlObjectsList3 is 0");
+	const int num = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1];
+	if (!clipBoundingBox(&_screenTransformRects[num], &b)) {
+		++_edi->unk6; // apnea counter/time
 	} else {
-		switch (_al) {
+		_edi->unk6 = 0;
+	}
+	b.y1 -= 24;
+	if (_edi->unk2 == 0 && !clipBoundingBox(&_screenTransformRects[num], &b)) {
+
+		if (addLvlObjectToList3(4)) {
+			_lvlObjectsList3->xPos = b.x1;
+			_lvlObjectsList3->yPos = b.y1 + 24;
+			_lvlObjectsList3->screenNum = ptr->screenNum;
+			_lvlObjectsList3->anim = 0;
+			_lvlObjectsList3->frame = 0;
+			_lvlObjectsList3->flags2 = ptr->flags2 + 1;
+			_lvlObjectsList3->flags0 = (_lvlObjectsList3->flags0 & ~0x19) | 6;
+			_lvlObjectsList3->flags1 &= ~0x20;
+		}
+
+		int currentApneaLevel = _edi->unk3;
+		static const int16_t _pwr1_apneaDuration[] = { 625, 937, 1094, 1250 };
+		int newApneaLevel = 0;
+		while (newApneaLevel < 4 && _edi->unk6 >= _pwr1_apneaDuration[newApneaLevel]) {
+			++newApneaLevel;
+		}
+		_edi->unk3 = newApneaLevel;
+		static const uint8_t _pwr1_apneaBubble[] = { 22, 20, 18, 16, 14 };
+		_edi->unk2 = _pwr1_apneaBubble[newApneaLevel];
+		// play Andy animation when apnea level changes
+		switch (currentApneaLevel) {
+		case 2:
+			if (newApneaLevel == 3) {
+				if (_actionDirectionKeyMaskIndex < 1) {
+					_actionDirectionKeyMaskIndex = 1;
+					_actionDirectionKeyMaskCounter = 0;
+				}
+			}
+			break;
+		case 3:
+			if (newApneaLevel == 4) {
+				if (_actionDirectionKeyMaskIndex < 2) {
+					_actionDirectionKeyMaskIndex = 2;
+					_actionDirectionKeyMaskCounter = 0;
+				}
+			}
+			break;
+		case 4:
+			if (_edi->unk6 >= 1250) {
+				if (_actionDirectionKeyMaskIndex < 160) {
+					_actionDirectionKeyMaskIndex = 160;
+					_actionDirectionKeyMaskCounter = 0;
+				}
+			}
+			break;
+		}
+// 4097E1
+		assert(_lvlObjectsList3);
+		switch (newApneaLevel) {
 		case 0:
 			_lvlObjectsList3->actionKeyMask = 1;
 			break;
@@ -2945,7 +2954,6 @@ void Game::lvlObjectType0CallbackHelper3(LvlObject *ptr) {
 			break;
 		}
 	}
-
 // 409809
 	if (_edi->unk2 != 0) {
 		--_edi->unk2;
@@ -3278,9 +3286,9 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 			setupSpecialPowers(ptr);
 		}
 		break;
-	case 2:
+	case 2: // pwr1_hod
 		if (!_hideAndyObjectSprite && _edi->unk4 == 6) {
-			lvlObjectType0CallbackHelper3(ptr);
+			lvlObjectType0CallbackBreathBubbles(ptr);
 		}
 		// fall through
 	case 3:
