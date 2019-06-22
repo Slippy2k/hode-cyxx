@@ -4850,6 +4850,61 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			t->monster1->o16->directionKeyMask = 0;
 		}
 		break;
+	case 26: {
+			int screenNum = _res->_mstOp56Data[num].unk8;
+			if (screenNum < -1 && !t->monster1) {
+				break;
+			}
+			if (screenNum == -1) {
+				screenNum = _currentScreen;
+			} else if (screenNum < -1) {
+				screenNum = t->monster1->o16->screenNum;
+			}
+			if (screenNum >= _res->_mstHdr.pointsCount) {
+				screenNum = _res->_mstHdr.pointsCount - 1;
+			}
+			int _ebp = _res->_mstPointOffsets[screenNum].xOffset;
+			int _edx = _res->_mstPointOffsets[screenNum].yOffset;
+			int _eax = _res->_mstOp56Data[num].unkC * 256;
+			int _edi = _ebp + 256;
+			_ebp -= _eax;
+			_edi += _eax;
+			int count = 0;
+			for (int i = 0; i < kMaxMonsterObjects1; ++i) {
+				MonsterObject1 *m = &_monsterObjects1Table[i];
+				if (!m->m46) {
+					continue;
+				}
+				if (m->xMstPos < _ebp || m->xMstPos > _edi) {
+					continue;
+				}
+				if (m->yMstPos < _edx || m->yMstPos > _edx + 192) {
+					continue;
+				}
+				switch (_res->_mstOp56Data[num].unk0) {
+				case 0:
+					_eax = _res->_mstOp56Data[num].unk4;
+					if (m->m46 == &_res->_mstUnk46[_eax]) {
+						++count;
+					}
+					break;
+				case 1:
+					_eax = _res->_mstOp56Data[num].unk4;
+					if (m->unk8 == &_res->_mstHeightMapData[_eax * 948]) {
+						++count;
+					}
+					break;
+				case 2:
+					_eax = _res->_mstOp56Data[num].unk4;
+					if (m->unk8[944] == _eax) {
+						++count;
+					}
+					break;
+				}
+			}
+			_mstOp56Counter = count;
+		}
+		break;
 	case 27: {
 			int index1 =  _res->_mstOp56Data[num].unk0;
 			int type1  = (_res->_mstOp56Data[num].unkC >> 0xC) & 15;
