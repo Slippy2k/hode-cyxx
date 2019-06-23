@@ -214,8 +214,8 @@ struct Game {
 
 	void mainLoop(int level, int checkpoint, bool levelChanged);
 	void mixAudio(int16_t *buf, int len);
-	void resetObjectScreenDataList();
-	void clearObjectScreenData(LvlObject *ptr);
+	void resetShootLvlObjectDataTable();
+	void clearShootLvlObjectData(LvlObject *ptr);
 	void setShakeScreen(int type, int counter);
 	void fadeScreenPalette();
 	void shakeScreen();

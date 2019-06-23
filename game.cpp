@@ -56,7 +56,7 @@ Game::~Game() {
 	free(_shadowScreenMaskBuffer);
 }
 
-void Game::resetObjectScreenDataList() {
+void Game::resetShootLvlObjectDataTable() {
 	_shootLvlObjectDataList = &_shootLvlObjectDataTable[0];
 	for (int i = 0; i < kMaxShootLvlObjectData - 1; ++i) {
 		_shootLvlObjectDataTable[i].nextPtr = &_shootLvlObjectDataTable[i + 1];
@@ -64,7 +64,7 @@ void Game::resetObjectScreenDataList() {
 	_shootLvlObjectDataTable[kMaxShootLvlObjectData - 1].nextPtr = 0;
 }
 
-void Game::clearObjectScreenData(LvlObject *ptr) {
+void Game::clearShootLvlObjectData(LvlObject *ptr) {
 	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
 	dat->nextPtr = _shootLvlObjectDataList;
 	_shootLvlObjectDataList = dat;
@@ -694,7 +694,7 @@ void Game::destroyLvlObject(LvlObject *o) {
 		case 3:
 		case 7:
 			if (o->dataPtr) {
-				clearObjectScreenData(o);
+				clearShootLvlObjectData(o);
 			}
 			break;
 		}
@@ -914,7 +914,7 @@ void Game::clearLvlObjectsList1() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					clearObjectScreenData(ptr);
+					clearShootLvlObjectData(ptr);
 				}
 				break;
 			}
@@ -946,7 +946,7 @@ void Game::clearLvlObjectsList2() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					clearObjectScreenData(ptr);
+					clearShootLvlObjectData(ptr);
 				}
 				break;
 			}
@@ -978,7 +978,7 @@ void Game::clearLvlObjectsList3() {
 			case 3:
 			case 7:
 				if (ptr->dataPtr) {
-					clearObjectScreenData(ptr);
+					clearShootLvlObjectData(ptr);
 				}
 				break;
 			}
@@ -1080,7 +1080,7 @@ void Game::removeLvlObject2(LvlObject *o) {
 		case 3:
 		case 7:
 			if (o->dataPtr) {
-				clearObjectScreenData(o);
+				clearShootLvlObjectData(o);
 			}
 			break;
 		}
@@ -1936,7 +1936,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		resetSound();
 	}
 	_quit = false;
-	resetObjectScreenDataList();
+	resetShootLvlObjectDataTable();
 	callLevel_initialize();
 	setupAndyLvlObject();
 	clearLvlObjectsList2();
@@ -2127,16 +2127,15 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	LvlObject *next, *o;
 
-	uint8_t _al = ptr->spriteNum;
 	o = next = ptr->nextPtr;
-	if ((_al > 15 && ptr->dataPtr == 0) || ptr->levelData0x2988 == 0) {
+	if ((ptr->spriteNum > 15 && ptr->dataPtr == 0) || ptr->levelData0x2988 == 0) {
 		if (ptr->childPtr) {
 			o = ptr->nextPtr;
 		}
 		return o;
 	}
-	_al = ptr->screenNum;
-	if (_currentScreen != _al && _currentRightScreen != _al && _currentLeftScreen != _al) {
+	const int num = ptr->screenNum;
+	if (_currentScreen != num && _currentRightScreen != num && _currentLeftScreen != num) {
 		return o;
 	}
 	if (!ptr->callbackFuncPtr) {
@@ -3481,7 +3480,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 			case 3:
 			case 7:
 				if (o->dataPtr) {
-					clearObjectScreenData(o);
+					clearShootLvlObjectData(o);
 				}
 				break;
 			}
@@ -3523,6 +3522,7 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	}
 	int xPos = o->xPos + o->posTable[3].x; // _ecx
 
+	int var18 = 0;
 	int var1C;
 	int var20;
 	int var24 = xPos;
@@ -3576,7 +3576,8 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	int var2E = _bl;
 	int _edx = _res->_screensBasePos[screenNum].v + yPos;
 	int _edi = _res->_screensBasePos[screenNum].u + var24; // _edi
-	_edx = ((_edx << 6) & ~511) + (_edi >> 3);
+	int var8 = yPos;
+	_edx = ((_edx << 6) & ~511) + (_edi >> 3); // screenMaskPos
 	int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
 	if (_cl >= 4) {
 		var2C = 0;
@@ -3597,7 +3598,7 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 			var2F = _al = 1;
 		}
 // 40D1DB
-		uint8_t var18 = _bl = dat->unk1;
+		var18 = _bl = dat->unk1;
 		if (_bl != 6 && _bl != 1 && _bl != 3) {
 			_edx = _ebp;
 			++_esi;
@@ -3624,24 +3625,15 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 		if (_al == 0) {
 			return 0;
 		}
-// 40D253
-		warning("lvlObjectSpecialPowersCallbackHelper2 40D253 unimplemented");
-
-// 40D35D
-		if (o->screenNum != _res->_currentScreenResourceNum) {
-			dat->y2 += 4;
-			return var30;
-		}
 
 	} else {
 // 40D2F1
 		_bl = dat->unk1;
-		uint8_t _al = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
-		int var2D = _al;
+		uint8_t var2D = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
 		var2C = 0;
 		_edx += *_esi++;
 		uint8_t var30 = _screenMaskBuffer[_edx];
-		while ((var30 & _al) == 0) {
+		while ((var30 & var2D) == 0) {
 			++var2C;
 			if (var2C >= var2E) {
 				return var2F;
@@ -3649,10 +3641,24 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 			_edx += *_esi++;
 			var30 = _screenMaskBuffer[_edx];
 		}
-		// goto loop3 40D253
-
-		warning("lvlObjectSpecialPowersCallbackHelper2 unimplemented");
-		// TODO
+	}
+// 40D253
+	dat->x2 = var10[var2C * 2] + var20 + (var24 & 7);
+	dat->y2 = var10[var2C * 2 + 1] + var1C + var8;
+	if (var18 != 2 && var18 != 4 && var18 != 7) {
+		return var30;
+	}
+	var2C = 0;
+	while (_res->_screensGrid[_res->_currentScreenResourceNum * 4 + var2C] != screenNum) {
+		++var2C;
+		if (var2C >= 4) {
+// 40D35D
+			if (o->screenNum != _res->_currentScreenResourceNum) {
+				dat->y2 += 4;
+				return var30;
+			}
+			break;
+		}
 	}
 // 40D384
 	const int _ecx = (o->posTable[3].x + o->xPos) & 7;
@@ -3703,8 +3709,8 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 				ptr->frame = 0;
 				setupLvlObjectBitmap(ptr);
 				setLvlObjectPosRelativeToObject(ptr, 0, o, 7);
-				ptr->xPos += dat->dxPos;
-				ptr->yPos += dat->dyPos;
+				o->xPos += dat->dxPos;
+				o->yPos += dat->dyPos;
 			}
 		} else {
 // 40D9FC
