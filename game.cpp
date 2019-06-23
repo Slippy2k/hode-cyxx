@@ -1979,6 +1979,11 @@ void Game::updateLvlObjectList(LvlObject **list) {
 	LvlObject *ptr = *list;
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr; // get 'next' as callback can modify linked list (eg. remove)
+		if (ptr->callbackFuncPtr == &Game::lvlObjectList3Callback && list != &_lvlObjectsList3) {
+			warning("lvlObject %p has callbackType3 and not in _lvlObjectsList3", ptr);
+			ptr = next;
+			continue;
+		}
 		if (ptr->callbackFuncPtr) {
 			(this->*(ptr->callbackFuncPtr))(ptr);
 		}
@@ -3026,12 +3031,9 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 	LvlObject *_esi = _edi->shootLvlObject;
 	const uint8_t pos = ptr->flags0 & 0x1F;
 	uint8_t var1 = (ptr->flags0 >> 5) & 7;
-	if (pos == 4) {
+	if (pos == 4) { // release
 // 40DB4C
-		if (!_esi->dataPtr) {
-			warning("lvlObject %p with NULL dataPtr", _esi);
-			return;
-		}
+		assert(_esi->dataPtr);
 		ShootLvlObjectData *_eax = (ShootLvlObjectData *)getLvlObjectDataPtr(_esi, kObjectDataTypeShoot);
 		_esi->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
 		uint8_t _cl = (ptr->flags1 >> 4) & 3;
@@ -3124,7 +3126,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 			_esi->xPos += _ecx->dxPos;
 		}
 		_edi->shootLvlObject = 0;
-	} else if (pos == 7) {
+	} else if (pos == 7) { // hold
 // 40DD4B
 		switch (var1) {
 		case 0:
@@ -3135,7 +3137,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->dataPtr = _shootLvlObjectDataList;
 					if (_shootLvlObjectDataList) {
 						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
-						 memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
+						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
 						warning("Nothing free in _shootLvlObjectDataList");
 					}
@@ -3146,7 +3148,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->anim = 7;
 					_edx->frame = 0;
 					_edx->bitmapBits = 0;
-					_edx->flags2 = (ptr->flags2 & 0xDFFF) - 1;
+					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DDEE
@@ -3172,6 +3174,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
 				if (_currentLevel == kLvl_isld) {
 					AndyLvlObjectData *_edx = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+					assert(_edx == _edi);
 					_esi->xPos += _edx->dxPos;
 				}
 			}
@@ -3183,7 +3186,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->dataPtr = _shootLvlObjectDataList;
 					if (_shootLvlObjectDataList) {
 						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
-						 memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
+						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
 						warning("Nothing free in _shootLvlObjectDataList");
 					}
@@ -3194,11 +3197,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->anim = 7;
 					_edx->frame = 0;
 					_edx->bitmapBits = 0;
-					_edx->flags2 = (ptr->flags2 & 0xDFFF) - 1;
+					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DEEC
 				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
+				assert(_ecx == _edi);
 				LvlObject *_eax = _ecx->shootLvlObject;
 				if (_eax) {
 					if (!_eax->dataPtr) {
@@ -3234,7 +3238,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->anim = 7;
 					_edx->frame = 0;
 					_edx->bitmapBits = 0;
-					_edx->flags2 = (ptr->flags2 & 0xDFFF) - 1;
+					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
 					prependLvlObjectToList(&_lvlObjectsList0, _edx);
 				}
 // 40DF82
@@ -3711,10 +3715,12 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 			if (dat->y2 >= 192) {
 				dat->y2 -= _res->_screensBasePos[o->screenNum].v;
 			}
-// 40DA3
-			// TODO
-			if (0) { // dat->0x1C
-
+// 40DA36
+			if (dat->o && (dat->o->actionKeyMask & 7) == 7) {
+				const uint8_t num = dat->o->spriteNum;
+				if ((num >= 8 && num <= 16) || num == 28) {
+					o->anim = 16;
+				}
 			} else {
 // 40DA5E
 				if (dat->counter == 0) {
@@ -3785,6 +3791,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 32:
 	case 33:
 	case 34:
+		o->callbackFuncPtr = 0;
 		break;
 	case 8: // lizard
 	case 9: // spider

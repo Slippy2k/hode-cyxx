@@ -124,8 +124,8 @@ struct Game {
 	uint8_t _actionDirectionKeyMaskIndex;
 	uint8_t _andyActionKeyMaskAnd, _andyActionKeyMaskOr;
 	uint8_t _andyDirectionKeyMaskAnd, _andyDirectionKeyMaskOr;
-	int32_t _gameXPosTable[129];
-	int32_t _gameYPosTable[129];
+	int32_t _gameXPosTable[129]; // _plasmaCannonDx
+	int32_t _gameYPosTable[129]; // _plasmaCannonDy
 	int32_t _plasmaCannonXPointsTable1[129];
 	int32_t _plasmaCannonYPointsTable1[129];
 	int32_t _plasmaCannonXPointsTable2[127];
