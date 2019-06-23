@@ -42,7 +42,7 @@ void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
 void Game::postScreenUpdate_pwr1_screen6() {
 	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[6];
 	switch (_res->_screensState[6].s0) {
-	case 0: {
+	case 1: {
 			BoundingBox b = { 185, 78, 225, 136 };
 			LvlObject *o = findLvlObjectBoundingBox(&b);
 			if (o) {
@@ -55,6 +55,8 @@ void Game::postScreenUpdate_pwr1_screen6() {
 		}
 		break;
 	case 2:
+		break;
+	case 3:
 		++_screenCounterTable[6];
 		if (_screenCounterTable[6] >= 41) {
 			_res->_screensState[6].s0 = 1;
@@ -65,7 +67,7 @@ void Game::postScreenUpdate_pwr1_screen6() {
 			}
 		}
 		break;
-	case 3:
+	case 4:
 		++_screenCounterTable[6];
 		if (_screenCounterTable[6] >= 54) {
 			_res->_screensState[6].s0 = 2;

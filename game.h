@@ -307,7 +307,7 @@ struct Game {
 	int lvlObjectType8Callback(LvlObject *o);
 	int lvlObjectList3Callback(LvlObject *o);
 	void lvlObjectSpecialPowersCallbackHelper1(LvlObject *o);
-	uint8_t lvlObjectSpecialPowersCallbackHelper2(LvlObject *o);
+	uint8_t lvlObjectSpecialPowersCallbackScreen(LvlObject *o);
 	int lvlObjectSpecialPowersCallback(LvlObject *o);
 	void lvlObjectTypeCallback(LvlObject *o);
 	LvlObject *addLvlObject(int type, int x, int y, int screen, int num, int o_anim, int o_flags1, int o_flags2, int actionKeyMask, int directionKeyMask);

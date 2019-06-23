@@ -3249,7 +3249,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 						break;
 					}
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
-					_edx->unk0 = 4;
+					_edx->unk0 = 4; // large power
 				}
 			}
 			break;
@@ -3509,7 +3509,7 @@ void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
 	// TODO
 }
 
-uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
+uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 	uint8_t var2F = 0;
 	uint8_t screenNum = o->screenNum;
 	uint8_t var30 = 0;
@@ -3522,7 +3522,6 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	}
 	int xPos = o->xPos + o->posTable[3].x; // _ecx
 
-	int var18 = 0;
 	int var1C;
 	int var20;
 	int var24 = xPos;
@@ -3576,9 +3575,9 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 	int var2E = _bl;
 	int _edx = _res->_screensBasePos[screenNum].v + yPos;
 	int _edi = _res->_screensBasePos[screenNum].u + var24; // _edi
-	int var8 = yPos;
+	int var8 = yPos & ~7;
 	_edx = ((_edx << 6) & ~511) + (_edi >> 3); // screenMaskPos
-	int var4 = ((yPos & ~7) << 2) + (var24 >> 3); // screenPos (8x8)
+	int var4 = (var8 << 2) + (var24 >> 3); // screenPos (8x8)
 	if (_cl >= 4) {
 		var2C = 0;
 		_edx += *_esi;
@@ -3598,7 +3597,7 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 			var2F = _al = 1;
 		}
 // 40D1DB
-		var18 = _bl = dat->unk1;
+		_bl = dat->unk1; // var18
 		if (_bl != 6 && _bl != 1 && _bl != 3) {
 			_edx = _ebp;
 			++_esi;
@@ -3632,7 +3631,7 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 		uint8_t var2D = (_bl == 6 || _bl == 1 || _bl == 3) ? 6 : 7;
 		var2C = 0;
 		_edx += *_esi++;
-		uint8_t var30 = _screenMaskBuffer[_edx];
+		var30 = _screenMaskBuffer[_edx];
 		while ((var30 & var2D) == 0) {
 			++var2C;
 			if (var2C >= var2E) {
@@ -3643,9 +3642,10 @@ uint8_t Game::lvlObjectSpecialPowersCallbackHelper2(LvlObject *o) {
 		}
 	}
 // 40D253
-	dat->x2 = var10[var2C * 2] + var20 + (var24 & 7);
+	dat->x2 = var10[var2C * 2] + var20 + (var24 & ~7);
 	dat->y2 = var10[var2C * 2 + 1] + var1C + var8;
-	if (var18 != 2 && var18 != 4 && var18 != 7) {
+	_bl = dat->unk1;
+	if (_bl != 2 && _bl != 4 && _bl != 7) {
 		return var30;
 	}
 	var2C = 0;
@@ -3675,7 +3675,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 	const uint16_t fl = o->flags0 & 0x1F;
 	if (fl == 1) {
 		if (dat->unk3 != 0x80 && dat->counter != 0) {
-			uint8_t _al = lvlObjectSpecialPowersCallbackHelper2(o);
+			uint8_t _al = lvlObjectSpecialPowersCallbackScreen(o);
 			if (_al != 0) {
 				if (dat->unk0 == 4 && (_al & 1) != 0 && (dat->unk1 == 4 || dat->unk1 == 2)) {
 					dat->unk0 = 5;
@@ -4023,7 +4023,7 @@ LvlObject *Game::findLvlObjectType2(int spriteNum, int screenNum) {
 LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 	LvlObject *ptr = _lvlObjectsList0;
 	while (ptr) {
-		if ((ptr->flags0 & 0x1F) != 0xB && (ptr->flags0 & 0xE0) != 0x40) {
+		if ((ptr->flags0 & 0x1F) != 0xB || (ptr->flags0 & 0xE0) != 0x40) {
 			BoundingBox b;
 			b.x1 = ptr->xPos;
 			b.x2 = ptr->xPos + ptr->width - 1;
