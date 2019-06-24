@@ -17,6 +17,7 @@
 #include "fs.h"
 
 static AAssetManager *_assetManager;
+static const char *_dataPath;
 
 static int asset_readfn(void *cookie, char *buf, int size) {
 	AAsset *asset = (AAsset *)cookie;
@@ -45,10 +46,12 @@ void android_setAssetManager(AAssetManager *assetManager) {
 FILE *android_fopen(const char *fname, const char *mode) {
 	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "android_fopen '%s' mode '%s'", fname, mode);
 	assert(mode[0] == 'r');
-	if (0) { // support for gamedata files installed on external storage
+	if (1) { // support for gamedata files installed on external storage
+		char path[MAXPATHLEN];
+		snprintf(path, sizeof(path), "%s/%s", _dataPath, fname);
 		struct stat st;
-		if (stat(fname, &st) == 0 && S_ISREG(st.st_mode)) {
-			return fopen(fname, mode);
+		if (stat(path, &st) == 0 && S_ISREG(st.st_mode)) {
+			return fopen(path, mode);
 		}
 	}
 	AAsset *asset = AAssetManager_open(_assetManager, fname, AASSET_MODE_STREAMING);
@@ -109,7 +112,8 @@ FileSystem::FileSystem(const char *dataPath) {
 	assert(globalAssetManager);
 
 	_assetManager = AAssetManager_fromJava(env, globalAssetManager);
-	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "dataPath %s _assetManager %p", dataPath, _assetManager);
+	_dataPath = dataPath;
+	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "dataPath %s _assetManager %p", _dataPath, _assetManager);
 }
 
 FileSystem::~FileSystem() {
