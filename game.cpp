@@ -1726,17 +1726,15 @@ int Game::restoreAndyCollidesLava() {
 			if (o->spriteNum != 21 || o->screenNum != _res->_currentScreenResourceNum) {
 				continue;
 			}
-			if (o->screenNum != _res->_currentScreenResourceNum) {
-				BoundingBox b;
-				b.x1 = o->xPos + o->posTable[0].x;
-				b.x2 = o->xPos + o->posTable[1].x;
-				b.y1 = o->yPos + o->posTable[0].y;
-				b.y2 = o->yPos + o->posTable[1].y;
-				if (!clipBoundingBox(&data->boundingBox, &b)) {
-					ret = clipLvlObjectsBoundingBox(_andyObject, o, 68);
-					if (ret) {
-						setAndySpecialAnimation(0xA3);
-					}
+			BoundingBox b;
+			b.x1 = o->xPos + o->posTable[0].x;
+			b.x2 = o->xPos + o->posTable[1].x;
+			b.y1 = o->yPos + o->posTable[0].y;
+			b.y2 = o->yPos + o->posTable[1].y;
+			if (!clipBoundingBox(&data->boundingBox, &b)) {
+				ret = clipLvlObjectsBoundingBox(_andyObject, o, 68);
+				if (ret) {
+					setAndySpecialAnimation(0xA3);
 				}
 			}
 		}
