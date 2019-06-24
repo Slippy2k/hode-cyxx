@@ -169,10 +169,8 @@ struct Game {
 	int _executeMstLogicPrevCounter;
 	Task _tasksTable[kMaxTasks];
 	Task *_tasksList;
-	Task *_mstTasksList1; // _monsterObjects1List
-	Task *_mstTasksList2; // _monsterObjects2List
-	Task *_mstTasksList3;
-	Task *_mstTasksList4;
+	Task *_monsterObjects1TasksList;
+	Task *_monsterObjects2TasksList;
 	int _mstPrevPosX; // _mstAndyLevelPrevPosX
 	int _mstPrevPosY; // _mstAndyLevelPrevPosY
 	int _mstPosX; // _mstAndyLevelPosX
