@@ -179,10 +179,10 @@ struct Game {
 	int _mstPosY; // _mstAndyLevelPosY
 	int _mstRefPosX; // _mstAndyScreenPosX
 	int _mstRefPosY; // _mstAndyScreenPosY
-	int _mstUnk10; // _mstAndyRectNum
-	int _mstOp54Unk1; // _m43Num1
-	int _mstOp54Unk2; // _m43Num2
-	int _mstOp54Unk3; // _m43Num3
+	int _mstAndyRectNum;
+	int _m43Num1;
+	int _m43Num2;
+	int _m43Num3;
 	int _yMstPos;
 	int _mstUnk12;
 	int _m48Num;

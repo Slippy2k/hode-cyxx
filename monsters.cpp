@@ -860,11 +860,11 @@ void Game::resetMstCode() {
 	memset(_monsterObjects2Table, 0, sizeof(_monsterObjects2Table));
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
-	_mstOp54Unk3 = _mstOp54Unk1 = _mstOp54Unk2 = _m48Num = -1;
+	_m43Num3 = _m43Num1 = _m43Num2 = _m48Num = -1;
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	_mstUnk8 = 0;
 	_specialAnimFlag = false;
-	_mstUnk10 = 255;
+	_mstAndyRectNum = 255;
 	_mstRectsCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
@@ -1904,7 +1904,7 @@ void Game::mstUpdateRefPos() {
 		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
 		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
 		if (!_specialAnimFlag) {
-			_mstUnk10 = updateMstRectsTable(_mstUnk10, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1) & 0xFF;
+			_mstAndyRectNum = updateMstRectsTable(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1) & 0xFF;
 		}
 		_mstRefPosX += _andyObject->posTable[3].x;
 		_mstRefPosY += _andyObject->posTable[3].y;
@@ -3383,24 +3383,24 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 215: { // 62
-				if (_mstOp54Unk3 != -1) {
-					assert(_mstOp54Unk3 < _res->_mstHdr.unk0x24);
-					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk3]);
+				if (_m43Num3 != -1) {
+					assert(_m43Num3 < _res->_mstHdr.unk0x24);
+					shuffleMstUnk43(&_res->_mstUnk43[_m43Num3]);
 				}
 				_mstOp54Counter = 0;
 			}
 			break;
 		case 216: { // 63
-				if (_mstOp54Unk1 != -1) {
-					assert(_mstOp54Unk1 < _res->_mstHdr.unk0x24);
-					shuffleMstUnk43(&_res->_mstUnk43[_mstOp54Unk1]);
+				if (_m43Num1 != -1) {
+					assert(_m43Num1 < _res->_mstHdr.unk0x24);
+					shuffleMstUnk43(&_res->_mstUnk43[_m43Num1]);
 				}
 			}
 			break;
 		case 217: { // 64
 				const int16_t num = READ_LE_UINT16(p + 2);
-				if (_mstOp54Unk3 != num) {
-					_mstOp54Unk3 = num;
+				if (_m43Num3 != num) {
+					_m43Num3 = num;
 					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
 					shuffleMstUnk43(&_res->_mstUnk43[num]);
 					_mstOp54Counter = 0;
@@ -3409,9 +3409,9 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 218: { // 65
 				const int16_t num = READ_LE_UINT16(p + 2);
-				if (num != _mstOp54Unk1) {
-					_mstOp54Unk1 = num;
-					_mstOp54Unk2 = num;
+				if (num != _m43Num1) {
+					_m43Num1 = num;
+					_m43Num2 = num;
 					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
 					shuffleMstUnk43(&_res->_mstUnk43[num]);
 				}
@@ -3419,7 +3419,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 219: { // 66
 				const int16_t num = READ_LE_UINT16(p + 2);
-				_mstOp54Unk2 = num;
+				_m43Num2 = num;
 			}
 			break;
 		case 220:
@@ -4419,22 +4419,22 @@ l2:
 }
 
 void Game::executeMstOp54() {
-	debug(kDebug_MONSTER, "mstOp54 %d %d %d", _m48Num, _mstOp54Unk2, _mstOp54Unk3);
+	debug(kDebug_MONSTER, "mstOp54 %d %d %d", _m48Num, _m43Num2, _m43Num3);
 	if (_m48Num != -1) {
 		return;
 	}
 	MstUnk43 *m43 = 0;
 	if (_mstFlags & 0x20000000) {
-		if (_mstOp54Unk2 == -1) {
+		if (_m43Num2 == -1) {
 			return;
 		}
-		m43 = &_res->_mstUnk43[_mstOp54Unk2];
+		m43 = &_res->_mstUnk43[_m43Num2];
 	} else {
-		if (_mstOp54Unk3 == -1) {
+		if (_m43Num3 == -1) {
 			return;
 		}
-		m43 = &_res->_mstUnk43[_mstOp54Unk3];
-		_mstOp54Unk2 = _mstOp54Unk1;
+		m43 = &_res->_mstUnk43[_m43Num3];
+		_m43Num2 = _m43Num1;
 	}
 	const int x = MIN(_mstRefPosX, 255);
 	if (_mstRefPosX < 0) {
@@ -4596,8 +4596,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			_specialAnimFlag = true;
 		}
 // 411BBA
-		if (_mstUnk10 != 255) {
-			_mstRectsTable[_mstUnk10].num = 255;
+		if (_mstAndyRectNum != 255) {
+			_mstRectsTable[_mstAndyRectNum].num = 255;
 		}
 		break;
 	case 1:
@@ -4636,7 +4636,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			_specialAnimFlag = false;
 		}
 // 4119F5
-		_mstUnk10 = updateMstRectsTable(_mstUnk10, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1);
+		_mstAndyRectNum = updateMstRectsTable(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1);
 		break;
 	case 2: {
 			LvlObject *o = t->monster1->o16;
