@@ -12,7 +12,6 @@
 
 static const char *kIconBmp = "icon.bmp";
 
-static const int kJoystickIndex = 0;
 static const int kJoystickCommitValue = 3200;
 
 static int _scalerMultiplier = 3;
@@ -101,7 +100,7 @@ SystemStub_SDL::SystemStub_SDL():
 }
 
 void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 	SDL_ShowCursor(SDL_DISABLE);
 	setupDefaultKeyMappings();
 	memset(&inp, 0, sizeof(inp));
@@ -123,13 +122,22 @@ void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
 	prepareScaledGfx(title, fullscreen);
 	_joystick = 0;
 	_controller = 0;
-	if (SDL_NumJoysticks() > 0) {
+	const int count = SDL_NumJoysticks();
+	if (count > 0) {
 		SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
-		if (SDL_IsGameController(kJoystickIndex)) {
-			_controller = SDL_GameControllerOpen(kJoystickIndex);
-		}
-		if (!_controller) {
-			_joystick = SDL_JoystickOpen(kJoystickIndex);
+		for (int i = 0; i < count; ++i) {
+			if (SDL_IsGameController(i)) {
+				_controller = SDL_GameControllerOpen(i);
+				if (_controller) {
+					fprintf(stdout, "Using controller '%s'\n", SDL_GameControllerName(_controller));
+					break;
+				}
+			}
+			_joystick = SDL_JoystickOpen(i);
+			if (_joystick) {
+				fprintf(stdout, "Using joystick '%s'", SDL_JoystickName(_joystick));
+				break;
+			}
 		}
 	}
 }
