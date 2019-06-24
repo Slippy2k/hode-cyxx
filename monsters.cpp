@@ -61,15 +61,6 @@ static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 	return r;
 }
 
-static LvlObject *getTaskLvlObject(Task *t) {
-	if (t->monster1) {
-		return t->monster1->o16;
-	} else if (t->monster2) {
-		return t->monster2->o;
-	}
-	return 0;
-}
-
 void Game::resetMonsterObject1(MonsterObject1 *m) {
 	m->m46 = 0;
 	LvlObject *o = m->o16;
@@ -4735,6 +4726,14 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 // 4114B3
 					xPos += o->posTable[6].x - o->posTable[7].x;
 					yPos += o->posTable[6].y - o->posTable[7].y;
+					if (t->monster2) {
+						xPos += t->monster2->xMstPos;
+						yPos += t->monster2->yMstPos;
+					} else {
+						assert(t->monster1);
+						xPos += t->monster1->xMstPos;
+						yPos += t->monster1->yMstPos;
+					}
 				}
 			} else {
 // 411545
@@ -4760,7 +4759,6 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					mstTaskUpdateScreenPosition(t);
 				}
 			} else if (code == 14) {
-				assert(_andyObject);
 				const uint16_t pos = dat->unkC >> 16;
 				assert(pos < 8);
 				xPos -= _res->_mstPointOffsets[screenNum].xOffset;
