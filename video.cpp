@@ -69,7 +69,7 @@ void Video::updateGameDisplay(uint8_t *buf) {
 }
 
 void Video::updateScreen() {
-	_system->updateScreen();
+	_system->updateScreen(true);
 }
 
 void Video::fillBackBuffer() {

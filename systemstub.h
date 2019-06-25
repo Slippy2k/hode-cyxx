@@ -40,7 +40,7 @@ struct SystemStub {
 
 	virtual ~SystemStub() {}
 
-	virtual void init(const char *title, int w, int h, bool fullscreen) = 0;
+	virtual void init(const char *title, int w, int h, bool fullscreen, bool widescreen) = 0;
 	virtual void destroy() = 0;
 
 	virtual void setScaler(const char *name, int multiplier) = 0;
@@ -50,8 +50,9 @@ struct SystemStub {
 	virtual void setPalette(const uint8_t *pal, int n, int depth = 8) = 0;
 	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) = 0;
 	virtual void fillRect(int x, int y, int w, int h, uint8_t color) = 0;
+	virtual void copyRectWidescreen(int w, int h, const uint8_t *buf, const uint8_t *pal) = 0;
 	virtual void shakeScreen(int dx, int dy) = 0;
-	virtual void updateScreen() = 0;
+	virtual void updateScreen(bool drawWidescreen) = 0;
 
 	virtual void processEvents() = 0;
 	virtual void sleep(int duration) = 0;

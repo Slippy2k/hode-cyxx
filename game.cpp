@@ -277,6 +277,7 @@ void Game::setupBackgroundBitmap() {
 		_video->_displayPaletteBuffer[i] = pal[i] << 8;
 	}
 	_video->_paletteNeedRefresh = true;
+	_system->copyRectWidescreen(Video::W, Video::H, _video->_backgroundLayer, pal);
 }
 
 void Game::addToSpriteList(LvlObject *ptr) {
@@ -2680,7 +2681,7 @@ int Game::displayHintScreen(int num, int pause) {
 	_res->loadHintImage(num, _video->_frontLayer, _video->_palette);
 	_system->setPalette(_video->_palette, 256, 6);
 	_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
-	_system->updateScreen();
+	_system->updateScreen(false);
 	do {
 		_system->processEvents();
 		if (confirmQuit) {
@@ -2693,7 +2694,7 @@ int Game::displayHintScreen(int num, int pause) {
 			}
 			if (currentQuit != quit) {
 				_system->copyRect(0, 0, Video::W, Video::H, quitBuffers[quit], 256);
-				_system->updateScreen();
+				_system->updateScreen(false);
 			}
 		}
 		_system->sleep(30);

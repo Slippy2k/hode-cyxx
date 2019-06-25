@@ -30,6 +30,7 @@ static const char *_usage =
 ;
 
 static bool _fullscreen = false;
+static bool _widescreen = false;
 static SystemStub *_system = 0;
 
 static void exitMain() {
@@ -107,6 +108,8 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 			_system->setPaletteScale(configBool(value));
 		} else if (strcmp(name, "fullscreen") == 0) {
 			_fullscreen = configBool(value);
+		} else if (strcmp(name, "widescreen") == 0) {
+			_widescreen = configBool(value);
 		}
 	}
 	return 0;
@@ -165,7 +168,7 @@ int main(int argc, char *argv[]) {
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);
-	_system->init(_title, Video::W, Video::H, _fullscreen);
+	_system->init(_title, Video::W, Video::H, _fullscreen, _widescreen);
 	g->_res->loadSetupDat();
 	g->benchmarkCpu();
 	bool levelChanged = false;

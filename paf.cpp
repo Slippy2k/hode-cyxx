@@ -477,7 +477,7 @@ void PafPlayer::mainLoop() {
 		decodeVideoFrame(_demuxVideoFrameBlocks + _pafHdr.framesOffsetTable[i]);
 		_system->setPalette(_paletteBuffer, 256, 6);
 		_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], 256);
-		_system->updateScreen();
+		_system->updateScreen(false);
 		_system->processEvents();
 		if (_system->inp.quit || _system->inp.keyPressed(SYS_INP_ESC)) {
 			break;

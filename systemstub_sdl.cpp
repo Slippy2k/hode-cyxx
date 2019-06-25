@@ -51,6 +51,7 @@ struct SystemStub_SDL : SystemStub {
 	uint32_t _pal[256];
 	int _screenW, _screenH;
 	int _shakeDx, _shakeDy;
+	SDL_Texture *_widescreenTexture;
 	KeyMapping _keyMappings[kKeyMappingsSize];
 	int _keyMappingsCount;
 	AudioCallback _audioCb;
@@ -61,7 +62,7 @@ struct SystemStub_SDL : SystemStub {
 
 	SystemStub_SDL();
 	virtual ~SystemStub_SDL() {}
-	virtual void init(const char *title, int w, int h, bool fullscreen);
+	virtual void init(const char *title, int w, int h, bool fullscreen, bool widescreen);
 	virtual void destroy();
 	virtual void setScaler(const char *name, int multiplier);
 	virtual void setGamma(float gamma);
@@ -69,8 +70,9 @@ struct SystemStub_SDL : SystemStub {
 	virtual void setPalette(const uint8_t *pal, int n, int depth);
 	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch);
 	virtual void fillRect(int x, int y, int w, int h, uint8_t color);
+	virtual void copyRectWidescreen(int w, int h, const uint8_t *buf, const uint8_t *pal);
 	virtual void shakeScreen(int dx, int dy);
-	virtual void updateScreen();
+	virtual void updateScreen(bool drawWidescreen);
 	virtual void processEvents();
 	virtual void sleep(int duration);
 	virtual uint32_t getTimeStamp();
@@ -85,7 +87,7 @@ struct SystemStub_SDL : SystemStub {
 	void addKeyMapping(int key, uint8_t mask);
 	void setupDefaultKeyMappings();
 	void updateKeys(PlayerInput *inp);
-	void prepareScaledGfx(const char *caption, bool fullscreen);
+	void prepareScaledGfx(const char *caption, bool fullscreen, bool widescreen);
 };
 
 SystemStub *SystemStub_SDL_create() {
@@ -99,7 +101,7 @@ SystemStub_SDL::SystemStub_SDL():
 	}
 }
 
-void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
+void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen, bool widescreen) {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 	SDL_ShowCursor(SDL_DISABLE);
 	setupDefaultKeyMappings();
@@ -119,7 +121,7 @@ void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen) {
 		error("SystemStub_SDL::init() Unable to allocate RGB offscreen buffer");
 	}
 	memset(_offscreenLut, 0, offscreenSize);
-	prepareScaledGfx(title, fullscreen);
+	prepareScaledGfx(title, fullscreen, widescreen);
 	_joystick = 0;
 	_controller = 0;
 	const int count = SDL_NumJoysticks();
@@ -148,6 +150,27 @@ void SystemStub_SDL::destroy() {
 	free(_offscreenRgb);
 	_offscreenRgb = 0;
 
+	if (_fmt) {
+		SDL_FreeFormat(_fmt);
+		_fmt = 0;
+	}
+	if (_texture) {
+		SDL_DestroyTexture(_texture);
+		_texture = 0;
+	}
+	if (_widescreenTexture) {
+		SDL_DestroyTexture(_widescreenTexture);
+		_widescreenTexture = 0;
+	}
+	if (_renderer) {
+		SDL_DestroyRenderer(_renderer);
+		_renderer = 0;
+	}
+	if (_window) {
+		SDL_DestroyWindow(_window);
+		_window = 0;
+	}
+
 	if (_controller) {
 		SDL_GameControllerClose(_controller);
 		_controller = 0;
@@ -155,6 +178,117 @@ void SystemStub_SDL::destroy() {
 	if (_joystick) {
 		SDL_JoystickClose(_joystick);
 		_joystick = 0;
+	}
+}
+
+
+static void blur_h(int radius, const uint32_t *src, int srcPitch, int w, int h, const SDL_PixelFormat *fmt, uint32_t *dst, int dstPitch) {
+
+	const int count = 2 * radius + 1;
+
+	for (int y = 0; y < h; ++y) {
+
+		uint32_t r = 0;
+		uint32_t g = 0;
+		uint32_t b = 0;
+
+		uint32_t color;
+
+		for (int x = -radius; x <= radius; ++x) {
+			color = src[MAX(x, 0)];
+			r += (color & fmt->Rmask) >> fmt->Rshift;
+			g += (color & fmt->Gmask) >> fmt->Gshift;
+			b += (color & fmt->Bmask) >> fmt->Bshift;
+		}
+		dst[0] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
+
+		for (int x = 1; x < w; ++x) {
+			color = src[MIN(x + radius, w - 1)];
+			r += (color & fmt->Rmask) >> fmt->Rshift;
+			g += (color & fmt->Gmask) >> fmt->Gshift;
+			b += (color & fmt->Bmask) >> fmt->Bshift;
+
+			color = src[MAX(x - radius - 1, 0)];
+			r -= (color & fmt->Rmask) >> fmt->Rshift;
+			g -= (color & fmt->Gmask) >> fmt->Gshift;
+			b -= (color & fmt->Bmask) >> fmt->Bshift;
+
+			dst[x] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
+		}
+
+		src += srcPitch;
+		dst += dstPitch;
+	}
+}
+
+static void blur_v(int radius, const uint32_t *src, int srcPitch, int w, int h, const SDL_PixelFormat *fmt, uint32_t *dst, int dstPitch) {
+
+	const int count = 2 * radius + 1;
+
+	for (int x = 0; x < w; ++x) {
+
+		uint32_t r = 0;
+		uint32_t g = 0;
+		uint32_t b = 0;
+
+		uint32_t color;
+
+		for (int y = -radius; y <= radius; ++y) {
+			color = src[MAX(y, 0) * srcPitch];
+			r += (color & fmt->Rmask) >> fmt->Rshift;
+			g += (color & fmt->Gmask) >> fmt->Gshift;
+			b += (color & fmt->Bmask) >> fmt->Bshift;
+		}
+		dst[0] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
+
+		for (int y = 1; y < h; ++y) {
+			color = src[MIN(y + radius, h - 1) * srcPitch];
+			r += (color & fmt->Rmask) >> fmt->Rshift;
+			g += (color & fmt->Gmask) >> fmt->Gshift;
+			b += (color & fmt->Bmask) >> fmt->Bshift;
+
+			color = src[MAX(y - radius - 1, 0) * srcPitch];
+			r -= (color & fmt->Rmask) >> fmt->Rshift;
+			g -= (color & fmt->Gmask) >> fmt->Gshift;
+			b -= (color & fmt->Bmask) >> fmt->Bshift;
+
+			dst[y * dstPitch] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
+		}
+
+		++src;
+		++dst;
+	}
+}
+
+void SystemStub_SDL::copyRectWidescreen(int w, int h, const uint8_t *buf, const uint8_t *pal) {
+	if (!_widescreenTexture) {
+		return;
+	}
+
+	assert(w == _screenW && h == _screenH);
+	void *ptr = 0;
+	int pitch = 0;
+	if (SDL_LockTexture(_widescreenTexture, 0, &ptr, &pitch) == 0) {
+		assert((pitch & 3) == 0);
+
+		uint32_t *src = (uint32_t *)malloc(w * sizeof(uint32_t) * h * sizeof(uint32_t));
+		uint32_t *tmp = (uint32_t *)malloc(w * sizeof(uint32_t) * h * sizeof(uint32_t));
+		uint32_t *dst = (uint32_t *)ptr;
+
+		if (src && tmp) {
+			for (int i = 0; i < w * h; ++i) {
+				const uint8_t color = buf[i];
+				src[i] = SDL_MapRGB(_fmt, pal[color * 3], pal[color * 3 + 1], pal[color * 3 + 2]);
+			}
+			static const int radius = 8;
+			blur_h(radius, src, w, w, h, _fmt, tmp, w);
+			blur_v(radius, tmp, w, w, h, _fmt, dst, pitch / sizeof(uint32_t));
+		}
+
+		free(src);
+		free(tmp);
+
+		SDL_UnlockTexture(_widescreenTexture);
 	}
 }
 
@@ -236,36 +370,38 @@ static void clearScreen(uint32_t *dst, int dstPitch, int x, int y, int w, int h)
 	}
 }
 
-void SystemStub_SDL::updateScreen() {
+void SystemStub_SDL::updateScreen(bool drawWidescreen) {
 	void *texturePtr = 0;
 	int texturePitch = 0;
 	if (SDL_LockTexture(_texture, 0, &texturePtr, &texturePitch) != 0) {
 		return;
 	}
+	int w = _screenW;
+	int h = _screenH;
+	const uint8_t *src = _offscreenLut;
 	uint32_t *dst = (uint32_t *)texturePtr;
 	assert((texturePitch & 3) == 0);
 	const int dstPitch = texturePitch / sizeof(uint32_t);
-	const uint8_t *src = _offscreenLut;
 	const int srcPitch = _screenW;
-	int w = _screenW;
-	int h = _screenH;
-	if (_shakeDy > 0) {
-		clearScreen(dst, dstPitch, 0, 0, w, _shakeDy);
-		h -= _shakeDy;
-		dst += _shakeDy * dstPitch;
-	} else if (_shakeDy < 0) {
-		h += _shakeDy;
-		clearScreen(dst, dstPitch, 0, h, w, -_shakeDy);
-		src -= _shakeDy * srcPitch;
-	}
-	if (_shakeDx > 0) {
-		clearScreen(dst, dstPitch, 0, 0, _shakeDx, h);
-		w -= _shakeDx;
-		dst += _shakeDx;
-	} else if (_shakeDx < 0) {
-		w += _shakeDx;
-		clearScreen(dst, dstPitch, w, 0, -_shakeDx, h);
-		src -= _shakeDx;
+	if (!_widescreenTexture) {
+		if (_shakeDy > 0) {
+			clearScreen(dst, dstPitch, 0, 0, w, _shakeDy);
+			h -= _shakeDy;
+			dst += _shakeDy * dstPitch;
+		} else if (_shakeDy < 0) {
+			h += _shakeDy;
+			clearScreen(dst, dstPitch, 0, h, w, -_shakeDy);
+			src -= _shakeDy * srcPitch;
+		}
+		if (_shakeDx > 0) {
+			clearScreen(dst, dstPitch, 0, 0, _shakeDx, h);
+			w -= _shakeDx;
+			dst += _shakeDx;
+		} else if (_shakeDx < 0) {
+			w += _shakeDx;
+			clearScreen(dst, dstPitch, w, 0, -_shakeDx, h);
+			src -= _shakeDx;
+		}
 	}
 	uint32_t *p = _offscreenRgb;
 	for (int y = 0; y < h; ++y) {
@@ -279,12 +415,20 @@ void SystemStub_SDL::updateScreen() {
 
 	SDL_RenderClear(_renderer);
 	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = _screenW * _scalerMultiplier;
-	r.h = _screenH * _scalerMultiplier;
+	if (_widescreenTexture) {
+		if (drawWidescreen) {
+			SDL_RenderCopy(_renderer, _widescreenTexture, 0, 0);
+		}
+		r.x = _shakeDx * _scalerMultiplier;
+		r.y = _shakeDy * _scalerMultiplier;
+		SDL_RenderGetLogicalSize(_renderer, &r.w, &r.h);
+		r.x += (r.w - _texW) / 2;
+		r.w = _texW;
+		r.y += (r.h - _texH) / 2;
+		r.h = _texH;
+	}
 	SDL_RenderCopy(_renderer, _texture, 0, &r);
-        SDL_RenderPresent(_renderer);
+	SDL_RenderPresent(_renderer);
 	_shakeDx = _shakeDy = 0;
 }
 
@@ -582,7 +726,7 @@ void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	inp->mask |= pad.mask;
 }
 
-void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen) {
+void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen, bool widescreen) {
 	int flags = 0;
 	if (fullscreen) {
 		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -591,14 +735,21 @@ void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen) {
 	}
 	_texW = _screenW * _scalerMultiplier;
 	_texH = _screenH * _scalerMultiplier;
-	_window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _texW, _texH, flags);
+	const int windowW = widescreen ? _texH * 16 / 9 : _texW;
+	const int windowH = _texH;
+	_window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowW, windowH, flags);
 	SDL_Surface *icon = SDL_LoadBMP(kIconBmp);
 	if (icon) {
 		SDL_SetWindowIcon(_window, icon);
 		SDL_FreeSurface(icon);
 	}
 	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
-	SDL_RenderSetLogicalSize(_renderer, _texW, _texH);
+	SDL_RenderSetLogicalSize(_renderer, windowW, windowH);
 	_texture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _texW, _texH);
+	if (widescreen) {
+		_widescreenTexture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _screenW, _screenH);
+	} else {
+		_widescreenTexture = 0;
+	}
 	_fmt = SDL_AllocFormat(_pixelFormat);
 }
