@@ -27,10 +27,10 @@ struct Video {
 
 	SystemStub *_system;
 
-	uint8_t _palette[768];
+	uint8_t _palette[256 * 3];
 	uint16_t _displayPaletteBuffer[256 * 3];
 	bool _paletteNeedRefresh;
-	uint8_t _refreshPalette;
+	bool _refreshPalette;
 	bool _displayShadowLayer;
 	uint8_t *_shadowLayer;
 	uint8_t *_frontLayer;

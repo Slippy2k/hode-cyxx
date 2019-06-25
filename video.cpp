@@ -36,7 +36,7 @@ Video::~Video() {
 }
 
 void Video::refreshGamePalette(const uint16_t *pal) {
-	_refreshPalette = 1;
+	_refreshPalette = true;
 	for (int i = 0; i < 256 * 3; ++i) {
 		_palette[i] = pal[i] >> 8;
 	}
@@ -73,12 +73,13 @@ void Video::updateScreen() {
 }
 
 void Video::fillBackBuffer() {
-	_system->fillRect(0, 0, 256, 192, _fillColor);
+	_system->fillRect(0, 0, W, H, _fillColor);
 }
 
 void Video::clearPalette() {
 	memset(_palette, 0, sizeof(_palette));
 	_refreshPalette = true;
+	_system->setPalette(_palette, 256);
 }
 
 void Video::decodeSPR(const uint8_t *src, uint8_t *dst, int x, int y, uint8_t flags) {
