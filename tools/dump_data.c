@@ -47,6 +47,9 @@ static void dumpInt(FILE *fp, const char *name, uint32_t offset, int size, const
 		case SIGNED_16BITS:
 			num = (int16_t)freadUint16LE(fp);
 			break;
+		case UNSIGNED_32BITS:
+			num = freadUint32LE(fp);
+			break;
 		default:
 			assert(0);
 			break;
@@ -141,7 +144,10 @@ int main(int argc, char* argv[]) {
 		dumpInt(fp, "byte_4528D0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpInt(fp, "byte_4528F8", 0x500F8, 17, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpInt(fp, "_lar2_checkpointData", 0x50109, 39, "0x%02X", UNSIGNED_8BITS, 0);
-		dumpInt(fp, "_lar1_unkData", 0x4FCD8, 96, "0x%02X", UNSIGNED_8BITS, 0);
+		dumpInt(fp, "_lar1_unkData2", 0x4FB58, 96, "0x%02X", UNSIGNED_32BITS, 0);
+		dumpInt(fp, "_lar1_unkData3", 0x4FCD8, 96, "0x%02X", UNSIGNED_8BITS, 0);
+		dumpInt(fp, "_lar2_unkData2", 0x4FFC8, 52, "0x%02X", UNSIGNED_32BITS, 0);
+		dumpInt(fp, "_lar2_unkData3", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
 
 		fclose(fp);
 	}
