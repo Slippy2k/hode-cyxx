@@ -17,13 +17,31 @@ static uint8_t byte_452620[] = {  2,  0, 0, 0 };
 static uint8_t byte_452624[] = {  2,  0, 0, 0 };
 static uint8_t byte_452628[] = {  2,  0, 0, 0 };
 
-static uint32_t _lar1_unkData2[96] = {
-	0xCB, 0xA2, 0xD5, 0xA6, 0x44, 0x56, 0x4E, 0x5A, 0xC3, 0x3A, 0xCD, 0x3E, 0x6F, 0xAB, 0x7D, 0xAF,
-	0x6F, 0xAB, 0x7D, 0xAF, 0xCA, 0xAB, 0xD4, 0xAF, 0x9E, 0x1D, 0xAA, 0x39, 0x9E, 0x1D, 0xAA, 0x39,
-	0x9E, 0x1D, 0xAA, 0x39, 0x9E, 0x1D, 0xAA, 0x39, 0xE6, 0x8B, 0xF2, 0xA7, 0xE6, 0x8B, 0xF2, 0xA7,
-	0xE6, 0x8B, 0xF2, 0xA7, 0x56, 0x25, 0x62, 0x41, 0x56, 0x25, 0x62, 0x41, 0x56, 0x25, 0x62, 0x41,
-	0xEE, 0x12, 0xFA, 0x2E, 0x0E, 0x8A, 0x1A, 0xA6, 0x0E, 0x8A, 0x1A, 0xA6, 0x33, 0x9D, 0x3D, 0xA1,
-	0x33, 0x9D, 0x3D, 0xA1, 0x33, 0x9D, 0x3D, 0xA1, 0xCA, 0x9D, 0xD4, 0xA1, 0x20, 0x91, 0x2C, 0xAD,
+const BoundingBox _lar1_unkData2[24] = {
+	{ 203, 162, 213, 166 },
+	{  68,  86,  78,  90 },
+	{ 195,  58, 205,  62 },
+	{ 111, 171, 125, 175 },
+	{ 111, 171, 125, 175 },
+	{ 202, 171, 212, 175 },
+	{ 158,  29, 170,  57 },
+	{ 158,  29, 170,  57 },
+	{ 158,  29, 170,  57 },
+	{ 158,  29, 170,  57 },
+	{ 230, 139, 242, 167 },
+	{ 230, 139, 242, 167 },
+	{ 230, 139, 242, 167 },
+	{  86,  37,  98,  65 },
+	{  86,  37,  98,  65 },
+	{  86,  37,  98,  65 },
+	{ 238,  18, 250,  46 },
+	{  14, 138,  26, 166 },
+	{  14, 138,  26, 166 },
+	{  51, 157,  61, 161 },
+	{  51, 157,  61, 161 },
+	{  51, 157,  61, 161 },
+	{ 202, 157, 212, 161 },
+	{  32, 145,  44, 173 }
 };
 
 static uint8_t _lar1_unkData3[96] = {
@@ -35,25 +53,25 @@ static uint8_t _lar1_unkData3[96] = {
 	0x12, 0x0B, 0xFF, 0x0D, 0x12, 0x0B, 0xFF, 0x0C, 0x12, 0x15, 0x02, 0x0B, 0x15, 0x2F, 0x00, 0x0E,
 };
 
-void Game::updateLevelTick_lar_helper1(int num, uint8_t *p1, const uint32_t *p2) {
+void Game::updateLevelTick_lar_helper1(int num, uint8_t *p1, const BoundingBox *r) {
 	// TODO
 }
 
-void Game::updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const uint32_t *p2) {
+void Game::updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const BoundingBox *r) {
 	// TODO
 }
 
-void Game::updateLevelTick_lar(int count, uint8_t *p1, const uint32_t *p2) {
+void Game::updateLevelTick_lar(int count, uint8_t *p1, const BoundingBox *r) {
 	for (int i = 0; i < count; ++i) {
 		p1[i * 4 + 1] &= ~0x40;
 	}
 	for (int i = 0; i < count; ++i) {
 		if (_andyObject->screenNum == p1[i * 4]) {
-			if ((p1[i* 4 + 1] & 0x10) == 0x10) {
-				updateLevelTick_lar_helper1(i, &p1[i * 4], &p2[i * 4]);
+			if ((p1[i * 4 + 1] & 0x10) == 0x10) {
+				updateLevelTick_lar_helper1(i, &p1[i * 4], &r[i]);
 			}
 			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			updateLevelTick_lar_helper2(i, &p1[i * 4], &data->boundingBox, &p2[i * 4]);
+			updateLevelTick_lar_helper2(i, &p1[i * 4], &data->boundingBox, &r[i]);
 		}
 	}
 	for (int i = 0; i < count; ++i) {

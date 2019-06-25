@@ -502,9 +502,9 @@ struct Game {
 	void callLevel_tick_pwr2();
 
 	// level7_lar1.cpp
-	void updateLevelTick_lar_helper1(int num, uint8_t *p1, const uint32_t *p2);
-	void updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const uint32_t *p2);
-	void updateLevelTick_lar(int count, uint8_t *p1, const uint32_t *p2);
+	void updateLevelTick_lar_helper1(int num, uint8_t *p1, const BoundingBox *r);
+	void updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const BoundingBox *r);
+	void updateLevelTick_lar(int count, uint8_t *p1, const BoundingBox *r);
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
 	void postScreenUpdate_lar1_screen0();

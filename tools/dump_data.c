@@ -27,6 +27,19 @@ static uint16_t freadUint16LE(FILE *fp) {
 	return (b << 8) | a;
 }
 
+static void dumpRect(FILE *fp, const char *name, uint32_t offset, int count) {
+	fprintf(stdout, "const BoundingBox %s[%d] = {", name, count);
+	fseek(fp, offset, SEEK_SET);
+	for (int i = 0; i < count; ++i) {
+		int x1 = freadUint32LE(fp);
+		int y1 = freadUint32LE(fp);
+		int x2 = freadUint32LE(fp);
+		int y2 = freadUint32LE(fp);
+		fprintf(stdout, "\n\t{ %3d, %3d, %3d, %3d },", x1, y1, x2, y2);
+	}
+	fprintf(stdout, "\n");
+}
+
 static void dumpInt(FILE *fp, const char *name, uint32_t offset, int size, const char *fmt, enum DataDumpType type, uint32_t addr) {
 	int i;
 
@@ -144,9 +157,9 @@ int main(int argc, char* argv[]) {
 		dumpInt(fp, "byte_4528D0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpInt(fp, "byte_4528F8", 0x500F8, 17, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpInt(fp, "_lar2_checkpointData", 0x50109, 39, "0x%02X", UNSIGNED_8BITS, 0);
-		dumpInt(fp, "_lar1_unkData2", 0x4FB58, 96, "0x%02X", UNSIGNED_32BITS, 0);
+		dumpRect(fp, "_lar1_unkData2", 0x4FB58, 24);
 		dumpInt(fp, "_lar1_unkData3", 0x4FCD8, 96, "0x%02X", UNSIGNED_8BITS, 0);
-		dumpInt(fp, "_lar2_unkData2", 0x4FFC8, 52, "0x%02X", UNSIGNED_32BITS, 0);
+		dumpRect(fp, "_lar2_unkData2", 0x4FFC8, 13);
 		dumpInt(fp, "_lar2_unkData3", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
 
 		fclose(fp);
