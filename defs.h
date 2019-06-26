@@ -181,16 +181,16 @@ struct SssObject {
 	int8_t unk8; // 0x8
 	int8_t priority; // 0x9
 	uint8_t flags; // 0xA
-	uint8_t unkB;
+	bool stereo; // 0xB
 	uint32_t flags0; // 0xC
 	uint32_t flags1; // 0x10
 	int32_t volume; // 0x14 panning default:64
 	int32_t unk18; // 0x18 volume (db) default:128
 	int panL; // 0x1C leftGain
 	int panR; // 0x20 rightGain
-	int panType; // 0x24
+	int panType; // 0x24 : 0: silent, 1:fullRight 2:fullLeft 3:both
 	const int16_t *currentPcmPtr; // 0x28
-	int32_t unk2C; // 0x2C
+	int32_t pcmFramesCount; // 0x2C
 	SssObject *prevPtr; // 0x30
 	SssObject *nextPtr; // 0x34
 	const uint8_t *codeDataStage1; // 0x38

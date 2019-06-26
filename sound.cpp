@@ -156,8 +156,8 @@ void Game::updateSoundObject(SssObject *so) {
 	} else if (_sssObjectsChanged) {
 		setSoundObjectVolume(so);
 	}
-	if (so->unk2C != 0) {
-		--so->unk2C;
+	if (so->pcmFramesCount != 0) {
+		--so->pcmFramesCount;
 		if ((so->flags & 2) == 0) {
 			++so->unk6C;
 		}
@@ -578,7 +578,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 29: // end
-			so->unk2C = 0;
+			so->pcmFramesCount = 0;
 			return 0;
 		default:
 			error("Invalid .sss opcode %d", *code);
@@ -622,15 +622,15 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	so->pcm = pcm;
 	so->unk18 = 128;
 	so->volume = 64;
-	if (pcm->flag & 1) {
-		so->unkB = 1;
+	if (pcm->flags & 1) {
+		so->stereo = true;
 	} else {
-		so->unkB = 0;
+		so->stereo = false;
 	}
 	so->unk78 = -1;
 	so->unk6C = 0;
 	so->flags = 0;
-	so->unk2C = pcm->strideCount;
+	so->pcmFramesCount = pcm->strideCount;
 	so->currentPcmPtr = pcm->ptr;
 	if (!so->currentPcmPtr) {
 		so->flags |= 2;
@@ -785,18 +785,17 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 			assert(firstCodeOffset >= 0 && firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
 			SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
 // 42B81D
-			int i = 0;
-			int priority = 0;
-			do {
+			int framesCount = 0;
+			for (int i = 0; i < unk3->count; ++i) {
 				if (codeOffset->pcm != 0xFFFF) {
 					SssObject *so = startSoundObject(num, i, flags);
-					if (so && so->unk2C < priority) {
-						priority = so->unk2C;
+					if (so && so->pcmFramesCount >= framesCount) {
+						framesCount = so->pcmFramesCount;
 						ret = so;
 					}
 				}
 				++codeOffset;
-			} while (++i < unk3->count);
+			}
 		}
 // 42B865
 		uint32_t _eax = 1 << (_rnd.update() & 31);
@@ -896,7 +895,7 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 			so->unk60 = 0;
 			so->unk68 = 0;
 			so->flags = flags;
-			so->unk2C = codeOffset->unk2;
+			so->pcmFramesCount = codeOffset->unk2;
 			so->unk6 = num;
 			so->unk8 = codeOffset->unk6;
 			so->filter = filter;

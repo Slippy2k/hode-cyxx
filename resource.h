@@ -452,7 +452,7 @@ struct SssPcm {
 	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed by indexes)
 	uint32_t strideSize;  // 12
 	uint16_t strideCount; // 16
-	uint16_t flag;        // 18
+	uint16_t flags;       // 18
 };
 
 struct SssUnk6 {

@@ -790,7 +790,7 @@ void Resource::loadSssData(File *fp) {
 		_sssPcmTable[i].totalSize = fp->readUint32();
 		_sssPcmTable[i].strideSize = fp->readUint32();
 		_sssPcmTable[i].strideCount = fp->readUint16();
-		_sssPcmTable[i].flag = fp->readUint16();
+		_sssPcmTable[i].flags = fp->readUint16();
 		debug(kDebug_RESOURCE, "sssPcmTable #%d/%d offset 0x%x size %d", i, _sssHdr.pcmCount, _sssPcmTable[i].offset, _sssPcmTable[i].totalSize);
 		if (_sssPcmTable[i].totalSize != 0) {
 			assert((_sssPcmTable[i].totalSize % _sssPcmTable[i].strideSize) == 0);
