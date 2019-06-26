@@ -5906,39 +5906,8 @@ int Game::runTask_waitResetInput(Task *t) {
 
 int Game::runTask_waitFlags(Task *t) {
 	debug(kDebug_MONSTER, "runTask_waitFlags t %p", t);
-	switch (t->delay) {
-	case 1:
-		if (t->tempVar == 0) {
-			return 1;
-		}
-		break;
-	case 2:
-		if ((t->flags & (1 << t->tempVar)) == 0) {
-			return 1;
-		}
-		break;
-	case 3:
-		if ((_mstFlags & (1 << t->tempVar)) == 0) {
-			return 1;
-		}
-		break;
-	case 4:
-		if (getTaskAndyVar(t->tempVar, t) == 0) {
-			return 1;
-		}
-		break;
-	case 5: {
-			MonsterObject1 *m = 0;
-			if (t->monster2) {
-				m = t->monster2->monster1;
-			} else {
-				m = t->monster1;
-			}
-			if (!m || (m->flags48 & (1 << t->tempVar)) == 0) {
-				return 1;
-			}
-		}
-		break;
+	if (getTaskFlag(t, t->tempVar, t->delay) == 0) {
+		return 1;
 	}
 	t->run = &Game::runTask_default;
 	LvlObject *o = 0;
