@@ -3330,8 +3330,13 @@ int Game::runTask_default(Task *t) {
 			}
 			executeMstOp52();
 			break;
+		case 201: { // 53
+				const int num = READ_LE_UINT16(p + 2);
+				mstOp53(&_res->_mstUnk48[num]);
+			}
+			break;
 		case 202: // 54
-			executeMstOp54();
+			mstOp54();
 			break;
 		case 203: // 55
 			// _mstCurrentMonster1 = t->monster1;
@@ -4418,7 +4423,49 @@ l2:
 	return var24 != 0;
 }
 
-void Game::executeMstOp54() {
+void Game::mstOp53(MstUnk48 *m) {
+	if (_m48Num != -1) {
+		return;
+	}
+	int x = _mstRefPosX;
+	if (x > 255) {
+		x = 255;
+	}
+	if (_mstRefPosX < 0) {
+		_mstPosXmin = x;
+		_mstPosXmax = 255 + x;
+	} else {
+		_mstPosXmin = -x;
+		_mstPosXmax = 255 - x;
+	}
+	int y = _mstRefPosY;
+	if (y > 191) {
+		y = 191;
+	}
+	if (_mstRefPosY < 0) {
+		_mstPosYmin = y;
+		_mstPosYmax = 191 + y;
+	} else {
+		_mstPosYmin = -y;
+		_mstPosYmax = 191 - y;
+	}
+	if (m->unk4 == 0) {
+		if (mstCollidesDirection(m, 0)) {
+			addChasingMonster(m, 0);
+		}
+		return;
+	}
+	int dir = _rnd.update() & 1;
+	if (mstCollidesDirection(m, dir) && addChasingMonster(m, dir)) {
+		return;
+	}
+	dir ^= 1;
+	if (mstCollidesDirection(m, dir) && addChasingMonster(m, dir)) {
+		return;
+	}
+}
+
+void Game::mstOp54() {
 	debug(kDebug_MONSTER, "mstOp54 %d %d %d", _m48Num, _m43Num2, _m43Num3);
 	if (_m48Num != -1) {
 		return;
