@@ -1333,7 +1333,7 @@ void Resource::loadMstData(File *fp) {
 		m->unk12 = m12;
 	}
 
-	const int mapDataSize = _mstHdr.unk0x3C * 948;
+	const int mapDataSize = _mstHdr.unk0x3C * kMstHeightMapDataSize;
 	_mstHeightMapData = (uint8_t *)malloc(mapDataSize);
 	fp->read(_mstHeightMapData, mapDataSize);
 	bytesRead += mapDataSize;
@@ -1368,7 +1368,7 @@ void Resource::loadMstData(File *fp) {
 			_mstUnk49[i].data1[j].unkF = fp->readByte();
 			const uint32_t num = _mstUnk49[i].data1[j].unk4;
 			assert(num < 32);
-			_mstUnk49[i].data1[j].offsetHeight = start * 948 + num * 28;
+			_mstUnk49[i].data1[j].offsetHeight = start * kMstHeightMapDataSize + num * 28;
 			bytesRead += 16;
 		}
 		_mstUnk49[i].data2 = (uint8_t *)malloc(_mstUnk49[i].count2);

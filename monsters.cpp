@@ -187,7 +187,7 @@ void Game::disableMonsterObject1(MonsterObject1 *m) {
 void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
 	MstUnk46Unk1 *m46unk1 = &m->m46->data[num];
 	m->unk4 = m46unk1;
-	m->unk8 = _res->_mstHeightMapData + m46unk1->indexHeight * 948;
+	m->unk8 = _res->_mstHeightMapData + m46unk1->indexHeight * kMstHeightMapDataSize;
 	if (m46unk1->indexUnk51 == kNone) {
 		m->flags48 &= ~4;
 	}
@@ -908,7 +908,7 @@ void Game::startMstCode() {
 	_mstPrevPosY = _mstPosY;
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
-		offset += 948;
+		offset += kMstHeightMapDataSize;
 		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]); // 900
 		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]); // 896
 
@@ -2035,7 +2035,7 @@ void Game::updateMstHeightMapData() {
 	}
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
-		offset += 948;
+		offset += kMstHeightMapDataSize;
 		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]); // 900
 		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]); // 896
 
@@ -2256,8 +2256,8 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	m->flagsA4 = var4;
 	if (delay == -1) {
 		const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
-		assert((offset % 948) == 0);
-		t->arg2 = offset / 948;
+		assert((offset % kMstHeightMapDataSize) == 0);
+		t->arg2 = offset / kMstHeightMapDataSize;
 		t->run = &Game::runTask_unk4;
 	} else {
 		t->arg1 = delay;
@@ -3534,7 +3534,7 @@ int Game::runTask_default(Task *t) {
 					if (!m->m46) {
 						continue;
 					}
-					if (m->unk8[944] != _res->_mstHeightMapData[m63->unk0 * 948 + 944]) {
+					if (m->unk8[944] != _res->_mstHeightMapData[m63->unk0 * kMstHeightMapDataSize + 944]) {
 						continue;
 					}
 					if (m->xMstPos < _edi || m->xMstPos > var20) {
@@ -3589,7 +3589,7 @@ int Game::runTask_default(Task *t) {
 					}
 				}
 				if (_edi != 0 || _esi != 0) {
-					mstOp68(t, _res->_mstHeightMapData + m63->unk0 * 948, _edi, _esi, _ecx, m63->unk6);
+					mstOp68(t, _res->_mstHeightMapData + m63->unk0 * kMstHeightMapDataSize, _edi, _esi, _ecx, m63->unk6);
 				}
 			}
 			break;
@@ -4293,7 +4293,7 @@ l1:
 				goto l1; // goto 41DB81
 			}
 
-			uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
+			uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
 			if (var4D != 0 && (_esi < _mstPosYmin || _esi > _mstPosYmax)) {
 				if (var1C != 2 || var4C == 1) { // _edi
 					return false;
@@ -4401,7 +4401,7 @@ l2:
 			continue;
 
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
-				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * 948 + 946] & 2;
+				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
 				if (var4D == 0 && _esi >= _mstPosYmin && _esi <= _mstPosYmax) {
 // 41DF10
 					warning("mstCollidesDirection 41DF10 unimplemented");
@@ -4939,7 +4939,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					break;
 				case 1:
 					_eax = _res->_mstOp56Data[num].unk4;
-					if (m->unk8 == &_res->_mstHeightMapData[_eax * 948]) {
+					if (m->unk8 == &_res->_mstHeightMapData[_eax * kMstHeightMapDataSize]) {
 						++count;
 					}
 					break;
@@ -5211,8 +5211,8 @@ void Game::mstResetCollisionTable() {
 			assert(m->task->monster1 == m);
 			if ((_al & 8) == 0 || m->unk8[945] != 0) {
 				const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
-				assert(offset % 948 == 0);
-				const uint32_t _ecx = offset / 948;
+				assert(offset % kMstHeightMapDataSize == 0);
+				const uint32_t _ecx = offset / kMstHeightMapDataSize;
 				assert(_ecx < 32);
 				_al = m->xMstPos < _mstPosX;
 				const int count = _mstCollisionTable[_al][_ecx].count;
@@ -5584,7 +5584,7 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 		assert((uint32_t)arg20 < m46->count);
 		MstUnk46Unk1 *m1 = &m46->data[arg20]; // _ecx
 		m->unk4 = m1;
-		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * 948;
+		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * kMstHeightMapDataSize;
 
 		m->localVars[7] = m1->energy;
 
@@ -5840,8 +5840,8 @@ void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
 		for (uint32_t j = 0; j < m46->count; ++j) {
 			MstUnk46Unk1 *m46u1 = &m46->data[j];
 			uint32_t indexHeight = p - _res->_mstHeightMapData;
-			assert((indexHeight % 948) == 0);
-			indexHeight /= 948;
+			assert((indexHeight % kMstHeightMapDataSize) == 0);
+			indexHeight /= kMstHeightMapDataSize;
 			if (m46u1->indexHeight == indexHeight) {
 				assert(count < 16);
 				data[count].m42Index = i;
@@ -6044,8 +6044,8 @@ int Game::runTask_unk4(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk4 t %p", t);
 	MonsterObject1 *m = t->monster1;
 	const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
-	assert(offset % 948 == 0);
-	const uint32_t num = offset / 948;
+	assert(offset % kMstHeightMapDataSize == 0);
+	const uint32_t num = offset / kMstHeightMapDataSize;
 	if (t->arg2 != num) {
 		updateMonsterObject1Position(m);
 		executeMstUnk13(t);
