@@ -26,9 +26,9 @@ static const uint8_t _dbVolumeTable[129] = {
 
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	// (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF) ?
-	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // lut index
-		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // lut offset
-			return (flags_a >> 24) == (flags_b >> 24); // bit mask
+	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // lut index : 0,1,2
+		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // lut offset : num _sssUnk3
+			return (flags_a >> 24) == (flags_b >> 24); // bit 0..31, used as a mask lut[][] |= 1 << bit
 		}
 	}
 	return false;
@@ -176,33 +176,28 @@ void Game::updateSoundObject(SssObject *so) {
 		if ((*sssLut2 & mask) == 0) {
 			return;
 		}
-		SssObject *so = _sssObjectsList1;
-		while (so) {
+		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _edi)) {
                                 *sssLut2 &= ~mask;
                                 return;
 			}
-			so = so->nextPtr;
 		}
-		so = _sssObjectsList2;
-		while (so) {
+		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _edi)) {
                                 *sssLut2 &= ~mask;
                                 return;
 			}
-			so = so->nextPtr;
 		}
 	}
 }
 
-void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundObjects
+void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // sssOp12_removeSounds2
 	assert(lut < 3);
 	assert(num < _res->_sssHdr.dataUnk3Count);
 	assert(c < 31);
 	const uint32_t mask = (1 << c);
 	_res->_sssLookupTable1[lut][num] &= ~mask;
-	SssObject *so = _sssObjectsList1;
-	while (so) {
+	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == c) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
@@ -211,10 +206,8 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 			so->unk78 = -1;
 			so->unk50 = -2;
 		}
-		so = so->nextPtr;
 	}
-	so = _sssObjectsList2;
-	while (so) {
+	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 		if (so->unk6 == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == c) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
@@ -223,14 +216,13 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundO
 			so->unk78 = -1;
 			so->unk50 = -2;
 		}
-		so = so->nextPtr;
 	}
 	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
 		--_sssObjectsCount;
 	}
 }
 
-void Game::executeSssCodeOp16(SssObject *so) {
+void Game::executeSssCodeOp16(SssObject *so) { // sssOp16_resumeSound
 	if ((so->flags & 2) != 0) {
 		SssObject *next = so->nextPtr; // _eax
 		SssObject *prev = so->prevPtr; // _edx
@@ -250,7 +242,7 @@ void Game::executeSssCodeOp16(SssObject *so) {
 	}
 }
 
-void Game::executeSssCodeOp17(SssObject *so) {
+void Game::executeSssCodeOp17(SssObject *so) { // sssOp17_pauseSound
 	if ((so->flags & 2) == 0) {
 		SssPcm *pcm = so->pcm;
 		SssObject *prev = so->prevPtr; // _edx
@@ -297,11 +289,10 @@ void Game::executeSssCodeOp17(SssObject *so) {
 	}
 }
 
-void Game::executeSssCodeOp4(uint32_t flags) {
+void Game::executeSssCodeOp4(uint32_t flags) { // sssOp4_removeSounds
 	const uint32_t mask = 1 << (flags >> 24);
 	*_res->getSssLutPtr(1, flags) &= ~mask;
-	SssObject *so = _sssObjectsList1;
-	while (so) {
+	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if ((so->flags1 & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
@@ -310,10 +301,8 @@ void Game::executeSssCodeOp4(uint32_t flags) {
 			so->unk78 = -1;
 			so->unk50 = -2;
 		}
-		so = so->nextPtr;
 	}
-	so = _sssObjectsList2;
-	while (so) {
+	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 		if ((so->flags1 & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
@@ -322,7 +311,6 @@ void Game::executeSssCodeOp4(uint32_t flags) {
 			so->unk78 = -1;
 			so->unk50 = -2;
 		}
-		so = so->nextPtr;
 	}
 	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
 		--_sssObjectsCount;
@@ -756,19 +744,16 @@ void Game::updateSoundObjectLut2(uint32_t flags) {
 	uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut = _res->getSssLutPtr(2, flags);
 	if ((*sssLut & mask) != 0) {
-		SssObject *so = _sssObjectsList1;
-		while (so) {
+		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
 				return;
 			}
 			so = so->nextPtr;
 		}
-		so = _sssObjectsList2;
-		while (so) {
+		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
 				return;
 			}
-			so = so->nextPtr;
 		}
 // 42AC87
 		*sssLut &= ~mask;
@@ -852,7 +837,7 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 	return ret;
 }
 
-SssObject *Game::startSoundObject(int num, int b, int flags) {
+SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 
 	SssUnk3 *unk3 = &_res->_sssDataUnk3[num];
@@ -946,21 +931,18 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
 	if ((*sssLut2 & mask) != 0) {
-		SssObject *so = _sssObjectsList1;
-		while (so) {
+		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
 				*sssLut2 &= ~mask;
 				return 0;
 			}
 			so = so->nextPtr;
 		}
-		so = _sssObjectsList2;
-		while (so) {
+		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
 				*sssLut2 &= ~mask;
 				return 0;
 			}
-			so = so->nextPtr;
 		}
 		*sssLut2 &= ~mask;
 	}
@@ -1060,19 +1042,15 @@ void Game::playSoundObject(SssUnk1 *s, int a, int b) {
 		*sssLut1 |= mask;
 // 42BB60
 	} else if (_al & 4) {
-		SssObject *ptr1 = _sssObjectsList1;
-		while (ptr1) {
-			if (compareSssLut(ptr1->flags0, _ebp)) {
+		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
+			if (compareSssLut(so->flags0, _ebp)) {
 				goto prepare;
 			}
-			ptr1 = ptr1->nextPtr;
 		}
-		SssObject *ptr2 = _sssObjectsList2;
-		while (ptr2) {
-			if (compareSssLut(ptr2->flags0, _ebp)) {
+		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
+			if (compareSssLut(so->flags0, _ebp)) {
 				goto prepare;
 			}
-			ptr2 = ptr2->nextPtr;
 		}
 		return;
 	}
@@ -1231,14 +1209,13 @@ void Game::setSoundObjectVolume(SssObject *so) {
 	}
 }
 
-void Game::expireSoundObjects(int flags) {
+void Game::expireSoundObjects(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut1 = _res->getSssLutPtr(1, flags);
 	*sssLut1 &= ~mask;
 	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
 	*sssLut2 &= ~mask;
-	SssObject *so = _sssObjectsList1;
-	while (so) {
+	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if ((so->flags & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
@@ -1247,10 +1224,8 @@ void Game::expireSoundObjects(int flags) {
 			so->unk78 = -1;
 			so->unk50 = -2;
 		}
-		so = so->nextPtr;
 	}
-	so = _sssObjectsList2;
-	while (so) {
+	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 		if ((so->flags & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
@@ -1259,7 +1234,6 @@ void Game::expireSoundObjects(int flags) {
 			so->unk78 = -1;
 			so->unk50 = -2;
 		}
-		so = so->nextPtr;
 	}
 	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
 		--_sssObjectsCount;
@@ -1309,15 +1283,13 @@ void Game::mixSoundObjects17640(bool flag) {
 }
 
 void Game::mixSoundObjects() {
-	SssObject *so = _sssObjectsList1;
-	while (so) {
+	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (so->pcm != 0) {
 			const int16_t *ptr = so->pcm->ptr;
 			if (ptr && so->currentPcmPtr >= ptr) {
 				// TODO: append to mixingQueue
 			}
 		}
-		so = so->nextPtr;
 	}
 }
 

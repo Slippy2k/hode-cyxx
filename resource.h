@@ -591,9 +591,9 @@ struct Resource {
 	uint32_t getSssPcmSize(SssPcm *pcm) const;
 
 	uint32_t *getSssLutPtr(int lut, uint32_t flags) {
-		const uint32_t a = (flags >> 20) & 0xF;
+		const uint32_t a = (flags >> 20) & 0xF; // 0,1,2
 		assert(a < 3);
-		const uint32_t b = flags & 0xFFF;
+		const uint32_t b = flags & 0xFFF; // num indexes _sssUnk3
 		assert(b < (uint32_t)_sssHdr.dataUnk3Count);
 		switch (lut) {
 		case 1:
@@ -606,11 +606,6 @@ struct Resource {
 			assert(0);
 		}
 		return 0;
-	}
-	void setSssLut1(int num, int offset, uint32_t value) {
-		assert(num < 3);
-		assert(offset < _sssHdr.dataUnk3Count);
-		_sssLookupTable1[num][offset] = value;
 	}
 
 	void clearSssLookupTable3();

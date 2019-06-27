@@ -704,13 +704,13 @@ struct Game {
 	void prependSoundObjectToList(SssObject *so);
 	void updateSoundObjectLut2(uint32_t flags);
 	SssObject *createSoundObject(int num, int b, int c);
-	SssObject *startSoundObject(int num, int b, int flags);
+	SssObject *startSoundObject(int num, int b, uint32_t flags);
 	void playSoundObject(SssUnk1 *s, int a, int b);
 	void clearSoundObjects();
 	void setLowPrioritySoundObject(SssObject *so);
 	int getSoundObjectPanning(SssObject *so) const;
 	void setSoundObjectVolume(SssObject *so);
-	void expireSoundObjects(int flags);
+	void expireSoundObjects(uint32_t flags);
 	void mixSoundObjects17640(bool flag);
 	void mixSoundObjects();
 	void stopSoundObject(SssObject **sssObjectsList, int num);
