@@ -422,9 +422,9 @@ struct Task {
 	MonsterObject2 *monster2; // 0x10
 	int32_t localVars[8]; // 0x14
 	uint8_t flags; // 0x34
-	uint8_t runningState; // 0x35
-	int16_t delay; // 0x36
-	uint32_t tempVar; // 0x38
+	uint8_t state; // 0x35
+	int16_t arg1; // 0x36 delay/counter/type
+	uint32_t arg2; // 0x38  num/index
 	int (Game::*run)(Task *t); // 0x3C
 	Task *child; // 0x40
 }; // sizeof == 0x44

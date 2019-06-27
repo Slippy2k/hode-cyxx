@@ -1031,7 +1031,7 @@ void Game::executeMstCode() {
 			assert(codeData != kNone);
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {
-				t->runningState = 1;
+				t->state = 1;
 			}
 		}
 	}
@@ -2257,10 +2257,10 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	if (delay == -1) {
 		const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
 		assert((offset % 948) == 0);
-		t->tempVar = offset / 948;
+		t->arg2 = offset / 948;
 		t->run = &Game::runTask_unk4;
 	} else {
-		t->delay = delay;
+		t->arg1 = delay;
 		t->run = &Game::runTask_unk3;
 	}
 	return 1;
@@ -2319,7 +2319,7 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 
 void Game::resetTask(Task *t, const uint8_t *codeData) {
 	assert(codeData);
-	t->runningState |= 2;
+	t->state |= 2;
 	t->codeData = codeData;
 	t->run = &Game::runTask_default;
 	t->localVars[7] = 0;
@@ -2723,7 +2723,7 @@ int Game::runTask_default(Task *t) {
 		return 1;
 	}
 	int ret = 0;
-	t->runningState &= ~2;
+	t->state &= ~2;
 	const uint8_t *p = t->codeData;
 	do {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
@@ -2749,7 +2749,7 @@ int Game::runTask_default(Task *t) {
 		case 1: { // 1
 				const int num = READ_LE_UINT16(p + 2);
 				const int delay = getTaskVar(t, num, p[1]);
-				t->delay = delay;
+				t->arg1 = delay;
 				if (delay > 0) {
 					if (p[0] == 0) {
 						t->run = &Game::runTask_waitResetInput;
@@ -2863,8 +2863,8 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 29: { // 19
-				t->delay = 4;
-				t->tempVar = p[1];
+				t->arg1 = 4;
+				t->arg2 = p[1];
 				if (getTaskAndyVar(p[1], t) == 0) {
 					LvlObject *o = 0;
 					if (t->monster1) {
@@ -2884,8 +2884,8 @@ int Game::runTask_default(Task *t) {
 			}
 			break;
 		case 30: { // 20
-				t->delay = 3;
-				t->tempVar = p[1];
+				t->arg1 = 3;
+				t->arg2 = p[1];
 				if (((1 << p[1]) & _mstFlags) == 0) {
 					LvlObject *o = 0;
 					if (t->monster1) {
@@ -2912,8 +2912,8 @@ int Game::runTask_default(Task *t) {
 					m = t->monster1;
 				}
 				if (m) {
-					t->delay = 5;
-					t->tempVar = p[1];
+					t->arg1 = 5;
+					t->arg2 = p[1];
 					if (((1 << p[1]) & m->flags48) == 0) {
 						LvlObject *o = 0;
 						if (t->monster1) {
@@ -3315,7 +3315,7 @@ int Game::runTask_default(Task *t) {
 					assert(codeData != kNone);
 					p = _res->_mstCodeData + codeData * 4;
 					t->codeData = p;
-					t->runningState &= ~2;
+					t->state &= ~2;
 					p -= 4;
 				}
 			}
@@ -3345,7 +3345,7 @@ int Game::runTask_default(Task *t) {
 				if (mstCollidesByFlags(t->monster1, _res->_mstUnk59[num].flags)) {
 					t->codeData = p + 4;
 					resetMstTask(t, _res->_mstUnk59[num].codeData, 0x10);
-					t->runningState &= ~2;
+					t->state &= ~2;
 					p = t->codeData - 4;
 				}
 			}
@@ -3638,7 +3638,7 @@ int Game::runTask_default(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->tempVar = num;
+						t->arg2 = num;
 						t->run = &Game::runTask_mstOp231;
 						ret = 1;
 					}
@@ -3657,7 +3657,7 @@ int Game::runTask_default(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->tempVar = num;
+						t->arg2 = num;
 						t->run = &Game::runTask_mstOp232;
 						ret = 1;
 					}
@@ -3684,7 +3684,7 @@ int Game::runTask_default(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->tempVar = num;
+						t->arg2 = num;
 						t->run = &Game::runTask_mstOp233;
 						ret = 1;
 					}
@@ -3702,7 +3702,7 @@ int Game::runTask_default(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->tempVar = num;
+						t->arg2 = num;
 						t->run = &Game::runTask_mstOp234;
 						ret = 1;
 					}
@@ -3754,7 +3754,7 @@ int Game::runTask_default(Task *t) {
 				child->nextPtr = t->nextPtr;
 				memcpy(t, child, sizeof(Task));
 				t->child = 0;
-				t->runningState &= ~2;
+				t->state &= ~2;
 				child->codeData = 0;
 				MonsterObject1 *m = t->monster1;
 				if (m) {
@@ -3787,7 +3787,7 @@ int Game::runTask_default(Task *t) {
 									const uint32_t codeData = m35->indexCodeData[num];
 									assert(codeData != kNone);
 									resetTask(t, _res->_mstCodeData + codeData * 4);
-									t->runningState &= ~2;
+									t->state &= ~2;
 									p = t->codeData - 4;
 								}
 								break;
@@ -3807,7 +3807,7 @@ int Game::runTask_default(Task *t) {
 							const uint32_t codeData = m35->indexCodeData[num];
 							assert(codeData != kNone);
 							resetTask(t, _res->_mstCodeData + codeData * 4);
-							t->runningState &= ~2;
+							t->state &= ~2;
 							const int counter = m->executeCounter;
 							m->executeCounter = _executeMstLogicCounter;
 							p = t->codeData - 4;
@@ -3850,7 +3850,7 @@ int Game::runTask_default(Task *t) {
 				mstRemoveMonsterObject2(t, &_monsterObjects2TasksList);
 				ret = 1;
 			} else {
-				if ((t->runningState & 1) != 0 && _mstVars[31] == 0) {
+				if ((t->state & 1) != 0 && _mstVars[31] == 0) {
 					_mstVars[31] = _mstTickDelay;
 				}
 				removeTask(&_tasksList, t);
@@ -3862,8 +3862,8 @@ int Game::runTask_default(Task *t) {
 			break;
 		}
 		p += 4;
-		if ((t->runningState & 2) != 0) {
-			t->runningState &= ~2;
+		if ((t->state & 2) != 0) {
+			t->state &= ~2;
 			p = t->codeData;
 		}
 		++_runTaskOpcodesCount;
@@ -5876,8 +5876,8 @@ void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
 
 int Game::runTask_wait(Task *t) {
 	debug(kDebug_MONSTER, "runTask_wait t %p", t);
-	--t->delay;
-	if (t->delay == 0) {
+	--t->arg1;
+	if (t->arg1 == 0) {
 		t->run = &Game::runTask_default;
 		return 0;
 	}
@@ -5886,8 +5886,8 @@ int Game::runTask_wait(Task *t) {
 
 int Game::runTask_waitResetInput(Task *t) {
 	debug(kDebug_MONSTER, "runTask_waitResetInput t %p", t);
-	--t->delay;
-	if (t->delay == 0) {
+	--t->arg1;
+	if (t->arg1 == 0) {
 		t->run = &Game::runTask_default;
 		LvlObject *o = 0;
 		if (t->monster1) {
@@ -5906,7 +5906,7 @@ int Game::runTask_waitResetInput(Task *t) {
 
 int Game::runTask_waitFlags(Task *t) {
 	debug(kDebug_MONSTER, "runTask_waitFlags t %p", t);
-	if (getTaskFlag(t, t->tempVar, t->delay) == 0) {
+	if (getTaskFlag(t, t->arg2, t->arg1) == 0) {
 		return 1;
 	}
 	t->run = &Game::runTask_default;
@@ -5929,7 +5929,7 @@ int Game::runTask_idle(Task *t) {
 }
 
 int Game::runTask_mstOp231(Task *t) {
-	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
+	const MstUnk55 *m = &_res->_mstUnk55[t->arg2];
 	const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
@@ -5960,7 +5960,7 @@ int Game::runTask_mstOp232(Task *t) {
 
 int Game::runTask_mstOp233(Task *t) {
 	debug(kDebug_MONSTER, "runTask_mstOp233 t %p", t);
-	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
+	const MstUnk55 *m = &_res->_mstUnk55[t->arg2];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
@@ -5982,7 +5982,7 @@ int Game::runTask_mstOp233(Task *t) {
 
 int Game::runTask_mstOp234(Task *t) {
 	debug(kDebug_MONSTER, "runTask_mstOp234 t %p", t);
-	const MstUnk55 *m = &_res->_mstUnk55[t->tempVar];
+	const MstUnk55 *m = &_res->_mstUnk55[t->arg2];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (compareOp(m->compare, a, b)) {
@@ -6004,12 +6004,12 @@ int Game::runTask_mstOp234(Task *t) {
 
 int Game::runTask_unk1(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk1 t %p", t);
-	if (t->delay == 0) {
+	if (t->arg1 == 0) {
 		updateMonsterObject1Position(t->monster1);
 		executeMstUnk13(t);
 		return 0;
 	}
-	--t->delay;
+	--t->arg1;
 	return 1;
 }
 
@@ -6030,7 +6030,7 @@ int Game::runTask_unk3(Task *t) {
 	MonsterObject1 *m = t->monster1;
 	const uint16_t flags0 = m->o16->flags0;
 	if ((flags0 & 0xFF) == m->flagsA4) {
-		if (t->delay > 0) {
+		if (t->arg1 > 0) {
 			t->run = &Game::runTask_unk1;
 		} else {
 			t->run = &Game::runTask_unk2;
@@ -6046,7 +6046,7 @@ int Game::runTask_unk4(Task *t) {
 	const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
 	assert(offset % 948 == 0);
 	const uint32_t num = offset / 948;
-	if (t->tempVar != num) {
+	if (t->arg2 != num) {
 		updateMonsterObject1Position(m);
 		executeMstUnk13(t);
 		return 0;
