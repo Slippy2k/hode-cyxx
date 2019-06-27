@@ -1899,22 +1899,22 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 
 void Game::mstUpdateRefPos() {
 	if (_andyObject) {
-		_mstRefPosX = _andyObject->xPos;
-		_mstRefPosY = _andyObject->yPos;
-		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
-		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
+		_mstAndyScreenPosX = _andyObject->xPos;
+		_mstAndyScreenPosY = _andyObject->yPos;
+		_mstPosX = _mstAndyScreenPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
+		_mstPosY = _mstAndyScreenPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
 		if (!_specialAnimFlag) {
 			_mstAndyRectNum = updateMstRectsTable(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1) & 0xFF;
 		}
-		_mstRefPosX += _andyObject->posTable[3].x;
-		_mstRefPosY += _andyObject->posTable[3].y;
+		_mstAndyScreenPosX += _andyObject->posTable[3].x;
+		_mstAndyScreenPosY += _andyObject->posTable[3].y;
 		_mstPosX += _andyObject->posTable[3].x;
 		_mstPosY += _andyObject->posTable[3].y;
 	} else {
-		_mstRefPosX = 128;
-		_mstRefPosY = 96;
-		_mstPosX = _mstRefPosX + _res->_mstPointOffsets[0].xOffset;
-		_mstPosY = _mstRefPosY + _res->_mstPointOffsets[0].yOffset;
+		_mstAndyScreenPosX = 128;
+		_mstAndyScreenPosY = 96;
+		_mstPosX = _mstAndyScreenPosX + _res->_mstPointOffsets[0].xOffset;
+		_mstPosY = _mstAndyScreenPosY + _res->_mstPointOffsets[0].yOffset;
         }
 	_mstMovingStateCount = 0;
 	_mstMovingState[0].unk40 = 0;
@@ -2521,9 +2521,9 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 int Game::getTaskOtherVar(int index, Task *t) const {
 	switch (index) {
 	case 0:
-		return _mstRefPosX;
+		return _mstAndyScreenPosX;
 	case 1:
-		return _mstRefPosY;
+		return _mstAndyScreenPosY;
 	case 2:
 		return _mstPosX;
 	case 3:
@@ -3505,7 +3505,7 @@ int Game::runTask_default(Task *t) {
 					t->flags |= 0x80;
 					if (p[0] == 222 || p[0] == 220) {
 						if (e == -1) {
-							if (a >= -_mstRefPosX && a <= 255 - _mstRefPosX) {
+							if (a >= -_mstAndyScreenPosX && a <= 255 - _mstAndyScreenPosX) {
 								break;
 							}
 						} else if (e == _currentScreen) {
@@ -3572,7 +3572,7 @@ int Game::runTask_default(Task *t) {
 				}
 				if (_edi != 0) {
 					if (_mstOp67_screenNum < 0) {
-						if (_mstOp67_x2 >= -_mstRefPosX && _mstOp67_x1 <= -_mstRefPosX * 2) {
+						if (_mstOp67_x2 >= -_mstAndyScreenPosX && _mstOp67_x1 <= -_mstAndyScreenPosX * 2) {
 							_edi = 0;
 						}
 					} else if (_mstOp67_screenNum == _currentScreen) {
@@ -3581,7 +3581,7 @@ int Game::runTask_default(Task *t) {
 				}
 				if (_esi != 0) {
 					if (_mstOp68_screenNum < 0) {
-						if (_mstOp68_x2 >= -_mstRefPosX && _mstOp68_x1 <= -_mstRefPosX * 2) {
+						if (_mstOp68_x2 >= -_mstAndyScreenPosX && _mstOp68_x1 <= -_mstAndyScreenPosX * 2) {
 							_esi = 0;
 						}
 					} else if (_mstOp68_screenNum == _currentScreen) {
@@ -4099,7 +4099,7 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 			return initMonsterObject1Type2(t);
 		} else {
 // 41BEF4
-			int x = MIN(_mstRefPosX, 255);
+			int x = MIN(_mstAndyScreenPosX, 255);
 			if (x < 0) {
 				c = x;
 				d = x + 255;
@@ -4107,7 +4107,7 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 				c = -x;
 				d = 255 - x;
 			}
-			int y = MIN(_mstRefPosY, 191);
+			int y = MIN(_mstAndyScreenPosY, 191);
 			if (y < 0) {
 				// _ebp = y
 				// var4 = y + 191;
@@ -4427,22 +4427,16 @@ void Game::mstOp53(MstUnk48 *m) {
 	if (_m48Num != -1) {
 		return;
 	}
-	int x = _mstRefPosX;
-	if (x > 255) {
-		x = 255;
-	}
-	if (_mstRefPosX < 0) {
+	int x = MIN(_mstAndyScreenPosX, 255);
+	if (_mstAndyScreenPosX < 0) {
 		_mstPosXmin = x;
 		_mstPosXmax = 255 + x;
 	} else {
 		_mstPosXmin = -x;
 		_mstPosXmax = 255 - x;
 	}
-	int y = _mstRefPosY;
-	if (y > 191) {
-		y = 191;
-	}
-	if (_mstRefPosY < 0) {
+	int y = MIN(_mstAndyScreenPosY, 191);
+	if (_mstAndyScreenPosY < 0) {
 		_mstPosYmin = y;
 		_mstPosYmax = 191 + y;
 	} else {
@@ -4483,16 +4477,16 @@ void Game::mstOp54() {
 		m43 = &_res->_mstUnk43[_m43Num3];
 		_m43Num2 = _m43Num1;
 	}
-	const int x = MIN(_mstRefPosX, 255);
-	if (_mstRefPosX < 0) {
+	const int x = MIN(_mstAndyScreenPosX, 255);
+	if (_mstAndyScreenPosX < 0) {
 		_mstPosXmin = x;
 		_mstPosXmax = 255 + x;
 	} else {
 		_mstPosXmin = -x;
 		_mstPosXmax = 255 - x;
 	}
-	const int y = MIN(_mstRefPosY, 191);
-	if (_mstRefPosY < 0) {
+	const int y = MIN(_mstAndyScreenPosY, 191);
+	if (_mstAndyScreenPosY < 0) {
 		_mstPosYmin = y;
 		_mstPosYmax = 191 + y;
 	} else {
@@ -5021,8 +5015,8 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 		yPos += o->yPos + o->posTable[7].y;
 		screen = o->screenNum;
 	} else if (type == 0xFF) { // -1
-		xPos += _mstRefPosX; // _ebx
-		yPos += _mstRefPosY; // _ebp
+		xPos += _mstAndyScreenPosX; // _ebx
+		yPos += _mstAndyScreenPosY; // _ebp
 		screen = _currentScreen;
 	}
 	uint16_t flags = (dat->unk6 == -1 && o) ? o->flags2 : 0x3001;
@@ -5609,8 +5603,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 				return;
 			}
 			if (screen < 0) {
-				m->o20->xPos += _mstRefPosX;
-				m->o20->yPos += _mstRefPosY;
+				m->o20->xPos += _mstAndyScreenPosX;
+				m->o20->yPos += _mstAndyScreenPosY;
 			}
 			m->o20->dataPtr = 0;
 			setLvlObjectPosRelativeToObject(m->o16, 6, m->o20, 6);
@@ -5659,8 +5653,8 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 	}
 // 4157E8
 	if (screen < 0) {
-		o->xPos += _mstRefPosX;
-		o->yPos += _mstRefPosY;
+		o->xPos += _mstAndyScreenPosX;
+		o->yPos += _mstAndyScreenPosY;
 	}
 	setLvlObjectPosInScreenGrid(o, 7);
 	if (mo) {

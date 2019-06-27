@@ -170,8 +170,8 @@ struct Game {
 	int _mstPrevPosY; // _mstAndyLevelPrevPosY
 	int _mstPosX; // _mstAndyLevelPosX
 	int _mstPosY; // _mstAndyLevelPosY
-	int _mstRefPosX; // _mstAndyScreenPosX
-	int _mstRefPosY; // _mstAndyScreenPosY
+	int _mstAndyScreenPosX;
+	int _mstAndyScreenPosY;
 	int _mstAndyRectNum;
 	int _m43Num1;
 	int _m43Num2;
