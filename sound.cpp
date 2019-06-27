@@ -879,13 +879,13 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
 		SssObject *so = addSoundObject(pcm, _ecx, flags1, flags);
 		if (so) {
-			if (codeOffset->codeOffset1 == kNone || codeOffset->codeOffset2 == kNone || codeOffset->codeOffset3 == kNone || codeOffset->codeOffset4 == kNone) {
+			if (codeOffset->codeOffset1 == kNone && codeOffset->codeOffset2 == kNone && codeOffset->codeOffset3 == kNone && codeOffset->codeOffset4 == kNone) {
 				so->flags |= 4;
 			}
-			so->codeDataStage1 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
-			so->codeDataStage2 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset2);
-			so->codeDataStage3 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset3);
-			so->codeDataStage4 = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset4);
+			so->codeDataStage1 = (codeOffset->codeOffset1 == kNone) ? 0 : _res->_sssCodeData + codeOffset->codeOffset1;
+			so->codeDataStage2 = (codeOffset->codeOffset2 == kNone) ? 0 : _res->_sssCodeData + codeOffset->codeOffset2;
+			so->codeDataStage3 = (codeOffset->codeOffset3 == kNone) ? 0 : _res->_sssCodeData + codeOffset->codeOffset3;
+			so->codeDataStage4 = (codeOffset->codeOffset4 == kNone) ? 0 : _res->_sssCodeData + codeOffset->codeOffset4;
 			so->lvlObject = _currentSoundLvlObject;
 			so->counter = -1;
 			so->unk4C = -1;
@@ -935,9 +935,8 @@ SssObject *Game::startSoundObject(int num, int b, int flags) {
 	tmpObj.volumePtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", codeOffset->pcm);
 	tmpObj.pcm = &_res->_sssPcmTable[codeOffset->pcm];
-	const uint8_t *code = PTR_OFFS<uint8_t>(_res->_sssCodeData, codeOffset->codeOffset1);
-	debug(kDebug_SOUND, "code %p", code);
-	if (code) {
+	if (codeOffset->codeOffset1 != kNone) {
+		const uint8_t *code = _res->_sssCodeData + codeOffset->codeOffset1;
 		executeSssCode(&tmpObj, code, true);
 	}
 

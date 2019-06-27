@@ -18,11 +18,6 @@ struct PafPlayer;
 struct Video;
 struct SystemStub;
 
-template <typename T>
-inline const uint8_t *PTR_OFFS(const uint8_t *base, uint32_t index) {
-	return index == 0xFFFFFFFF ? 0 : (const uint8_t *)base + index * sizeof(T);
-}
-
 struct Game {
 	enum {
 		kObjectDataTypeAndy,
