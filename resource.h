@@ -115,7 +115,7 @@ struct MstScreenAreaCode {
 	uint8_t unk0x1C; // 0x1C
 	uint8_t unk0x1D; // 0x1D
 	uint16_t unk0x1E;
-	uint32_t codeData; // const uint8_t *codeData; // 0x20, offset _mstCodeData
+	uint32_t codeData; // 0x20, offset _mstCodeData
 }; // SIZEOF_MstScreenAreaCode 36
 
 struct MstUnk34 {
@@ -389,7 +389,7 @@ struct SssHdr {
 	int pcmCount; // 30
 };
 
-struct SssUnk1 {
+struct SssUnk1 { // SssInfo
 	uint16_t sssUnk3; // 0 index to _sssDataUnk3
 	uint8_t unk2; // 2
 	uint8_t unk3;
@@ -399,26 +399,26 @@ struct SssUnk1 {
 	uint8_t unk7;
 };
 
-struct SssUnk2 { // SssProperty
+struct SssUnk2 {
 	uint8_t unk0; // defaultPriority
 	int8_t unk1; // defaultVolume
 	int8_t unk2;
 };
 
-struct SssUnk3 { // SssInfo
+struct SssUnk3 { // SssBank
 	uint8_t flags; // 0 flags0
 	int8_t count; // 1 codeOffsetCount
 	uint16_t sssFilter; // 2 index to _sssFilters
 	uint32_t firstCodeOffset; // 4 offset to _sssCodeOffsets
 };
 
-struct SssCodeOffset {
+struct SssCodeOffset { // SssSample
 	uint16_t pcm; // index to _sssPcmTable
-	uint16_t unk2;
-	uint8_t unk4;
+	uint16_t unk2; // framesCount
+	uint8_t unk4; // volume
 	uint8_t unk5;
-	int8_t unk6;
-	uint8_t unk7;
+	int8_t unk6; // priority
+	uint8_t unk7; // panning
 	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData
 	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
@@ -452,7 +452,7 @@ struct SssPcm {
 	uint32_t totalSize;   // 8 size in .sss (256 int16_t words + followed by indexes)
 	uint32_t strideSize;  // 12
 	uint16_t strideCount; // 16
-	uint16_t flags;       // 18
+	uint16_t flags;       // 18 1:stereo
 };
 
 struct SssUnk6 {
@@ -594,16 +594,23 @@ struct Resource {
 		const uint32_t a = (flags >> 20) & 0xF;
 		assert(a < 3);
 		const uint32_t b = flags & 0xFFF;
+		assert(b < (uint32_t)_sssHdr.dataUnk3Count);
 		switch (lut) {
 		case 1:
-			return _sssLookupTable1[a] + b;
+			return &_sssLookupTable1[a][b];
 		case 2:
-			return _sssLookupTable2[a] + b;
+			return &_sssLookupTable2[a][b];
 		case 3:
-			return _sssLookupTable3[a] + b;
+			return &_sssLookupTable3[a][b];
+		default:
+			assert(0);
 		}
-		assert(0);
 		return 0;
+	}
+	void setSssLut1(int num, int offset, uint32_t value) {
+		assert(num < 3);
+		assert(offset < _sssHdr.dataUnk3Count);
+		_sssLookupTable1[num][offset] = value;
 	}
 
 	void clearSssLookupTable3();

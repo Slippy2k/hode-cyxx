@@ -196,6 +196,9 @@ void Game::updateSoundObject(SssObject *so) {
 }
 
 void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // expireSoundObjects
+	assert(lut < 3);
+	assert(num < _res->_sssHdr.dataUnk3Count);
+	assert(c < 31);
 	const uint32_t mask = (1 << c);
 	_res->_sssLookupTable1[lut][num] &= ~mask;
 	SssObject *so = _sssObjectsList1;

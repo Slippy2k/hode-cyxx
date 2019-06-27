@@ -210,8 +210,8 @@ struct SssObject {
 	int32_t unk6C; // 0x6C seek_pos
 	int *volumePtr; // 0x70
 	LvlObject *lvlObject; // 0x74
-	int32_t unk78; // 0x78
-	int32_t unk7C; // 0x7C
+	int32_t unk78; // 0x78 nextSound indexes _sssUnk3
+	int32_t unk7C; // 0x7C repeatCount
 	SssFilter *filter;
 };
 
