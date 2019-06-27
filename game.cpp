@@ -277,7 +277,6 @@ void Game::setupBackgroundBitmap() {
 		_video->_displayPaletteBuffer[i] = pal[i] << 8;
 	}
 	_video->_paletteNeedRefresh = true;
-	_system->copyRectWidescreen(Video::W, Video::H, _video->_backgroundLayer, pal);
 }
 
 void Game::addToSpriteList(LvlObject *ptr) {
@@ -2488,6 +2487,7 @@ void Game::levelMainLoop() {
 	if (_video->_paletteNeedRefresh) {
 		_video->_paletteNeedRefresh = false;
 		_video->refreshGamePalette(_video->_displayPaletteBuffer);
+		_system->copyRectWidescreen(Video::W, Video::H, _video->_backgroundLayer, _video->_palette);
 	}
 	drawScreen();
 	if (_system->inp.screenshot) {
