@@ -35,7 +35,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
 	_video = new Video(system);
-	_andyCurrentLevelScreenNum = -1;
+	_mstAndyCurrentScreenNum = -1;
 	_specialAnimMask = 0; // original only clears ~0x30
 	_mstCurrentAnim = 0;
 	_mstOriginPosX = Video::W / 2;
@@ -603,36 +603,36 @@ void Game::setupPlasmaCannonPointsHelper() {
 		int xR = _rnd.update();
 		for (int i = 0; i < 64; ++i) {
 			const int index = _pointDstIndexTable[i];
-			const int x1 = _gameXPosTable[_pointSrcIndex1Table[index]];
-			const int x2 = _gameXPosTable[_pointSrcIndex2Table[index]];
-			_gameXPosTable[index] = (x1 + x2 + (xR >> _pointRandomizeShiftTable[i])) / 2;
+			const int x1 = _plasmaCannonPosX[_pointSrcIndex1Table[index]];
+			const int x2 = _plasmaCannonPosX[_pointSrcIndex2Table[index]];
+			_plasmaCannonPosX[index] = (x1 + x2 + (xR >> _pointRandomizeShiftTable[i])) / 2;
 			xR *= 2;
 		}
 		int yR = _rnd.update();
 		for (int i = 0; i < 64; ++i) {
 			const int index = _pointDstIndexTable[i];
-			const int y1 = _gameYPosTable[_pointSrcIndex1Table[index]];
-			const int y2 = _gameYPosTable[_pointSrcIndex2Table[index]];
-			_gameYPosTable[index] = (y1 + y2 + (yR >> _pointRandomizeShiftTable[i])) / 2;
+			const int y1 = _plasmaCannonPosY[_pointSrcIndex1Table[index]];
+			const int y2 = _plasmaCannonPosY[_pointSrcIndex2Table[index]];
+			_plasmaCannonPosY[index] = (y1 + y2 + (yR >> _pointRandomizeShiftTable[i])) / 2;
 			yR *= 2;
 		}
 		if (_andyObject->anim == 84) {
 			for (int i = 0; i <= 496; i += 8) {
 				const int index = i / 4;
-				_plasmaCannonXPointsTable2[2 + index] = (_gameXPosTable[4 + index] - _plasmaCannonXPointsTable1[4 + index]) / 2;
-				_plasmaCannonYPointsTable2[2 + index] = (_gameYPosTable[4 + index] - _plasmaCannonYPointsTable1[4 + index]) / 8;
+				_plasmaCannonXPointsTable2[2 + index] = (_plasmaCannonPosX[4 + index] - _plasmaCannonXPointsTable1[4 + index]) / 2;
+				_plasmaCannonYPointsTable2[2 + index] = (_plasmaCannonPosY[4 + index] - _plasmaCannonYPointsTable1[4 + index]) / 8;
 			}
 		} else {
 			for (int i = 0; i <= 496; i += 8) {
 				const int index = i / 4;
-				_plasmaCannonXPointsTable2[2 + index] = (_gameXPosTable[4 + index] - _plasmaCannonXPointsTable1[4 + index]) / 2;
-				_plasmaCannonYPointsTable2[2 + index] = (_gameYPosTable[4 + index] - _plasmaCannonYPointsTable1[4 + index]) / 2;
+				_plasmaCannonXPointsTable2[2 + index] = (_plasmaCannonPosX[4 + index] - _plasmaCannonXPointsTable1[4 + index]) / 2;
+				_plasmaCannonYPointsTable2[2 + index] = (_plasmaCannonPosY[4 + index] - _plasmaCannonYPointsTable1[4 + index]) / 2;
 			}
 		}
 		for (int i = 0; i <= 504; i += 8) {
 			const int index = i / 4;
-			_plasmaCannonXPointsTable1[2 + index] = _gameXPosTable[2 + index];
-			_plasmaCannonYPointsTable1[2 + index] = _gameYPosTable[2 + index];
+			_plasmaCannonXPointsTable1[2 + index] = _plasmaCannonPosX[2 + index];
+			_plasmaCannonYPointsTable1[2 + index] = _plasmaCannonPosY[2 + index];
 		}
 	} else {
 		for (int i = 0; i <= 496; i += 8) {
@@ -713,24 +713,24 @@ void Game::setupPlasmaCannonPoints(LvlObject *ptr) {
 		if ((ptr->actionKeyMask & 4) == 0) { // not using plasma cannon
 			destroyLvlObjectPlasmaExplosion(ptr);
 		} else {
-			_gameXPosTable[0] = _gameXPosTable[128] = ptr->xPos + ptr->posTable[6].x;
-			_gameYPosTable[0] = _gameYPosTable[128] = ptr->yPos + ptr->posTable[6].y;
+			_plasmaCannonPosX[0] = _plasmaCannonPosX[128] = ptr->xPos + ptr->posTable[6].x;
+			_plasmaCannonPosY[0] = _plasmaCannonPosY[128] = ptr->yPos + ptr->posTable[6].y;
 			const int num = ((ptr->flags0 >> 5) & 7) - 3;
 			switch (num) {
 			case 0:
-				_gameYPosTable[128] -= 176; // 192 - 16
+				_plasmaCannonPosY[128] -= 176; // 192 - 16
 				_plasmaCannonDirection = 3;
 				break;
 			case 1:
-				_gameYPosTable[128] += 176;
+				_plasmaCannonPosY[128] += 176;
 				_plasmaCannonDirection = 6;
 				break;
 			case 3:
-				_gameYPosTable[128] -= 176;
+				_plasmaCannonPosY[128] -= 176;
 				_plasmaCannonDirection = 1;
 				break;
 			case 4:
-				_gameYPosTable[128] += 176;
+				_plasmaCannonPosY[128] += 176;
 				_plasmaCannonDirection = 4;
 				break;
 			default:
@@ -740,19 +740,19 @@ void Game::setupPlasmaCannonPoints(LvlObject *ptr) {
 			if (ptr->flags1 & 0x10) {
 				if (_plasmaCannonDirection != 1) {
 					_plasmaCannonDirection = (_plasmaCannonDirection & ~2) | 8;
-					_gameXPosTable[128] -= 264; // 256 + 8
+					_plasmaCannonPosX[128] -= 264; // 256 + 8
 				}
 			} else {
 				if (_plasmaCannonDirection != 1) {
-					_gameXPosTable[128] += 264;
+					_plasmaCannonPosX[128] += 264;
 				}
 			}
 			if (_plasmaCannonPrevDirection != _plasmaCannonDirection) {
-				_plasmaCannonXPointsTable1[0] = _gameXPosTable[0];
-				_plasmaCannonXPointsTable1[128] = _gameXPosTable[128];
+				_plasmaCannonXPointsTable1[0] = _plasmaCannonPosX[0];
+				_plasmaCannonXPointsTable1[128] = _plasmaCannonPosX[128];
 				randomizeInterpolatePoints(_plasmaCannonXPointsTable1, 64);
-				_plasmaCannonYPointsTable1[0] = _gameYPosTable[0];
-				_plasmaCannonYPointsTable1[128] = _gameYPosTable[128];
+				_plasmaCannonYPointsTable1[0] = _plasmaCannonPosY[0];
+				_plasmaCannonYPointsTable1[128] = _plasmaCannonPosY[128];
 				randomizeInterpolatePoints(_plasmaCannonYPointsTable1, 64);
 				_plasmaCannonPrevDirection = _plasmaCannonDirection;
 			}
@@ -769,8 +769,8 @@ void Game::setupPlasmaCannonPoints(LvlObject *ptr) {
 
 int Game::testPlasmaCannonPointsDirection(int x1, int y1, int x2, int y2) {
 	int index1 = _plasmaCannonFirstIndex;
-	int _esi = _gameXPosTable[index1];
-	int _ebp = _gameYPosTable[index1];
+	int _esi = _plasmaCannonPosX[index1];
+	int _ebp = _plasmaCannonPosY[index1];
 	int index2 = _plasmaCannonLastIndex1;
 	if (index2 == 0) {
 		index2 = _plasmaCannonLastIndex2;
@@ -1122,7 +1122,7 @@ void Game::setupAndyLvlObject() {
 	const uint8_t *dat = &_levelCheckpointData[_currentLevel][_levelCheckpoint * 12];
 	_plasmaCannonFlags = 0;
 	_actionDirectionKeyMaskIndex = 0;
-	_andyCurrentLevelScreenNum = ptr->screenNum;
+	_mstAndyCurrentScreenNum = ptr->screenNum;
 	if (dat[9] != ptr->spriteNum) {
 		setAndySprite(dat[9]);
 	}
@@ -1799,8 +1799,8 @@ void Game::drawPlasmaCannon() {
 	if (lastIndex == 0) {
 		lastIndex = _plasmaCannonLastIndex2;
 	}
-	int x1 = _gameXPosTable[index];
-	int y1 = _gameYPosTable[index];
+	int x1 = _plasmaCannonPosX[index];
+	int y1 = _plasmaCannonPosY[index];
 	index += 4;
 	do {
 		_video->_drawLine.color = 0xA9;
@@ -1907,7 +1907,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
 	_res->loadLevelData(_levels[_currentLevel]);
-	_andyCurrentLevelScreenNum = -1;
+	_mstAndyCurrentScreenNum = -1;
 	initMstCode();
 //	res_initIO();
 	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint * 12 + 8], 0xFF);
@@ -3362,7 +3362,7 @@ int Game::lvlObjectType1Callback(LvlObject *ptr) {
 			ptr->directionKeyMask = 0;
 			break;
 		}
-		setLvlObjectPosRelativeToPoint(ptr, 0, _gameXPosTable[_plasmaCannonFirstIndex], _gameYPosTable[_plasmaCannonFirstIndex]);
+		setLvlObjectPosRelativeToPoint(ptr, 0, _plasmaCannonPosX[_plasmaCannonFirstIndex], _plasmaCannonPosY[_plasmaCannonFirstIndex]);
 		updateAndyObject(ptr);
 		ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2, 0x18);
 		ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2 + 1, 7);

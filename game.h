@@ -101,7 +101,7 @@ struct Game {
 	uint8_t _screenPosTable[5][24 * 32];
 	uint8_t _screenTempMaskBuffer[24 * 32];
 	uint8_t _screenMaskBuffer[96 * 24 * 32];
-	int _andyCurrentLevelScreenNum;
+	int _mstAndyCurrentScreenNum;
 	uint8_t _shakeScreenDuration;
 	const uint8_t *_shakeScreenTable;
 	uint8_t _plasmaCannonDirection;
@@ -119,8 +119,8 @@ struct Game {
 	uint8_t _actionDirectionKeyMaskIndex;
 	uint8_t _andyActionKeyMaskAnd, _andyActionKeyMaskOr;
 	uint8_t _andyDirectionKeyMaskAnd, _andyDirectionKeyMaskOr;
-	int32_t _gameXPosTable[129]; // _plasmaCannonDx
-	int32_t _gameYPosTable[129]; // _plasmaCannonDy
+	int32_t _plasmaCannonPosX[129];
+	int32_t _plasmaCannonPosY[129];
 	int32_t _plasmaCannonXPointsTable1[129];
 	int32_t _plasmaCannonYPointsTable1[129];
 	int32_t _plasmaCannonXPointsTable2[127];

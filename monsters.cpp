@@ -1042,8 +1042,8 @@ void Game::executeMstCode() {
 		assert(msac->codeData != kNone);
 		createTask(_res->_mstCodeData + msac->codeData * 4);
 	}
-	if (_andyCurrentLevelScreenNum != _currentScreen) {
-		_andyCurrentLevelScreenNum = _currentScreen;
+	if (_mstAndyCurrentScreenNum != _currentScreen) {
+		_mstAndyCurrentScreenNum = _currentScreen;
 	}
 	for (Task *t = _tasksList; t; t = t->nextPtr) {
 		_runTaskOpcodesCount = 0;
@@ -1928,8 +1928,8 @@ void Game::mstUpdateRefPos() {
 		_mstMovingState[0].unk28 = 0;
 		_mstMovingState[0].unk40 = 3;
 		_mstMovingState[0].unk18 = 4;
-		_mstMovingState[0].xPos = _gameXPosTable[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].xOffset;
-		_mstMovingState[0].yPos = _gameYPosTable[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].yOffset;
+		_mstMovingState[0].xPos = _plasmaCannonPosX[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].xOffset;
+		_mstMovingState[0].yPos = _plasmaCannonPosY[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].yOffset;
 		switch (_plasmaCannonDirection - 1) {
 		case 0:
 			_mstMovingState[0].unk24 = 6;
@@ -2681,7 +2681,7 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 	case 34:
 		return _levelCheckpoint;
 	case 35:
-		return _andyCurrentLevelScreenNum;
+		return _mstAndyCurrentScreenNum;
 	default:
 		warning("getTaskOtherVar unhandled index %d", index);
 		break;
