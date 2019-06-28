@@ -6,13 +6,6 @@
 
 static uint8_t byte_4528BD[15] = { 5, 0, 9, 0xD, 7, 0xFF, 8, 0xD, 5, 1, 8, 0xD, 7, 0xFF, 9 };
 
-static uint8_t byte_452898[52] = {
-	0x03, 0x07, 0x00, 0x01, 0x0A, 0x07, 0x00, 0x04, 0x09, 0x03, 0x00, 0x07, 0x08, 0x03, 0x00, 0x07,
-	0x0B, 0x17, 0x00, 0x06, 0x0B, 0x15, 0xFF, 0x05, 0x0B, 0x15, 0x01, 0x06, 0x0B, 0x17, 0xFF, 0x05,
-	0x0B, 0x17, 0x02, 0x06, 0x0D, 0x05, 0x00, 0x09, 0x0D, 0x07, 0xFF, 0x08, 0x0D, 0x05, 0x01, 0x08,
-	0x0D, 0x07, 0xFF, 0x09
-};
-
 static uint8_t byte_4528D0[40] = {
 	0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00,
 	0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
@@ -203,13 +196,33 @@ void Game::postScreenUpdate_lar2_screen11() {
 	postScreenUpdate_lar1_helper(o, byte_4528D0 + 0x14, 5);
 	o = findLvlObject(2, 1, 11);
 	postScreenUpdate_lar1_helper(o, byte_4528D0 + 0x18, 6);
-	uint8_t *p = byte_452898 + 0x18;
-	if ((byte_452898[0x11] & 1) == 0 && (byte_452898[0x11] & 0x40) != 0 && (byte_452898[0x19] & 1) == 0) {
-		byte_452898[0x19] = (byte_452898[0x19] & ~0x40) | 1;
-		p = byte_452898 + 0x1C;
-		byte_452898[0x1D] = (byte_452898[0x1D] & ~0x40) | 1;
+	uint8_t *p = _lar2_unkData3 + 0x18;
+	if ((_lar2_unkData3[0x11] & 1) == 0 && (_lar2_unkData3[0x11] & 0x40) != 0 && (_lar2_unkData3[0x19] & 1) == 0) {
+		_lar2_unkData3[0x19] = (_lar2_unkData3[0x19] & ~0x40) | 1;
+		p = _lar2_unkData3 + 0x1C;
+		_lar2_unkData3[0x1D] = (_lar2_unkData3[0x1D] & ~0x40) | 1;
 	}
-	// TODO 4084AD
+	if ((p[1] & 1) == 0 && (p[1] & 0x40) != 0) {
+		if ((_lar2_unkData3[0x21] & 1) != 0) {
+			goto next;
+		}
+		_lar2_unkData3[0x21] |= 1;
+		_lar2_unkData3[0x21] &= ~0x40;
+	}
+	if ((_lar2_unkData3[0x21] & 1) == 0 && (_lar2_unkData3[0x21] & 0x40) != 0 && (p[1] & 1) == 0) {
+		p[1] &= ~0x40;
+		p[1] |= 1;
+		_lar2_unkData3[0x1D] |= 1;
+		_lar2_unkData3[0x1D] &= ~0x40;
+		p = _lar2_unkData3 + 0x1C;
+	}
+next:
+	if ((p[1] & 1) == 0 && (p[1] & 0x40) != 0 && (_lar2_unkData3[0x11] & 1) == 0) {
+		_lar2_unkData3[0x11] |= 1;
+		_lar2_unkData3[0x11] &= ~0x40;
+		_lar2_unkData3[0x15] |= 1;
+		_lar2_unkData3[0x15] &= ~0x40;
+	}
 }
 
 void Game::postScreenUpdate_lar2_screen12() {
@@ -462,10 +475,10 @@ void Game::callLevel_tick_lar2() {
 void Game::setupLvlObjects_lar2_screen19() {
 	int num1 = _lar2_checkpointData[_levelCheckpoint * 3 + 1];
 	for (int i = num1; i < 13; ++i) {
-		byte_452898[i * 4 + 1] = (byte_452898[i * 4 + 1] & ~0x40) | 1;
+		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~0x40) | 1;
 	}
 	for (int i = num1; i != 0; --i) {
-		byte_452898[i * 4 + 1] = (byte_452898[i * 4 + 1] & ~1) | 0x40;
+		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~1) | 0x40;
 	}
 	int num2 = _lar2_checkpointData[_levelCheckpoint * 3];
 	for (int i = num2; i < 10; ++i) {
