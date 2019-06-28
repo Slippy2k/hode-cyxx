@@ -24,43 +24,43 @@ static uint32_t read32(const uint8_t *p) {
 
 enum {
 	/* 0x00 */
-	op_end,
-	op_invalid0x01,
-	op_addSound,
-	op_invalid0x03,
+	op00_end,
+	op01_invalid,
+	op02_addSound,
+	op03_invalid,
 	/* 0x04 */
-	op_removeSound,
-	op_seekSound,
-	op_jge,
-	op_invalid0x07,
+	op04_removeSound,
+	op05_seekSound,
+	op06_jge,
+	op07_invalid,
 	/* 0x08 */
-	op_seekSound2,
-	op_modulatePan,
-	op_modulateVolume,
-	op_setVolume,
+	op08_seekSound2,
+	op09_modulatePanning,
+	op0a_modulateVolume,
+	op0b_setVolume,
 	/* 0x0C */
-	op_removeSounds2,
-	op_initVolume,
-	op_initPan,
-	op_invalid0x0F,
+	op0c_removeSounds2,
+	op0d_initVolume,
+	op0e_initPanning,
+	op0f_invalid,
 	/* 0x10 */
-	op_resumeSound,
-	op_pauseSound,
-	op_setCounter,
-	op_setPan,
+	op10_resumeSound,
+	op11_pauseSound,
+	op12_setCounter,
+	op13_setPanning,
 	/* 0x14 */
-	op_unk0x14,
-	op_decrementVar0x50,
-	op_setVar0x50,
-	op_decrementVar0x54,
+	op14_setPause,
+	op15_decrementVar0x50,
+	op16_setVar0x50,
+	op17_decrementVar0x54,
 	/* 0x18 */
-	op_setVar0x54,
-	op_decrementVar0x58,
-	op_setVar0x58,
-	op_seekSound2_,
+	op18_setVar0x54,
+	op19_decrementVar0x58,
+	op1a_setVar0x58,
+	op1b_seekSound,
 	/* 0x1C */
-	op_jmp,
-	op_terminate,
+	op1c_jmp,
+	op1d_terminate,
 
 	op_count
 };
@@ -70,83 +70,83 @@ static int _histogram[op_count];
 static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	fprintf(_out, "%04X: ", addr);
 	switch (opcode) {
-	case op_end:
+	case op00_end:
 		fprintf(_out, "// end");
 		break;
-	case op_addSound:
-		fprintf(_out, "op_addSound num:%d", args[0]);
+	case op02_addSound:
+		fprintf(_out, "op02_addSound num:%d", args[0]);
 		break;
-	case op_removeSound:
-		fprintf(_out, "op_removeSound %d num:%d", args[0], args[1]);
+	case op04_removeSound:
+		fprintf(_out, "op04_removeSound %d num:%d", args[0], args[1]);
 		break;
-	case op_seekSound:
-		fprintf(_out, "op_seekSound %d pos:%d", args[0], args[1]);
+	case op05_seekSound:
+		fprintf(_out, "op05_seekSound %d pos:%d", args[0], args[1]);
 		break;
-	case op_jge:
-		fprintf(_out, "op_jge offset:%d", args[0]);
+	case op06_jge:
+		fprintf(_out, "op06_jge offset:%d", args[0]);
 		break;
-	case op_seekSound2:
-		fprintf(_out, "op_seekSound2 %d pos:%d %d", args[0], args[1], args[2]);
+	case op08_seekSound2:
+		fprintf(_out, "op08_seekSound2 %d pos:%d %d", args[0], args[1], args[2]);
 		break;
-	case op_modulatePan:
-		fprintf(_out, "op_modulatePan");
+	case op09_modulatePanning:
+		fprintf(_out, "op09_modulatePanning");
 		break;
-	case op_modulateVolume:
-		fprintf(_out, "op_modulateVolume");
+	case op0a_modulateVolume:
+		fprintf(_out, "op0a_modulateVolume");
 		break;
-	case op_setVolume:
-		fprintf(_out, "op_setVolume %d", args[0]);
+	case op0b_setVolume:
+		fprintf(_out, "op0b_setVolume %d", args[0]);
 		break;
-	case op_removeSounds2:
-		fprintf(_out, "op_removeSounds2 %d", args[0]);
+	case op0c_removeSounds2:
+		fprintf(_out, "op0c_removeSounds2 %d", args[0]);
 		break;
-	case op_initVolume:
-		fprintf(_out, "op_initVolume value:%d steps:%d", args[0], args[1]);
+	case op0d_initVolume:
+		fprintf(_out, "op0d_initVolume value:%d steps:%d", args[0], args[1]);
 		break;
-	case op_initPan:
-		fprintf(_out, "op_initPan value:%d steps:%d", args[0], args[1]);
+	case op0e_initPanning:
+		fprintf(_out, "op0e_initPanning value:%d steps:%d", args[0], args[1]);
 		break;
-	case op_resumeSound:
-		fprintf(_out, "op_resumeSound %d", args[0]);
+	case op10_resumeSound:
+		fprintf(_out, "op10_resumeSound %d", args[0]);
 		break;
-	case op_pauseSound:
-		fprintf(_out, "op_pauseSound %d", args[0]);
+	case op11_pauseSound:
+		fprintf(_out, "op11_pauseSound %d", args[0]);
 		break;
-	case op_setCounter:
-		fprintf(_out, "op_setCounter %d", args[0]);
+	case op12_setCounter:
+		fprintf(_out, "op12_setCounter %d", args[0]);
 		break;
-	case op_setPan:
-		fprintf(_out, "op_setPan %d", args[0]);
+	case op13_setPanning:
+		fprintf(_out, "op13_setPanning %d", args[0]);
 		break;
-	case op_unk0x14:
-		fprintf(_out, "op_unk0x14 %d", args[0]);
+	case op14_setPause:
+		fprintf(_out, "op14_setPause %d", args[0]);
 		break;
-	case op_decrementVar0x50:
-		fprintf(_out, "op_decrementVar0x50");
+	case op15_decrementVar0x50:
+		fprintf(_out, "op15_decrementVar0x50");
 		break;
-	case op_setVar0x50:
-		fprintf(_out, "op_setVar0x50 %d", args[0]);
+	case op16_setVar0x50:
+		fprintf(_out, "op16_setVar0x50 %d", args[0]);
 		break;
-	case op_decrementVar0x54:
-		fprintf(_out, "op_decrementVar0x54");
+	case op17_decrementVar0x54:
+		fprintf(_out, "op17_decrementVar0x54");
 		break;
-	case op_setVar0x54:
-		fprintf(_out, "op_setVar0x54 %d", args[0]);
+	case op18_setVar0x54:
+		fprintf(_out, "op18_setVar0x54 %d", args[0]);
 		break;
-	case op_decrementVar0x58:
-		fprintf(_out, "op_decrementVar0x58");
+	case op19_decrementVar0x58:
+		fprintf(_out, "op19_decrementVar0x58");
 		break;
-	case op_setVar0x58:
-		fprintf(_out, "op_setVar0x58 %d", args[0]);
+	case op1a_setVar0x58:
+		fprintf(_out, "op1a_setVar0x58 %d", args[0]);
 		break;
-	case op_seekSound2_:
-		fprintf(_out, "op_seekSound2 %d %d %d", args[0], args[1], args[2]);
+	case op1b_seekSound:
+		fprintf(_out, "op08_seekSound2 %d %d %d", args[0], args[1], args[2]);
 		break;
-	case op_jmp:
-		fprintf(_out, "op_jmp %d", args[0]);
+	case op1c_jmp:
+		fprintf(_out, "op1c_jmp %d", args[0]);
 		break;
-	case op_terminate:
-		fprintf(_out, "op_terminate");
+	case op1d_terminate:
+		fprintf(_out, "op1d_terminate");
 		break;
 	}
 	fprintf(_out, "\n");
@@ -163,110 +163,110 @@ static int parse(const uint8_t *buf, uint32_t size) {
 		++_histogram[op];
 		a = b = c = d = 0;
 		switch (op) {
-		case op_end:
+		case op00_end:
 			p += 4;
 			break;
-		case op_addSound:
+		case op02_addSound:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op_removeSound:
+		case op04_removeSound:
 			a = p[1]; p += 2;
 			b = read16(p); p += 2;
 			break;
-		case op_seekSound:
+		case op05_seekSound:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
 			break;
-		case op_jge:
+		case op06_jge:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op_seekSound2:
+		case op08_seekSound2:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
 			c = read32(p); p += 4;
 			break;
-		case op_modulatePan:
+		case op09_modulatePanning:
 			p += 4;
 			break;
-		case op_modulateVolume:
+		case op0a_modulateVolume:
 			p += 4;
 			break;
-		case op_setVolume:
+		case op0b_setVolume:
 			a = p[1];
 			p += 4;
 			break;
-		case op_removeSounds2:
+		case op0c_removeSounds2:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op_initVolume:
-			p += 2;
-			a = read16(p); p += 2;
-			b = read32(p); p += 4;
-			break;
-		case op_initPan:
+		case op0d_initVolume:
 			p += 2;
 			a = read16(p); p += 2;
 			b = read32(p); p += 4;
-			c = read32(p); p += 4;
 			break;
-		case op_resumeSound:
+		case op0e_initPanning:
 			p += 2;
 			a = read16(p); p += 2;
-			break;
-		case op_pauseSound:
-			p += 4;
-			a = read32(p); p += 4;
-			break;
-		case op_setCounter:
-			p += 4;
-			a = read32(p); p += 4;
-			break;
-		case op_setPan:
-			p += 2;
-			a = read16(p); p += 2;
-			break;
-		case op_unk0x14:
-			p += 2;
-			a = read16(p); p += 2;
-			break;
-		case op_decrementVar0x50:
-			p += 4;
-			break;
-		case op_setVar0x50:
-			p += 4;
-			a = read32(p); p += 4;
-			break;
-		case op_decrementVar0x54:
-			p += 4;
-			break;
-		case op_setVar0x54:
-			p += 4;
-			a = read32(p); p += 4;
-			break;
-		case op_decrementVar0x58:
-			p += 4;
-			break;
-		case op_setVar0x58:
-			p += 4;
-			a = read32(p); p += 4;
-			break;
-		case op_seekSound2_:
-			p += 4;
-			a = read32(p); p += 4;
 			b = read32(p); p += 4;
 			c = read32(p); p += 4;
 			break;
-		case op_jmp:
+		case op10_resumeSound:
+			p += 2;
+			a = read16(p); p += 2;
+			break;
+		case op11_pauseSound:
+			p += 4;
+			a = read32(p); p += 4;
+			break;
+		case op12_setCounter:
+			p += 4;
+			a = read32(p); p += 4;
+			break;
+		case op13_setPanning:
+			p += 2;
+			a = read16(p); p += 2;
+			break;
+		case op14_setPause:
+			p += 2;
+			a = read16(p); p += 2;
+			break;
+		case op15_decrementVar0x50:
+			p += 4;
+			break;
+		case op16_setVar0x50:
+			p += 4;
+			a = read32(p); p += 4;
+			break;
+		case op17_decrementVar0x54:
+			p += 4;
+			break;
+		case op18_setVar0x54:
+			p += 4;
+			a = read32(p); p += 4;
+			break;
+		case op19_decrementVar0x58:
+			p += 4;
+			break;
+		case op1a_setVar0x58:
+			p += 4;
+			a = read32(p); p += 4;
+			break;
+		case op1b_seekSound:
+			p += 4;
+			a = read32(p); p += 4;
+			b = read32(p); p += 4;
+			c = read32(p); p += 4;
+			break;
+		case op1c_jmp:
 			p += 4;
 			a = read32(p); p += 4;
 			// p -= a;
 			break;
-		case op_terminate:
+		case op1d_terminate:
 			p += 4;
 			break;
 		default:
@@ -355,10 +355,10 @@ int main(int argc, char *argv[]) {
 				for (int i = 0; i < op_count; ++i) {
 					if (_histogram[i] == 0) {
 						switch (i) {
-						case op_invalid0x01:
-						case op_invalid0x03:
-						case op_invalid0x07:
-						case op_invalid0x0F:
+						case op01_invalid:
+						case op03_invalid:
+						case op07_invalid:
+						case op0f_invalid:
 							break;
 						default:
 							fprintf(stdout, "Opcode %d not referenced\n", i);
