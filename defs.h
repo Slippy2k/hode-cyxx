@@ -198,20 +198,20 @@ struct SssObject {
 	const uint8_t *codeDataStage2; // 0x3C
 	const uint8_t *codeDataStage3; // 0x40
 	const uint8_t *codeDataStage4; // 0x44
-	int32_t counter; // 0x48 repeat_count
-	int32_t unk4C; // 0x4C loop_count
-	int32_t unk50; // 0x50 delay
-	int32_t unk54; // 0x54 volume_modulate_steps
-	int32_t unk58; // 0x58 panning_modulate_steps
-	int32_t unk5C; // 0x5C volume_modulate_current
-	int32_t unk60; // 0x60 volume_modulate_delta
-	int32_t unk64; // 0x64 panning_modulate_current
-	int32_t unk68; // 0x68 panning_modulate_delta
+	int32_t counter; // 0x48 repeatCounter
+	int32_t unk4C; // 0x4C pauseCounter
+	int32_t unk50; // 0x50 delayCounter
+	int32_t unk54; // 0x54 volumeModulateSteps
+	int32_t unk58; // 0x58 panningModulateSteps
+	int32_t unk5C; // 0x5C volumeModulateCurrent
+	int32_t unk60; // 0x60 volumeModulateDelta
+	int32_t unk64; // 0x64 panningModulateCurrent
+	int32_t unk68; // 0x68 panningModulateDelta
 	int32_t unk6C; // 0x6C seek_pos
 	int *volumePtr; // 0x70
 	LvlObject *lvlObject; // 0x74
-	int32_t unk78; // 0x78 nextSound indexes _sssUnk3
-	int32_t unk7C; // 0x7C repeatCount
+	int32_t unk78; // 0x78 nextSoundNum indexes _sssUnk3
+	int32_t unk7C; // 0x7C nextSoundCounter
 	SssFilter *filter;
 };
 

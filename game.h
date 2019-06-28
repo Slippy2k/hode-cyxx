@@ -695,10 +695,10 @@ struct Game {
 	void resetSound();
 	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);
-	void executeSssCodeOp4(uint32_t flags);
-	void executeSssCodeOp12(int num, uint8_t lut, uint8_t c);
-	void executeSssCodeOp16(SssObject *so);
-	void executeSssCodeOp17(SssObject *so);
+	void sssOp4_removeSounds(uint32_t flags);
+	void sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c);
+	void sssOp16_resumeSound(SssObject *so);
+	void sssOp17_pauseSound(SssObject *so);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code, bool tempSssObject = false);
 	SssObject *addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b);
 	void prependSoundObjectToList(SssObject *so);

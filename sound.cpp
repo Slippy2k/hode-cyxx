@@ -191,10 +191,10 @@ void Game::updateSoundObject(SssObject *so) {
 	}
 }
 
-void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // sssOp12_removeSounds2
+void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
 	assert(lut < 3);
 	assert(num < _res->_sssHdr.dataUnk3Count);
-	assert(c < 31);
+	assert(c < 32);
 	const uint32_t mask = (1 << c);
 	_res->_sssLookupTable1[lut][num] &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
@@ -222,7 +222,7 @@ void Game::executeSssCodeOp12(int num, uint8_t lut, uint8_t c) { // sssOp12_remo
 	}
 }
 
-void Game::executeSssCodeOp16(SssObject *so) { // sssOp16_resumeSound
+void Game::sssOp16_resumeSound(SssObject *so) {
 	if ((so->flags & 2) != 0) {
 		SssObject *next = so->nextPtr; // _eax
 		SssObject *prev = so->prevPtr; // _edx
@@ -242,7 +242,7 @@ void Game::executeSssCodeOp16(SssObject *so) { // sssOp16_resumeSound
 	}
 }
 
-void Game::executeSssCodeOp17(SssObject *so) { // sssOp17_pauseSound
+void Game::sssOp17_pauseSound(SssObject *so) {
 	if ((so->flags & 2) == 0) {
 		SssPcm *pcm = so->pcm;
 		SssObject *prev = so->prevPtr; // _edx
@@ -289,7 +289,7 @@ void Game::executeSssCodeOp17(SssObject *so) { // sssOp17_pauseSound
 	}
 }
 
-void Game::executeSssCodeOp4(uint32_t flags) { // sssOp4_removeSounds
+void Game::sssOp4_removeSounds(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	*_res->getSssLutPtr(1, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
@@ -337,10 +337,10 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			break;
 		case 4: { // remove_sound
 				const uint8_t _cl = code[1] & 0xF;
-				const uint16_t _dx = READ_LE_UINT16(code + 2);
+				const uint16_t num = READ_LE_UINT16(code + 2);
 				uint32_t flags = (so->flags0 & 0xFFF0F000);
-				flags |= (_cl << 16) | (_dx & 0xFFF);
-				executeSssCodeOp4(flags);
+				flags |= (_cl << 16) | (num & 0xFFF);
+				sssOp4_removeSounds(flags);
 				code += 4;
 			}
 			break;
@@ -430,7 +430,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				uint32_t _eax =  so->flags1 >> 24;
 				uint32_t _edx = (so->flags1 >> 20) & 0xF;
 				uint16_t _ecx = READ_LE_UINT16(code + 2);
-				executeSssCodeOp12(_ecx, _edx, _eax);
+				sssOp12_removeSounds2(_ecx, _edx, _eax);
 				code += 4;
 			}
 			break;
@@ -462,8 +462,9 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 12;
 			}
 			break;
-		case 16: { // move from list2 to list1, restart_sound
+		case 16: { // move from list2 to list1, resumeSound
 				if (tempSssObject) {
+					// 'tempSssObject' is allocated on the stack, it must not be added to the linked list
 					warning("Invalid call to .sss opcode 16 with temp SssObject");
 					return 0;
 				}
@@ -471,7 +472,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				if (so->unk4C >= 0) {
 					return code;
 				}
-				executeSssCodeOp16(so);
+				sssOp16_resumeSound(so);
 				code += 4;
 				if (so->pcm == 0) {
 					return code;
@@ -479,12 +480,13 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				_sssObjectsChanged = true;
 			}
 			break;
-		case 17: { // move to list2, stop_sound2
+		case 17: { // move to list2, pauseSound
 				if (tempSssObject) {
+					// 'tempSssObject' is allocated on the stack, it must not be added to the linked list
 					warning("Invalid call to .sss opcode 17 with temp SssObject");
 					return 0;
 				}
-				executeSssCodeOp17(so);
+				sssOp17_pauseSound(so);
 				so->unk4C = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
@@ -949,8 +951,8 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	return 0;
 }
 
-void Game::playSoundObject(SssUnk1 *s, int a, int b) {
-	debug(kDebug_SOUND, "setupSound num %d a 0x%x b 0x%x", s->sssUnk3, a, b);
+void Game::playSoundObject(SssUnk1 *s, int lut, int bits) {
+	debug(kDebug_SOUND, "playSoundObject num %d lut 0x%x bits 0x%x", s->sssUnk3, lut, bits);
 	if (_sssDisabled) {
 		return;
 	}
@@ -1010,7 +1012,8 @@ void Game::playSoundObject(SssUnk1 *s, int a, int b) {
 	}
 // 42BA9D
 
-	uint32_t _ebp = (a & 15) | (b << 4);
+	uint32_t _ebp = (lut & 15) | (bits << 4);
+	assert(_ebp < 32);
 
 	_ebp <<= 4;
 	_ebp |= s->unk2 & 15;
