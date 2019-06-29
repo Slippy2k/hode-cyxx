@@ -709,7 +709,7 @@ struct Game {
 	void clearSoundObjects();
 	void setLowPrioritySoundObject(SssObject *so);
 	int getSoundObjectPanning(SssObject *so) const;
-	void setSoundObjectVolume(SssObject *so);
+	void setSoundObjectPanning(SssObject *so);
 	void expireSoundObjects(uint32_t flags);
 	void mixSoundObjects17640(bool flag);
 	void mixSoundObjects();

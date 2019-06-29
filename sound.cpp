@@ -118,9 +118,9 @@ void Game::updateSoundObject(SssObject *so) {
 				return;
 			}
 			if (so->volumePtr) {
-				const int volume = getSoundObjectPanning(so);
-				if (volume != so->volume) {
-					so->volume = volume;
+				const int panning = getSoundObjectPanning(so);
+				if (panning != so->panning) {
+					so->panning = panning;
 					_sssObjectsChanged = true;
 				}
 			} else {
@@ -141,33 +141,33 @@ void Game::updateSoundObject(SssObject *so) {
 				return;
 			}
 			if (_sssObjectsChanged && (so->flags & 1) != 0) {
-				setSoundObjectVolume(so);
+				setSoundObjectPanning(so);
 			}
 		}
 	} else if ((so->flags & 1) == 0) {
 
 	} else if (so->volumePtr) {
-		const int volume = getSoundObjectPanning(so);
-		if (volume != so->volume) {
-			so->volume = volume;
+		const int panning = getSoundObjectPanning(so);
+		if (panning != so->panning) {
+			so->panning = panning;
 			_sssObjectsChanged = true;
-			setSoundObjectVolume(so);
+			setSoundObjectPanning(so);
 		}
 	} else if (_sssObjectsChanged) {
-		setSoundObjectVolume(so);
+		setSoundObjectPanning(so);
 	}
 	if (so->pcmFramesCount != 0) {
 		--so->pcmFramesCount;
 		if ((so->flags & 2) == 0) {
-			++so->unk6C;
+			++so->currentPcmFrame;
 		}
 	} else {
 		const int _edi = so->flags0;
 		removeSoundObjectFromList(so);
-		if (so->unk78 != -1) {
+		if (so->nextSoundNum != -1) {
 			LvlObject *tmp = _currentSoundLvlObject;
 			_currentSoundLvlObject = so->lvlObject;
-			createSoundObject(so->unk78, so->unk7C, _edi);
+			createSoundObject(so->nextSoundNum, so->nextSoundCounter, _edi);
 			_currentSoundLvlObject = tmp;
 			return;
 		}
@@ -203,8 +203,8 @@ void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->unk78 = -1;
-			so->unk50 = -2;
+			so->nextSoundNum = -1;
+			so->delayCounter = -2;
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
@@ -213,8 +213,8 @@ void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->unk78 = -1;
-			so->unk50 = -2;
+			so->nextSoundNum = -1;
+			so->delayCounter = -2;
 		}
 	}
 	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
@@ -298,8 +298,8 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->unk78 = -1;
-			so->unk50 = -2;
+			so->nextSoundNum = -1;
+			so->delayCounter = -2;
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
@@ -308,8 +308,8 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->unk78 = -1;
-			so->unk50 = -2;
+			so->nextSoundNum = -1;
+			so->delayCounter = -2;
 		}
 	}
 	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {
@@ -324,7 +324,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 		case 0:
 			return 0;
 		case 2: // add_sound
-			if (so->unk50 >= -1) {
+			if (so->delayCounter >= -1) {
 				LvlObject *tmp = _currentSoundLvlObject;
 				_currentSoundLvlObject = so->lvlObject;
 				createSoundObject(READ_LE_UINT16(code + 2), code[1], so->flags0);
@@ -346,8 +346,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			break;
 		case 5: { // seek_sound
 				const int32_t _eax = READ_LE_UINT32(code + 4);
-				if (so->unk6C < _eax) {
-					so->unk6C = _eax;
+				if (so->currentPcmFrame < _eax) {
+					so->currentPcmFrame = _eax;
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
 						if (ptr) {
@@ -359,8 +359,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 6: { // jump_ge
-				--so->counter;
-				if (so->counter < 0) {
+				--so->repeatCounter;
+				if (so->repeatCounter < 0) {
 					code += 8;
 				} else {
 					const int32_t offset = READ_LE_UINT32(code + 4);
@@ -370,14 +370,14 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			break;
 		case 8: { // seek_sound2
 				const int32_t _eax = READ_LE_UINT32(code + 12);
-				if (so->unk6C <= _eax) {
+				if (so->currentPcmFrame <= _eax) {
 					return code;
 				}
-				--so->unk4C;
-				if (so->unk4C < 0) {
+				--so->pauseCounter;
+				if (so->pauseCounter < 0) {
 					code += 16;
 				} else {
-					so->unk6C = READ_LE_UINT32(code + 8);
+					so->currentPcmFrame = READ_LE_UINT32(code + 8);
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
 						if (ptr) {
@@ -389,29 +389,29 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 9: { // modulate_pan
-				so->unk64 += so->unk68;
-				const int volume = (so->unk64 + 0x8000) >> 16;
-				if (volume != so->volume) {
-					so->volume = volume;
+				so->panningModulateCurrent += so->panningModulateDelta;
+				const int panning = (so->panningModulateCurrent + 0x8000) >> 16;
+				if (panning != so->panning) {
+					so->panning = panning;
 					_sssObjectsChanged = true;
 				}
-				--so->unk58;
-				if (so->unk58 >= 0) {
+				--so->panningModulateSteps;
+				if (so->panningModulateSteps >= 0) {
 					return code;
 				}
 				code += 4;
 			}
 			break;
 		case 10: { // modulate_volume
-				if (so->unk54 >= 0) {
-					so->unk5C += so->unk60;
-					int value = (so->unk5C + 0x8000) >> 16;
-					if (value != so->unk18) {
-						so->unk18 = value;
+				if (so->volumeModulateSteps >= 0) {
+					so->volumeModulateCurrent += so->volumeModulateDelta;
+					int value = (so->volumeModulateCurrent + 0x8000) >> 16;
+					if (value != so->volume) {
+						so->volume = value;
 						_sssObjectsChanged = true;
 					}
-					--so->unk54;
-					if (so->unk54 >= 0) {
+					--so->volumeModulateSteps;
+					if (so->volumeModulateSteps >= 0) {
 						return code;
 					}
 				}
@@ -419,8 +419,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 11: { // set_volume
-				if (so->unk18 != code[1]) {
-					so->unk18 = code[1];
+				if (so->volume != code[1]) {
+					so->volume = code[1];
 					_sssObjectsChanged = true;
 				}
 				code += 4;
@@ -435,30 +435,30 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 13: { // init_volume
-				so->unk54 = READ_LE_UINT32(code + 4) - 1;
+				so->volumeModulateSteps = READ_LE_UINT32(code + 4) - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
-					so->unk5C = so->unk18 << 16;
+					so->volumeModulateCurrent = so->volume << 16;
 				} else {
-					so->unk5C = value << 16;
+					so->volumeModulateCurrent = value << 16;
 				}
-				so->unk18 = value;
+				so->volume = value;
 				_sssObjectsChanged = true;
-				so->unk60 = ((code[1] << 16) - so->unk5C) / READ_LE_UINT32(code + 4);
+				so->volumeModulateDelta = ((code[1] << 16) - so->volumeModulateCurrent) / READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
 		case 14: { // init_pan
-				so->unk58 = READ_LE_UINT32(code + 8) - 1;
+				so->panningModulateSteps = READ_LE_UINT32(code + 8) - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
-					so->unk64 = so->volume << 16;
+					so->panningModulateCurrent = so->panning << 16;
 				} else {
-					so->unk64 = value << 16;
-					so->volume = value;
+					so->panningModulateCurrent = value << 16;
+					so->panning = value;
 					_sssObjectsChanged = true;
 				}
-				so->unk68 = ((code[1] << 16) - so->unk64) / READ_LE_UINT32(code + 8);
+				so->panningModulateDelta = ((code[1] << 16) - so->panningModulateCurrent) / READ_LE_UINT32(code + 8);
 				return code + 12;
 			}
 			break;
@@ -468,8 +468,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 					warning("Invalid call to .sss opcode 16 with temp SssObject");
 					return 0;
 				}
-				--so->unk4C;
-				if (so->unk4C >= 0) {
+				--so->pauseCounter;
+				if (so->pauseCounter >= 0) {
 					return code;
 				}
 				sssOp16_resumeSound(so);
@@ -487,75 +487,75 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 					return 0;
 				}
 				sssOp17_pauseSound(so);
-				so->unk4C = READ_LE_UINT32(code + 4);
+				so->pauseCounter = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 18: {
-				if (so->counter < 0) {
-					so->counter = READ_LE_UINT32(code + 4);
+		case 18: { // decrementRepeatCounter
+				if (so->repeatCounter < 0) {
+					so->repeatCounter = READ_LE_UINT32(code + 4);
 				}
 				code += 8;
 			}
 			break;
-		case 19: { // set_panning
-				if (so->volume != code[1]) {
-					so->volume = code[1];
+		case 19: { // setPanning
+				if (so->panning != code[1]) {
+					so->panning = code[1];
 					_sssObjectsChanged = true;
 				}
 				code += 4;
 			}
 			break;
-		case 20: {
-				so->unk4C = READ_LE_UINT16(code + 2);
+		case 20: { // setPauseCounter
+				so->pauseCounter = READ_LE_UINT16(code + 2);
 				code += 4;
 			}
 			break;
-		case 21: { // dec_unk50
-				--so->unk50;
-				if (so->unk50 >= 0) {
+		case 21: { // decrementDelayCounter
+				--so->delayCounter;
+				if (so->delayCounter >= 0) {
 					return code;
 				}
 				code += 4;
 			}
 			break;
-		case 22: { // load_unk50
-				so->unk50 = READ_LE_UINT32(code + 4);
+		case 22: { // setDelayCounter
+				so->delayCounter = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 23: { // dec_unk54
-				--so->unk54;
-				if (so->unk54 >= 0) {
+		case 23: { // decrementVolumeModulateSteps
+				--so->volumeModulateSteps;
+				if (so->volumeModulateSteps >= 0) {
 					return code;
 				}
 				code += 4;
 			}
 			break;
-		case 24: { // load_unk54
-				so->unk54 = READ_LE_UINT32(code + 4);
+		case 24: { // setVolumeModulateSteps
+				so->volumeModulateSteps = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 25: { // dec_unk58
-				--so->unk58;
-				if (so->unk58 >= 0) {
+		case 25: { // decrementPanningModulateSteps
+				--so->panningModulateSteps;
+				if (so->panningModulateSteps >= 0) {
 					return code;
 				}
 				code += 4;
 			}
 			break;
-		case 26: { // load_unk58
-				so->unk58 = READ_LE_UINT32(code + 4);
+		case 26: { // setPanningModulateSteps
+				so->panningModulateSteps = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
 		case 27: { // seek_sound2
 				int _eax = READ_LE_UINT32(code + 12);
-				if (so->unk6C <= _eax) {
+				if (so->currentPcmFrame <= _eax) {
 					return code;
 				}
-				so->unk6C = _eax;
+				so->currentPcmFrame = _eax;
 				if (so->pcm) {
 					const int16_t *ptr = so->pcm->ptr;
 					if (ptr) {
@@ -613,15 +613,15 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	so->flags1 = flags_a;
 	so->priority = priority;
 	so->pcm = pcm;
-	so->unk18 = 128;
-	so->volume = 64;
+	so->volume = 128;
+	so->panning = 64;
 	if (pcm->flags & 1) {
 		so->stereo = true;
 	} else {
 		so->stereo = false;
 	}
-	so->unk78 = -1;
-	so->unk6C = 0;
+	so->nextSoundNum = -1;
+	so->currentPcmFrame = 0;
 	so->flags = 0;
 	so->pcmFramesCount = pcm->strideCount;
 	so->currentPcmPtr = pcm->ptr;
@@ -825,14 +825,14 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 		ret = startSoundObject(num, b, flags);
 // 42B909
 		if (ret && (_res->_sssDataUnk3[num].flags & 4) != 0) {
-			ret->unk78 = num;
-			ret->unk7C = -1;
+			ret->nextSoundNum = num;
+			ret->nextSoundCounter = -1;
 		}
 	} else {
 		SssObject *so = startSoundObject(num, b, flags);
 		if (so && (_res->_sssDataUnk3[num].flags & 4) != 0) {
-			so->unk7C = b;
-			so->unk78 = num;
+			so->nextSoundCounter = b;
+			so->nextSoundNum = num;
 		}
 		ret = so;
 	}
@@ -877,35 +877,35 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 			so->codeDataStage3 = (codeOffset->codeOffset3 == kNone) ? 0 : _res->_sssCodeData + codeOffset->codeOffset3;
 			so->codeDataStage4 = (codeOffset->codeOffset4 == kNone) ? 0 : _res->_sssCodeData + codeOffset->codeOffset4;
 			so->lvlObject = _currentSoundLvlObject;
-			so->counter = -1;
-			so->unk4C = -1;
-			so->unk50 = -1;
-			so->unk54 = -100;
-			so->unk58 = -1;
-			so->unk60 = 0;
-			so->unk68 = 0;
+			so->repeatCounter = -1;
+			so->pauseCounter = -1;
+			so->delayCounter = -1;
+			so->volumeModulateSteps = -100;
+			so->panningModulateSteps = -1;
+			so->volumeModulateDelta = 0;
+			so->panningModulateDelta = 0;
 			so->flags = flags;
 			so->pcmFramesCount = codeOffset->unk2;
 			so->unk6 = num;
 			so->unk8 = codeOffset->unk6;
 			so->filter = filter;
-			so->unk18 = codeOffset->unk4;
-			so->volume = codeOffset->unk7;
+			so->volume = codeOffset->unk4;
+			so->panning = codeOffset->unk7;
 			if (codeOffset->unk7 == 0xFF) {
 				if (_currentSoundLvlObject) {
 					_currentSoundLvlObject->sssObj = so;
 					so->volumePtr = &_snd_volumeMax;
-					so->volume = getSoundObjectPanning(so);
+					so->panning = getSoundObjectPanning(so);
 				} else {
 					so->volumePtr = 0;
-					so->volume = 64;
+					so->panning = 64;
 				}
 			} else {
 // 42B7A5
 				so->volumePtr = 0;
 			}
 // 42B7C3
-			setSoundObjectVolume(so);
+			setSoundObjectPanning(so);
 			if (so->pcm) {
 				updateSoundObject(so);
 				return so;
@@ -919,8 +919,8 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	tmpObj.flags0 = flags;
 	tmpObj.flags1 = flags;
 	tmpObj.unk6 = num;
-	tmpObj.counter = -1;
-	tmpObj.unk4C = -1;
+	tmpObj.repeatCounter = -1;
+	tmpObj.pauseCounter = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.volumePtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", codeOffset->pcm);
@@ -1137,21 +1137,21 @@ int Game::getSoundObjectPanning(SssObject *so) const {
 			return -2;
 		}
 	}
-	return so->volume;
+	return so->panning;
 }
 
-void Game::setSoundObjectVolume(SssObject *so) {
-	if ((so->flags & 2) == 0 && so->unk18 != 0 && _snd_masterVolume != 0) {
-		int volume = ((so->filter->unk4 >> 16) * so->unk18) >> 7; // indexes decibel volume table
+void Game::setSoundObjectPanning(SssObject *so) {
+	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
+		int volume = ((so->filter->unk4 >> 16) * so->volume) >> 7; // indexes decibel volume table
 		int _esi = 0;
 		if (so->volumePtr) {
 			int _eax = CLIP(so->unk8 + so->filter->unk24, 0, 7); // priority
-			if (so->volume == -2) {
+			if (so->panning == -2) {
 				volume = 0;
 				_esi = 64;
 				_eax = 0;
 			} else {
-				_esi = CLIP(so->volume, 0, 128);
+				_esi = CLIP(so->panning, 0, 128);
 				volume >>= 2; // _edi
 				_eax /= 2;
 			}
@@ -1169,7 +1169,7 @@ void Game::setSoundObjectVolume(SssObject *so) {
 
 		} else {
 // 429076
-			_esi = CLIP(so->volume + (so->filter->unk14 >> 16), 0, 128); // panning ?
+			_esi = CLIP(so->panning + (so->filter->unk14 >> 16), 0, 128); // panning ?
 		}
 // 429094
 		if (so->pcm == 0) {
@@ -1224,8 +1224,8 @@ void Game::expireSoundObjects(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->unk78 = -1;
-			so->unk50 = -2;
+			so->nextSoundNum = -1;
+			so->delayCounter = -2;
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
@@ -1234,8 +1234,8 @@ void Game::expireSoundObjects(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->unk78 = -1;
-			so->unk50 = -2;
+			so->nextSoundNum = -1;
+			so->delayCounter = -2;
 		}
 	}
 	while (_sssObjectsCount > 0 && _sssObjectsTable[_sssObjectsCount - 1].pcm == 0) {

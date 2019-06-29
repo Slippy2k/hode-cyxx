@@ -185,8 +185,8 @@ struct SssObject {
 	bool stereo; // 0xB
 	uint32_t flags0; // 0xC
 	uint32_t flags1; // 0x10
-	int32_t volume; // 0x14 panning default:64
-	int32_t unk18; // 0x18 volume (db) default:128
+	int32_t panning; // 0x14 panning default:64
+	int32_t volume; // 0x18 volume (db) default:128
 	int panL; // 0x1C leftGain
 	int panR; // 0x20 rightGain
 	int panType; // 0x24 : 0: silent, 1:fullRight 2:fullLeft 3:both
@@ -198,20 +198,20 @@ struct SssObject {
 	const uint8_t *codeDataStage2; // 0x3C
 	const uint8_t *codeDataStage3; // 0x40
 	const uint8_t *codeDataStage4; // 0x44
-	int32_t counter; // 0x48 repeatCounter
-	int32_t unk4C; // 0x4C pauseCounter
-	int32_t unk50; // 0x50 delayCounter
-	int32_t unk54; // 0x54 volumeModulateSteps
-	int32_t unk58; // 0x58 panningModulateSteps
-	int32_t unk5C; // 0x5C volumeModulateCurrent
-	int32_t unk60; // 0x60 volumeModulateDelta
-	int32_t unk64; // 0x64 panningModulateCurrent
-	int32_t unk68; // 0x68 panningModulateDelta
-	int32_t unk6C; // 0x6C seek_pos
+	int32_t repeatCounter; // 0x48
+	int32_t pauseCounter; // 0x4C
+	int32_t delayCounter; // 0x50
+	int32_t volumeModulateSteps; // 0x54
+	int32_t panningModulateSteps; // 0x58
+	int32_t volumeModulateCurrent; // 0x5C
+	int32_t volumeModulateDelta; // 0x60
+	int32_t panningModulateCurrent; // 0x64
+	int32_t panningModulateDelta; // 0x68
+	int32_t currentPcmFrame; // 0x6C
 	int *volumePtr; // 0x70
 	LvlObject *lvlObject; // 0x74
-	int32_t unk78; // 0x78 nextSoundNum indexes _sssUnk3
-	int32_t unk7C; // 0x7C nextSoundCounter
+	int32_t nextSoundNum; // 0x78 indexes _sssUnk3
+	int32_t nextSoundCounter; // 0x7C
 	SssFilter *filter;
 };
 
