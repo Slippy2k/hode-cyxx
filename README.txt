@@ -1,5 +1,5 @@
 
-HODe README
+hode README
 Release version: 0.1.7
 -------------------------------------------------------------------------------
 
@@ -7,7 +7,7 @@ Release version: 0.1.7
 About:
 ------
 
-HODe is a reimplementation of the engine used by the game 'Heart of Darkness'
+hode is a reimplementation of the engine used by the game 'Heart of Darkness'
 developed by Amazing Studio.
 
 
