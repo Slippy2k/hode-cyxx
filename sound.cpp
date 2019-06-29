@@ -344,10 +344,10 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 5: { // seek_sound
-				const int32_t _eax = READ_LE_UINT32(code + 4);
-				if (so->currentPcmFrame < _eax) {
-					so->currentPcmFrame = _eax;
+		case 5: { // seek_forward
+				const int32_t frame = READ_LE_UINT32(code + 4);
+				if (so->currentPcmFrame < frame) {
+					so->currentPcmFrame = frame;
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
 						if (ptr) {
@@ -358,7 +358,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 12;
 			}
 			break;
-		case 6: { // jump_ge
+		case 6: { // repeat_jge
 				--so->repeatCounter;
 				if (so->repeatCounter < 0) {
 					code += 8;
@@ -368,15 +368,14 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				}
 			}
 			break;
-		case 8: { // seek_sound2
-				const int32_t _eax = READ_LE_UINT32(code + 12);
-				if (so->currentPcmFrame <= _eax) {
-					return code;
-				}
-				--so->pauseCounter;
-				if (so->pauseCounter < 0) {
-					code += 16;
-				} else {
+		case 8: { // seek_backward2
+				const int32_t frame = READ_LE_UINT32(code + 12);
+				if (so->currentPcmFrame > frame) {
+					--so->pauseCounter;
+					if (so->pauseCounter < 0) {
+						code += 16;
+						break;
+					}
 					so->currentPcmFrame = READ_LE_UINT32(code + 8);
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
@@ -388,7 +387,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				}
 			}
 			break;
-		case 9: { // modulate_pan
+		case 9: { // modulate_panning
 				so->panningModulateCurrent += so->panningModulateDelta;
 				const int panning = (so->panningModulateCurrent + 0x8000) >> 16;
 				if (panning != so->panning) {
@@ -426,7 +425,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 12: { // stop_sound
+		case 12: { // remove_sounds2
 				uint32_t _eax =  so->flags1 >> 24;
 				uint32_t _edx = (so->flags1 >> 20) & 0xF;
 				uint16_t _ecx = READ_LE_UINT16(code + 2);
@@ -448,7 +447,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 8;
 			}
 			break;
-		case 14: { // init_pan
+		case 14: { // init_panning
 				so->panningModulateSteps = READ_LE_UINT32(code + 8) - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
@@ -462,7 +461,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 12;
 			}
 			break;
-		case 16: { // move from list2 to list1, resumeSound
+		case 16: { // resume_sound
 				if (tempSssObject) {
 					// 'tempSssObject' is allocated on the stack, it must not be added to the linked list
 					warning("Invalid call to .sss opcode 16 with temp SssObject");
@@ -480,7 +479,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				_sssObjectsChanged = true;
 			}
 			break;
-		case 17: { // move to list2, pauseSound
+		case 17: { // pause_sound
 				if (tempSssObject) {
 					// 'tempSssObject' is allocated on the stack, it must not be added to the linked list
 					warning("Invalid call to .sss opcode 17 with temp SssObject");
@@ -491,14 +490,14 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 8;
 			}
 			break;
-		case 18: { // decrementRepeatCounter
+		case 18: { // decrement_repeat_counter
 				if (so->repeatCounter < 0) {
 					so->repeatCounter = READ_LE_UINT32(code + 4);
 				}
 				code += 8;
 			}
 			break;
-		case 19: { // setPanning
+		case 19: { // set_panning
 				if (so->panning != code[1]) {
 					so->panning = code[1];
 					_sssObjectsChanged = true;
@@ -506,12 +505,12 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 20: { // setPauseCounter
+		case 20: { // set_pause_counter
 				so->pauseCounter = READ_LE_UINT16(code + 2);
 				code += 4;
 			}
 			break;
-		case 21: { // decrementDelayCounter
+		case 21: { // decrement_delay_counter
 				--so->delayCounter;
 				if (so->delayCounter >= 0) {
 					return code;
@@ -519,12 +518,12 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 22: { // setDelayCounter
+		case 22: { // set_delay_counter
 				so->delayCounter = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 23: { // decrementVolumeModulateSteps
+		case 23: { // decrement_volume_modulate_steps
 				--so->volumeModulateSteps;
 				if (so->volumeModulateSteps >= 0) {
 					return code;
@@ -532,12 +531,12 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 24: { // setVolumeModulateSteps
+		case 24: { // set_volume_modulate_steps
 				so->volumeModulateSteps = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 25: { // decrementPanningModulateSteps
+		case 25: { // decrement_panning_modulate_steps
 				--so->panningModulateSteps;
 				if (so->panningModulateSteps >= 0) {
 					return code;
@@ -545,21 +544,20 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 26: { // setPanningModulateSteps
+		case 26: { // set_panning_modulate_steps
 				so->panningModulateSteps = READ_LE_UINT32(code + 4);
 				return code + 8;
 			}
 			break;
-		case 27: { // seek_sound2
-				int _eax = READ_LE_UINT32(code + 12);
-				if (so->currentPcmFrame <= _eax) {
-					return code;
-				}
-				so->currentPcmFrame = _eax;
-				if (so->pcm) {
-					const int16_t *ptr = so->pcm->ptr;
-					if (ptr) {
-						so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4);
+		case 27: { // seekBackward
+				int frame = READ_LE_UINT32(code + 12);
+				if (so->currentPcmFrame > frame) {
+					so->currentPcmFrame = READ_LE_UINT32(code + 8);
+					if (so->pcm) {
+						const int16_t *ptr = so->pcm->ptr;
+						if (ptr) {
+							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4);
+						}
 					}
 				}
 				return code;

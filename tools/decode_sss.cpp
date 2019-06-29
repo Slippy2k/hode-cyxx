@@ -30,11 +30,11 @@ enum {
 	op03_invalid,
 	/* 0x04 */
 	op04_removeSound,
-	op05_seekSound,
-	op06_jge,
+	op05_seekForward,
+	op06_repeatJge,
 	op07_invalid,
 	/* 0x08 */
-	op08_seekSound2,
+	op08_seekBackward2,
 	op09_modulatePanning,
 	op0a_modulateVolume,
 	op0b_setVolume,
@@ -46,18 +46,18 @@ enum {
 	/* 0x10 */
 	op10_resumeSound,
 	op11_pauseSound,
-	op12_setCounter,
+	op12_decrementRepeatCounter,
 	op13_setPanning,
 	/* 0x14 */
-	op14_setPause,
-	op15_decrementVar0x50,
-	op16_setVar0x50,
-	op17_decrementVar0x54,
+	op14_setPauseCounter,
+	op15_decrementDelayCounter,
+	op16_set_delay_counter,
+	op17_decrementVolumeModulateSteps,
 	/* 0x18 */
-	op18_setVar0x54,
-	op19_decrementVar0x58,
-	op1a_setVar0x58,
-	op1b_seekSound,
+	op18_setVolumeModulateSteps,
+	op19_decrementPanningModulateSteps,
+	op1a_setPanningModulateSteps,
+	op1b_seekBackward,
 	/* 0x1C */
 	op1c_jmp,
 	op1d_terminate,
@@ -74,76 +74,76 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 		fprintf(_out, "// end");
 		break;
 	case op02_addSound:
-		fprintf(_out, "op02_addSound num:%d", args[0]);
+		fprintf(_out, "op02_add_sound %d num:%d", args[0], args[1]);
 		break;
 	case op04_removeSound:
-		fprintf(_out, "op04_removeSound %d num:%d", args[0], args[1]);
+		fprintf(_out, "op04_remove_sound %d num:%d", args[0], args[1]);
 		break;
-	case op05_seekSound:
-		fprintf(_out, "op05_seekSound %d pos:%d", args[0], args[1]);
+	case op05_seekForward:
+		fprintf(_out, "op05_seek_forward frame:%d pos:%d", args[0], args[1]);
 		break;
-	case op06_jge:
-		fprintf(_out, "op06_jge offset:%d", args[0]);
+	case op06_repeatJge:
+		fprintf(_out, "op06_repeat_jge offset:-%d", args[0]);
 		break;
-	case op08_seekSound2:
-		fprintf(_out, "op08_seekSound2 %d pos:%d %d", args[0], args[1], args[2]);
+	case op08_seekBackward2:
+		fprintf(_out, "op08_seek_backward2 pos:%d frame:%d frame:%d", args[0], args[1], args[2]);
 		break;
 	case op09_modulatePanning:
-		fprintf(_out, "op09_modulatePanning");
+		fprintf(_out, "op09_modulate_panning");
 		break;
 	case op0a_modulateVolume:
-		fprintf(_out, "op0a_modulateVolume");
+		fprintf(_out, "op0a_modulate_volume");
 		break;
 	case op0b_setVolume:
-		fprintf(_out, "op0b_setVolume %d", args[0]);
+		fprintf(_out, "op0b_set_volume %d", args[0]);
 		break;
 	case op0c_removeSounds2:
-		fprintf(_out, "op0c_removeSounds2 %d", args[0]);
+		fprintf(_out, "op0c_remove_sounds2 %d", args[0]);
 		break;
 	case op0d_initVolume:
-		fprintf(_out, "op0d_initVolume value:%d steps:%d", args[0], args[1]);
+		fprintf(_out, "op0d_init_volume value:%d steps:%d", args[0], args[1]);
 		break;
 	case op0e_initPanning:
-		fprintf(_out, "op0e_initPanning value:%d steps:%d", args[0], args[1]);
+		fprintf(_out, "op0e_init_panning value:%d steps:%d", args[0], args[1]);
 		break;
 	case op10_resumeSound:
-		fprintf(_out, "op10_resumeSound %d", args[0]);
+		fprintf(_out, "op10_resume_sound %d", args[0]);
 		break;
 	case op11_pauseSound:
-		fprintf(_out, "op11_pauseSound %d", args[0]);
+		fprintf(_out, "op11_pause_sound %d", args[0]);
 		break;
-	case op12_setCounter:
-		fprintf(_out, "op12_setCounter %d", args[0]);
+	case op12_decrementRepeatCounter:
+		fprintf(_out, "op12_decrement_repeat_counter %d", args[0]);
 		break;
 	case op13_setPanning:
-		fprintf(_out, "op13_setPanning %d", args[0]);
+		fprintf(_out, "op13_set_panning %d", args[0]);
 		break;
-	case op14_setPause:
-		fprintf(_out, "op14_setPause %d", args[0]);
+	case op14_setPauseCounter:
+		fprintf(_out, "op14_set_pause_counter %d", args[0]);
 		break;
-	case op15_decrementVar0x50:
-		fprintf(_out, "op15_decrementVar0x50");
+	case op15_decrementDelayCounter:
+		fprintf(_out, "op15_decrement_delay_counter");
 		break;
-	case op16_setVar0x50:
-		fprintf(_out, "op16_setVar0x50 %d", args[0]);
+	case op16_set_delay_counter:
+		fprintf(_out, "op16_set_delay_counter %d", args[0]);
 		break;
-	case op17_decrementVar0x54:
-		fprintf(_out, "op17_decrementVar0x54");
+	case op17_decrementVolumeModulateSteps:
+		fprintf(_out, "op17_decrement_volume_modulate_steps");
 		break;
-	case op18_setVar0x54:
-		fprintf(_out, "op18_setVar0x54 %d", args[0]);
+	case op18_setVolumeModulateSteps:
+		fprintf(_out, "op18_set_volume_modulate_steps %d", args[0]);
 		break;
-	case op19_decrementVar0x58:
-		fprintf(_out, "op19_decrementVar0x58");
+	case op19_decrementPanningModulateSteps:
+		fprintf(_out, "op19_decrement_panning_modulates_steps");
 		break;
-	case op1a_setVar0x58:
-		fprintf(_out, "op1a_setVar0x58 %d", args[0]);
+	case op1a_setPanningModulateSteps:
+		fprintf(_out, "op1a_set_panning_modulate_steps %d", args[0]);
 		break;
-	case op1b_seekSound:
-		fprintf(_out, "op08_seekSound2 %d %d %d", args[0], args[1], args[2]);
+	case op1b_seekBackward:
+		fprintf(_out, "op08_seek_backward pos:%d frame:%d frame:%d", args[0], args[1], args[2]);
 		break;
 	case op1c_jmp:
-		fprintf(_out, "op1c_jmp %d", args[0]);
+		fprintf(_out, "op1c_jmp offset:-%d", args[0]);
 		break;
 	case op1d_terminate:
 		fprintf(_out, "op1d_terminate");
@@ -167,23 +167,23 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			p += 4;
 			break;
 		case op02_addSound:
-			p += 2;
-			a = read16(p); p += 2;
+			a = p[1]; p += 2;
+			b = read16(p); p += 2;
 			break;
 		case op04_removeSound:
 			a = p[1]; p += 2;
 			b = read16(p); p += 2;
 			break;
-		case op05_seekSound:
+		case op05_seekForward:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
 			break;
-		case op06_jge:
+		case op06_repeatJge:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op08_seekSound2:
+		case op08_seekBackward2:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
@@ -215,47 +215,45 @@ static int parse(const uint8_t *buf, uint32_t size) {
 			c = read32(p); p += 4;
 			break;
 		case op10_resumeSound:
-			p += 2;
-			a = read16(p); p += 2;
+			p += 4;
 			break;
 		case op11_pauseSound:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op12_setCounter:
+		case op12_decrementRepeatCounter:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
 		case op13_setPanning:
+			a = p[1]; p += 4;
+			break;
+		case op14_setPauseCounter:
 			p += 2;
 			a = read16(p); p += 2;
 			break;
-		case op14_setPause:
-			p += 2;
-			a = read16(p); p += 2;
-			break;
-		case op15_decrementVar0x50:
+		case op15_decrementDelayCounter:
 			p += 4;
 			break;
-		case op16_setVar0x50:
+		case op16_set_delay_counter:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op17_decrementVar0x54:
+		case op17_decrementVolumeModulateSteps:
 			p += 4;
 			break;
-		case op18_setVar0x54:
-			p += 4;
-			a = read32(p); p += 4;
-			break;
-		case op19_decrementVar0x58:
-			p += 4;
-			break;
-		case op1a_setVar0x58:
+		case op18_setVolumeModulateSteps:
 			p += 4;
 			a = read32(p); p += 4;
 			break;
-		case op1b_seekSound:
+		case op19_decrementPanningModulateSteps:
+			p += 4;
+			break;
+		case op1a_setPanningModulateSteps:
+			p += 4;
+			a = read32(p); p += 4;
+			break;
+		case op1b_seekBackward:
 			p += 4;
 			a = read32(p); p += 4;
 			b = read32(p); p += 4;
@@ -264,7 +262,6 @@ static int parse(const uint8_t *buf, uint32_t size) {
 		case op1c_jmp:
 			p += 4;
 			a = read32(p); p += 4;
-			// p -= a;
 			break;
 		case op1d_terminate:
 			p += 4;
