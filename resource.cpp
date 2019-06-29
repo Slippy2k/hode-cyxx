@@ -558,7 +558,7 @@ void Resource::loadSssData(File *fp) {
 		_sssHdr.dataUnk1Count = 0;
 	}
 	_sssHdr.version = fp->readUint32();
-	if (_sssHdr.version != 6 && _sssHdr.version != 10) {
+	if (_sssHdr.version != 6 && _sssHdr.version != 10 && _sssHdr.version != 12) {
 		warning("Unhandled .sss version %d", _sssHdr.version);
 		closeDat(_fs, _sssFile);
 		return;
@@ -669,7 +669,7 @@ void Resource::loadSssData(File *fp) {
 			_sssPreloadData1[i].ptr = (uint8_t *)malloc(count);
 			debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
 			fp->read(_sssPreloadData1[i].ptr, count);
-			bytesRead += count + 1;
+			bytesRead += count + ((_sssHdr.version == 12) ? 2 : 1);
 		}
 		_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.preloadData2Count * sizeof(SssPreloadData));
 		for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
@@ -710,7 +710,7 @@ void Resource::loadSssData(File *fp) {
 		int32_t count = fp->readUint32();
 		int32_t offset = fp->readUint32();
 		_sssDataUnk4[i].count = count;
-		debug(kDebug_RESOURCE, "DataUnk6 #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, count, offset);
+		debug(kDebug_RESOURCE, "_sssDataUnk4 #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, count, offset);
 		bytesRead += 8;
 	}
 	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
@@ -721,31 +721,7 @@ void Resource::loadSssData(File *fp) {
 			fp->seek(size, SEEK_CUR);
 			bytesRead += size;
 // 429A25
-			// _sssDataUnk4[i * 8 + 4] = data;
-/*
-			_esi = _sssDataUnk4;
-			_ebp = 0;
-			_ecx = *(uint32_t *)data; // count
-			data += _ecx * 32;
-			if (_ecx > 0) {
-				_edx = 0;
-				_ecx = _esi + i * 8 + 4; // offset
-				do {
-					*(uint32_t *)(_edx + _ecx + 24) = _eax; //
-					++_ebp;
-					_edx += 32; // next entry
-
-					_ecx = *(uint32_t *)(_esi + _edi * 8 + 4); // offset
-					_ebx = *(uint32_t *)(_edx + _ecx - 4); //
-					_eax += _ebx * 4;
-					_ebx = *(uint32_t *)(_esi + _edi * 8); // count
-				} while (_ebp < _ebx);
-			}
-			_ebx = 0;
-*/
 		}
-// 429A78
-
 	} else if (_sssHdr.version == 6) {
 // 42E8DF
 		static const int kSizeOfUnk4Data_V6 = 68;
@@ -783,7 +759,7 @@ void Resource::loadSssData(File *fp) {
 
 	// _res_sssPcmTable = data; // size : sssHdr.unk30 * 20
 	_sssPcmTable = (SssPcm *)malloc(_sssHdr.pcmCount * sizeof(SssPcm));
-// 429AB8:
+// 429AB8
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 		_sssPcmTable[i].ptr = 0; fp->readUint32();
 		_sssPcmTable[i].offset = fp->readUint32();
@@ -813,7 +789,7 @@ void Resource::loadSssData(File *fp) {
 		_sssFilters[i].unk24 = READ_LE_UINT32(buf + 0x24);
 		_sssFilters[i].unk30 = READ_LE_UINT32(buf + 0x30);
 		bytesRead += kSizeOfSssFilter;
-		// debug(kDebug_RESOURCE, "sssFilter #%d/%d ", i, _sssHdr.dataUnk2Count);
+		debug(kDebug_RESOURCE, "sssFilter #%d/%d 0x%x", i, _sssHdr.dataUnk2Count, READ_LE_UINT32(buf));
 	}
 
 	// _res_sssDataUnk6 = data; // size : sssHdr.unk18 * 20
@@ -825,7 +801,7 @@ void Resource::loadSssData(File *fp) {
 		_sssDataUnk6[i].unk0[3] = fp->readUint32();
 		_sssDataUnk6[i].unk10 = fp->readUint32();
 		bytesRead += 20;
-		// debug(kDebug_RESOURCE, "sssUnk12 #%d/%d", i, _sssHdr.dataUnk3Count);
+		debug(kDebug_RESOURCE, "sssDataUnk6 #%d/%d unk10 0x%x", i, _sssHdr.dataUnk3Count, _sssDataUnk6[i].unk10);
 	}
 
 // 429AB8:
@@ -866,9 +842,9 @@ void Resource::loadSssData(File *fp) {
 	checkSssCode(_sssCodeData, _sssHdr.codeSize);
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		if (_sssDataUnk3[i].count != 0) {
-			const int num = _sssDataUnk3[i].firstCodeOffset;
+			// const int num = _sssDataUnk3[i].firstCodeOffset;
 			// _sssDataUnk3[i].codeOffset = &_sssCodeOffsets[num];
-			debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
+			// debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
 		} else {
 			_sssDataUnk3[i].firstCodeOffset = kNone;
 		}

@@ -427,7 +427,7 @@ struct SssCodeOffset { // SssSample
 
 struct SssUnk4 { // SssPreloadInfo
 	uint32_t count;
-	uint8_t *data;
+	uint8_t *data; // sizeof 32
 };
 
 struct SssFilter {
