@@ -208,7 +208,7 @@ struct SssObject {
 	int32_t panningModulateCurrent; // 0x64
 	int32_t panningModulateDelta; // 0x68
 	int32_t currentPcmFrame; // 0x6C
-	int *volumePtr; // 0x70
+	int *panningPtr; // 0x70
 	LvlObject *lvlObject; // 0x74
 	int32_t nextSoundNum; // 0x78 indexes _sssUnk3
 	int32_t nextSoundCounter; // 0x7C

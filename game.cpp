@@ -45,7 +45,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_transformShadowLayerDelta = 0;
 	_mstLogicDisabled = true;
 	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
-	_snd_volumeMax = 64;
+	_snd_masterPanning = 64;
 	_snd_masterVolume = 128;
 }
 

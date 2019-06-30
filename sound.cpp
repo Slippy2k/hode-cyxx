@@ -117,7 +117,7 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->pcm == 0) {
 				return;
 			}
-			if (so->volumePtr) {
+			if (so->panningPtr) {
 				const int panning = getSoundObjectPanning(so);
 				if (panning != so->panning) {
 					so->panning = panning;
@@ -144,17 +144,17 @@ void Game::updateSoundObject(SssObject *so) {
 				setSoundObjectPanning(so);
 			}
 		}
-	} else if ((so->flags & 1) == 0) {
-
-	} else if (so->volumePtr) {
-		const int panning = getSoundObjectPanning(so);
-		if (panning != so->panning) {
-			so->panning = panning;
-			_sssObjectsChanged = true;
+	} else if ((so->flags & 1) != 0) {
+		if (so->panningPtr) {
+			const int panning = getSoundObjectPanning(so);
+			if (panning != so->panning) {
+				so->panning = panning;
+				_sssObjectsChanged = true;
+				setSoundObjectPanning(so);
+			}
+		} else if (_sssObjectsChanged) {
 			setSoundObjectPanning(so);
 		}
-	} else if (_sssObjectsChanged) {
-		setSoundObjectPanning(so);
 	}
 	if (so->pcmFramesCount != 0) {
 		--so->pcmFramesCount;
@@ -892,15 +892,15 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 			if (codeOffset->unk7 == 0xFF) {
 				if (_currentSoundLvlObject) {
 					_currentSoundLvlObject->sssObj = so;
-					so->volumePtr = &_snd_volumeMax;
+					so->panningPtr = &_snd_masterPanning;
 					so->panning = getSoundObjectPanning(so);
 				} else {
-					so->volumePtr = 0;
+					so->panningPtr = 0;
 					so->panning = 64;
 				}
 			} else {
 // 42B7A5
-				so->volumePtr = 0;
+				so->panningPtr = 0;
 			}
 // 42B7C3
 			setSoundObjectPanning(so);
@@ -920,7 +920,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	tmpObj.repeatCounter = -1;
 	tmpObj.pauseCounter = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
-	tmpObj.volumePtr = 0;
+	tmpObj.panningPtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", codeOffset->pcm);
 	tmpObj.pcm = &_res->_sssPcmTable[codeOffset->pcm];
 	if (codeOffset->codeOffset1 != kNone) {
@@ -1142,7 +1142,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
 		int volume = ((so->filter->unk4 >> 16) * so->volume) >> 7; // indexes decibel volume table
 		int _esi = 0;
-		if (so->volumePtr) {
+		if (so->panningPtr) {
 			int _eax = CLIP(so->unk8 + so->filter->unk24, 0, 7); // priority
 			if (so->panning == -2) {
 				volume = 0;

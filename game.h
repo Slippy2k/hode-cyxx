@@ -697,7 +697,7 @@ struct Game {
 	SssObject *_lowPrioritySssObject; // point to the object in _sssObjectsList1 with the highest 'priority'
 	uint8_t _channelMixingTable[32];
 	int _playingSssObjectsMax;
-	int _snd_volumeMax;
+	int _snd_masterPanning;
 	int _playingSssObjectsCount;
 	int _snd_masterVolume;
 
