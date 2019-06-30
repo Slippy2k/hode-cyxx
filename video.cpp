@@ -353,20 +353,19 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 
 	dst2 += y * dst_pitch + x;
 	src2 = _shadowColorLookupTable;
-	while (src_h-- != 0) {
+	for (int j = 0; j < src_h; ++j) {
 		for (int i = 0; i < src_w; ++i) {
+			int offset = READ_LE_UINT16(src1); src1 += 2;
+			// Not sure if this is an issue in the original or in the rewrite
+			if (offset >= W * H) {
+				offset = W * H - 1;
+			}
 			if (!src2) { // no LUT
-				int offset = READ_LE_UINT16(src1); src1 += 2;
-				// Not sure if this is an issue in the original or in the rewrite
-				if (offset >= W * H) {
-					offset = W * H - 1;
-				}
 				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], _shadowColorLut);
 			} else {
 				// build lookup offset
 				//   msb : _shadowLayer[ _projectionData[ (x, y) ] ]
 				//   lsb : _frontLayer[ (x, y) ]
-				int offset = READ_LE_UINT16(src1); src1 += 2;
 				offset = (dst1[offset] << 8) | dst2[i];
 
 				// lookup color matrix
