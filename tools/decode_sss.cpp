@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
-#include <sys/stat.h>
 
 enum {
 	MAX_FILESIZE = 0x10000,
@@ -13,11 +12,11 @@ static uint8_t _fileBuf[MAX_FILESIZE];
 
 static FILE *_out = stdout;
 
-static uint16_t read16(const uint8_t *p) {
-	return (p[1] << 8) | p[0]; // LE
+static int16_t read16(const uint8_t *p) {
+	return (p[1] << 8) | p[0];
 }
 
-static uint32_t read32(const uint8_t *p) {
+static int32_t read32(const uint8_t *p) {
 	const uint16_t lo = read16(p); p += 2;
 	return lo | (read16(p) << 16);
 }
@@ -334,10 +333,9 @@ static int readFile(const char *path) {
 }
 
 int main(int argc, char *argv[]) {
-	if (argc == 2) {
-		struct stat st;
-		if (stat(argv[1], &st) == 0 && S_ISREG(st.st_mode)) {
-			const int size = readFile(argv[1]);
+	if (argc >= 2) {
+		for (int i = 1; i < argc; ++i) {
+			const int size = readFile(argv[i]);
 			if (size != 0) {
 				visitOpcode = printOpcode;
 				parse(_fileBuf, size);
@@ -350,7 +348,7 @@ int main(int argc, char *argv[]) {
 						case op0f_invalid:
 							break;
 						default:
-							fprintf(stdout, "Opcode %d not referenced\n", i);
+							fprintf(stdout, "Opcode %d not called\n", i);
 							break;
 						}
 					}
