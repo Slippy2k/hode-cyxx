@@ -178,6 +178,8 @@ int main(int argc, char *argv[]) {
 		checkpoint = 0;
 		levelChanged = true;
 	} while (!_system->inp.quit && level < kLvl_test);
+	_system->stopAudio();
+	g->_mix.fini();
 	delete g;
 	free(dataPath);
 	return 0;

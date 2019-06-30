@@ -35,6 +35,7 @@ Mixer::~Mixer() {
 }
 
 void Mixer::init(int rate) {
+	MixerLock ml(_lock);
 	sts_mixer_init(&_mixer, rate, STS_MIXER_SAMPLE_FORMAT_16);
 	memset(_channels, 0, sizeof(_channels));
 	for (int i = 0; i < kPcmChannels; ++i) {
@@ -43,6 +44,7 @@ void Mixer::init(int rate) {
 }
 
 void Mixer::fini() {
+	MixerLock ml(_lock);
 	sts_mixer_shutdown(&_mixer);
 }
 
