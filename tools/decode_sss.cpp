@@ -12,6 +12,8 @@ static uint8_t _fileBuf[MAX_FILESIZE];
 
 static FILE *_out = stdout;
 
+static void (*visitOpcode)(uint16_t addr, uint8_t opcode, int *args);
+
 static int16_t read16(const uint8_t *p) {
 	return (p[1] << 8) | p[0];
 }
@@ -58,7 +60,7 @@ enum {
 
 static int _histogram[op_count];
 
-static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
+static void printSssOpcode(uint16_t addr, uint8_t opcode, int *args) {
 	fprintf(_out, "%04X: ", addr);
 	switch (opcode) {
 	case op00_end:
@@ -143,9 +145,7 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	fprintf(_out, "\n");
 }
 
-static void (*visitOpcode)(uint16_t addr, uint8_t opcode, int args[4]);
-
-static int parse(const uint8_t *buf, uint32_t size) {	
+static int parseSss(const uint8_t *buf, uint32_t size) {
 	const uint8_t *p = buf;
 	while (p < buf + size) {
 		const uint32_t addr = p - buf;
@@ -267,7 +267,7 @@ static int parse(const uint8_t *buf, uint32_t size) {
 	return 0;
 }
 
-static void opcodesLength() {
+static void printSssOpcodesLength() {
 	uint8_t len[op_count];
 	for (int i = 0; i < op_count; ++i) {
 		switch (i) {
@@ -337,8 +337,8 @@ int main(int argc, char *argv[]) {
 		for (int i = 1; i < argc; ++i) {
 			const int size = readFile(argv[i]);
 			if (size != 0) {
-				visitOpcode = printOpcode;
-				parse(_fileBuf, size);
+				visitOpcode = printSssOpcode;
+				parseSss(_fileBuf, size);
 				for (int i = 0; i < op_count; ++i) {
 					if (_histogram[i] == 0) {
 						switch (i) {
@@ -356,7 +356,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	} else {
-		opcodesLength();
+		printSssOpcodesLength();
 	}
 	return 0;
 }
