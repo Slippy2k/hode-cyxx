@@ -17,13 +17,13 @@ static const uint8_t byte_4528F8[17] = {
 	0x00
 };
 
-static const uint8_t _lar2_checkpointData[39] = {
+static const uint8_t _lar2_lutData[39] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 0x02,
 	0x00, 0x00, 0x05, 0x02, 0x00, 0x02, 0x00, 0x00, 0x03, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x0A, 0x0C,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-const BoundingBox _lar2_unkData2[13] = {
+static const BoundingBox _lar2_unkData2[13] = {
 	{ 210, 155, 220, 159 },
 	{ 224, 146, 234, 150 },
 	{ 193,  84, 203,  88 },
@@ -473,14 +473,14 @@ void Game::callLevel_tick_lar2() {
 }
 
 void Game::setupLvlObjects_lar2_screen19() {
-	int num1 = _lar2_checkpointData[_levelCheckpoint * 3 + 1];
+	int num1 = _lar2_lutData[_levelCheckpoint * 3 + 1];
 	for (int i = num1; i < 13; ++i) {
 		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~0x40) | 1;
 	}
 	for (int i = num1; i != 0; --i) {
 		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~1) | 0x40;
 	}
-	int num2 = _lar2_checkpointData[_levelCheckpoint * 3];
+	int num2 = _lar2_lutData[_levelCheckpoint * 3];
 	for (int i = num2; i < 10; ++i) {
 		// TODO 408CBC
 	}

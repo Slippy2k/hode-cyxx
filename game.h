@@ -18,6 +18,15 @@ struct PafPlayer;
 struct Video;
 struct SystemStub;
 
+struct CheckpointData {
+	int16_t xPos;
+	int16_t yPos;
+	uint16_t flags2;
+	uint16_t anim;
+	uint8_t screenNum;
+	uint8_t spriteNum;
+};
+
 struct Game {
 	enum {
 		kObjectDataTypeAndy,
@@ -50,7 +59,7 @@ struct Game {
 	static const uint8_t _pointSrcIndex2Table[];
 	static const uint8_t _pointSrcIndex1Table[];
 	static const uint8_t _actionDirectionKeyMaskTable[];
-	static const uint8_t *_levelCheckpointData[];
+	static const CheckpointData *_levelCheckpointData[];
 	static const uint8_t *_levelScreenStartData[];
 	static const uint8_t _pwr1_screenTransformData[];
 	static const uint8_t _pwr2_screenTransformData[];

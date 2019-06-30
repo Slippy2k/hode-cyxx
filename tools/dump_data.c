@@ -28,7 +28,7 @@ static uint16_t freadUint16LE(FILE *fp) {
 }
 
 static void dumpRect(FILE *fp, const char *name, uint32_t offset, int count) {
-	fprintf(stdout, "const BoundingBox %s[%d] = {", name, count);
+	fprintf(stdout, "static const BoundingBox %s[%d] = {", name, count);
 	fseek(fp, offset, SEEK_SET);
 	for (int i = 0; i < count; ++i) {
 		int x1 = freadUint32LE(fp);
@@ -36,6 +36,23 @@ static void dumpRect(FILE *fp, const char *name, uint32_t offset, int count) {
 		int x2 = freadUint32LE(fp);
 		int y2 = freadUint32LE(fp);
 		fprintf(stdout, "\n\t{ %3d, %3d, %3d, %3d },", x1, y1, x2, y2);
+	}
+	fprintf(stdout, "\n");
+}
+
+static void dumpCheckpointData(FILE *fp, const char *name, uint32_t offset, int count) {
+	assert((count % 12) == 0);
+	fprintf(stdout, "static const CheckpointData %s[%d] = {", name, count / 12);
+	fseek(fp, offset, SEEK_SET);
+	for (int i = 0; i < count; i += 12) {
+		int xPos = (int16_t)freadUint16LE(fp);
+		int yPos = (int16_t)freadUint16LE(fp);
+		int flags2 = freadUint16LE(fp);
+		int anim = freadUint16LE(fp);
+		int screenNum = fgetc(fp);
+		int spriteNum = fgetc(fp);
+		int unk = freadUint16LE(fp);
+		fprintf(stdout, "\n\t{ %3d, %3d, 0x%04x, %3d, %2d, %2d },", xPos, yPos, flags2, anim, screenNum, spriteNum);
 	}
 	fprintf(stdout, "\n");
 }
@@ -133,30 +150,31 @@ int main(int argc, char* argv[]) {
 
 	// retail
 
-//		dumpInt(fp, "_level1UpdateData1", 0x53060, 96, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_rock_checkpointData", 0x53060, 96);
 //		dumpInt(fp, "_level1UpdateData2", 0x530C0, 56, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_level2UpdateData1", 0x4E940, 64, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_fort_checkpointData", 0x4E940, 60);
 //		dumpInt(fp, "_level2UpdateData2", 0x58A50, 56, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_level3UpdateData1", 0x517A8, 120, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_pwr1_checkpointData", 0x517A8, 120);
 //		fillInt("_level3UpdateData2", 80, "0x%02X", 0);
-//		dumpInt(fp, "_level4UpdateData1", 0x4F408, 64, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_isld_checkpointData", 0x4F408, 60);
 //		dumpInt(fp, "_level4UpdateData2", 0x58A88, 56, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_level5UpdateData1", 0x50248, 72, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_lava_checkpointData", 0x50248, 72);
 //		dumpInt(fp, "_level5UpdateData2", 0x50290, 40, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_level6UpdateData1", 0x51D68, 40, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_pwr2_checkpointData", 0x51D68, 36);
 //		fillInt("_level6UpdateData2", 32, "0x%02X", 0);
-//		dumpInt(fp, "_level7UpdateData1", 0x4F6F8, 112, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_lar1_checkpointData", 0x4F6F8, 108);
 //		dumpInt(fp, "_level7UpdateData2", 0x4F768, 56, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_level8UpdateData1", 0x4F8C0, 144, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_lar2_checkpointData", 0x4F8C0, 144);
 //		dumpInt(fp, "_level8UpdateData2", 0x58B28, 64, "0x%02X", UNSIGNED_8BITS);
-//		dumpInt(fp, "_level9UpdateData1", 0x4E850, 16, "0x%02X", UNSIGNED_8BITS);
+		dumpCheckpointData(fp, "_dark_checkpointData", 0x4E850, 12);
 //		dumpInt(fp, "_level9UpdateData2", 0x58A40, 8, "0x%02X", UNSIGNED_8BITS);
+
 		dumpInt(fp, "Game::_transformBufferData1", 0x51DA8, 4536, "0x%02X", UNSIGNED_8BITS, 0x4545A8);
 		dumpInt(fp, "Game::_transformBufferData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS, 0x452D00);
 		dumpInt(fp, "byte_452898", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpInt(fp, "byte_4528D0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpInt(fp, "byte_4528F8", 0x500F8, 17, "0x%02X", UNSIGNED_8BITS, 0);
-		dumpInt(fp, "_lar2_checkpointData", 0x50109, 39, "0x%02X", UNSIGNED_8BITS, 0);
+		dumpInt(fp, "_lar2_lutData", 0x50109, 39, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpRect(fp, "_lar1_unkData2", 0x4FB58, 24);
 		dumpInt(fp, "_lar1_unkData3", 0x4FCD8, 96, "0x%02X", UNSIGNED_8BITS, 0);
 		dumpRect(fp, "_lar2_unkData2", 0x4FFC8, 13);
