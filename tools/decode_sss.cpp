@@ -23,42 +23,34 @@ static uint32_t read32(const uint8_t *p) {
 }
 
 enum {
-	/* 0x00 */
 	op00_end,
 	op01_invalid,
 	op02_addSound,
 	op03_invalid,
-	/* 0x04 */
 	op04_removeSound,
 	op05_seekForward,
 	op06_repeatJge,
 	op07_invalid,
-	/* 0x08 */
 	op08_seekBackward2,
 	op09_modulatePanning,
 	op0a_modulateVolume,
 	op0b_setVolume,
-	/* 0x0C */
 	op0c_removeSounds2,
 	op0d_initVolume,
 	op0e_initPanning,
 	op0f_invalid,
-	/* 0x10 */
 	op10_resumeSound,
 	op11_pauseSound,
 	op12_decrementRepeatCounter,
 	op13_setPanning,
-	/* 0x14 */
 	op14_setPauseCounter,
 	op15_decrementDelayCounter,
-	op16_set_delay_counter,
+	op16_setDelayCounter,
 	op17_decrementVolumeModulateSteps,
-	/* 0x18 */
 	op18_setVolumeModulateSteps,
 	op19_decrementPanningModulateSteps,
 	op1a_setPanningModulateSteps,
 	op1b_seekBackward,
-	/* 0x1C */
 	op1c_jmp,
 	op1d_terminate,
 
@@ -124,8 +116,8 @@ static void printOpcode(uint16_t addr, uint8_t opcode, int args[16]) {
 	case op15_decrementDelayCounter:
 		fprintf(_out, "op15_decrement_delay_counter");
 		break;
-	case op16_set_delay_counter:
-		fprintf(_out, "op16_set_delay_counter %d", args[0]);
+	case op16_setDelayCounter:
+		fprintf(_out, "op16_setDelayCounter %d", args[0]);
 		break;
 	case op17_decrementVolumeModulateSteps:
 		fprintf(_out, "op17_decrement_volume_modulate_steps");
@@ -235,7 +227,7 @@ static int parse(const uint8_t *buf, uint32_t size) {
 		case op15_decrementDelayCounter:
 			p += 4;
 			break;
-		case op16_set_delay_counter:
+		case op16_setDelayCounter:
 			p += 4;
 			a = read32(p); p += 4;
 			break;

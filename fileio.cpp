@@ -5,6 +5,7 @@
 
 #include <sys/param.h>
 #include "fileio.h"
+#include "util.h"
 
 File::File()
 	: _fp(0) {
@@ -138,4 +139,15 @@ void SectorFile::flush() {
 	const int currentPos = ftell(_fp);
 	assert((currentPos & 2047) == 0);
 	_bufLen = _bufPos = 0;
+}
+
+void fioDumpData(const char *filename, const uint8_t *data, int size) {
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		const int count = fwrite(data, 1, size, fp);
+		if (count != size) {
+			warning("Failed to write %d bytes, count %d\n", size, count);
+		}
+		fclose(fp);
+	}
 }

@@ -563,7 +563,7 @@ struct Resource {
 	void loadLvlScreenVectorData(int num);
 	void loadLvlScreenStateData(int num);
 	void loadLvlScreenObjectData(int num);
-	void loadLvlData(File *fp);
+	void loadLvlData(File *fp, const char *name);
 	void loadLvlSpriteData(int num);
 
 	uint8_t *getLevelData0x470CPtr0(int num); // getLvlScreenMaskDataPtr
@@ -585,7 +585,7 @@ struct Resource {
 	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
 	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
 
-	void loadSssData(File *fp);
+	void loadSssData(File *fp, const char *name);
 	void checkSssCode(const uint8_t *buf, int size);
 	void loadSssPcm(File *fp, int num);
 	uint32_t getSssPcmSize(SssPcm *pcm) const;
@@ -610,7 +610,7 @@ struct Resource {
 
 	void clearSssLookupTable3();
 
-	void loadMstData(File *fp);
+	void loadMstData(File *fp, const char *name);
 
 	MstScreenAreaCode *findMstCodeForPos(int num, int xPos, int yPos);
 	void flagMstCodeForPos(int num, uint8_t value);

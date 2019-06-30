@@ -10,6 +10,8 @@
 #include "resource.h"
 #include "util.h"
 
+static const bool kDumpBytecode = false;
+
 static bool openDat(FileSystem &fs, const char *name, File *f) {
 	FILE *fp = fs.openFile(name);
 	if (fp) {
@@ -134,7 +136,7 @@ void Resource::loadLevelData(const char *levelName) {
 	closeDat(_fs, _lvlFile);
 	snprintf(filename, sizeof(filename), "%s.LVL", levelName);
 	if (openDat(_fs, filename, _lvlFile)) {
-		loadLvlData(_lvlFile);
+		loadLvlData(_lvlFile, filename);
 	} else {
 		error("Unable to open '%s'", filename);
 	}
@@ -142,7 +144,7 @@ void Resource::loadLevelData(const char *levelName) {
 	closeDat(_fs, _mstFile);
 	snprintf(filename, sizeof(filename), "%s.MST", levelName);
 	if (openDat(_fs, filename, _mstFile)) {
-		loadMstData(_mstFile);
+		loadMstData(_mstFile, filename);
 	} else {
 		warning("Unable to open '%s'", filename);
 		memset(&_mstHdr, 0, sizeof(_mstHdr));
@@ -151,7 +153,7 @@ void Resource::loadLevelData(const char *levelName) {
 	closeDat(_fs, _sssFile);
 	snprintf(filename, sizeof(filename), "%s.SSS", levelName);
 	if (openDat(_fs, filename, _sssFile)) {
-		loadSssData(_sssFile);
+		loadSssData(_sssFile, filename);
 	} else {
 		warning("Unable to open '%s'", filename);
 		memset(&_sssHdr, 0, sizeof(_sssHdr));
@@ -346,7 +348,7 @@ void Resource::loadLevelData0x470C() {
 
 static const uint32_t kLvlHdrTag = 0x484F4400; // 'HOD\x00'
 
-void Resource::loadLvlData(File *fp) {
+void Resource::loadLvlData(File *fp, const char *name) {
 
 	assert(fp == _lvlFile);
 
@@ -541,7 +543,7 @@ static int skipBytesAlign(File *f, int len) {
 	return size;
 }
 
-void Resource::loadSssData(File *fp) {
+void Resource::loadSssData(File *fp, const char *name) {
 
 	assert(fp == _sssFile); // TODO: or _datFile
 
@@ -915,6 +917,12 @@ void Resource::loadSssData(File *fp) {
 
 // 429F38:
 	clearSssLookupTable3();
+
+	if (kDumpBytecode) {
+		char fname[64];
+		snprintf(fname, sizeof(fname), "%s.bytecode", name);
+		fioDumpData(fname, _sssCodeData, _sssHdr.codeSize);
+	}
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {
@@ -965,7 +973,7 @@ void Resource::clearSssLookupTable3() {
 	}
 }
 
-void Resource::loadMstData(File *fp) {
+void Resource::loadMstData(File *fp, const char *name) {
 	assert(fp == _mstFile);
 	_mstHdr.version  = fp->readUint32();
 	_mstHdr.dataSize = fp->readUint32();
@@ -1501,6 +1509,12 @@ void Resource::loadMstData(File *fp) {
 	}
 
 	// TODO:
+
+	if (kDumpBytecode) {
+		char fname[64];
+		snprintf(fname, sizeof(fname), "%s.bytecode", name);
+		fioDumpData(fname, _mstCodeData, _mstHdr.codeSize * 4);
+	}
 
 	if (0) {
 		for (int i = 0; i < _lvlHdr.screensCount; ++i) {
