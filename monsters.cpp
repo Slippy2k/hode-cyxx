@@ -2718,17 +2718,16 @@ int Game::getTaskFlag(Task *t, int num, int type) const {
 }
 
 int Game::runTask_default(Task *t) {
-	if (!t->codeData) {
-		warning("runTask_default has NULL codeData t %p", t);
-		return 1;
-	}
+	assert(t->codeData);
+	const int taskNum = t - _tasksTable;
 	int ret = 0;
 	t->state &= ~2;
 	const uint8_t *p = t->codeData;
 	do {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
-		debug(kDebug_MONSTER, "executeMstCode code %d", p[0]);
+		const uint32_t codeOffset = p - _res->_mstCodeData;
+		debug(kDebug_MONSTER, "executeMstCode task %d code %d offset 0x%04x", taskNum, p[0], codeOffset);
 		assert(p[0] <= 242);
 		switch (p[0]) {
 		case 0: { // 0
@@ -3595,6 +3594,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 227: { // 69
 				const int num = READ_LE_UINT16(p + 2);
+				assert(num < _res->_mstHdr.unk0x58);
 				const MstUnk54 *m = &_res->_mstUnk54[num];
 				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
@@ -3606,6 +3606,7 @@ int Game::runTask_default(Task *t) {
 			break;
 		case 228: { // 70
 				const int num = READ_LE_UINT16(p + 2);
+				assert(num < _res->_mstHdr.unk0x58);
 				const MstUnk54 *m = &_res->_mstUnk54[num];
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
