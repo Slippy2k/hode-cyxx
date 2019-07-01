@@ -41,6 +41,19 @@ static const char *_arithOp[] = {
 	0
 };
 
+static const char *_compareOp[] = {
+	"!=",
+	"==",
+	">=",
+	">",
+	"<=",
+	"<",
+	"&",
+	"|"
+	"^",
+	0
+};
+
 static const char *taskOtherVar(int num, char *buffer) {
 	sprintf(buffer, "otherVar_%d", num);
 	return buffer;
@@ -52,16 +65,16 @@ static const char *taskVar(int num, int type, char *buffer) {
 		sprintf(buffer, "%d", num);
 		break;
 	case 2:
-		sprintf(buffer, "task.localVars[%d]", num);
+		sprintf(buffer, "task.vars[%d]", num);
 		break;
 	case 3:
-		sprintf(buffer, "mstVars[%d]", num);
+		sprintf(buffer, "global.vars[%d]", num);
 		break;
 	case 4:
 		taskOtherVar(num, buffer);
 		break;
 	case 5:
-		sprintf(buffer, "monster.localVars[%d]", num);
+		sprintf(buffer, "monster.vars[%d]", num);
 		break;
 	}
 	return buffer;
@@ -109,40 +122,97 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "unset_flag_monster bit:%d", p[1]);
 		break;
 	case 33:
+	case 229:
 		fprintf(_out, "jmp_imm offset:0x%x", 4 * read16(p + 2));
 		break;
 	case 41:
-		fprintf(_out, "++task.localVars[%d]", p[1]);
+		fprintf(_out, "++task.vars[%d]", p[1]);
 		break;
 	case 42:
-		fprintf(_out, "++mstVars[%d]", p[1]);
+		fprintf(_out, "++global.vars[%d]", p[1]);
 		break;
 	case 47 ... 56:
-		fprintf(_out, "task.localVars[%d] %s task.localVars[%d]", p[1], _arithOp[opcode - 47], p[2]);
+		fprintf(_out, "task.vars[%d] %s task.vars[%d]", p[1], _arithOp[opcode - 47], p[2]);
+		break;
+	case 57 ... 66:
+		fprintf(_out, "global.vars[%d] %s task.vars[%d]", p[1], _arithOp[opcode - 57], p[2]);
+		break;
+	case 67 ... 76:
+		fprintf(_out, "monster.vars[%d] %s task.vars[%d]", p[1], _arithOp[opcode - 67], p[2]);
+		break;
+	case 77 ... 86:
+		fprintf(_out, "task.vars[%d] %s monster.vars[%d]", p[1], _arithOp[opcode - 77], p[2]);
+		break;
+	case 107 ... 116:
+		fprintf(_out, "task.vars[%d] %s global.vars[%d]", p[1], _arithOp[opcode - 107], p[2]);
+		break;
+	case 117 ... 126:
+		fprintf(_out, "global.vars[%d] %s global.vars[%d]", p[1], _arithOp[opcode - 117], p[2]);
+		break;
+	case 137 ... 146: {
+			char buffer[64];
+			fprintf(_out, "task.vars[%d] %s %s", p[1], _arithOp[opcode - 137], taskOtherVar(p[2], buffer));
+		}
+		break;
+	case 147 ... 158: {
+			char buffer[64];
+			fprintf(_out, "global.vars[%d] %s %s", p[1], _arithOp[opcode - 147], taskOtherVar(p[2], buffer));
+		}
 		break;
 	case 167 ... 176:
-		fprintf(_out, "task.localVars[%d] %s %d", p[1], _arithOp[opcode - 167], read16(p + 2));
+		fprintf(_out, "task.vars[%d] %s %d", p[1], _arithOp[opcode - 167], read16(p + 2));
 		break;
 	case 177 ... 186:
-		fprintf(_out, "mstVars[%d] %s %d", p[1], _arithOp[opcode - 177], read16(p + 2));
+		fprintf(_out, "global.vars[%d] %s %d", p[1], _arithOp[opcode - 177], read16(p + 2));
 		break;
 	case 187 ... 196:
-		fprintf(_out, "monster.localVars[%d] %s %d", p[1], _arithOp[opcode - 187], read16(p + 2));
+		fprintf(_out, "monster.vars[%d] %s %d", p[1], _arithOp[opcode - 187], read16(p + 2));
 		break;
 	case 202:
 		fprintf(_out, "op54");
 		break;
+	case 203:
+		fprintf(_out, "op55");
+		break;
 	case 204:
 		printMstOpcode56(p[1], read16(p + 2));
 		break;
+	case 207:
+	case 208:
+	case 209:
+		fprintf(_out, "nop");
+		break;
+	case 213: {
+			char buffer1[64];
+			taskVar(p[2], p[1] >> 4, buffer1);
+			char buffer2[64];
+			taskVar(p[3], p[1] & 15, buffer2);
+			fprintf(_out, "monster_set_action_direction am:%s dm:%s", buffer1, buffer2);
+		}
+		break;
+	case 214:
+		fprintf(_out, "reset_monster_energy");
+		break;
+	case 217:
+		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
+		break;
 	case 220 ... 225:
-		fprintf(stdout, "add_monster num:%d", read16(p + 2));
+		fprintf(_out, "add_monster num:%d", read16(p + 2));
+		break;
+	case 227:
+		fprintf(_out, "compare_vars num:%d", read16(p + 2));
+		break;
+	case 228:
+		fprintf(_out, "compare_flags num:%d", read16(p + 2));
 		break;
 	case 239:
 		fprintf(_out, "create_task num:%d", read16(p + 2));
 		break;
+	case 240:
+		fprintf(_out, "update_task num:%d", read16(p + 2));
+		break;
 	case 242:
-		fprintf(_out, "break");
+		fprintf(_out, "break\n");
 		break;
 	}
 	fprintf(_out, "\n");
@@ -165,9 +235,11 @@ int main(int argc, char *argv[]) {
 			}
 			fclose(fp);
 		}
-		for (int i = 0; i < op_count; ++i) {
-			if (_histogram[i] != 0) {
-				fprintf(stdout, "opcode %d referenced %d times\n", i, _histogram[i]);
+		if (0) {
+			for (int i = 0; i < op_count; ++i) {
+				if (_histogram[i] != 0) {
+					fprintf(stdout, "opcode %d referenced %d times\n", i, _histogram[i]);
+				}
 			}
 		}
 	}
