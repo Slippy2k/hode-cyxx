@@ -4852,6 +4852,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 				}
 			}
 			const int pos = _res->_mstOp56Data[num].unk8;
+			assert(pos < 8);
 			const int xPos = o->xPos + o->posTable[pos].x;
 			const int yPos = o->yPos + o->posTable[pos].y;
 			const int type1  = (_res->_mstOp56Data[num].unkC >> 4) & 15;
@@ -4866,11 +4867,12 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			_mstCurrentActionKeyMask = _res->_mstOp56Data[num].unk0 & 255;
 		}
 		break;
-	case 19:
-		_andyActionKeyMaskAnd    = _res->_mstOp56Data[num].unk0 & 255;
-		_andyActionKeyMaskOr     = _res->_mstOp56Data[num].unk4 & 255;
-		_andyDirectionKeyMaskAnd = _res->_mstOp56Data[num].unk8 & 255;
-		_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].unkC & 255;
+	case 19: {
+			_andyActionKeyMaskAnd    = _res->_mstOp56Data[num].unk0 & 255;
+			_andyActionKeyMaskOr     = _res->_mstOp56Data[num].unk4 & 255;
+			_andyDirectionKeyMaskAnd = _res->_mstOp56Data[num].unk8 & 255;
+			_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].unkC & 255;
+		}
 		break;
 	case 20: {
 			_mstCurrentActionKeyMask = 0;
