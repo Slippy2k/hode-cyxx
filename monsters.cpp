@@ -2098,11 +2098,11 @@ void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
 	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~0x70) | flags;
 	Task *c = t->child;
+	if (c) {
+		t->child = 0;
+		c->codeData = 0;
+	}
 	if (m->flagsA5 & 8) {
-		if (c) {
-			t->child = 0;
-			c->codeData = 0;
-		}
 		Task *n = findFreeTask();
 		if (n) {
 			memcpy(n, t, sizeof(Task));
@@ -2115,12 +2115,6 @@ void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
 				n->codeData = p;
 				n->run = &Game::runTask_default;
 			}
-		}
-	} else {
-// 417A1A
-		if (c) {
-			t->child = 0;
-			c->codeData = 0;
 		}
 	}
 // 417A2B
