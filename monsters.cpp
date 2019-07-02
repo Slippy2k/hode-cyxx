@@ -1459,14 +1459,16 @@ bool Game::executeMstUnk27(MonsterObject1 *m, const uint8_t *p) {
 	if ((a & 0x8000) != 0 && (m->flagsA6 & 4) == 0) {
 		Task t;
 		memcpy(&t, _mstCurrentTask, sizeof(Task));
-		t.child = 0;
+		_mstCurrentTask->child = 0;
 		const uint32_t codeData = READ_LE_UINT32(p + 0x18);
 		assert(codeData != kNone);
-		t.codeData = _res->_mstCodeData + codeData * 4;
-		t.run = &Game::runTask_default;
-		t.monster1->flagsA6 |= 4;
+		_mstCurrentTask->codeData = _res->_mstCodeData + codeData * 4;
+		_mstCurrentTask->run = &Game::runTask_default;
+		_mstCurrentTask->monster1->flagsA6 |= 4;
+		Task *currentTask = _mstCurrentTask;
 		runTask_default(_mstCurrentTask);
-		t.monster1->flagsA6 &= ~4;
+		_mstCurrentTask = currentTask;
+		_mstCurrentTask->monster1->flagsA6 &= ~4;
 		t.nextPtr = _mstCurrentTask->nextPtr;
 		t.prevPtr = _mstCurrentTask->prevPtr;
 		memcpy(_mstCurrentTask, &t, sizeof(Task));
@@ -2112,9 +2114,6 @@ void Game::resetMstTask(Task *t, uint32_t codeData, uint8_t flags) {
 				}
 				n->codeData = p;
 				n->run = &Game::runTask_default;
-				assert(codeData != kNone);
-				resetTask(t, _res->_mstCodeData + codeData * 4);
-				return;
 			}
 		}
 	} else {
@@ -2727,7 +2726,7 @@ int Game::runTask_default(Task *t) {
 		assert(p >= _res->_mstCodeData && p < _res->_mstCodeData + _res->_mstHdr.codeSize * 4);
 		assert(((p - t->codeData) & 3) == 0);
 		const uint32_t codeOffset = p - _res->_mstCodeData;
-		debug(kDebug_MONSTER, "executeMstCode task %d code %d offset 0x%04x", taskNum, p[0], codeOffset);
+		debug(kDebug_MONSTER, "executeMstCode task %d %p code %d offset 0x%04x", taskNum, t, p[0], codeOffset);
 		assert(p[0] <= 242);
 		switch (p[0]) {
 		case 0: { // 0
