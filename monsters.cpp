@@ -5664,47 +5664,34 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 // 41584E
 		memset(t, 0, sizeof(Task));
 		resetTask(t, kUndefinedMonsterByteCode);
-		t->prevPtr = 0;
-		t->nextPtr = _monsterObjects2TasksList;
-		if (_monsterObjects2TasksList) {
-			_monsterObjects2TasksList->prevPtr = t;
-		}
+//		t->prevPtr = 0;
+//		t->nextPtr = _monsterObjects2TasksList;
+//		if (_monsterObjects2TasksList) {
+//			_monsterObjects2TasksList->prevPtr = t;
+//		}
 		t->monster2 = mo;
 		t->monster1 = 0;
+//		_monsterObjects2TasksList = t;
 		mo->task = t;
 		// _edi = _mstCurrentTask
 		// _mstCurrentTask = t;
-		Task *child = t->child;
-		if (child) {
-			child->codeData = 0;
-			t->child = 0;
-		}
-		Task *next = t->nextPtr;
-		Task *prev = t->prevPtr;
+//		Task *child = t->child;
+//		if (child) {
+//			child->codeData = 0;
+//			t->child = 0;
+//		}
+//		Task *next = t->nextPtr;
+//		Task *prev = t->prevPtr;
 		t->codeData = 0;
-		if (next) {
-			next->prevPtr = prev;
-		}
-		if (prev) {
-			prev->nextPtr = next;
-		} else {
-			_monsterObjects2TasksList = next;
-		}
-		if (!_monsterObjects2TasksList) {
-			_monsterObjects2TasksList = t;
-			t->nextPtr = 0;
-			t->prevPtr = 0;
-		} else {
-			Task *current = _monsterObjects2TasksList;
-			next = current->nextPtr;
-			while (next) {
-				current = next;
-				next = current->nextPtr;
-			}
-			current->nextPtr = t;
-			t->nextPtr = 0;
-			t->prevPtr = current;
-		}
+//		if (next) {
+//			next->prevPtr = prev;
+//		}
+//		if (prev) {
+//			prev->nextPtr = next;
+//		} else {
+//			_monsterObjects2TasksList = next;
+//		}
+		appendTask(&_monsterObjects2TasksList, t);
 		t->codeData = kUndefinedMonsterByteCode;
 		mstTaskSetScreenPosition(t);
 		const uint32_t codeData = mo->m45->codeData;
@@ -5725,48 +5712,34 @@ void Game::mstOp67_addMonster(Task *t, int x1, int x2, int y1, int y2, int scree
 // 415989
 		memset(t, 0, sizeof(Task));
 		resetTask(t, kUndefinedMonsterByteCode);
-		t->prevPtr = 0;
-		t->nextPtr = _monsterObjects1TasksList;
-		if (_monsterObjects1TasksList) {
-			_monsterObjects1TasksList->prevPtr = t;
-		}
+//		t->prevPtr = 0;
+//		t->nextPtr = _monsterObjects1TasksList;
+//		if (_monsterObjects1TasksList) {
+//			_monsterObjects1TasksList->prevPtr = t;
+//		}
 		t->monster1 = m;
 		t->monster2 = 0;
-		_monsterObjects1TasksList = t;
+//		_monsterObjects1TasksList = t;
 		m->task = t;
 		// _edi = _currentTask;
 		// _currentTask = t;
-		Task *child = t->child;
-		if (child) {
-			child->codeData = 0;
-			t->child = 0;
-		}
-		Task *next = t->nextPtr;
-		Task *prev = t->prevPtr;
+//		Task *child = t->child;
+//		if (child) {
+//			child->codeData = 0;
+//			t->child = 0;
+//		}
+//		Task *next = t->nextPtr;
+//		Task *prev = t->prevPtr;
 		t->codeData = 0;
-		if (next) {
-			next->prevPtr = prev;
-		}
-		if (prev) {
-			prev->nextPtr = next;
-		} else {
-			_monsterObjects1TasksList = next;
-		}
-		if (!_monsterObjects1TasksList) {
-			_monsterObjects1TasksList = t;
-			t->nextPtr = 0;
-			t->prevPtr = 0;
-		} else {
-			Task *current = _monsterObjects1TasksList; // _eax
-			next = current->nextPtr; // _ecx
-			while (next) {
-				current = next;
-				next = current->nextPtr;
-			}
-			current->nextPtr = t;
-			t->nextPtr = 0;
-			t->prevPtr = current;
-		}
+//		if (next) {
+//			next->prevPtr = prev;
+//		}
+//		if (prev) {
+//			prev->nextPtr = next;
+//		} else {
+//			_monsterObjects1TasksList = next;
+//		}
+		appendTask(&_monsterObjects1TasksList, t);
 // 415A3C
 		t->codeData = kUndefinedMonsterByteCode;
 		_rnd.resetMst(m->rnd_m35);
