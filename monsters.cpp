@@ -206,15 +206,27 @@ void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
 	}
 }
 
+// mstStopMonsterObject1
 int Game::initMonsterObject1Type2(Task *t) {
 	if (_m48Num == -1) {
 		return 0;
 	}
 	MonsterObject1 *m = t->monster1;
-	uint8_t _al = (m->flagsA5 == 0) ? 1 : 0;
-	if ((_al & 8) == 0) {
-		return 0;
-	}
+
+	// The condition matches the disassembly but looks like a bug
+	// It was probably meant to check bit 3 instead
+
+	//   mov  dl, [esi+MonsterObject1.flagsA5]
+	//   test dl, dl
+	//   setz al
+	//   test al, 8
+	//   jnz  short return_0
+
+	// const uint8_t r = (m->flagsA5 == 0) ? 1 : 0;
+	// if ((r & 8) != 0) {
+	//   return 0;
+	// }
+
 	MstUnk48Unk12Unk4 *m48 = m->unk18;
 	if (!m48) {
 		return 0;
