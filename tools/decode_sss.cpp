@@ -61,10 +61,10 @@ enum {
 static int _histogram[op_count];
 
 static void printSssOpcode(uint16_t addr, uint8_t opcode, int *args) {
-	fprintf(_out, "%04X: ", addr);
+	fprintf(_out, "%04X (%02X): ", addr, opcode);
 	switch (opcode) {
 	case op00_end:
-		fprintf(_out, "// end");
+		fprintf(_out, "// end\n");
 		break;
 	case op02_addSound:
 		fprintf(_out, "op02_add_sound %d num:%d", args[0], args[1]);
@@ -118,7 +118,7 @@ static void printSssOpcode(uint16_t addr, uint8_t opcode, int *args) {
 		fprintf(_out, "op15_decrement_delay_counter");
 		break;
 	case op16_setDelayCounter:
-		fprintf(_out, "op16_setDelayCounter %d", args[0]);
+		fprintf(_out, "op16_set_delay_counter %d", args[0]);
 		break;
 	case op17_decrementVolumeModulateSteps:
 		fprintf(_out, "op17_decrement_volume_modulate_steps");
