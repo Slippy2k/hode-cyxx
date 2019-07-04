@@ -98,6 +98,15 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 3:
 		fprintf(_out, "set_monster_action_direction_imm num:%d", read16(p + 2));
 		break;
+	case 5:
+		fprintf(_out, "set_monster_action_direction_global_var num:%d", read16(p + 2));
+		break;
+	case 6:
+		fprintf(_out, "set_monster_action_direction_other_var num:%d", read16(p + 2));
+		break;
+	case 7:
+		fprintf(_out, "set_monster_action_direction_monster_var num:%d", read16(p + 2));
+		break;
 	case 13:
 		fprintf(_out, "set_monster_action_direction_cond_imm num:%d", read16(p + 2));
 		break;
@@ -118,6 +127,12 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		break;
 	case 28:
 		fprintf(_out, "unset_flag_monster bit:%d", p[1]);
+		break;
+	case 29:
+		fprintf(_out, "sm_wait andy_var num:%d", p[1]);
+		break;
+	case 30:
+		fprintf(_out, "sm_wait global_flag bit:%d", p[1]);
 		break;
 	case 33:
 	case 229:

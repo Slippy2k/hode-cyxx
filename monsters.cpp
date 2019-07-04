@@ -2799,32 +2799,6 @@ int Game::runTask_default(Task *t) {
 				ret = mstTaskSetActionDirection(t, num, t->localVars[arg]);
 			}
 			break;
-//		case 5: // 5 - set_monster_action_direction_global_var
-//			if (t->monster1) {
-//				const int num = READ_LE_UINT16(p + 2);
-//				const int arg = _res->_mstUnk52[num * 4 + 3];
-//				t->codeData = p;
-//				assert(arg < kMaxVars);
-//				ret = mstTaskSetActionDirection(t, num, _mstVars[arg]);
-//			}
-//			break;
-//		case 6: // 6 - set_monster_action_direction_other_var
-//			if (t->monster1) {
-//				const int num = READ_LE_UINT16(p + 2);
-//				const int arg = _res->_mstUnk52[num * 4 + 3];
-//				t->codeData = p;
-//				ret = mstTaskSetActionDirection(t, num, getTaskOtherVar(arg, t));
-//			}
-//			break;
-//		case 7: // 7 - set_monster_action_direction_mst_var
-//			if (t->monster1) {
-//				const int num = READ_LE_UINT16(p + 2);
-//				const int arg = _res->_mstUnk52[num * 4 + 3];
-//				t->codeData = p;
-//				assert(arg < kMaxLocals);
-//				ret = mstTaskSetActionDirection(t, num, t->monster1->localVars[arg]);
-//			}
-//			break;
 		case 13: // 8
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
@@ -2871,27 +2845,6 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-//		case 29: { // 19
-//				t->arg1 = 4;
-//				t->arg2 = p[1];
-//				if (getTaskAndyVar(p[1], t) == 0) {
-//					LvlObject *o = 0;
-//					if (t->monster1) {
-//						if ((t->monster1->flagsA6 & 2) == 0) {
-//							o = t->monster1->o16;
-//						}
-//					} else if (t->monster2) {
-//						o = t->monster2->o;
-//					}
-//					if (o) {
-//						o->actionKeyMask = 0;
-//						o->directionKeyMask = 0;
-//					}
-//					t->run = &Game::runTask_waitFlags;
-//					ret = 1;
-//				}
-//			}
-//			break;
 		case 30: { // 20
 				t->arg1 = 3;
 				t->arg2 = p[1];
@@ -3014,20 +2967,6 @@ int Game::runTask_default(Task *t) {
 				--_mstVars[num];
 			}
 			break;
-//		case 46: { // 33 - decrement_monster_var
-//				MonsterObject1 *m = 0;
-//				if (t->monster2) {
-//					m = t->monster2->monster1;
-//				} else {
-//					m = t->monster1;
-//				}
-//				if (m) {
-//					const int num = p[1];
-//					assert(num < kMaxLocals);
-//					--m->localVars[num];
-//				}
-//			}
-//			break;
 		case 47:
 		case 48:
 		case 49:
@@ -3499,13 +3438,6 @@ int Game::runTask_default(Task *t) {
 				_mstOp54Counter = 0;
 			}
 			break;
-//		case 216: { // 63
-//				if (_m43Num1 != -1) {
-//					assert(_m43Num1 < _res->_mstHdr.unk0x24);
-//					shuffleMstUnk43(&_res->_mstUnk43[_m43Num1]);
-//				}
-//			}
-//			break;
 		case 217: { // 64
 				const int16_t num = READ_LE_UINT16(p + 2);
 				if (_m43Num3 != num) {
@@ -3526,11 +3458,6 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-//		case 219: { // 66
-//				const int16_t num = READ_LE_UINT16(p + 2);
-//				_m43Num2 = num;
-//			}
-//			break;
 		case 220:
 		case 221:
 		case 222:
