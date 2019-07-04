@@ -4,9 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
-enum {
-	MAX_FILESIZE = 0x10000,
-};
+static const bool kDumpOpcodeUsage = false;
 
 static FILE *_out = stdout;
 
@@ -125,11 +123,38 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 229:
 		fprintf(_out, "jmp_imm offset:0x%x", 4 * read16(p + 2));
 		break;
+	case 34:
+		fprintf(_out, "nop");
+		break;
+	case 35:
+		fprintf(_out, "enable_trigger num:%d", read16(p + 2));
+		break;
+	case 36:
+		fprintf(_out, "disable_trigger num:%d", read16(p + 2));
+		break;
+	case 39:
+		fprintf(_out, "remove_monsters_screen screen:%d", p[1]);
+		break;
+	case 40:
+		fprintf(_out, "remove_monsters_screen_flags screen:%d", p[1]);
+		break;
 	case 41:
 		fprintf(_out, "++task.vars[%d]", p[1]);
 		break;
 	case 42:
 		fprintf(_out, "++global.vars[%d]", p[1]);
+		break;
+	case 43:
+		fprintf(_out, "++monster.vars[%d]", p[1]);
+		break;
+	case 44:
+		fprintf(_out, "--local.vars[%d]", p[1]);
+		break;
+	case 45:
+		fprintf(_out, "--global.vars[%d]", p[1]);
+		break;
+	case 46:
+		fprintf(_out, "--monster.vars[%d]", p[1]);
 		break;
 	case 47 ... 56:
 		fprintf(_out, "task.vars[%d] %s task.vars[%d]", p[1], _arithOp[opcode - 47], p[2]);
@@ -142,6 +167,12 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		break;
 	case 77 ... 86:
 		fprintf(_out, "task.vars[%d] %s monster.vars[%d]", p[1], _arithOp[opcode - 77], p[2]);
+		break;
+	case 87 ... 96:
+		fprintf(_out, "global.vars[%d] %s monster.vars[%d]", p[1], _arithOp[opcode - 87], p[2]);
+		break;
+	case 97 ... 106:
+		fprintf(_out, "monster.vars[%d] %s monster.vars[%d]", p[1], _arithOp[opcode - 97], p[2]);
 		break;
 	case 107 ... 116:
 		fprintf(_out, "task.vars[%d] %s global.vars[%d]", p[1], _arithOp[opcode - 107], p[2]);
@@ -168,6 +199,18 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 187 ... 196:
 		fprintf(_out, "monster.vars[%d] %s %d", p[1], _arithOp[opcode - 187], read16(p + 2));
 		break;
+	case 197:
+		fprintf(_out, "set_moving_bounds num:%d", read16(p + 2));
+		break;
+	case 198:
+		fprintf(_out, "child_task num:%d", read16(p + 2));
+		break;
+	case 199:
+		fprintf(_out, "stop_current_monster_object");
+		break;
+	case 200:
+		fprintf(_out, "op52");
+		break;
 	case 202:
 		fprintf(_out, "op54");
 		break;
@@ -181,6 +224,9 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 208:
 	case 209:
 		fprintf(_out, "nop");
+		break;
+	case 211:
+		fprintf(_out, "add_lvl_object num:%d", read16(p + 2));
 		break;
 	case 213: {
 			char buffer1[64];
@@ -196,14 +242,29 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 217:
 		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
 		break;
+	case 218:
+		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
+		break;
 	case 220 ... 225:
 		fprintf(_out, "add_monster num:%d", read16(p + 2));
+		break;
+	case 226:
+		fprintf(_out, "add_monster_group num:%d", read16(p + 2));
 		break;
 	case 227:
 		fprintf(_out, "compare_vars num:%d", read16(p + 2));
 		break;
 	case 228:
 		fprintf(_out, "compare_flags num:%d", read16(p + 2));
+		break;
+	case 233:
+		fprintf(_out, "sm_not_flags num:%d", read16(p + 2));
+		break;
+	case 234:
+		fprintf(_out, "sm_flags num:%d", read16(p + 2));
+		break;
+	case 238:
+		fprintf(_out, "jmp num:%d", read16(p + 2));
 		break;
 	case 239:
 		fprintf(_out, "create_task num:%d", read16(p + 2));
@@ -220,8 +281,8 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 }
 
 int main(int argc, char *argv[]) {
-	if (argc == 2) {
-		FILE *fp = fopen(argv[1], "rb");
+	for (int i = 1; i < argc; ++i) {
+		FILE *fp = fopen(argv[i], "rb");
 		if (fp) {
 			visitOpcode = printMstOpcode;
 			uint32_t addr = 0;
@@ -235,11 +296,16 @@ int main(int argc, char *argv[]) {
 			}
 			fclose(fp);
 		}
-		if (0) {
-			for (int i = 0; i < op_count; ++i) {
-				if (_histogram[i] != 0) {
-					fprintf(stdout, "opcode %d referenced %d times\n", i, _histogram[i]);
-				}
+	}
+	if (kDumpOpcodeUsage) {
+		for (int i = 0; i < op_count; ++i) {
+			if (_histogram[i] != 0) {
+				fprintf(stdout, "opcode %d referenced %d times\n", i, _histogram[i]);
+			}
+		}
+		for (int i = 0; i < op_count; ++i) {
+			if (_histogram[i] == 0) {
+				fprintf(stdout, "opcode %d is unused\n", i);
 			}
 		}
 	}
