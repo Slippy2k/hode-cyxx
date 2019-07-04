@@ -3375,9 +3375,101 @@ int Game::runTask_default(Task *t) {
 		case 211: // 58
 			mstOp58_addLvlObject(t, READ_LE_UINT16(p + 2));
 			break;
-//		case 212: // 59
-//			// TODO
-//			break;
+		case 212: { // 59
+				LvlObject *o = 0;
+				if (t->monster2) {
+					o = t->monster2->o;
+				} else if (t->monster1) {
+					o = t->monster1->o16;
+				} else {
+					break;
+				}
+				assert(o);
+				int xPos = o->xPos + o->posTable[6].x; // _edi
+				int yPos = o->yPos + o->posTable[6].y; // _edx
+				const uint16_t flags1 = o->flags1;
+				if (flags1 & 0x10) {
+					xPos -= (int8_t)p[2];
+				} else {
+					xPos += (int8_t)p[2];
+				}
+				if (flags1 & 0x20) {
+					yPos -= (int8_t)p[3];
+				} else {
+					yPos += (int8_t)p[3];
+				}
+				int dirMask = 0;
+				if ((t->monster1 && (t->monster1->unk8[944] == 10 || t->monster1->unk8[944] == 25)) || (t->monster2 && (t->monster2->m45->unk0 == 10 || t->monster2->m45->unk0 == 25))) {
+					int dx = o->posTable[6].x - o->posTable[7].x;
+					int dy = o->posTable[6].y - o->posTable[7].y;
+					if (dx >= 8) {
+						dirMask = 2;
+					} else if (dx < -8) {
+						dirMask = 8;
+					}
+					if (dy >= 8) {
+						dirMask |= 4;
+					} else if (dy < -8) {
+						dirMask |= 1;
+					}
+				} else {
+					dirMask = ((flags1 & 0x10) != 0) ? 8 : 0;
+				}
+				if (p[1] == 0) {
+					int type = 0;
+					switch (dirMask) {
+					case 1:
+						type = 6;
+						break;
+					case 3:
+						type = 3;
+						break;
+					case 4:
+						type = 7;
+						break;
+					case 6:
+						type = 4;
+						break;
+					case 8:
+						type = 5;
+						break;
+					case 9:
+						type = 1;
+						break;
+					case 12:
+						type = 2;
+						break;
+					}
+					mstOp59_1(xPos, yPos, o->screenNum, type, (o->flags2 + 1) & 0xDFFF);
+				} else {
+					int type = 0;
+					switch (dirMask) {
+					case 1:
+						type = 6;
+						break;
+					case 3:
+						type = 3;
+						break;
+					case 4:
+						type = 7;
+						break;
+					case 6:
+						type = 4;
+						break;
+					case 8:
+						type = 5;
+						break;
+					case 9:
+						type = 1;
+						break;
+					case 12:
+						type = 2;
+						break;
+					}
+					mstOp59_2(xPos, yPos, o->screenNum, type, (o->flags2 + 1) & 0xDFFF);
+				}
+			}
+			break;
 		case 213: { // 60 - monster_set_action_direction
 				LvlObject *o = 0;
 				if (t->monster2) {
@@ -5041,6 +5133,14 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 	if (o) {
 		o->dataPtr = 0;
 	}
+}
+
+void Game::mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags) {
+	warning("mstOp59_1 unimplemented");
+}
+
+void Game::mstOp59_2(int x, int y, int screenNum, int type, uint16_t flags) {
+	warning("mstOp59_2 unimplemented");
 }
 
 void Game::executeMstUnk1(Task *t) {

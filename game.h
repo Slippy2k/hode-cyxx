@@ -658,6 +658,8 @@ struct Game {
 	int mstOp56_specialAction(Task *t, int code, int num);
 	void mstOp57_addSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
+	void mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags);
+	void mstOp59_2(int x, int y, int screenNum, int type, uint16_t flags);
 	void executeMstUnk1(Task *t);
 	int mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);
