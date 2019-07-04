@@ -589,7 +589,7 @@ struct Game {
 	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);
 	void disableMonsterObject1(MonsterObject1 *m);
 	void copyMonsterObject1(Task *t, MonsterObject1 *m, int num);
-	int initMonsterObject1Type2(Task *t);
+	int mstTaskStopMonsterObject1(Task *t);
 	void updateMstLvlObjectPos(MonsterObject1 *m);
 	bool updateMonsterObject1PositionHelper(MonsterObject1 *m);
 	bool updateMonsterObject1Position(MonsterObject1 *m);
@@ -633,7 +633,7 @@ struct Game {
 	void updateMstHeightMapData();
 
 	void mstRemoveMonsterObject2(Task *t, Task **tasksList);
-	void resetMstTask(Task *t, uint32_t codeData, uint8_t flags);
+	void mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags);
 	void mstRemoveMonsterObject1(Task *t, Task **tasksList);
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
