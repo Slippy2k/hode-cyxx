@@ -542,7 +542,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 			if (dx <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dx / p->unk1C;
+			return (p->unk40 == 3) ? 0 : dx / p->width;
 		}
 		break;
 	case 1:
@@ -557,7 +557,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 = p->boundingBox.y2 + dx2 * 2 / 3;
 					if (dy2 > _mstTemp_y1) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+						return (p->unk40 == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -574,7 +574,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 = p->boundingBox.y1 + dx2 * 2 / 3;
 					if (dy2 <= _mstTemp_y2) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+						return (p->unk40 == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -591,7 +591,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 =  p->boundingBox.y2 - dx2 * 2 / 3;
 					if (dy2 >= _mstTemp_y1) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+						return (p->unk40 == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -609,7 +609,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 = dx2 * 2 / 3 + + p->boundingBox.y1;
 					if (dy2 <= _mstTemp_y2) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->unk1C;
+						return (p->unk40 == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -621,7 +621,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 			if (dx <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dx / p->unk1C;
+			return (p->unk40 == 3) ? 0 : dx / p->width;
 		}
 		break;
 	case 6:
@@ -630,7 +630,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 			if (dy <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dy / p->unk20;
+			return (p->unk40 == 3) ? 0 : dy / p->height;
 		}
 		break;
 	case 7:
@@ -683,8 +683,8 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	} else {
 		m->flags49 |= 4;
 	}
-	m->unkEC = -1;
-	m->unk1C = 0;
+	m->collideDistance = -1;
+	m->collidePtr = 0;
 // 40ED0D
 	if (_mstMovingStateCount != 0 && !_specialAnimFlag && (o->flags1 & 6) != 6) {
 		if (m->localVars[7] > 0 || m->localVars[7] < -1) {
@@ -767,9 +767,9 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 					if (res < 0) {
 						continue;
 					}
-					if (m->unkEC == -1 || m->unkEC > res || (m->unkEC == 0 && res == 0 && (m->unk1C->unk40 & 1) == 0 && p->unk40 == 2)) {
-						m->unk1C = p;
-						m->unkEC = res;
+					if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->collidePtr->unk40 & 1) == 0 && p->unk40 == 2)) {
+						m->collidePtr = p;
+						m->collideDistance = res;
 					}
 				}
 			}
@@ -1571,7 +1571,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if (p->m && p->m != m) {
 			continue;
 		}
-		if (m->unkEC < 0) {
+		if (m->collideDistance < 0) {
 			continue;
 		}
 		if ((m->flags48 & 4) == 0) {
@@ -1938,8 +1938,8 @@ void Game::mstUpdateRefPos() {
 			_executeMstLogicPrevCounter = _executeMstLogicCounter;
 			return;
 		}
-		_mstMovingState[0].unk1C = 512;
-		_mstMovingState[0].unk20 = 512;
+		_mstMovingState[0].width  = 512;
+		_mstMovingState[0].height = 512;
 		_mstMovingState[0].unk28 = 0;
 		_mstMovingState[0].unk40 = 3;
 		_mstMovingState[0].unk18 = 4;
@@ -1995,8 +1995,8 @@ void Game::mstUpdateRefPos() {
 			if (ptr->dxPos == 0 && ptr->dyPos == 0) {
 				continue;
 			}
-			p->unk1C = ptr->dxPos;
-			p->unk20 = ptr->dyPos;
+			p->width  = ptr->dxPos;
+			p->height = ptr->dyPos;
 			p->unk24 = ptr->unk1;
 			switch (ptr->unk0) {
 			case 0:
@@ -2544,13 +2544,13 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 	case 6:
 		return _difficulty;
 	case 7:
-		if (t->monster1 && t->monster1->unk1C) {
-			return t->monster1->unk1C->unk40;
+		if (t->monster1 && t->monster1->collidePtr) {
+			return t->monster1->collidePtr->unk40;
 		}
 		return _mstMovingState[0].unk40;
 	case 8:
-		if (t->monster1 && t->monster1->unk1C) {
-			return t->monster1->unk1C->unk24 & 0x7F;
+		if (t->monster1 && t->monster1->collidePtr) {
+			return t->monster1->collidePtr->unk24 & 0x7F;
 		}
 		return _mstMovingState[0].unk24 & 0x7F;
 	case 9:
@@ -2605,7 +2605,7 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		break;
 	case 17:
 		if (t->monster1) {
-			return t->monster1->unkEC;
+			return t->monster1->collideDistance;
 		}
 		break;
 	case 18:
@@ -5610,7 +5610,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		memset(m->localVars, 0, sizeof(m->localVars));
 		m->flags48 = 0x1C;
 		m->flagsA5 = 0;
-		m->unkEC = -1;
+		m->collideDistance = -1;
 		m->m35 = 0;
 		m->flagsA6 = 0;
 

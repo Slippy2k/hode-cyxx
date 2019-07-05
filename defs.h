@@ -275,8 +275,8 @@ struct MovingOpcodeState {
 	int32_t yPos; // 4
 	BoundingBox boundingBox; // 8
 	int32_t unk18;
-	int32_t unk1C;
-	int32_t unk20;
+	int32_t width;
+	int32_t height;
 	int32_t unk24;
 	ShootLvlObjectData *unk28;
 	LvlObject *o; // 0x2C
@@ -340,7 +340,7 @@ struct MonsterObject1 {
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
 	MstUnk48Unk12Unk4 *unk18;
-	MovingOpcodeState *unk1C; // 0x1C
+	MovingOpcodeState *collidePtr; // 0x1C
 	int collisionNum; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
@@ -388,7 +388,7 @@ struct MonsterObject1 {
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;
 	uint16_t unkE8; // 0xE8
-	int unkEC; // 0xEC
+	int collideDistance; // 0xEC
 	int unkF0; // 0xF0
 	int unkF4; // 0xF4
 	uint8_t unkF8; // 0xF8
