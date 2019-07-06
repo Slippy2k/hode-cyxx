@@ -1231,6 +1231,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk46[i].data[j].unk6        = READ_LE_UINT16(data + 0x06);
 			_mstUnk46[i].data[j].energy      = READ_LE_UINT32(data + 0x0C);
 			_mstUnk46[i].data[j].unk10       = READ_LE_UINT32(data + 0x10);
+			_mstUnk46[i].data[j].unk14       = READ_LE_UINT32(data + 0x14);
 			_mstUnk46[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
 			_mstUnk46[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);
 			_mstUnk46[i].data[j].indexUnk47  = READ_LE_UINT32(data + 0x24);

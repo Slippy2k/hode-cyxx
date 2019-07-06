@@ -651,7 +651,7 @@ struct Game {
 	int runTask_default(Task *t);
 	void mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum);
 	void mstOp27_removeMstTaskScreenFlags(Task **tasksList, int num, int arg);
-	int mstOp49(int a, int b, int c, int d, int screen, Task *t, int num);
+	int mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num);
 	void executeMstOp52();
 	bool mstCollidesDirection(MstUnk48 *m, uint8_t flag);
 	void mstOp53(MstUnk48 *m);

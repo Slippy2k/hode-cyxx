@@ -1605,7 +1605,26 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			continue;
 		}
 		m->unkF0 = 8;
-		warning("mstUpdateTaskMonsterObject1 4183E6");
+		//int var28 = 0;
+		//MovingOpcodeState *var14 = m->collidePtr;
+		if (t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
+			if (m->unk8[946] & 2) {
+				warning("mstUpdateTaskMonsterObject1 418459");
+				// TODO
+			}
+		} else {
+// 4184EC
+			m->unkF0 = _mstLut1[m->flags4A];
+			//var28 = 0;
+		}
+// 418508
+		//int var24 = 0;
+		if (m->unk4->unk14 != 0) {
+			//var24 = _rnd.update() % (m->unk4->unk14 + 1);
+		}
+// 418530
+		warning("mstUpdateTaskMonsterObject1 418530");
+		// TODO
 	}
 // 41882E
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
@@ -3270,7 +3289,7 @@ int Game::runTask_default(Task *t) {
 				if (e >= _res->_mstHdr.pointsCount) {
 					e = _res->_mstHdr.pointsCount - 1;
 				}
-				ret = mstOp49(a, b, c, d, e, t, num);
+				ret = mstOp49_setMovingBounds(a, b, c, d, e, t, num);
 			}
 			break;
 		case 198: { // 50
@@ -3994,8 +4013,7 @@ void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int
 	}
 }
 
-// mstOp49_setMovingBounds
-int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
+int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num) {
 	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
 	MonsterObject1 *m = t->monster1;
 	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
@@ -4163,31 +4181,38 @@ int Game::mstOp49(int a, int b, int c, int d, int screen, Task *t, int num) {
 				d = 255 - x;
 			}
 			int y = MIN(_mstAndyScreenPosY, 191);
+			int _ebp, var4;
 			if (y < 0) {
-				// _ebp = y
-				// var4 = y + 191;
+				_ebp = y;
+				var4 = y + 191;
 			} else {
-				// _ebp = -y;
-				// var4 = 191 - y;
+				_ebp = -y;
+				var4 = 191 - y;
 			}
+			int _edx, _edi;
 			if (_dl == 0xFD && m->xMstPos < _mstPosX) {
-				// _edx = -m->unk68;
-				// _edi = -m->unk64;
+				_edx = -m->unk68;
+				_edi = -m->unk64;
 			} else {
-				// _edx = m->unk64;
-				// _edi = m->unk68;
+				_edx = m->unk64;
+				_edi = m->unk68;
 			}
-			if ((m->unk8[946] & 2) != 0 && _dl == 0xFD && m->yMstPos < _mstPosY) {
-				// _eax = -m->unk70;
-				// _ecx = -m>-unk6C;
+			uint8_t _bl = m->unk8[946] & 2;
+			int _eax, _ecx;
+			if (_bl != 0 && _dl == 0xFD && m->yMstPos < _mstPosY) {
+				_eax = -m->unk70;
+				_ecx = -m->unk6C;
 			} else {
-				// _eax = m->unk6C;
-				// _ecx = m->unk70;
+				_eax = m->unk6C;
+				_ecx = m->unk70;
 			}
-
-			warning("mstOp49 41BEF4");
-			// TODO
-			return mstTaskStopMonsterObject1(t);
+			if (_edx < a || _edi < b || (_bl != 0 && (_eax < _ebp || _ecx > var4))) {
+				if ((m->unk8[946] & 4) != 0) {
+					warning("mstOp49 41BFDD");
+					// TODO
+				}
+				return mstTaskStopMonsterObject1(t);
+			}
 		}
 	}
 // 41C038
