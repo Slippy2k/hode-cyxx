@@ -1202,8 +1202,29 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 }
 
 bool Game::executeMstUnk6(MonsterObject1 *m) {
-	warning("executeMstUnk6 unimplemented");
-	// TODO
+	if (_mstLut1[m->flags4A] & 1) {
+		if (_xMstPos2 < m->m49->unk14) {
+			m->flags4A &= ~0xA;
+		}
+		if (_yMstPos < m->m49->unk15) {
+			m->flags4A &= ~0x5;
+		}
+	}
+	if (_mstLut1[m->flags4A] & 1) {
+		while (--m->unkDC >= 0) {
+			m->unkD4 = &m->m49->data1[m->unkDC];
+			if (_xMstPos2 >= m->unkD4->unkE && _yMstPos >= m->unkD4->unkF) {
+				return true;
+			}
+		}
+	} else {
+		while (--m->unkDC >= 0) {
+			m->unkD4 = &m->m49->data1[m->unkDC];
+			if (((m->flags4A & 0xA) == 0 || _xMstPos2 >= m->unkD4->unkC) && ((m->flags4A & 0x5) == 0 || _yMstPos >= m->unkD4->unkD)) {
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -5452,42 +5473,81 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		return 0;
 	}
 // 41CCA3
+	int _edi;
 	const uint8_t *p = m->unk8;
 	if (p[946] & 2) {
 		m->unkE4 = 255;
-		warning("executeMstOp67Type2 t %p flag %d p[946] %x", t, flag, p[946]);
-		// TODO
-	}
-// 41CE2B
-	int32_t _ebp = READ_LE_UINT32(p + 900);
-	int32_t _ecx = READ_LE_UINT32(p + 896);
-	int r = _ecx / 4;
-	m->unk64 = _ebp + r;
-	m->unk68 = _ecx + _ebp - r;
-	if (r != 0) {
-		r = _rnd.update() % r;
-	}
-	m->unk64 += r;
-	m->unk68 -= r;
-	m->unk74 = m->unk64;
-	m->unk7C = m->unk68;
-	if (m->flags4B == 0 && m->xMstPos < _mstPosX) {
-		m->unk74 = _mstPosX - m->unk68;
-		m->unk7C = _mstPosX - m->unk64;
-	} else {
-// 41CEA1
-		m->unk74 = _mstPosX + m->unk64;
-		m->unk7C += _mstPosX;
-	}
-// 41CEB4
-	mstSetHorizontalBounds(m);
-	int _edi = 1;
-	while (_xMstPos2 < m->unkD4->unkC) {
-		if (--m->unkDC < 0) {
-			_edi = 0;
-			break;
+		if (p[946] & 4) {
+// 41CCC5
+			warning("executeMstOp67Type2 t %p flag %d p[946] %x", t, flag, p[946]);
 		}
-		m->unkD4 = &m->m49->data1[m->unkDC];
+// 41CD22
+		m->unk64 = READ_LE_UINT32(m->unk8 + 900);
+		m->unk68 = m->unk64 + READ_LE_UINT32(m->unk8 + 896);
+		m->unk6C = READ_LE_UINT32(m->unk8 + 900);
+		m->unk70 = m->unk6C + READ_LE_UINT32(m->unk8 + 896);
+		m->unk74 = m->unk64;
+		m->unk7C = m->unk68;
+		m->unk78 = m->unk6C;
+		m->unk80 = m->unk70;
+		const uint8_t *ptr1 = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+		if ((ptr1[2] & 0x5) == 0) {
+			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
+		}
+		if ((ptr1[2] & 0xA) == 0) {
+			m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
+		}
+		if (p[946] & 4) {
+			executeMstUnk4(m);
+			executeMstUnk8(m);
+		} else {
+			executeMstUnk4(m);
+			mstSetVerticalHorizontalBounds(m);
+		}
+		_edi = 1;
+		int8_t _cl, _dl;
+		if (_mstLut1[m->flags4A] & 1) {
+			_cl = m->unkD4->unkE;
+			_dl = m->unkD4->unkF;
+		} else {
+			_cl = m->unkD4->unkC;
+			_dl = m->unkD4->unkD;
+		}
+		if (_xMstPos2 < _cl && _yMstPos < _dl && !executeMstUnk6(m)) {
+			_edi = 0;
+		}
+	} else {
+// 41CE2B
+		int32_t _ebp = READ_LE_UINT32(p + 900);
+		int32_t _ecx = READ_LE_UINT32(p + 896);
+		int r = _ecx / 4;
+		m->unk64 = _ebp + r;
+		m->unk68 = _ecx + _ebp - r;
+		if (r != 0) {
+			r = _rnd.update() % r;
+		}
+		m->unk64 += r;
+		m->unk68 -= r;
+		m->unk74 = m->unk64;
+		m->unk7C = m->unk68;
+		if (m->flags4B == 0 && m->xMstPos < _mstPosX) {
+			m->unk74 = _mstPosX - m->unk68;
+			m->unk7C = _mstPosX - m->unk64;
+		} else {
+// 41CEA1
+			m->unk74 = _mstPosX + m->unk64;
+			m->unk7C += _mstPosX;
+		}
+// 41CEB4
+		mstSetHorizontalBounds(m);
+		_edi = 1;
+		while (_xMstPos2 < m->unkD4->unkC) {
+			if (--m->unkDC < 0) {
+				_edi = 0;
+				break;
+			}
+			m->unkD4 = &m->m49->data1[m->unkDC];
+		}
 	}
 // 41CF17
 	if (_xMstPos2 <= 0) {
