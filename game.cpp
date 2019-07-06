@@ -321,8 +321,8 @@ void Game::addToSpriteList(LvlObject *ptr) {
 			spr->bitmapBits = ptr->bitmapBits;
 			_spritesListNextPtr = spr->nextPtr;
 			index = (ptr->flags2 & 31);
-			spr->nextPtr = _gameSpriteListPtrTable[index];
-			_gameSpriteListPtrTable[index] = spr;
+			spr->nextPtr = _spriteListPtrTable[index];
+			_spriteListPtrTable[index] = spr;
 		}
 	}
 }
@@ -1829,21 +1829,21 @@ void Game::drawScreen() {
 
 	// redraw background animation sprites
 	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[_res->_currentScreenResourceNum];
-	for (Sprite *spr = _gameSpriteListPtrTable[0]; spr; spr = spr->nextPtr) {
+	for (Sprite *spr = _spriteListPtrTable[0]; spr; spr = spr->nextPtr) {
 		if ((spr->num & 0x1F) == 0) {
 			_video->decodeSPR(spr->bitmapBits, _video->_backgroundLayer, spr->xPos, spr->yPos, 0);
 		}
 	}
 	memset(_video->_shadowLayer, 0, Video::W * Video::H);
 	for (int i = 1; i < 8; ++i) {
-		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x2000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_shadowLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
 		}
 	}
 	for (int i = 1; i < 4; ++i) {
-		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -1855,14 +1855,14 @@ void Game::drawScreen() {
 		}
 	}
 	for (int i = 4; i < 8; ++i) {
-		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
 		}
 	}
 	for (int i = 0; i < 24; ++i) {
-		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x2000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_shadowLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -1881,7 +1881,7 @@ void Game::drawScreen() {
 			_shadowScreenMasksTable[i].shadowPalettePtr);
 	}
 	for (int i = 1; i < 12; ++i) {
-		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -1893,7 +1893,7 @@ void Game::drawScreen() {
 		}
 	}
 	for (int i = 12; i <= 24; ++i) {
-		for (Sprite *spr = _gameSpriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -2015,8 +2015,8 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			spr->num = ptr->flags2;
 			const int index = spr->num & 0x1F;
 			_spritesListNextPtr = spr->nextPtr;
-			spr->nextPtr = _gameSpriteListPtrTable[index];
-			_gameSpriteListPtrTable[index] = spr;
+			spr->nextPtr = _spriteListPtrTable[index];
+			_spriteListPtrTable[index] = spr;
 		}
 	}
 	int16_t soundNum = -1;
@@ -2114,8 +2114,8 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 				_spritesListNextPtr = spr->nextPtr;
 				spr->num = ptr->flags2;
 				const int index = spr->num & 0x1F;
-				spr->nextPtr = _gameSpriteListPtrTable[index];
-				_gameSpriteListPtrTable[index] = spr;
+				spr->nextPtr = _spriteListPtrTable[index];
+				_spriteListPtrTable[index] = spr;
 			}
 		}
 	}
@@ -2168,8 +2168,8 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 			int index = spr->num = _ecx;
 			index &= 0x1F;
 			_spritesListNextPtr = spr->nextPtr;
-			spr->nextPtr = _gameSpriteListPtrTable[index];
-			_gameSpriteListPtrTable[index] = spr;
+			spr->nextPtr = _spriteListPtrTable[index];
+			_spriteListPtrTable[index] = spr;
 		}
 	}
 	if (ptr->spriteNum <= 15 || ptr->dataPtr == 0) {
@@ -2407,7 +2407,7 @@ void Game::updateInput() {
 }
 
 void Game::levelMainLoop() {
-	memset(_gameSpriteListPtrTable, 0, sizeof(_gameSpriteListPtrTable));
+	memset(_spriteListPtrTable, 0, sizeof(_spriteListPtrTable));
 	_spritesListNextPtr = &_spritesTable[0];
 	for (int i = 0; i < kMaxSprites - 1; ++i) {
 		_spritesTable[i].nextPtr = &_spritesTable[i + 1];

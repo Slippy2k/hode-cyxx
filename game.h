@@ -51,6 +51,7 @@ struct Game {
 		kMaxMonsterObjects2 = 64,
 		kMaxBackgroundAnims = 64,
 		kMaxSprites = 128,
+		kMaxSpriteTypes = 32,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -87,7 +88,7 @@ struct Game {
 	bool _quit;
 	Sprite _spritesTable[kMaxSprites];
 	Sprite *_spritesListNextPtr; // pointer to the first 'free' element
-	Sprite *_gameSpriteListPtrTable[32];
+	Sprite *_spriteListPtrTable[kMaxSpriteTypes];
 	uint16_t _fadePaletteBuffer[256 * 3];
 	uint8_t *_shadowScreenMaskBuffer;
 	uint8_t *_transformShadowBuffer;
