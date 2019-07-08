@@ -1246,7 +1246,7 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 	return executeMstUnk9(t, m);
 }
 
-bool Game::executeMstUnk17(MonsterObject1 *m, int num) {
+bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	LvlObject *o = m->o16;
 	uint8_t _al = _res->_mstUnk52[num * 4];
 	uint8_t _bl = _res->_mstUnk52[num * 4 + 2];
@@ -1272,7 +1272,7 @@ bool Game::executeMstUnk17(MonsterObject1 *m, int num) {
 			} else {
 				_ecx |= m->flags49;
 				if (m->unk8[946] & 2) {
-					if (_ebp == 160 && _mstLut1[_ecx] != 1) {
+					if (_ebp == 160 && (_mstLut1[_ecx] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
 							_ecx &= ~5;
 						} else {
@@ -1290,7 +1290,7 @@ bool Game::executeMstUnk17(MonsterObject1 *m, int num) {
 			break;
 		case 128: // 1
 			_ecx |= var8;
-			if ((m->unk8[946] & 2) != 0 && _mstLut1[_ecx] != 1) {
+			if ((m->unk8[946] & 2) != 0 && (_mstLut1[_ecx] & 1) != 0) {
 				if (m->xDelta >= m->yDelta) {
 					_ecx &= ~5;
 				} else {
@@ -2830,7 +2830,7 @@ int Game::runTask_default(Task *t) {
 		case 13: // 8
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				if (executeMstUnk17(t->monster1, num)) {
+				if (mstTestActionDirection(t->monster1, num)) {
 					const int arg = _res->_mstUnk52[num * 4 + 3];
 					t->codeData = p;
 					ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
@@ -3150,6 +3150,9 @@ int Game::runTask_default(Task *t) {
 				assert(p[1] < kMaxVars);
 				assert(p[2] < kMaxVars);
 				arithOp(p[0] - 117, &_mstVars[p[1]], _mstVars[p[2]]);
+				if (p[1] == 31 && _mstVars[31] > 0) {
+					_mstTickDelay = _mstVars[31];
+				}
 			}
 			break;
 		case 137:

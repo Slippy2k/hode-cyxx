@@ -621,7 +621,7 @@ struct Game {
 	void executeMstUnk8(MonsterObject1 *m);
 	int executeMstUnk9(Task *t, MonsterObject1 *m);
 	int executeMstUnk11(Task *t, MonsterObject1 *m);
-	bool executeMstUnk17(MonsterObject1 *m, int num);
+	bool mstTestActionDirection(MonsterObject1 *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);
 	bool executeMstUnk28(LvlObject *o, int type) const;
