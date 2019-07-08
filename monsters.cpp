@@ -234,22 +234,10 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	const uint32_t codeData = m48->codeData2;
 	if (codeData != kNone) {
 		resetTask(t, _res->_mstCodeData + codeData * 4);
-		m->flags48 &= ~0x50;
-		m48->unk1B = 255;
-		m->unk18 = 0;
-		--_mstChasingMonstersCount;
-		if (_mstChasingMonstersCount <= 0) {
-			_m48Num = -1;
-		}
+		disableMonsterObject1(m);
 		return 0;
 	}
-	m->flags48 &= ~0x50;
-	m48->unk1B = 255;
-	m->unk18 = 0;
-	--_mstChasingMonstersCount;
-	if (_mstChasingMonstersCount <= 0) {
-		_m48Num = -1;
-	}
+	disableMonsterObject1(m);
 	if (m->flagsA5 & 0x80) {
 		m->flagsA5 &= ~8;
 		const uint32_t codeData = m->unk4->codeData;
@@ -4297,13 +4285,7 @@ void Game::executeMstOp52() {
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
 			MonsterObject1 *m = &_monsterObjects1Table[num];
-			m->flags48 &= ~0x50;
-			m->unk18->unk1B = 255;
-			m->unk18 = 0;
-			--_mstChasingMonstersCount;
-			if (_mstChasingMonstersCount <= 0) {
-				_m48Num = -1;
-			}
+			disableMonsterObject1(m);
 			if ((m->flagsA5 & 0x70) == 0) {
 				const int a = (m->o16->flags0 & 255) * 28;
 				if (m->unk8[a] != 0) {
