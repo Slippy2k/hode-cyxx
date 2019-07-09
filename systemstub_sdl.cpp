@@ -403,14 +403,16 @@ void SystemStub_SDL::updateScreen(bool drawWidescreen) {
 			src -= _shakeDx;
 		}
 	}
-	uint32_t *p = _offscreenRgb;
+	uint32_t *p = (_scalerMultiplier == 1) ? dst : _offscreenRgb;
 	for (int y = 0; y < h; ++y) {
 		for (int x = 0; x < w; ++x) {
 			p[x] = _pal[src[y * w + x]];
 		}
 		p += w;
 	}
-	_scaler->scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
+	if (_scalerMultiplier != 1) {
+		_scaler->scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
+	}
 	SDL_UnlockTexture(_texture);
 
 	SDL_RenderClear(_renderer);
