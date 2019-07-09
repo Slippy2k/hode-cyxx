@@ -5435,9 +5435,14 @@ int Game::executeMstOp67Type1(Task *t) {
 // 41C7F6
 		if (_edi != 0) {
 			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m->m49->unk15)) {
+// 41C833
+				if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->unkD4->offsetHeight + 0xE] != 0 && m->flagsA8 == 0) {
+					warning("executeMstOp67Type1 41C863");
+					// TODO
+				}
+// 41C976
+				warning("executeMstOp67Type1 41C976");
 				// TODO
-				warning("executeMstOp67Type1 41C833");
-
 // 41CA2D
 				if (m->unk8[946] & 4) {
 					t->run = &Game::runTask_unk9;
