@@ -1587,12 +1587,24 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			//var28 = 0;
 		}
 // 418508
-		//int var24 = 0;
-		if (m->unk4->unk14 != 0) {
-			//var24 = _rnd.update() % (m->unk4->unk14 + 1);
+		uint32_t var24 = 0;
+		MstUnk46Unk1 *_esi = m->unk4;
+		if (_esi->unk14 != 0) {
+			var24 = _rnd.update() % (_esi->unk14 + 1);
 		}
 // 418530
-		warning("mstUpdateTaskMonsterObject1 418530");
+		//int var20 = -1;
+		//int var18;
+		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->unk4 != 0 && m->unk8 == &_res->_mstHeightMapData[m->unk18->unk0 * 948]) {
+			//var18 = m->unk18->unk4;
+		} else {
+			//var18 = _esi->indexUnk51;
+		}
+		if (var24 >= _esi->unk8) {
+			continue;
+		}
+// 418554
+		warning("mstUpdateTaskMonsterObject1 418554");
 		// TODO
 	}
 // 41882E
@@ -3689,8 +3701,6 @@ int Game::runTask_default(Task *t) {
 				const MstUnk55 *m = &_res->_mstUnk55[num];
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
-				// TODO: mstOp231 & mstOp232 are duplicating code
-				// could we simply break and leave the codeData pointer to the same opcode ?
 				if (compareOp(m->compare, a, b)) {
 					if (p[0] == 231) {
 						LvlObject *o = 0;

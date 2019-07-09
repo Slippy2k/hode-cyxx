@@ -1229,6 +1229,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk46[i].data[j].indexHeight = READ_LE_UINT32(data);
 			_mstUnk46[i].data[j].anim        = READ_LE_UINT16(data + 0x04);
 			_mstUnk46[i].data[j].unk6        = READ_LE_UINT16(data + 0x06);
+			_mstUnk46[i].data[j].unk8        = READ_LE_UINT32(data + 0x08);
 			_mstUnk46[i].data[j].energy      = READ_LE_UINT32(data + 0x0C);
 			_mstUnk46[i].data[j].unk10       = READ_LE_UINT32(data + 0x10);
 			_mstUnk46[i].data[j].unk14       = READ_LE_UINT32(data + 0x14);
@@ -1304,6 +1305,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 				uint8_t data[28];
 				fp->read(data, sizeof(data));
 				m12[j].data[k].unk0 = READ_LE_UINT32(data);
+				m12[j].data[k].unk4 = READ_LE_UINT32(data + 0x4);
 				m12[j].data[k].unk8 = READ_LE_UINT32(data + 0x8);
 				m12[j].data[k].unkC = READ_LE_UINT32(data + 0xC);
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);

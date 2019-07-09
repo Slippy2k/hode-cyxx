@@ -194,6 +194,7 @@ struct MstUnk46Unk1 { // MonsterBehaviour
 	uint32_t indexHeight; // 0, indexes mstHeightMapData
 	uint16_t anim; // 4
 	uint16_t unk6; // 6
+	uint32_t unk8; // 0x8
 	uint32_t energy; // 0xC
 	uint32_t unk10; // 0x10
 	uint32_t unk14; // 0x14
@@ -215,6 +216,7 @@ struct MstUnk47 {
 
 struct MstUnk48Unk12Unk4 {
 	uint32_t unk0; // 0x0, indexes _mstHeightMapData
+	uint32_t unk4; // 0x4
 	int32_t unk8; // 0x8 xPos
 	int32_t unkC; // 0xC yPos
 	uint32_t codeData; // 0x10
