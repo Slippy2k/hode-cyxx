@@ -3155,6 +3155,29 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
+		case 127:
+		case 128:
+		case 129:
+		case 130:
+		case 131:
+		case 132:
+		case 133:
+		case 134:
+		case 135:
+		case 136: { // 42
+				MonsterObject1 *m = 0;
+				if (t->monster2) {
+					m = t->monster2->monster1;
+				} else {
+					m = t->monster1;
+				}
+				if (m) {
+					assert(p[1] < kMaxLocals);
+					assert(p[2] < kMaxVars);
+					arithOp(p[0] - 127, &m->localVars[p[1]], _mstVars[p[2]]);
+				}
+			}
+			break;
 		case 137:
 		case 138:
 		case 139:

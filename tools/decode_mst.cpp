@@ -96,7 +96,11 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "set_var_random_range num:%d", read16(p + 2));
 		break;
 	case 3:
+	case 8:
 		fprintf(_out, "set_monster_action_direction_imm num:%d", read16(p + 2));
+		break;
+	case 4:
+		fprintf(_out, "set_monster_action_direction_task_var num:%d", read16(p + 2));
 		break;
 	case 5:
 		fprintf(_out, "set_monster_action_direction_global_var num:%d", read16(p + 2));
@@ -132,7 +136,10 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "sm_wait andy_var num:%d", p[1]);
 		break;
 	case 30:
-		fprintf(_out, "sm_wait global_flag bit:%d", p[1]);
+		fprintf(_out, "sm_wait flag_global bit:%d", p[1]);
+		break;
+	case 32:
+		fprintf(_out, "sm_wait flag_monster bit:%d", p[1]);
 		break;
 	case 33:
 	case 229:
@@ -195,6 +202,9 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 117 ... 126:
 		fprintf(_out, "global.vars[%d] %s global.vars[%d]", p[1], _arithOp[opcode - 117], p[2]);
 		break;
+	case 127 ... 136:
+		fprintf(_out, "monster.vars[%d] %s global.vars[%d]", p[1], _arithOp[opcode - 127], p[2]);
+		break;
 	case 137 ... 146: {
 			char buffer[64];
 			fprintf(_out, "task.vars[%d] %s %s", p[1], _arithOp[opcode - 137], taskOtherVar(p[2], buffer));
@@ -226,6 +236,9 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 200:
 		fprintf(_out, "op52");
 		break;
+	case 201:
+		fprintf(_out, "op51");
+		break;
 	case 202:
 		fprintf(_out, "op54");
 		break;
@@ -243,6 +256,9 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 211:
 		fprintf(_out, "add_lvl_object num:%d", read16(p + 2));
 		break;
+	case 212:
+		fprintf(_out, "op59 type:%d dx:%d dy:%d", p[1], (int8_t)p[2], (int8_t)p[3]);
+		break;
 	case 213: {
 			char buffer1[64];
 			taskVar(p[2], p[1] >> 4, buffer1);
@@ -253,6 +269,9 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		break;
 	case 214:
 		fprintf(_out, "reset_monster_energy");
+		break;
+	case 215:
+		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
 		break;
 	case 217:
 		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
@@ -272,11 +291,20 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 228:
 		fprintf(_out, "compare_flags num:%d", read16(p + 2));
 		break;
+	case 231:
+		fprintf(_out, "sm_wait flag_task num:%d", read16(p + 2));
+		break;
+	case 232:
+		fprintf(_out, "sm_not_wait flag_task num:%d", read16(p + 2));
+		break;
 	case 233:
 		fprintf(_out, "sm_not_flags num:%d", read16(p + 2));
 		break;
 	case 234:
 		fprintf(_out, "sm_flags num:%d", read16(p + 2));
+		break;
+	case 237:
+		fprintf(_out, "remove_monster_task");
 		break;
 	case 238:
 		fprintf(_out, "jmp num:%d", read16(p + 2));
