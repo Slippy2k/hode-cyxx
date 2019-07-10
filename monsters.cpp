@@ -1180,16 +1180,16 @@ bool Game::executeMstUnk6(MonsterObject1 *m) {
 		}
 	}
 	if (_mstLut1[m->flags4A] & 1) {
-		while (--m->unkDC >= 0) {
-			m->unkD4 = &m->m49->data1[m->unkDC];
-			if (_xMstPos2 >= m->unkD4->unkE && _yMstPos >= m->unkD4->unkF) {
+		while (--m->indexUnk49Unk1 >= 0) {
+			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+			if (_xMstPos2 >= m->m49Unk1->unkE && _yMstPos >= m->m49Unk1->unkF) {
 				return true;
 			}
 		}
 	} else {
-		while (--m->unkDC >= 0) {
-			m->unkD4 = &m->m49->data1[m->unkDC];
-			if (((m->flags4A & 0xA) == 0 || _xMstPos2 >= m->unkD4->unkC) && ((m->flags4A & 0x5) == 0 || _yMstPos >= m->unkD4->unkD)) {
+		while (--m->indexUnk49Unk1 >= 0) {
+			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+			if (((m->flags4A & 0xA) == 0 || _xMstPos2 >= m->m49Unk1->unkC) && ((m->flags4A & 0x5) == 0 || _yMstPos >= m->m49Unk1->unkD)) {
 				return true;
 			}
 		}
@@ -4024,16 +4024,16 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
 	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
 	m->m49 = m49;
-	m->unkDC = op49data->unkF;
-	if (m->unkDC < 0) {
+	m->indexUnk49Unk1 = op49data->unkF;
+	if (m->indexUnk49Unk1 < 0) {
 		if (m49->count2 == 0) {
-			m->unkDC = 0;
+			m->indexUnk49Unk1 = 0;
 		} else {
-			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
+			m->indexUnk49Unk1 = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
-	assert((uint32_t)m->unkDC < m49->count1);
-	m->unkD4 = &m49->data1[m->unkDC];
+	assert((uint32_t)m->indexUnk49Unk1 < m49->count1);
+	m->m49Unk1 = &m49->data1[m->indexUnk49Unk1];
 	m->flags4B = screen;
 	if (a > b) {
 		m->unk64 = b;
@@ -4150,7 +4150,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->unkBC = -1;
 	m->flagsA7 = 255;
 	m->unk80 = m->unk70;
-	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 	if ((ptr[2] & 5) == 0) {
 		m->unk6C = m->yMstPos;
 		m->unk78 = m->yMstPos;
@@ -4242,11 +4242,11 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 // 41C281
 		uint8_t _cl, _dl;
 		if (_mstLut1[m->flags4A] & 1) {
-			_cl = m->unkD4->unkE;
-			_dl = m->unkD4->unkF;
+			_cl = m->m49Unk1->unkE;
+			_dl = m->m49Unk1->unkF;
 		} else {
-			_cl = m->unkD4->unkC;
-			_dl = m->unkD4->unkD;
+			_cl = m->m49Unk1->unkC;
+			_dl = m->m49Unk1->unkD;
 		}
 		if (_xMstPos2 < _cl && _yMstPos < _dl && !executeMstUnk6(m)) {
 // 41C2E6
@@ -4266,12 +4266,12 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		}
 // 41C399
 		mstSetHorizontalBounds(m);
-		while (_xMstPos2 < m->unkD4->unkC) {
-			if (--m->unkDC < 0) {
+		while (_xMstPos2 < m->m49Unk1->unkC) {
+			if (--m->indexUnk49Unk1 < 0) {
 				goto l41C2E6;
 				break;
 			}
-			m->unkD4 = &m->m49->data1[m->unkDC];
+			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 		}
 	}
 // 41C3FD
@@ -5365,17 +5365,17 @@ int Game::executeMstOp67Type1(Task *t) {
 	assert(indexUnk49 != kNone);
 	MstUnk49 *m49 = &_res->_mstUnk49[indexUnk49];
 	m->m49 = m49;
-	m->unkDC = m36->unk4;
-	if (m->unkDC < 0) {
+	m->indexUnk49Unk1 = m36->unk4;
+	if (m->indexUnk49Unk1 < 0) {
 		if (m49->count2 == 0) {
-			m->unkDC = 0;
+			m->indexUnk49Unk1 = 0;
 		} else {
-			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
+			m->indexUnk49Unk1 = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 // 41C5B1
-	assert((uint32_t)m->unkDC < m49->count1);
-	m->unkD4 = &m49->data1[m->unkDC];
+	assert((uint32_t)m->indexUnk49Unk1 < m49->count1);
+	m->m49Unk1 = &m49->data1[m->indexUnk49Unk1];
 	int _edi = (m->unkC->x1 - x) / 4;
 	m->unk64 = x + _edi;
 	m->unk68 = m->unkC->x1 - _edi;
@@ -5386,7 +5386,7 @@ int Game::executeMstOp67Type1(Task *t) {
 	m->unk64 += _edi;
 	m->unk74 = m->unk64;
 	m->unk7C = m->unk68;
-	const uint8_t *ptr1 = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+	const uint8_t *ptr1 = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 	if ((ptr1[2] & 0xA) == 0) {
 		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
 	}
@@ -5402,7 +5402,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		m->unk78 = m->unk6C;
 		m->unk70 -= _edi;
 		m->unk80 = m->unk70;
-		const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+		const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 		if ((ptr[2] & 5) == 0) {
 			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 		}
@@ -5416,12 +5416,12 @@ int Game::executeMstOp67Type1(Task *t) {
 // 41C712
 	mstSetHorizontalBounds(m);
 	_edi = 1;
-	while (_xMstPos2 < m->unkD4->unkC) {
-		if (--m->unkDC < 0) {
+	while (_xMstPos2 < m->m49Unk1->unkC) {
+		if (--m->indexUnk49Unk1 < 0) {
 			_edi = 0;
 			break;
 		}
-		m->unkD4 = &m->m49->data1[m->unkDC];
+		m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 	}
 // 41C774
 	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos <= 0)) {
@@ -5436,13 +5436,19 @@ int Game::executeMstOp67Type1(Task *t) {
 		if (_edi != 0) {
 			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m->m49->unk15)) {
 // 41C833
-				if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->unkD4->offsetHeight + 0xE] != 0 && m->flagsA8 == 0) {
+				if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->m49Unk1->offsetHeight + 0xE] != 0 && m->flagsA8 == 0) {
 					warning("executeMstOp67Type1 41C863");
 					// TODO
 				}
 // 41C976
-				warning("executeMstOp67Type1 41C976");
-				// TODO
+				if (_xMstPos2 >= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m36->unk8)) {
+					m->indexUnk49Unk1 = m->m49->count1 - 1;
+					m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+					if (m->unk8[946] & 4) {
+						warning("executeMstOp67Type1 41C9CD");
+						// TODO
+					}
+				}
 // 41CA2D
 				if (m->unk8[946] & 4) {
 					t->run = &Game::runTask_unk9;
@@ -5478,20 +5484,20 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	MstUnk49 *m49 = &_res->_mstUnk49[j];
 	m->m49 = m49;
 	if (flag != 0) {
-		m->unkDC = m49->count1 - 1;
+		m->indexUnk49Unk1 = m49->count1 - 1;
 	} else {
-		m->unkDC = m36->unk4;
+		m->indexUnk49Unk1 = m36->unk4;
 	}
-	if (m->unkDC < 0) {
+	if (m->indexUnk49Unk1 < 0) {
 		if (m49->count2 == 0) {
-			m->unkDC = 0;
+			m->indexUnk49Unk1 = 0;
 		} else {
-			m->unkDC = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
+			m->indexUnk49Unk1 = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 // 41CC44
-	assert((uint32_t)m->unkDC < m49->count1);
-	m->unkD4 = &m49->data1[m->unkDC];
+	assert((uint32_t)m->indexUnk49Unk1 < m49->count1);
+	m->m49Unk1 = &m49->data1[m->indexUnk49Unk1];
 	m->flags4B = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;
@@ -5519,7 +5525,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		m->unk7C = m->unk68;
 		m->unk78 = m->unk6C;
 		m->unk80 = m->unk70;
-		const uint8_t *ptr1 = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+		const uint8_t *ptr1 = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 		if ((ptr1[2] & 0x5) == 0) {
 			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 		}
@@ -5536,11 +5542,11 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		_edi = 1;
 		int8_t _cl, _dl;
 		if (_mstLut1[m->flags4A] & 1) {
-			_cl = m->unkD4->unkE;
-			_dl = m->unkD4->unkF;
+			_cl = m->m49Unk1->unkE;
+			_dl = m->m49Unk1->unkF;
 		} else {
-			_cl = m->unkD4->unkC;
-			_dl = m->unkD4->unkD;
+			_cl = m->m49Unk1->unkC;
+			_dl = m->m49Unk1->unkD;
 		}
 		if (_xMstPos2 < _cl && _yMstPos < _dl && !executeMstUnk6(m)) {
 			_edi = 0;
@@ -5570,12 +5576,12 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CEB4
 		mstSetHorizontalBounds(m);
 		_edi = 1;
-		while (_xMstPos2 < m->unkD4->unkC) {
-			if (--m->unkDC < 0) {
+		while (_xMstPos2 < m->m49Unk1->unkC) {
+			if (--m->indexUnk49Unk1 < 0) {
 				_edi = 0;
 				break;
 			}
-			m->unkD4 = &m->m49->data1[m->unkDC];
+			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 		}
 	}
 // 41CF17
@@ -5606,15 +5612,15 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CF99
 	if (_edi) {
 		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_yMstPos >= m->m49->unk15))) {
-			if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->unkD4->offsetHeight + 0xE] != 0 && m->flagsA8[0] == 0xFF) {
+			if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->m49Unk1->offsetHeight + 0xE] != 0 && m->flagsA8[0] == 0xFF) {
 				warning("executeMstOp67Type2 41D002");
 				// TODO
 			}
 // 41D115
 
 			if (_xMstPos2 <= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m36->unk8)) {
-				m->unkDC = m->m49->count1 - 1;
-				m->unkD4 = &m->m49->data1[m->unkDC];
+				m->indexUnk49Unk1 = m->m49->count1 - 1;
+				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 				if (m->unk8[946] & 4) {
 					warning("executeMstOp67Type2 41D16E");
 					// TODO
@@ -6113,11 +6119,11 @@ int Game::runTask_unk5(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk5 t %p", t);
 	MonsterObject1 *m = t->monster1;
 	mstSetHorizontalBounds(m);
-	if (_xMstPos2 < m->unkD4->unk8) {
+	if (_xMstPos2 < m->m49Unk1->unk8) {
 		if (_xMstPos2 > 0) {
-			while (--m->unkDC >= 0) {
-				m->unkD4 = &m->m49->data1[m->unkDC];
-				if (_xMstPos2 >= m->unkD4->unkC) {
+			while (--m->indexUnk49Unk1 >= 0) {
+				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+				if (_xMstPos2 >= m->m49Unk1->unkC) {
 					goto set_am;
 				}
 			}
@@ -6125,7 +6131,7 @@ int Game::runTask_unk5(Task *t) {
 		return executeMstUnk9(t, m);
 	}
 set_am:
-	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
 	return 1;
 }
@@ -6141,11 +6147,11 @@ int Game::runTask_unk6(Task *t) {
 		m->unk7C = _mstPosX + m->unk68;
 	}
 	mstSetHorizontalBounds(m);
-	if (_xMstPos2 < m->unkD4->unk8) {
+	if (_xMstPos2 < m->m49Unk1->unk8) {
 		if (_xMstPos2 > 0) {
-			while (--m->unkDC >= 0) {
-				m->unkD4 = &m->m49->data1[m->unkDC];
-				if (_xMstPos2 >= m->unkD4->unkC) {
+			while (--m->indexUnk49Unk1 >= 0) {
+				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+				if (_xMstPos2 >= m->m49Unk1->unkC) {
 					goto set_am;
 				}
 			}
@@ -6153,7 +6159,7 @@ int Game::runTask_unk6(Task *t) {
 		return executeMstUnk9(t, m);
 	}
 set_am:
-	const uint8_t *ptr = _res->_mstHeightMapData + m->unkD4->offsetHeight;
+	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
 	return 1;
 }

@@ -381,9 +381,9 @@ struct MonsterObject1 {
 	uint8_t rnd_m49[4]; // 0xC8
 	uint8_t rnd_m35[4]; // 0xCC
 	MstUnk35 *m35; // 0xD0
-	MstUnk49Unk1 *unkD4; // 0xD4, sizeof=16
+	MstUnk49Unk1 *m49Unk1; // 0xD4, sizeof=16
 	MstUnk49 *m49; // 0xD8
-	int unkDC; // 0xDC // indexes _mstUnk49.data1
+	int indexUnk49Unk1; // 0xDC // indexes _mstUnk49.data1
 	uint8_t unkE4;
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;
