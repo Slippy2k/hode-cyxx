@@ -747,6 +747,7 @@ void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen, bool
 	}
 	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_RenderSetLogicalSize(_renderer, windowW, windowH);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	_texture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _texW, _texH);
 	if (widescreen) {
 		_widescreenTexture = SDL_CreateTexture(_renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, _screenW, _screenH);
