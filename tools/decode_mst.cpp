@@ -124,13 +124,13 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "set_flag_monster bit:%d", p[1]);
 		break;
 	case 26:
-		fprintf(_out, "unset_flag_global bit:%d", p[1]);
+		fprintf(_out, "clear_flag_global bit:%d", p[1]);
 		break;
 	case 27:
-		fprintf(_out, "unset_flag_task bit:%d", p[1]);
+		fprintf(_out, "clear_flag_task bit:%d", p[1]);
 		break;
 	case 28:
-		fprintf(_out, "unset_flag_monster bit:%d", p[1]);
+		fprintf(_out, "clear_flag_monster bit:%d", p[1]);
 		break;
 	case 29:
 		fprintf(_out, "sm_wait andy_var num:%d", p[1]);

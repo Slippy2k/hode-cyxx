@@ -2848,13 +2848,13 @@ int Game::runTask_default(Task *t) {
 				}
 			}
 			break;
-		case 26: // 16 - unset_flag_global
+		case 26: // 16 - clear_flag_global
 			_mstFlags &= ~(1 << p[1]);
 			break;
-		case 27: // 17 - unset_flag_task
+		case 27: // 17 - clear_flag_task
 			t->flags &= ~(1 << p[1]);
 			break;
-		case 28: { // 18 - unset_flag_mst
+		case 28: { // 18 - clear_flag_mst
 				MonsterObject1 *m = 0;
 				if (t->monster2) {
 					m = t->monster2->monster1;
