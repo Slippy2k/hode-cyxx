@@ -403,21 +403,16 @@ int Game::prepareMstTask(Task *t) {
 }
 
 void Game::clearMstRectsTable(MonsterObject1 *m, int num) {
-	int r = m->flagsA8[num];
-	if (r < _mstRectsCount) {
-		MstRect *p = &_mstRectsTable[r];
-		int a = p->num;
-		if (a == m->collisionNum) {
-			p->num = 255;
-			a = r;
-		}
-		do {
-			if (p->num == 255) {
-				++a;
-				++p;
+	uint8_t r = m->flagsA8[num];
+	if (r < _mstRectsCount && _mstRectsTable[r].num == m->collisionNum) {
+		_mstRectsTable[r].num = 255;
+		int i = r;
+		for (; i < _mstRectsCount; ++i) {
+			if (_mstRectsTable[i].num != 255) {
+				break;
 			}
-		} while (a < _mstRectsCount);
-		if (a == _mstRectsCount) {
+		}
+		if (i == _mstRectsCount) {
 			_mstRectsCount = r;
 		}
 	}
@@ -4172,12 +4167,15 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	uint8_t _dl = m->flags4B;
 	if (_dl != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
 		if (t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk10) {
-			warning("mstOp49 41BE6C");
-			// TODO
-			return mstTaskStopMonsterObject1(t);
+			if ((_dl == 0xFE && m->o16->screenNum != _currentScreen) || (_dl != 0xFE && _dl != _currentScreen)) {
+				if (m->unk8[946] & 4) {
+					clearMstRectsTable(m, 1);
+				}
+				return mstTaskStopMonsterObject1(t);
+			}
 		} else {
 // 41BEF4
-			int x = MIN(_mstAndyScreenPosX, 255);
+			const int x = MIN(_mstAndyScreenPosX, 255);
 			if (x < 0) {
 				c = x;
 				d = x + 255;
@@ -4185,7 +4183,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 				c = -x;
 				d = 255 - x;
 			}
-			int y = MIN(_mstAndyScreenPosY, 191);
+			const int y = MIN(_mstAndyScreenPosY, 191);
 			int _ebp, var4;
 			if (y < 0) {
 				_ebp = y;
@@ -5585,29 +5583,13 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CF17
-	if (_xMstPos2 <= 0) {
-		if ((m->unk8[946] & 2) == 0 || _yMstPos <= 0) {
-			if (m->unk8[946] & 4) {
-				uint8_t _dl = m->flagsA8[1];
-				if (_dl < _mstRectsCount && _mstRectsTable[_dl].num == m->collisionNum) {
-					_mstRectsTable[_dl].num = 255;
-					int i = _dl;
-					for (; i < _mstRectsCount; ++i) {
-						if (_mstRectsTable[_dl].num != 255) {
-							break;
-						}
-					}
-					if (i != _mstRectsCount) {
-						_mstRectsCount = _dl;
-					}
-				}
-// 41CF7F
-				m->flagsA8[1] = 255;
-			}
-// 41CF86
-			executeMstUnk1(t);
-			return 0;
+	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos <= 0)) {
+		if (m->unk8[946] & 4) {
+			clearMstRectsTable(m, 1);
 		}
+// 41CF86
+		executeMstUnk1(t);
+		return 0;
 	}
 // 41CF99
 	if (_edi) {
