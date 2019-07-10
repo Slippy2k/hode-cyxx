@@ -652,7 +652,7 @@ struct Game {
 	void mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum);
 	void mstOp27_removeMstTaskScreenFlags(Task **tasksList, int num, int arg);
 	int mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num);
-	void executeMstOp52();
+	void mstOp52();
 	bool mstCollidesDirection(MstUnk48 *m, uint8_t flag);
 	void mstOp53(MstUnk48 *m);
 	void mstOp54();
@@ -689,6 +689,7 @@ struct Game {
 	int runTask_unk8(Task *t);
 	int runTask_unk9(Task *t);
 	int runTask_unk10(Task *t);
+	int runTask_unk11(Task *t);
 
 	// sound.cpp
 	bool _sssDisabled;

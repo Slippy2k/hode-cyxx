@@ -3315,10 +3315,10 @@ int Game::runTask_default(Task *t) {
 			return 0;
 		case 200: // 52
 			if (t->monster1 && t->monster1->unk18) {
-				executeMstOp52();
+				mstOp52();
 				return 1;
 			}
-			executeMstOp52();
+			mstOp52();
 			break;
 		case 201: { // 53
 				const int num = READ_LE_UINT16(p + 2);
@@ -4288,7 +4288,7 @@ l41C2E6:
 	return 0;
 }
 
-void Game::executeMstOp52() {
+void Game::mstOp52() {
 	if (_m48Num == -1) {
 		return;
 	}
@@ -4302,10 +4302,18 @@ void Game::executeMstOp52() {
 			MonsterObject1 *m = &_monsterObjects1Table[num];
 			disableMonsterObject1(m);
 			if ((m->flagsA5 & 0x70) == 0) {
+				assert(m->task->monster1 == m);
+				Task *t = m->task;
 				const int a = (m->o16->flags0 & 255) * 28;
 				if (m->unk8[a] != 0) {
-					// TODO
-					warning("MstOp52 t->task %p unimplemented", m->task->run);
+					if (t->run != &Game::runTask_unk1 && t->run != &Game::runTask_unk4 && t->run != &Game::runTask_unk2 && t->run != &Game::runTask_unk3 && t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
+						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
+						executeMstOp67Type2(m->task, 1);
+					} else {
+						m->o16->actionKeyMask = 0;
+						m->o16->directionKeyMask = 0;
+						t->run = &Game::runTask_unk11;
+					}
 				} else {
 // 41D7D8
 					m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
@@ -6174,4 +6182,14 @@ int Game::runTask_unk10(Task *t) {
 	executeMstUnk4(m);
 	executeMstUnk8(m);
 	return executeMstUnk11(t, m);
+}
+
+int Game::runTask_unk11(Task *t) {
+	debug(kDebug_MONSTER, "runTask_unk11 t %p", t);
+	MonsterObject1 *m = t->monster1;
+	const int num = m->o16->flags0 & 0xFF;
+	if (m->unk8[num * 28] == 0) {
+		executeMstUnk23(t);
+	}
+	return 1;
 }
