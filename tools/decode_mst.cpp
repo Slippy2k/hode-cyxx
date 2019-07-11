@@ -53,6 +53,48 @@ static const char *_compareOp[] = {
 };
 
 static const char *taskOtherVar(int num, char *buffer) {
+	switch (num) {
+	case 0:
+		return "var.andy_screen_pos_x";
+	case 1:
+		return "var.andy_screen_pos_y";
+	case 2:
+		return "var.mst_pos_x";
+	case 3:
+		return "var.mst_pos_y";
+	case 4:
+		return "var.current_screen";
+	case 5:
+		return "var.current_screen.state";
+	case 6:
+		return "var.difficulty";
+	case 12:
+		return "var.monster_screen_pos_x";
+	case 13:
+		return "var.monster_screen_pos_y";
+	case 14:
+		return "var.monster_screen_num";
+	case 15:
+		return "var.monster_dx";
+	case 16:
+		return "var.monster_dy";
+	case 23:
+		return "var.andy_action_key_mask";
+	case 24:
+		return "var.andy_direction_key_mask";
+	case 25:
+		return "var.monster_level_pos_x";
+	case 26:
+		return "var.monster_level_pos_y";
+	case 27:
+		return "var.monster_flags0";
+	case 28:
+		return "var.monster_anim";
+	case 29:
+		return "var.monster_frame";
+	case 34:
+		return "var.level_checkpoint";
+	}
 	sprintf(buffer, "otherVar_%d", num);
 	return buffer;
 }
@@ -69,8 +111,7 @@ static const char *taskVar(int num, int type, char *buffer) {
 		sprintf(buffer, "global.vars[%d]", num);
 		break;
 	case 4:
-		taskOtherVar(num, buffer);
-		break;
+		return taskOtherVar(num, buffer);
 	case 5:
 		sprintf(buffer, "monster.vars[%d]", num);
 		break;
@@ -170,7 +211,7 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "++monster.vars[%d]", p[1]);
 		break;
 	case 44:
-		fprintf(_out, "--local.vars[%d]", p[1]);
+		fprintf(_out, "--task.vars[%d]", p[1]);
 		break;
 	case 45:
 		fprintf(_out, "--global.vars[%d]", p[1]);
