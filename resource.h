@@ -224,7 +224,7 @@ struct MstUnk48Unk12Unk4 {
 	uint8_t unk18; // 0x18
 	uint8_t unk19; // 0x19
 	int8_t screenNum; // 0x1A
-	uint8_t unk1B; // 0x1B
+	uint8_t monster1Index; // 0x1B
 }; // sizeof == 28
 
 struct MstUnk48Unk12 {

@@ -126,11 +126,11 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
 	_mstChasingMonstersCount = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;
-		const uint8_t code = unk4->unk1B;
-		if (code != 255) {
-			assert(code < kMaxMonsterObjects1);
+		const uint8_t num = unk4->monster1Index;
+		if (num != 255) {
+			assert(num < kMaxMonsterObjects1);
 			unk4->unk19 = flag;
-			MonsterObject1 *m = &_monsterObjects1Table[code];
+			MonsterObject1 *m = &_monsterObjects1Table[num];
 			m->unk18 = unk4;
 			m->flags48 |= 0x40;
 			m->flagsA5 &= 0x8A;
@@ -160,7 +160,7 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
 
 void Game::disableMonsterObject1(MonsterObject1 *m) {
 	m->flags48 &= ~0x50;
-	m->unk18->unk1B = 255;
+	m->unk18->monster1Index = 255;
 	m->unk18 = 0;
 	--_mstChasingMonstersCount;
 	if (_mstChasingMonstersCount <= 0) {
@@ -405,7 +405,7 @@ int Game::prepareMstTask(Task *t) {
 
 void Game::clearMstRectsTable(MonsterObject1 *m, int num) {
 	uint8_t r = m->flagsA8[num];
-	if (r < _mstRectsCount && _mstRectsTable[r].num == m->collisionNum) {
+	if (r < _mstRectsCount && _mstRectsTable[r].num == m->monster1Index) {
 		_mstRectsTable[r].num = 255;
 		int i = r;
 		for (; i < _mstRectsCount; ++i) {
@@ -628,7 +628,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[13];
 			_mstTemp_x2 = _mstTemp_x1 + ptr1[14];
 			_mstTemp_y2 = _mstTemp_y1 + ptr1[15];
-			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->collisionNum, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
+			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
 		} else {
 			clearMstRectsTable(m, 0);
 		}
@@ -868,10 +868,10 @@ void Game::resetMstCode() {
 	}
 	_mstVars[30] = 0x20;
 	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
-		_monsterObjects1Table[i].collisionNum = 0;
+		_monsterObjects1Table[i].monster1Index = i;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		_monsterObjects2Table[i].unk0x10 = 0;
+		_monsterObjects2Table[i].monster2Index = i;
 	}
 	mstUpdateRefPos();
 	_mstPrevPosX = _mstPosX;
@@ -2264,12 +2264,12 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 // 40EA40
 			_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
 			_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->collisionNum, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
+			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
 				t->flags |= 0x80;
 				return 0;
 			}
 // 40EAA0
-			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->collisionNum, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 		}
 	} else {
 		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
@@ -4300,7 +4300,7 @@ void Game::mstOp52() {
 	int j = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m48unk12 = &m48->unk12[j];
-		const uint8_t num = m48unk12->data->unk1B;
+		const uint8_t num = m48unk12->data->monster1Index;
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
 			MonsterObject1 *m = &_monsterObjects1Table[num];
@@ -4341,7 +4341,7 @@ bool Game::mstCollidesDirection(MstUnk48 *m48, uint8_t flag) {
 		}
 	}
 
-	uint8_t _op54Data[32];
+	uint8_t _op54Data[kMaxMonsterObjects1];
 	memset(_op54Data, 0, sizeof(_op54Data));
 
 	int var24 = 0;
@@ -4407,7 +4407,7 @@ l1:
 				//MstCollision *var20 = varC;
 				for (int j = 0; j < var10; ++j) {
 					MonsterObject1 *m = varC->monster1[j];
-					if (_op54Data[m->collisionNum] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
+					if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
 						int _ebp = var38 - m->yMstPos;
 						int _eax = ABS(_ebp);
 						int _esi = var44 - m->xMstPos;
@@ -4447,8 +4447,8 @@ l1:
 			}
 			if (var34 != -1) {
 // 41DDEE
-				const uint8_t num = varC->monster1[var34]->collisionNum;
-				m12u4->unk1B = num;
+				const uint8_t num = varC->monster1[var34]->monster1Index;
+				m12u4->monster1Index = num;
 				_op54Data[num] = 1;
 				++var24;
 				continue;
@@ -4473,7 +4473,7 @@ l1:
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
 			uint8_t var1C = m12u4->unk18;
-			m12u4->unk1B = 255;
+			m12u4->monster1Index = 255;
 			int var4C = (var1C == 2) ? 0 : var1C;
 // 41DE98
 l2:

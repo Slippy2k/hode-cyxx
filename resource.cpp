@@ -1313,7 +1313,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 				m12[j].data[k].unk18 = data[0x18];
 				m12[j].data[k].unk19 = data[0x19];
 				m12[j].data[k].screenNum = data[0x1A];
-				m12[j].data[k].unk1B = data[0x1B];
+				m12[j].data[k].monster1Index = data[0x1B];
 				bytesRead += 28;
 			}
 		}

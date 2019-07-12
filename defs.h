@@ -341,7 +341,7 @@ struct MonsterObject1 {
 	LvlObject *o20; // 0x14
 	MstUnk48Unk12Unk4 *unk18;
 	MovingOpcodeState *collidePtr; // 0x1C
-	int collisionNum; // 0x20
+	int monster1Index; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
@@ -399,7 +399,7 @@ struct MonsterObject2 {
 	MstUnk45 *m45;
 	LvlObject *o; // 4
 	MonsterObject1 *monster1; // 8
-	int unk0x10;
+	int monster2Index; // 10
 	int xPos; // 14
 	int yPos; // 18
 	int xMstPos; // 1C
