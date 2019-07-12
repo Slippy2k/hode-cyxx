@@ -5,6 +5,10 @@
 
 #include "random.h"
 
+void Random::setSeed() {
+	_rndSeed = 0x101A1010;
+}
+
 void Random::initMstTable() {
 	for (int i = 0; i < 8; ++i) {
 		for (int j = 0; j < 32; ++j) {
@@ -28,11 +32,6 @@ void Random::initTable() {
 		SWAP(_rndRandomTable[a], _rndRandomTable[b]);
 	}
 	_rndRandomTableIndex = 0;
-}
-
-void Random::init() {
-	_rndSeed = 0x101A1010;
-	initTable();
 }
 
 uint32_t Random::update() {

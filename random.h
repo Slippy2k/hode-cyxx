@@ -14,6 +14,7 @@ struct Random {
 	int _rndRandomTableIndex;
 	uint8_t _mstRandomTable[8][32];
 
+	void setSeed();
 	void initMstTable();
 	void initTable();
 	void init();

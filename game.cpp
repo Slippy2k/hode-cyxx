@@ -47,6 +47,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
 	_snd_masterPanning = 64;
 	_snd_masterVolume = 128;
+	_rnd.setSeed();
 }
 
 Game::~Game() {
@@ -1907,6 +1908,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_levelCheckpoint = checkpoint;
 	_res->loadLevelData(_levels[_currentLevel]);
 	_mstAndyCurrentScreenNum = -1;
+	_rnd.initTable();
 	initMstCode();
 //	res_initIO();
 	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum, 0xFF);
