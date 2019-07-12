@@ -201,8 +201,8 @@ struct Game {
 	uint8_t _mstCurrentActionKeyMask;
 	int _xMstPos1, _xMstPos2;
 	int _mstCurrentPosX, _mstCurrentPosY;
-	int _mstRectsCount;
-	MstRect _mstRectsTable[64];
+	int _mstBoundingBoxesCount;
+	MstBoundingBox _mstBoundingBoxesTable[64];
 	Task *_mstCurrentTask;
 	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
 
@@ -598,10 +598,10 @@ struct Game {
 	void resetMonsterObject2(MonsterObject2 *m);
 	int prepareMstTask(Task *t);
 
-	void clearMstRectsTable(MonsterObject1 *m, int num);
-	int resetMstRectsTable(int num, int x1, int y1, int x2, int y2);
-	int updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2);
-	int checkMstRectsTable(int num, int x1, int y1, int x2, int y2);
+	void mstBoundingBoxClear(MonsterObject1 *m, int dir);
+	int mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2);
+	int mstBoundingBoxUpdate(int num, int a, int x1, int y1, int x2, int y2);
+	int mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2);
 
 	void mstTaskSetScreenPosition(Task *t);
 	int getMstDistance(int y, const MovingOpcodeState *p) const;

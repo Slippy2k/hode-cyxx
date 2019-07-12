@@ -403,27 +403,28 @@ int Game::prepareMstTask(Task *t) {
 	return m->executeCounter - counter;
 }
 
-void Game::clearMstRectsTable(MonsterObject1 *m, int num) {
-	uint8_t r = m->flagsA8[num];
-	if (r < _mstRectsCount && _mstRectsTable[r].num == m->monster1Index) {
-		_mstRectsTable[r].num = 255;
+void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
+	assert(dir == 0 || dir == 1);
+	uint8_t r = m->flagsA8[dir];
+	if (r < _mstBoundingBoxesCount && _mstBoundingBoxesTable[r].monster1Index == m->monster1Index) {
+		_mstBoundingBoxesTable[r].monster1Index = 255;
 		int i = r;
-		for (; i < _mstRectsCount; ++i) {
-			if (_mstRectsTable[i].num != 255) {
+		for (; i < _mstBoundingBoxesCount; ++i) {
+			if (_mstBoundingBoxesTable[i].monster1Index != 255) {
 				break;
 			}
 		}
-		if (i == _mstRectsCount) {
-			_mstRectsCount = r;
+		if (i == _mstBoundingBoxesCount) {
+			_mstBoundingBoxesCount = r;
 		}
 	}
-	m->flagsA8[num] = 255;
+	m->flagsA8[dir] = 255;
 }
 
-int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
-	for (int i = 0; i < _mstRectsCount; ++i) {
-		const MstRect *p = &_mstRectsTable[i];
-		if (p->num != 0xFF && num != p->num) {
+int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) {
+	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
+		const MstBoundingBox *p = &_mstBoundingBoxesTable[i];
+		if (p->monster1Index != 0xFF && num != p->monster1Index) {
 			if (p->x2 < x1) { // 16 - 8
 				continue;
 			}
@@ -442,11 +443,11 @@ int Game::resetMstRectsTable(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-int Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
+int Game::mstBoundingBoxUpdate(int num, int a, int x1, int y1, int x2, int y2) {
 	if (num == 0xFF) {
-		MstRect *p = &_mstRectsTable[0];
-		for (int i = 0; i < _mstRectsCount; ++i) {
-			if (p->num == 0xFF) {
+		MstBoundingBox *p = &_mstBoundingBoxesTable[0];
+		for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
+			if (p->monster1Index == 0xFF) {
 				num = i;
 				break;
 			}
@@ -455,13 +456,13 @@ int Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
 		p->y1 = y1;
 		p->x2 = x2;
 		p->y2 = y2;
-		p->num = a;
-		if (num != _mstRectsCount) {
-			++_mstRectsCount;
+		p->monster1Index = a;
+		if (num != _mstBoundingBoxesCount) {
+			++_mstBoundingBoxesCount;
 		}
-	} else if (num < _mstRectsCount) {
-		MstRect *p = &_mstRectsTable[num];
-		if (p->num == a) {
+	} else if (num < _mstBoundingBoxesCount) {
+		MstBoundingBox *p = &_mstBoundingBoxesTable[num];
+		if (p->monster1Index == a) {
 			p->x1 = x1;
 			p->y1 = y1;
 			p->x2 = x2;
@@ -471,13 +472,13 @@ int Game::updateMstRectsTable(int num, int a, int x1, int y1, int x2, int y2) {
 	return num;
 }
 
-int Game::checkMstRectsTable(int num, int x1, int y1, int x2, int y2) {
-	for (int i = 0; i < _mstRectsCount; ++i) {
-		MstRect *p = &_mstRectsTable[i];
-		if (p->num == 0xFF || p->num == num) {
+int Game::mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) {
+	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
+		MstBoundingBox *p = &_mstBoundingBoxesTable[i];
+		if (p->monster1Index == 0xFF || p->monster1Index == num) {
 			continue;
 		}
-		if (p->num == 0xFE) {
+		if (p->monster1Index == 0xFE) {
 			if (_monsterObjects1Table[num].unk8[944] != 15) {
 				continue;
 			}
@@ -628,9 +629,9 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[13];
 			_mstTemp_x2 = _mstTemp_x1 + ptr1[14];
 			_mstTemp_y2 = _mstTemp_y1 + ptr1[15];
-			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
+			m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
 		} else {
-			clearMstRectsTable(m, 0);
+			mstBoundingBoxClear(m, 0);
 		}
 	}
 // 40ECBD
@@ -844,7 +845,7 @@ void Game::resetMstCode() {
 	_mstUnk8 = 0;
 	_specialAnimFlag = false;
 	_mstAndyRectNum = 255;
-	_mstRectsCount = 0;
+	_mstBoundingBoxesCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
 	_mstOp67_screenNum = 0xFF;
@@ -1520,7 +1521,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		// monster is dead
 		m->flagsA5 |= 0x80;
 		if (m->unk8[946] & 4) {
-			clearMstRectsTable(m, 1);
+			mstBoundingBoxClear(m, 1);
 		}
 		if (t->child) {
 			t->child->codeData = 0;
@@ -1938,7 +1939,7 @@ void Game::mstUpdateRefPos() {
 		_mstPosX = _mstAndyScreenPosX + _res->_mstPointOffsets[_currentScreen].xOffset;
 		_mstPosY = _mstAndyScreenPosY + _res->_mstPointOffsets[_currentScreen].yOffset;
 		if (!_specialAnimFlag) {
-			_mstAndyRectNum = updateMstRectsTable(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1) & 0xFF;
+			_mstAndyRectNum = mstBoundingBoxUpdate(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1) & 0xFF;
 		}
 		_mstAndyScreenPosX += _andyObject->posTable[3].x;
 		_mstAndyScreenPosY += _andyObject->posTable[3].y;
@@ -2108,8 +2109,8 @@ void Game::mstRemoveMonsterObject1(Task *t, Task **tasksList) {
 		}
 	}
 	if (m->unk8[946] & 4) {
-		clearMstRectsTable(m, 0);
-		clearMstRectsTable(m, 1);
+		mstBoundingBoxClear(m, 0);
+		mstBoundingBoxClear(m, 1);
 	}
 	m->m46 = 0;
 	LvlObject *o = m->o16;
@@ -2264,12 +2265,12 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 // 40EA40
 			_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
 			_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-			if ((var8 & 0xE0) == 0x60 && checkMstRectsTable(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
+			if ((var8 & 0xE0) == 0x60 && mstBoundingBoxCollides2(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
 				t->flags |= 0x80;
 				return 0;
 			}
 // 40EAA0
-			m->flagsA8[0] = updateMstRectsTable(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+			m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 		}
 	} else {
 		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
@@ -3962,8 +3963,8 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 			}
 			const uint8_t *ptr = m->unk8;
 			if (ptr[946] & 4) {
-				clearMstRectsTable(m, 0);
-				clearMstRectsTable(m, 1);
+				mstBoundingBoxClear(m, 0);
+				mstBoundingBoxClear(m, 1);
 			}
 			resetMonsterObject1(m);
 			removeLvlObject2(m->o16);
@@ -3995,8 +3996,8 @@ void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int
 			}
 			const uint8_t *ptr = m->unk8;
 			if (ptr[946] & 4) {
-				clearMstRectsTable(m, 0);
-				clearMstRectsTable(m, 1);
+				mstBoundingBoxClear(m, 0);
+				mstBoundingBoxClear(m, 1);
 			}
 			resetMonsterObject1(m);
 			removeLvlObject2(m->o16);
@@ -4173,7 +4174,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		if (t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk10) {
 			if ((_dl == 0xFE && m->o16->screenNum != _currentScreen) || (_dl != 0xFE && _dl != _currentScreen)) {
 				if (m->unk8[946] & 4) {
-					clearMstRectsTable(m, 1);
+					mstBoundingBoxClear(m, 1);
 				}
 				return mstTaskStopMonsterObject1(t);
 			}
@@ -4727,7 +4728,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		}
 // 411BBA
 		if (_mstAndyRectNum != 255) {
-			_mstRectsTable[_mstAndyRectNum].num = 255;
+			_mstBoundingBoxesTable[_mstAndyRectNum].monster1Index = 255;
 		}
 		break;
 	case 1:
@@ -4766,7 +4767,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			_specialAnimFlag = false;
 		}
 // 4119F5
-		_mstAndyRectNum = updateMstRectsTable(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1);
+		_mstAndyRectNum = mstBoundingBoxUpdate(_mstAndyRectNum, 0xFE, _mstPosX, _mstPosY, _mstPosX + _andyObject->width - 1, _mstPosY + _andyObject->height - 1);
 		break;
 	case 2: {
 			LvlObject *o = t->monster1->o16;
@@ -5598,7 +5599,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CF17
 	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos <= 0)) {
 		if (m->unk8[946] & 4) {
-			clearMstRectsTable(m, 1);
+			mstBoundingBoxClear(m, 1);
 		}
 // 41CF86
 		executeMstUnk1(t);

@@ -308,12 +308,12 @@ struct AndyMoveData {
 	const uint8_t *unk28;
 }; // sizeof == 0x2C
 
-struct MstRect {
+struct MstBoundingBox {
 	int x1; // 0
 	int y1; // 4
 	int x2; // 8
-	int y2; // 12
-	int num; // 16
+	int y2; // 0xC
+	int monster1Index; // 0x10
 }; // sizeof == 0x20
 
 struct MstCollision {
