@@ -274,13 +274,13 @@ struct MstUnk49 {
 }; // SIZEOF_MstUnk49 24
 
 struct MstUnk50 {
-	uint32_t offset;
+	uint8_t *data; // sizeof == 40
 	uint32_t count;
 }; // SIZEOF_MstUnk50 8
 
 struct MstUnk51 {
 	uint32_t unk0;
-	uint32_t offset;
+	uint8_t *data; // sizeof == 36
 	uint32_t count;
 }; // SIZEOF_MstUnk51 12
 

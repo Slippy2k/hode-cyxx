@@ -1572,7 +1572,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			continue;
 		}
 		m->unkF0 = 8;
-		//int var28 = 0;
+		int var28 = 0;
 		//MovingOpcodeState *var14 = m->collidePtr;
 		if (t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
 			if (m->unk8[946] & 2) {
@@ -1582,7 +1582,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		} else {
 // 4184EC
 			m->unkF0 = _mstLut1[m->flags4A];
-			//var28 = 0;
+			var28 = 0;
 		}
 // 418508
 		uint32_t var24 = 0;
@@ -1592,18 +1592,62 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 // 418530
 		//int var20 = -1;
-		//int var18;
+		int indexUnk51;
 		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->unk4 != 0 && m->unk8 == &_res->_mstHeightMapData[m->unk18->unk0 * 948]) {
-			//var18 = m->unk18->unk4;
+			indexUnk51 = m->unk18->unk4;
 		} else {
-			//var18 = _esi->indexUnk51;
+			indexUnk51 = _esi->indexUnk51;
 		}
-		if (var24 >= _esi->unk8) {
-			continue;
+		assert(indexUnk51 < _res->_mstHdr.unk0x48);
+		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
+		for (; var24 < var18->count; ++var24) {
+			const uint8_t *data = &var18->data[var24 * 36 + m->unkF0 * 4];
+			const int32_t x1 = READ_LE_UINT32(data + 0x1C);
+			const int32_t y1 = READ_LE_UINT32(data + 0x20);
+			if (x1 != 0 || y1 != 0) {
+				int _ebx = 0;
+				int _ebp = 0;
+				if ((data[4] & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
+					_mstTemp_x1 = m->xMstPos - x1;
+				} else {
+					_mstTemp_x1 = m->xMstPos + x1;
+				}
+				if (_mstTemp_x1 < m->xMstPos) {
+					if (_mstTemp_x1 < m->unk74) {
+						_ebx = 8;
+					}
+					_ebp = 8;
+				} else if (_mstTemp_x1 > m->xMstPos) {
+					if (_mstTemp_x1 > m->unk7C) {
+						_ebx = 2;
+					}
+					_ebp = 2;
+				} else {
+					_ebp = 0;
+				}
+				_mstTemp_y1 = m->yMstPos + y1;
+				if (_mstTemp_y1 < m->yMstPos) {
+					if (_mstTemp_y1 < m->unk78 && (m->unk8[946] & 2) != 0) {
+						_ebx |= 1;
+					}
+					_ebp |= 1;
+				} else if (_mstTemp_y1 > m->yMstPos) {
+					if (_mstTemp_y1 > m->unk80 && (m->unk8[946] & 2) != 0) {
+						_ebx |= 4;
+					}
+					_ebp |= 4;
+				}
+				if (var28 == _ebx) {
+					continue;
+				}
+				if (executeMstUnk14(m, _mstTemp_x1, _mstTemp_y1, _ebp)) {
+					continue;
+				}
+			}
+// 41866A
+			warning("mstUpdateTaskMonsterObject1 41866A");
+			// TODO
 		}
-// 418554
-		warning("mstUpdateTaskMonsterObject1 418554");
-		// TODO
 	}
 // 41882E
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
@@ -5167,7 +5211,7 @@ void Game::executeMstUnk1(Task *t) {
 	}
 }
 
-int Game::mstSetCurrentPos(MonsterObject1 *m, int x, int y) {
+bool Game::mstSetCurrentPos(MonsterObject1 *m, int x, int y) {
 	_mstCurrentPosX = x; // _esi
 	_mstCurrentPosY = y;
 	const uint8_t *ptr = m->unk8;
@@ -5191,7 +5235,7 @@ int Game::mstSetCurrentPos(MonsterObject1 *m, int x, int y) {
 					_mstCurrentPosY = _ebx;
 				}
 			}
-			return 0;
+			return false;
 		}
 // 419E4F
 		const int32_t b = READ_LE_UINT32(ptr + 896);
@@ -5210,9 +5254,9 @@ int Game::mstSetCurrentPos(MonsterObject1 *m, int x, int y) {
 			_mstCurrentPosY = _ebp;
 		}
 		if (_mstCurrentPosX != x || _mstCurrentPosY != y) {
-			return 0;
+			return false;
 		}
-		return 1;
+		return true;
 	}
 // 419EA7
 	if (x > _ecx && x < _edi) {
@@ -5221,19 +5265,19 @@ int Game::mstSetCurrentPos(MonsterObject1 *m, int x, int y) {
 		} else {
 			_mstCurrentPosX = _ecx;
 		}
-		return 0;
+		return false;
 	}
 	const int32_t b = READ_LE_UINT32(ptr + 896);
 	_ecx -= b;
 	_edi += b;
 	if (x < _ecx) {
 		_mstCurrentPosX = _ecx;
-		return 0;
+		return false;
 	} else if (x > _edi) {
 		_mstCurrentPosX = _edi;
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
@@ -5330,6 +5374,25 @@ void Game::executeMstUnk13(Task *t) {
 		o->actionKeyMask = 0;
 		o->directionKeyMask = 0;
 	}
+}
+
+bool Game::executeMstUnk14(MonsterObject1 *m, int x, int y, uint8_t dir) {
+	if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && !mstSetCurrentPos(m, x, y)) {
+		return true;
+	}
+	if ((dir & 8) != 0 && x < m->x2) {
+		return true;
+	}
+	if ((dir & 2) != 0 && x > m->x1) {
+		return true;
+	}
+	if ((dir & 1) != 0 && y < m->y2) {
+		return true;
+	}
+	if ((dir & 4) != 0 && y > m->y1) {
+		return true;
+	}
+	return false;
 }
 
 int Game::executeMstUnk23(Task *t) {

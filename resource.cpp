@@ -1365,24 +1365,26 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	_mstUnk50 = (MstUnk50 *)malloc(_mstHdr.unk0x44 * sizeof(MstUnk50));
 	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
-		_mstUnk50[i].offset = fp->readUint32();
-		_mstUnk50[i].count  = fp->readUint32();
+		_mstUnk50[i].data  = 0; fp->readUint32();
+		_mstUnk50[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
-		fp->seek(_mstUnk50[i].count * 40, SEEK_CUR);
+		_mstUnk50[i].data = (uint8_t *)malloc(_mstUnk50[i].count * 40);
+		fp->read(_mstUnk50[i].data, _mstUnk50[i].count * 40);
 		bytesRead += _mstUnk50[i].count * 40;
 	}
 
 	_mstUnk51 = (MstUnk51 *)malloc(_mstHdr.unk0x48 * sizeof(MstUnk51));
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		_mstUnk51[i].unk0   = fp->readUint32();
-		_mstUnk51[i].offset = fp->readUint32();
-		_mstUnk51[i].count  = fp->readUint32();
+		_mstUnk51[i].unk0  = fp->readUint32();
+		_mstUnk51[i].data  = 0; fp->readUint32();
+		_mstUnk51[i].count = fp->readUint32();
 		bytesRead += 12;
 	}
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		fp->seek(_mstUnk51[i].count * 36, SEEK_CUR);
+		_mstUnk51[i].data = (uint8_t *)malloc(_mstUnk51[i].count * 36);
+		fp->read(_mstUnk51[i].data, _mstUnk51[i].count * 36);
 		bytesRead += _mstUnk51[i].count * 36;
 	}
 	_mstUnk52 = (uint8_t *)malloc(_mstHdr.unk0x4C * 4);

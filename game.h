@@ -662,10 +662,11 @@ struct Game {
 	void mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags);
 	void mstOp59_2(int x, int y, int screenNum, int type, uint16_t flags);
 	void executeMstUnk1(Task *t);
-	int mstSetCurrentPos(MonsterObject1 *m, int x, int y);
+	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);
 	void mstResetCollisionTable();
 	void executeMstUnk13(Task *t);
+	bool executeMstUnk14(MonsterObject1 *m, int x, int y, uint8_t dir);
 	int executeMstUnk23(Task *t);
 	int executeMstOp67Type1(Task *t);
 	int executeMstOp67Type2(Task *t, int flag);
