@@ -1599,7 +1599,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		} else {
 			indexUnk51 = _esi->indexUnk51;
 		}
-		int _ebx;
+		int _ebx = -1;
 		assert(indexUnk51 < _res->_mstHdr.unk0x48);
 		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
 		for (; var24 < var18->count; ++var24) {
@@ -1609,7 +1609,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			const int32_t x1 = m50u1->unk1C;
 			const int32_t y1 = m50u1->unk20;
 			if (x1 != 0 || y1 != 0) {
-				int _ebx = 0;
+				int dirMask = 0;
 				int _ebp = 0;
 				if ((m50u1->unk4 & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
 					_mstTemp_x1 = m->xMstPos - x1;
@@ -1618,12 +1618,12 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				}
 				if (_mstTemp_x1 < m->xMstPos) {
 					if (_mstTemp_x1 < m->unk74) {
-						_ebx = 8;
+						dirMask = 8;
 					}
 					_ebp = 8;
 				} else if (_mstTemp_x1 > m->xMstPos) {
 					if (_mstTemp_x1 > m->unk7C) {
-						_ebx = 2;
+						dirMask = 2;
 					}
 					_ebp = 2;
 				} else {
@@ -1632,19 +1632,19 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				_mstTemp_y1 = m->yMstPos + y1;
 				if (_mstTemp_y1 < m->yMstPos) {
 					if (_mstTemp_y1 < m->unk78 && (m->unk8[946] & 2) != 0) {
-						_ebx |= 1;
+						dirMask |= 1;
 					}
 					_ebp |= 1;
 				} else if (_mstTemp_y1 > m->yMstPos) {
 					if (_mstTemp_y1 > m->unk80 && (m->unk8[946] & 2) != 0) {
-						_ebx |= 4;
+						dirMask |= 4;
 					}
 					_ebp |= 4;
 				}
-				if (var28 == _ebx) {
+				if (var28 == dirMask) {
 					continue;
 				}
-				if (executeMstUnk14(m, _mstTemp_x1, _mstTemp_y1, _ebp)) {
+				if (executeMstUnk14(m, _mstTemp_x1, _mstTemp_y1, dirMask)) {
 					continue;
 				}
 			}
