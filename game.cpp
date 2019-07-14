@@ -1903,6 +1903,7 @@ void Game::drawScreen() {
 }
 
 void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
+	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
@@ -2495,6 +2496,11 @@ void Game::levelMainLoop() {
 	if (_system->inp.screenshot) {
 		_system->inp.screenshot = false;
 		captureScreenshot();
+	}
+	if (0) {
+		char buffer[256];
+		snprintf(buffer, sizeof(buffer), "P%d S%02d %d R%d", _currentLevel, _andyObject->screenNum, _res->_screensState[_andyObject->screenNum].s0, _levelCheckpoint);
+		_video->drawString(buffer, (Video::W - strlen(buffer) * 8) / 2, 8, _video->findWhiteColor(), _video->_frontLayer);
 	}
 	if (_shakeScreenDuration != 0 || _levelRestartCounter != 0 || _video->_displayShadowLayer) {
 		shakeScreen();

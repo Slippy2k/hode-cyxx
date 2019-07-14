@@ -25,6 +25,8 @@ struct Video {
 		H = 192
 	};
 
+	static const uint8_t _fontCharactersTable[78];
+
 	SystemStub *_system;
 
 	uint8_t _palette[256 * 3];
@@ -40,6 +42,7 @@ struct Video {
 	uint8_t _blackColor;
 	bool _findBlackColor;
 	uint8_t _shadowColorLut[256];
+	const uint8_t *_font;
 
 	struct {
 		int x1, y1;
@@ -68,6 +71,11 @@ struct Video {
 	void drawLine(int x1, int y1, int x2, int y2);
 	void applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch, int src_pitch, uint8_t *dst1, uint8_t *dst2, uint8_t *src1, uint8_t *src2);
 	void buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst);
+
+	uint8_t findStringCharacterFontIndex(uint8_t chr) const;
+	void drawStringCharacter(int x, int y, uint8_t chr, uint8_t color, uint8_t *dst);
+	void drawString(const char *s, int x, int y, uint8_t color, uint8_t *dst);
+	uint8_t findWhiteColor() const;
 };
 
 #endif // VIDEO_H__

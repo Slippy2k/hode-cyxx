@@ -422,3 +422,60 @@ void Video::buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst) {
 #endif
 }
 
+// returns the font index
+uint8_t Video::findStringCharacterFontIndex(uint8_t chr) const {
+	// the original code seems to ignore the last 3 entries
+	for (int i = 0; i < 36 * 2; i += 2) {
+		if (_fontCharactersTable[i] == chr) {
+			return _fontCharactersTable[i + 1];
+		}
+	}
+	return 255;
+}
+
+void Video::drawStringCharacter(int x, int y, uint8_t chr, uint8_t color, uint8_t *dst) {
+	const uint8_t *p = _font + ((chr & 15) + (chr >> 4) * 256) * 16;
+	dst += y * W + x;
+	for (int j = 0; j < 16; ++j) {
+		for (int i = 0; i < 16; ++i) {
+			if (p[i] != 0) {
+				dst[i] = color;
+			}
+		}
+		p += 16 * 16;
+		dst += W;
+	}
+}
+
+void Video::drawString(const char *s, int x, int y, uint8_t color, uint8_t *dst) {
+	for (int i = 0; s[i]; ++i) {
+		uint8_t chr = s[i];
+		if (chr >= 'a' && chr <= 'z') {
+			chr += 'A' - 'a';
+		}
+		if (chr != ' ') {
+			chr = findStringCharacterFontIndex(chr);
+			if (chr == 255) {
+				continue;
+			}
+			drawStringCharacter(x, y, chr, color, dst);
+		}
+		x += 8;
+	}
+}
+
+uint8_t Video::findWhiteColor() const {
+	uint8_t color = 0;
+	int whiteQuant = 0;
+	for (int i = 0; i < 256; ++i) {
+		const int r = _palette[i * 3];
+		const int g = _palette[i * 3 + 1];
+		const int b = _palette[i * 3 + 2];
+		const int q = (r + g * 2) * 19 + b * 7;
+		if (q > whiteQuant) {
+			whiteQuant = q;
+			color = i;
+		}
+	}
+	return color;
+}

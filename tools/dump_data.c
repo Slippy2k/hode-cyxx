@@ -57,6 +57,26 @@ static void dumpCheckpointData(FILE *fp, const char *name, uint32_t offset, int 
 	fprintf(stdout, "\n");
 }
 
+static void dumpFontCharMap(FILE *fp, const char *name, uint32_t offset, int count) {
+	fprintf(stdout, "static const uint8_t %s[%d] = {", name, count * 2);
+	fseek(fp, offset, SEEK_SET);
+	for (int i = 0; i < count; ++i) {
+		int chr = fgetc(fp);
+		int num = fgetc(fp);
+		int a = fgetc(fp);
+		assert(a == 0);
+		int b = fgetc(fp);
+		assert(b == 0);
+		if ((i % 8) == 0) {
+			fprintf(stdout, "\n\t");
+		} else {
+			fprintf(stdout, " ");
+		}
+		fprintf(stdout, "0x%02x, 0x%02x,", chr, num);
+	}
+	fprintf(stdout, "\n};\n");
+}
+
 static void dumpInt(FILE *fp, const char *name, uint32_t offset, int size, const char *fmt, enum DataDumpType type, uint32_t addr) {
 	int i;
 
@@ -147,6 +167,8 @@ int main(int argc, char* argv[]) {
 //		dumpInt(fp, "_actionDirectionKeyMaskTable", 0x3E3D4, 352, "0x%02X", UNSIGNED_8BITS);
 
 //		dumpInt(fp, "_dbVolumeTable", 0x40010, 129, "0x%02X", UNSIGNED_8BITS);
+
+		dumpFontCharMap(fp, "_fontCharactersTable", 0x3FE88, 39);
 
 	// retail
 
