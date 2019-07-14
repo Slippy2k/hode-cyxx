@@ -1232,7 +1232,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk46[i].data[j].unk8        = READ_LE_UINT32(data + 0x08);
 			_mstUnk46[i].data[j].energy      = READ_LE_UINT32(data + 0x0C);
 			_mstUnk46[i].data[j].unk10       = READ_LE_UINT32(data + 0x10);
-			_mstUnk46[i].data[j].unk14       = READ_LE_UINT32(data + 0x14);
+			_mstUnk46[i].data[j].count       = READ_LE_UINT32(data + 0x14);
+			_mstUnk46[i].data[j].unk18       = READ_LE_UINT32(data + 0x18);
 			_mstUnk46[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
 			_mstUnk46[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);
 			_mstUnk46[i].data[j].indexUnk47  = READ_LE_UINT32(data + 0x24);
@@ -1370,22 +1371,37 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
-		_mstUnk50[i].data = (uint8_t *)malloc(_mstUnk50[i].count * 40);
-		fp->read(_mstUnk50[i].data, _mstUnk50[i].count * 40);
-		bytesRead += _mstUnk50[i].count * 40;
+		_mstUnk50[i].data = (MstUnk50Unk1 *)malloc(_mstUnk50[i].count * sizeof(MstUnk50Unk1));
+		for (uint32_t j = 0; j < _mstUnk50[i].count; ++j) {
+			_mstUnk50[i].data[j].codeData = fp->readUint32();
+			_mstUnk50[i].data[j].unk4 = fp->readUint32();
+			_mstUnk50[i].data[j].unk8 = fp->readUint32();
+			_mstUnk50[i].data[j].unkC = fp->readUint32();
+			_mstUnk50[i].data[j].unk10 = fp->readUint32();
+			_mstUnk50[i].data[j].unk14 = fp->readUint32();
+			_mstUnk50[i].data[j].unk18 = fp->readUint32();
+			_mstUnk50[i].data[j].unk1C = fp->readUint32();
+			_mstUnk50[i].data[j].unk20 = fp->readUint32();
+			_mstUnk50[i].data[j].unk24 = fp->readUint32();
+			bytesRead += 40;
+		}
 	}
 
 	_mstUnk51 = (MstUnk51 *)malloc(_mstHdr.unk0x48 * sizeof(MstUnk51));
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		_mstUnk51[i].unk0  = fp->readUint32();
-		_mstUnk51[i].data  = 0; fp->readUint32();
+		_mstUnk51[i].indexUnk50 = fp->readUint32();
+		assert(_mstUnk51[i].indexUnk50 < (uint32_t)_mstHdr.unk0x44);
+		_mstUnk51[i].indexUnk50Unk1 = 0; fp->readUint32();
 		_mstUnk51[i].count = fp->readUint32();
 		bytesRead += 12;
 	}
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		_mstUnk51[i].data = (uint8_t *)malloc(_mstUnk51[i].count * 36);
-		fp->read(_mstUnk51[i].data, _mstUnk51[i].count * 36);
-		bytesRead += _mstUnk51[i].count * 36;
+		_mstUnk51[i].indexUnk50Unk1 = (uint32_t *)malloc(_mstUnk51[i].count * 9 * sizeof(uint32_t));
+		for (uint32_t j = 0; j < _mstUnk51[i].count * 9; ++j) {
+			_mstUnk51[i].indexUnk50Unk1[j] = fp->readUint32();
+			assert(_mstUnk51[i].indexUnk50Unk1[j] < _mstUnk50[_mstUnk51[i].indexUnk50].count);
+			bytesRead += 4;
+		}
 	}
 	_mstUnk52 = (uint8_t *)malloc(_mstHdr.unk0x4C * 4);
 	fp->read(_mstUnk52, _mstHdr.unk0x4C * 4);

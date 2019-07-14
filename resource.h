@@ -197,7 +197,8 @@ struct MstUnk46Unk1 { // MonsterBehaviour
 	uint32_t unk8; // 0x8
 	uint32_t energy; // 0xC
 	uint32_t unk10; // 0x10
-	uint32_t unk14; // 0x14
+	uint32_t count; // 0x14
+	uint32_t unk18; // 0x18
 	uint32_t indexUnk51; // 0x1C indexes _mstUnk51
 	uint32_t indexUnk44; // 0x20 indexes _mstUnk44
 	uint32_t indexUnk47; // 0x24 indexes _mstUnk47
@@ -273,14 +274,27 @@ struct MstUnk49 {
 	uint8_t unk17; // 0x17
 }; // SIZEOF_MstUnk49 24
 
+struct MstUnk50Unk1 {
+	uint32_t codeData;
+	uint32_t unk4;
+	uint32_t unk8;
+	uint32_t unkC;
+	uint32_t unk10;
+	uint32_t unk14;
+	uint32_t unk18;
+	uint32_t unk1C;
+	uint32_t unk20;
+	int32_t unk24;
+}; // sizeof == 40
+
 struct MstUnk50 {
-	uint8_t *data; // sizeof == 40
+	MstUnk50Unk1 *data;
 	uint32_t count;
 }; // SIZEOF_MstUnk50 8
 
 struct MstUnk51 {
-	uint32_t unk0;
-	uint8_t *data; // sizeof == 36
+	uint32_t indexUnk50;
+	uint32_t *indexUnk50Unk1; // sizeof == 36
 	uint32_t count;
 }; // SIZEOF_MstUnk51 12
 

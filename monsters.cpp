@@ -1554,6 +1554,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	}
 // 418384
 	assert(_mstCurrentMonster1 == m);
+	int dir = 0;
 	for (int i = 0; i < _mstMovingStateCount; ++i) {
 		MovingOpcodeState *p = &_mstMovingState[i];
 		if (p->m && p->m != m) {
@@ -1573,7 +1574,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 		m->unkF0 = 8;
 		int var28 = 0;
-		//MovingOpcodeState *var14 = m->collidePtr;
+		MovingOpcodeState *var14 = m->collidePtr;
 		if (t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
 			if (m->unk8[946] & 2) {
 				warning("mstUpdateTaskMonsterObject1 418459");
@@ -1587,27 +1588,30 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418508
 		uint32_t var24 = 0;
 		MstUnk46Unk1 *_esi = m->unk4;
-		if (_esi->unk14 != 0) {
-			var24 = _rnd.update() % (_esi->unk14 + 1);
+		if (_esi->count != 0) {
+			var24 = _rnd.update() % (_esi->count + 1);
 		}
 // 418530
-		//int var20 = -1;
+		int var20 = -1;
 		int indexUnk51;
 		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->unk4 != 0 && m->unk8 == &_res->_mstHeightMapData[m->unk18->unk0 * 948]) {
 			indexUnk51 = m->unk18->unk4;
 		} else {
 			indexUnk51 = _esi->indexUnk51;
 		}
+		int _ebx;
 		assert(indexUnk51 < _res->_mstHdr.unk0x48);
 		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
 		for (; var24 < var18->count; ++var24) {
-			const uint8_t *data = &var18->data[var24 * 36 + m->unkF0 * 4];
-			const int32_t x1 = READ_LE_UINT32(data + 0x1C);
-			const int32_t y1 = READ_LE_UINT32(data + 0x20);
+			assert(m->unkF0 >= 0 && m->unkF0 < 9);
+			uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->unkF0];
+			MstUnk50Unk1 *m50u1 = &_res->_mstUnk50[var18->indexUnk50].data[indexUnk50Unk1];
+			const int32_t x1 = m50u1->unk1C;
+			const int32_t y1 = m50u1->unk20;
 			if (x1 != 0 || y1 != 0) {
 				int _ebx = 0;
 				int _ebp = 0;
-				if ((data[4] & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
+				if ((m50u1->unk4 & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
 					_mstTemp_x1 = m->xMstPos - x1;
 				} else {
 					_mstTemp_x1 = m->xMstPos + x1;
@@ -1645,8 +1649,59 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				}
 			}
 // 41866A
-			warning("mstUpdateTaskMonsterObject1 41866A");
-			// TODO
+			_mstTemp_x1 = m->xMstPos;
+			if ((m50u1->unk4 & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
+				_mstTemp_x1 -= m50u1->unk14;
+				_mstTemp_x1 -= m50u1->unkC;
+			} else {
+				_mstTemp_x1 += m50u1->unkC;
+			}
+			_mstTemp_y1 = m->yMstPos + m50u1->unk10;
+			_mstTemp_x2 = _mstTemp_x1 + m50u1->unk14 - 1;
+			_mstTemp_y2 = _mstTemp_y1 + m50u1->unk18 - 1;
+			if ((m->unk8[946] & 4) != 0 && mstBoundingBoxCollides1(m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
+				continue;
+			}
+			int _ecx;
+			if (m->unk8[946] & 2) {
+				_ecx = var14->boundingBox.y2;
+			} else {
+				_ecx = m->yMstPos;
+			}
+			if (m50u1->unk14 != 0 && getMstDistance(_ecx, var14) >= 0) {
+				continue;
+			}
+			if (m->collideDistance >= m50u1->unk24) {
+// 418766
+				MstUnk46Unk1 *m46u1 = m->unk4;
+				_ebx = var24;
+				int _edi = m50u1->unk24;
+				if (m46u1->unk18 != 0) {
+					_edi += (_rnd.update() % (m46u1->unk18 * 2 + 1)) - m46u1->unk18;
+					if (_edi < 0) {
+						_edi = 0;
+					}
+				}
+				dir = _edi;
+				break;
+			}
+			if (var20 == -1) {
+				dir = m50u1->unk24;
+				var20 = var24;
+			}
+			_ebx = var20;
+		}
+		if (_ebx >= 0) {
+// 4187BC
+			uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->unkF0];
+			MstUnk50Unk1 *m50u1 = &_res->_mstUnk50[var18->indexUnk50].data[indexUnk50Unk1];
+
+			mstTaskAttack(_mstCurrentTask, m50u1->codeData, 0x40);
+			_mstCurrentMonster1->unkF8 = m50u1->unk8;
+			_mstCurrentMonster1->unkF4 = dir;
+			_mstCurrentMonster1->unkFC = var14->unk24;
+			_mstCurrentMonster1->directionKeyMask = _andyObject->directionKeyMask;
+			return 0;
 		}
 	}
 // 41882E
@@ -1710,7 +1765,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	if ((_al & 2) != 0 || (_dl & 0x30) != 0) {
 		return 0;
 	}
-	uint8_t dir = _dl & 3;
+	dir = _dl & 3;
 	if (dir == 1) {
 // 418AC6
 		MstUnk44Unk1 *m44unk1 = _mstCurrentMonster1->unkC;
