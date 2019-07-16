@@ -4473,85 +4473,71 @@ l1:
 
 			debug(kDebug_MONSTER, "mstCollidesDirection (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 
-			if (_ebx < _mstPosXmin || _ebx > _mstPosXmax) {
-// 41DDD0
-				if (var1C != 2 || var4C == 1) {
-					return false;
-				}
-				_edi = 1;
-				goto l1; // goto 41DB81
-			}
-
-			uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
-			if (var4D != 0 && (_esi < _mstPosYmin || _esi > _mstPosYmax)) {
-				if (var1C != 2 || var4C == 1) { // _edi
-					return false;
-				}
-				_edi = 1;
-				goto l1; // goto 41DB85
-			}
+			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
+				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
+				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DC19
-			MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
+					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
 
-			_ebx += _mstPosX;
-			int var44 =  _ebx;
-			_esi += _mstPosY;
-			int var38 = _esi;
+					_ebx += _mstPosX;
+					int var44 =  _ebx;
+					_esi += _mstPosY;
+					int var38 = _esi;
 
-			int minDistY = 0x1000000;
-			int minDistX = 0x1000000;
-			int var34 = -1;
+					int minDistY = 0x1000000;
+					int minDistX = 0x1000000;
+					int var34 = -1;
 
-			int var10 = varC->count;
-			if (var10 > 0) {
-				//MstCollision *var20 = varC;
-				for (int j = 0; j < var10; ++j) {
-					MonsterObject1 *m = varC->monster1[j];
-					if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
-						int _ebp = var38 - m->yMstPos;
-						int _eax = ABS(_ebp);
-						int _esi = var44 - m->xMstPos;
-						int _ecx = ABS(_esi);
-						if (_ecx > m48->unk0 || _eax > m48->unk2) {
-							continue;
-						}
-						if ((var8 || var4) && m->unk8[944] != 10 && m->unk8[944] != 16 && m->unk8[944] != 9) {
-							if (_esi <= 0) {
-								if (m->x2 > _ebx) { // var44
-									continue;
-								}
-							} else {
-								if (m->x1 < _ebx) { // var44
-									continue;
-								}
+					int var10 = varC->count;
+					//MstCollision *var20 = varC;
+					for (int j = 0; j < var10; ++j) {
+						MonsterObject1 *m = varC->monster1[j];
+						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
+							int _ebp = var38 - m->yMstPos;
+							int _eax = ABS(_ebp);
+							int _esi = var44 - m->xMstPos;
+							int _ecx = ABS(_esi);
+							if (_ecx > m48->unk0 || _eax > m48->unk2) {
+								continue;
 							}
-							if (var4D != 0) { // vertical move
-								if (_ebp <= 0) {
-									if (m->y2 > var38) {
+							if ((var8 || var4) && m->unk8[944] != 10 && m->unk8[944] != 16 && m->unk8[944] != 9) {
+								if (_esi <= 0) {
+									if (m->x2 > _ebx) { // var44
 										continue;
 									}
 								} else {
-									if (m->y1 < var38) {
+									if (m->x1 < _ebx) { // var44
 										continue;
 									}
 								}
+								if (var4D != 0) { // vertical move
+									if (_ebp <= 0) {
+										if (m->y2 > var38) {
+											continue;
+										}
+									} else {
+										if (m->y1 < var38) {
+											continue;
+										}
+									}
+								}
+							}
+							if (_ecx <= minDistX && _eax <= minDistY) {
+								minDistY = _eax;
+								minDistX = _ecx;
+								var34 = j;
 							}
 						}
-						if (_ecx <= minDistX && _eax <= minDistY) {
-							minDistY = _eax;
-							minDistX = _ecx;
-							var34 = j;
-						}
+					}
+					if (var34 != -1) {
+// 41DDEE
+						const uint8_t num = varC->monster1[var34]->monster1Index;
+						m12u4->monster1Index = num;
+						_op54Data[num] = 1;
+						++var24;
+						continue;
 					}
 				}
-			}
-			if (var34 != -1) {
-// 41DDEE
-				const uint8_t num = varC->monster1[var34]->monster1Index;
-				m12u4->monster1Index = num;
-				_op54Data[num] = 1;
-				++var24;
-				continue;
 			}
 // 41DDA7
 			if (var1C != 2 || var4C == 1) {
@@ -4575,27 +4561,48 @@ l1:
 			uint8_t var1C = m12u4->unk18;
 			m12u4->monster1Index = 255;
 			int var4C = (var1C == 2) ? 0 : var1C;
+			int _edx = var4C;
 // 41DE98
 l2:
 			int var4 = m12u4->unk8;
 			int _ebx = var4;
 			int var8 = m12u4->unkC;
 			int _esi = var8;
-			if ((var4C ^ flag) == 1) {
+			int _eax = _edx ^ flag;
+			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
 
-			// TODO
-			warning("mstCollidesDirection (unk0==0) %d [%d,%d]", _ebx, _mstPosXmin, _mstPosXmax);
-			continue;
-
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
-				if (var4D == 0 && _esi >= _mstPosYmin && _esi <= _mstPosYmax) {
+				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DF10
-					warning("mstCollidesDirection 41DF10 unimplemented");
-					// TODO
+					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
+					_ebx += _mstPosX;
+					//int var44 =  _ebx;
+					_esi += _mstPosY;
+					//int var38 = _esi;
 
+					//int minDistY = 0x1000000;
+					//int minDistX = 0x1000000;
+					int var34 = -1;
+
+					int var10 = varC->count;
+					for (int j = 0; j < var10; ++j) {
+						MonsterObject1 *m = varC->monster1[j];
+						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
+							warning("mstCollidesDirection 41DFA0 unimplemented");
+							// TODO
+						}
+					}
+					if (var34 != -1) {
+// 41E0BA
+						const uint8_t num = varC->monster1[var34]->monster1Index;
+						m12u4->monster1Index = num;
+						_op54Data[num] = 1;
+						++var24;
+						continue;
+					}
 				}
 			}
 // 41E09E
