@@ -4470,24 +4470,19 @@ l1:
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
-
 			debug(kDebug_MONSTER, "mstCollidesDirection (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
-
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DC19
 					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
-
 					_ebx += _mstPosX;
 					int var44 =  _ebx;
 					_esi += _mstPosY;
 					int var38 = _esi;
-
 					int minDistY = 0x1000000;
 					int minDistX = 0x1000000;
 					int var34 = -1;
-
 					int var10 = varC->count;
 					//MstCollision *var20 = varC;
 					for (int j = 0; j < var10; ++j) {
@@ -4572,27 +4567,57 @@ l2:
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
-
+			debug(kDebug_MONSTER, "mstCollidesDirection (unk0==0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DF10
 					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
 					_ebx += _mstPosX;
-					//int var44 =  _ebx;
+					int var44 =  _ebx;
 					_esi += _mstPosY;
-					//int var38 = _esi;
-
-					//int minDistY = 0x1000000;
-					//int minDistX = 0x1000000;
+					int var38 = _esi;
+					int minDistY = 0x1000000;
+					int minDistX = 0x1000000;
 					int var34 = -1;
-
 					int var10 = varC->count;
 					for (int j = 0; j < var10; ++j) {
 						MonsterObject1 *m = varC->monster1[j];
 						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
-							warning("mstCollidesDirection 41DFA0 unimplemented");
-							// TODO
+							int _ebp = var38 - m->yMstPos;
+							int _eax = ABS(_ebp);
+							int _esi = var44 - m->xMstPos;
+							int _ecx = ABS(_esi);
+							if (_ecx > m48->unk0 || _eax > m48->unk2) {
+								continue;
+							}
+							if ((var8 || var4) && m->unk8[944] != 10 && m->unk8[944] != 16 && m->unk8[944] != 9) {
+								if (_esi <= 0) {
+									if (m->x2 > _ebx) { // var44
+										continue;
+									}
+								} else {
+									if (m->x1 < _ebx) { // var44
+										continue;
+									}
+								}
+								if (var4D != 0) { // vertical move
+									if (_ebp <= 0) {
+										if (m->y2 > var38) {
+											continue;
+										}
+									} else {
+										if (m->y1 < var38) {
+											continue;
+										}
+									}
+								}
+							}
+							if (_ecx <= minDistX && _eax <= minDistY) {
+								minDistY = _eax;
+								minDistX = _ecx;
+								var34 = j;
+							}
 						}
 					}
 					if (var34 != -1) {
