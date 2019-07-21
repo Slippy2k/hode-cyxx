@@ -1594,13 +1594,13 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418530
 		int var20 = -1;
 		int indexUnk51;
-		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->unk4 != 0 && m->unk8 == &_res->_mstHeightMapData[m->unk18->unk0 * 948]) {
-			indexUnk51 = m->unk18->unk4;
+		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->indexUnk51 != kNone && m->unk8 == &_res->_mstHeightMapData[m->unk18->unk0 * 948]) {
+			indexUnk51 = m->unk18->indexUnk51;
 		} else {
 			indexUnk51 = _esi->indexUnk51;
 		}
 		int _ebx = -1;
-		assert(indexUnk51 < _res->_mstHdr.unk0x48);
+		assert(indexUnk51 >= 0 && indexUnk51 < _res->_mstHdr.unk0x48);
 		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
 		for (; var24 < var18->count; ++var24) {
 			assert(m->unkF0 >= 0 && m->unkF0 < 9);
