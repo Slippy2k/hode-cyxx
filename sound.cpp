@@ -24,14 +24,57 @@ static const uint8_t _dbVolumeTable[129] = {
 	0x80
 };
 
+static uint32_t valueSssLut(uint8_t source, uint8_t mask, SssUnk1 *s) {
+	uint32_t value = 0;
+	assert(source < 3); // 0,1,2
+// 42BA9D
+
+	// bits 20..24
+	value = source;
+	// bits 24..32
+	value |= mask << 4;
+
+	// bits 16..20
+	value <<= 4;
+	value |= s->unk2 & 15;
+
+	// bits 12..16
+	value <<= 4;
+	value |= s->unk6;
+
+	// bits 0..12
+	value <<= 12;
+	value |= (s->sssUnk3 & 0xFFF);
+
+	return value;
+}
+
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	// (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF) ?
-	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // lut index : 0,1,2
+	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // lut index : 0,1,2 (Andy, monster1, monster2)
 		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // lut offset : num _sssUnk3
 			return (flags_a >> 24) == (flags_b >> 24); // bit 0..31, used as a mask lut[][] |= 1 << bit
 		}
 	}
 	return false;
+}
+
+static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
+	const uint32_t a = (flags >> 20) & 0xF; // 0,1,2
+	assert(a < 3);
+	const uint32_t b = flags & 0xFFF; // num indexes _sssUnk3
+	assert(b < (uint32_t)res->_sssHdr.dataUnk3Count);
+	switch (lut) {
+	case 1:
+		return &res->_sssLookupTable1[a][b];
+	case 2:
+		return &res->_sssLookupTable2[a][b];
+	case 3:
+		return &res->_sssLookupTable3[a][b];
+	default:
+		error("Invalid sssLut %d", lut);
+	}
+	return 0;
 }
 
 void Game::resetSound() {
@@ -172,7 +215,7 @@ void Game::updateSoundObject(SssObject *so) {
 			return;
 		}
 		const uint32_t mask = 1 << (_edi >> 24);
-		uint32_t *sssLut2 = _res->getSssLutPtr(2, _edi);
+		uint32_t *sssLut2 = getSssLutPtr(_res, 2, _edi);
 		if ((*sssLut2 & mask) == 0) {
 			return;
 		}
@@ -291,7 +334,7 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 
 void Game::sssOp4_removeSounds(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	*_res->getSssLutPtr(1, flags) &= ~mask;
+	*getSssLutPtr(_res, 1, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if ((so->flags1 & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
@@ -742,7 +785,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 
 void Game::updateSoundObjectLut2(uint32_t flags) {
 	uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut = _res->getSssLutPtr(2, flags);
+	uint32_t *sssLut = getSssLutPtr(_res, 2, flags);
 	if ((*sssLut & mask) != 0) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
@@ -841,10 +884,10 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 
 	SssUnk3 *unk3 = &_res->_sssDataUnk3[num];
-	int firstCodeOffset = unk3->firstCodeOffset;
-	debug(kDebug_SOUND, "startSoundObject codeOffset %d", firstCodeOffset);
-	assert(firstCodeOffset >= 0 && firstCodeOffset < _res->_sssHdr.codeOffsetsCount);
-	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[firstCodeOffset];
+	int codeOffsetNum = unk3->firstCodeOffset + b;
+	debug(kDebug_SOUND, "startSoundObject codeOffset %d", codeOffsetNum);
+	assert(codeOffsetNum >= 0 && codeOffsetNum < _res->_sssHdr.codeOffsetsCount);
+	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[codeOffsetNum];
 	// TEMP: mixSounds
 	{
 		_res->loadSssPcm(_res->_sssFile, codeOffset->pcm);
@@ -929,7 +972,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	}
 
 	const uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
+	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
 	if ((*sssLut2 & mask) != 0) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
@@ -1009,21 +1052,9 @@ void Game::playSoundObject(SssUnk1 *s, int lut, int bits) {
 		}
 	}
 // 42BA9D
-
-	uint32_t _ebp = (lut & 15) | (bits << 4);
-	assert(_ebp < 32);
-
-	_ebp <<= 4;
-	_ebp |= s->unk2 & 15;
-
-	_ebp <<= 4;
+	const uint32_t _ebp = valueSssLut(lut, bits, s);
 	const uint8_t _al = s->unk6;
-	_ebp |= _al;
-
-	_ebp <<= 12; // lut offset
 	_ecx = s->sssUnk3;
-	_ebp |= _ecx & 0xFFF;
-
 	if (_al & 2) {
 		const uint32_t mask = 1 << (_ebp >> 24);
 		uint32_t *sssLut3 = _res->_sssLookupTable3[(_ebp >> 20) & 15] + _ecx;
@@ -1212,9 +1243,9 @@ void Game::setSoundObjectPanning(SssObject *so) {
 
 void Game::expireSoundObjects(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut1 = _res->getSssLutPtr(1, flags);
+	uint32_t *sssLut1 = getSssLutPtr(_res, 1, flags);
 	*sssLut1 &= ~mask;
-	uint32_t *sssLut2 = _res->getSssLutPtr(2, flags);
+	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
 	*sssLut2 &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if ((so->flags & 0xFFFF0FFF) == 0) {
@@ -1266,8 +1297,8 @@ void Game::mixSoundObjects17640(bool flag) {
 			}
 			if (flag) {
 				const int mask = 1 << (so->flags1 >> 24);
-				if ((*_res->getSssLutPtr(2, so->flags1) & mask) != 0) {
-					if ((*_res->getSssLutPtr(3, so->flags1) & mask) == 0) {
+				if ((*getSssLutPtr(_res, 2, so->flags1) & mask) != 0) {
+					if ((*getSssLutPtr(_res, 3, so->flags1) & mask) == 0) {
 						expireSoundObjects(so->flags1);
 					}
 				}

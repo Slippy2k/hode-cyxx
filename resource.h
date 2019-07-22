@@ -421,12 +421,12 @@ struct SssHdr {
 };
 
 struct SssUnk1 { // SssInfo
-	uint16_t sssUnk3; // 0 index to _sssDataUnk3
-	uint8_t unk2; // 2
-	uint8_t unk3;
-	uint8_t unk4; // 4
-	uint8_t unk5;
-	uint8_t unk6;
+	uint16_t sssUnk3; // 0 indexes _sssDataUnk3
+	int8_t unk2; // 2 codeOffsetNum
+	int8_t unk3; // 3 filterDelta1
+	int8_t unk4; // 4 filterDelta2
+	int8_t unk5; // 5 filterDelta3
+	uint8_t unk6; // 6 sound source mask
 	uint8_t unk7;
 };
 
@@ -454,7 +454,7 @@ struct SssCodeOffset { // SssSample
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData
 	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
 	uint32_t codeOffset4; // 0x14 offset to _sssCodeData
-};
+}; // sizeof == 24
 
 struct SssUnk4 { // SssPreloadInfo
 	uint32_t count;
@@ -624,24 +624,6 @@ struct Resource {
 	void checkSssCode(const uint8_t *buf, int size);
 	void loadSssPcm(File *fp, int num);
 	uint32_t getSssPcmSize(SssPcm *pcm) const;
-
-	uint32_t *getSssLutPtr(int lut, uint32_t flags) {
-		const uint32_t a = (flags >> 20) & 0xF; // 0,1,2
-		assert(a < 3);
-		const uint32_t b = flags & 0xFFF; // num indexes _sssUnk3
-		assert(b < (uint32_t)_sssHdr.dataUnk3Count);
-		switch (lut) {
-		case 1:
-			return &_sssLookupTable1[a][b];
-		case 2:
-			return &_sssLookupTable2[a][b];
-		case 3:
-			return &_sssLookupTable3[a][b];
-		default:
-			assert(0);
-		}
-		return 0;
-	}
 
 	void clearSssLookupTable3();
 

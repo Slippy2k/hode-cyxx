@@ -239,6 +239,7 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 	}
 }
 
+// a: type/source (0, 1, 2) b: num/index (3, monster1Index, monster2.monster1Index)
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	if (num < _res->_sssHdr.dataUnk1Count) {
 		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.dataUnk1Count, a, b);
