@@ -1,5 +1,5 @@
 
-ALL = bitop decode_mst decode_sss dump_data dump_staticres opcode_map
+ALL = bitop decode_mst decode_sss dump_data opcode_map
 
 all: $(ALL)
 
@@ -13,10 +13,7 @@ decode_sss: decode_sss.o
 	$(CXX) $^ -o $@
 
 dump_data: dump_data.o
-	$(CC) $^ -o $@
-
-dump_staticres: dump_staticres.o
-	$(CC) -o $@ $^ -lz
+	$(CC) $^ -o $@ -lz
 
 opcode_map: opcode_map.o
 	$(CC) $^ -o $@
