@@ -2064,8 +2064,29 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		}
 		break;
 	case 2:
-		warning("updateAnimatedLvlObjectType0 - TODO case 2");
-		break;
+		while (_esi->currentFrame < _esi->framesCount - 2) {
+			++_esi->currentFrame;
+			_esi->currentSpriteData = _eax;
+			_eax += 2;
+			const uint16_t _di = READ_LE_UINT16(_eax + 2);
+			_eax += _di + 2;
+		}
+		_eax = _esi->currentSpriteData + 2; // _esi
+		if (_res->_currentScreenResourceNum == ptr->screenNum) {
+			Sprite *spr = _spritesListNextPtr;
+			if (spr && READ_LE_UINT16(_eax + 2) > 8) {
+				spr->bitmapBits = _eax + 2;
+				spr->xPos = _eax[0];
+				spr->yPos = _eax[1];
+				_spritesListNextPtr = spr->nextPtr;
+				spr->num = ptr->flags2;
+				const int index = spr->num & 0x1F;
+				spr->nextPtr = _spriteListPtrTable[index];
+				_spriteListPtrTable[index] = spr;
+			}
+		}
+		ptr->objectUpdateType = 1;
+		return ptr->nextPtr;
 	case 1:
 		++_esi->currentFrame;
 		if (_esi->currentFrame < _esi->framesCount - 1) {
