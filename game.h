@@ -700,7 +700,7 @@ struct Game {
 	SssObject *_sssObjectsList1; // playing
 	SssObject *_sssObjectsList2; // paused/idle
 	SssObject *_lowPrioritySssObject; // point to the object in _sssObjectsList1 with the highest 'priority'
-	uint8_t _channelMixingTable[32];
+	bool _sssUpdatedObjectsTable[kMaxSssObjects];
 	int _playingSssObjectsMax;
 	int _snd_masterPanning;
 	int _playingSssObjectsCount;

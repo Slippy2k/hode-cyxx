@@ -135,7 +135,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 }
 
 void Game::updateSoundObject(SssObject *so) {
-	_channelMixingTable[so->num] = 1;
+	_sssUpdatedObjectsTable[so->num] = true;
 	_sssObjectsChanged = so->filter->unk30;
 	if ((so->flags & 4) == 0) {
 //42B179:
@@ -1101,7 +1101,7 @@ void Game::clearSoundObjects() {
 	}
 	_sssObjectsCount = 0;
 	_playingSssObjectsCount = 0;
-	// _snd_mixingQueueSize = 0;
+	// TODO: _snd_mixingQueueSize = 0;
 	if (_res->_sssHdr.dataUnk1Count != 0) {
 		const int size = _res->_sssHdr.dataUnk3Count * 4;
 		for (int i = 0; i < 3; ++i) {
@@ -1110,7 +1110,7 @@ void Game::clearSoundObjects() {
 			memset(_res->_sssLookupTable3[i], 0, size);
 		}
 	}
-	memset(_channelMixingTable, 0, sizeof(_channelMixingTable));
+	memset(_sssUpdatedObjectsTable, 0, sizeof(_sssUpdatedObjectsTable));
 	if (_res->_sssFilters) {
 		memset(_res->_sssFilters, 0, _res->_sssHdr.dataUnk2Count * sizeof(SssFilter));
 		if (_res->_sssHdr.dataUnk2Count != 0) {
@@ -1275,15 +1275,15 @@ void Game::expireSoundObjects(uint32_t flags) {
 void Game::mixSoundObjects17640(bool flag) {
 	for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
 		_res->_sssFilters[i].unk30 = 0;
-		const int counter1 = _res->_sssFilters[i].unkC;
-		if (counter1 != 0) {
-			_res->_sssFilters[i].unkC = counter1 - 1;
+
+		if (_res->_sssFilters[i].unkC != 0) {
+			--_res->_sssFilters[i].unkC;
 		}
 		_res->_sssFilters[i].unk4 += _res->_sssFilters[i].unk8;
 		_res->_sssFilters[i].unk30 = 1;
-		const int counter2 = _res->_sssFilters[i].unk1C;
-		if (counter2 != 0) {
-			_res->_sssFilters[i].unk1C = counter2 - 1;
+
+		if (_res->_sssFilters[i].unk1C != 0) {
+			--_res->_sssFilters[i].unk1C;
 		}
 		_res->_sssFilters[i].unk14 += _res->_sssFilters[i].unk18;
 		_res->_sssFilters[i].unk30 = 1;
@@ -1292,7 +1292,7 @@ void Game::mixSoundObjects17640(bool flag) {
 	for (int i = 0; i < _sssObjectsCount; ++i) {
 		SssObject *so = &_sssObjectsTable[i];
 		if (so->pcm) {
-			if (_channelMixingTable[i] != 0) {
+			if (_sssUpdatedObjectsTable[i]) {
 				continue;
 			}
 			if (flag) {
@@ -1307,7 +1307,7 @@ void Game::mixSoundObjects17640(bool flag) {
 		}
 	}
 // 42B4B2
-	memset(_channelMixingTable, 0, sizeof(_channelMixingTable));
+	memset(_sssUpdatedObjectsTable, 0, sizeof(_sssUpdatedObjectsTable));
 	if (flag) {
 		_res->clearSssLookupTable3();
 	}
