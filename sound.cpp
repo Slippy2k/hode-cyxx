@@ -1101,7 +1101,7 @@ void Game::clearSoundObjects() {
 	}
 	_sssObjectsCount = 0;
 	_playingSssObjectsCount = 0;
-	// TODO: _snd_mixingQueueSize = 0;
+	_mix._mixingQueueSize = 0;
 	if (_res->_sssHdr.dataUnk1Count != 0) {
 		const int size = _res->_sssHdr.dataUnk3Count * 4;
 		for (int i = 0; i < 3; ++i) {
@@ -1316,11 +1316,26 @@ void Game::mixSoundObjects17640(bool flag) {
 
 void Game::mixSoundObjects() {
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if (so->pcm != 0) {
-			const int16_t *ptr = so->pcm->ptr;
-			if (ptr && so->currentPcmPtr >= ptr) {
-				// TODO: append to mixingQueue
+		const SssPcm *pcm = so->pcm;
+		if (pcm != 0) {
+			const int16_t *ptr = pcm->ptr;
+			if (!ptr) {
+				continue;
 			}
+			if (so->currentPcmPtr < ptr) {
+				continue;
+			}
+			const int16_t *end = ptr + pcm->strideCount * pcm->strideSize / sizeof(int16_t);
+			if (so->currentPcmPtr >= end) {
+				continue;
+			}
+			assert(_mix._mixingQueueSize < Mixer::kPcmChannels);
+			_mix._mixingQueue[_mix._mixingQueueSize].ptr = so->currentPcmPtr;
+			_mix._mixingQueue[_mix._mixingQueueSize].panL = so->panL;
+			_mix._mixingQueue[_mix._mixingQueueSize].panR = so->panR;
+			_mix._mixingQueue[_mix._mixingQueueSize].panType = so->panType;
+			_mix._mixingQueue[_mix._mixingQueueSize].stereo = so->stereo;
+			++_mix._mixingQueueSize;
 		}
 	}
 }

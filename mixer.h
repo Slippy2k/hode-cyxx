@@ -15,6 +15,15 @@ struct Mixer {
 		int voice;
 	} _channels[kPcmChannels];
 
+	struct {
+		const int16_t *ptr;
+		int panL;
+		int panR;
+		uint8_t panType;
+		bool stereo;
+	} _mixingQueue[kPcmChannels];
+	int _mixingQueueSize;
+
 	Mixer();
 	~Mixer();
 

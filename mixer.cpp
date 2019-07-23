@@ -41,6 +41,8 @@ void Mixer::init(int rate) {
 	for (int i = 0; i < kPcmChannels; ++i) {
 		_channels[i].voice = -1;
 	}
+	memset(_mixingQueue, 0, sizeof(_mixingQueue));
+	_mixingQueueSize = 0;
 }
 
 void Mixer::fini() {
