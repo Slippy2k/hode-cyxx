@@ -7,6 +7,7 @@
 #include "paf_decoder.h"
 #include "writer.h"
 
+// names from the PSX version
 static const char *_names[] = {
 	// 0
 	"intro",
