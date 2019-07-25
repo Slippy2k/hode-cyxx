@@ -268,7 +268,7 @@ struct ScreenMask { // ShadowScreenMask
 	uint16_t h;
 }; // sizeof == 0x14
 
-struct LevelSpriteData { // mstOp57
+struct CrackSprite { // mstOp57
 	uint8_t screenNum;
 	uint8_t initData1;
 	int8_t initData2; // xPos

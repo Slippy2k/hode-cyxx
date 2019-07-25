@@ -209,8 +209,8 @@ struct Game {
 	MstBoundingBox _mstBoundingBoxesTable[64];
 	Task *_mstCurrentTask;
 	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
-	int _mstOp57SpritesCount;
-	LevelSpriteData _mstOp57SpritesTable[6];
+	int _crackSpritesCount;
+	CrackSprite _crackSpritesTable[6];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
@@ -329,8 +329,8 @@ struct Game {
 	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int screenNum);
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
-	void resetMstOp57Sprites();
-	void updateMstOp57Sprites();
+	void resetCrackSprites();
+	void updateCrackSprites();
 	void captureScreenshot();
 
 	// level1_rock.cpp
@@ -663,7 +663,7 @@ struct Game {
 	void mstOp53(MstUnk48 *m);
 	void mstOp54();
 	int mstOp56_specialAction(Task *t, int code, int num);
-	void mstOp57_addSprite(int x, int y, int screenNum);
+	void mstOp57_addCrackSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags);
 	void mstOp59_2(int x, int y, int screenNum, int type, uint16_t flags);

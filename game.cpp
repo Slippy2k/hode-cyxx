@@ -1315,7 +1315,7 @@ void Game::resetScreen() {
 			break;
 		}
 	}
-	resetMstOp57Sprites();
+	resetCrackSprites();
 }
 
 void Game::restartLevel() {
@@ -4068,17 +4068,17 @@ LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 	return 0;
 }
 
-void Game::resetMstOp57Sprites() {
-	memset(_mstOp57SpritesTable, 0, sizeof(_mstOp57SpritesTable));
-	_mstOp57SpritesCount = 0;
+void Game::resetCrackSprites() {
+	memset(_crackSpritesTable, 0, sizeof(_crackSpritesTable));
+	_crackSpritesCount = 0;
 }
 
-void Game::updateMstOp57Sprites() {
+void Game::updateCrackSprites() {
 	const uint8_t screenNum = _res->_currentScreenResourceNum;
-	LevelSpriteData *spr = 0;
-	for (int i = 0; i < _mstOp57SpritesCount; ++i) {
-		if (_mstOp57SpritesTable[i].screenNum == screenNum) {
-			spr = &_mstOp57SpritesTable[i];
+	CrackSprite *spr = 0;
+	for (int i = 0; i < _crackSpritesCount; ++i) {
+		if (_crackSpritesTable[i].screenNum == screenNum) {
+			spr = &_crackSpritesTable[i];
 			break;
 		}
 	}

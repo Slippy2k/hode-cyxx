@@ -3453,7 +3453,7 @@ int Game::runTask_default(Task *t) {
 		case 210: // 57
 			{
 				MonsterObject1 *m = t->monster1;
-				mstOp57_addSprite(m->xPos + (int8_t)p[2], m->yPos + (int8_t)p[3], m->o16->screenNum);
+				mstOp57_addCrackSprite(m->xPos + (int8_t)p[2], m->yPos + (int8_t)p[3], m->o16->screenNum);
 			}
 			break;
 		case 211: // 58
@@ -5206,7 +5206,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	return 0;
 }
 
-static void initMstOp57(LevelSpriteData *s, const uint8_t *p) {
+static void initCrackSprite(CrackSprite *s, const uint8_t *p) {
 	s->screenNum = p[0];
 	s->initData1 = p[1];
 	s->initData2 = p[2];
@@ -5222,15 +5222,15 @@ static void initMstOp57(LevelSpriteData *s, const uint8_t *p) {
 	s->initDataF = p[0xF];
 }
 
-void Game::mstOp57_addSprite(int x, int y, int screenNum) {
+void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 	bool found = false;
 	int spriteNum = 0;
 	for (int i = 0; i < 6; ++i) {
-		if (_mstOp57SpritesTable[i].screenNum == screenNum) {
+		if (_crackSpritesTable[i].screenNum == screenNum) {
 			found = true;
 			break;
 		}
-		if (_mstOp57SpritesTable[i].screenNum == 0xFF) {
+		if (_crackSpritesTable[i].screenNum == 0xFF) {
 			break;
 		}
 		++spriteNum;
@@ -5238,41 +5238,38 @@ void Game::mstOp57_addSprite(int x, int y, int screenNum) {
 	if (!found) {
 		found = true;
 		if (spriteNum == 6) {
-			++_mstOp57SpritesCount;
-			if (_mstOp57SpritesCount >= spriteNum) {
-				_mstOp57SpritesCount = 0;
+			++_crackSpritesCount;
+			if (_crackSpritesCount >= spriteNum) {
+				_crackSpritesCount = 0;
 				spriteNum = 0;
 			} else {
-				spriteNum = _mstOp57SpritesCount - 1;
+				spriteNum = _crackSpritesCount - 1;
 			}
 		} else {
-			spriteNum = _mstOp57SpritesCount;
+			spriteNum = _crackSpritesCount;
 		}
 // 40347C
 		switch (_currentLevel) {
 		case 2:
-			initMstOp57(&_mstOp57SpritesTable[spriteNum], _pwr1_spritesData + screenNum * 16);
+			initCrackSprite(&_crackSpritesTable[spriteNum], _pwr1_spritesData + screenNum * 16);
 			break;
 		case 3:
-			initMstOp57(&_mstOp57SpritesTable[spriteNum], _isld_spritesData + screenNum * 16);
+			initCrackSprite(&_crackSpritesTable[spriteNum], _isld_spritesData + screenNum * 16);
 			break;
 		case 4:
-			initMstOp57(&_mstOp57SpritesTable[spriteNum], _lava_spritesData + screenNum * 16);
+			initCrackSprite(&_crackSpritesTable[spriteNum], _lava_spritesData + screenNum * 16);
 			break;
 		case 6:
-			initMstOp57(&_mstOp57SpritesTable[spriteNum], _lar1_spritesData + screenNum * 16);
+			initCrackSprite(&_crackSpritesTable[spriteNum], _lar1_spritesData + screenNum * 16);
 			break;
 		default:
 			warning("mstOp57 unhandled level %d", _currentLevel);
-			break;
-		}
-		if (!found) {
 			return;
 		}
 	}
 // 4034D2
-	const int dx = x - _mstOp57SpritesTable[spriteNum].initData2;
-	const int dy = y + 15 - _mstOp57SpritesTable[spriteNum].initData3;
+	const int dx = x - _crackSpritesTable[spriteNum].initData2;
+	const int dy = y + 15 - _crackSpritesTable[spriteNum].initData3;
 	spriteNum = _rnd.getSeed() & 3;
 	if (spriteNum == 0) {
 		spriteNum = 1;
@@ -5284,7 +5281,7 @@ void Game::mstOp57_addSprite(int x, int y, int screenNum) {
 // 403515
 	const int pos = byte_451248[(dx >> 3) & 31];
 	const int num = dy >> 5;
-	if ((_mstOp57SpritesTable[spriteNum].flags[num] & (3 << pos)) == 0) {
+	if ((_crackSpritesTable[spriteNum].flags[num] & (3 << pos)) == 0) {
 		if (addLvlObjectToList3(20)) {
 			LvlObject *o = _lvlObjectsList3;
 			o->flags0 = _andyObject->flags0;
@@ -5297,7 +5294,7 @@ void Game::mstOp57_addSprite(int x, int y, int screenNum) {
 			setLvlObjectPosRelativeToPoint(o, 7, x, y);
 		}
 	}
-	_mstOp57SpritesTable[spriteNum].flags[num] |= (spriteNum << pos);
+	_crackSpritesTable[spriteNum].flags[num] |= (spriteNum << pos);
 }
 
 void Game::mstOp58_addLvlObject(Task *t, int num) {

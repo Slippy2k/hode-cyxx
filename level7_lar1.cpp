@@ -543,13 +543,13 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 }
 
 void Game::callLevel_initialize_lar1() {
-	resetMstOp57Sprites();
+	resetCrackSprites();
 	_screenCounterTable[26] = 0;
 }
 
 void Game::callLevel_tick_lar1() {
 	updateLevelTick_lar(24, _lar1_unkData3, _lar1_unkData2);
-	updateMstOp57Sprites();
+	updateCrackSprites();
 	if (_screenCounterTable[19] != 0) {
 		_plasmaCannonFlags |= 2;
 	}
