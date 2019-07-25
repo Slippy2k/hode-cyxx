@@ -5206,8 +5206,98 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	return 0;
 }
 
+static void initMstOp57(LevelSpriteData *s, const uint8_t *p) {
+	s->screenNum = p[0];
+	s->initData1 = p[1];
+	s->initData2 = p[2];
+	s->initData3 = p[3];
+	s->initData4 = READ_LE_UINT32(p + 4);
+	s->initData8 = p[8];
+	s->initData9 = p[9];
+	s->initDataA = p[0xA];
+	s->initDataB = p[0xB];
+	s->initDataC = p[0xC];
+	s->initDataD = p[0xD];
+	s->initDataE = p[0xE];
+	s->initDataF = p[0xF];
+}
+
 void Game::mstOp57_addSprite(int x, int y, int screenNum) {
-	warning("mstOp57_addSprite unimplemented");
+	bool found = false;
+	int spriteNum = 0;
+	for (int i = 0; i < 6; ++i) {
+		if (_mstOp57SpritesTable[i].screenNum == screenNum) {
+			found = true;
+			break;
+		}
+		if (_mstOp57SpritesTable[i].screenNum == 0xFF) {
+			break;
+		}
+		++spriteNum;
+	}
+	if (!found) {
+		found = true;
+		if (spriteNum == 6) {
+			++_mstOp57SpritesCount;
+			if (_mstOp57SpritesCount >= spriteNum) {
+				_mstOp57SpritesCount = 0;
+				spriteNum = 0;
+			} else {
+				spriteNum = _mstOp57SpritesCount - 1;
+			}
+		} else {
+			spriteNum = _mstOp57SpritesCount;
+		}
+// 40347C
+		switch (_currentLevel) {
+		case 2:
+			initMstOp57(&_mstOp57SpritesTable[spriteNum], _pwr1_spritesData + screenNum * 16);
+			break;
+		case 3:
+			initMstOp57(&_mstOp57SpritesTable[spriteNum], _isld_spritesData + screenNum * 16);
+			break;
+		case 4:
+			initMstOp57(&_mstOp57SpritesTable[spriteNum], _lava_spritesData + screenNum * 16);
+			break;
+		case 6:
+			initMstOp57(&_mstOp57SpritesTable[spriteNum], _lar1_spritesData + screenNum * 16);
+			break;
+		default:
+			warning("mstOp57 unhandled level %d", _currentLevel);
+			break;
+		}
+		if (!found) {
+			return;
+		}
+	}
+// 4034D2
+	const int dx = x - _mstOp57SpritesTable[spriteNum].initData2;
+	const int dy = y + 15 - _mstOp57SpritesTable[spriteNum].initData3;
+	spriteNum = _rnd.getSeed() & 3;
+	if (spriteNum == 0) {
+		spriteNum = 1;
+	}
+	static const uint8_t byte_451248[32] = {
+		0x00, 0x00, 0x00, 0x02, 0x02, 0x02, 0x04, 0x04, 0x04, 0x06, 0x06, 0x06, 0x08, 0x08, 0x08, 0x0A,
+		0x0A, 0x0A, 0x0C, 0x0C, 0x0C, 0x0E, 0x0E, 0x0E, 0x10, 0x10, 0x10, 0x12, 0x12, 0x12, 0x14, 0x14,
+	};
+// 403515
+	const int pos = byte_451248[(dx >> 3) & 31];
+	const int num = dy >> 5;
+	if ((_mstOp57SpritesTable[spriteNum].flags[num] & (3 << pos)) == 0) {
+		if (addLvlObjectToList3(20)) {
+			LvlObject *o = _lvlObjectsList3;
+			o->flags0 = _andyObject->flags0;
+			o->flags1 = _andyObject->flags1;
+			o->screenNum = screenNum;
+			o->flags2 = 0x1007;
+			o->anim = 0;
+			o->frame = 0;
+			setupLvlObjectBitmap(o);
+			setLvlObjectPosRelativeToPoint(o, 7, x, y);
+		}
+	}
+	_mstOp57SpritesTable[spriteNum].flags[num] |= (spriteNum << pos);
 }
 
 void Game::mstOp58_addLvlObject(Task *t, int num) {

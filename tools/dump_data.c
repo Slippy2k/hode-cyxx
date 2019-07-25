@@ -238,6 +238,8 @@ int main(int argc, char* argv[]) {
 				dumpCheckpointData(fp, "_dark_checkpointData", 0x4E850, 12);
 //				dumpBinary(fp, "_level9UpdateData2", 0x58A40, 8, "0x%02X", UNSIGNED_8BITS);
 
+				dumpBinary(fp, "byte_451248", 0x4EA48, 32, "0x%02X", UNSIGNED_8BITS, 0);
+
 				dumpBinary(fp, "Game::_transformBufferData1", 0x51DA8, 4536, "0x%02X", UNSIGNED_8BITS, 0x4545A8);
 				dumpBinary(fp, "Game::_transformBufferData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS, 0x452D00);
 				dumpBinary(fp, "byte_452898", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
@@ -248,6 +250,10 @@ int main(int argc, char* argv[]) {
 				dumpBinary(fp, "_lar1_unkData3", 0x4FCD8, 96, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpRect(fp, "_lar2_unkData2", 0x4FFC8, 13);
 				dumpBinary(fp, "_lar2_unkData3", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_pwr1_spritesData", 0x51820, 576, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_isld_spritesData", 0x4F448, 368, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_lava_spritesData", 0x50380, 288, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_lar1_spritesData", 0x4F9A8, 400, "0x%02X", UNSIGNED_8BITS, 0);
 			}
 			fclose(fp);
 		}

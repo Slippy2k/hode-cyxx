@@ -4069,11 +4069,71 @@ LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 }
 
 void Game::resetMstOp57Sprites() {
-	// TODO
+	memset(_mstOp57SpritesTable, 0, sizeof(_mstOp57SpritesTable));
+	_mstOp57SpritesCount = 0;
 }
 
 void Game::updateMstOp57Sprites() {
-	// TODO
+	const uint8_t screenNum = _res->_currentScreenResourceNum;
+	LevelSpriteData *spr = 0;
+	for (int i = 0; i < _mstOp57SpritesCount; ++i) {
+		if (_mstOp57SpritesTable[i].screenNum == screenNum) {
+			spr = &_mstOp57SpritesTable[i];
+			break;
+		}
+	}
+	if (!spr) {
+		return;
+	}
+	LvlObject tmp;
+	memset(&tmp, 0, sizeof(tmp));
+	tmp.screenNum = screenNum;
+	tmp.flags2 = 0x1001;
+	tmp.type = 8;
+	tmp.spriteNum = 20;
+	_res->incLevelData0x2988RefCounter(&tmp);
+	uint32_t var68 = 0;
+	for (int i = 0; i < 6; ++i) {
+		uint32_t *flags = &spr->flags[i];
+		uint32_t _eax = 0;
+		if (*flags != _eax) {
+			int var70 = 0;
+			int var6C = 0;
+			for (int var75 = 0; var75 < 11; ++var75) {
+				uint8_t _al = (*flags >> (var70 * 2)) & 3;
+				if (_al != 0 && _spritesListNextPtr != 0) {
+					const int _edi = spr->initData2 + var6C + 12; // xPos
+					const int _ebp = spr->initData3 + var68 + 16; // yPos
+					if (_edi >= spr->initData8 && _edi <= spr->initDataA && _ebp >= spr->initData9 && _ebp <= spr->initDataB) {
+						_al += 3;
+					} else if (_edi >= spr->initDataC && _edi <= spr->initDataE && _ebp >= spr->initDataD && _ebp <= spr->initDataF) {
+						_al += 6;
+					}
+					tmp.anim = _al;
+					setupLvlObjectBitmap(&tmp);
+					setLvlObjectPosRelativeToPoint(&tmp, 7, _edi, _ebp);
+					if (var75 & 1) {
+						tmp.yPos -= 16;
+					}
+					if (READ_LE_UINT16(tmp.bitmapBits) != 8) {
+						Sprite *spr = _spritesListNextPtr;
+						spr->xPos = _edi;
+						spr->yPos = _ebp;
+						spr->bitmapBits = tmp.bitmapBits;
+						spr->num = tmp.flags2 & 0x3FFF;
+						const int index = spr->num & 0x1F;
+						_spritesListNextPtr = spr->nextPtr;
+						spr->nextPtr = _spriteListPtrTable[index];
+						_spriteListPtrTable[index] = spr;
+					}
+				}
+				++var70;
+				var6C += 24;
+			}
+		}
+		var68 += 32;
+	}
+	_res->decLevelData0x2988RefCounter(&tmp);
 }
 
 void Game::captureScreenshot() {

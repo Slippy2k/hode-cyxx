@@ -67,6 +67,10 @@ struct Game {
 	static const uint8_t _pwr1_screenTransformLut[];
 	static const uint8_t _lava_screenTransformLut[];
 	static const uint8_t _pwr2_screenTransformLut[];
+	static const uint8_t _pwr1_spritesData[];
+	static const uint8_t _isld_spritesData[];
+	static const uint8_t _lava_spritesData[];
+	static const uint8_t _lar1_spritesData[];
 
 	Mixer _mix;
 	PafPlayer *_paf;
@@ -205,6 +209,8 @@ struct Game {
 	MstBoundingBox _mstBoundingBoxesTable[64];
 	Task *_mstCurrentTask;
 	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
+	int _mstOp57SpritesCount;
+	LevelSpriteData _mstOp57SpritesTable[6];
 
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
