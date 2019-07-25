@@ -995,6 +995,26 @@ void Game::clearLvlObjectsList3() {
 	_lvlObjectsList3 = 0;
 }
 
+LvlObject *Game::addLvlObjectToList0(int num) {
+	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < 160) {
+		assert(_declaredLvlObjectsListHead);
+		LvlObject *ptr = _declaredLvlObjectsListHead;
+		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+		++_declaredLvlObjectsListCount;
+		ptr->spriteNum = num;
+		ptr->type = 8;
+		_res->incLevelData0x2988RefCounter(ptr);
+		lvlObjectTypeCallback(ptr);
+		ptr->currentSprite = 0;
+		ptr->sssObj = 0;
+		ptr->nextPtr = 0;
+		ptr->bitmapBits = 0;
+		ptr->nextPtr = _lvlObjectsList0;
+		_lvlObjectsList0 = ptr;
+	}
+	return 0;
+}
+
 LvlObject *Game::addLvlObjectToList1(int type, int num) {
 	if ((type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) && _declaredLvlObjectsListCount < 160) {
 		assert(_declaredLvlObjectsListHead);
@@ -1014,6 +1034,26 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 		ptr->nextPtr = _lvlObjectsList1;
 		_lvlObjectsList1 = ptr;
 		return ptr;
+	}
+	return 0;
+}
+
+LvlObject *Game::addLvlObjectToList2(int num) {
+	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < 160) {
+		assert(_declaredLvlObjectsListHead);
+		LvlObject *ptr = _declaredLvlObjectsListHead;
+		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+		++_declaredLvlObjectsListCount;
+		ptr->spriteNum = num;
+		ptr->type = 8;
+		_res->incLevelData0x2988RefCounter(ptr);
+		lvlObjectTypeCallback(ptr);
+		ptr->currentSprite = 0;
+		ptr->sssObj = 0;
+		ptr->nextPtr = 0;
+		ptr->bitmapBits = 0;
+		ptr->nextPtr = _lvlObjectsList2;
+		_lvlObjectsList2 = ptr;
 	}
 	return 0;
 }
@@ -3013,16 +3053,6 @@ void Game::lvlObjectType0CallbackBreathBubbles(LvlObject *ptr) {
 	}
 }
 
-// dx, dy
-static const uint8_t byte_43E660[] = {
-	0x1F, 0x00, 0xE5, 0xEE, 0xE5, 0x12, 0x1B, 0xEE, 0x1B, 0x12, 0xE1, 0x00, 0x00, 0xE1, 0x00, 0x1F
-};
-
-// dx, dy
-static const uint8_t byte_43E670[] = {
-	0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
-};
-
 static const uint8_t byte_43E680[] = {
 	0xFF, 0x00, 0x07, 0x00, 0x0F, 0x00, 0x17, 0x00, 0x08, 0x08, 0x00, 0x00, 0xF8, 0xF8, 0xF0, 0xF0,
 	0x08, 0xF8, 0x00, 0xFF, 0xF8, 0x07, 0xF0, 0x0F, 0xFF, 0x08, 0x07, 0x00, 0x0F, 0xF8, 0x17, 0xF0,
@@ -3094,8 +3124,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DBCE
-			_eax->dxPos = (int8_t)byte_43E670[_eax->unk1 * 2];
-			_eax->dyPos = (int8_t)byte_43E670[_eax->unk1 * 2 + 1];
+			_eax->dxPos = (int8_t)_byte_43E670[_eax->unk1 * 2];
+			_eax->dyPos = (int8_t)_byte_43E670[_eax->unk1 * 2 + 1];
 			_esi->anim = 10;
 		} else {
 // 40DBF4
@@ -3140,8 +3170,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DCCE
-			_eax->dxPos = (int8_t)byte_43E660[_eax->unk1 * 2];
-			_eax->dyPos = (int8_t)byte_43E660[_eax->unk1 * 2 + 1];
+			_eax->dxPos = (int8_t)_byte_43E660[_eax->unk1 * 2];
+			_eax->dyPos = (int8_t)_byte_43E660[_eax->unk1 * 2 + 1];
 		}
 // 40DCE9
 		_esi->frame = 0;

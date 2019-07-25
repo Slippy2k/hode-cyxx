@@ -55,6 +55,13 @@ struct Game {
 		kFrameTimeStamp = 50 // 80
 	};
 
+	static const uint8_t _byte_43E660[];
+	static const uint8_t _byte_43E670[];
+	static const uint8_t _byte_43E6E0[];
+	static const uint8_t _byte_43E6F0[];
+	static const uint8_t _byte_43E730[];
+	static const uint8_t _byte_43E740[];
+	static const uint8_t _byte_43E760[];
 	static const uint8_t _pointDstIndexTable[];
 	static const uint8_t _pointRandomizeShiftTable[];
 	static const uint8_t _pointSrcIndex2Table[];
@@ -257,7 +264,9 @@ struct Game {
 	void clearLvlObjectsList1();
 	void clearLvlObjectsList2();
 	void clearLvlObjectsList3();
+	LvlObject *addLvlObjectToList0(int num);
 	LvlObject *addLvlObjectToList1(int type, int num);
+	LvlObject *addLvlObjectToList2(int num);
 	LvlObject *addLvlObjectToList3(int num);
 	void removeLvlObject(LvlObject *ptr);
 	void removeLvlObject2(LvlObject *o);
@@ -666,7 +675,7 @@ struct Game {
 	void mstOp57_addCrackSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags);
-	void mstOp59_2(int x, int y, int screenNum, int type, uint16_t flags);
+	void mstOp59_2(int x, int y, int screenNum, int pos, int type, uint16_t flags);
 	void executeMstUnk1(Task *t);
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);

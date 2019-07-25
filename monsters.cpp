@@ -3499,7 +3499,7 @@ int Game::runTask_default(Task *t) {
 				} else {
 					dirMask = ((flags1 & 0x10) != 0) ? 8 : 0;
 				}
-				if (p[1] == 0) {
+				if (p[1] == 255) {
 					int type = 0;
 					switch (dirMask) {
 					case 1:
@@ -3550,7 +3550,7 @@ int Game::runTask_default(Task *t) {
 						type = 2;
 						break;
 					}
-					mstOp59_2(xPos, yPos, o->screenNum, type, (o->flags2 + 1) & 0xDFFF);
+					mstOp59_2(xPos, yPos, o->screenNum, p[1], type, (o->flags2 + 1) & 0xDFFF);
 				}
 			}
 			break;
@@ -5336,12 +5336,66 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 	}
 }
 
+// mstOp59_addShootSpecialPowers
 void Game::mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags) {
-	warning("mstOp59_1 unimplemented");
+	LvlObject *o = addLvlObjectToList0(3);
+	if (o) {
+		o->dataPtr = _shootLvlObjectDataList;
+		if (_shootLvlObjectDataList) {
+			_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+			memset(o->dataPtr, 0, sizeof(ShootLvlObjectData));
+		}
+		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
+		assert(s);
+		o->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
+		s->unk1 = type;
+		s->unk0 = 0;
+		s->counter = 17;
+		s->dxPos = (int8_t)_byte_43E660[type * 2];
+		s->dyPos = (int8_t)_byte_43E660[type * 2 + 1];
+		o->anim = _byte_43E730[type * 2];
+		o->flags1 = ((_byte_43E730[type * 2 + 1] & 3) << 4) | (o->flags1 & ~0x0030);
+		o->frame = 0;
+		o->flags2 = o->flags1;
+		o->screenNum = screenNum;
+		setupLvlObjectBitmap(o);
+		setLvlObjectPosRelativeToPoint(o, 6, x, y);
+	}
 }
 
-void Game::mstOp59_2(int x, int y, int screenNum, int type, uint16_t flags) {
-	warning("mstOp59_2 unimplemented");
+// mstOp59_addShootMonster
+void Game::mstOp59_2(int x, int y, int screenNum, int pos, int type, uint16_t flags) {
+	LvlObject *o = addLvlObjectToList2(7);
+	if (o) {
+		o->dataPtr = _shootLvlObjectDataList;
+		if (_shootLvlObjectDataList) {
+			_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+			memset(o->dataPtr, 0, sizeof(ShootLvlObjectData));
+		}
+		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
+		assert(s);
+		s->unk1 = pos;
+		const uint8_t *_ecx;
+		if (type >= 7) {
+			s->dxPos = (int8_t)_byte_43E6F0[type * 2];
+			s->dyPos = (int8_t)_byte_43E6F0[type * 2 + 1];
+			s->counter = 33;
+			_ecx = &_byte_43E760[type * 2];
+		} else {
+			s->dxPos = (int8_t)_byte_43E6E0[type * 2];
+			s->dyPos = (int8_t)_byte_43E6E0[type * 2 + 1];
+			s->counter = 39;
+			_ecx = &_byte_43E740[type * 2];
+		}
+		s->unk0 = type;
+		o->anim = _ecx[0];
+		o->screenNum = screenNum;
+		o->flags1 = ((_ecx[1] & 3) << 4) | (o->flags1 & ~0x0030);
+		o->flags2 = o->flags1;
+		o->frame = 0;
+		setupLvlObjectBitmap(o);
+		setLvlObjectPosRelativeToPoint(o, 6, x - s->dxPos, y - s->dyPos);
+	}
 }
 
 void Game::executeMstUnk1(Task *t) {

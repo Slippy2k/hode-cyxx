@@ -207,6 +207,13 @@ int main(int argc, char* argv[]) {
 
 //				dumpBinary(fp, "Game::_transformBufferData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS); // _benchmarkData1
 //				dumpBinary(fp, "Game::_transformBufferData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS); // _benchmarkData2
+				dumpBinary(fp, "_byte_43E660", 0x3E660, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E670", 0x3E670, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E6E0", 0x3E6E0, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E6F0", 0x3E6F0, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E730", 0x3E730, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E740", 0x3E740, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E760", 0x3E6F0, 16, "0x%02X", UNSIGNED_8BITS, 0);
 //				dumpBinary(fp, "_byte_43E8F8", 0x3E8F8, 68, "0x%02X", UNSIGNED_8BITS);
 //				dumpBinary(fp, "_byte_43E940", 0x3E940, 68, "0x%02X", UNSIGNED_8BITS);
 //				dumpBinary(fp, "_level1OpHelper1KeyMaskTable", 0x3E888, 112, "%d", UNSIGNED_8BITS);
@@ -214,7 +221,7 @@ int main(int argc, char* argv[]) {
 //				dumpBinary(fp, "_actionDirectionKeyMaskTable", 0x3E3D4, 352, "0x%02X", UNSIGNED_8BITS);
 //				dumpBinary(fp, "_dbVolumeTable", 0x40010, 129, "0x%02X", UNSIGNED_8BITS);
 
-				dumpFontCharMap(fp, "_fontCharactersTable", 0x3FE88, 39);
+//				dumpFontCharMap(fp, "_fontCharactersTable", 0x3FE88, 39);
 			}
 
 			if (version == FULL_FR_10) {
