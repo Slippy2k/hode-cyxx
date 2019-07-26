@@ -996,7 +996,7 @@ void Game::clearLvlObjectsList3() {
 }
 
 LvlObject *Game::addLvlObjectToList0(int num) {
-	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < 160) {
+	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < kMaxLvlObjects) {
 		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
@@ -1011,12 +1011,13 @@ LvlObject *Game::addLvlObjectToList0(int num) {
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList0;
 		_lvlObjectsList0 = ptr;
+		return ptr;
 	}
 	return 0;
 }
 
 LvlObject *Game::addLvlObjectToList1(int type, int num) {
-	if ((type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) && _declaredLvlObjectsListCount < 160) {
+	if ((type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) && _declaredLvlObjectsListCount < kMaxLvlObjects) {
 		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
@@ -1039,7 +1040,7 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 }
 
 LvlObject *Game::addLvlObjectToList2(int num) {
-	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < 160) {
+	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < kMaxLvlObjects) {
 		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
@@ -1054,12 +1055,13 @@ LvlObject *Game::addLvlObjectToList2(int num) {
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList2;
 		_lvlObjectsList2 = ptr;
+		return ptr;
 	}
 	return 0;
 }
 
 LvlObject *Game::addLvlObjectToList3(int num) {
-	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < 160) {
+	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < kMaxLvlObjects) {
 		assert(_declaredLvlObjectsListHead);
 		LvlObject *ptr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
@@ -3962,7 +3964,7 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 
 LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 	if (type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) {
-		if (_declaredLvlObjectsListCount < 160) {
+		if (_declaredLvlObjectsListCount < kMaxLvlObjects) {
 			assert(_declaredLvlObjectsListHead);
 			LvlObject *ptr = _declaredLvlObjectsListHead;
 			_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
@@ -3986,10 +3988,10 @@ LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 
 void Game::clearDeclaredLvlObjectsList() {
 	memset(_declaredLvlObjectsList, 0, sizeof(_declaredLvlObjectsList));
-	for (int i = 0; i < 159; ++i) {
+	for (int i = 0; i < kMaxLvlObjects - 1; ++i) {
 		_declaredLvlObjectsList[i].nextPtr = &_declaredLvlObjectsList[i + 1];
 	}
-	_declaredLvlObjectsList[159].nextPtr = 0;
+	_declaredLvlObjectsList[kMaxLvlObjects - 1].nextPtr = 0;
 	_declaredLvlObjectsListHead = &_declaredLvlObjectsList[0];
 	_declaredLvlObjectsListCount = 0;
 }

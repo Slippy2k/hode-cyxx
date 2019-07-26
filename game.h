@@ -52,6 +52,7 @@ struct Game {
 		kMaxBackgroundAnims = 64,
 		kMaxSprites = 128,
 		kMaxSpriteTypes = 32,
+		kMaxLvlObjects = 160,
 		kFrameTimeStamp = 50 // 80
 	};
 
@@ -98,7 +99,7 @@ struct Game {
 	int _currentLevelCheckpoint;
 	bool _quit;
 	Sprite _spritesTable[kMaxSprites];
-	Sprite *_spritesListNextPtr; // pointer to the first 'free' element
+	Sprite *_spritesListNextPtr; // pointer to the next free element
 	Sprite *_spriteListPtrTable[kMaxSpriteTypes];
 	uint16_t _fadePaletteBuffer[256 * 3];
 	uint8_t *_shadowScreenMaskBuffer;
@@ -113,7 +114,7 @@ struct Game {
 	bool _fadePalette;
 	bool _hideAndyObjectSprite;
 	ShootLvlObjectData _shootLvlObjectDataTable[kMaxShootLvlObjectData];
-	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the first 'free' element
+	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the next free element
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -174,8 +175,8 @@ struct Game {
 	int _mstOp56Counter;
 	uint8_t _mstOp54Table[32];
 	bool _mstLogicDisabled;
-	LvlObject _declaredLvlObjectsList[160];
-	LvlObject *_declaredLvlObjectsListHead; // pointer to the first 'free' element
+	LvlObject _declaredLvlObjectsList[kMaxLvlObjects];
+	LvlObject *_declaredLvlObjectsListHead; // pointer to the next free element
 	int _declaredLvlObjectsListCount;
 	AndyLvlObjectData _andyObjectScreenData;
 	AnimBackgroundData _animBackgroundDataTable[kMaxBackgroundAnims];
@@ -227,7 +228,6 @@ struct Game {
 	uint32_t benchmarkCpu();
 
 	// game.cpp
-
 	void mainLoop(int level, int checkpoint, bool levelChanged);
 	void mixAudio(int16_t *buf, int len);
 	void resetShootLvlObjectDataTable();
@@ -745,7 +745,6 @@ struct Game {
 	void stopSoundObject(SssObject **sssObjectsList, int num);
 
 	// andy.cpp
-
 	AndyMoveData _andyMoveData;
 	int32_t _andyPosX;
 	int32_t _andyPosY;
