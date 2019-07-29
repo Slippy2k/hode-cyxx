@@ -188,10 +188,10 @@ struct Game {
 	Task *_tasksList;
 	Task *_monsterObjects1TasksList;
 	Task *_monsterObjects2TasksList;
-	int _mstPrevPosX; // _mstAndyLevelPrevPosX
-	int _mstPrevPosY; // _mstAndyLevelPrevPosY
-	int _mstPosX; // _mstAndyLevelPosX
-	int _mstPosY; // _mstAndyLevelPosY
+	int _mstAndyLevelPrevPosX;
+	int _mstAndyLevelPrevPosY;
+	int _mstAndyLevelPosX;
+	int _mstAndyLevelPosY;
 	int _mstAndyScreenPosX;
 	int _mstAndyScreenPosY;
 	int _mstAndyRectNum;
