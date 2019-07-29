@@ -198,7 +198,7 @@ struct Game {
 	int _m43Num1;
 	int _m43Num2;
 	int _m43Num3;
-	int _yMstPos;
+	int _yMstPos1, _yMstPos2;
 	int _mstUnk12;
 	int _m48Num;
 	uint8_t _mstUnk8;

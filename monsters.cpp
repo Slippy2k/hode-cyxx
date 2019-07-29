@@ -1163,6 +1163,66 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 }
 
 void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
+	MstUnk44Unk1 *m44u1 = m->unkC;
+	const uint8_t *p = m->unk8;
+	assert(m44u1->indexUnk34_16 != kNone);
+	MstUnk34 *m34 = &_res->_mstUnk34[m44u1->indexUnk34_16];
+	const int w = READ_LE_UINT32(p + 904);
+	const int h = READ_LE_UINT32(p + 908);
+	if (m->xMstPos < m34->x2 - w || m->xMstPos > m34->x1 + w || m->yMstPos < m34->y2 - h || m->yMstPos > m34->y1 + h) {
+		updateMonsterObject1Position(m);
+		m->unkC0 = -1;
+		m->unkBC = -1;
+	}
+	m->task->flags &= ~0x80;
+	if (m->xMstPos < m->unk74) {
+		int x = m->unk7C;
+		_xMstPos1 = x;
+		if (x > m->x1) {
+			x = m->x1;
+			m->task->flags |= 0x80;
+		}
+		m->flags4A = 2;
+		_xMstPos2 = x - m->xMstPos;
+	} else if (m->xMstPos > m->unk7C) {
+		int x = m->unk74;
+		_xMstPos1 = x;
+		if (x < m->x2) {
+			x = m->x2;
+			m->task->flags |= 0x80;
+		}
+		m->flags4A = 8;
+		_xMstPos2 = m->xMstPos - x;
+	} else {
+		_xMstPos1 = m->xMstPos;
+		m->flags4A = 0;
+		_xMstPos2 = 0;
+	}
+	if (m->yMstPos < m->unk78) {
+		int y = m->unk80;
+		_yMstPos1 = y;
+		if (y > m->y1) {
+			y = m->y1;
+			m->task->flags |= 0x80;
+		}
+		_yMstPos2 = y - m->yMstPos;
+		m->flags4A |= 4;
+	} else if (m->yMstPos > m->unk80) {
+		int y = m->unk78;
+		_yMstPos1 = y;
+		if (y < m->y2) {
+			y = m->y2;
+			m->task->flags |= 0x80;
+		}
+		m->flags4A |= 1;
+	} else {
+		_yMstPos1 = m->yMstPos;
+		_yMstPos2 = 0;
+	}
+	if (m->flags4A == 0) {
+		return;
+	}
+// 41A759
 	warning("mstSetVerticalHorizontalBounds unimplemented");
 	// TODO
 }
@@ -1172,21 +1232,21 @@ bool Game::executeMstUnk6(MonsterObject1 *m) {
 		if (_xMstPos2 < m->m49->unk14) {
 			m->flags4A &= ~0xA;
 		}
-		if (_yMstPos < m->m49->unk15) {
+		if (_yMstPos2 < m->m49->unk15) {
 			m->flags4A &= ~0x5;
 		}
 	}
 	if (_mstLut1[m->flags4A] & 1) {
 		while (--m->indexUnk49Unk1 >= 0) {
 			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
-			if (_xMstPos2 >= m->m49Unk1->unkE && _yMstPos >= m->m49Unk1->unkF) {
+			if (_xMstPos2 >= m->m49Unk1->unkE && _yMstPos2 >= m->m49Unk1->unkF) {
 				return true;
 			}
 		}
 	} else {
 		while (--m->indexUnk49Unk1 >= 0) {
 			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
-			if (((m->flags4A & 0xA) == 0 || _xMstPos2 >= m->m49Unk1->unkC) && ((m->flags4A & 0x5) == 0 || _yMstPos >= m->m49Unk1->unkD)) {
+			if (((m->flags4A & 0xA) == 0 || _xMstPos2 >= m->m49Unk1->unkC) && ((m->flags4A & 0x5) == 0 || _yMstPos2 >= m->m49Unk1->unkD)) {
 				return true;
 			}
 		}
@@ -4350,7 +4410,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			_cl = m->m49Unk1->unkC;
 			_dl = m->m49Unk1->unkD;
 		}
-		if (_xMstPos2 < _cl && _yMstPos < _dl && !executeMstUnk6(m)) {
+		if (_xMstPos2 < _cl && _yMstPos2 < _dl && !executeMstUnk6(m)) {
 // 41C2E6
 			goto l41C2E6;
 		}
@@ -5726,7 +5786,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 	}
 // 41C774
-	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos <= 0)) {
+	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos2 <= 0)) {
 		if (m->unk8[946] & 4) {
 			// TODO
 			warning("executeMstOp67Type1 41C799");
@@ -5736,14 +5796,14 @@ int Game::executeMstOp67Type1(Task *t) {
 	} else {
 // 41C7F6
 		if (_edi != 0) {
-			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m->m49->unk15)) {
+			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)) {
 // 41C833
 				if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->m49Unk1->offsetHeight + 0xE] != 0 && m->flagsA8 == 0) {
 					warning("executeMstOp67Type1 41C863");
 					// TODO
 				}
 // 41C976
-				if (_xMstPos2 >= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m36->unk8)) {
+				if (_xMstPos2 >= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
 					m->indexUnk49Unk1 = m->m49->count1 - 1;
 					m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 					if (m->unk8[946] & 4) {
@@ -5851,7 +5911,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 			_cl = m->m49Unk1->unkC;
 			_dl = m->m49Unk1->unkD;
 		}
-		if (_xMstPos2 < _cl && _yMstPos < _dl && !executeMstUnk6(m)) {
+		if (_xMstPos2 < _cl && _yMstPos2 < _dl && !executeMstUnk6(m)) {
 			_edi = 0;
 		}
 	} else {
@@ -5888,7 +5948,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 	}
 // 41CF17
-	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos <= 0)) {
+	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos2 <= 0)) {
 		if (m->unk8[946] & 4) {
 			mstBoundingBoxClear(m, 1);
 		}
@@ -5898,14 +5958,14 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	}
 // 41CF99
 	if (_edi) {
-		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_yMstPos >= m->m49->unk15))) {
+		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_yMstPos2 >= m->m49->unk15))) {
 			if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->m49Unk1->offsetHeight + 0xE] != 0 && m->flagsA8[0] == 0xFF) {
 				warning("executeMstOp67Type2 41D002");
 				// TODO
 			}
 // 41D115
 
-			if (_xMstPos2 <= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos >= m36->unk8)) {
+			if (_xMstPos2 <= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
 				m->indexUnk49Unk1 = m->m49->count1 - 1;
 				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 				if (m->unk8[946] & 4) {
