@@ -1279,9 +1279,86 @@ int Game::executeMstUnk9(Task *t, MonsterObject1 *m) {
 }
 
 int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
-	warning("executeMstUnk11 unimplemented");
-	// TODO
-	return executeMstUnk9(t, m);
+	if ((m->unk8[946] & 4) == 0 || (_mstLut1[m->flags4A] & 1) != 0) {
+		if (_xMstPos2 < m->m49->unk14) {
+			m->flags4A &= ~0xA;
+		}
+		if (_yMstPos2 < m->m49->unk15) {
+			m->flags4A &= ~0x5;
+		}
+	}
+// 41B64F
+	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	if ((m->unk8[946] & 4) == 0 && (m->flagsA5 & 4) == 0 && (m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
+		int _edi, _ebp;
+		if (_mstLut1[m->flags4A] & 1) {
+			_edi = (int8_t)ptr[0xA];
+			_ebp = (int8_t)ptr[0xB];
+		} else {
+			_edi = (int8_t)ptr[0x8];
+			_ebp = (int8_t)ptr[0x9];
+		}
+		int x = m->xMstPos;
+		int y = m->yMstPos;
+		if (m->flags4A & 8) {
+			x -= _edi;
+		} else if (m->flags4A & 2) {
+			x += _edi;
+		}
+		if (m->flags4A & 1) {
+			y -= _ebp;
+		} else if (m->flags4A & 4) {
+			y += _ebp;
+		}
+		if (!mstSetCurrentPos(m, x, y)) {
+			_xMstPos2 = ABS(m->xMstPos - _mstCurrentPosX);
+			_yMstPos2 = ABS(m->yMstPos - _mstCurrentPosY);
+		}
+	}
+// 41B72A
+	ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	int _edx, _ecx;
+	if (_mstLut1[m->flags4A] & 1) {
+		_edx = (int8_t)ptr[0xA];
+		_ecx = (int8_t)ptr[0xB];
+	} else {
+		_edx = (int8_t)ptr[0x8];
+		_ecx = (int8_t)ptr[0x9];
+	}
+	if (m->flags4A == 0) {
+		return executeMstUnk9(t, m);
+	}
+	if (_xMstPos2 < _edx && _yMstPos2 < _ecx) {
+		if ((_xMstPos2 <= 0 && _yMstPos2 <= 0) || !executeMstUnk6(m)) {
+			return executeMstUnk9(t, m);
+		}
+	}
+// 41B79D
+	if ((m->unk8[946] & 4) == 0 && (_mstLut1[m->flags4A] & 1) != 0) {
+		if (_xMstPos2 < _yMstPos2) {
+			if (_xMstPos2 < m->m49Unk1->unkA) {
+				const uint8_t _al = m->flags4A;
+				m->flags4A &= ~0xA;
+				if (m->flagsA7 != _al) {
+					_xMstPos2 = 0;
+				}
+
+			}
+		} else {
+// 41B7E9
+			if (_yMstPos2 < m->m49Unk1->unkB) {
+				const uint8_t _al = m->flags4A;
+				m->flags4A &= ~0x5;
+				if (m->flagsA7 != _al) {
+					_yMstPos2 = 0;
+				}
+			}
+		}
+	}
+// 41B80E
+	ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
+	return 1;
 }
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
