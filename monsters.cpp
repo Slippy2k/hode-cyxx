@@ -1223,8 +1223,24 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 		return;
 	}
 // 41A759
+	int _edi = 0;
 	warning("mstSetVerticalHorizontalBounds unimplemented");
 	// TODO
+// 41A9F4
+	if (m->flags4A & 8) {
+		_xMstPos2 = m->xMstPos - m->unkC->unk34[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
+	} else if (m->flags4A & 2) {
+		_xMstPos2 = m->unkC->unk2C[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904) - m->xMstPos;
+	} else {
+		_xMstPos2 = 0;
+	}
+	if (m->flags4A & 1) {
+		_yMstPos2 = m->yMstPos - m->unkC->unk44[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 908);
+	} else if (m->flags4A & 4) {
+		_yMstPos2 = m->unkC->unk3C[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 908) - m->yMstPos;
+	} else {
+		_yMstPos2 = 0;
+	}
 }
 
 bool Game::executeMstUnk6(MonsterObject1 *m) {
@@ -1255,14 +1271,23 @@ bool Game::executeMstUnk6(MonsterObject1 *m) {
 }
 
 void Game::executeMstUnk8(MonsterObject1 *m) {
+	if (m->unkAC != -1) {
+		if (m->xMstPos != m->unkAC || m->yMstPos != m->unkB0) {
+			_xMstPos2 = m->unkB4;
+			_yMstPos2 = m->unkB8;
+			return;
+		}
+		mstBoundingBoxClear(m, 1);
+	}
+// 41AB38
+	mstSetVerticalHorizontalBounds(m);
 	warning("executeMstUnk8 unimplemented");
 	// TODO
 }
 
 int Game::executeMstUnk9(Task *t, MonsterObject1 *m) {
 	if (m->unk8[946] & 4) {
-		warning("executeMstUnk9 unimplemented");
-		// TODO
+		mstBoundingBoxClear(m, 1);
 	}
 	if (m->flags4B != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
 		LvlObject *o = m->o16;
@@ -2509,6 +2534,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 		}
 	} else {
+// 40E9BC
 		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
 			warning("mstTaskSetActionDirection %d unimplemented ptr[14] %d", num, ptr[14]);
 			// TODO
@@ -4401,8 +4427,10 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 // 41BDA9
 	if (m->unk8[946] & 4) {
-		warning("mstOp49 41BDA9");
-		// TODO
+		m->flagsA8[3] = 255;
+		m->unkAC = -1;
+		m->unkB0 = -1;
+		mstBoundingBoxClear(m, 1);
 	}
 // 41BE12
 	uint8_t _dl = m->flags4B;
@@ -4452,8 +4480,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			}
 			if (_edx < a || _edi < b || (_bl != 0 && (_eax < _ebp || _ecx > var4))) {
 				if ((m->unk8[946] & 4) != 0) {
-					warning("mstOp49 41BFDD");
-					// TODO
+					mstBoundingBoxClear(m, 1);
 				}
 				return mstTaskStopMonsterObject1(t);
 			}
@@ -4461,7 +4488,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 // 41C038
 	if (m->unk8[946] & 4) {
-		warning("mstOp49 41C038");
+		warning("mstOp49 41C038 unimplemented");
 		// TODO
 	}
 // 41C17B
@@ -5788,7 +5815,11 @@ int Game::executeMstOp67Type1(Task *t) {
 	x = m->unkC->x2;
 	if (m->unk8[946] & 4) {
 // 41C4C9
-		warning("executeMstOp67Type1 t %p 41C4C9 unimplemented", t);
+		m->flagsA8[3] = 255;
+		m->unkAC = -1;
+		m->unkB0 = -1;
+		mstBoundingBoxClear(m, 1);
+		warning("executeMstOp67Type1 t %p 41C531 unimplemented", t);
 		// TODO
 	}
 // 41C531
@@ -5865,8 +5896,7 @@ int Game::executeMstOp67Type1(Task *t) {
 // 41C774
 	if (_xMstPos2 <= 0 && ((m->unk8[946] & 2) == 0 || _yMstPos2 <= 0)) {
 		if (m->unk8[946] & 4) {
-			// TODO
-			warning("executeMstOp67Type1 41C799");
+			mstBoundingBoxClear(m, 1);
 		}
 		executeMstUnk1(t);
 		return 0;
@@ -5884,8 +5914,10 @@ int Game::executeMstOp67Type1(Task *t) {
 					m->indexUnk49Unk1 = m->m49->count1 - 1;
 					m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 					if (m->unk8[946] & 4) {
-						warning("executeMstOp67Type1 41C9CD");
-						// TODO
+						m->flagsA8[3] = 255;
+						m->unkAC = -1;
+						m->unkB0 = -1;
+						mstBoundingBoxClear(m, 1);
 					}
 				}
 // 41CA2D
@@ -5899,8 +5931,7 @@ int Game::executeMstOp67Type1(Task *t) {
 				return (this->*(t->run))(t);
 			} else if (m->unk8[946] & 4) {
 // 41CB2F
-				// TODO
-				warning("executeMstOp67Type1 41CB3B");
+				mstBoundingBoxClear(m, 1);
 			}
 		}
 // 41CB85

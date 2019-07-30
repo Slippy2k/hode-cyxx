@@ -392,6 +392,10 @@ struct MonsterObject1 {
 	uint8_t flagsA6; // 0xA6
 	uint8_t flagsA7; // 0xA7
 	uint8_t flagsA8[4]; // 0xA8, 0xA9, 0xAA, 0xAB collideRectNum
+	int32_t unkAC;
+	int32_t unkB0;
+	int32_t unkB4; // _xMstPos2
+	int32_t unkB8; // _yMstPos2
 	int32_t unkBC;
 	int32_t unkC0;
 	Task *task; // 0xC4
