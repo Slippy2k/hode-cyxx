@@ -331,6 +331,7 @@ struct MstCollision {
 struct Task;
 
 struct MstUnk35;
+struct MstUnk44;
 struct MstUnk45;
 struct MstUnk46;
 struct MstUnk46Unk1;

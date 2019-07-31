@@ -198,7 +198,8 @@ struct Game {
 	int _m43Num1;
 	int _m43Num2;
 	int _m43Num3;
-	int _yMstPos1, _yMstPos2;
+	int _xMstPos1, _xMstPos2, _xMstPos3;
+	int _yMstPos1, _yMstPos2, _yMstPos3;
 	int _mstUnk12;
 	int _m48Num;
 	uint8_t _mstUnk8;
@@ -211,7 +212,6 @@ struct Game {
 	MonsterObject2 _monsterObjects2Table[kMaxMonsterObjects2];
 	int _mstTickDelay;
 	uint8_t _mstCurrentActionKeyMask;
-	int _xMstPos1, _xMstPos2;
 	int _mstCurrentPosX, _mstCurrentPosY;
 	int _mstBoundingBoxesCount;
 	MstBoundingBox _mstBoundingBoxesTable[64];
@@ -636,6 +636,7 @@ struct Game {
 	void executeMstUnk8(MonsterObject1 *m);
 	int executeMstUnk9(Task *t, MonsterObject1 *m);
 	int executeMstUnk11(Task *t, MonsterObject1 *m);
+	int executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y);
 	bool mstTestActionDirection(MonsterObject1 *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);
