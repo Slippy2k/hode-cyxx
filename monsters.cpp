@@ -777,7 +777,7 @@ void Game::initMstCode() {
 	if (_mstLogicDisabled) {
 		return;
 	}
-	// TODO
+	// _mstLut initialization
 	resetMstCode();
 }
 
@@ -877,9 +877,6 @@ void Game::resetMstCode() {
 	mstUpdateRefPos();
 	_mstAndyLevelPrevPosX = _mstAndyLevelPosX;
 	_mstAndyLevelPrevPosY = _mstAndyLevelPosY;
-	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
-		// TODO
-	}
 }
 
 void Game::startMstCode() {
@@ -1941,24 +1938,27 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 					if (_al & 1) {
 						_ebp = 1;
 					} else {
-						_al = mstGetFacingDirectionMask(m->flags49) & 1;
+						_al = mstGetFacingDirectionMask(_mstCurrentMonster1->flags49) & 1;
 						_dl = (_mstCurrentMonster1->o16->flags1 >> 4) & 1;
-						if (_dl == _al) {
-							_ebp = 1;
-						} else if (_mstCurrentMonster1->unk8[946] & 4) {
+						if (_dl == _al || (_mstCurrentMonster1->unk8[946] & 4) != 0) {
 							_ebp = 1;
 						} else if (m->xDelta <= m44unk1->x2) {
 							_ebp = 2;
 						}
 					}
 				}
-// 418BAA
+// 418B1B
 			} else if (o->screenNum == _currentScreen) {
-				if (m->flagsA6 & 1) {
+				if (_al & 1) {
 					_ebp = 1;
 				} else {
-					warning("mstUpdateTaskMonsterObject1 mstPosY %d screen %d", _mstAndyLevelPosY, o->screenNum);
-					// TODO
+					_al = mstGetFacingDirectionMask(_mstCurrentMonster1->flags49) & 1;
+					_dl = (_mstCurrentMonster1->o16->flags1 >> 4) & 1;
+					if (_al != _dl && (_mstCurrentMonster1->unk8[946] & 4) == 0) {
+						_ebp = 2;
+					} else {
+						_ebp = 1;
+					}
 				}
 			}
 		}
@@ -3794,9 +3794,11 @@ int Game::runTask_default(Task *t) {
 				}
 				if (e <= -2 && o) {
 					if (o->flags & 0x10) {
-						warning("Unhandled lvlObject.flags 0x%x screen %d\n", o->flags, e);
-						// TODO
-
+// 413657
+						const int x1 = a;
+						const int x2 = b;
+						a = o->xPos - x2;
+						b = o->xPos - x1;
 					} else {
 // 41367F
 						a += o->xPos;
