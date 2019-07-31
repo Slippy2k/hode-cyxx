@@ -6080,12 +6080,21 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CF99
 	if (_edi) {
 		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_yMstPos2 >= m->m49->unk15))) {
-			if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->m49Unk1->offsetHeight + 0xE] != 0 && m->flagsA8[0] == 0xFF) {
-				warning("executeMstOp67Type2 41D002");
-				// TODO
+			const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+			if ((m->unk8[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 0xFF) {
+				// int var10 = 0;
+				const int x1 = m->xMstPos + (int8_t)p[0xC];
+				const int x2 = x1 + p[0xE] - 1;
+				const int y1 = m->yMstPos + (int8_t)p[0xD];
+				const int y2 = y1 + p[0xF] - 1;
+				if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2)) {
+// 41D1F5
+					warning("executeMstOp67Type2 41D1F5 unimplemented");
+					// TODO
+				}
+				m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 			}
 // 41D115
-
 			if (_xMstPos2 <= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
 				m->indexUnk49Unk1 = m->m49->count1 - 1;
 				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
