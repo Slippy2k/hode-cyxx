@@ -2463,6 +2463,8 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	int _edi = (int8_t)ptr[4];
 	int _ebp = (int8_t)ptr[5];
 	debug(kDebug_MONSTER, "mstTaskSetActionDirection m %p action 0x%x direction 0x%x (%d,%d)", m, o->actionKeyMask, o->directionKeyMask, _edi, _ebp);
+	int _eax = 0;
+	int var10 = 0;
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
 		uint8_t var11 = ptr[2];
@@ -2471,7 +2473,6 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		} else {
 			_edi = m->xMstPos + _edi;
 		}
-		int var10;
 		if (_edi < m->xMstPos) {
 			var10 = 8;
 		} else {
@@ -2497,48 +2498,41 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			t->flags |= 0x80;
 			return 0;
 		}
-
-		int _eax = var10;
+		_eax = var10;
 // 40E9BC
-		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
-			if (_eax == 0) {
-				_ebp = 0;
-			} else if (_mstLut1[_eax] & 1) {
-// 40E9F
-				_ebp = (int8_t)ptr[10];
-				_eax = (int8_t)ptr[11];
-			} else {
+	}
+	if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
+		if (_eax == 0) {
+			_ebp = 0;
+		} else if (_mstLut1[_eax] & 1) {
+// 40E9FF
+			_ebp = (int8_t)ptr[10];
+			_eax = (int8_t)ptr[11];
+		} else {
 // 40EA12
-				_ebp = (int8_t)ptr[8];
-				_eax = (int8_t)ptr[9];
-			}
+			_ebp = (int8_t)ptr[8];
+			_eax = (int8_t)ptr[9];
+		}
 // 40EA1A
-			if (o->directionKeyMask & 8) {
-				_ebp = -_ebp;
-			} else if ((o->directionKeyMask & 2) == 0) {
-				_ebp = 0;
-			}
-			if (o->directionKeyMask & 1) {
-				_eax = -_eax;
-			} else if ((o->directionKeyMask & 4) == 0) {
-				_eax = 0;
-			}
+		if (o->directionKeyMask & 8) {
+			_ebp = -_ebp;
+		} else if ((o->directionKeyMask & 2) == 0) {
+			_ebp = 0;
+		}
+		if (o->directionKeyMask & 1) {
+			_eax = -_eax;
+		} else if ((o->directionKeyMask & 4) == 0) {
+			_eax = 0;
+		}
 // 40EA40
-			_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
-			_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-			if ((var8 & 0xE0) == 0x60 && mstBoundingBoxCollides2(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
-				t->flags |= 0x80;
-				return 0;
-			}
+		_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
+		_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
+		if ((var8 & 0xE0) == 0x60 && mstBoundingBoxCollides2(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
+			t->flags |= 0x80;
+			return 0;
+		}
 // 40EAA0
-			m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
-		}
-	} else {
-// 40E9BC
-		if ((m->unk8[946] & 4) != 0 && ptr[14] != 0) {
-			warning("mstTaskSetActionDirection %d unimplemented ptr[14] %d", num, ptr[14]);
-			// TODO
-		}
+		m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 	}
 // 40EAD0
 	m->flagsA4 = var4;
@@ -5907,8 +5901,20 @@ int Game::executeMstOp67Type1(Task *t) {
 		if (_edi != 0) {
 			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)) {
 // 41C833
-				if ((m->unk8[946] & 4) != 0 && _res->_mstHeightMapData[m->m49Unk1->offsetHeight + 0xE] != 0 && m->flagsA8 == 0) {
-					warning("executeMstOp67Type1 41C863");
+				const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+				if ((m->unk8[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 255) {
+					const int x1 = m->xMstPos + (int8_t)p[0xC];
+					const int x2 = x1 + p[0xE] - 1;
+					const int y1 = m->yMstPos + (int8_t)p[0xD];
+					const int y2 = y1 + p[0xF] - 1;
+					if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2)) {
+// 41CA54
+						warning("executeMstOp67Type1 41CA54 unimplemented");
+						// TODO
+					}
+					mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
+// 41C970
+					warning("executeMstOp67Type1 41C970 unimplemented");
 					// TODO
 				}
 // 41C976
