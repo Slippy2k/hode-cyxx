@@ -1736,7 +1736,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		MovingOpcodeState *var14 = m->collidePtr;
 		if (t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
 			if (m->unk8[946] & 2) {
-				warning("mstUpdateTaskMonsterObject1 418459");
+				warning("mstUpdateTaskMonsterObject1 418459 unimplemented");
 				// TODO
 			}
 		} else {
@@ -4484,8 +4484,18 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 // 41C038
 	if (m->unk8[946] & 4) {
-		warning("mstOp49 41C038 unimplemented");
-		// TODO
+		const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		const int x1 = m->xMstPos + (int8_t)p[0xC];
+		const int x2 = x1 + p[0xE] - 1;
+		const int y1 = m->yMstPos + (int8_t)p[0xD];
+		const int y2 = y1 + p[0xF] - 1;
+		if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2)) {
+// 41C1BB
+			warning("mstOp49 41C1BB unimplemented");
+			// TODO
+		}
+// 41C11C
+		m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 	}
 // 41C17B
 	t->flags &= ~0x80;
@@ -5815,8 +5825,6 @@ int Game::executeMstOp67Type1(Task *t) {
 		m->unkAC = -1;
 		m->unkB0 = -1;
 		mstBoundingBoxClear(m, 1);
-		warning("executeMstOp67Type1 t %p 41C531 unimplemented", t);
-		// TODO
 	}
 // 41C531
 	if (!var14 && m->xMstPos >= x && m->xMstPos <= m->unkC->x1) {
@@ -5912,10 +5920,7 @@ int Game::executeMstOp67Type1(Task *t) {
 						warning("executeMstOp67Type1 41CA54 unimplemented");
 						// TODO
 					}
-					mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
-// 41C970
-					warning("executeMstOp67Type1 41C970 unimplemented");
-					// TODO
+					m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 				}
 // 41C976
 				if (_xMstPos2 >= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
@@ -6085,8 +6090,10 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 				m->indexUnk49Unk1 = m->m49->count1 - 1;
 				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 				if (m->unk8[946] & 4) {
-					warning("executeMstOp67Type2 41D16E");
-					// TODO
+					m->flagsA8[3] = 0xFF;
+					m->unkAC = -1;
+					m->unkB0 = -1;
+					mstBoundingBoxClear(m, 1);
 				}
 			}
 // 41D1CE
