@@ -130,7 +130,7 @@ struct MstScreenAreaCode {
 	uint8_t unk0x1D; // 0x1D
 	uint16_t unk0x1E;
 	uint32_t codeData; // 0x20, offset _mstCodeData
-}; // SIZEOF_MstScreenAreaCode 36
+}; // sizeof == 36
 
 struct MstUnk34 {
 	int32_t x1; // 0
@@ -158,14 +158,14 @@ struct MstUnk42 { // MonsterGroup
 	uint32_t count1; // 4
 	uint8_t *data2; // 8
 	uint32_t count2; // C
-}; // SIZEOF_MstUnk42 16
+}; // sizeof == 16
 
 struct MstUnk43 {
 	uint32_t *indexUnk48; // indexes _mstUnk48
 	uint32_t count1; // 4
 	uint8_t *data2; // 8
 	uint32_t count2; // C
-}; // SIZEOF_MstUnk43 16
+}; // sizeof == 16
 
 struct MstUnk44Unk1 {
 	int32_t x1; // 0
@@ -194,7 +194,7 @@ struct MstUnk44 {
 	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t unk8;
 	uint32_t count;
-}; // SIZEOF_MstUnk44 16
+}; // sizeof == 16
 
 struct MstUnk45 {
 	uint8_t unk0;
@@ -222,12 +222,12 @@ struct MstUnk46Unk1 { // MonsterBehaviour
 struct MstUnk46 {
 	MstUnk46Unk1 *data;
 	uint32_t count;
-}; // SIZEOF_MstUnk46 8
+}; // sizeof == 8
 
 struct MstUnk47 {
 	uint8_t *data; // sizeof == 20
 	uint32_t count;
-}; // SIZEOF_MstUnk47 8
+}; // sizeof == 8
 
 struct MstUnk48Unk12Unk4 {
 	uint32_t unk0; // 0x0, indexes _mstHeightMapData
@@ -261,7 +261,7 @@ struct MstUnk48 {
 	uint32_t *data1[2]; // 0x14, 0x18
 	uint32_t *data2[2]; // 0x1C, 0x20
 	uint32_t count[2]; // 0x24, 0x28
-}; // SIZEOF_MstUnk48 44
+}; // sizeof == 44
 
 struct MstUnk49Unk1 {
 	uint32_t offsetHeight; // 0, offset _mstHeightMapData[32]
@@ -286,7 +286,7 @@ struct MstUnk49 {
 	uint8_t unk15; // 0x15
 	uint8_t unk16; // 0x16
 	uint8_t unk17; // 0x17
-}; // SIZEOF_MstUnk49 24
+}; // sizeof == 24
 
 struct MstUnk50Unk1 {
 	uint32_t codeData;
@@ -304,23 +304,23 @@ struct MstUnk50Unk1 {
 struct MstUnk50 {
 	MstUnk50Unk1 *data;
 	uint32_t count;
-}; // SIZEOF_MstUnk50 8
+}; // sizeof == 8
 
 struct MstUnk51 {
 	uint32_t indexUnk50;
 	uint32_t *indexUnk50Unk1; // sizeof == 36
 	uint32_t count;
-}; // SIZEOF_MstUnk51 12
+}; // sizeof == 12
 
 struct MstScreenInitCode {
 	int32_t delay;
 	uint32_t codeData;
-}; // SIZEOF_MstScreenInitCode 8
+}; // sizeof == 8
 
 struct MstUnk59 { // MstOp240Data
 	uint32_t flags;
 	uint32_t codeData;
-}; // SIZEOF_MstUnk59 8
+}; // sizeof == 8
 
 struct MstUnk53 { // MstOp223Data
 	int16_t indexVar1;
@@ -334,7 +334,7 @@ struct MstUnk53 { // MstOp223Data
 	uint16_t unkC; // C
 	uint16_t unkE; // E
 	uint32_t maskVars; // 0x10
-}; // SIZEOF_MstUnk53 20
+}; // sizeof == 20
 
 struct MstUnk54 { // MstOpCompareData
 	int16_t indexVar1; // 0
@@ -342,7 +342,7 @@ struct MstUnk54 { // MstOpCompareData
 	uint8_t compare; // 4
 	uint8_t maskVars; // 5
 	uint16_t codeData; // 6
-}; // SIZEOF_MstUnk54 8
+}; // sizeof == 8
 
 struct MstUnk55 { // MstOp234Data
 	int16_t indexVar1; // 0
@@ -473,9 +473,7 @@ struct SssFilter {
 	int32_t unk20;
 	int32_t unk24; // priority (0,7)
 	int32_t unk30; // flag
-};
-
-#define SIZEOF_SssFilter 52
+}; // sizeof == 52
 
 struct SssPcm {
 	int16_t *ptr;    // 0 PCM data
@@ -568,7 +566,7 @@ struct Resource {
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;
-	uint8_t *_mstHeightMapData; // sizeof == 948 == (32 * 28 + 52)
+	uint8_t *_mstHeightMapData; // _mstMonsterInfos sizeof == 948 == (32 * 28 + 52)
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;

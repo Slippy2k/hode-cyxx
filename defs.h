@@ -75,9 +75,7 @@ struct LvlAnimSeqHeader {
 	uint16_t flags1;
 	uint16_t unkE;
 	uint32_t offset; // 0x10, LvlAnimSeqFrameHeader
-} PACKED;
-
-#define SIZEOF_LvlAnimSeqHeader 20
+} PACKED; // sizeof == 20
 
 struct LvlAnimSeqFrameHeader {
 	uint16_t move; // 0
@@ -86,18 +84,14 @@ struct LvlAnimSeqFrameHeader {
 	uint8_t unk5; // 5
 	int8_t unk6;
 	int8_t unk7;
-} PACKED;
-
-#define SIZEOF_LvlAnimSeqFrameHeader 8
+} PACKED; // sizeof == 8
 
 struct LvlAnimHeader {
 	uint16_t unk0;
 	uint8_t seqCount;
 	uint8_t unk2;
 	uint32_t seqOffset;
-} PACKED;
-
-#define SIZEOF_LvlAnimHeader 8
+} PACKED; // sizeof == 8
 
 struct LvlSprMoveData {
 	uint8_t op1;
@@ -105,15 +99,11 @@ struct LvlSprMoveData {
 	uint16_t op3;
 	uint16_t op4;
 	uint16_t unk0x6;
-} PACKED;
-
-#define SIZEOF_LvlSprMoveData 8
+} PACKED; // sizeof == 8
 
 struct LvlSprHotspotData {
 	Point8_t pts[8];
-} PACKED;
-
-#define SIZEOF_LvlSprHotspotData 16
+} PACKED; // sizeof == 16
 
 struct LvlObjectData {
 	uint8_t unk0;
