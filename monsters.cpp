@@ -1155,8 +1155,53 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 }
 
 void Game::executeMstUnk4(MonsterObject1 *m) {
-	warning("executeMstUnk4 unimplemented");
-	// TODO
+	int var1C = 0;
+	if (m->flags4B == 0xFD) {
+		warning("executeMstUnk4 41B087 unimplemented");
+		// TODO
+	}
+// 41B3BB
+	switch (var1C & 0xF0) {
+	case 0x00:
+		m->unk74 = m->unk64;
+		m->unk7C = m->unk68;
+		break;
+	case 0x10:
+		m->unk74 = -m->unk68;
+		m->unk7C = -m->unk64;
+		break;
+	case 0x20:
+		m->unk74 = -m->unk68;
+		m->unk7C =  m->unk68;
+		break;
+	}
+// 41B404
+	switch (var1C & 0xF) {
+	case 0:
+		m->unk78 = m->unk6C;
+		m->unk80 = m->unk70;
+		break;
+	case 1:
+		m->unk78 = -m->unk70;
+		m->unk80 = -m->unk6C;
+		break;
+	case 2:
+		m->unk80 =  m->unk70;
+		m->unk78 = -m->unk70;
+		break;
+	}
+// 41B442
+	m->unk74 += _mstAndyLevelPosX;
+	m->unk7C += _mstAndyLevelPosX;
+	m->unk78 += _mstAndyLevelPosY;
+	m->unk80 += _mstAndyLevelPosY;
+	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	if ((ptr[2] & 0x5) == 0) {
+		m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
+	}
+	if ((ptr[2] & 0xA) == 0) {
+		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
+	}
 }
 
 void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
@@ -1221,7 +1266,28 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	}
 // 41A759
 	int _edi = 0;
-	warning("mstSetVerticalHorizontalBounds unimplemented");
+	MstUnk46Unk1 *m46u1 = m->unk4;
+	assert(m46u1->indexUnk44 != kNone);
+	MstUnk44 *m44 = &_res->_mstUnk44[m46u1->indexUnk44];
+	if (m->unkBC != _xMstPos1 || m->unkC0 != _yMstPos1) {
+		const uint8_t _cl = m->flagsA8[2];
+		if (_cl < m44->count) {
+			MstUnk44Unk1 *m44u1 = &m44->data[_cl];
+			assert(m44u1->indexUnk34_16 != kNone);
+			MstUnk34 *m34 = &_res->_mstUnk34[m44u1->indexUnk34_16];
+			if (_xMstPos1 < m34->x2 || _xMstPos1 > m34->x1 || _yMstPos1 < m34->y2 || _yMstPos1 > m34->y1) {
+				_edi = -1;
+			} else {
+				goto l41A879;
+			}
+		}
+// 41A7AD
+		warning("mstSetVerticalHorizontalBounds 41A7AD unimplemented");
+		// TODO
+	}
+// 41A879
+l41A879:
+	warning("mstSetVerticalHorizontalBounds 41A879 unimplemented");
 	// TODO
 // 41A9F4
 	if (m->flags4A & 8) {
@@ -1278,7 +1344,30 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 	}
 // 41AB38
 	mstSetVerticalHorizontalBounds(m);
-	warning("executeMstUnk8 unimplemented");
+	if (m->flags4A == 0) {
+		return;
+	}
+	m->unkB4 = _xMstPos2;
+	m->unkB8 = _yMstPos2;
+	MstUnk49Unk1 *m49u1 = m->m49Unk1;
+	int _ecx, _edx;
+	if (_mstLut1[m->flags4A] & 1) {
+		_ecx = m49u1->unkA;
+		_edx = m49u1->unkB;
+	} else {
+		_ecx = m49u1->unk8;
+		_edx = m49u1->unk9;
+	}
+	if (_yMstPos2 < _ecx && _yMstPos2 < _edx) {
+		if (_xMstPos2 <= 0 && _yMstPos2 <= 0) {
+			return;
+		}
+		if (!executeMstUnk6(m)) {
+			return;
+		}
+	}
+// 41ABED
+	warning("executeMstUnk8 41ABED unimplemented");
 	// TODO
 }
 
