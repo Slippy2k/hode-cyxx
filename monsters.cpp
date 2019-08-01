@@ -370,7 +370,7 @@ bool Game::updateMonsterObject1Position(MonsterObject1 *m) {
 				return true;
 			}
 
-			indexUnk44Unk1 = m44unk1->indexUnk44_92;
+			indexUnk44Unk1 = m44unk1->indexUnk44Unk1_92;
 			if (indexUnk44Unk1 == kNone) {
 				break;
 			}
@@ -1357,9 +1357,50 @@ l41A879:
 // 41A8DD
 		m->unkBC = _xMstPos1;
 		m->unkC0 = _yMstPos1;
-		warning("mstSetVerticalHorizontalBounds 41A8DD unimplemented");
-		// TODO
-
+		uint32_t offset = m->m46Unk1->indexUnk44;
+		assert(offset != kNone);
+		MstUnk44 *m44 = &_res->_mstUnk44[offset];
+		uint8_t var1D = m->m44Unk1->unk60[_edi][_cl];
+		if (var1D != 0) {
+			const uint8_t *p = m->unk8;
+			const int w = (int32_t)READ_LE_UINT32(p + 904);
+			const int h = (int32_t)READ_LE_UINT32(p + 908);
+			while (_xMstPos1 >= m->m44Unk1->unk34[_edi] + w) {
+				if (_xMstPos1 > m->m44Unk1->unk2C[_edi] - w) {
+					break;
+				}
+				if (_yMstPos1 < m->m44Unk1->unk44[_edi] + h) {
+					break;
+				}
+				if (_yMstPos1 > m->m44Unk1->unk3C[_edi] - h) {
+					break;
+				}
+				int var1C;
+				switch (var1D) {
+				case 2:
+					var1C = 0;
+					break;
+				case 4:
+					var1C = 2;
+					break;
+				case 8:
+					var1C = 1;
+					break;
+				default:
+					var1C = 3;
+					break;
+				}
+				offset = m->m44Unk1->indexUnk44Unk1_76[var1C];
+				if (&m44->data[offset] == &m44->data[_cl]) {
+					m->flagsA7 = 0xFF;
+					return;
+				}
+			}
+// 41A9E4
+			m->flags4A = var1D;
+		}
+// 41A9EB
+		m->flagsA7 = m->flags4A;
 	}
 // 41A9F4
 	if (m->flags4A & 8) {

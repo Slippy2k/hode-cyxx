@@ -1215,11 +1215,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk44[i].data[j].unk3C[1] = READ_LE_UINT32(data + 0x40);
 			_mstUnk44[i].data[j].unk44[0] = READ_LE_UINT32(data + 0x44);
 			_mstUnk44[i].data[j].unk44[1] = READ_LE_UINT32(data + 0x48);
-			_mstUnk44[i].data[j].indexUnk44_76 = READ_LE_UINT32(data + 76); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44_80 = READ_LE_UINT32(data + 80); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44_84 = READ_LE_UINT32(data + 84); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44_88 = READ_LE_UINT32(data + 88); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44_92 = READ_LE_UINT32(data + 92); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44Unk1_76[0] = READ_LE_UINT32(data + 76); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44Unk1_76[1] = READ_LE_UINT32(data + 80); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44Unk1_76[2] = READ_LE_UINT32(data + 84); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44Unk1_76[3] = READ_LE_UINT32(data + 88); // sizeof == 104
+			_mstUnk44[i].data[j].indexUnk44Unk1_92 = READ_LE_UINT32(data + 92); // sizeof == 104
 			_mstUnk44[i].data[j].unk60[0] = (uint8_t *)malloc(count);
 			_mstUnk44[i].data[j].unk60[1] = (uint8_t *)malloc(count);
 		}
