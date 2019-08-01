@@ -576,6 +576,14 @@ static int skipBytesAlign(File *f, int len) {
 	return size;
 }
 
+static int readBytesAlign(File *f, uint8_t *buf, int len) {
+	f->read(buf, len);
+	if ((len & 3) != 0) {
+		f->seek(4 - (len & 3), SEEK_CUR);
+	}
+	return (len + 3) & ~3;
+}
+
 void Resource::loadSssData(File *fp, const char *name) {
 
 	assert(fp == _sssFile); // TODO: or _datFile
@@ -1079,11 +1087,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk35[i].indexCodeData[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		fp->read(_mstUnk35[i].data2, _mstUnk35[i].count2);
-		if ((_mstUnk35[i].count2 & 3) != 0) {
-			fp->seek(4 - (_mstUnk35[i].count2 & 3), SEEK_CUR);
-		}
-		bytesRead += (_mstUnk35[i].count2 + 3) & ~3;
+		bytesRead += readBytesAlign(fp, _mstUnk35[i].data2, _mstUnk35[i].count2);
 	}
 
 	_mstUnk36 = (MstUnk36 *)malloc(_mstHdr.unk0x10 * sizeof(MstUnk36));
@@ -1156,11 +1160,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk42[i].indexUnk46[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		fp->read(_mstUnk42[i].data2, _mstUnk42[i].count2);
-		if ((_mstUnk42[i].count2 & 3) != 0) {
-			fp->seek(4 - (_mstUnk42[i].count2 & 3), SEEK_CUR);
-		}
-		bytesRead += (_mstUnk42[i].count2 + 3) & ~3;
+		bytesRead += readBytesAlign(fp, _mstUnk42[i].data2, _mstUnk42[i].count2);
 	}
 
 	_mstUnk43 = (MstUnk43 *)malloc(_mstHdr.unk0x24 * sizeof(MstUnk43));
@@ -1178,11 +1178,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk43[i].indexUnk48[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		fp->read(_mstUnk43[i].data2, _mstUnk43[i].count2);
-		if ((_mstUnk43[i].count2 & 3) != 0) {
-			fp->seek(4 - (_mstUnk43[i].count2 & 3), SEEK_CUR);
-		}
-		bytesRead += (_mstUnk43[i].count2 + 3) & ~3;
+		bytesRead += readBytesAlign(fp, _mstUnk43[i].data2, _mstUnk43[i].count2);
 	}
 
 	_mstUnk44 = (MstUnk44 *)malloc(_mstHdr.unk0x28 * sizeof(MstUnk44));
@@ -1224,6 +1220,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk44[i].data[j].indexUnk44_84 = READ_LE_UINT32(data + 84); // sizeof == 104
 			_mstUnk44[i].data[j].indexUnk44_88 = READ_LE_UINT32(data + 88); // sizeof == 104
 			_mstUnk44[i].data[j].indexUnk44_92 = READ_LE_UINT32(data + 92); // sizeof == 104
+			_mstUnk44[i].data[j].unk60[0] = (uint8_t *)malloc(count);
+			_mstUnk44[i].data[j].unk60[1] = (uint8_t *)malloc(count);
 		}
 		_mstUnk44[i].indexUnk44Unk1 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
 		for (int j = 0; j < _mstHdr.pointsCount; ++j) {
@@ -1232,7 +1230,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 		for (int j = 0; j < count; ++j) {
 			for (int k = 0; k < 2; ++k) {
-				bytesRead += skipBytesAlign(fp, count);
+				bytesRead += readBytesAlign(fp, _mstUnk44[i].data[j].unk60[k], count);
 			}
 		}
 	}
@@ -1561,8 +1559,6 @@ void Resource::loadMstData(File *fp, const char *name) {
 	if (bytesRead != _mstHdr.dataSize) {
 		warning("Unexpected .mst bytesRead %d dataSize %d", bytesRead, _mstHdr.dataSize);
 	}
-
-	// TODO:
 
 	if (kDumpBytecode) {
 		char fname[64];

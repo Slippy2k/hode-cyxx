@@ -187,6 +187,7 @@ struct MstUnk44Unk1 {
 	uint32_t indexUnk44_84;
 	uint32_t indexUnk44_88;
 	uint32_t indexUnk44_92; // next 0x5C
+	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
 
 struct MstUnk44 {
