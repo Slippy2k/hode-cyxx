@@ -276,9 +276,8 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 	int _edi = 0x1000000;
 	int var1C = y;
 
-	uint32_t i = 0;
-
-	for (i = 0; i < m44->count; ++i) {
+	int i = 0;
+	for (; i < m44->count; ++i) {
 		uint32_t indexUnk34 = m44->data[i].indexUnk34_16;
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
@@ -852,8 +851,8 @@ void Game::resetMstCode() {
 	_mstOp68_y1 = 0;
 	_mstOp68_y2 = 0;
 	_mstOp68_screenNum = 255;
-	_mstLogicHelper1TestValue = 0;
-	_mstLogicHelper1TestMask = 0xFFFFFFFF;
+	_mstHelper1TestValue = 0;
+	_mstHelper1TestMask = 0xFFFFFFFF;
 	_mstAndyVarMask = 0;
 	_tasksList = 0;
 	_monsterObjects1TasksList = 0;
@@ -988,10 +987,10 @@ void Game::executeMstCode() {
 		return;
 	}
 	++_executeMstLogicCounter;
-	if ((_mstLogicHelper1TestValue & _mstLogicHelper1TestMask) != 0) {
-		_mstUnk12 = 0;
+	if ((_mstHelper1TestValue & _mstHelper1TestMask) != 0) {
+		_mstHelper1Count = 0;
 		executeMstCodeHelper1();
-		_mstLogicHelper1TestValue = 0;
+		_mstHelper1TestValue = 0;
 	}
 	for (int i = 0; i < kMaxMovingStates; ++i) {
 		_mstMovingState[i].unk28 = 0;
@@ -1082,7 +1081,41 @@ void Game::executeMstCode() {
 }
 
 void Game::executeMstCodeHelper1() {
-	warning("executeMstCodeHelper1 unimplemented");
+	for (int i = 0; i < _res->_mstHdr.unk0x28; ++i) {
+		MstUnk44 *m44 = &_res->_mstUnk44[i];
+		if (m44->mask & _mstHelper1TestValue) {
+			++_mstHelper1Count;
+			for (int j = 0; j < m44->count; ++j) {
+				for (int k = 0; k < 2; ++k) {
+					m44->data[j].unk2C[k] = -1;
+					m44->data[j].unk34[k] = -1;
+					m44->data[j].unk3C[k] = -1;
+					m44->data[j].unk44[k] = -1;
+				}
+			}
+			warning("executeMstCodeHelper1 417691 unimplemented");
+			// TODO
+			for (int j = 0; j < m44->count; ++j) {
+			}
+// 4177D7
+			executeMstUnk16(m44, 0);
+			executeMstUnk16(m44, 1);
+		}
+	}
+	if (_mstHelper1Count != 0) {
+		for (int i = 0; i < kMaxMonsterObjects1; ++i) {
+			MonsterObject1 *m = &_monsterObjects1Table[i];
+			if (!m->m46) {
+				continue;
+			}
+			MstUnk44Unk1 *m44Unk1 = m->m44Unk1;
+			const int num = (~m->flagsA5) & 1;
+			m->x1 = m44Unk1->unk2C[num] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
+			m->x2 = m44Unk1->unk34[num] + (int32_t)READ_LE_UINT32(m->unk8 + 904);
+			m->y1 = m44Unk1->unk3C[num] - (int32_t)READ_LE_UINT32(m->unk8 + 908);
+			m->y2 = m44Unk1->unk44[num] + (int32_t)READ_LE_UINT32(m->unk8 + 908);
+		}
+	}
 }
 
 void Game::executeMstCodeHelper2() {
@@ -1513,6 +1546,10 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 	warning("executeMstUnk15 unimplemented");
 	return -1;
+}
+
+void Game::executeMstUnk16(MstUnk44 *m44, int flag) {
+	warning("executeMstUnk16 unimplemented");
 }
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {

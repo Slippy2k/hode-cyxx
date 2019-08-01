@@ -1185,7 +1185,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
 		fp->readUint32();
 		fp->readUint32();
-		_mstUnk44[i].unk8  = fp->readUint32();
+		_mstUnk44[i].mask  = fp->readUint32();
 		_mstUnk44[i].count = fp->readUint32();
 		bytesRead += 16;
 	}

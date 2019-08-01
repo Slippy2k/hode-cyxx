@@ -164,8 +164,8 @@ struct Game {
 	uint16_t _mstOp68_flags1;
 	int _mstOp68_x1, _mstOp68_x2, _mstOp68_y1, _mstOp68_y2;
 	uint8_t _mstOp68_screenNum;
-	uint32_t _mstLogicHelper1TestValue;
-	uint32_t _mstLogicHelper1TestMask;
+	uint32_t _mstHelper1TestValue;
+	uint32_t _mstHelper1TestMask;
 	int _runTaskOpcodesCount;
 	int32_t _mstVars[kMaxVars];
 	uint32_t _mstFlags;
@@ -200,7 +200,7 @@ struct Game {
 	int _m43Num3;
 	int _xMstPos1, _xMstPos2, _xMstPos3;
 	int _yMstPos1, _yMstPos2, _yMstPos3;
-	int _mstUnk12;
+	int _mstHelper1Count;
 	int _m48Num;
 	uint8_t _mstUnk8;
 	uint32_t _mstAndyVarMask;
@@ -637,6 +637,7 @@ struct Game {
 	int executeMstUnk9(Task *t, MonsterObject1 *m);
 	int executeMstUnk11(Task *t, MonsterObject1 *m);
 	int executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y);
+	void executeMstUnk16(MstUnk44 *m44, int flag);
 	bool mstTestActionDirection(MonsterObject1 *m, int num);
 	bool executeMstUnk19(LvlObject *o, int type);
 	bool executeMstUnk21(LvlObject *o, int type);

@@ -193,8 +193,8 @@ struct MstUnk44Unk1 {
 struct MstUnk44 {
 	MstUnk44Unk1 *data;
 	uint32_t *indexUnk44Unk1; // indexed by screen number
-	uint32_t unk8;
-	uint32_t count;
+	uint32_t mask; // 0x8
+	int count; // 0xC
 }; // sizeof == 16
 
 struct MstUnk45 {
