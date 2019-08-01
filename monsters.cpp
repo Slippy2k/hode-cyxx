@@ -170,7 +170,7 @@ void Game::disableMonsterObject1(MonsterObject1 *m) {
 
 void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
 	MstUnk46Unk1 *m46unk1 = &m->m46->data[num];
-	m->unk4 = m46unk1;
+	m->m46Unk1 = m46unk1;
 	m->unk8 = _res->_mstHeightMapData + m46unk1->indexHeight * kMstHeightMapDataSize;
 	if (m46unk1->indexUnk51 == kNone) {
 		m->flags48 &= ~4;
@@ -221,7 +221,7 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	disableMonsterObject1(m);
 	if (m->flagsA5 & 0x80) {
 		m->flagsA5 &= ~8;
-		const uint32_t codeData = m->unk4->codeData;
+		const uint32_t codeData = m->m46Unk1->codeData;
 		if (codeData != kNone) {
 			resetTask(t, _res->_mstCodeData + codeData * 4);
 			return 0;
@@ -248,7 +248,7 @@ void Game::updateMstLvlObjectPos(MonsterObject1 *m) {
 }
 
 bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
-	MstUnk46Unk1 *m46unk1 = m->unk4;
+	MstUnk46Unk1 *m46unk1 = m->m46Unk1;
 	const uint32_t indexUnk44 = m46unk1->indexUnk44;
 	assert(indexUnk44 != kNone);
 	MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44];
@@ -352,7 +352,7 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 bool Game::updateMonsterObject1Position(MonsterObject1 *m) {
 	debug(kDebug_MONSTER, "updateMonsterObject1Position m %p", m);
 	const uint8_t screenNum = m->o16->screenNum;
-	MstUnk46Unk1 *m46 = m->unk4;
+	MstUnk46Unk1 *m46 = m->m46Unk1;
 	const uint32_t indexUnk44 = m46->indexUnk44;
 	assert(indexUnk44 != kNone);
 	MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44];
@@ -1266,7 +1266,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	}
 // 41A759
 	int _edi = 0;
-	MstUnk46Unk1 *m46u1 = m->unk4;
+	MstUnk46Unk1 *m46u1 = m->m46Unk1;
 	assert(m46u1->indexUnk44 != kNone);
 	MstUnk44 *m44 = &_res->_mstUnk44[m46u1->indexUnk44];
 	uint8_t _cl = m->flagsA8[2];
@@ -1315,8 +1315,20 @@ l41A879:
 		m->flagsA7 = 0xFF;
 		return;
 	}
-	warning("mstSetVerticalHorizontalBounds 41A879 unimplemented");
-	// TODO
+	_edi = (~m->flagsA5) & 1;
+	if (m->unkBC == _xMstPos1 && m->unkC0 == _yMstPos1) {
+		if (m->flagsA7 == 255) {
+			return;
+		}
+		m->flags4A = m->flagsA7;
+	} else {
+// 41A8DD
+		m->unkBC = _xMstPos1;
+		m->unkC0 = _yMstPos1;
+		warning("mstSetVerticalHorizontalBounds 41A8DD unimplemented");
+		// TODO
+
+	}
 // 41A9F4
 	if (m->flags4A & 8) {
 		_xMstPos2 = m->xMstPos - m->unkC->unk34[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
@@ -1812,7 +1824,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			mstTaskStopMonsterObject1(_mstCurrentTask);
 			return 0;
 		}
-		const uint32_t codeData = m->unk4->codeData;
+		const uint32_t codeData = m->m46Unk1->codeData;
 		if (codeData != kNone) {
 			resetTask(t, _res->_mstCodeData + codeData * 4);
 			return 0;
@@ -1847,10 +1859,10 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if ((m->flags48 & 4) == 0) {
 			continue;
 		}
-		if (m->unk4->indexUnk51 == kNone) {
+		if (m->m46Unk1->indexUnk51 == kNone) {
 			continue;
 		}
-		if (_rnd.getNextNumber() > m->unk4->unk10) {
+		if (_rnd.getNextNumber() > m->m46Unk1->unk10) {
 			continue;
 		}
 		m->unkF0 = 8;
@@ -1868,7 +1880,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 // 418508
 		uint32_t var24 = 0;
-		MstUnk46Unk1 *_esi = m->unk4;
+		MstUnk46Unk1 *_esi = m->m46Unk1;
 		if (_esi->count != 0) {
 			var24 = _rnd.update() % (_esi->count + 1);
 		}
@@ -1954,7 +1966,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			}
 			if (m->collideDistance >= m50u1->unk24) {
 // 418766
-				MstUnk46Unk1 *m46u1 = m->unk4;
+				MstUnk46Unk1 *m46u1 = m->m46Unk1;
 				_ebx = var24;
 				int _edi = m50u1->unk24;
 				if (m46u1->unk18 != 0) {
@@ -1987,7 +1999,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	}
 // 41882E
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
-		MstUnk46Unk1 *m46 = m->unk4;
+		MstUnk46Unk1 *m46 = m->m46Unk1;
 		if (m46->indexUnk47 != kNone) {
 			MstUnk47 *m47 = &_res->_mstUnk47[m46->indexUnk47];
 			if (m47->count > 0) {
@@ -2739,7 +2751,7 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 				m->flags48 &= ~0x1C;
 			} else if ((mask & 2) != 0) {
 				m->flags48 |= 8;
-				const MstUnk46Unk1 *m46unk1 = m->unk4;
+				const MstUnk46Unk1 *m46unk1 = m->m46Unk1;
 				if (m46unk1->indexUnk51 != kNone) {
 					m->flags48 |= 4;
 				}
@@ -3850,7 +3862,7 @@ int Game::runTask_default(Task *t) {
 				MonsterObject1 *m = t->monster1;
 				if (m) {
 					m->flagsA5 &= ~0xC0;
-					m->localVars[7] = m->unk4->energy;
+					m->localVars[7] = m->m46Unk1->energy;
 				}
 			}
 			break;
@@ -4290,7 +4302,7 @@ int Game::runTask_default(Task *t) {
 				} else if ((m->flagsA5 & 8) != 0) {
 // 413F8B
 					m->flagsA5 &= ~8;
-					const uint32_t codeData = m->unk4->codeData;
+					const uint32_t codeData = m->m46Unk1->codeData;
 					if (codeData != kNone) {
 						resetTask(t, _res->_mstCodeData + codeData * 4);
 						return 0;
@@ -6346,7 +6358,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		m->m46 = m46;
 		assert((uint32_t)arg20 < m46->count);
 		MstUnk46Unk1 *m1 = &m46->data[arg20]; // _ecx
-		m->unk4 = m1;
+		m->m46Unk1 = m1;
 		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * kMstHeightMapDataSize;
 
 		m->localVars[7] = m1->energy;
@@ -6476,7 +6488,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		_rnd.resetMst(m->rnd_m49);
 
 		m->x2 = -1;
-		MstUnk46Unk1 *m46unk1 = m->unk4;
+		MstUnk46Unk1 *m46unk1 = m->m46Unk1;
 		m->unkC = _res->_mstUnk44[m46unk1->indexUnk44].data;
 
 		if (m->unk8[946] & 4) {

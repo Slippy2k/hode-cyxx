@@ -342,7 +342,7 @@ struct MstUnk49Unk1;
 
 struct MonsterObject1 {
 	MstUnk46 *m46;
-	MstUnk46Unk1 *unk4; // m46Unk1
+	MstUnk46Unk1 *m46Unk1;
 	const uint8_t *unk8; // infos
 	MstUnk44Unk1 *unkC; // m44Unk1
 	LvlObject *o16; // 0x10
