@@ -342,12 +342,12 @@ struct MstUnk49Unk1;
 
 struct MonsterObject1 {
 	MstUnk46 *m46;
-	MstUnk46Unk1 *unk4;
-	const uint8_t *unk8;
-	MstUnk44Unk1 *unkC;
+	MstUnk46Unk1 *unk4; // m46Unk1
+	const uint8_t *unk8; // infos
+	MstUnk44Unk1 *unkC; // m44Unk1
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
-	MstUnk48Unk12Unk4 *unk18;
+	MstUnk48Unk12Unk4 *unk18; // m48Unk4
 	MovingOpcodeState *collidePtr; // 0x1C
 	int monster1Index; // 0x20
 	int executeCounter; // 0x24

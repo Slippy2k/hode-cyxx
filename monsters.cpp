@@ -2649,7 +2649,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 // 40EA40
 		_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
 		_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-		if ((var8 & 0xE0) == 0x60 && mstBoundingBoxCollides2(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1)) {
+		if ((var8 & 0xE0) != 0x60 && mstBoundingBoxCollides2(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1) != 0) {
 			t->flags |= 0x80;
 			return 0;
 		}
@@ -4611,13 +4611,22 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		const int x2 = x1 + p[0xE] - 1;
 		const int y1 = m->yMstPos + (int8_t)p[0xD];
 		const int y2 = y1 + p[0xF] - 1;
-		if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2)) {
+		if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
 // 41C1BB
-			warning("mstOp49 41C1BB unimplemented");
-			// TODO
+			m->indexUnk49Unk1 = 0;
+			m->m49Unk1 = &m->m49->data1[0];
+			m->flagsA8[3] = 255;
+			m->unkAC = -1;
+			m->unkB0 = -1;
+			mstBoundingBoxClear(m, 1);
+			if (p[0xE] != 0) {
+				t->flags &= ~0x80;
+				executeMstUnk1(t);
+				return 0;
+			}
+		} else {
+			m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 		}
-// 41C11C
-		m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 	}
 // 41C17B
 	t->flags &= ~0x80;
@@ -6037,12 +6046,22 @@ int Game::executeMstOp67Type1(Task *t) {
 					const int x2 = x1 + p[0xE] - 1;
 					const int y1 = m->yMstPos + (int8_t)p[0xD];
 					const int y2 = y1 + p[0xF] - 1;
-					if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2)) {
+					if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
 // 41CA54
-						warning("executeMstOp67Type1 41CA54 unimplemented");
-						// TODO
+						m->indexUnk49Unk1 = 0;
+						m->m49Unk1 = &m->m49->data1[0];
+						m->flagsA8[3] = 255;
+						m->unkAC = -1;
+						m->unkB0 = -1;
+						mstBoundingBoxClear(m, 1);
+						if (p[0xE] != 0) {
+							t->flags &= ~0x80;
+							executeMstUnk1(t);
+							return 0;
+						}
+					} else {
+						m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 					}
-					m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 				}
 // 41C976
 				if (_xMstPos2 >= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
@@ -6209,12 +6228,22 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 				const int x2 = x1 + p[0xE] - 1;
 				const int y1 = m->yMstPos + (int8_t)p[0xD];
 				const int y2 = y1 + p[0xF] - 1;
-				if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2)) {
+				if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
 // 41D1F5
-					warning("executeMstOp67Type2 41D1F5 unimplemented");
-					// TODO
+					m->indexUnk49Unk1 = 0;
+					m->m49Unk1 = &m->m49->data1[0];
+					m->flagsA8[3] = 255;
+					m->unkAC = -1;
+					m->unkB0 = -1;
+					mstBoundingBoxClear(m, 1);
+					if (p[0xE] != 0) {
+						t->flags &= ~0x80;
+						executeMstUnk1(t);
+						return 0;
+					}
+				} else {
+					m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 				}
-				m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 			}
 // 41D115
 			if (_xMstPos2 <= m36->unk8 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
