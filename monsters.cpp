@@ -600,6 +600,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 	case 128: // 8
 	case 133: // 9
 		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
+		// TODO
 		break;
 	}
 	return -1;
@@ -1545,11 +1546,13 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 
 int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 	warning("executeMstUnk15 unimplemented");
+	// TODO
 	return -1;
 }
 
 void Game::executeMstUnk16(MstUnk44 *m44, int flag) {
 	warning("executeMstUnk16 unimplemented");
+	// TODO
 }
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
@@ -6235,15 +6238,13 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		}
 		m->unk64 += r;
 		m->unk68 -= r;
-		m->unk74 = m->unk64;
-		m->unk7C = m->unk68;
 		if (m->flags4B == 0 && m->xMstPos < _mstAndyLevelPosX) {
 			m->unk74 = _mstAndyLevelPosX - m->unk68;
 			m->unk7C = _mstAndyLevelPosX - m->unk64;
 		} else {
 // 41CEA1
 			m->unk74 = _mstAndyLevelPosX + m->unk64;
-			m->unk7C += _mstAndyLevelPosX;
+			m->unk7C = _mstAndyLevelPosX + m->unk68;
 		}
 // 41CEB4
 		mstSetHorizontalBounds(m);
@@ -6270,7 +6271,6 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_yMstPos2 >= m->m49->unk15))) {
 			const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 			if ((m->unk8[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 0xFF) {
-				// int var10 = 0;
 				const int x1 = m->xMstPos + (int8_t)p[0xC];
 				const int x2 = x1 + p[0xE] - 1;
 				const int y1 = m->yMstPos + (int8_t)p[0xD];
@@ -6535,22 +6535,14 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		switch (type) {
 		case 1:
 			executeMstOp67Type1(t);
-			if (t->run == &Game::runTask_default && (!t->codeData || t->codeData == kUndefinedMonsterByteCode)) { // TEMP
-				warning("mstOp67 no bytecode for t %p type 1", t);
-				removeTask(mo ? &_monsterObjects2TasksList : &_monsterObjects1TasksList, t);
-				memset(m, 0, sizeof(MonsterObject1));
-			}
+			assert(t->run != &Game::runTask_default || (t->codeData && t->codeData != kUndefinedMonsterByteCode));
 			break;
 		case 2:
 			if (m) {
 				m->flagsA6 |= 1;
 			}
 			executeMstOp67Type2(t, 0);
-			if (t->run == &Game::runTask_default && (!t->codeData || t->codeData == kUndefinedMonsterByteCode)) { // TEMP
-				warning("mstOp67 no bytecode for t %p type 2", t);
-				removeTask(mo ? &_monsterObjects2TasksList : &_monsterObjects1TasksList, t);
-				memset(m, 0, sizeof(MonsterObject1));
-			}
+			assert(t->run != &Game::runTask_default || (t->codeData && t->codeData != kUndefinedMonsterByteCode));
 			break;
 		default:
 			m->flagsA5 = 1;
