@@ -547,11 +547,19 @@ struct Game {
 	void preScreenUpdate_lar1_screen0();
 	void preScreenUpdate_lar1_screen2();
 	void preScreenUpdate_lar1_screen6();
+	void preScreenUpdate_lar1_screen8();
+	void preScreenUpdate_lar1_screen10();
 	void preScreenUpdate_lar1_screen11();
+	void preScreenUpdate_lar1_screen12();
 	void preScreenUpdate_lar1_screen13();
 	void preScreenUpdate_lar1_screen14();
+	void preScreenUpdate_lar1_screen15();
 	void preScreenUpdate_lar1_screen16();
+	void preScreenUpdate_lar1_screen17();
+	void preScreenUpdate_lar1_screen18();
+	void preScreenUpdate_lar1_screen19();
 	void preScreenUpdate_lar1_screen20();
+	void preScreenUpdate_lar1_screen23();
 	void preScreenUpdate_lar1_screen24();
 	void callLevel_preScreenUpdate_lar1(int num);
 

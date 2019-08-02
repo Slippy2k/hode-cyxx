@@ -1,5 +1,6 @@
 
 #include "game.h"
+#include "lzw.h"
 #include "paf.h"
 #include "util.h"
 #include "video.h"
@@ -16,6 +17,15 @@ static uint8_t byte_45261C[] = {  2,  0, 0, 0 };
 static uint8_t byte_452620[] = {  2,  0, 0, 0 };
 static uint8_t byte_452624[] = {  2,  0, 0, 0 };
 static uint8_t byte_452628[] = {  2,  0, 0, 0 };
+
+static const uint8_t _lar1_unkData1[90] = {
+	0x04, 0x00, 0x68, 0x50, 0x08, 0x00, 0x04, 0x00, 0x68, 0x90, 0x08, 0x01, 0x03, 0x00, 0x50, 0x10,
+	0x0A, 0x01, 0x03, 0x00, 0x80, 0x10, 0x0A, 0x02, 0x04, 0x00, 0xC8, 0x80, 0x0A, 0x03, 0x01, 0x00,
+	0xC8, 0x10, 0x0C, 0x00, 0x04, 0x00, 0x80, 0x20, 0x0C, 0x01, 0x04, 0x00, 0x38, 0x30, 0x0C, 0x02,
+	0x04, 0x00, 0xB0, 0x80, 0x0C, 0x03, 0x02, 0x00, 0xB0, 0x40, 0x0C, 0x04, 0x05, 0x00, 0x38, 0x70,
+	0x0C, 0x05, 0x04, 0x00, 0x38, 0x30, 0x0F, 0x00, 0x04, 0x00, 0x30, 0x70, 0x11, 0x00, 0x03, 0x00,
+	0x58, 0x60, 0x12, 0x00, 0x04, 0x00, 0xC0, 0x30, 0x17, 0x00
+};
 
 const BoundingBox _lar1_unkData2[24] = {
 	{ 203, 162, 213, 166 },
@@ -410,6 +420,36 @@ void Game::preScreenUpdate_lar1_screen6() {
 	}
 }
 
+void Game::preScreenUpdate_lar1_screen8() {
+	if (_res->_currentScreenResourceNum == 8) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen10() {
+	if (_res->_currentScreenResourceNum == 10) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+	}
+}
+
 void Game::preScreenUpdate_lar1_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		if (_levelCheckpoint >= 2 && _levelCheckpoint <= 3) {
@@ -422,6 +462,25 @@ void Game::preScreenUpdate_lar1_screen11() {
 			_transformShadowBuffer = 0;
 		}
 		_video->_displayShadowLayer = false;
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen12() {
+	if (_res->_currentScreenResourceNum == 12) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+		_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+		const int size = decodeLZW(_pwr2_screenTransformData, _transformShadowBuffer);
+		assert(size == 256 * 192);
+		memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
 	}
 }
 
@@ -460,10 +519,84 @@ void Game::preScreenUpdate_lar1_screen14() {
 	}
 }
 
+void Game::preScreenUpdate_lar1_screen15() {
+	if (_res->_currentScreenResourceNum == 15) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+	}
+}
+
 void Game::preScreenUpdate_lar1_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
 		if (_levelCheckpoint == 5) {
 			_levelCheckpoint = 6;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen17() {
+	if (_res->_currentScreenResourceNum == 17) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen18() {
+	if (_levelCheckpoint >= 7) {
+		byte_452628[0] &= 0xF;
+		byte_452628[0] |= 0x10;
+	}
+	if (_res->_currentScreenResourceNum == 18) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen19() {
+	if (_res->_currentScreenResourceNum == 19) {
+		if (_levelCheckpoint == 6) {
+			_res->_screensState[19].s0 = 0;
+		}
+		_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 0;
+		_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 0;
+		if (_res->_screensState[19].s0 != 0) {
+			_res->_screensState[19].s0 = 1;
+			_screenCounterTable[19] = 14;
+			if (_difficulty != 0) {
+				_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
+				_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
+			}
+		} else {
+			_screenCounterTable[19] = (_plasmaCannonFlags >> 1) & 1;
+		}
+		if (_screenCounterTable[19] == 0) {
+			if (!_paf->_skipCutscenes) {
+				_paf->preload(13);
+			}
 		}
 	}
 }
@@ -474,6 +607,25 @@ void Game::preScreenUpdate_lar1_screen20() {
 			if ((_andyObject->flags0 & 0x1F) == 0xB) {
 				_levelCheckpoint = 7;
 			}
+		}
+	}
+}
+
+void Game::preScreenUpdate_lar1_screen23() {
+	if (_res->_currentScreenResourceNum == 23) {
+		const uint8_t *p = _lar1_unkData1;
+		for (int i = 0; i < 15; ++i) {
+			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
+				LvlObject *o = findLvlObject2(0, p[5], p[4]);
+				if (o) {
+					o->objectUpdateType = 3;
+				}
+			}
+			p += 6;
+		}
+		if (_plasmaCannonFlags & 2) {
+			byte_452620[0] &= 0xF;
+			byte_452620[0] |= 0x10;
 		}
 	}
 }
@@ -498,16 +650,16 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 		preScreenUpdate_lar1_screen6();
 		break;
 	case 8:
-		// TODO
+		preScreenUpdate_lar1_screen8();
 		break;
 	case 10:
-		// TODO
+		preScreenUpdate_lar1_screen10();
 		break;
 	case 11:
 		preScreenUpdate_lar1_screen11();
 		break;
 	case 12:
-		// TODO
+		preScreenUpdate_lar1_screen12();
 		break;
 	case 13:
 		preScreenUpdate_lar1_screen13();
@@ -516,25 +668,25 @@ void Game::callLevel_preScreenUpdate_lar1(int num) {
 		preScreenUpdate_lar1_screen14();
 		break;
 	case 15:
-		// TODO
+		preScreenUpdate_lar1_screen15();
 		break;
 	case 16:
 		preScreenUpdate_lar1_screen16();
 		break;
 	case 17:
-		// TODO
+		preScreenUpdate_lar1_screen17();
 		break;
 	case 18:
-		// TODO
+		preScreenUpdate_lar1_screen18();
 		break;
 	case 19:
-		// TODO
+		preScreenUpdate_lar1_screen19();
 		break;
 	case 20:
 		preScreenUpdate_lar1_screen20();
 		break;
 	case 23:
-		// TODO
+		preScreenUpdate_lar1_screen23();
 		break;
 	case 24:
 		preScreenUpdate_lar1_screen24();
