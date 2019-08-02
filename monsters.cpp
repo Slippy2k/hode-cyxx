@@ -1243,6 +1243,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	MstUnk34 *m34 = &_res->_mstUnk34[m44u1->indexUnk34_16];
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
+	debug(kDebug_MONSTER, "mstSetVerticalHorizontalBounds m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->bottom, m34->top);
 	if (m->xMstPos < m34->left - w || m->xMstPos > m34->right + w || m->yMstPos < m34->bottom - h || m->yMstPos > m34->top + h) {
 		updateMonsterObject1Position(m);
 		m->unkC0 = -1;
@@ -1288,6 +1289,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			y = m->y2;
 			m->task->flags |= 0x80;
 		}
+		_yMstPos2 = m->yMstPos - y;
 		m->flags4A |= 1;
 	} else {
 		_yMstPos1 = m->yMstPos;
@@ -1338,8 +1340,8 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 		}
 // 41A85C
 		m->flagsA8[2] = _cl;
-		m->unkBC = _edi;
-		m->unkC0 = _edi;
+		m->unkBC = -1;
+		m->unkC0 = -1;
 	}
 // 41A879
 l41A879:
@@ -1357,22 +1359,23 @@ l41A879:
 // 41A8DD
 		m->unkBC = _xMstPos1;
 		m->unkC0 = _yMstPos1;
-		uint32_t offset = m->m46Unk1->indexUnk44;
-		assert(offset != kNone);
-		MstUnk44 *m44 = &_res->_mstUnk44[offset];
+		uint32_t indexUnk44Unk1 = m->m46Unk1->indexUnk44;
+		assert(indexUnk44Unk1 != kNone);
+		MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44Unk1];
 		uint8_t var1D = m->m44Unk1->unk60[_edi][_cl];
 		if (var1D != 0) {
+			MstUnk44Unk1 *m44u1 = m->m44Unk1;
 			const uint8_t *p = m->unk8;
 			const int w = (int32_t)READ_LE_UINT32(p + 904);
 			const int h = (int32_t)READ_LE_UINT32(p + 908);
-			while (_xMstPos1 >= m->m44Unk1->unk34[_edi] + w) {
-				if (_xMstPos1 > m->m44Unk1->unk2C[_edi] - w) {
+			while (_xMstPos1 >= m44u1->unk34[_edi] + w) {
+				if (_xMstPos1 > m44u1->unk2C[_edi] - w) {
 					break;
 				}
-				if (_yMstPos1 < m->m44Unk1->unk44[_edi] + h) {
+				if (_yMstPos1 < m44u1->unk44[_edi] + h) {
 					break;
 				}
-				if (_yMstPos1 > m->m44Unk1->unk3C[_edi] - h) {
+				if (_yMstPos1 > m44u1->unk3C[_edi] - h) {
 					break;
 				}
 				int var1C;
@@ -1390,8 +1393,10 @@ l41A879:
 					var1C = 3;
 					break;
 				}
-				offset = m->m44Unk1->indexUnk44Unk1_76[var1C];
-				if (&m44->data[offset] == &m44->data[_cl]) {
+				indexUnk44Unk1 = m44u1->indexUnk44Unk1_76[var1C];
+				assert(indexUnk44Unk1 != kNone);
+				m44u1 = &m44->data[indexUnk44Unk1];
+				if (m44u1 == &m44->data[_cl]) {
 					m->flagsA7 = 0xFF;
 					return;
 				}
@@ -1480,7 +1485,26 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		}
 	}
 // 41ABED
-	warning("executeMstUnk8 41ABED unimplemented");
+	if (_mstLut1[m->flags4A] & 1) {
+		if (_xMstPos2 < _yMstPos2) {
+			if (_xMstPos2 < m->m49Unk1->unkA) {
+				m->flags4A &= ~0xA;
+				if (m->flagsA7 != 255) {
+					_xMstPos2 = 0;
+				}
+			}
+		} else {
+// 41AC2B
+			if (_yMstPos2 < m->m49Unk1->unkB) {
+				m->flags4A &= ~0x5;
+				if (m->flagsA7 != 255) {
+					_yMstPos2 = 0;
+				}
+			}
+		}
+	}
+// 41AC4F
+	warning("executeMstUnk8 41AC4F unimplemented");
 	// TODO
 }
 
@@ -1585,6 +1609,8 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 	return 1;
 }
 
+// ret >0: found a rect matching
+// ret <0: return the closest match (setting _xMstPos3 and _yMstPos3)
 int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 	_xMstPos3 = x;
 	_yMstPos3 = y;
