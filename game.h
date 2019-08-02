@@ -336,7 +336,7 @@ struct Game {
 	void initLvlObjects();
 	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
 	LvlObject *findLvlObject(uint8_t type, uint8_t spriteNum, int screenNum);
-	LvlObject *findLvlObject2(uint8_t type, uint8_t flags, int screenNum);
+	LvlObject *findLvlObject2(uint8_t type, uint8_t dataNum, int screenNum);
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void resetCrackSprites();

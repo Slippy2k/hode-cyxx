@@ -255,7 +255,7 @@ void Game::removeSound(LvlObject *ptr) {
 			_sssObjectsTable[i].lvlObject = 0;
 		}
 	}
-	ptr->sssObj = 0;
+	ptr->sssObject = 0;
 }
 
 void Game::setupBackgroundBitmap() {
@@ -701,10 +701,10 @@ void Game::destroyLvlObject(LvlObject *o) {
 			break;
 		}
 	}
-	if (o->sssObj) {
+	if (o->sssObject) {
 		removeSound(o);
 	}
-	o->sssObj = 0;
+	o->sssObject = 0;
 	o->bitmapBits = 0;
 }
 
@@ -920,10 +920,10 @@ void Game::clearLvlObjectsList1() {
 				}
 				break;
 			}
-			if (ptr->sssObj) {
+			if (ptr->sssObject) {
 				removeSound(ptr);
 			}
-			ptr->sssObj = 0;
+			ptr->sssObject = 0;
 			ptr->bitmapBits = 0;
 		}
 		ptr = next;
@@ -952,10 +952,10 @@ void Game::clearLvlObjectsList2() {
 				}
 				break;
 			}
-			if (ptr->sssObj) {
+			if (ptr->sssObject) {
 				removeSound(ptr);
 			}
-			ptr->sssObj = 0;
+			ptr->sssObject = 0;
 			ptr->bitmapBits = 0;
 		}
 		ptr = next;
@@ -984,10 +984,10 @@ void Game::clearLvlObjectsList3() {
 				}
 				break;
 			}
-			if (ptr->sssObj) {
+			if (ptr->sssObject) {
 				removeSound(ptr);
 			}
-			ptr->sssObj = 0;
+			ptr->sssObject = 0;
 			ptr->bitmapBits = 0;
 		}
 		ptr = next;
@@ -1006,7 +1006,7 @@ LvlObject *Game::addLvlObjectToList0(int num) {
 		_res->incLevelData0x2988RefCounter(ptr);
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
-		ptr->sssObj = 0;
+		ptr->sssObject = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList0;
@@ -1029,7 +1029,7 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 			lvlObjectTypeCallback(ptr);
 		}
 		ptr->currentSprite = 0;
-		ptr->sssObj = 0;
+		ptr->sssObject = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList1;
@@ -1050,7 +1050,7 @@ LvlObject *Game::addLvlObjectToList2(int num) {
 		_res->incLevelData0x2988RefCounter(ptr);
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
-		ptr->sssObj = 0;
+		ptr->sssObject = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList2;
@@ -1071,7 +1071,7 @@ LvlObject *Game::addLvlObjectToList3(int num) {
 		_res->incLevelData0x2988RefCounter(ptr);
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
-		ptr->sssObj = 0;
+		ptr->sssObject = 0;
 		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList3;
@@ -1129,9 +1129,9 @@ void Game::removeLvlObject2(LvlObject *o) {
 			break;
 		}
 	}
-	if (o->sssObj) {
+	if (o->sssObject) {
 		removeSound(o);
-		o->sssObj = 0;
+		o->sssObject = 0;
 	}
 	o->bitmapBits = 0;
 }
@@ -1198,7 +1198,7 @@ void Game::updateScreenHelper(int num) {
 		switch (ptr->type) {
 		case 0: {
 				AnimBackgroundData *p = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
-				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->flags & 0xFF];
+				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->dataNum];
 				assert(data);
 				p->framesCount = READ_LE_UINT16(data); data += 2;
 				ptr->currentSound = READ_LE_UINT16(data); data += 2;
@@ -1208,13 +1208,13 @@ void Game::updateScreenHelper(int num) {
 			}
 			break;
 		case 1: {
-				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->flags & 0xFF];
+				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->dataNum];
 				ptr->currentSound = READ_LE_UINT16(data); data += 2;
 				ptr->dataPtr = data;
 			}
 			break;
 		case 2:
-			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->flags & 0xFF];
+			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->dataNum];
 			if (_currentLevel == kLvl_rock) {
 				switch (ptr->objectUpdateType) {
 				case 0:
@@ -3699,10 +3699,10 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 				break;
 			}
 		}
-		if (o->sssObj) {
+		if (o->sssObject) {
 			removeSound(o);
 		}
-		o->sssObj = 0;
+		o->sssObject = 0;
 		o->bitmapBits = 0;
 	} else {
 		updateAndyObject(o);
@@ -4133,7 +4133,7 @@ LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 				lvlObjectTypeCallback(ptr);
 			}
 			ptr->currentSprite = 0;
-			ptr->sssObj = 0;
+			ptr->sssObject = 0;
 			ptr->nextPtr = 0;
 			ptr->bitmapBits = 0;
 			return ptr;
@@ -4215,10 +4215,10 @@ LvlObject *Game::findLvlObject(uint8_t type, uint8_t spriteNum, int screenNum) {
 	return ptr;
 }
 
-LvlObject *Game::findLvlObject2(uint8_t type, uint8_t flags, int screenNum) {
+LvlObject *Game::findLvlObject2(uint8_t type, uint8_t dataNum, int screenNum) {
 	LvlObject *ptr = _screenLvlObjectsList[screenNum];
 	while (ptr) {
-		if (ptr->type == type && ptr->flags == flags) {
+		if (ptr->type == type && ptr->dataNum == dataNum) {
 			break;
 		}
 		ptr = ptr->nextPtr;

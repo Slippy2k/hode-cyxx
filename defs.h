@@ -134,7 +134,7 @@ struct LvlObject {
 	int32_t yPos; // 4
 	uint8_t screenNum; // 8
 	uint8_t screenState;
-	uint8_t flags;
+	uint8_t dataNum;
 	uint8_t frame;
 	uint16_t anim;
 	uint8_t type;
@@ -156,7 +156,7 @@ struct LvlObject {
 	const uint8_t *bitmapBits;
 	int (Game::*callbackFuncPtr)(LvlObject *ptr);
 	void *dataPtr;
-	SssObject *sssObj; // 0x34
+	SssObject *sssObject; // 0x34
 	LvlObjectData *levelData0x2988;
 	Point16_t posTable[8];
 	LvlObject *nextPtr;
@@ -376,10 +376,10 @@ struct MonsterObject1 {
 	int unk88; // 0x88
 	int unk8C; // 0x8C
 	int unk90; // 0x90
-	int x1; // 0x94
-	int x2; // 0x98
-	int y1; // 0x9C
-	int y2; // 0xA0
+	int x1; // right 0x94
+	int x2; // left 0x98
+	int y1; // top 0x9C
+	int y2; // bottom 0xA0
 	uint8_t flagsA4; // 0xA4
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6

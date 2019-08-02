@@ -934,7 +934,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 			so->panning = codeOffset->unk7;
 			if (codeOffset->unk7 == 0xFF) {
 				if (_currentSoundLvlObject) {
-					_currentSoundLvlObject->sssObj = so;
+					_currentSoundLvlObject->sssObject = so;
 					so->panningPtr = &_snd_masterPanning;
 					so->panning = getSoundObjectPanning(so);
 				} else {

@@ -206,7 +206,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->yPos = _lvlFile->readUint32();
 	dat->screenNum = _lvlFile->readByte();
 	dat->screenState = _lvlFile->readByte();
-	dat->flags = _lvlFile->readByte();
+	dat->dataNum = _lvlFile->readByte();
 	dat->frame = _lvlFile->readByte();
 	dat->anim = _lvlFile->readUint16();
 	dat->type = _lvlFile->readByte();
@@ -232,7 +232,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->bitmapBits = 0; _lvlFile->readUint32();
 	dat->callbackFuncPtr = 0; _lvlFile->readUint32();
 	dat->dataPtr = 0; _lvlFile->readUint32();
-	dat->sssObj = 0; _lvlFile->readUint32();
+	dat->sssObject = 0; _lvlFile->readUint32();
 	dat->levelData0x2988 = 0; _lvlFile->readUint32();
 	for (int i = 0; i < 8; ++i) {
 		dat->posTable[i].x = _lvlFile->readUint16();

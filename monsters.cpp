@@ -4105,7 +4105,7 @@ int Game::runTask_default(Task *t) {
 					o = t->monster1->o16;
 				}
 				if (e <= -2 && o) {
-					if (o->flags & 0x10) {
+					if (o->flags1 & 0x10) {
 // 413657
 						const int x1 = a;
 						const int x2 = b;
