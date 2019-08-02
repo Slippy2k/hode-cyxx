@@ -133,10 +133,10 @@ struct MstScreenAreaCode {
 }; // sizeof == 36
 
 struct MstUnk34 {
-	int32_t x1; // 0
-	int32_t x2; // 4
-	int32_t y1; // 8
-	int32_t y2; // C
+	int32_t right; // 0
+	int32_t left; //  4
+	int32_t top; // 8
+	int32_t bottom; // 0xC
 	int32_t unk10; // 0x10
 }; // sizeof == 20
 

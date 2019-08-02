@@ -271,7 +271,7 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 	uint32_t indexUnk34 = m44->data[0].indexUnk34_16;
 	assert(indexUnk34 != kNone);
 	MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
-	int _ecx = (m34->x1 - m34->x2) / 2 + m34->x2;
+	int _ecx = (m34->right - m34->left) / 2 + m34->left;
 
 	int _edi = 0x1000000;
 	int var1C = y;
@@ -281,18 +281,18 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 		uint32_t indexUnk34 = m44->data[i].indexUnk34_16;
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
-		if (m34->x1 < x || m34->x2 > x || m34->y1 < y || m34->y2 > y) {
-			const int d1 = ABS(x - m34->x2);
+		if (m34->right < x || m34->left > x || m34->top < y || m34->bottom > y) {
+			const int d1 = ABS(x - m34->left);
 			if (d1 < _edi) {
 				_edi = d1;
 				m44unk1 = &m44->data[i];
-				_ecx = m34->x2;
+				_ecx = m34->left;
 			}
-			const int d2 = ABS(x - m34->x1);
+			const int d2 = ABS(x - m34->right);
 			if (d2 < _edi) {
 				_edi = d2;
 				m44unk1 = &m44->data[i];
-				_ecx = m34->x1;
+				_ecx = m34->right;
 			}
 		} else {
 // 41E6FD
@@ -308,8 +308,8 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 		uint32_t indexUnk34 = m44unk1->indexUnk34_16;
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
-		if (y <= m34->y1) {
-			y = (m34->y1 - m34->y2) / 2 + m34->y2;
+		if (y <= m34->top) {
+			y = (m34->top - m34->bottom) / 2 + m34->bottom;
 		}
 		_edx = var1C = y;
 	}
@@ -360,8 +360,8 @@ bool Game::updateMonsterObject1Position(MonsterObject1 *m) {
 		uint32_t indexUnk34 = m44unk1->indexUnk34_16;
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
-		while (m34->x2 <= m->xMstPos) {
-			if (m34->x1 >= m->xMstPos && m34->y2 <= m->yMstPos && m34->y1 >= m->yMstPos) {
+		while (m34->left <= m->xMstPos) {
+			if (m34->right >= m->xMstPos && m34->bottom <= m->yMstPos && m34->top >= m->yMstPos) {
 				if (m->m44Unk1 == m44unk1) {
 					return false;
 				}
@@ -1243,7 +1243,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	MstUnk34 *m34 = &_res->_mstUnk34[m44u1->indexUnk34_16];
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
-	if (m->xMstPos < m34->x2 - w || m->xMstPos > m34->x1 + w || m->yMstPos < m34->y2 - h || m->yMstPos > m34->y1 + h) {
+	if (m->xMstPos < m34->left - w || m->xMstPos > m34->right + w || m->yMstPos < m34->bottom - h || m->yMstPos > m34->top + h) {
 		updateMonsterObject1Position(m);
 		m->unkC0 = -1;
 		m->unkBC = -1;
@@ -1307,7 +1307,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			MstUnk44Unk1 *m44u1 = &m44->data[_cl];
 			assert(m44u1->indexUnk34_16 != kNone);
 			MstUnk34 *m34 = &_res->_mstUnk34[m44u1->indexUnk34_16];
-			if (_xMstPos1 < m34->x2 || _xMstPos1 > m34->x1 || _yMstPos1 < m34->y2 || _yMstPos1 > m34->y1) {
+			if (_xMstPos1 < m34->left || _xMstPos1 > m34->right || _yMstPos1 < m34->bottom || _yMstPos1 > m34->top) {
 				_edi = -1;
 			} else {
 				goto l41A879;
@@ -1602,15 +1602,15 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 		const uint32_t indexUnk34 = m44u1->indexUnk34_16;
 		assert(indexUnk34 != kNone);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
-		if (x >= m34->x2 && x <= m34->x1 && y >= m34->y2 && y <= m34->y1) {
+		if (x >= m34->left && x <= m34->right && y >= m34->bottom && y <= m34->top) {
 			return i;
 		}
 // 41A3CE
-		if (x >= m34->x2 && x <= m34->x1) {
-			int var4 = m34->y1;
-			int var8 = ABS(y - m34->y1);
-			int _ebx = m34->y2;
-			int _eax = ABS(y - m34->y2);
+		if (x >= m34->left && x <= m34->right) {
+			int var4 = m34->top;
+			int var8 = ABS(y - m34->top);
+			int _ebx = m34->bottom;
+			int _eax = ABS(y - m34->bottom);
 			if (_eax >= var8) {
 				_ebx = var4;
 			}
@@ -1622,12 +1622,12 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 				_yMstPos3 = _ebx;
 				var20 = var24;
 			}
-		} else if (y >= m34->y2 && y <= m34->y1) {
+		} else if (y >= m34->bottom && y <= m34->top) {
 // 41A435
-			int var8 = m34->x1;
-			int var4 = ABS(x - m34->x1);
-			int _ecx = m34->x2;
-			int _eax = ABS(x - m34->x2);
+			int var8 = m34->right;
+			int var4 = ABS(x - m34->right);
+			int _ecx = m34->left;
+			int _eax = ABS(x - m34->left);
 			if (_eax >= var4) {
 				_ecx = var8;
 			}
@@ -1642,42 +1642,42 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 
 		} else {
 // 41A49C
-			int _edx = (x - m34->x2);
+			int _edx = (x - m34->left);
 			_edx *= _edx;
-			int _eax = (y - m34->y2);
+			int _eax = (y - m34->bottom);
 			_eax *= _eax;
 			_edx += _eax;
 			if (_esi >= _edx) {
-				_xMstPos3 = m34->x2;
-				_yMstPos3 = m34->y2;
+				_xMstPos3 = m34->left;
+				_yMstPos3 = m34->bottom;
 				var20 = var24;
 				_esi = _edx;
 			}
 // 41A4C6
-			_edx = x - m34->x1;
+			_edx = x - m34->right;
 			_edx *= _edx;
 			_eax += _edx;
 			if (_esi >= _edx) {
-				_xMstPos3 = m34->x1;
-				_yMstPos3 = m34->y2;
+				_xMstPos3 = m34->right;
+				_yMstPos3 = m34->bottom;
 				var20 = var24;
 			}
 // 41A4FB
-			_edi = y - m34->y1;
+			_edi = y - m34->top;
 			_edi *= _edi;
 			_edx += _edi;
 			if (_esi >= _edi) {
-				_xMstPos3 = m34->x1;
-				_yMstPos3 = m34->y1;
+				_xMstPos3 = m34->right;
+				_yMstPos3 = m34->top;
 				var20 = var24;
 			}
 // 41A529
-			_ebp = x - m34->x2;
+			_ebp = x - m34->left;
 			_ebp *= _ebp;
 			_eax = _edi + _ebp;
 			if (_esi >= _eax) {
-				_xMstPos3 = m34->x2;
-				_yMstPos3 = m34->y1;
+				_xMstPos3 = m34->left;
+				_yMstPos3 = m34->top;
 				var20 = var24;
 			}
 

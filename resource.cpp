@@ -1064,11 +1064,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	_mstUnk34 = (MstUnk34 *)malloc(_mstHdr.unk0x08 * sizeof(MstUnk34));
 	for (int i = 0; i < _mstHdr.unk0x08; ++i) {
-		_mstUnk34[i].x1 = fp->readUint32();
-		_mstUnk34[i].x2 = fp->readUint32();
-		_mstUnk34[i].y1 = fp->readUint32();
-		_mstUnk34[i].y2 = fp->readUint32();
-		_mstUnk34[i].unk10 = fp->readUint32();
+		_mstUnk34[i].right  = fp->readUint32();
+		_mstUnk34[i].left   = fp->readUint32();
+		_mstUnk34[i].top    = fp->readUint32();
+		_mstUnk34[i].bottom = fp->readUint32();
+		_mstUnk34[i].unk10  = fp->readUint32();
 		bytesRead += 20;
 	}
 
