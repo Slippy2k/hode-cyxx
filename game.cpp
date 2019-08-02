@@ -3077,6 +3077,16 @@ static const uint8_t byte_43E710[] = {
 	0x04, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x04, 0x08, 0x02, 0x08, 0x02, 0x08
 };
 
+// anim sprite 7
+static const uint8_t _byte_43E720[16] = {
+	0x06, 0x0B, 0x05, 0x09, 0x05, 0x09, 0x05, 0x09, 0x05, 0x09, 0x06, 0x0B, 0x04, 0x07, 0x04, 0x07
+};
+
+// anim sprite 7
+static const uint8_t _byte_43E750[16] = {
+	0x06, 0x0E, 0x05, 0x0E, 0x05, 0x0E, 0x05, 0x0E, 0x05, 0x0E, 0x06, 0x0E, 0x04, 0x0E, 0x04, 0x0E
+};
+
 static const int dword_43E770[] = {
 	0, 1, 1, 1, 0, -513, -513, -513, 0, 511, 511, 511, 0, -511, -511, -511, 0, 513, 513, 513, 0, -1, -1, -1, 0, -512, -512, -512, 0, 512, 512, 512
 };
@@ -3428,6 +3438,99 @@ int Game::lvlObjectType1Callback(LvlObject *ptr) {
 		updateAndyObject(ptr);
 		ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2, 0x18);
 		ptr->flags2 = merge_bits(ptr->flags2, _andyObject->flags2 + 1, 7);
+	}
+	return 0;
+}
+
+int Game::lvlObjectType7Callback(LvlObject *ptr) {
+	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
+	if (!dat) {
+		return 0;
+	}
+	if ((ptr->flags0 & 0x1F) == 1) {
+		dat->unk14 = ptr->posTable[7].x + ptr->xPos;
+		dat->unk18 = ptr->posTable[7].y + ptr->yPos;
+		ptr->xPos += dat->dxPos;
+		ptr->yPos += dat->dyPos;
+		if (!_hideAndyObjectSprite && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0) {
+			dat->unk3 = 0x80;
+			dat->x2 = _clipBoxOffsetX;
+			dat->y2 = _clipBoxOffsetY;
+			setAndySpecialAnimation(0xA3);
+		}
+// 40D6E0
+		if (dat->unk3 != 0x80 && dat->counter != 0) {
+			if (dat->unk0 == 7) {
+				ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[7].x, ptr->yPos + ptr->posTable[7].y + 4, ptr->screenNum);
+
+			}
+// 40D711
+			const uint8_t ret = lvlObjectSpecialPowersCallbackScreen(ptr);
+			if (ret != 0 && (dat->unk0 != 7 || (ret & 1) == 0)) {
+				dat->unk3 = 0x80;
+			}
+		}
+// 40D729
+		const uint8_t *anim = (dat->unk0 >= 7) ? &_byte_43E750[dat->unk1 * 2] : &_byte_43E720[dat->unk1 * 2];
+		if (dat->counter != 0 && dat->unk3 != 0x80) {
+			if (addLvlObjectToList3(ptr->spriteNum)) {
+				LvlObject *o = _lvlObjectsList3;
+				o->flags0 = ptr->flags0;
+				o->flags1 = ptr->flags1;
+				o->screenNum = ptr->screenNum;
+				o->flags2 = ptr->flags2;
+				o->anim = anim[1];
+				if (_rnd.getSeed() & 1) {
+					++o->anim;
+				}
+				o->frame = 0;
+				if (dat->x2 >= 256) {
+					dat->x2 -= _res->_screensBasePos[ptr->screenNum].u;
+				}
+				if (dat->y2 >= 192) {
+					dat->y2 -= _res->_screensBasePos[ptr->screenNum].v;
+				}
+				setupLvlObjectBitmap(o);
+				setLvlObjectPosRelativeToPoint(o, 0, dat->unk14, dat->unk18);
+			}
+		} else {
+// 40D7F5
+			dat->unk0 = (dat->unk0 < 7) ? 3 : 9;
+			if (dat->counter != 0 && _actionDirectionKeyMaskIndex != 0xA3) {
+				ptr->anim = anim[0];
+			} else {
+				ptr->anim = 3;
+			}
+// 40D81F
+			ptr->frame = 0;
+			if (dat->x2 >= 256) {
+				dat->x2 -= _res->_screensBasePos[ptr->screenNum].u;
+			}
+			if (dat->y2 >= 192) {
+				dat->y2 -= _res->_screensBasePos[ptr->screenNum].v;
+			}
+			setupLvlObjectBitmap(ptr);
+			setLvlObjectPosRelativeToPoint(ptr, 0, dat->x2, dat->y2);
+			return 0;
+		}
+	} else if ((ptr->flags0 & 0x1F) == 11) {
+// 40D873
+		dat->counter = ((ptr->flags0 & 0xE0) == 0x40) ? 0 : 1;
+	}
+// 40D88B
+	if (dat->counter == 0) {
+		if (ptr->spriteNum == 3) {
+			removeLvlObjectFromList(&_lvlObjectsList0, ptr);
+		} else {
+			removeLvlObjectFromList(&_lvlObjectsList2, ptr);
+		}
+		destroyLvlObject(ptr);
+	} else {
+		--dat->counter;
+		updateAndyObject(ptr);
+	}
+	if (setLvlObjectPosInScreenGrid(ptr, 3) < 0) {
+		dat->counter = 0;
 	}
 	return 0;
 }
@@ -3859,6 +3962,9 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 33:
 	case 34:
 		o->callbackFuncPtr = 0;
+		break;
+	case 7: // flying spectre fireball
+		o->callbackFuncPtr = &Game::lvlObjectType7Callback;
 		break;
 	case 8: // lizard
 	case 9: // spider

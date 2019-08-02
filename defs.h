@@ -244,6 +244,8 @@ struct ShootLvlObjectData {
 	int32_t dyPos; // 0x8
 	int32_t x2; // 0xC
 	int32_t y2; // 0x10
+	int unk14; // 0x14
+	int unk18; // 0x18
 	LvlObject *o; // 0x1C
 	ShootLvlObjectData *nextPtr; // 0x20 next pointer to 'free' element
 };

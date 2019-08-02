@@ -322,6 +322,7 @@ struct Game {
 	void setupSpecialPowers(LvlObject *ptr);
 	int lvlObjectType0Callback(LvlObject *ptr);
 	int lvlObjectType1Callback(LvlObject *ptr);
+	int lvlObjectType7Callback(LvlObject *o);
 	int lvlObjectType8Callback(LvlObject *o);
 	int lvlObjectList3Callback(LvlObject *o);
 	void lvlObjectSpecialPowersCallbackHelper1(LvlObject *o);

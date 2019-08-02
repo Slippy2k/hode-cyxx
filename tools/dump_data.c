@@ -211,8 +211,10 @@ int main(int argc, char* argv[]) {
 				dumpBinary(fp, "_byte_43E670", 0x3E670, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E6E0", 0x3E6E0, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E6F0", 0x3E6F0, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E720", 0x3E720, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E730", 0x3E730, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E740", 0x3E740, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_byte_43E750", 0x3E750, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E760", 0x3E6F0, 16, "0x%02X", UNSIGNED_8BITS, 0);
 //				dumpBinary(fp, "_byte_43E8F8", 0x3E8F8, 68, "0x%02X", UNSIGNED_8BITS);
 //				dumpBinary(fp, "_byte_43E940", 0x3E940, 68, "0x%02X", UNSIGNED_8BITS);
