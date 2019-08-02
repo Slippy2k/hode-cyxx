@@ -1582,7 +1582,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 	}
 	switch (direction) {
 	case 1:
-		for (; --count != 0; coords += 4) {
+		for (; count-- != 0; coords += 4) {
 			if (_ecx->x1 > _ebp->x2 - coords[0] || _ecx->x2 < _ebp->x2 - coords[2]) {
 				continue;
 			}
@@ -1593,7 +1593,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 		}
 		break;
 	case 2:
-		for (; --count != 0; coords += 4) {
+		for (; count-- != 0; coords += 4) {
 			if (_ecx->x1 > coords[2] + _ebp->x1 || _ecx->x2 < coords[0] + _ebp->x1) {
 				continue;
 			}
@@ -1604,7 +1604,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 		}
 		break;
 	case 3:
-		for (; --count != 0; coords += 4) {
+		for (; count-- != 0; coords += 4) {
 			if (_ecx->x1 > _ebp->x2 - coords[0] || _ecx->x2 < _ebp->x2 - coords[2]) {
 				continue;
 			}
@@ -1615,7 +1615,7 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 		}
 		break;
 	default:
-		for (; --count != 0; coords += 4) {
+		for (; count-- != 0; coords += 4) {
 			if (_ecx->x1 > coords[2] + _ebp->x1 || _ecx->x2 < coords[0] + _ebp->x1) {
 				continue;
 			}
@@ -1635,8 +1635,58 @@ int Game::updateBoundingBoxClippingOffset(BoundingBox *_ecx, BoundingBox *_ebp, 
 }
 
 int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlObject *o2, BoundingBox *box2) {
-	warning("clipLvlObjectsBoundingBoxHelper() unimplemented");
-	return 0;
+	int ret = 0;
+	const uint8_t *coords1 = _res->getLvlSpriteCoordPtr(o1->levelData0x2988, o1->currentSprite);
+	const uint8_t *coords2 = _res->getLvlSpriteCoordPtr(o2->levelData0x2988, o2->currentSprite);
+	if (clipBoundingBox(box1, box2)) {
+		int count = *coords1++;
+		if (count != 0) {
+			const int direction = (o1->flags1 >> 4) & 3;
+			switch (direction) {
+			case 1:
+				for (; count-- != 0 && ret != 0; coords1 += 4) {
+					BoundingBox tmp;
+					tmp.x1 = box1->x2 - coords1[2];
+					tmp.x2 = box1->x2 - coords1[0];
+					tmp.y1 = box1->y1 + coords1[1];
+					tmp.y2 = box1->y2 + coords1[3];
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+				}
+				break;
+			case 2:
+				for (; count-- != 0 && ret != 0; coords1 += 4) {
+					BoundingBox tmp;
+					tmp.x1 = box1->x1 + coords1[0];
+					tmp.x2 = box1->x1 + coords1[2];
+					tmp.y1 = box1->y2 - coords1[3];
+					tmp.y2 = box1->y2 - coords1[1];
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+				}
+				break;
+			case 3:
+				for (; count-- != 0 && ret != 0; coords1 += 4) {
+					BoundingBox tmp;
+					tmp.x1 = box1->x2 - coords1[2];
+					tmp.x2 = box1->x2 - coords1[0];
+					tmp.y1 = box1->y2 - coords1[3];
+					tmp.y2 = box1->y2 - coords1[1];
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+				}
+				break;
+			default:
+				for (; count-- != 0 && ret != 0; coords1 += 4) {
+					BoundingBox tmp;
+					tmp.x1 = box1->x1 + coords1[0];
+					tmp.x2 = box1->x1 + coords1[2];
+					tmp.y1 = box1->y1 + coords1[1];
+					tmp.y2 = box1->y1 + coords1[3];
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+				}
+				break;
+			}
+		}
+	}
+	return ret;
 }
 
 int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
