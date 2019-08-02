@@ -1650,7 +1650,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 					tmp.x2 = box1->x2 - coords1[0];
 					tmp.y1 = box1->y1 + coords1[1];
 					tmp.y2 = box1->y2 + coords1[3];
-					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags1 >> 4) & 3);
 				}
 				break;
 			case 2:
@@ -1660,7 +1660,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 					tmp.x2 = box1->x1 + coords1[2];
 					tmp.y1 = box1->y2 - coords1[3];
 					tmp.y2 = box1->y2 - coords1[1];
-					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags1 >> 4) & 3);
 				}
 				break;
 			case 3:
@@ -1670,7 +1670,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 					tmp.x2 = box1->x2 - coords1[0];
 					tmp.y1 = box1->y2 - coords1[3];
 					tmp.y2 = box1->y2 - coords1[1];
-					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags1 >> 4) & 3);
 				}
 				break;
 			default:
@@ -1680,7 +1680,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 					tmp.x2 = box1->x1 + coords1[2];
 					tmp.y1 = box1->y1 + coords1[1];
 					tmp.y2 = box1->y1 + coords1[3];
-					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags >> 4) & 3);
+					ret = updateBoundingBoxClippingOffset(&tmp, box2, coords2, (o2->flags1 >> 4) & 3);
 				}
 				break;
 			}
