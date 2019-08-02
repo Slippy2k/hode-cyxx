@@ -1586,9 +1586,114 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 }
 
 int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
-	warning("executeMstUnk15 unimplemented");
-	// TODO
-	return -1;
+	_xMstPos3 = x;
+	_yMstPos3 = y;
+	const int num = (~m->flagsA5) & 1;
+	int _esi = 0x40000000;
+	int var20 = -1;
+	int var24 = -1;
+	int _ebp = 0;
+	for (int i = 0; i < m44->count; ++i, --var24) {
+		int _edi;
+		MstUnk44Unk1 *m44u1 = &m44->data[i];
+		if (m44u1->unk60[num][i] == 0 && m->m44Unk1 != m44u1) {
+			continue;
+		}
+		const uint32_t indexUnk34 = m44u1->indexUnk34_16;
+		assert(indexUnk34 != kNone);
+		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		if (x >= m34->x2 && x <= m34->x1 && y >= m34->y2 && y <= m34->y1) {
+			return i;
+		}
+// 41A3CE
+		if (x >= m34->x2 && x <= m34->x1) {
+			int var4 = m34->y1;
+			int var8 = ABS(y - m34->y1);
+			int _ebx = m34->y2;
+			int _eax = ABS(y - m34->y2);
+			if (_eax >= var8) {
+				_ebx = var4;
+			}
+			_edi = y - _ebx;
+			_edi *= _edi;
+			if (_esi >= _edi) {
+				_esi = _edi;
+				_xMstPos3 = x;
+				_yMstPos3 = _ebx;
+				var20 = var24;
+			}
+		} else if (y >= m34->y2 && y <= m34->y1) {
+// 41A435
+			int var8 = m34->x1;
+			int var4 = ABS(x - m34->x1);
+			int _ecx = m34->x2;
+			int _eax = ABS(x - m34->x2);
+			if (_eax >= var4) {
+				_ecx = var8;
+			}
+			_ebp = x - _ecx;
+			_ebp *= _ebp;
+			if (_esi >= _ebp) {
+				_xMstPos3 = _ecx;
+				_yMstPos3 = y;
+				var20 = var24;
+				_esi = _ebp;
+			}
+
+		} else {
+// 41A49C
+			int _edx = (x - m34->x2);
+			_edx *= _edx;
+			int _eax = (y - m34->y2);
+			_eax *= _eax;
+			_edx += _eax;
+			if (_esi >= _edx) {
+				_xMstPos3 = m34->x2;
+				_yMstPos3 = m34->y2;
+				var20 = var24;
+				_esi = _edx;
+			}
+// 41A4C6
+			_edx = x - m34->x1;
+			_edx *= _edx;
+			_eax += _edx;
+			if (_esi >= _edx) {
+				_xMstPos3 = m34->x1;
+				_yMstPos3 = m34->y2;
+				var20 = var24;
+			}
+// 41A4FB
+			_edi = y - m34->y1;
+			_edi *= _edi;
+			_edx += _edi;
+			if (_esi >= _edi) {
+				_xMstPos3 = m34->x1;
+				_yMstPos3 = m34->y1;
+				var20 = var24;
+			}
+// 41A529
+			_ebp = x - m34->x2;
+			_ebp *= _ebp;
+			_eax = _edi + _ebp;
+			if (_esi >= _eax) {
+				_xMstPos3 = m34->x2;
+				_yMstPos3 = m34->y1;
+				var20 = var24;
+			}
+
+		}
+// 41A560
+		// This matches disassembly byt looks like a copy-paste from the above condition
+/*
+		if (_esi >= _edi + _ebp) {
+			_xMstPos3 = x;
+			_yMstPos3 = _ebx;
+			var20 = var24;
+
+		}
+*/
+	}
+	return var20;
 }
 
 void Game::executeMstUnk16(MstUnk44 *m44, int flag) {
