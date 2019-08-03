@@ -586,7 +586,7 @@ static int readBytesAlign(File *f, uint8_t *buf, int len) {
 
 void Resource::loadSssData(File *fp, const char *name) {
 
-	assert(fp == _sssFile); // TODO: or _datFile
+	assert(fp == _sssFile || fp == _datFile);
 
 	if (0 /* _sssBuffer1 */ ) {
 		int count = _sssHdr.pcmCount;
@@ -909,8 +909,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 
 // 429C96:
-	if (_sssHdr.dataUnk2Count != 0) {
-		// TODO:
+	if (0 && _sssHdr.dataUnk2Count != 0) {
 		fp->flush();
 		uint8_t buf[256];
 		assert(_sssHdr.dataUnk2Count <= (int)sizeof(buf));

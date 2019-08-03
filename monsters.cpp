@@ -597,10 +597,31 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 		}
 		break;
 	case 7:
+		if (p->boundingBox.y1 <= _mstTemp_y2 && p->boundingBox.x2 >= _mstTemp_x1 && p->boundingBox.x1 <= _mstTemp_x2) {
+			const int dy = _mstTemp_y1 - p->boundingBox.y2;
+			if (dy <= 0) {
+				return 0;
+			}
+			return (p->unk40 == 3) ? 0 : dy / p->height;
+		}
+		break;
 	case 128: // 8
+		if (p->boundingBox.x1 <= _mstTemp_x2 && y >= _mstTemp_y1 && y - _mstTemp_y2 <= 9) {
+			const int dx = _mstTemp_x1 - p->boundingBox.x2;
+			if (dx <= 0) {
+				return 0;
+			}
+			return dx / p->width;
+		}
+		break;
 	case 133: // 9
-		warning("getMstDistance unk24 %d y %d unimplemented", p->unk24, y);
-		// TODO
+		if (p->boundingBox.x2 >= _mstTemp_x1 && y >= _mstTemp_y1 && y - _mstTemp_y2 <= 9) {
+			const int dx = _mstTemp_x2 - p->boundingBox.x1;
+			if (dx <= 0) {
+				return 0;
+			}
+			return dx / p->width;
+		}
 		break;
 	}
 	return -1;
