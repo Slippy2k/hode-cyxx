@@ -79,6 +79,17 @@ static const uint8_t _byte_40BAE4[] = {
 	0xA, 0xA, 0xA, 0xA, 0xA, 0x9
 };
 
+static const uint8_t _byte_418E58[] = {
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 8, 3, 8, 8, 8, 8, 1
+};
+
 static const int _mstDefaultLutOpCount = sizeof(_mstDefaultLutOp) / sizeof(_mstDefaultLutOp[0]);
 
 int main(int argc, char *argv[]) {
@@ -115,6 +126,12 @@ int main(int argc, char *argv[]) {
 		for (int i = 0; i < 116; ++i) {
 			if (_byte_40BAE4[i] != 10) {
 				fprintf(stdout, "_byte_40BAE4 case %d: // %d\n", i, _byte_40BAE4[i]);
+			}
+		}
+		assert(sizeof(_byte_418E58) == 134);
+		for (int i = 0; i < 134; ++i) {
+			if (_byte_418E58[i] != 8) {
+				fprintf(stdout, "_byte_418E58 case %d: // %d\n", i, _byte_418E58[i]);
 			}
 		}
 	}

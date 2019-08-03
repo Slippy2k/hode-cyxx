@@ -1189,7 +1189,21 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 void Game::executeMstUnk4(MonsterObject1 *m) {
 	int var1C = 0;
 	if (m->flags4B == 0xFD) {
-		warning("executeMstUnk4 41B087 unimplemented");
+		MstUnk49 *m49 = m->m49;
+		if (m->x1 > _mstAndyLevelPosX + m49->unk14 - m->unk68 && m->x2 < _mstAndyLevelPosX + m->unk68 - m49->unk14 && m->y1 > _mstAndyLevelPosY + m49->unk15 - m->unk70 && m->y2 < _mstAndyLevelPosY + m49->unk15 + m->unk70) {
+			int x1 = _mstAndyLevelPosX + m49->unk14 + m->unk64;
+			if (m->x1 < x1) {
+				if (m->x2 > _mstAndyLevelPosX - m->unk64 - m49->unk14 && m->y1 < _mstAndyLevelPosY + m49->unk15 + m->unk6C && m->y2 > _mstAndyLevelPosY - m->unk6C - m49->unk15) {
+					goto l41B2DC;
+				}
+			}
+// 41B170
+			warning("executeMstUnk4 41B170 unimplemented");
+			// TODO
+		}
+// 41B2DC
+l41B2DC:
+		warning("executeMstUnk4 41B2DC unimplemented");
 		// TODO
 	}
 // 41B3BB
@@ -2080,8 +2094,37 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		MovingOpcodeState *var14 = m->collidePtr;
 		if (t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
 			if (m->unk8[946] & 2) {
-				warning("mstUpdateTaskMonsterObject1 418459 unimplemented");
-				// TODO
+				_mstCurrentMonster1->unk74 = _mstCurrentMonster1->unk78 = 0x80000000;
+				_mstCurrentMonster1->unk7C = _mstCurrentMonster1->unk80 = 0x7FFFFFFF;
+				switch (var14->unk24) {
+				case 0:
+					var28 = 2;
+					break;
+				case 1:
+				case 133:
+					var28 = 9;
+					break;
+				case 2:
+					var28 = 12;
+					break;
+				case 3:
+				case 128:
+					var28 = 3;
+					break;
+				case 4:
+					var28 = 6;
+					break;
+				case 5:
+					var28 = 8;
+					break;
+				case 6:
+					var28 = 1;
+					break;
+				case 7:
+					var28 = 4;
+					break;
+				}
+				_mstCurrentMonster1->unkF0 = _mstLut1[var28];
 			}
 		} else {
 // 4184EC
