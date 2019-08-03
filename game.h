@@ -698,7 +698,7 @@ struct Game {
 	int executeMstOp67Type1(Task *t);
 	int executeMstOp67Type2(Task *t, int flag);
 	void mstOp67_addMonster(Task *t, int y1, int y2, int x1, int x2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
-	void mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d);
+	void mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int c, int d);
 	int runTask_waitResetInput(Task *t);
 	int runTask_wait(Task *t);
 	int runTask_waitFlags(Task *t);

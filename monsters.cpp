@@ -4332,7 +4332,7 @@ int Game::runTask_default(Task *t) {
 					}
 				}
 				if (_edi != 0 || _esi != 0) {
-					mstOp68(t, _res->_mstHeightMapData + m63->unk0 * kMstHeightMapDataSize, _edi, _esi, _ecx, m63->unk6);
+					mstOp68_addMonsterGroup(t, _res->_mstHeightMapData + m63->unk0 * kMstHeightMapDataSize, _edi, _esi, _ecx, m63->unk6);
 				}
 			}
 			break;
@@ -4970,10 +4970,9 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 // 41C2E6
 l41C2E6:
 	if (m->unk8[946] & 4) {
-		warning("mstOp49 41C2E6");
+		mstBoundingBoxClear(m, 1);
 	}
 // 41C33C
-	m->flagsA8[1] = 255;
 	t->flags |= 0x80;
 	executeMstUnk1(t);
 	return 0;
@@ -6650,8 +6649,8 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		if (_currentLevel == kLvl_lar2 && m->unk8[944] == 26) {
 			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], m1->anim + 1, o_flags1, 0x3001, 0, 0);
 			if (!m->o20) {
-				warning("mstOp67 addLvlObject kLvl_lar2 o is NULL");
-				// TODO
+				warning("mstOp67 failed to addLvlObject in kLvl_lar2");
+				resetMonsterObject1(m);
 				return;
 			}
 			if (screen < 0) {
@@ -6673,7 +6672,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 			}
 		}
 		if (!mo) {
-			warning("mstOp67 unable to find a free monster2");
+			warning("mstOp67 no free monster2");
 			return;
 		}
 // 415743
@@ -6712,7 +6711,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 	if (mo) {
 		Task *t = findFreeTask();
 		if (!t) {
-			warning("mstOp67_addMonster mo %p no free task found", mo);
+			warning("mstOp67 mo %p no free task", mo);
 			mo->m45 = 0;
 			if (mo->o) {
 				mo->o->dataPtr = 0;
@@ -6793,8 +6792,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 	currentTask->flags &= ~0x80;
 }
 
-// mstOp68_addMonsterGroup
-void Game::mstOp68(Task *t, const uint8_t *p, int a, int b, int c, int d) {
+void Game::mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int c, int d) {
 	MstUnk42 *m42 = &_res->_mstUnk42[d];
 	struct {
 		int m42Index;
