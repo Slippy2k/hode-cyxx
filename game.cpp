@@ -440,6 +440,7 @@ void Game::resetScreenMask() {
 void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum) {
 	if (screenNum != 255) {
 		warning("setScreenMaskRectHelper unimplemented %d,%d,%d,%d screen %d", x1, y1, x2, y2, screenNum);
+		// TODO
 	}
 }
 
@@ -1826,6 +1827,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		}
 	default:
 		warning("Unhandled clipLvlObjectsBoundingBox type %d (%d)", type, type - 17);
+		break;
 	}
 	return 0;
 }

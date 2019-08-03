@@ -13,6 +13,7 @@ static uint8_t byte_452608[] = {  2,  0, 0, 0 };
 static uint8_t byte_45260C[] = {  2,  3, 0, 0 };
 static uint8_t byte_452610[] = {  2,  0, 0, 0 };
 static uint8_t byte_452614[] = {  2,  0, 0, 0 };
+static uint8_t byte_452618[] = {  2,  0, 0, 0 };
 static uint8_t byte_45261C[] = {  2,  0, 0, 0 };
 static uint8_t byte_452620[] = {  2,  0, 0, 0 };
 static uint8_t byte_452624[] = {  2,  0, 0, 0 };
@@ -238,6 +239,74 @@ void Game::postScreenUpdate_lar1_screen13() {
 	postScreenUpdate_lar1_helper(o, byte_452614, 7);
 }
 
+void Game::postScreenUpdate_lar1_screen14() {
+	if (_res->_currentScreenResourceNum == 14) {
+		switch (_res->_screensState[14].s0) {
+		case 0:
+			if (_currentLevelCheckpoint == 4) {
+				if (_levelCheckpoint == 5) {
+					_currentLevelCheckpoint = _levelCheckpoint;
+					if (!_paf->_skipCutscenes) {
+						_paf->play(11);
+						_paf->unload();
+						_video->clearPalette();
+					}
+					restartLevel();
+				}
+			} else {
+				BoundingBox b = { 33, 60, 76, 89 };
+				LvlObject *o = findLvlObjectBoundingBox(&b);
+				if (o) {
+					if (((ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot))->unk0 == 6) {
+						_res->_screensState[14].s0 = 3;
+					}
+				}
+			}
+			break;
+		case 1: {
+				BoundingBox b = { 172, 23, 222, 53 };
+				AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+				if (clipBoundingBox(&b, &data->boundingBox) && (_andyObject->flags0 & 0x1F) == 0 && (_andyObject->flags0 & 0xE0) == 0xE0) {
+					_res->_screensState[14].s0 = 4;
+					if (!_paf->_skipCutscenes) {
+						_paf->preload(12);
+					}
+				} else {
+					setAndySpecialAnimation(3);
+				}
+			}
+			break;
+		case 3:
+			++_screenCounterTable[14];
+			if (_screenCounterTable[14] == 1) {
+				_res->_resLvlScreenBackgroundDataTable[14].currentMaskId = 1;
+				setupScreenMask(14);
+			} else if (_screenCounterTable[14] >= 20) {
+				_res->_screensState[14].s0 = 1;
+			} else if (_screenCounterTable[14] == 7 || _screenCounterTable[14] == 9 || _screenCounterTable[14] == 11 || _screenCounterTable[14] == 13 || _screenCounterTable[14] == 15) {
+				setShakeScreen(3, 2);
+			}
+			break;
+		case 4:
+			++_screenCounterTable[14];
+			if (_screenCounterTable[14] >= 37) {
+				_res->_screensState[14].s0 = 2;
+				_res->_resLvlScreenBackgroundDataTable[14].currentBackgroundId = 1;
+				_res->_resLvlScreenBackgroundDataTable[14].currentMaskId = 2;
+				if (!_paf->_skipCutscenes) {
+					_paf->play(12);
+					_paf->unload(12);
+				}
+				_video->clearPalette();
+				updateScreen(_andyObject->screenNum);
+			}
+			break;
+		}
+	}
+	LvlObject *o = findLvlObject(2, 0, 14);
+	postScreenUpdate_lar1_helper(o, byte_452618, 8);
+}
+
 void Game::postScreenUpdate_lar1_screen15() {
 	LvlObject *o = findLvlObject(2, 0, 15);
 	postScreenUpdate_lar1_helper(o, byte_45261C, 9);
@@ -363,7 +432,7 @@ void Game::callLevel_postScreenUpdate_lar1(int num) {
 		postScreenUpdate_lar1_screen13();
 		break;
 	case 14:
-		// TODO
+		postScreenUpdate_lar1_screen14();
 		break;
 	case 15:
 		postScreenUpdate_lar1_screen15();
