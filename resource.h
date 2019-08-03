@@ -182,7 +182,7 @@ struct MstUnk44Unk1 {
 	int32_t unk34[2]; // 0x34
 	int32_t unk3C[2]; // 0x3C
 	int32_t unk44[2]; // 0x44
-	uint32_t indexUnk44Unk1_76[4]; // 0x4C
+	uint32_t indexUnk44Unk1_76[4]; // next per direction 0x4C
 	uint32_t indexUnk44Unk1_92; // next 0x5C
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104

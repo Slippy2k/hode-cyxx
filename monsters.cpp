@@ -1394,9 +1394,9 @@ l41A879:
 // 41A8DD
 		m->unkBC = _xMstPos1;
 		m->unkC0 = _yMstPos1;
-		uint32_t indexUnk44Unk1 = m->m46Unk1->indexUnk44;
-		assert(indexUnk44Unk1 != kNone);
-		MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44Unk1];
+		uint32_t indexUnk44 = m->m46Unk1->indexUnk44;
+		assert(indexUnk44 != kNone && indexUnk44 < (uint32_t)_res->_mstHdr.unk0x28);
+		MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44];
 		uint8_t var1D = m->m44Unk1->unk60[_edi][_cl];
 		if (var1D != 0) {
 			MstUnk44Unk1 *m44u1 = m->m44Unk1;
@@ -1414,7 +1414,7 @@ l41A879:
 					break;
 				}
 				int var1C;
-				switch (var1D) {
+				switch (m44u1->unk60[_edi][_cl]) {
 				case 2:
 					var1C = 0;
 					break;
@@ -1428,7 +1428,7 @@ l41A879:
 					var1C = 3;
 					break;
 				}
-				indexUnk44Unk1 = m44u1->indexUnk44Unk1_76[var1C];
+				const uint32_t indexUnk44Unk1 = m44u1->indexUnk44Unk1_76[var1C];
 				assert(indexUnk44Unk1 != kNone);
 				m44u1 = &m44->data[indexUnk44Unk1];
 				if (m44u1 == &m44->data[_cl]) {
