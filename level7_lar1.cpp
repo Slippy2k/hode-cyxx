@@ -18,7 +18,7 @@ static uint8_t byte_452620[] = {  2,  0, 0, 0 };
 static uint8_t byte_452624[] = {  2,  0, 0, 0 };
 static uint8_t byte_452628[] = {  2,  0, 0, 0 };
 
-static const uint8_t _lar1_unkData1[90] = {
+static const uint8_t _lar1_unkData1[15 * 6] = {
 	0x04, 0x00, 0x68, 0x50, 0x08, 0x00, 0x04, 0x00, 0x68, 0x90, 0x08, 0x01, 0x03, 0x00, 0x50, 0x10,
 	0x0A, 0x01, 0x03, 0x00, 0x80, 0x10, 0x0A, 0x02, 0x04, 0x00, 0xC8, 0x80, 0x0A, 0x03, 0x01, 0x00,
 	0xC8, 0x10, 0x0C, 0x00, 0x04, 0x00, 0x80, 0x20, 0x0C, 0x01, 0x04, 0x00, 0x38, 0x30, 0x0C, 0x02,
@@ -62,6 +62,19 @@ static uint8_t _lar1_unkData3[96] = {
 	0x0E, 0x07, 0x02, 0x08, 0x0F, 0x27, 0x01, 0x09, 0x0F, 0x2F, 0xFF, 0x0B, 0x12, 0x07, 0x01, 0x0B,
 	0x12, 0x0B, 0xFF, 0x0D, 0x12, 0x0B, 0xFF, 0x0C, 0x12, 0x15, 0x02, 0x0B, 0x15, 0x2F, 0x00, 0x0E,
 };
+
+static void setLvlObjectUpdateType3_lar1(Game *g, int screenNum) {
+	const uint8_t *p = _lar1_unkData1;
+	for (int i = 0; i < 15; ++i) {
+		if (p[4] == screenNum && p[1] == 1) {
+			LvlObject *o = g->findLvlObject2(0, p[5], p[4]);
+			if (o) {
+				o->objectUpdateType = 3;
+			}
+		}
+		p += 6;
+	}
+}
 
 void Game::updateLevelTick_lar_helper1(int num, uint8_t *p1, const BoundingBox *r) {
 	// TODO
@@ -277,7 +290,7 @@ void Game::postScreenUpdate_lar1_screen19() {
 				_andyObject->actionKeyMask = 0;
 				setupLvlObjectBitmap(_andyObject);
 				removeLvlObject(_andyObject);
-				// sub_40E3C0
+				clearLvlObjectsList0();
 			}
 		}
 	} else if (_res->_screensState[19].s0 == 2) {
@@ -422,31 +435,13 @@ void Game::preScreenUpdate_lar1_screen6() {
 
 void Game::preScreenUpdate_lar1_screen8() {
 	if (_res->_currentScreenResourceNum == 8) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 8);
 	}
 }
 
 void Game::preScreenUpdate_lar1_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 10);
 	}
 }
 
@@ -467,16 +462,8 @@ void Game::preScreenUpdate_lar1_screen11() {
 
 void Game::preScreenUpdate_lar1_screen12() {
 	if (_res->_currentScreenResourceNum == 12) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 12);
+		assert(!_transformShadowBuffer);
 		_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
 		const int size = decodeLZW(_pwr2_screenTransformData, _transformShadowBuffer);
 		assert(size == 256 * 192);
@@ -521,16 +508,7 @@ void Game::preScreenUpdate_lar1_screen14() {
 
 void Game::preScreenUpdate_lar1_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 15);
 	}
 }
 
@@ -544,16 +522,7 @@ void Game::preScreenUpdate_lar1_screen16() {
 
 void Game::preScreenUpdate_lar1_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 17);
 	}
 }
 
@@ -563,16 +532,7 @@ void Game::preScreenUpdate_lar1_screen18() {
 		byte_452628[0] |= 0x10;
 	}
 	if (_res->_currentScreenResourceNum == 18) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 18);
 	}
 }
 
@@ -613,16 +573,7 @@ void Game::preScreenUpdate_lar1_screen20() {
 
 void Game::preScreenUpdate_lar1_screen23() {
 	if (_res->_currentScreenResourceNum == 23) {
-		const uint8_t *p = _lar1_unkData1;
-		for (int i = 0; i < 15; ++i) {
-			if (p[4] == _res->_currentScreenResourceNum && p[1] == 1) {
-				LvlObject *o = findLvlObject2(0, p[5], p[4]);
-				if (o) {
-					o->objectUpdateType = 3;
-				}
-			}
-			p += 6;
-		}
+		setLvlObjectUpdateType3_lar1(this, 23);
 		if (_plasmaCannonFlags & 2) {
 			byte_452620[0] &= 0xF;
 			byte_452620[0] |= 0x10;

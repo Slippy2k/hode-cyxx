@@ -261,6 +261,7 @@ struct Game {
 	void loadLevelScreenSounds(int num);
 	void setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2);
 	void setLvlObjectPosRelativeToPoint(LvlObject *ptr, int num, int x, int y);
+	void clearLvlObjectsList0();
 	void clearLvlObjectsList1();
 	void clearLvlObjectsList2();
 	void clearLvlObjectsList3();

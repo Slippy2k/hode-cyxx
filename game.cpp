@@ -890,6 +890,38 @@ void Game::setLvlObjectPosRelativeToPoint(LvlObject *ptr, int num, int x, int y)
 	ptr->yPos = y - ptr->posTable[num].y;
 }
 
+void Game::clearLvlObjectsList0() {
+	LvlObject *ptr = _lvlObjectsList0;
+	while (ptr) {
+		LvlObject *next = ptr->nextPtr;
+		if (ptr->type == 8) {
+			_res->decLevelData0x2988RefCounter(ptr);
+			ptr->nextPtr = _declaredLvlObjectsListHead;
+			--_declaredLvlObjectsListCount;
+			_declaredLvlObjectsListHead = ptr;
+			switch (ptr->spriteNum) {
+			case 0:
+			case 2:
+				ptr->dataPtr = 0;
+				break;
+			case 3:
+			case 7:
+				if (ptr->dataPtr) {
+					clearShootLvlObjectData(ptr);
+				}
+				break;
+			}
+			if (ptr->sssObject) {
+				removeSound(ptr);
+			}
+			ptr->sssObject = 0;
+			ptr->bitmapBits = 0;
+		}
+		ptr = next;
+	}
+	_lvlObjectsList0 = 0;
+}
+
 void Game::clearLvlObjectsList1() {
 	if (!_lvlObjectsList1) {
 		return;
