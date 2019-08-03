@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
 				dumpBinary(fp, "Game::_transformBufferData1", 0x51DA8, 4536, "0x%02X", UNSIGNED_8BITS, 0x4545A8);
 				dumpBinary(fp, "Game::_transformBufferData2", 0x50500, 2152, "0x%02X", UNSIGNED_8BITS, 0x452D00);
 				dumpBinary(fp, "_lar1_unkData1", 0x4FD98, 90, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_4525F8", 0x4FDF8, 52, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_lar1_unkData0", 0x4FDF8, 52, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "byte_452898", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "byte_4528D0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "byte_4528F8", 0x500F8, 17, "0x%02X", UNSIGNED_8BITS, 0);

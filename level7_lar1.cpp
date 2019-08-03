@@ -5,19 +5,12 @@
 #include "util.h"
 #include "video.h"
 
-static uint8_t byte_4525F8[] = {  2,  0, 0, 0 };
-static uint8_t byte_4525FC[] = { 18,  0, 0, 0 };
-static uint8_t byte_452600[] = { 50,  9, 2, 0 };
-static uint8_t byte_452604[] = { 50, 14, 2, 0 };
-static uint8_t byte_452608[] = {  2,  0, 0, 0 };
-static uint8_t byte_45260C[] = {  2,  3, 0, 0 };
-static uint8_t byte_452610[] = {  2,  0, 0, 0 };
-static uint8_t byte_452614[] = {  2,  0, 0, 0 };
-static uint8_t byte_452618[] = {  2,  0, 0, 0 };
-static uint8_t byte_45261C[] = {  2,  0, 0, 0 };
-static uint8_t byte_452620[] = {  2,  0, 0, 0 };
-static uint8_t byte_452624[] = {  2,  0, 0, 0 };
-static uint8_t byte_452628[] = {  2,  0, 0, 0 };
+static uint8_t _lar1_unkData0[13 * 4] = {
+        0x02, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x32, 0x09, 0x02, 0x00, 0x32, 0x0E, 0x02, 0x00,
+        0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+        0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+        0x02, 0x00, 0x00, 0x00,
+};
 
 static const uint8_t _lar1_unkData1[15 * 6] = {
 	0x04, 0x00, 0x68, 0x50, 0x08, 0x00, 0x04, 0x00, 0x68, 0x90, 0x08, 0x01, 0x03, 0x00, 0x50, 0x10,
@@ -185,24 +178,24 @@ void Game::postScreenUpdate_lar1_screen3() {
 
 void Game::postScreenUpdate_lar1_screen4() {
 	LvlObject *o = findLvlObject(2, 0, 4);
-	postScreenUpdate_lar1_helper(o, byte_4525F8, 0);
+	postScreenUpdate_lar1_helper(o, _lar1_unkData0, 0);
 }
 
 void Game::postScreenUpdate_lar1_screen5() {
 	LvlObject *o1 = findLvlObject(2, 0, 5);
-	postScreenUpdate_lar1_helper(o1, byte_4525FC, 1);
+	postScreenUpdate_lar1_helper(o1, &_lar1_unkData0[4], 1);
 	LvlObject *o2 = findLvlObject(2, 1, 5);
-	postScreenUpdate_lar1_helper(o2, byte_452600, 2);
+	postScreenUpdate_lar1_helper(o2, &_lar1_unkData0[8], 2);
 	LvlObject *o3 = findLvlObject(2, 2, 5);
-	postScreenUpdate_lar1_helper(o3, byte_452604, 3);
+	postScreenUpdate_lar1_helper(o3, &_lar1_unkData0[12], 3);
 	if (_res->_currentScreenResourceNum == 5) {
 		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
 			_levelCheckpoint = 2;
 			BoundingBox b = { 194, 0, 255, 88 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (clipBoundingBox(&b, &data->boundingBox) && (byte_452610[0] & 0xF0) == 0x10) {
+			if (clipBoundingBox(&b, &data->boundingBox) && (_lar1_unkData0[0x18] & 0xF0) == 0x10) {
 				_levelCheckpoint = 2;
-				_screenCounterTable[26] = (byte_452614[0] < 16) ? 1 : 3;
+				_screenCounterTable[26] = (_lar1_unkData0[0x1C] < 16) ? 1 : 3;
 			}
 		}
 	}
@@ -210,18 +203,18 @@ void Game::postScreenUpdate_lar1_screen5() {
 
 void Game::postScreenUpdate_lar1_screen8() {
 	LvlObject *o1 = findLvlObject(2, 0, 8);
-	postScreenUpdate_lar1_helper(o1, byte_452608, 4);
+	postScreenUpdate_lar1_helper(o1, &_lar1_unkData0[16], 4);
 	LvlObject *o2 = findLvlObject(2, 1, 8);
-	postScreenUpdate_lar1_helper(o2, byte_45260C, 5);
+	postScreenUpdate_lar1_helper(o2, &_lar1_unkData0[20], 5);
 	if (_res->_currentScreenResourceNum == 8) {
 		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
 			BoundingBox b = { 104, 0, 255, 80 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (clipBoundingBox(&b, &data->boundingBox)) {
 				_levelCheckpoint = 3;
-				const int a = (byte_452610[0] & 0xF0) != 0 ? 3 : 4;
+				const int a = (_lar1_unkData0[0x18] & 0xF0) != 0 ? 3 : 4;
 				_screenCounterTable[26] = a;
-				if ((byte_452614[0] & 0xF0) == 0x10) {
+				if ((_lar1_unkData0[0x1C] & 0xF0) == 0x10) {
 					_screenCounterTable[26] = a + 2;
 				}
 			}
@@ -231,12 +224,12 @@ void Game::postScreenUpdate_lar1_screen8() {
 
 void Game::postScreenUpdate_lar1_screen9() {
 	LvlObject *o = findLvlObject(2, 0, 9);
-	postScreenUpdate_lar1_helper(o, byte_452610, 6);
+	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x18], 6);
 }
 
 void Game::postScreenUpdate_lar1_screen13() {
 	LvlObject *o = findLvlObject(2, 0, 13);
-	postScreenUpdate_lar1_helper(o, byte_452614, 7);
+	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x1C], 7);
 }
 
 void Game::postScreenUpdate_lar1_screen14() {
@@ -304,24 +297,24 @@ void Game::postScreenUpdate_lar1_screen14() {
 		}
 	}
 	LvlObject *o = findLvlObject(2, 0, 14);
-	postScreenUpdate_lar1_helper(o, byte_452618, 8);
+	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x20], 8);
 }
 
 void Game::postScreenUpdate_lar1_screen15() {
 	LvlObject *o = findLvlObject(2, 0, 15);
-	postScreenUpdate_lar1_helper(o, byte_45261C, 9);
+	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x24], 9);
 }
 
 void Game::postScreenUpdate_lar1_screen16() {
 	LvlObject *o = findLvlObject(2, 0, 16);
-	postScreenUpdate_lar1_helper(o, byte_452620, 10);
+	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x28], 10);
 }
 
 void Game::postScreenUpdate_lar1_screen18() {
 	LvlObject *o1 = findLvlObject(2, 0, 18);
-	postScreenUpdate_lar1_helper(o1, byte_452624, 11);
+	postScreenUpdate_lar1_helper(o1, &_lar1_unkData0[0x2C], 11);
 	LvlObject *o2 = findLvlObject(2, 1, 18);
-	postScreenUpdate_lar1_helper(o2, byte_452628, 12);
+	postScreenUpdate_lar1_helper(o2, &_lar1_unkData0[0x30], 12);
 	if ((_lar1_unkData3[0x59] & 0x40) == 0 && (_lar1_unkData3[0x59] & 0x80) != 0) {
 		if ((_lar1_unkData3[0x4D] & 1) == 0) {
 			_lar1_unkData3[0x4D] |= 1;
@@ -493,10 +486,9 @@ void Game::preScreenUpdate_lar1_screen2() {
 void Game::preScreenUpdate_lar1_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
 		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
-			if ((byte_452610[0] & 0xF0) == 0) {
+			if ((_lar1_unkData0[0x18] & 0xF0) == 0) {
 				_levelCheckpoint = 2;
-				const uint8_t counter = ((byte_452610[0] & 0xF0) != 0) ? 2 : 0;
-				_screenCounterTable[26] = counter; // +0x1A
+				_screenCounterTable[26] = ((_lar1_unkData0[0x1C] & 0xF0) != 0) ? 2 : 0;
 			}
 		}
 	}
@@ -517,7 +509,7 @@ void Game::preScreenUpdate_lar1_screen10() {
 void Game::preScreenUpdate_lar1_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		if (_levelCheckpoint >= 2 && _levelCheckpoint <= 3) {
-			if ((byte_452614[0] & 0xF) == 1 && (byte_452610[0] & 0xF) == 1) {
+			if ((_lar1_unkData0[0x1C] & 0xF) == 1 && (_lar1_unkData0[0x18] & 0xF) == 1) {
 				_levelCheckpoint = 4;
 			}
 		}
@@ -597,8 +589,8 @@ void Game::preScreenUpdate_lar1_screen17() {
 
 void Game::preScreenUpdate_lar1_screen18() {
 	if (_levelCheckpoint >= 7) {
-		byte_452628[0] &= 0xF;
-		byte_452628[0] |= 0x10;
+		_lar1_unkData0[0x30] &= 0xF;
+		_lar1_unkData0[0x30] |= 0x10;
 	}
 	if (_res->_currentScreenResourceNum == 18) {
 		setLvlObjectUpdateType3_lar1(this, 18);
@@ -644,8 +636,8 @@ void Game::preScreenUpdate_lar1_screen23() {
 	if (_res->_currentScreenResourceNum == 23) {
 		setLvlObjectUpdateType3_lar1(this, 23);
 		if (_plasmaCannonFlags & 2) {
-			byte_452620[0] &= 0xF;
-			byte_452620[0] |= 0x10;
+			_lar1_unkData0[0x28] &= 0xF;
+			_lar1_unkData0[0x28] |= 0x10;
 		}
 	}
 }
