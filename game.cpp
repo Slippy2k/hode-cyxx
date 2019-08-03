@@ -3555,6 +3555,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 			}
 		}
 // 40D729
+		assert(dat->unk1 < 8);
 		const uint8_t *anim = (dat->unk0 >= 7) ? &_byte_43E750[dat->unk1 * 2] : &_byte_43E720[dat->unk1 * 2];
 		if (dat->counter != 0 && dat->unk3 != 0x80) {
 			if (addLvlObjectToList3(ptr->spriteNum)) {
@@ -3564,8 +3565,12 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 				o->screenNum = ptr->screenNum;
 				o->flags2 = ptr->flags2;
 				o->anim = anim[1];
-				if (_rnd.getSeed() & 1) {
+				if (_rnd._rndSeed & 1) {
 					++o->anim;
+				}
+				if (o->anim > 12) {
+					warning("Invalid frame number %d for fireball type %d", o->anim, dat->unk0);
+					o->anim = 12;
 				}
 				o->frame = 0;
 				if (dat->x2 >= 256) {

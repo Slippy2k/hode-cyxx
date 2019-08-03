@@ -688,7 +688,7 @@ struct Game {
 	void mstOp57_addCrackSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags);
-	void mstOp59_2(int x, int y, int screenNum, int pos, int type, uint16_t flags);
+	void mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags);
 	void executeMstUnk1(Task *t);
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);

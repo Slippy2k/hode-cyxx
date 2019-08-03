@@ -17,6 +17,7 @@ GLOBAL test_cdqsubsar
 GLOBAL test_imul0x55555556
 GLOBAL test_0040D136
 GLOBAL test_0041C644
+GLOBAL test_0040D7F5
 
 SECTION .text
 
@@ -319,3 +320,20 @@ test_0041C644:
 
   pop ebp
   ret
+
+test_0040D7F5:
+
+  push ebp
+  mov ebp, esp
+  push edx
+
+      mov     eax, [ebp + arg0]
+      cmp     al, 7
+      sbb     dl, dl
+      and     dl, -6
+      add     dl, 9
+      movzx   eax, dl
+
+ pop edx
+ pop ebp
+ ret

@@ -4194,7 +4194,7 @@ int Game::runTask_default(Task *t) {
 						type = 2;
 						break;
 					}
-					mstOp59_2(xPos, yPos, o->screenNum, p[1], type, (o->flags2 + 1) & 0xDFFF);
+					mstOp59_addShootFireball(xPos, yPos, o->screenNum, p[1], type, (o->flags2 + 1) & 0xDFFF);
 				}
 			}
 			break;
@@ -6028,8 +6028,7 @@ void Game::mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags) {
 	}
 }
 
-// mstOp59_addShootMonster
-void Game::mstOp59_2(int x, int y, int screenNum, int pos, int type, uint16_t flags) {
+void Game::mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags) {
 	LvlObject *o = addLvlObjectToList2(7);
 	if (o) {
 		o->dataPtr = _shootLvlObjectDataList;
@@ -6056,7 +6055,7 @@ void Game::mstOp59_2(int x, int y, int screenNum, int pos, int type, uint16_t fl
 		o->anim = _ecx[0];
 		o->screenNum = screenNum;
 		o->flags1 = ((_ecx[1] & 3) << 4) | (o->flags1 & ~0x0030);
-		o->flags2 = o->flags1;
+		o->flags2 = flags;
 		o->frame = 0;
 		setupLvlObjectBitmap(o);
 		setLvlObjectPosRelativeToPoint(o, 6, x - s->dxPos, y - s->dyPos);
