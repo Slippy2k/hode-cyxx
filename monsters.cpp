@@ -1210,6 +1210,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 void Game::executeMstUnk4(MonsterObject1 *m) {
 	int var1C = 0;
 	int var18 = 0;
+	int _ebp, _edi, _esi, _eax;
 	if (m->flags4B == 0xFD) {
 		MstUnk49 *m49 = m->m49;
 		if (m->x1 > _mstAndyLevelPosX + m49->unk14 - m->unk68 && m->x2 < _mstAndyLevelPosX + m->unk68 - m49->unk14 && m->y1 > _mstAndyLevelPosY + m49->unk15 - m->unk70 && m->y2 < _mstAndyLevelPosY + m49->unk15 + m->unk70) {
@@ -1220,10 +1221,10 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 				}
 			}
 // 41B170
-			int _esi = var18;
+			int tmp = var18;
 			var18 = 0;
-			int _ebp = 0x40000000;
-			if (m->x1 >= _esi) {
+			_ebp = 0x40000000;
+			if (m->x1 >= tmp) {
 				if (m->xMstPos > _mstAndyLevelPosX + m->unk68) {
 					_ebp = m->xMstPos - m->unk64 - _mstAndyLevelPosX;
 // 41B191
@@ -1232,39 +1233,107 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 					} else {
 						var18 = 1;
 					}
-				} else {
 // 41B1A2
-					if (m->xMstPos >= _mstAndyLevelPosX + m->unk64) {
-						_ebp = -1;
+				} else if (m->xMstPos >= _mstAndyLevelPosX + m->unk64) {
+					_ebp = -1;
+					var18 = 1;
+				} else {
+					_ebp = m->unk68 - m->xMstPos + _mstAndyLevelPosX;
+					if (_ebp < 0 || _ebp >= m49->unk14) {
 						var18 = 1;
+					}
+					if (_ebp >= 0 && _ebp < m49->unk14) {
+						_ebp = 0x40000000;
 					} else {
-						_ebp = m->unk68 - m->xMstPos + _mstAndyLevelPosX;
-						if (_ebp < 0 || _ebp >= m49->unk14) {
-							var18 = 1;
-						}
-						if (_ebp >= 0 && _ebp < m49->unk14) {
-							_ebp = 0x40000000;
-						} else {
-							var18 = 1;
-						}
+						var18 = 1;
 					}
 				}
 			}
 // 41B1BE
-			warning("executeMstUnk4 41B1BE unimplemented");
-			// TODO
-		}
+			_edi = 0x40000000;
+			if (m->x2 <= _mstAndyLevelPosX - m->unk64 - m49->unk14) {
+				if (m->xMstPos > _mstAndyLevelPosX - m->unk64) {
+					_edi = m->xMstPos - _mstAndyLevelPosX  + m->unk68;
+					if (_edi >= 0 && _edi < m49->unk14) {
+						_edi = 0x40000000;
+					} else {
+						var18 |= 2;
+					}
+// 41B1F8
+				} else if (m->xMstPos >= _mstAndyLevelPosX - m->unk68) {
+					_edi = -1;
+					var18 |= 2;
+				} else {
+					_edi = _mstAndyLevelPosX - m->unk64 - m->xMstPos;
+					if (_edi >= 0 && _edi < m49->unk14) {
+						_edi = 0x40000000;
+					} else {
+						var18 |= 2;
+					}
+				}
+			}
+// 41B21A
+			_esi = 0x40000000;
+			if (m->y1 >= _mstAndyLevelPosY + m->unk6C + m49->unk15) {
+				if (m->yMstPos > _mstAndyLevelPosY + m->unk70) {
+					_esi = m->yMstPos - m->unk6C - _mstAndyLevelPosY;
+					if (_esi >= 0 && _esi < m49->unk15) {
+						_esi = 0x40000000;
+					} else {
+						var18 |= 4;
+					}
+// 41B252
+				} else if (m->yMstPos >= _mstAndyLevelPosY + m->unk6C) {
+					_esi = -1;
+					var18 |= 4;
+				} else {
+					_esi = m->unk70 - m->yMstPos - _mstAndyLevelPosY;
+					if (_esi >= 0 && _esi < m49->unk15) {
+						_esi = 0x40000000;
+					} else {
+						var18 |= 4;
+					}
+				}
+			}
+// 41B276
+			_eax = 0x40000000;
+			if (m->y2 <= _mstAndyLevelPosY - m->unk6C - m49->unk15) {
+				if (m->yMstPos > _mstAndyLevelPosY - m->unk6C) {
+					_eax = m->yMstPos - _mstAndyLevelPosY + m->unk70;
+					if (_eax >= 0 && _eax < m49->unk15) {
+						_eax = 0x40000000;
+					} else {
+						var18 |= 8;
+					}
+				} else if (m->yMstPos >= _mstAndyLevelPosY - m->unk70) {
+// 41B2B0
+					_eax = -1;
+					var18 |= 8;
+				} else {
+					_eax = _mstAndyLevelPosY - m->unk6C - m->yMstPos;
+					if (_eax >= 0 && _eax < m49->unk15) {
+						_eax = 0x40000000;
+					} else {
+						var18 |= 8;
+					}
+				}
+			}
+// 41B2D2
+			if (var18 == 0) {
+				var18 = 15;
+			}
+		} else {
 // 41B2DC
 l41B2DC:
-		int _ebp = ABS(m->xMstPos - _mstAndyLevelPosX + m49->unk14 - m->unk68);
-		int _edi = ABS(m->xMstPos - _mstAndyLevelPosX - m49->unk14 + m->unk68);
-		int _esi = ABS(m->yMstPos - _mstAndyLevelPosY + m49->unk15 - m->unk70);
-		int _eax = ABS(m->yMstPos - _mstAndyLevelPosX - m49->unk15 + m->unk70);
+			_ebp = ABS(m->xMstPos - _mstAndyLevelPosX + m49->unk14 - m->unk68);
+			_edi = ABS(m->xMstPos - _mstAndyLevelPosX - m49->unk14 + m->unk68);
+			_esi = ABS(m->yMstPos - _mstAndyLevelPosY + m49->unk15 - m->unk70);
+			_eax = ABS(m->yMstPos - _mstAndyLevelPosX - m49->unk15 + m->unk70);
 // 41B338
-		uint8_t _bl = 15;
-		var18 = _bl;
+			var18 = 15;
+		}
 // 41B33E
-		if (_bl == m->unkE4) {
+		if (var18 == m->unkE4) {
 			var1C = m->unkE5;
 		} else {
 // 41B352
@@ -1299,7 +1368,7 @@ l41B2DC:
 				break;
 			}
 // 41B3A9
-			m->unkE4 = _bl;
+			m->unkE4 = var18;
 			m->unkE5 = var1C;
 		}
 	} else {
