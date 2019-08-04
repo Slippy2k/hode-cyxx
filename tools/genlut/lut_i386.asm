@@ -4,6 +4,7 @@ GLOBAL gen1
 GLOBAL mstLookupTable1
 GLOBAL gen2
 GLOBAL mstLookupTable2
+GLOBAL gen3
 GLOBAL mstLookupTable3
 GLOBAL gen4
 GLOBAL mstLookupTable4
@@ -14,7 +15,7 @@ SECTION .bss
 
 mstLookupTable1: resb 16
 mstLookupTable2: resb 12
-mstLookupTable3: resb 39
+mstLookupTable3: resb 40
 mstLookupTable4: resb 18
 mstLookupTable5: resb 32
 
@@ -86,6 +87,52 @@ loc_419919:
 
 gen2:
 	ENTER
+	LEAVE
+
+gen3:
+	ENTER
+	mov     eax, 7
+        mov     edi, mstLookupTable2
+        push    esi
+        lea     ecx, [mstLookupTable3+1]
+        sub     edi, eax
+loop3:
+        mov     dl, [edi+eax]
+        lea     esi, [eax-6]
+        cmp     esi, 8
+        mov     [ecx-1], dl
+        jl      short loc_4199AF
+        lea     esi, [eax-14]
+loc_4199AF:
+        mov     dl, [mstLookupTable2 + esi]
+        lea     esi, [eax-8]
+        test    esi, esi
+        mov     [ecx], dl
+        jge     short loc_4199C0
+        mov     esi, eax
+loc_4199C0:
+        mov     dl, [mstLookupTable2 + esi]
+        lea     esi, [eax-5]
+        cmp     esi, 8
+        mov     [ecx+1], dl
+        jl      short loc_4199D4
+        lea     esi, [eax-0Dh]
+loc_4199D4:
+        mov     dl, [mstLookupTable2 + esi]
+        lea     esi, [eax-9]
+        test    esi, esi
+        mov     [ecx+2], dl
+        jge     short loc_4199E7
+        lea     esi, [eax-1]
+loc_4199E7:
+        mov     dl, [mstLookupTable2 + esi]
+        inc     eax
+        mov     [ecx+3], dl
+        add     ecx, 5
+        lea     edx, [eax-7]
+        cmp     edx, 8
+        jb      short loop3
+        pop     esi
 	LEAVE
 
 gen4:

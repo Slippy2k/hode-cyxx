@@ -11,6 +11,12 @@ static const uint8_t _mstLut1[] = {
 	0x08, 0x00, 0x02, 0x01, 0x04, 0x00, 0x03, 0x01, 0x06, 0x07, 0x02, 0x01, 0x05, 0x07, 0x03, 0x01
 };
 
+static const uint8_t _mstLut3[] = {
+	0x01, 0x03, 0x09, 0x02, 0x08, 0x03, 0x02, 0x01, 0x06, 0x09, 0x02, 0x06, 0x03, 0x04, 0x01, 0x06,
+	0x04, 0x02, 0x0C, 0x03, 0x04, 0x0C, 0x06, 0x08, 0x02, 0x0C, 0x08, 0x04, 0x09, 0x06, 0x08, 0x09,
+	0x0C, 0x01, 0x04, 0x09, 0x01, 0x08, 0x03, 0x0C
+};
+
 static const uint8_t _mstLut4[] = {
 	0x01, 0x02, 0x03, 0x05, 0x06, 0x07, 0x09, 0x0A, 0x0B, 0x0D, 0x0E, 0x0F, 0x11, 0x12, 0x13, 0x15,
 	0x16, 0x17
@@ -1687,8 +1693,79 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		}
 	}
 // 41AC4F
-	warning("executeMstUnk8 41AC4F unimplemented");
-	// TODO
+	int var10 = (~m->flagsA5) & 1;
+	//uint32_t indexUnk34 = m->m44Unk1->indexUnk34_16;
+	//assert(indexUnk34 != kNone);
+	//MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+	int var20 = 0;
+	int varC = 0;
+	int var8 = _mstLut1[m->flags4A];
+	for (; var20 < 5; ++var20) {
+		if (var20 != 0) {
+			const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+			if (p[0xE] == 0 || varC == 0) {
+				goto l41B030;
+			}
+		}
+// 41ACAB
+		int num = var20 + var8 * 5;
+		int var4 = _mstLut3[num];
+		if (_mstLut1[var4] == m->flagsA8[3]) {
+			continue;
+		}
+		int _ecx, _eax;
+		const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		if (_mstLut1[var4] & 1) {
+			_ecx = p[0xA];
+			_eax = p[0xB];
+		} else {
+			_ecx = p[0x8];
+			_eax = p[0x9];
+		}
+// 41ACF5
+		int _edi = m->xMstPos;
+		if (var4 & 8) {
+			_edi -= _ecx;
+			if (_edi < m->x2) {
+				continue;
+			}
+		} else if (var4 & 2) {
+			_edi += _ecx;
+			if (_edi > m->x1) {
+				continue;
+			}
+		}
+// 41AD27
+		int _ebp = m->yMstPos;
+		if (var4 & 1) {
+			_ebp -= _eax;
+			if (_ebp < m->y2) {
+				continue;
+			}
+		} else if (var4 & 4) {
+			_ebp += _eax;
+			if (_ebp > m->y1) {
+				continue;
+			}
+		}
+// 41AD53
+		if (var10 == 1 && (m->flagsA5 & 4) == 0 && (m->flags48 & 8) != 0) {
+			if (!mstSetCurrentPos(m, _edi, _ebp)) {
+				continue;
+			}
+		}
+// 41AD7B
+		warning("executeMstUnk8 41AD7B unimplemented");
+		// TODO
+	}
+// 41B029
+	if (var20 == 5) {
+l41B030:
+		m->task->flags |= 0x80;
+		m->flags4A = 0;
+		_yMstPos2 = 0;
+		_xMstPos2 = 0;
+	}
 }
 
 int Game::executeMstUnk9(Task *t, MonsterObject1 *m) {
