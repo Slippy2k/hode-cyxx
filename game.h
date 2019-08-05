@@ -676,7 +676,7 @@ struct Game {
 	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;
 	int getTaskFlag(Task *t, int index, int type) const;
-	int runTask_default(Task *t);
+	int mstSm_main(Task *t);
 	void mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum);
 	void mstOp27_removeMstTaskScreenFlags(Task **tasksList, int num, int arg);
 	int mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num);
