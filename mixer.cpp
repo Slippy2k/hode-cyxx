@@ -36,6 +36,7 @@ Mixer::~Mixer() {
 
 void Mixer::init(int rate) {
 	MixerLock ml(_lock);
+	_rate = rate;
 	sts_mixer_init(&_mixer, rate, STS_MIXER_SAMPLE_FORMAT_16);
 	memset(_channels, 0, sizeof(_channels));
 	for (int i = 0; i < kPcmChannels; ++i) {
@@ -99,5 +100,19 @@ void Mixer::stopPcm(const uint8_t *data) {
 void Mixer::mix(int16_t *buf, int len) {
 	// stereo s16
 	assert((len & 1) == 0);
-	sts_mixer_mix_audio(&_mixer, buf, len / 2);
+	// sts_mixer_mix_audio(&_mixer, buf, len / 2);
+	for (int j = 0; j < len / 2; ++j) {
+		for (int i = 0; i < _mixingQueueSize; ++i) {
+			if (_mixingQueue[i].ptr + j < _mixingQueue[i].end) {
+				const int sample = buf[j] + _mixingQueue[i].ptr[j];
+				if (sample < -32768) {
+					buf[j] = -32678;
+				} else if (sample > 32767) {
+					buf[j] = 32767;
+				} else {
+					buf[j] = sample;
+				}
+			}
+		}
+	}
 }

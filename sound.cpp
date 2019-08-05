@@ -888,11 +888,10 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	debug(kDebug_SOUND, "startSoundObject codeOffset %d", codeOffsetNum);
 	assert(codeOffsetNum >= 0 && codeOffsetNum < _res->_sssHdr.codeOffsetsCount);
 	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[codeOffsetNum];
-	// TEMP: mixSounds
-	{
+	if (1) {
 		_res->loadSssPcm(_res->_sssFile, codeOffset->pcm);
 		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
-		if (pcm->ptr) {
+		if (0 && pcm->ptr) {
 			uint32_t size = _res->getSssPcmSize(pcm);
 			assert((size & 1) == 0);
 			_mix.playPcm((const uint8_t *)pcm->ptr, size, 22050, 0 /* volume */, 0 /* pan */);
@@ -1273,6 +1272,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 }
 
 void Game::mixSoundObjects17640(bool flag) {
+	_mix._lock(1);
 	for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
 		_res->_sssFilters[i].unk30 = 0;
 
@@ -1312,6 +1312,7 @@ void Game::mixSoundObjects17640(bool flag) {
 		_res->clearSssLookupTable3();
 	}
 	mixSoundObjects();
+	_mix._lock(0);
 }
 
 void Game::mixSoundObjects() {
@@ -1331,6 +1332,7 @@ void Game::mixSoundObjects() {
 			}
 			assert(_mix._mixingQueueSize < Mixer::kPcmChannels);
 			_mix._mixingQueue[_mix._mixingQueueSize].ptr = so->currentPcmPtr;
+			_mix._mixingQueue[_mix._mixingQueueSize].end = end;
 			_mix._mixingQueue[_mix._mixingQueueSize].panL = so->panL;
 			_mix._mixingQueue[_mix._mixingQueueSize].panR = so->panR;
 			_mix._mixingQueue[_mix._mixingQueueSize].panType = so->panType;

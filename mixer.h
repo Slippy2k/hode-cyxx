@@ -6,9 +6,10 @@
 
 struct Mixer {
 
-	static const int kPcmChannels = 16;
+	static const int kPcmChannels = 32;
 
 	void (*_lock)(int);
+	int _rate;
 	sts_mixer_t _mixer;
 	struct {
 		sts_mixer_sample_t sample;
@@ -17,6 +18,7 @@ struct Mixer {
 
 	struct {
 		const int16_t *ptr;
+		const int16_t *end;
 		int panL;
 		int panR;
 		uint8_t panType;

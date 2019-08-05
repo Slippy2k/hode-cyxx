@@ -2100,6 +2100,9 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 }
 
 void Game::mixAudio(int16_t *buf, int len) {
+	_mix._mixingQueueSize = 0;
+	// 17640 + 17640 * 25 / 100 == 22050 (1.25x)
+	mixSoundObjects17640(true);
 	_mix.mix(buf, len);
 }
 
@@ -2606,10 +2609,8 @@ void Game::levelMainLoop() {
 		}
 	}
 	if (_res->_sssHdr.dataUnk1Count != 0) {
-#if 1
-		/* original code had a dedicated thread for sound, that main thread/loop was signaling */
-		mixSoundObjects17640(true);
-#else
+#if 0
+		// original code had a dedicated thread for sound, that main thread/loop was signaling
 		if (_snd_numberOfBuffers != 0) {
 			SetEvent(_snd_threadEvent1);
 			while (_snd_numberOfBuffers != 0) {
