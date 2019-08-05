@@ -1694,9 +1694,9 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 	}
 // 41AC4F
 	int var10 = (~m->flagsA5) & 1;
-	//uint32_t indexUnk34 = m->m44Unk1->indexUnk34_16;
-	//assert(indexUnk34 != kNone);
-	//MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+	uint32_t indexUnk34 = m->m44Unk1->indexUnk34_16;
+	assert(indexUnk34 != kNone);
+	MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
 	int var20 = 0;
 	int varC = 0;
 	int var8 = _mstLut1[m->flags4A];
@@ -1704,7 +1704,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		if (var20 != 0) {
 			const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
 			if (p[0xE] == 0 || varC == 0) {
-				goto l41B030;
+				break;
 			}
 		}
 // 41ACAB
@@ -1755,17 +1755,59 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 			}
 		}
 // 41AD7B
-		warning("executeMstUnk8 41AD7B unimplemented");
-		// TODO
+		int w = READ_LE_UINT32(m->unk8 + 904);
+		int h = READ_LE_UINT32(m->unk8 + 908);
+		if (_edi < m34->left - w || _edi > m34->right + w || _ebp < m34->bottom - h || _ebp > m34->top + h) {
+			const uint32_t indexUnk44 = m->m46Unk1->indexUnk44;
+			assert(indexUnk44 != kNone);
+			MstUnk44 *m44 = &_res->_mstUnk44[indexUnk44];
+			const int num = executeMstUnk15(m, m44, _edi, _ebp);
+			if (num < 0) {
+				continue;
+			}
+			if (m->m44Unk1->unk60[var10][num] == 0) {
+				continue;
+			}
+// 41ADDF
+		}
+		m->unkAC = _edi;
+		m->unkB0 = _ebp;
+		p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		if (p[0xE] != 0) {
+			const int x1 = m->xMstPos + (int8_t)p[0xC];
+			const int x2 = x1 + p[0xE] - 1;
+			const int y1 = m->yMstPos + (int8_t)p[0xD];
+			const int y2 = y1 + p[0xF] - 1;
+			int r = mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2);
+			if (r > 0) {
+// 41AEA3
+				MstBoundingBox *b = &_mstBoundingBoxesTable[r - 1];
+				if (m->unk7C < b->x1 || m->unk74 > b->x2 || m->unk80 < b->y1 || m->unk78 > b->y2) {
+					break;
+				}
+			} else {
+// 41AF09
+				m->flagsA8[1] = mstBoundingBoxUpdate(m->flagsA8[1], m->monster1Index, x1, y1, x2, y2);
+			}
+// 41AFB3
+		}
+		mstBoundingBoxClear(m, 1);
+// 41B00C
+		m->flags4A = var4;
+		if (var20 == 0) {
+			m->flagsA8[3] = 255;
+			uint8_t n = _mstLut1[var4];
+			if (n >= 4) {
+				n -= 4;
+			}
+			m->flagsA8[3] = n;
+		}
 	}
-// 41B029
-	if (var20 == 5) {
-l41B030:
-		m->task->flags |= 0x80;
-		m->flags4A = 0;
-		_yMstPos2 = 0;
-		_xMstPos2 = 0;
-	}
+// 41B030
+	m->task->flags |= 0x80;
+	m->flags4A = 0;
+	_yMstPos2 = 0;
+	_xMstPos2 = 0;
 }
 
 int Game::executeMstUnk9(Task *t, MonsterObject1 *m) {
