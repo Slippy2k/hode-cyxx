@@ -320,7 +320,7 @@ void Game::postScreenUpdate_lar1_screen18() {
 			_lar1_unkData3[0x4D] |= 1;
 		}
 	}
-	if ((_lar1_unkData3[0x4D] & 0x40) == 0 && (_lar1_unkData3[0xD4] & 0x80) != 0) {
+	if ((_lar1_unkData3[0x4D] & 0x40) == 0 && (_lar1_unkData3[0x4D] & 0x80) != 0) {
 		if ((_lar1_unkData3[0x59] & 1) == 0) {
 			_lar1_unkData3[0x59] |= 1;
 		}
