@@ -1825,6 +1825,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		if (clipBoundingBox(&obj2, &obj1)) {
 			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(o->levelData0x2988, o->currentSprite), (o->flags1 >> 4) & 3);
 		}
+		break;
 	default:
 		warning("Unhandled clipLvlObjectsBoundingBox type %d (%d)", type, type - 17);
 		break;
