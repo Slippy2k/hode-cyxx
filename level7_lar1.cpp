@@ -21,7 +21,7 @@ static uint8_t _lar1_unkData1[15 * 6] = {
 	0x58, 0x60, 0x12, 0x00, 0x04, 0x00, 0xC0, 0x30, 0x17, 0x00
 };
 
-const BoundingBox _lar1_unkData2[24] = {
+BoundingBox _lar1_unkData2[24] = {
 	{ 203, 162, 213, 166 },
 	{  68,  86,  78,  90 },
 	{ 195,  58, 205,  62 },
@@ -108,15 +108,41 @@ static void setLvlObjectUpdateType3_lar1(Game *g, int screenNum) {
 	}
 }
 
-void Game::updateLevelTick_lar_helper1(int num, uint8_t *p1, const BoundingBox *r) {
-	// TODO
+void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
+	bool found = false;
+	for (LvlObject *o = _lvlObjectsList1; o && !found; o = o->nextPtr) {
+		if (o->screenNum != p[0]) {
+			continue;
+		}
+		if (!((o->spriteNum >= 11 && o->spriteNum <= 13) || o->spriteNum == 16)) {
+			continue;
+		}
+		BoundingBox b;
+		b.x1 = o->xPos;
+		b.y1 = o->yPos;
+		b.x2 = b.x1 + o->width - 1;
+		b.y2 = b.y1 + o->height - 1;
+		if ((p[1] & 0x40) == 0 && clipBoundingBox(r, &b)) {
+			found = true;
+// 406B66
+			// TODO
+
+		} else {
+// 406C3A
+			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
+				// TODO
+			}
+		}
+// 406CCC
+		p[3] = 4;
+	}
 }
 
 void Game::updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const BoundingBox *r) {
 	// TODO
 }
 
-void Game::updateLevelTick_lar(int count, uint8_t *p1, const BoundingBox *r) {
+void Game::updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r) {
 	for (int i = 0; i < count; ++i) {
 		p1[i * 4 + 1] &= ~0x40;
 	}
@@ -141,7 +167,45 @@ void Game::updateLevelTick_lar(int count, uint8_t *p1, const BoundingBox *r) {
 }
 
 void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
+	uint32_t mask = 1 << num; // _ebp
+	uint8_t _cl = p[0] & 15;
+	if (_cl >= 3) {
+		if ((o->flags0 & 0x1F) == 0) {
+			if (p[3] == 0) {
+				if (_cl == 3) {
+					p[0] = (p[0] & ~0xB) | 4;
+					p[3] = p[1];
+					o->directionKeyMask = 1;
+					o->actionKeyMask = 0;
+				} else {
+					p[0] = (p[0] & ~0xC) | 3;
+					p[3] = p[2];
+					o->directionKeyMask = 4;
+					o->actionKeyMask = 0;
+				}
+			} else {
+				--p[3];
+				o->directionKeyMask = 0;
+				o->actionKeyMask = 0;
+			}
+		}
+	} else {
+// 4062C7
+		num = p[2] | p[1];
+		// TODO
+	}
+// 4063C4
 	// TODO
+// 406576
+	if (o->screenNum == _res->_currentScreenResourceNum && o->directionKeyMask == 4) {
+		if ((o->flags0 & 0x1F) == 1 && (o->flags0 & 0xE0) == 0x40) {
+			if (!_hideAndyObjectSprite && (_mstFlags & 0x80000000) == 0) {
+				if (clipLvlObjectsBoundingBox(_andyObject, o, 132)) {
+					setAndySpecialAnimation(0xA1);
+				}
+			}
+		}
+	}
 }
 
 void Game::postScreenUpdate_lar1_screen0() {
