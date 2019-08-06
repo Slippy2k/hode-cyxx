@@ -64,6 +64,10 @@ Resource::Resource(const char *dataPath)
 		_mstFile = new File;
 		_sssFile = new File;
 	}
+	memset(&_datHdr, 0, sizeof(_datHdr));
+	memset(&_lvlHdr, 0, sizeof(_lvlHdr));
+	memset(&_mstHdr, 0, sizeof(_mstHdr));
+	memset(&_sssHdr, 0, sizeof(_sssHdr));
 
 	_loadingImageBuffer = 0;
 	_fontBuffer = 0;
@@ -1008,8 +1012,10 @@ void Resource::loadSssPcm(File *fp, int num) {
 }
 
 void Resource::clearSssLookupTable3() {
-	for (int i = 0; i < 3; ++i) {
-		memset(_sssLookupTable3[i], 0, _sssHdr.dataUnk3Count * sizeof(uint32_t));
+	if (_sssHdr.dataUnk3Count != 0) {
+		for (int i = 0; i < 3; ++i) {
+			memset(_sssLookupTable3[i], 0, _sssHdr.dataUnk3Count * sizeof(uint32_t));
+		}
 	}
 }
 
