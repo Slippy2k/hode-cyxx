@@ -417,8 +417,8 @@ void Game::setupScreenMask(uint8_t num) {
 		} else {
 			memset(_screenTempMaskBuffer, 0, 768);
 		}
-		const int offs = ((_res->_screensBasePos[num].v & ~7) << 6) + (_res->_screensBasePos[num].u >> 3);
-		p = _screenMaskBuffer + offs;
+		p = _screenMaskBuffer;
+		p += ((_res->_screensBasePos[num].v & ~7) << 6) + (_res->_screensBasePos[num].u >> 3);
 		for (int i = 0; i < 24; ++i) {
 			memcpy(p, _screenTempMaskBuffer + i * 32, 32);
 			p += 512;
@@ -438,9 +438,30 @@ void Game::resetScreenMask() {
 }
 
 void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum) {
-	if (screenNum != 255) {
-		warning("setScreenMaskRectHelper unimplemented %d,%d,%d,%d screen %d", x1, y1, x2, y2, screenNum);
-		// TODO
+	if (screenNum != 0xFF) {
+
+		int index = _res->_resLvlScreenBackgroundDataTable[screenNum].currentMaskId;
+		const uint8_t *p = _res->getLevelData0x470CPtr4(screenNum * 4 + index);
+		Video::decodeRLE(p, _screenTempMaskBuffer, 768);
+
+		int h = (y2 - y1 + 7) >> 3;
+		int w = (x2 - x1 + 7) >> 3;
+
+		const int x = x1 - _res->_screensBasePos[screenNum].u;
+		const int y = y1 - _res->_screensBasePos[screenNum].v;
+
+		const int u = _res->_screensBasePos[screenNum].u + 256;
+		if (x2 < u) {
+			++w;
+		}
+
+		const uint8_t *src = _screenTempMaskBuffer + (x >> 3) + (y & ~7) * 4; // should be << 6 ?
+		uint8_t *dst = _screenMaskBuffer + (x1 >> 3) + ((y1 & ~7) << 6);
+		for (int i = 0; i < h; ++i) {
+			memcpy(dst, src, w);
+			src += 32;
+			dst += 512;
+		}
 	}
 }
 
