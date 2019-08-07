@@ -108,6 +108,8 @@ static void setLvlObjectUpdateType3_lar1(Game *g, int screenNum) {
 	}
 }
 
+extern uint8_t _lar2_unkData0[40];
+
 void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 	bool found = false;
 	for (LvlObject *o = _lvlObjectsList1; o && !found; o = o->nextPtr) {
@@ -132,8 +134,18 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 				if (_currentLevel == kLvl_lar2) {
-					// TODO
-
+					_edi = &_lar2_unkData0[p[3] * 4];
+					uint8_t _al = ((~p[1]) >> 1) & 1;
+					uint8_t _bl = (_edi[0] >> 4);
+					if (_bl == _al) {
+						continue;
+					}
+					_bl = (_al << 4) | (_edi[0] & 15);
+					_edi[0] = _bl;
+					uint8_t _cl = (p[1] >> 5) & 1;
+					if (_cl != 1 || _al != _cl) {
+						continue;
+					}
 				} else {
 // 406C94
 					_edi = &_lar1_unkData0[p[3] * 4];
@@ -142,7 +154,7 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 					if (_bl == _al) {
 						continue;
 					}
-					_bl = (_al >> 4) | (_edi[0] & 15);
+					_bl = (_al << 4) | (_edi[0] & 15);
 					_edi[0] = _bl;
 					uint8_t _cl = (p[1] >> 5) & 1;
 					if (_cl != 1 || _al != _cl) {
@@ -681,8 +693,8 @@ void Game::postScreenUpdate_lar1_screen19() {
 					_video->clearPalette();
 					++_screenCounterTable[19];
 					updateScreen(_andyObject->screenNum);
-					// byte_4525E1 = 0;
-					// byte_4525E7 = 0;
+					_lar1_unkData1[0x49] = 0;
+					_lar1_unkData1[0X4F] = 0;
 				}
 				_andyObject->xPos = 204;
 				_andyObject->yPos = 25;

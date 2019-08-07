@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
 				dumpBinary(fp, "_lar1_unkData1", 0x4FD98, 90, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_lar1_unkData0", 0x4FDF8, 52, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "byte_452898", 0x50098, 52, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_4528D0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_lar2_unkData0", 0x500D0, 40, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "byte_4528F8", 0x500F8, 17, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_lar2_lutData", 0x50109, 39, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpRect(fp, "_lar1_unkData2", 0x4FB58, 24);
