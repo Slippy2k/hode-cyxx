@@ -21,7 +21,7 @@ static uint8_t _lar1_unkData1[15 * 6] = {
 	0x58, 0x60, 0x12, 0x00, 0x04, 0x00, 0xC0, 0x30, 0x17, 0x00
 };
 
-BoundingBox _lar1_unkData2[24] = {
+static BoundingBox _lar1_unkData2[24] = {
 	{ 203, 162, 213, 166 },
 	{  68,  86,  78,  90 },
 	{ 195,  58, 205,  62 },
@@ -122,6 +122,7 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 		b.y1 = o->yPos;
 		b.x2 = b.x1 + o->width - 1;
 		b.y2 = b.y1 + o->height - 1;
+		uint8_t *_edi;
 		if ((p[1] & 0x40) == 0 && clipBoundingBox(r, &b)) {
 			found = true;
 // 406B66
@@ -130,16 +131,80 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 		} else {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
-				// TODO
+				if (_currentLevel == kLvl_lar2) {
+					// TODO
+
+				} else {
+// 406C94
+					_edi = &_lar1_unkData0[p[3] * 4];
+					uint8_t _al = ((~p[1]) >> 1) & 1;
+					uint8_t _bl = (_edi[0] >> 4);
+					if (_bl == _al) {
+						continue;
+					}
+					_bl = (_al >> 4) | (_edi[0] & 15);
+					_edi[0] = _bl;
+					uint8_t _cl = (p[1] >> 5) & 1;
+					if (_cl != 1 || _al != _cl) {
+						continue;
+					}
+				}
 			}
 		}
 // 406CCC
-		p[3] = 4;
+		_edi[3] = 4;
 	}
 }
 
 void Game::updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const BoundingBox *r) {
 	// TODO
+}
+
+extern BoundingBox _lar2_unkData2[13];
+
+int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim) {
+	uint8_t _al = (_andyObject->flags0 >> 5) & 7;
+	uint8_t _cl = (_andyObject->flags0 & 0x1F);
+	uint8_t _bl = 0;
+	if (dataNum >= 0) {
+		BoundingBox *box;
+		if (_currentLevel == kLvl_lar2) {
+			box = &_lar2_unkData2[boxNum];
+		} else {
+			box = &_lar1_unkData2[boxNum];
+		}
+		int dy = box->y2 - box->y1;
+		int dx = box->x2 - box->x1;
+		if (dx >= dy) {
+			_bl = 1;
+		} else {
+			uint8_t _dl = ((_andyObject->flags1) >> 4) & 3;
+			if (anim != _dl) {
+				return 0;
+			}
+			if (_cl == 3 || _cl == 5 || _cl == 2 || _al == 2 || _cl == 0 || _al == 7) {
+				_bl = 1;
+			} else {
+				setAndySpecialAnimation(anim);
+			}
+		}
+	} else {
+// 406736
+		_bl = 1;
+	}
+// 406738
+	if (_bl) {
+		if (!flag) {
+			_bl = _andyObject->anim == 224;
+		}
+		if (_bl) {
+			LvlObject *o = findLvlObject(0, dataNum, screenNum);
+			if (o) {
+				o->objectUpdateType = 7;
+			}
+		}
+	}
+	return _bl;
 }
 
 void Game::updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r) {
@@ -192,7 +257,58 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	} else {
 // 4062C7
 		num = p[2] | p[1];
-		// TODO
+		if (num != p[0]) {
+			uint8_t _dl = num >> 4;
+			if (_cl != _dl) {
+				uint8_t _al = (p[0] & 0xF0) | _dl;
+				p[0] = _al;
+				if (_al & 0xF0) {
+					p[3] = p[1];
+				} else {
+					p[3] = p[2];
+				}
+			}
+// 4062F3
+			if (p[3] == 0) {
+				if (p[0] & 0xF) {
+					o->directionKeyMask = 1;
+					_mstAndyVarMask &= ~mask;
+				} else {
+					o->directionKeyMask = 4;
+					_mstAndyVarMask |= mask;
+				}
+				_mstHelper1TestValue |= mask;
+			} else {
+// 406333
+				--p[3];
+				o->actionKeyMask = 0;
+				o->directionKeyMask = 0;
+			}
+		} else {
+// 406343
+			uint8_t _dl = p[0] >> 4;
+			if (_cl != _dl) {
+				if (p[3] != 0) {
+					--p[3];
+				} else {
+					uint8_t _al = (p[0] & 0xF0) | _dl;
+					p[0] = _al;
+					if (p[0] & 0xF0) {
+						o->directionKeyMask = 1;
+						_mstAndyVarMask &= ~mask;
+					} else {
+						o->directionKeyMask = 4;
+						_mstAndyVarMask |= mask;
+					}
+					_mstHelper1TestValue |= mask;
+					if (o->screenNum != _currentScreen && o->screenNum != _currentLeftScreen && o->screenNum != _currentRightScreen) {
+						o->actionKeyMask = 1;
+					} else {
+						o->actionKeyMask = 0;
+					}
+				}
+			}
+		}
 	}
 // 4063C4
 	// TODO

@@ -30,7 +30,7 @@ static const uint8_t _lar2_lutData[39] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static BoundingBox _lar2_unkData2[13] = {
+BoundingBox _lar2_unkData2[13] = {
 	{ 210, 155, 220, 159 },
 	{ 224, 146, 234, 150 },
 	{ 193,  84, 203,  88 },
