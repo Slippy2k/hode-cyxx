@@ -2056,7 +2056,9 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	assert(level < kLvl_test);
 	_currentLevel = level;
 	_levelCheckpoint = checkpoint;
+	_mix._lock(1);
 	_res->loadLevelData(_levels[_currentLevel]);
+	_mix._lock(0);
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
 	initMstCode();
@@ -2122,10 +2124,40 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 }
 
 void Game::mixAudio(int16_t *buf, int len) {
-	_mix._mixingQueueSize = 0;
-	// 17640 + 17640 * 25 / 100 == 22050 (1.25x)
-	mixSoundObjects17640(true);
-	_mix.mix(buf, len);
+
+	static const int kStereoSamples = (2276 - 256 * sizeof(int16_t)) * 2; // stereo
+
+	static int16_t buffer[kStereoSamples];
+	static int bufferOffset = 0;
+	static int bufferSize = 0;
+
+	// flush samples from previous run
+	if (bufferSize > 0) {
+		const int count = len < bufferSize ? len : bufferSize;
+		memcpy(buf, buffer + bufferOffset, count * sizeof(int16_t));
+		buf += count;
+		len -= count;
+		bufferOffset += count;
+		bufferSize -= count;
+	}
+
+	while (len > 0) {
+		// this enqueues 1764*2 bytes for mono samples and 3528*2 bytes for stereo
+		_mix._mixingQueueSize = 0;
+		// 17640 + 17640 * 25 / 100 == 22050 (1.25x)
+		mixSoundObjects17640(true);
+		if (len >= kStereoSamples) {
+			_mix.mix(buf, kStereoSamples);
+			buf += kStereoSamples;
+			len -= kStereoSamples;
+		} else {
+			_mix.mix(buffer, kStereoSamples);
+			memcpy(buf, buffer, len * sizeof(int16_t));
+			bufferOffset = len;
+			bufferSize = kStereoSamples - len;
+			break;
+		}
+	}
 }
 
 void Game::updateLvlObjectList(LvlObject **list) {

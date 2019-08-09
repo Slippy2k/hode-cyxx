@@ -619,7 +619,7 @@ struct Resource {
 	void loadSssData(File *fp, const char *name);
 	void checkSssCode(const uint8_t *buf, int size);
 	void loadSssPcm(File *fp, int num);
-	uint32_t getSssPcmSize(SssPcm *pcm) const;
+	uint32_t getSssPcmSize(const SssPcm *pcm) const;
 
 	void clearSssLookupTable3();
 

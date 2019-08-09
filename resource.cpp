@@ -985,7 +985,7 @@ void Resource::checkSssCode(const uint8_t *buf, int size) {
 	assert(offset == size);
 }
 
-uint32_t Resource::getSssPcmSize(SssPcm *pcm) const {
+uint32_t Resource::getSssPcmSize(const SssPcm *pcm) const {
 	return (pcm->strideSize - 256 * sizeof(int16_t)) * pcm->strideCount * sizeof(int16_t);
 }
 

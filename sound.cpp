@@ -394,7 +394,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
 						if (ptr) {
-							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 8);
+							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 8) / sizeof(int16_t);
 						}
 					}
 				}
@@ -423,7 +423,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
 						if (ptr) {
-							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4);
+							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4) / sizeof(int16_t);
 						}
 					}
 					return code;
@@ -599,7 +599,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 					if (so->pcm) {
 						const int16_t *ptr = so->pcm->ptr;
 						if (ptr) {
-							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4);
+							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4) / sizeof(int16_t);
 						}
 					}
 				}
@@ -890,12 +890,6 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	SssCodeOffset *codeOffset = &_res->_sssCodeOffsets[codeOffsetNum];
 	if (1) {
 		_res->loadSssPcm(_res->_sssFile, codeOffset->pcm);
-		SssPcm *pcm = &_res->_sssPcmTable[codeOffset->pcm];
-		if (0 && pcm->ptr) {
-			uint32_t size = _res->getSssPcmSize(pcm);
-			assert((size & 1) == 0);
-			_mix.playPcm((const uint8_t *)pcm->ptr, size, 22050, 0 /* volume */, 0 /* pan */);
-		}
 	}
 	//
 	if (codeOffset->unk2 != 0) {
@@ -1315,6 +1309,7 @@ void Game::mixSoundObjects17640(bool flag) {
 	_mix._lock(0);
 }
 
+// queue 'strideSize' samples
 void Game::mixSoundObjects() {
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		const SssPcm *pcm = so->pcm;
@@ -1326,8 +1321,13 @@ void Game::mixSoundObjects() {
 			if (so->currentPcmPtr < ptr) {
 				continue;
 			}
-			const int16_t *end = ptr + pcm->strideCount * pcm->strideSize / sizeof(int16_t);
+			//const int16_t *end = ptr + pcm->strideCount * pcm->strideSize / sizeof(int16_t);
+			const int16_t *end = ptr + _res->getSssPcmSize(pcm) / sizeof(int16_t);
 			if (so->currentPcmPtr >= end) {
+				continue;
+			}
+			if (pcm->strideSize != 2276 && pcm->strideSize != 4040) {
+				warning("Ignore sample strideSize %d", pcm->strideSize);
 				continue;
 			}
 			assert(_mix._mixingQueueSize < Mixer::kPcmChannels);
@@ -1337,6 +1337,10 @@ void Game::mixSoundObjects() {
 			_mix._mixingQueue[_mix._mixingQueueSize].panR = so->panR;
 			_mix._mixingQueue[_mix._mixingQueueSize].panType = so->panType;
 			_mix._mixingQueue[_mix._mixingQueueSize].stereo = so->stereo;
+			const int strideSize = (pcm->strideSize - 256 * sizeof(int16_t));
+			assert(strideSize == 1764 || strideSize == 3528); // words
+			//pcm->currentPcmPtr += pcm->strideSize;
+			so->currentPcmPtr += strideSize;
 			++_mix._mixingQueueSize;
 		}
 	}
