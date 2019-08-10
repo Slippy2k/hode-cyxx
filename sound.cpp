@@ -1326,7 +1326,10 @@ void Game::mixSoundObjects() {
 				warning("Ignore sample strideSize %d", pcm->strideSize);
 				continue;
 			}
-			assert(_mix._mixingQueueSize < Mixer::kPcmChannels);
+			if (_mix._mixingQueueSize >= Mixer::kPcmChannels) {
+				warning("MixingQueue overflow %d", _mix._mixingQueueSize);
+				break;
+			}
 			_mix._mixingQueue[_mix._mixingQueueSize].ptr = so->currentPcmPtr;
 			_mix._mixingQueue[_mix._mixingQueueSize].end = end;
 			_mix._mixingQueue[_mix._mixingQueueSize].panL = so->panL;

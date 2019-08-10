@@ -30,6 +30,9 @@ void Mixer::mix(int16_t *buf, int len) {
 	// stereo s16
 	assert((len & 1) == 0);
 	assert(len == 1764 * 2);
+	if (_mixingQueueSize == 0) {
+		return;
+	}
 	for (int j = 0; j < len; j += 2) {
 		for (int i = 0; i < _mixingQueueSize; ++i) {
 			if (_mixingQueue[i].stereo) {
