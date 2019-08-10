@@ -28,4 +28,15 @@ struct Mixer {
 	void mix(int16_t *buf, int len);
 };
 
+struct MixerLock {
+	Mixer *_mix;
+	MixerLock(Mixer *mix)
+		: _mix(mix) {
+		_mix->_lock(1);
+	}
+	~MixerLock() {
+		_mix->_lock(0);
+	}
+};
+
 #endif

@@ -10,17 +10,6 @@
 static void nullMixerLock(int lock) {
 }
 
-struct MixerLock {
-	void (*_lock)(int);
-	MixerLock(void (*lock)(int))
-		: _lock(lock) {
-		_lock(1);
-	}
-	~MixerLock() {
-		_lock(0);
-	}
-};
-
 Mixer::Mixer()
 	: _lock(nullMixerLock) {
 }
@@ -29,7 +18,6 @@ Mixer::~Mixer() {
 }
 
 void Mixer::init(int rate) {
-	MixerLock ml(_lock);
 	_rate = rate;
 	memset(_mixingQueue, 0, sizeof(_mixingQueue));
 	_mixingQueueSize = 0;

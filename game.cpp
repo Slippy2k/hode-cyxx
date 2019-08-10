@@ -241,6 +241,7 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 
 // a: type/source (0, 1, 2) b: num/index (3, monster1Index, monster2.monster1Index)
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
+	MixerLock ml(&_mix);
 	if (num < _res->_sssHdr.dataUnk1Count) {
 		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.dataUnk1Count, a, b);
 		_currentSoundLvlObject = ptr;
@@ -250,6 +251,7 @@ void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 }
 
 void Game::removeSound(LvlObject *ptr) {
+	MixerLock ml(&_mix);
 	for (int i = 0; i < _sssObjectsCount; ++i) {
 		if (_sssObjectsTable[i].lvlObject == ptr) {
 			_sssObjectsTable[i].lvlObject = 0;
@@ -881,6 +883,7 @@ void Game::preloadLevelScreenData(int num, int prev) {
 }
 
 void Game::loadLevelScreenSounds(int num) {
+	MixerLock ml(&_mix);
 	if (_res->_sssHdr.pcmCount > 0 && _res->_sssPreloadData1) {
 		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
 			const int j = _res->_sssPreloadData1[num].ptr[i];

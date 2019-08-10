@@ -78,6 +78,7 @@ static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
 }
 
 void Game::resetSound() {
+	MixerLock ml(&_mix);
 	// TODO
 	clearSoundObjects();
 }
@@ -426,8 +427,8 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 							so->currentPcmPtr = ptr + READ_LE_UINT32(code + 4) / sizeof(int16_t);
 						}
 					}
-					return code;
 				}
+				return code;
 			}
 			break;
 		case 9: { // modulate_panning
@@ -592,7 +593,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				return code + 8;
 			}
 			break;
-		case 27: { // seekBackward
+		case 27: { // seek_backward
 				int frame = READ_LE_UINT32(code + 12);
 				if (so->currentPcmFrame > frame) {
 					so->currentPcmFrame = READ_LE_UINT32(code + 8);
@@ -1266,7 +1267,6 @@ void Game::expireSoundObjects(uint32_t flags) {
 }
 
 void Game::mixSoundObjects17640(bool flag) {
-	_mix._lock(1);
 	for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
 		_res->_sssFilters[i].unk30 = 0;
 
@@ -1285,10 +1285,7 @@ void Game::mixSoundObjects17640(bool flag) {
 // 42B426
 	for (int i = 0; i < _sssObjectsCount; ++i) {
 		SssObject *so = &_sssObjectsTable[i];
-		if (so->pcm) {
-			if (_sssUpdatedObjectsTable[i]) {
-				continue;
-			}
+		if (so->pcm && !_sssUpdatedObjectsTable[i]) {
 			if (flag) {
 				const int mask = 1 << (so->flags1 >> 24);
 				if ((*getSssLutPtr(_res, 2, so->flags1) & mask) != 0) {
@@ -1306,7 +1303,6 @@ void Game::mixSoundObjects17640(bool flag) {
 		_res->clearSssLookupTable3();
 	}
 	mixSoundObjects();
-	_mix._lock(0);
 }
 
 // queue 'strideSize' samples
