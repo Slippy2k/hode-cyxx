@@ -612,7 +612,6 @@ struct Game {
 	void callLevel_preScreenUpdate_dark(int num);
 
 	// monsters.cpp
-
 	void resetMonsterObject1(MonsterObject1 *m);
 	void initMonsterObject1(MonsterObject1 *m);
 	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);

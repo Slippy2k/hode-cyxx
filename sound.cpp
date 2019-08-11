@@ -919,7 +919,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 			so->panningModulateSteps = -1;
 			so->volumeModulateDelta = 0;
 			so->panningModulateDelta = 0;
-			so->flags = flags;
+			so->flags0 = flags;
 			so->pcmFramesCount = codeOffset->unk2;
 			so->unk6 = num;
 			so->unk8 = codeOffset->unk6;
