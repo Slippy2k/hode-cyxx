@@ -444,10 +444,10 @@ struct SssUnk3 { // SssBank
 struct SssCodeOffset { // SssSample
 	uint16_t pcm; // index to _sssPcmTable
 	uint16_t unk2; // framesCount
-	uint8_t unk4; // volume
+	uint8_t unk4; // initVolume
 	uint8_t unk5;
 	int8_t unk6; // priority
-	uint8_t unk7; // panning
+	uint8_t unk7; // initPanning
 	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData
 	uint32_t codeOffset3; // 0x10 offset to _sssCodeData

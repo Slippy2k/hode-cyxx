@@ -448,9 +448,9 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 		case 10: { // modulate_volume
 				if (so->volumeModulateSteps >= 0) {
 					so->volumeModulateCurrent += so->volumeModulateDelta;
-					int value = (so->volumeModulateCurrent + 0x8000) >> 16;
-					if (value != so->volume) {
-						so->volume = value;
+					const int volume = (so->volumeModulateCurrent + 0x8000) >> 16;
+					if (volume != so->volume) {
+						so->volume = volume;
 						_sssObjectsChanged = true;
 					}
 					--so->volumeModulateSteps;
@@ -477,38 +477,42 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				code += 4;
 			}
 			break;
-		case 13: { // init_volume
-				so->volumeModulateSteps = READ_LE_UINT32(code + 4) - 1;
+		case 13: { // init_volume_modulation
+				const int count = READ_LE_UINT32(code + 4);
+				so->volumeModulateSteps = count - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
 					so->volumeModulateCurrent = so->volume << 16;
 				} else {
+					assert(value >= 0);
 					so->volumeModulateCurrent = value << 16;
+					so->volume = value;
+					_sssObjectsChanged = true;
 				}
-				so->volume = value;
-				_sssObjectsChanged = true;
-				so->volumeModulateDelta = ((code[1] << 16) - so->volumeModulateCurrent) / READ_LE_UINT32(code + 4);
+				so->volumeModulateDelta = ((code[1] << 16) - so->volumeModulateCurrent) / count;
 				return code + 8;
 			}
 			break;
-		case 14: { // init_panning
-				so->panningModulateSteps = READ_LE_UINT32(code + 8) - 1;
+		case 14: { // init_panning_modulation
+				const int count = READ_LE_UINT32(code + 8);
+				so->panningModulateSteps = count - 1;
 				const int16_t value = READ_LE_UINT16(code + 2);
 				if (value == -1) {
 					so->panningModulateCurrent = so->panning << 16;
 				} else {
+					assert(value >= 0);
 					so->panningModulateCurrent = value << 16;
 					so->panning = value;
 					_sssObjectsChanged = true;
 				}
-				so->panningModulateDelta = ((code[1] << 16) - so->panningModulateCurrent) / READ_LE_UINT32(code + 8);
+				so->panningModulateDelta = ((code[1] << 16) - so->panningModulateCurrent) / count;
 				return code + 12;
 			}
 			break;
 		case 16: { // resume_sound
 				if (tempSssObject) {
 					// 'tempSssObject' is allocated on the stack, it must not be added to the linked list
-					warning("Invalid call to .sss opcode 16 with temp SssObject");
+					warning("Invalid call to .sss opcode 16 with temporary SssObject");
 					return 0;
 				}
 				--so->pauseCounter;
@@ -526,7 +530,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 		case 17: { // pause_sound
 				if (tempSssObject) {
 					// 'tempSssObject' is allocated on the stack, it must not be added to the linked list
-					warning("Invalid call to .sss opcode 17 with temp SssObject");
+					warning("Invalid call to .sss opcode 17 with temporary SssObject");
 					return 0;
 				}
 				sssOp17_pauseSound(so);
@@ -1197,6 +1201,10 @@ void Game::setSoundObjectPanning(SssObject *so) {
 // 429094
 		if (so->pcm == 0) {
 			return;
+		}
+		if (volume >= (int)ARRAYSIZE(_dbVolumeTable)) {
+			warning("Out of bounds volume %d (filter %d volume %d)", volume, so->filter->unk4, so->volume);
+			volume = ARRAYSIZE(_dbVolumeTable) - 1;
 		}
 		int _edx = _dbVolumeTable[volume];
 		int _edi = _esi;
