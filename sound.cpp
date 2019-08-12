@@ -83,6 +83,16 @@ void Game::resetSound() {
 	clearSoundObjects();
 }
 
+static SssObject *findLowestPrioritySssObject(SssObject *sssObjectsList) {
+	SssObject *ret = 0;
+	for (SssObject *current = sssObjectsList; current; current = current->nextPtr) {
+		if (!ret || ret->priority > current->priority) {
+			ret = current;
+		}
+	}
+	return ret;
+}
+
 void Game::removeSoundObjectFromList(SssObject *so) {
 	so->pcm = 0;
 	if ((so->flags & 1) != 0) {
@@ -102,20 +112,8 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 		--_playingSssObjectsCount;
 
 		if (kLimitSounds) {
-			if (_lowPrioritySssObject != so) {
-				if (_playingSssObjectsCount >= _playingSssObjectsMax) {
-					return;
-				}
-				if (_lowPrioritySssObject == 0) {
-					return;
-				}
-			}
-			// set _lowPrioritySssObject to the highest 'priority'
-			_lowPrioritySssObject = 0;
-			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
-				if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
-					_lowPrioritySssObject = current;
-				}
+			if (_lowPrioritySssObject == so || (_playingSssObjectsCount < _playingSssObjectsMax && _lowPrioritySssObject)) {
+				_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 			}
 		}
 	} else {
@@ -268,9 +266,9 @@ void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
 
 void Game::sssOp16_resumeSound(SssObject *so) {
 	if ((so->flags & 2) != 0) {
-		SssObject *next = so->nextPtr; // _eax
-		SssObject *prev = so->prevPtr; // _edx
-		SssPcm *pcm = so->pcm; // _esi
+		SssObject *next = so->nextPtr;
+		SssObject *prev = so->prevPtr;
+		SssPcm *pcm = so->pcm;
 		so->pcm = 0;
 		if (next) {
 			next->prevPtr = prev;
@@ -289,8 +287,8 @@ void Game::sssOp16_resumeSound(SssObject *so) {
 void Game::sssOp17_pauseSound(SssObject *so) {
 	if ((so->flags & 2) == 0) {
 		SssPcm *pcm = so->pcm;
-		SssObject *prev = so->prevPtr; // _edx
-		SssObject *next = so->nextPtr; // _eax
+		SssObject *prev = so->prevPtr;
+		SssObject *next = so->nextPtr;
 		so->pcm = 0;
 		if ((so->flags & 1) != 0) {
 			if (next) {
@@ -304,16 +302,9 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 			--_playingSssObjectsCount;
 			if (kLimitSounds) {
 				if (so == _lowPrioritySssObject || (_playingSssObjectsCount < _playingSssObjectsMax && _lowPrioritySssObject)) {
-					SssObject *prev3 = 0; // _esi
 					_lowPrioritySssObject = 0;
 					if (_playingSssObjectsCount >= _playingSssObjectsMax && _sssObjectsList1) {
-						for (SssObject *cur = _sssObjectsList1; cur; cur = cur->nextPtr) {
-							if (prev3 && prev3->priority <= cur->priority) {
-								continue;
-							}
-							prev3 = cur;
-							_sssObjectsList2 = prev3;
-						}
+						_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 					}
 				}
 			}
@@ -731,12 +722,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 						_sssObjectsList1 = so;
 					}
 // 429281
-					_lowPrioritySssObject = 0;
-					for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
-						if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
-							_lowPrioritySssObject = current;
-						}
-					}
+					_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 				}
 			} else {
 // 4291E8
@@ -749,25 +735,18 @@ void Game::prependSoundObjectToList(SssObject *so) {
 					_sssObjectsList1->prevPtr = so;
 				}
 				_sssObjectsList1 = so;
-
+// 42920F
 				if (kLimitSounds) {
 					if (_playingSssObjectsCount < _playingSssObjectsMax) {
 						_lowPrioritySssObject = 0;
 					} else {
 						if (_lowPrioritySssObject == 0) {
-							_lowPrioritySssObject = 0;
-							for (SssObject *current = so; current; current = current->nextPtr) {
-								if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
-									_lowPrioritySssObject = current;
-								}
-							}
-							// goto 4292BE
+							_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 						} else {
 // 429269
 							if (so->priority < _lowPrioritySssObject->priority) {
 								_lowPrioritySssObject = so;
 							}
-							// goto 4292BE
 						}
 					}
 				}
@@ -1132,11 +1111,7 @@ void Game::setLowPrioritySoundObject(SssObject *so) {
 		if (kLimitSounds) {
 			_lowPrioritySssObject = 0;
 			if (_playingSssObjectsCount >= _playingSssObjectsMax) {
-				for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
-					if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
-						_lowPrioritySssObject = current;
-					}
-				}
+				_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 			}
 		}
 	}
@@ -1186,11 +1161,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 				so->priority = _eax;
 				_lowPrioritySssObject = 0;
 				if (kLimitSounds && _playingSssObjectsCount >= _playingSssObjectsMax) {
-					for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
-						if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
-							_lowPrioritySssObject = current;
-						}
-					}
+					_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 				}
 			}
 
@@ -1388,11 +1359,7 @@ void Game::stopSoundObject(SssObject **sssObjectsList, int num) {
 	if (kLimitSounds && found) {
 		_lowPrioritySssObject = 0;
 		if (_playingSssObjectsCount >= _playingSssObjectsMax) {
-			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
-				if (!_lowPrioritySssObject || _lowPrioritySssObject->priority > current->priority) {
-					_lowPrioritySssObject = current;
-				}
-			}
+			_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 		}
 	}
 }

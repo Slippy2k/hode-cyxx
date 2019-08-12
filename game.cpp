@@ -2128,26 +2128,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 
 void Game::mixAudio(int16_t *buf, int len) {
 
-	memset(buf, 0, len * sizeof(int16_t));
-
-	if (0) {
-		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-			const SssPcm *pcm = so->pcm;
-			if (pcm && pcm->ptr && so->currentPcmPtr >= pcm->ptr) {
-				if (so->stereo) {
-					const int16_t *end = pcm->ptr + _res->getSssPcmSize(pcm) / sizeof(int16_t);
-					for (int i = 0; i < len; ++i) {
-						if (so->currentPcmPtr < end) {
-							const int sample = *so->currentPcmPtr++;
-							buf[i] = CLIP(buf[i] + sample, -32768, 32767);
-						}
-					}
-					break;
-				}
-			}
-		}
-		return;
-	}
 	static const int kStereoSamples = 3528; // stereo
 
 	static int16_t buffer[kStereoSamples];
