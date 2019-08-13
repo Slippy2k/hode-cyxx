@@ -56,7 +56,7 @@ struct LvlBackgroundData {
 	uint8_t currentBackgroundId;
 	uint8_t maskCount;
 	uint8_t currentMaskId;
-	uint8_t dataUnk1Count; /* shadowCount */
+	uint8_t shadowCount;
 	uint8_t currentDataUnk1Id; /* currentShadowId */
 	uint8_t dataUnk2Count; /* soundCount */
 	uint8_t currentSoundId;
@@ -407,10 +407,10 @@ struct SssHdr {
 	int unk4;
 	int preloadPcmCount;
 	int preloadInfoCount;
-	int dataUnk1Count;
+	int infosDataCount;
 	int dataUnk2Count;
 	int dataUnk3Count;
-	int codeOffsetsCount;
+	int samplesDataCount;
 	int codeSize;
 	int preloadData1Count; // 24
 	int preloadData2Count; // 28
@@ -418,8 +418,8 @@ struct SssHdr {
 	int pcmCount; // 30
 };
 
-struct SssUnk1 { // SssInfo
-	uint16_t sssUnk3; // 0 indexes _sssDataUnk3
+struct SssInfo {
+	uint16_t sssBankIndex; // 0 indexes _sssBanksData
 	int8_t unk2; // 2 codeOffsetNum
 	int8_t unk3; // 3 filterDelta1
 	int8_t unk4; // 4 filterDelta2
@@ -434,14 +434,14 @@ struct SssUnk2 {
 	int8_t unk2;
 };
 
-struct SssUnk3 { // SssBank
+struct SssBank {
 	uint8_t flags; // 0 flags0
 	int8_t count; // 1 codeOffsetCount
 	uint16_t sssFilter; // 2 index to _sssFilters
-	uint32_t firstCodeOffset; // 4 offset to _sssCodeOffsets
+	uint32_t firstSampleIndex; // 4 offset to _sssSamplesData
 };
 
-struct SssCodeOffset { // SssSample
+struct SssSample {
 	uint16_t pcm; // index to _sssPcmTable
 	uint16_t unk2; // framesCount
 	uint8_t unk4; // initVolume
@@ -529,10 +529,10 @@ struct Resource {
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
 
-	SssUnk1 *_sssDataUnk1;
+	SssInfo *_sssInfosData;
 	SssUnk2 *_sssDataUnk2;
-	SssUnk3 *_sssDataUnk3;
-	SssCodeOffset *_sssCodeOffsets;
+	SssBank *_sssBanksData;
+	SssSample *_sssSamplesData;
 	SssUnk4 *_sssDataUnk4;
 	SssFilter *_sssFilters;
 	SssPcm *_sssPcmTable;

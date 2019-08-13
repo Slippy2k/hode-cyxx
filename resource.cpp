@@ -413,7 +413,7 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 	dat->currentBackgroundId = *src++;
 	dat->maskCount = *src++;
 	dat->currentMaskId = *src++;
-	dat->dataUnk1Count = *src++;
+	dat->shadowCount = *src++;
 	dat->currentDataUnk1Id = *src++;
 	dat->dataUnk2Count = *src++;
 	dat->currentSoundId = *src++;
@@ -602,7 +602,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		}
 		// free(_sssBuffer1);
 		// _sssBuffer1 = 0;
-		_sssHdr.dataUnk1Count = 0;
+		_sssHdr.infosDataCount = 0;
 	}
 	_sssHdr.version = fp->readUint32();
 	if (_sssHdr.version != 6 && _sssHdr.version != 10 && _sssHdr.version != 12) {
@@ -614,13 +614,13 @@ void Resource::loadSssData(File *fp, const char *name) {
 	_sssHdr.preloadPcmCount = fp->readUint32();
 	_sssHdr.preloadInfoCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.unk4 %d _sssHdr.preloadPcmCount %d _sssHdr.preloadInfoCount %d", _sssHdr.unk4, _sssHdr.preloadPcmCount, _sssHdr.preloadInfoCount);
-	_sssHdr.dataUnk1Count = fp->readUint32();
+	_sssHdr.infosDataCount = fp->readUint32();
 	_sssHdr.dataUnk2Count = fp->readUint32();
 	_sssHdr.dataUnk3Count = fp->readUint32();
-	debug(kDebug_RESOURCE, "_sssHdr.dataUnk1Count %d _sssHdr.dataUnk2Count %d _sssHdr.dataUnk3Count %d", _sssHdr.dataUnk1Count, _sssHdr.dataUnk2Count, _sssHdr.dataUnk3Count);
-	_sssHdr.codeOffsetsCount = fp->readUint32();
+	debug(kDebug_RESOURCE, "_sssHdr.infosDataCount %d _sssHdr.dataUnk2Count %d _sssHdr.dataUnk3Count %d", _sssHdr.infosDataCount, _sssHdr.dataUnk2Count, _sssHdr.dataUnk3Count);
+	_sssHdr.samplesDataCount = fp->readUint32();
 	_sssHdr.codeSize = fp->readUint32();
-	debug(kDebug_RESOURCE, "_sssHdr.codeOffsetsCount %d _sssHdr.codeSize %d", _sssHdr.codeOffsetsCount, _sssHdr.codeSize);
+	debug(kDebug_RESOURCE, "_sssHdr.samplesDataCount %d _sssHdr.codeSize %d", _sssHdr.samplesDataCount, _sssHdr.codeSize);
 	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
 		_sssHdr.preloadData1Count = fp->readUint32() & 255; // pcm
 		_sssHdr.preloadData2Count = fp->readUint32() & 255; // sprites
@@ -637,17 +637,17 @@ void Resource::loadSssData(File *fp, const char *name) {
 	// _sssBuffer1
 	int bytesRead = 0;
 
-	// _sssDataUnk1
-	_sssDataUnk1 = (SssUnk1 *)malloc(_sssHdr.dataUnk1Count * sizeof(SssUnk1));
-	for (int i = 0; i < _sssHdr.dataUnk1Count; ++i) {
-		_sssDataUnk1[i].sssUnk3 = fp->readUint16(); // index _sssDataUnk3
-		_sssDataUnk1[i].unk2 = fp->readByte();
-		_sssDataUnk1[i].unk3 = fp->readByte();
-		_sssDataUnk1[i].unk4 = fp->readByte();
-		_sssDataUnk1[i].unk5 = fp->readByte();
-		_sssDataUnk1[i].unk6 = fp->readByte();
-		_sssDataUnk1[i].unk7 = fp->readByte();
-		// debug(kDebug_RESOURCE, "SssDataUnk1 #%d 0x%x 0x%x 0x%x", i, unk1, unk2, unk3);
+	// _sssInfosData
+	_sssInfosData = (SssInfo *)malloc(_sssHdr.infosDataCount * sizeof(SssInfo));
+	for (int i = 0; i < _sssHdr.infosDataCount; ++i) {
+		_sssInfosData[i].sssBankIndex = fp->readUint16(); // index _sssBanksData
+		_sssInfosData[i].unk2 = fp->readByte();
+		_sssInfosData[i].unk3 = fp->readByte();
+		_sssInfosData[i].unk4 = fp->readByte();
+		_sssInfosData[i].unk5 = fp->readByte();
+		_sssInfosData[i].unk6 = fp->readByte();
+		_sssInfosData[i].unk7 = fp->readByte();
+		// debug(kDebug_RESOURCE, "SssInfo #%d 0x%x 0x%x 0x%x", i, unk1, unk2, unk3);
 		bytesRead += 8;
 	}
 	// _sssDataUnk2, indexes to _sssFilters
@@ -660,30 +660,30 @@ void Resource::loadSssData(File *fp, const char *name) {
 		// debug(kDebug_RESOURCE, "SssDataUnk2 #%d %d %d %d", i, unk0, unk1, unk2);
 		bytesRead += 4;
 	}
-	// _sssDataUnk3
-	_sssDataUnk3 = (SssUnk3 *)malloc(_sssHdr.dataUnk3Count * sizeof(SssUnk3));
+	// _sssBanksData
+	_sssBanksData = (SssBank *)malloc(_sssHdr.dataUnk3Count * sizeof(SssBank));
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
-		_sssDataUnk3[i].flags = fp->readByte();
-		_sssDataUnk3[i].count = fp->readByte();
-		_sssDataUnk3[i].sssFilter = fp->readUint16();
-		_sssDataUnk3[i].firstCodeOffset = fp->readUint32();
-		debug(kDebug_RESOURCE, "SssDataUnk3 #%d count %d codeOffset 0x%x", i, _sssDataUnk3[i].count, _sssDataUnk3[i].firstCodeOffset);
+		_sssBanksData[i].flags = fp->readByte();
+		_sssBanksData[i].count = fp->readByte();
+		_sssBanksData[i].sssFilter = fp->readUint16();
+		_sssBanksData[i].firstSampleIndex = fp->readUint32();
+		debug(kDebug_RESOURCE, "SssBank #%d count %d codeOffset 0x%x", i, _sssBanksData[i].count, _sssBanksData[i].firstSampleIndex);
 		bytesRead += 8;
 	}
-	// _sssCodeOffsets
-	_sssCodeOffsets = (SssCodeOffset *)malloc(_sssHdr.codeOffsetsCount * sizeof(SssCodeOffset));
-	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
-		_sssCodeOffsets[i].pcm = fp->readUint16(); // 0x0
-		_sssCodeOffsets[i].unk2 = fp->readUint16(); // 0x0
-		_sssCodeOffsets[i].unk4 = fp->readByte(); // 0x4
-		_sssCodeOffsets[i].unk5 = fp->readByte(); // 0x5
-		_sssCodeOffsets[i].unk6 = fp->readByte(); // 0x6
-		_sssCodeOffsets[i].unk7 = fp->readByte(); // 0x7
-		_sssCodeOffsets[i].codeOffset1 = fp->readUint32(); // 0x8 offset to sssCodeData
-		_sssCodeOffsets[i].codeOffset2 = fp->readUint32(); // 0xC offset to sssCodeData
-		_sssCodeOffsets[i].codeOffset3 = fp->readUint32(); // 0x10 offset to sssCodeData
-		_sssCodeOffsets[i].codeOffset4 = fp->readUint32(); // 0x14 offset to sssCodeData
-		debug(kDebug_RESOURCE, "SssCodeOffset #%d unk0 %d unk2 %d", i, _sssCodeOffsets[i].pcm, _sssCodeOffsets[i].unk2);
+	// _sssSamplesData
+	_sssSamplesData = (SssSample *)malloc(_sssHdr.samplesDataCount * sizeof(SssSample));
+	for (int i = 0; i < _sssHdr.samplesDataCount; ++i) {
+		_sssSamplesData[i].pcm = fp->readUint16(); // 0x0
+		_sssSamplesData[i].unk2 = fp->readUint16(); // 0x2
+		_sssSamplesData[i].unk4 = fp->readByte(); // 0x4
+		_sssSamplesData[i].unk5 = fp->readByte(); // 0x5
+		_sssSamplesData[i].unk6 = fp->readByte(); // 0x6
+		_sssSamplesData[i].unk7 = fp->readByte(); // 0x7
+		_sssSamplesData[i].codeOffset1 = fp->readUint32(); // 0x8 offset to sssCodeData
+		_sssSamplesData[i].codeOffset2 = fp->readUint32(); // 0xC offset to sssCodeData
+		_sssSamplesData[i].codeOffset3 = fp->readUint32(); // 0x10 offset to sssCodeData
+		_sssSamplesData[i].codeOffset4 = fp->readUint32(); // 0x14 offset to sssCodeData
+		debug(kDebug_RESOURCE, "SssSample #%d unk0 %d unk2 %d", i, _sssSamplesData[i].pcm, _sssSamplesData[i].unk2);
 		bytesRead += 24;
 	}
 	_sssCodeData = (uint8_t *)malloc(_sssHdr.codeSize);
@@ -888,23 +888,23 @@ void Resource::loadSssData(File *fp, const char *name) {
 // 429B9F
 	checkSssCode(_sssCodeData, _sssHdr.codeSize);
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
-		if (_sssDataUnk3[i].count != 0) {
-			// const int num = _sssDataUnk3[i].firstCodeOffset;
-			// _sssDataUnk3[i].codeOffset = &_sssCodeOffsets[num];
+		if (_sssBanksData[i].count != 0) {
+			// const int num = _sssBanksData[i].firstSampleIndex;
+			// _sssBanksData[i].codeOffset = &_sssSamplesData[num];
 			// debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
 		} else {
-			_sssDataUnk3[i].firstCodeOffset = kNone;
+			_sssBanksData[i].firstSampleIndex = kNone;
 		}
 	}
 // 429C00
-	for (int i = 0; i < _sssHdr.codeOffsetsCount; ++i) {
-		if (_sssCodeOffsets[i].codeOffset1 != kNone) {
+	for (int i = 0; i < _sssHdr.samplesDataCount; ++i) {
+		if (_sssSamplesData[i].codeOffset1 != kNone) {
 		}
-		if (_sssCodeOffsets[i].codeOffset2 != kNone) {
+		if (_sssSamplesData[i].codeOffset2 != kNone) {
 		}
-		if (_sssCodeOffsets[i].codeOffset3 != kNone) {
+		if (_sssSamplesData[i].codeOffset3 != kNone) {
 		}
-		if (_sssCodeOffsets[i].codeOffset4 != kNone) {
+		if (_sssSamplesData[i].codeOffset4 != kNone) {
 		}
 	}
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
@@ -927,9 +927,9 @@ void Resource::loadSssData(File *fp, const char *name) {
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		uint32_t mask = 1;
 		_sssDataUnk6[i].unk10 = 0;
-		const SssCodeOffset *codeOffset = &_sssCodeOffsets[_sssDataUnk3[i].firstCodeOffset];
+		const SssSample *codeOffset = &_sssSamplesData[_sssBanksData[i].firstSampleIndex];
 		uint32_t *ptr = _sssDataUnk6[i].unk0;
-		for (int j = 0; j < _sssDataUnk3[i].count; ++j) {
+		for (int j = 0; j < _sssBanksData[i].count; ++j) {
 			for (int k = 0; k < codeOffset->unk5; ++k) {
 				if (mask != 0) {
 					*ptr |= mask;

@@ -201,7 +201,7 @@ void Game::transformShadowLayer(int delta) {
 
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 	uint8_t *dst = _shadowScreenMaskBuffer;
-	for (int i = lvl->currentDataUnk1Id; i < lvl->dataUnk1Count; ++i) {
+	for (int i = lvl->currentDataUnk1Id; i < lvl->shadowCount; ++i) {
 		uint8_t *src = lvl->backgroundMaskTable[i];
 		if (src) {
 			const int decodedSize = decodeLZW(src + 2, dst);
@@ -242,10 +242,10 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 // a: type/source (0, 1, 2) b: num/index (3, monster1Index, monster2.monster1Index)
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	MixerLock ml(&_mix);
-	if (num < _res->_sssHdr.dataUnk1Count) {
-		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.dataUnk1Count, a, b);
+	if (num < _res->_sssHdr.infosDataCount) {
+		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.infosDataCount, a, b);
 		_currentSoundLvlObject = ptr;
-		playSoundObject(&_res->_sssDataUnk1[num], a, b);
+		playSoundObject(&_res->_sssInfosData[num], a, b);
 		_currentSoundLvlObject = 0;
 	}
 }
@@ -274,7 +274,7 @@ void Game::setupBackgroundBitmap() {
 		playSound(lvl->backgroundBitmapId, 0, 0, 3);
 	}
 	decodeLZW(pic, _video->_backgroundLayer);
-	if (lvl->dataUnk1Count != 0) {
+	if (lvl->shadowCount != 0) {
 		decodeShadowScreenMask(lvl);
 	}
 	for (int i = 0; i < 256 * 3; ++i) {
@@ -1427,7 +1427,7 @@ void Game::restartLevel() {
 	} else {
 		_mstFlags = 0;
 	}
-	if (_res->_sssHdr.dataUnk1Count != 0) {
+	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum;
@@ -2021,7 +2021,7 @@ void Game::drawScreen() {
 			}
 		}
 	}
-	for (int i = 0; i < dat->dataUnk1Count; ++i) {
+	for (int i = 0; i < dat->shadowCount; ++i) {
 		_video->applyShadowColors(_shadowScreenMasksTable[i].x,
 			_shadowScreenMasksTable[i].y,
 			_shadowScreenMasksTable[i].w,
@@ -2087,7 +2087,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		_paf->play(num);
 		_paf->unload(num);
 	}
-	if (_res->_sssHdr.dataUnk1Count != 0) {
+	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
 	_quit = false;
@@ -2102,7 +2102,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	} else {
 		_mstFlags = 0;
 	}
-	if (_res->_sssHdr.dataUnk1Count != 0) {
+	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
 	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum;
@@ -2666,7 +2666,7 @@ void Game::levelMainLoop() {
 			updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
 		}
 	}
-	if (_res->_sssHdr.dataUnk1Count != 0) {
+	if (_res->_sssHdr.infosDataCount != 0) {
 #if 0
 		// original code had a dedicated thread for sound, that main thread/loop was signaling
 		if (_snd_numberOfBuffers != 0) {
