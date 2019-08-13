@@ -201,7 +201,7 @@ void Game::transformShadowLayer(int delta) {
 
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 	uint8_t *dst = _shadowScreenMaskBuffer;
-	for (int i = lvl->currentDataUnk1Id; i < lvl->shadowCount; ++i) {
+	for (int i = lvl->currentShadowId; i < lvl->shadowCount; ++i) {
 		uint8_t *src = lvl->backgroundMaskTable[i];
 		if (src) {
 			const int decodedSize = decodeLZW(src + 2, dst);

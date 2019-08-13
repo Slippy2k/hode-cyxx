@@ -555,7 +555,7 @@ void Game::preScreenUpdate_rock_screen4() {
 		break;
 	}
 	_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
-	_res->_resLvlScreenBackgroundDataTable[4].currentDataUnk1Id = num;
+	_res->_resLvlScreenBackgroundDataTable[4].currentShadowId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = num;
 	if (_res->_currentScreenResourceNum == 4 && _levelCheckpoint == 1) {
 		_levelCheckpoint = 2;

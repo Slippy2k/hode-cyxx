@@ -57,8 +57,8 @@ struct LvlBackgroundData {
 	uint8_t maskCount;
 	uint8_t currentMaskId;
 	uint8_t shadowCount;
-	uint8_t currentDataUnk1Id; /* currentShadowId */
-	uint8_t dataUnk2Count; /* soundCount */
+	uint8_t currentShadowId;
+	uint8_t soundCount;
 	uint8_t currentSoundId;
 	uint8_t dataUnk3Count;
 	uint8_t unk9;
