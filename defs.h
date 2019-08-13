@@ -168,9 +168,9 @@ struct SssPcm;
 struct SssObject {
 	SssPcm *pcm; // 0x0
 	uint16_t num; // 0x4
-	uint16_t unk6; // 0x6
-	int8_t unk8; // 0x8
-	int8_t priority; // 0x9
+	uint16_t bankIndex; // 0x6
+	int8_t priority; // 0x8
+	int8_t currentPriority; // 0x9
 	uint8_t flags; // 0xA
 	bool stereo; // 0xB
 	uint32_t flags0; // 0xC

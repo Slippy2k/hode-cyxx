@@ -756,7 +756,7 @@ struct Game {
 	void expireSoundObjects(uint32_t flags);
 	void mixSoundObjects17640(bool flag);
 	void mixSoundObjects();
-	void stopSoundObject(SssObject **sssObjectsList, int num);
+	void stopSoundObjectsByPcm(SssObject **sssObjectsList, int num);
 
 	// andy.cpp
 	AndyMoveData _andyMoveData;
