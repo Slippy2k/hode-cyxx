@@ -795,17 +795,17 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "createSoundObject num %d b %d c 0x%x", num, b, flags);
 	SssObject *ret = 0;
 	if (b < 0) {
-		SssBank *unk3 = &_res->_sssBanksData[num];
-		if ((unk3->flags & 1) != 0) {
-			int firstSampleIndex = unk3->firstSampleIndex;
-			if (unk3->count <= 0) {
+		SssBank *bank = &_res->_sssBanksData[num];
+		if ((bank->flags & 1) != 0) {
+			int firstSampleIndex = bank->firstSampleIndex;
+			if (bank->count <= 0) {
 				return 0;
 			}
 			assert(firstSampleIndex >= 0 && firstSampleIndex < _res->_sssHdr.samplesDataCount);
 			SssSample *sample = &_res->_sssSamplesData[firstSampleIndex];
 // 42B81D
 			int framesCount = 0;
-			for (int i = 0; i < unk3->count; ++i) {
+			for (int i = 0; i < bank->count; ++i) {
 				if (sample->pcm != 0xFFFF) {
 					SssObject *so = startSoundObject(num, i, flags);
 					if (so && so->pcmFramesCount >= framesCount) {
@@ -833,21 +833,21 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 		}
 // 42B8AE
 		b = 0;
-		if (unk3->count > 0) {
+		if (bank->count > 0) {
 			do {
 				if ((unk6->unk0[b] & _eax) != 0) {
 					break;
 				}
-			} while (++b < unk3->count);
+			} while (++b < bank->count);
 		}
 // 42B8C7
-		if ((unk3->flags & 2) != 0) {
+		if ((bank->flags & 2) != 0) {
 			unk6->unk10 &= ~unk6->unk0[b];
-			if (unk6->unk10 == 0 && unk3->count > 0) {
+			if (unk6->unk10 == 0 && bank->count > 0) {
 				int i = 0;
 				do {
 					unk6->unk10 |= unk6->unk0[i];
-				} while (++i < unk3->count);
+				} while (++i < bank->count);
 			}
 		}
 // 42B8E9
@@ -869,18 +869,18 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
 
-	SssBank *unk3 = &_res->_sssBanksData[num];
-	int sampleNum = unk3->firstSampleIndex + b;
+	SssBank *bank = &_res->_sssBanksData[num];
+	int sampleNum = bank->firstSampleIndex + b;
 	debug(kDebug_SOUND, "startSoundObject sample %d", sampleNum);
 	assert(sampleNum >= 0 && sampleNum < _res->_sssHdr.samplesDataCount);
 	SssSample *sample = &_res->_sssSamplesData[sampleNum];
-	if (1) {
-		_res->loadSssPcm(_res->_sssFile, sample->pcm);
-	}
-	//
+
+	// original loads the PCM data in a seperate thread
+	_res->loadSssPcm(_res->_sssFile, sample->pcm);
+
 	if (sample->unk2 != 0) {
 // 42B64C
-		SssFilter *filter = &_res->_sssFilters[unk3->sssFilter];
+		SssFilter *filter = &_res->_sssFilters[bank->sssFilter];
 		int _ecx = CLIP(filter->unk24 + sample->unk6, 0, 7); // priority
 // 42B67F
 		uint32_t flags1 = flags & 0xFFF0F000;
