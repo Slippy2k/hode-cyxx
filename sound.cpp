@@ -365,7 +365,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			if (so->delayCounter >= -1) {
 				LvlObject *tmp = _currentSoundLvlObject;
 				_currentSoundLvlObject = so->lvlObject;
-				createSoundObject(READ_LE_UINT16(code + 2), code[1], so->flags0);
+				createSoundObject(READ_LE_UINT16(code + 2), (int8_t)code[1], so->flags0);
 				_currentSoundLvlObject = tmp;
 			}
 			code += 4;
@@ -406,7 +406,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 				}
 			}
 			break;
-		case 8: { // seek_backward2
+		case 8: { // seek_backward_delay
 				const int32_t frame = READ_LE_UINT32(code + 12);
 				if (so->currentPcmFrame > frame) {
 					--so->pauseCounter;
@@ -794,7 +794,7 @@ void Game::updateSoundObjectLut2(uint32_t flags) {
 SssObject *Game::createSoundObject(int num, int b, int flags) {
 	debug(kDebug_SOUND, "createSoundObject num %d b %d c 0x%x", num, b, flags);
 	SssObject *ret = 0;
-	if (b > 0) {
+	if (b < 0) {
 		SssBank *unk3 = &_res->_sssBanksData[num];
 		if ((unk3->flags & 1) != 0) {
 			int firstSampleIndex = unk3->firstSampleIndex;
@@ -852,18 +852,16 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 		}
 // 42B8E9
 		ret = startSoundObject(num, b, flags);
-// 42B909
 		if (ret && (_res->_sssBanksData[num].flags & 4) != 0) {
 			ret->nextSoundNum = num;
 			ret->nextSoundCounter = -1;
 		}
 	} else {
-		SssObject *so = startSoundObject(num, b, flags);
-		if (so && (_res->_sssBanksData[num].flags & 4) != 0) {
-			so->nextSoundCounter = b;
-			so->nextSoundNum = num;
+		ret = startSoundObject(num, b, flags);
+		if (ret && (_res->_sssBanksData[num].flags & 4) != 0) {
+			ret->nextSoundNum = num;
+			ret->nextSoundCounter = b;
 		}
-		ret = so;
 	}
 	return ret;
 }
@@ -1069,7 +1067,7 @@ void Game::playSoundObject(SssInfo *s, int lut, int bits) {
 	}
 // 42BBDD
 prepare:
-	createSoundObject(s->sssBankIndex, (int8_t)s->unk2, _ebp);
+	createSoundObject(s->sssBankIndex, s->unk2, _ebp);
 }
 
 void Game::clearSoundObjects() {
@@ -1285,11 +1283,10 @@ void Game::mixSoundObjects17640(bool flag) {
 	if (flag) {
 		_res->clearSssLookupTable3();
 	}
-	mixSoundObjects();
+	queueSoundObjectsPcmStride();
 }
 
-// queueSoundObjectsPcmStride
-void Game::mixSoundObjects() {
+void Game::queueSoundObjectsPcmStride() {
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		const SssPcm *pcm = so->pcm;
 		if (pcm != 0) {
