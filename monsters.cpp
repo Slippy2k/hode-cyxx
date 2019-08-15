@@ -2094,6 +2094,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	return (var8 & _ecx) != 0 ? 0 : 1;
 }
 
+// lvlObjectCollidesAndy1
 bool Game::executeMstUnk19(LvlObject *o, int flags) {
 	int x1, y1, x2, y2;
 	if (flags != 1 && flags != 0x4000) {
@@ -2126,37 +2127,38 @@ bool Game::executeMstUnk19(LvlObject *o, int flags) {
 	return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
+// lvlObjectCollidesAndy2
 bool Game::executeMstUnk21(LvlObject *o, int type) {
-	int _esi, _edi, _ebx, _ebp;
+	int x1, y1, x2, y2;
 	if (type != 1 && type != 0x1000) {
-		_esi = o->xPos;
-		_edi = o->yPos;
-		_ebx = _esi + o->width  - 1;
-		_ebp = _edi + o->height - 1;
+		x1 = o->xPos; // _esi
+		y1 = o->yPos; // _edi
+		x2 = x1 + o->width  - 1; // _ebx
+		y2 = y1 + o->height - 1; // _ebp
 	} else {
-		_esi = o->xPos + o->posTable[0].x;
-		_ebx = o->xPos + o->posTable[1].x;
-		_edi = o->yPos + o->posTable[0].y;
-		_ebp = o->yPos + o->posTable[1].y;
-		if (_esi > _ebx) {
-			SWAP(_esi, _ebx);
+		x1 = o->xPos + o->posTable[0].x; // _esi
+		x2 = o->xPos + o->posTable[1].x; // _ebx
+		y1 = o->yPos + o->posTable[0].y; // _edi
+		y2 = o->yPos + o->posTable[1].y; // _ebp
+		if (x1 > x2) {
+			SWAP(x1, x2);
 		}
-		if (_edi > _ebp) {
-			SWAP(_edi, _ebp);
+		if (y1 > y2) {
+			SWAP(y1, y2);
 		}
 		if (type == 0x1000 && _andyObject->screenNum != o->screenNum) {
 			const int dx = _res->_mstPointOffsets[_andyObject->screenNum].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
-			_esi += dx;
-			_ebx += dx;
+			x1 += dx;
+			x2 += dx;
 			const int dy = _res->_mstPointOffsets[_andyObject->screenNum].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
-			_edi += dy;
-			_ebp += dy;
+			y1 += dy;
+			y2 += dy;
 		}
 	}
-// 417D2B
-	return (_andyObject->xPos + _andyObject->width - 1 >= _esi && _andyObject->xPos <= _ebx && _andyObject->yPos + _andyObject->height - 1 >= _edi && _andyObject->yPos <= _ebp);
+	return (_andyObject->xPos + _andyObject->width - 1 >= x1 && _andyObject->xPos <= x2 && _andyObject->yPos + _andyObject->height - 1 >= y1 && _andyObject->yPos <= y2);
 }
 
+// lvlObjectCollidesAndy3
 bool Game::executeMstUnk22(LvlObject *o, int type) {
 	int x1, y1, x2, y2;
 	if (type != 1) {
@@ -2184,6 +2186,7 @@ bool Game::executeMstUnk22(LvlObject *o, int type) {
 	return false;
 }
 
+// lvlObjectCollidesAndy4
 bool Game::executeMstUnk28(LvlObject *o, int type) const {
 	int x1, y1, x2, y2;
 	if (type != 1) {
