@@ -1126,7 +1126,7 @@ void Game::setLowPrioritySoundObject(SssObject *so) {
 }
 
 int Game::getSoundObjectPanning(SssObject *so) const {
-	LvlObject *obj = so->lvlObject;
+	const LvlObject *obj = so->lvlObject;
 	if (obj) {
 		switch (obj->type) {
 		case 8:
@@ -1153,29 +1153,27 @@ int Game::getSoundObjectPanning(SssObject *so) const {
 void Game::setSoundObjectPanning(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
 		int volume = ((so->filter->unk4 >> 16) * so->volume) >> 7; // indexes decibel volume table
-		int _esi = 0;
+		int panning = 0;
 		if (so->panningPtr) {
-			int _eax = CLIP(so->priority + so->filter->unk24, 0, 7); // priority
+			int priority = CLIP(so->priority + so->filter->unk24, 0, 7);
 			if (so->panning == -2) {
 				volume = 0;
-				_esi = 64;
-				_eax = 0;
+				panning = 64;
+				priority = 0;
 			} else {
-				_esi = CLIP(so->panning, 0, 128);
+				panning = CLIP(so->panning, 0, 128);
 				volume >>= 2; // _edi
-				_eax /= 2;
+				priority /= 2;
 			}
-			if (so->currentPriority != _eax) {
-				so->currentPriority = _eax;
+			if (so->currentPriority != priority) {
+				so->currentPriority = priority;
 				_lowPrioritySssObject = 0;
 				if (kLimitSounds && _playingSssObjectsCount >= _playingSssObjectsMax && _sssObjectsList1) {
 					_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
 				}
 			}
-
 		} else {
-// 429076
-			_esi = CLIP(so->panning + (so->filter->unk14 >> 16), 0, 128); // panning ?
+			panning = CLIP(so->panning + (so->filter->unk14 >> 16), 0, 128);
 		}
 // 429094
 		if (so->pcm == 0) {
@@ -1186,9 +1184,8 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			volume = ARRAYSIZE(_dbVolumeTable) - 1;
 		}
 		int _edx = _dbVolumeTable[volume];
-		int _edi = _esi;
 		int _eax = _edx << 7;
-		switch (_edi) {
+		switch (panning) {
 		case 0: // full left
 			so->panL = _eax;
 			so->panR = 0;
@@ -1206,7 +1203,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			so->panType = 1;
 			break;
 		default:
-			_edx *= _esi;
+			_edx *= panning;
 			so->panR = _edx;
 			so->panL = _eax - _edx;
 			so->panType = 4;
