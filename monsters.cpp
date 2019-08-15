@@ -107,10 +107,10 @@ void Game::initMonsterObject1(MonsterObject1 *m) { // mstResetPosition
 	const uint8_t *ptr = m->unk8;
 	const int num = (~m->flagsA5) & 1;
 
-	m->x1 = m->m44Unk1->unk2C[num] - READ_LE_UINT32(ptr + 904); // x2 ?
-	m->x2 = m->m44Unk1->unk34[num] + READ_LE_UINT32(ptr + 904); // x1 ?
-	m->y1 = m->m44Unk1->unk3C[num] - READ_LE_UINT32(ptr + 908); // y2 ?
-	m->y2 = m->m44Unk1->unk44[num] + READ_LE_UINT32(ptr + 908); // y1 ?
+	m->x1 = m->m44Unk1->unk2C[0][num] - READ_LE_UINT32(ptr + 904); // x2 ?
+	m->x2 = m->m44Unk1->unk2C[1][num] + READ_LE_UINT32(ptr + 904); // x1 ?
+	m->y1 = m->m44Unk1->unk2C[2][num] - READ_LE_UINT32(ptr + 908); // y2 ?
+	m->y2 = m->m44Unk1->unk2C[3][num] + READ_LE_UINT32(ptr + 908); // y1 ?
 
 	const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_0x24[num];
 	m->m35 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
@@ -282,7 +282,7 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 	int _edi = 0x1000000;
 	int var1C = y;
 
-	int i = 0;
+	uint32_t i = 0;
 	for (; i < m44->count; ++i) {
 		uint32_t indexUnk34 = m44->data[i].indexUnk34_16;
 		assert(indexUnk34 != kNone);
@@ -1108,22 +1108,62 @@ void Game::executeMstCode() {
 	}
 }
 
+int Game::executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44u1, int num, int index) {
+	if (m44u1->unk2C[num][index] < 0) {
+		const uint32_t indexUnk34 = m44u1->indexUnk34_16;
+		assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.unk0x08);
+		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		uint32_t mask;
+		uint8_t flags = m34->unk10[num];
+		if (flags) {
+			flags &= 0x7F;
+			mask = _mstAndyVarMask & (1 << flags);
+		} else {
+			mask = flags & (1 << index);
+		}
+		if (mask) {
+			switch (num) { // ((int *)&m34)[num]
+			case 0:
+				m44u1->unk2C[num][index] = m34->right;
+				break;
+			case 1:
+				m44u1->unk2C[num][index] = m34->left;
+				break;
+			case 2:
+				m44u1->unk2C[num][index] = m34->top;
+				break;
+			case 3:
+				m44u1->unk2C[num][index] = m34->bottom;
+				break;
+			}
+		} else {
+			const uint32_t indexUnk44Unk1 = m44u1->indexUnk44Unk1_76[num];
+			assert(indexUnk44Unk1 != kNone && indexUnk44Unk1 < m44->count);
+			m44u1->unk2C[num][index] = executeMstUnk18(m44, &m44->data[indexUnk44Unk1], num, index);
+		}
+	}
+	return m44u1->unk2C[num][index];
+}
+
 void Game::executeMstCodeHelper1() {
 	for (int i = 0; i < _res->_mstHdr.unk0x28; ++i) {
 		MstUnk44 *m44 = &_res->_mstUnk44[i];
 		if (m44->mask & _mstHelper1TestValue) {
 			++_mstHelper1Count;
-			for (int j = 0; j < m44->count; ++j) {
+			for (uint32_t j = 0; j < m44->count; ++j) {
 				for (int k = 0; k < 2; ++k) {
-					m44->data[j].unk2C[k] = -1;
-					m44->data[j].unk34[k] = -1;
-					m44->data[j].unk3C[k] = -1;
-					m44->data[j].unk44[k] = -1;
+					m44->data[j].unk2C[0][k] = -1;
+					m44->data[j].unk2C[1][k] = -1;
+					m44->data[j].unk2C[2][k] = -1;
+					m44->data[j].unk2C[3][k] = -1;
 				}
 			}
 			warning("executeMstCodeHelper1 417691 unimplemented");
 			// TODO
-			for (int j = 0; j < m44->count; ++j) {
+			for (uint32_t j = 0; j < m44->count; ++j) {
+				// MstUnk44Unk1 *m44u1 = &m44->data[j];
+				for (int k = 0; k < 4; ++k) { // unk2C[0] .. unk2C[3]
+				}
 			}
 // 4177D7
 			executeMstUnk16(m44, 0);
@@ -1138,10 +1178,10 @@ void Game::executeMstCodeHelper1() {
 			}
 			MstUnk44Unk1 *m44Unk1 = m->m44Unk1;
 			const int num = (~m->flagsA5) & 1;
-			m->x1 = m44Unk1->unk2C[num] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
-			m->x2 = m44Unk1->unk34[num] + (int32_t)READ_LE_UINT32(m->unk8 + 904);
-			m->y1 = m44Unk1->unk3C[num] - (int32_t)READ_LE_UINT32(m->unk8 + 908);
-			m->y2 = m44Unk1->unk44[num] + (int32_t)READ_LE_UINT32(m->unk8 + 908);
+			m->x1 = m44Unk1->unk2C[0][num] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
+			m->x2 = m44Unk1->unk2C[1][num] + (int32_t)READ_LE_UINT32(m->unk8 + 904);
+			m->y1 = m44Unk1->unk2C[2][num] - (int32_t)READ_LE_UINT32(m->unk8 + 908);
+			m->y2 = m44Unk1->unk2C[3][num] + (int32_t)READ_LE_UINT32(m->unk8 + 908);
 		}
 	}
 }
@@ -1557,14 +1597,14 @@ l41A879:
 			const uint8_t *p = m->unk8;
 			const int w = (int32_t)READ_LE_UINT32(p + 904);
 			const int h = (int32_t)READ_LE_UINT32(p + 908);
-			while (_xMstPos1 >= m44u1->unk34[_edi] + w) {
-				if (_xMstPos1 > m44u1->unk2C[_edi] - w) {
+			while (_xMstPos1 >= m44u1->unk2C[1][_edi] + w) {
+				if (_xMstPos1 > m44u1->unk2C[0][_edi] - w) {
 					break;
 				}
-				if (_yMstPos1 < m44u1->unk44[_edi] + h) {
+				if (_yMstPos1 < m44u1->unk2C[3][_edi] + h) {
 					break;
 				}
-				if (_yMstPos1 > m44u1->unk3C[_edi] - h) {
+				if (_yMstPos1 > m44u1->unk2C[2][_edi] - h) {
 					break;
 				}
 				int var1C;
@@ -1598,16 +1638,16 @@ l41A879:
 	}
 // 41A9F4
 	if (m->flags4A & 8) {
-		_xMstPos2 = m->xMstPos - m->m44Unk1->unk34[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
+		_xMstPos2 = m->xMstPos - m->m44Unk1->unk2C[1][_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904);
 	} else if (m->flags4A & 2) {
-		_xMstPos2 = m->m44Unk1->unk2C[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904) - m->xMstPos;
+		_xMstPos2 = m->m44Unk1->unk2C[0][_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 904) - m->xMstPos;
 	} else {
 		_xMstPos2 = 0;
 	}
 	if (m->flags4A & 1) {
-		_yMstPos2 = m->yMstPos - m->m44Unk1->unk44[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 908);
+		_yMstPos2 = m->yMstPos - m->m44Unk1->unk2C[3][_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 908);
 	} else if (m->flags4A & 4) {
-		_yMstPos2 = m->m44Unk1->unk3C[_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 908) - m->yMstPos;
+		_yMstPos2 = m->m44Unk1->unk2C[2][_edi] - (int32_t)READ_LE_UINT32(m->unk8 + 908) - m->yMstPos;
 	} else {
 		_yMstPos2 = 0;
 	}
@@ -1921,7 +1961,7 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 	int var20 = -1;
 	int var24 = -1;
 	int _ebp = 0;
-	for (int i = 0; i < m44->count; ++i, --var24) {
+	for (uint32_t i = 0; i < m44->count; ++i, --var24) {
 		int _edi;
 		MstUnk44Unk1 *m44u1 = &m44->data[i];
 		if (m44u1->unk60[num][i] == 0 && m->m44Unk1 != m44u1) {
@@ -2654,7 +2694,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			m->flagsA6 |= 1;
 			assert(_mstCurrentMonster1 == m);
 			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0 && (m->unk8[946] & 2) == 0) {
-				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->m44Unk1->unk2C[1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->m44Unk1->unk34[1])) {
+				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->m44Unk1->unk2C[0][1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->m44Unk1->unk2C[1][1])) {
 					uint32_t indexUnk35 = m->m44Unk1->indexUnk35_20;
 					if (indexUnk35 != kNone) {
 						m->m35 = &_res->_mstUnk35[indexUnk35];
@@ -2677,8 +2717,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			if ((m->unk8[946] & 2) == 0) {
 				MstUnk44Unk1 *m44 = m->m44Unk1;
 				int _edi = READ_LE_UINT32(m->unk8 + 904);
-				int _ebx = MAX(m->unk88, m44->unk34[1] + _edi);
-				int _eax = MIN(m->unk84, m44->unk2C[1] - _edi);
+				int _ebx = MAX(m->unk88, m44->unk2C[1][1] + _edi);
+				int _eax = MIN(m->unk84, m44->unk2C[0][1] - _edi);
 				uint32_t indexUnk36 = m44->indexUnk36_32;
 				assert(indexUnk36 != kNone);
 				uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
@@ -2741,7 +2781,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	if ((m->flagsA5 & 8) == 0 && (m->unk8[946] & 2) == 0) {
 		uint8_t _dl = m->flags49;
 		if ((_dl & 2) != 0) {
-			if ((int32_t)READ_LE_UINT32(m->unk8 + 916) <= m->m44Unk1->unk34[1] || (int32_t)READ_LE_UINT32(m->unk8 + 912) >= m->m44Unk1->unk2C[1]) {
+			if ((int32_t)READ_LE_UINT32(m->unk8 + 916) <= m->m44Unk1->unk2C[1][1] || (int32_t)READ_LE_UINT32(m->unk8 + 912) >= m->m44Unk1->unk2C[0][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
@@ -2754,7 +2794,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			}
 		} else if (_dl & 8) {
 // 418A37
-			if ((int32_t)READ_LE_UINT32(m->unk8 + 920) >= m->m44Unk1->unk2C[1] || (int32_t)READ_LE_UINT32(m->unk8 + 924) <= m->m44Unk1->unk34[1]) {
+			if ((int32_t)READ_LE_UINT32(m->unk8 + 920) >= m->m44Unk1->unk2C[0][1] || (int32_t)READ_LE_UINT32(m->unk8 + 924) <= m->m44Unk1->unk2C[1][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;

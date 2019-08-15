@@ -639,6 +639,7 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+	int executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44u1, int num, int index);
 	void executeMstCodeHelper1();
 	void executeMstCodeHelper2();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);

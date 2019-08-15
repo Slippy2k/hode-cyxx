@@ -137,7 +137,7 @@ struct MstUnk34 { // MstBox
 	int32_t left; //  4
 	int32_t top; // 8
 	int32_t bottom; // 0xC
-	int32_t unk10; // 0x10
+	uint8_t unk10[4]; // 0x10
 }; // sizeof == 20
 
 struct MstUnk35 { // MstTrigger1
@@ -178,10 +178,7 @@ struct MstUnk44Unk1 { // MstPathBox
 	uint32_t indexUnk36_28; // 0x1C
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
-	int32_t unk2C[2]; // 0x2C
-	int32_t unk34[2]; // 0x34
-	int32_t unk3C[2]; // 0x3C
-	int32_t unk44[2]; // 0x44
+	int32_t unk2C[4][2]; // 0x2C, 0x34, 0x3C, 0x44
 	uint32_t indexUnk44Unk1_76[4]; // next per direction 0x4C
 	uint32_t indexUnk44Unk1_92; // next 0x5C
 	uint8_t *unk60[2]; // 0x60
@@ -191,7 +188,7 @@ struct MstUnk44 { // MstPath
 	MstUnk44Unk1 *data;
 	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t mask; // 0x8
-	int count; // 0xC
+	uint32_t count; // 0xC
 }; // sizeof == 16
 
 struct MstUnk45 { // MstTrigger2
@@ -253,7 +250,7 @@ struct MstUnk48 {
 	uint8_t unk5;
 	uint8_t unk6;
 	uint8_t unk7;
-	uint32_t codeData; // 0x8, PTR_OFFS<uint32>(_mstCodeData, N)
+	uint32_t codeData; // 0x8 indexes _mstCodeData
 	MstUnk48Unk12 *unk12; // 0xC
 	int countUnk12; // 0x10
 	uint32_t *data1[2]; // 0x14, 0x18

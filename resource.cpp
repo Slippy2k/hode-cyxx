@@ -1073,7 +1073,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstUnk34[i].left   = fp->readUint32();
 		_mstUnk34[i].top    = fp->readUint32();
 		_mstUnk34[i].bottom = fp->readUint32();
-		_mstUnk34[i].unk10  = fp->readUint32();
+		_mstUnk34[i].unk10[0] = fp->readByte();
+		_mstUnk34[i].unk10[1] = fp->readByte();
+		_mstUnk34[i].unk10[2] = fp->readByte();
+		_mstUnk34[i].unk10[3] = fp->readByte();
 		bytesRead += 20;
 	}
 
@@ -1212,14 +1215,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk44[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
 			_mstUnk44[i].data[j].indexUnk35_0x24[0] = READ_LE_UINT32(data + 36); // sizeof == 16
 			_mstUnk44[i].data[j].indexUnk35_0x24[1] = READ_LE_UINT32(data + 40); // sizeof == 16
-			_mstUnk44[i].data[j].unk2C[0] = READ_LE_UINT32(data + 0x2C);
-			_mstUnk44[i].data[j].unk2C[1] = READ_LE_UINT32(data + 0x30);
-			_mstUnk44[i].data[j].unk34[0] = READ_LE_UINT32(data + 0x34);
-			_mstUnk44[i].data[j].unk34[1] = READ_LE_UINT32(data + 0x38);
-			_mstUnk44[i].data[j].unk3C[0] = READ_LE_UINT32(data + 0x3C);
-			_mstUnk44[i].data[j].unk3C[1] = READ_LE_UINT32(data + 0x40);
-			_mstUnk44[i].data[j].unk44[0] = READ_LE_UINT32(data + 0x44);
-			_mstUnk44[i].data[j].unk44[1] = READ_LE_UINT32(data + 0x48);
+			for (int k = 0; k < 4; ++k) {
+				_mstUnk44[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
+				_mstUnk44[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
+			}
 			_mstUnk44[i].data[j].indexUnk44Unk1_76[0] = READ_LE_UINT32(data + 76); // sizeof == 104
 			_mstUnk44[i].data[j].indexUnk44Unk1_76[1] = READ_LE_UINT32(data + 80); // sizeof == 104
 			_mstUnk44[i].data[j].indexUnk44Unk1_76[2] = READ_LE_UINT32(data + 84); // sizeof == 104
