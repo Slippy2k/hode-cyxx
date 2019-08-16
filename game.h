@@ -639,6 +639,7 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
+	void executeMstUnk16(MstUnk44 *m44, int index);
 	int executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44u1, int num, int index);
 	void executeMstCodeHelper1();
 	void executeMstCodeHelper2();
@@ -650,7 +651,6 @@ struct Game {
 	int executeMstUnk9(Task *t, MonsterObject1 *m);
 	int executeMstUnk11(Task *t, MonsterObject1 *m);
 	int executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y);
-	void executeMstUnk16(MstUnk44 *m44, int flag);
 	bool mstTestActionDirection(MonsterObject1 *m, int num);
 	bool lvlObjectCollidesAndy1(LvlObject *o, int type) const;
 	bool lvlObjectCollidesAndy2(LvlObject *o, int type) const;

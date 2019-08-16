@@ -1108,6 +1108,16 @@ void Game::executeMstCode() {
 	}
 }
 
+void Game::executeMstUnk16(MstUnk44 *m44, int index) {
+	warning("executeMstUnk16 unimplemented");
+	for (uint32_t i = 0; i < m44->count; ++i) {
+//		MstUnk44Unk1 *m44Unk1 = &m44->data[i];
+//		assert(m44->count == 64 * 4);
+//		memset(m44Unk1->unk60[index], -1, 64 * 4);
+// 41749C
+	}
+}
+
 int Game::executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44Unk1, int num, int index) {
 	if (m44Unk1->unk2C[num][index] < 0) {
 		const uint32_t indexUnk34 = m44Unk1->indexUnk34_16;
@@ -1115,7 +1125,7 @@ int Game::executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44Unk1, int num, int ind
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
 		uint32_t mask;
 		uint8_t flags = m34->unk10[num];
-		if (flags) {
+		if (flags & 0x80) {
 			flags &= 0x7F;
 			mask = _mstAndyVarMask & (1 << flags);
 		} else {
@@ -1158,14 +1168,13 @@ void Game::executeMstCodeHelper1() {
 					m44->data[j].unk2C[3][k] = -1;
 				}
 			}
-			warning("executeMstCodeHelper1 417691 unimplemented");
-			// TODO
 			for (uint32_t j = 0; j < m44->count; ++j) {
-				// MstUnk44Unk1 *m44Unk1 = &m44->data[j];
-				for (int k = 0; k < 4; ++k) { // unk2C[0] .. unk2C[3]
+				MstUnk44Unk1 *m44Unk1 = &m44->data[j];
+				for (int k = 0; k < 4; ++k) {
+					executeMstUnk18(m44, m44Unk1, k, 0);
+					executeMstUnk18(m44, m44Unk1, k, 1);
 				}
 			}
-// 4177D7
 			executeMstUnk16(m44, 0);
 			executeMstUnk16(m44, 1);
 		}
@@ -2062,11 +2071,6 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 */
 	}
 	return var20;
-}
-
-void Game::executeMstUnk16(MstUnk44 *m44, int flag) {
-	warning("executeMstUnk16 unimplemented");
-	// TODO
 }
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
