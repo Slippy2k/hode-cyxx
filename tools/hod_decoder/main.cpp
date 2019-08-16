@@ -367,7 +367,7 @@ static void DecodeLvl(File *fp) {
 	}
 }
 
-static void DecodeSssCode(const uint8_t *p, int size) {
+static void CheckSssCode(const uint8_t *p, int size) {
 	static const uint8_t _opcodesLength[] = {
 		4, 0, 4, 0, 4, 12, 8, 0, 16, 4, 4, 4, 4, 8, 12, 0, 4, 8, 8, 4, 4, 4, 8, 4, 8, 4, 8, 16, 8, 4
 	};
@@ -382,6 +382,8 @@ static void DecodeSssCode(const uint8_t *p, int size) {
 	}
 	assert(offset == size);
 }
+
+void DecodeSssCode(const uint8_t *codeData, uint32_t codeSize);
 
 static void DecodeSssPcm(File *fp, uint32_t count, uint32_t stride, int16_t *ptr) {
 	for (uint32_t i = 0; i < count; ++i) {
@@ -449,6 +451,7 @@ static void DecodeSss(File *fp, uint32_t baseOffset = 0) {
 	uint8_t *codeData = (uint8_t *)malloc(codeSize);
 	if (codeData) {
 		fp->read(codeData, codeSize);
+		CheckSssCode(codeData, codeSize);
 		DecodeSssCode(codeData, codeSize);
 		free(codeData);
 	}
