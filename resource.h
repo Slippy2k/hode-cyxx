@@ -200,7 +200,7 @@ struct MstUnk45 { // MstTrigger2
 }; // sizeof == 12
 
 struct MstUnk46Unk1 { // MstBehaviour
-	uint32_t indexHeight; // 0, indexes mstHeightMapData
+	uint32_t indexMonsterInfo; // 0, indexes _mstMonsterInfos
 	uint16_t anim; // 4
 	uint16_t unk6; // 6
 	uint32_t unk8; // 0x8
@@ -225,7 +225,7 @@ struct MstUnk47 {
 }; // sizeof == 8
 
 struct MstUnk48Unk12Unk4 {
-	uint32_t unk0; // 0x0, indexes _mstHeightMapData
+	uint32_t unk0; // 0x0, indexes _mstMonsterInfos
 	uint32_t indexUnk51; // 0x4
 	int32_t unk8; // 0x8 xPos
 	int32_t unkC; // 0xC yPos
@@ -259,7 +259,7 @@ struct MstUnk48 {
 }; // sizeof == 44
 
 struct MstUnk49Unk1 {
-	uint32_t offsetHeight; // 0, offset _mstHeightMapData[32]
+	uint32_t offsetMonsterInfo; // 0, offset _mstMonsterInfos[32]
 	uint32_t unk4;
 	uint8_t unk8;
 	uint8_t unk9;
@@ -272,7 +272,7 @@ struct MstUnk49Unk1 {
 }; // sizeof == 16
 
 struct MstUnk49 {
-	uint32_t indexHeight; // 0, indexes _mstHeightMapData
+	uint32_t indexMonsterInfo; // 0, indexes _mstMonsterInfos
 	MstUnk49Unk1 *data1; // 0x4, sizeof == 16
 	uint32_t count1; // 0x8
 	uint8_t *data2; // 0xC
@@ -356,7 +356,7 @@ struct MstUnk56 { // MstOp2Data
 	uint8_t unkB;
 }; // sizeof == 12
 
-struct MstUnk63 { // MstOp226Data
+struct MstOp226Data {
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;
@@ -561,7 +561,7 @@ struct Resource {
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;
-	uint8_t *_mstHeightMapData; // _mstMonsterInfos sizeof == 948 == (32 * 28 + 52)
+	uint8_t *_mstMonsterInfos; // sizeof == 948
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
@@ -576,7 +576,7 @@ struct Resource {
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	MstOp56Data *_mstOp56Data;
 	uint8_t *_mstCodeData;
-	MstUnk63 *_mstUnk63;
+	MstOp226Data *_mstOp226Data;
 
 	Resource(const char *dataPath);
 	~Resource();

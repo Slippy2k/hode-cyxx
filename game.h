@@ -652,10 +652,10 @@ struct Game {
 	int executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y);
 	void executeMstUnk16(MstUnk44 *m44, int flag);
 	bool mstTestActionDirection(MonsterObject1 *m, int num);
-	bool executeMstUnk19(LvlObject *o, int type);
-	bool executeMstUnk21(LvlObject *o, int type);
-	bool executeMstUnk28(LvlObject *o, int type) const;
-	bool executeMstUnk22(LvlObject *o, int type);
+	bool lvlObjectCollidesAndy1(LvlObject *o, int type) const;
+	bool lvlObjectCollidesAndy2(LvlObject *o, int type) const;
+	bool lvlObjectCollidesAndy4(LvlObject *o, int type) const;
+	bool lvlObjectCollidesAndy3(LvlObject *o, int type) const;
 	bool mstCollidesByFlags(MonsterObject1 *m, uint32_t flags);
 	bool executeMstUnk27(MonsterObject1 *m, const uint8_t *p);
 	int mstUpdateTaskMonsterObject1(Task *t);

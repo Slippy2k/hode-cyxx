@@ -175,7 +175,7 @@ void Game::disableMonsterObject1(MonsterObject1 *m) {
 void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
 	MstUnk46Unk1 *m46unk1 = &m->m46->data[num];
 	m->m46Unk1 = m46unk1;
-	m->unk8 = _res->_mstHeightMapData + m46unk1->indexHeight * kMstHeightMapDataSize;
+	m->unk8 = _res->_mstMonsterInfos + m46unk1->indexMonsterInfo * kMonsterInfoDataSize;
 	if (m46unk1->indexUnk51 == kNone) {
 		m->flags48 &= ~4;
 	}
@@ -910,23 +910,23 @@ void Game::startMstCode() {
 	_mstAndyLevelPrevPosY = _mstAndyLevelPosY;
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
-		offset += kMstHeightMapDataSize;
-		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]); // 900
-		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]); // 896
+		offset += kMonsterInfoDataSize;
+		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x30]); // 900
+		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x34]); // 896
 
 		const uint32_t unk20 = _mstAndyLevelPosX - unk30;
 		const uint32_t unk1C = _mstAndyLevelPosX + unk30;
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x20], unk20);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x1C], unk1C);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x24], unk20 - unk34);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x18], unk1C + unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x20], unk20);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x1C], unk1C);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x24], unk20 - unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x18], unk1C + unk34);
 
 		const uint32_t unk10 = _mstAndyLevelPosY - unk30;
 		const uint32_t unk0C = _mstAndyLevelPosY + unk30;
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x10], unk10);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x0C], unk0C);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x14], unk10 - unk34);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x08], unk0C + unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x10], unk10);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x0C], unk0C);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x14], unk10 - unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x08], unk0C + unk34);
 	}
 	if (_levelCheckpoint < _res->_mstHdr.unk0x14) {
 		const uint32_t codeData = _res->_mstScreenInitCodeData[_levelCheckpoint];
@@ -1456,7 +1456,7 @@ l41B2DC:
 	m->unk7C += _mstAndyLevelPosX;
 	m->unk78 += _mstAndyLevelPosY;
 	m->unk80 += _mstAndyLevelPosY;
-	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr[2] & 0x5) == 0) {
 		m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 	}
@@ -1742,7 +1742,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 	int var8 = _mstLut1[m->flags4A];
 	for (; var20 < 5; ++var20) {
 		if (var20 != 0) {
-			const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 			if (p[0xE] == 0 || varC == 0) {
 				break;
 			}
@@ -1754,7 +1754,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 			continue;
 		}
 		int _ecx, _eax;
-		const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (_mstLut1[var4] & 1) {
 			_ecx = p[0xA];
 			_eax = p[0xB];
@@ -1812,7 +1812,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		}
 		m->unkAC = _edi;
 		m->unkB0 = _ebp;
-		p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (p[0xE] != 0) {
 			const int x1 = m->xMstPos + (int8_t)p[0xC];
 			const int x2 = x1 + p[0xE] - 1;
@@ -1878,7 +1878,7 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 		}
 	}
 // 41B64F
-	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((m->unk8[946] & 4) == 0 && (m->flagsA5 & 4) == 0 && (m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0) {
 		int _edi, _ebp;
 		if (_mstLut1[m->flags4A] & 1) {
@@ -1906,7 +1906,7 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 		}
 	}
 // 41B72A
-	ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	int _edx, _ecx;
 	if (_mstLut1[m->flags4A] & 1) {
 		_edx = (int8_t)ptr[0xA];
@@ -1946,7 +1946,7 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 		}
 	}
 // 41B80E
-	ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
 	return 1;
 }
@@ -2134,8 +2134,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	return (var8 & _ecx) != 0 ? 0 : 1;
 }
 
-// lvlObjectCollidesAndy1
-bool Game::executeMstUnk19(LvlObject *o, int flags) {
+bool Game::lvlObjectCollidesAndy1(LvlObject *o, int flags) const {
 	int x1, y1, x2, y2;
 	if (flags != 1 && flags != 0x4000) {
 		x1 = o->xPos;
@@ -2167,8 +2166,7 @@ bool Game::executeMstUnk19(LvlObject *o, int flags) {
 	return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
-// lvlObjectCollidesAndy2
-bool Game::executeMstUnk21(LvlObject *o, int type) {
+bool Game::lvlObjectCollidesAndy2(LvlObject *o, int type) const {
 	int x1, y1, x2, y2;
 	if (type != 1 && type != 0x1000) {
 		x1 = o->xPos; // _esi
@@ -2198,8 +2196,7 @@ bool Game::executeMstUnk21(LvlObject *o, int type) {
 	return (_andyObject->xPos + _andyObject->width - 1 >= x1 && _andyObject->xPos <= x2 && _andyObject->yPos + _andyObject->height - 1 >= y1 && _andyObject->yPos <= y2);
 }
 
-// lvlObjectCollidesAndy3
-bool Game::executeMstUnk22(LvlObject *o, int type) {
+bool Game::lvlObjectCollidesAndy3(LvlObject *o, int type) const {
 	int x1, y1, x2, y2;
 	if (type != 1) {
 		x1 = o->xPos; // _eax
@@ -2226,8 +2223,7 @@ bool Game::executeMstUnk22(LvlObject *o, int type) {
 	return false;
 }
 
-// lvlObjectCollidesAndy4
-bool Game::executeMstUnk28(LvlObject *o, int type) const {
+bool Game::lvlObjectCollidesAndy4(LvlObject *o, int type) const {
 	int x1, y1, x2, y2;
 	if (type != 1) {
 		x1 = o->xPos; // _edx
@@ -2270,27 +2266,27 @@ bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 		return false;
 	} else if ((flags & 0x80) != 0 && (mstGetFacingDirectionMask(m->flags49) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->unk8[946] & 4) != 0) {
 		return false;
-	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 0))) {
+	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy1(m->o16, 0))) {
 		return false;
-	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk19(m->o16, 1))) {
+	} else if ((flags & 0x800) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy1(m->o16, 1))) {
 		return false;
-	} else if ((flags & 0x100000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk22(m->o16, 0))) {
+	} else if ((flags & 0x100000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy3(m->o16, 0))) {
 		return false;
-	} else if ((flags & 0x200000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk22(m->o16, 1))) {
+	} else if ((flags & 0x200000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy3(m->o16, 1))) {
 		return false;
-	} else if ((flags & 4) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk21(m->o16, 0))) {
+	} else if ((flags & 4) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy2(m->o16, 0))) {
 		return false;
-	} else if ((flags & 2) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk21(m->o16, 1))) {
+	} else if ((flags & 2) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy2(m->o16, 1))) {
 		return false;
-	} else if ((flags & 0x4000) != 0 && !executeMstUnk19(m->o16, 0x4000)) {
+	} else if ((flags & 0x4000) != 0 && !lvlObjectCollidesAndy1(m->o16, 0x4000)) {
 		return false;
-	} else if ((flags & 0x1000) != 0 && !executeMstUnk21(m->o16, 0x1000)) {
+	} else if ((flags & 0x1000) != 0 && !lvlObjectCollidesAndy2(m->o16, 0x1000)) {
 		return false;
 	} else if ((flags & 0x20) != 0 && (m->o16->flags0 & 0x100) == 0) {
 		return false;
-	} else if ((flags & 0x10000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk28(m->o16, 1))) {
+	} else if ((flags & 0x10000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy4(m->o16, 1))) {
 		return false;
-	} else if ((flags & 0x20000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !executeMstUnk28(m->o16, 0))) {
+	} else if ((flags & 0x20000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy4(m->o16, 0))) {
 		return false;
 	} else if ((flags & 0x40000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 36))) {
 		return false;
@@ -2355,7 +2351,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	if (_edi != kNone) {
 		MstUnk46 *m46 = _mstCurrentMonster1->m46;
 		for (uint32_t i = 0; i < m46->count; ++i) {
-			if (m46->data[i].indexHeight == _edi) {
+			if (m46->data[i].indexMonsterInfo == _edi) {
 				copyMonsterObject1(_mstCurrentTask, _mstCurrentMonster1, i);
 				return 0;
 			}
@@ -2471,7 +2467,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418530
 		int var20 = -1;
 		int indexUnk51;
-		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->indexUnk51 != kNone && m->unk8 == &_res->_mstHeightMapData[m->unk18->unk0 * 948]) {
+		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->indexUnk51 != kNone && m->unk8 == &_res->_mstMonsterInfos[m->unk18->unk0 * 948]) {
 			indexUnk51 = m->unk18->indexUnk51;
 		} else {
 			indexUnk51 = _esi->indexUnk51;
@@ -3049,23 +3045,23 @@ void Game::updateMstHeightMapData() {
 	}
 	int offset = 0;
 	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
-		offset += kMstHeightMapDataSize;
-		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x30]); // 900
-		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstHeightMapData[offset - 0x34]); // 896
+		offset += kMonsterInfoDataSize;
+		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x30]); // 900
+		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x34]); // 896
 
 		const uint32_t unk20 = _mstAndyLevelPosX - unk30;
 		const uint32_t unk1C = _mstAndyLevelPosX + unk30;
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x20], unk20);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x1C], unk1C);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x24], unk20 - unk34);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x18], unk1C + unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x20], unk20);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x1C], unk1C);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x24], unk20 - unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x18], unk1C + unk34);
 
 		const uint32_t unk10 = _mstAndyLevelPosY - unk30;
 		const uint32_t unk0C = _mstAndyLevelPosY + unk30;
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x10], unk10);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x0C], unk0C);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x14], unk10 - unk34);
-		WRITE_LE_UINT32(&_res->_mstHeightMapData[offset - 0x08], unk0C + unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x10], unk10);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x0C], unk0C);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x14], unk10 - unk34);
+		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x08], unk0C + unk34);
 	}
 }
 
@@ -3255,9 +3251,9 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 // 40EAD0
 	m->flagsA4 = var4;
 	if (delay == -1) {
-		const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
-		assert((offset % kMstHeightMapDataSize) == 0);
-		t->arg2 = offset / kMstHeightMapDataSize;
+		const uint32_t offset = m->unk8 - _res->_mstMonsterInfos;
+		assert((offset % kMonsterInfoDataSize) == 0);
+		t->arg2 = offset / kMonsterInfoDataSize;
 		t->run = &Game::runTask_unk4;
 		debug(kDebug_MONSTER, "mstTaskSetActionDirection arg2 %d", t->arg2);
 	} else {
@@ -4572,12 +4568,12 @@ int Game::mstSm_main(Task *t) {
 			break;
 		case 226: { // 68
 				const int num = READ_LE_UINT16(p + 2);
-				const MstUnk63 *m63 = &_res->_mstUnk63[num];
+				const MstOp226Data *m226Data = &_res->_mstOp226Data[num];
 				int _edi  = _res->_mstPointOffsets[_currentScreen].xOffset; // xOffset
 				int var14 = _res->_mstPointOffsets[_currentScreen].yOffset; // yOffset
 				int var1C = 0;
 				int var8  = 0;
-				int _ecx  = m63->unk4 * 256;
+				int _ecx  = m226Data->unk4 * 256;
 				int _edx  = _edi + 256;
 				_edi -= _ecx;
 				_edx += _ecx;
@@ -4587,7 +4583,7 @@ int Game::mstSm_main(Task *t) {
 					if (!m->m46) {
 						continue;
 					}
-					if (m->unk8[944] != _res->_mstHeightMapData[m63->unk0 * kMstHeightMapDataSize + 944]) {
+					if (m->unk8[944] != _res->_mstMonsterInfos[m226Data->unk0 * kMonsterInfoDataSize + 944]) {
 						continue;
 					}
 					if (m->xMstPos < _edi || m->xMstPos > var20) {
@@ -4606,18 +4602,18 @@ int Game::mstSm_main(Task *t) {
 				_edi = var1C;
 				_edx = var8;
 				int _ebx = var1C + var8;
-				if (_ebx >= m63->unk3) {
+				if (_ebx >= m226Data->unk3) {
 					break;
 				}
 				_edi += var8;
-				_ecx = m63->unk3 - _edi;
-				_edi = m63->unk1;
+				_ecx = m226Data->unk3 - _edi;
+				_edi = m226Data->unk1;
 				if (var8 >= _edi) {
 					_edi = 0;
 				} else {
 					_edi -= var8;
 				}
-				int _esi = m63->unk2;
+				int _esi = m226Data->unk2;
 				if (var1C >= _esi) {
 					_esi = 0;
 				} else {
@@ -4642,7 +4638,7 @@ int Game::mstSm_main(Task *t) {
 					}
 				}
 				if (_edi != 0 || _esi != 0) {
-					mstOp68_addMonsterGroup(t, _res->_mstHeightMapData + m63->unk0 * kMstHeightMapDataSize, _edi, _esi, _ecx, m63->unk6);
+					mstOp68_addMonsterGroup(t, _res->_mstMonsterInfos + m226Data->unk0 * kMonsterInfoDataSize, _edi, _esi, _ecx, m226Data->unk6);
 				}
 			}
 			break;
@@ -5126,7 +5122,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->unkBC = -1;
 	m->flagsA7 = 255;
 	m->unk80 = m->unk70;
-	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr[2] & 5) == 0) {
 		m->unk6C = m->yMstPos;
 		m->unk78 = m->yMstPos;
@@ -5202,7 +5198,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 // 41C038
 	if (m->unk8[946] & 4) {
-		const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		const int x1 = m->xMstPos + (int8_t)p[0xC];
 		const int x2 = x1 + p[0xE] - 1;
 		const int y1 = m->yMstPos + (int8_t)p[0xD];
@@ -5368,7 +5364,7 @@ l1:
 			}
 			debug(kDebug_MONSTER, "mstCollidesDirection (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
-				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
+				uint8_t var4D = _res->_mstMonsterInfos[m12u4->unk0 * kMonsterInfoDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DC19
 					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
@@ -5465,7 +5461,7 @@ l2:
 			}
 			debug(kDebug_MONSTER, "mstCollidesDirection (unk0==0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
-				uint8_t var4D = _res->_mstHeightMapData[m12u4->unk0 * kMstHeightMapDataSize + 946] & 2;
+				uint8_t var4D = _res->_mstMonsterInfos[m12u4->unk0 * kMonsterInfoDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DF10
 					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
@@ -6052,7 +6048,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					break;
 				case 1:
 					_eax = _res->_mstOp56Data[num].unk4;
-					if (m->unk8 == &_res->_mstHeightMapData[_eax * kMstHeightMapDataSize]) {
+					if (m->unk8 == &_res->_mstMonsterInfos[_eax * kMonsterInfoDataSize]) {
 						++count;
 					}
 					break;
@@ -6471,9 +6467,9 @@ void Game::mstResetCollisionTable() {
 			}
 			assert(m->task->monster1 == m);
 			if ((_al & 8) == 0 || m->unk8[945] != 0) {
-				const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
-				assert(offset % kMstHeightMapDataSize == 0);
-				const uint32_t _ecx = offset / kMstHeightMapDataSize;
+				const uint32_t offset = m->unk8 - _res->_mstMonsterInfos;
+				assert(offset % kMonsterInfoDataSize == 0);
+				const uint32_t _ecx = offset / kMonsterInfoDataSize;
 				assert(_ecx < 32);
 				_al = m->xMstPos < _mstAndyLevelPosX;
 				const int count = _mstCollisionTable[_al][_ecx].count;
@@ -6585,7 +6581,7 @@ int Game::executeMstOp67Type1(Task *t) {
 	m->unk64 += _edi;
 	m->unk74 = m->unk64;
 	m->unk7C = m->unk68;
-	const uint8_t *ptr1 = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr1[2] & 0xA) == 0) {
 		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
 	}
@@ -6601,7 +6597,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		m->unk78 = m->unk6C;
 		m->unk70 -= _edi;
 		m->unk80 = m->unk70;
-		const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if ((ptr[2] & 5) == 0) {
 			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 		}
@@ -6634,7 +6630,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		if (_edi != 0) {
 			if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)) {
 // 41C833
-				const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+				const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 				if ((m->unk8[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 255) {
 					const int x1 = m->xMstPos + (int8_t)p[0xC];
 					const int x2 = x1 + p[0xE] - 1;
@@ -6744,7 +6740,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		m->unk7C = m->unk68;
 		m->unk78 = m->unk6C;
 		m->unk80 = m->unk70;
-		const uint8_t *ptr1 = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+		const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if ((ptr1[2] & 0x5) == 0) {
 			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 		}
@@ -6813,7 +6809,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 // 41CF99
 	if (_edi) {
 		if (_xMstPos2 >= m->m49->unk14 || ((m->unk8[946] & 2) != 0 && (_yMstPos2 >= m->m49->unk15))) {
-			const uint8_t *p = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 			if ((m->unk8[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 0xFF) {
 				const int x1 = m->xMstPos + (int8_t)p[0xC];
 				const int x2 = x1 + p[0xE] - 1;
@@ -6938,7 +6934,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		assert((uint32_t)arg20 < m46->count);
 		MstUnk46Unk1 *m1 = &m46->data[arg20]; // _ecx
 		m->m46Unk1 = m1;
-		m->unk8 = _res->_mstHeightMapData + m1->indexHeight * kMstHeightMapDataSize;
+		m->unk8 = _res->_mstMonsterInfos + m1->indexMonsterInfo * kMonsterInfoDataSize;
 
 		m->localVars[7] = m1->energy;
 
@@ -7112,10 +7108,10 @@ void Game::mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int 
 		MstUnk46 *m46 = &_res->_mstUnk46[m42->indexUnk46[i]];
 		for (uint32_t j = 0; j < m46->count; ++j) {
 			MstUnk46Unk1 *m46u1 = &m46->data[j];
-			uint32_t indexHeight = p - _res->_mstHeightMapData;
-			assert((indexHeight % kMstHeightMapDataSize) == 0);
-			indexHeight /= kMstHeightMapDataSize;
-			if (m46u1->indexHeight == indexHeight) {
+			uint32_t indexMonsterInfo = p - _res->_mstMonsterInfos;
+			assert((indexMonsterInfo % kMonsterInfoDataSize) == 0);
+			indexMonsterInfo /= kMonsterInfoDataSize;
+			if (m46u1->indexMonsterInfo == indexMonsterInfo) {
 				assert(count < 16);
 				data[count].m42Index = i;
 				data[count].m46Index = j;
@@ -7316,9 +7312,9 @@ int Game::runTask_unk3(Task *t) {
 int Game::runTask_unk4(Task *t) {
 	debug(kDebug_MONSTER, "runTask_unk4 t %p", t);
 	MonsterObject1 *m = t->monster1;
-	const uint32_t offset = m->unk8 - _res->_mstHeightMapData;
-	assert(offset % kMstHeightMapDataSize == 0);
-	const uint32_t num = offset / kMstHeightMapDataSize;
+	const uint32_t offset = m->unk8 - _res->_mstMonsterInfos;
+	assert(offset % kMonsterInfoDataSize == 0);
+	const uint32_t num = offset / kMonsterInfoDataSize;
 	if (t->arg2 != num) {
 		updateMonsterObject1Position(m);
 		executeMstUnk13(t);
@@ -7343,7 +7339,7 @@ int Game::runTask_unk5(Task *t) {
 		return executeMstUnk9(t, m);
 	}
 set_am:
-	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
 	return 1;
 }
@@ -7371,7 +7367,7 @@ int Game::runTask_unk6(Task *t) {
 		return executeMstUnk9(t, m);
 	}
 set_am:
-	const uint8_t *ptr = _res->_mstHeightMapData + m->m49Unk1->offsetHeight;
+	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	mstLvlObjectSetActionDirection(m->o16, ptr, ptr[3], m->flags4A);
 	return 1;
 }

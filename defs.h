@@ -16,7 +16,7 @@ enum {
 enum {
 	kNone = 0xFFFFFFFF, // (uint32_t)-1
 	kLvlAnimHdrOffset = 0x2C,
-	kMstHeightMapDataSize = 948
+	kMonsterInfoDataSize = 948 // (32 * 28 + 52)
 };
 
 enum {
