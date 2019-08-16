@@ -1313,6 +1313,9 @@ void Game::queueSoundObjectsPcmStride() {
 				warning("MixingQueue overflow %d", _mix._mixingQueueSize);
 				break;
 			}
+			if (so->panL == 0 && so->panR == 0) {
+				continue;
+			}
 			_mix._mixingQueue[_mix._mixingQueueSize].ptr = so->currentPcmPtr;
 			_mix._mixingQueue[_mix._mixingQueueSize].end = end;
 			_mix._mixingQueue[_mix._mixingQueueSize].panL = so->panL;
