@@ -128,38 +128,47 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 		if ((p[1] & 0x40) == 0 && clipBoundingBox(r, &b)) {
 			found = true;
 // 406B66
-			// TODO
-
+			if ((p[2] & 0x80) == 0 && !updateLevelTick_lar_helper3(true, p[2], p[0], num, (p[1] >> 5) & 1)) {
+				continue;
+			}
+			p[1] |= 0x40;
+			if ((p[1] & 0x8) != 0) {
+				continue;
+			}
+			if (_currentLevel == kLvl_lar2) {
+				_edi = &_lar2_unkData0[p[3] * 4];
+			} else {
+				_edi = &_lar1_unkData0[p[3] * 4];
+			}
+			uint8_t _al = (p[1] >> 1) & 1;
+			uint8_t _bl = (_edi[0] >> 4);
+			if (_bl == _al) {
+				continue;
+			}
+			_bl = (_al << 4) | (_edi[0] & 15);
+			_edi[0] = _bl;
+			uint8_t _cl = (p[1] >> 5) & 1;
+			if (_cl != 1 || _al != _cl) {
+				continue;
+			}
 		} else {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 				if (_currentLevel == kLvl_lar2) {
 					_edi = &_lar2_unkData0[p[3] * 4];
-					uint8_t _al = ((~p[1]) >> 1) & 1;
-					uint8_t _bl = (_edi[0] >> 4);
-					if (_bl == _al) {
-						continue;
-					}
-					_bl = (_al << 4) | (_edi[0] & 15);
-					_edi[0] = _bl;
-					uint8_t _cl = (p[1] >> 5) & 1;
-					if (_cl != 1 || _al != _cl) {
-						continue;
-					}
 				} else {
-// 406C94
 					_edi = &_lar1_unkData0[p[3] * 4];
-					uint8_t _al = ((~p[1]) >> 1) & 1;
-					uint8_t _bl = (_edi[0] >> 4);
-					if (_bl == _al) {
-						continue;
-					}
-					_bl = (_al << 4) | (_edi[0] & 15);
-					_edi[0] = _bl;
-					uint8_t _cl = (p[1] >> 5) & 1;
-					if (_cl != 1 || _al != _cl) {
-						continue;
-					}
+				}
+				uint8_t _al = ((~p[1]) >> 1) & 1;
+				uint8_t _bl = (_edi[0] >> 4);
+				if (_bl == _al) {
+					continue;
+				}
+				_bl = (_al << 4) | (_edi[0] & 15);
+				_edi[0] = _bl;
+				uint8_t _cl = (p[1] >> 5) & 1;
+				if (_cl != 1 || _al != _cl) {
+					continue;
 				}
 			}
 		}
@@ -168,8 +177,41 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 	}
 }
 
-void Game::updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const BoundingBox *r) {
-	// TODO
+int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, BoundingBox *b2) {
+	int ret = 0;
+	//const uint8_t flags = _andyObject->flags0 & 0x1F;
+	if ((p[1] & 0x40) == 0) {
+		ret = clipBoundingBox(b1, b2);
+		if (ret) {
+			if ((p[1] & 1) == 0) {
+				return ret;
+			}
+// 4068A4
+			// TODO
+		}
+	}
+// 406A0D
+	if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
+		if (_currentLevel == kLvl_lar2) {
+			p = &_lar2_unkData0[p[3] * 4];
+		} else {
+			p = &_lar1_unkData0[p[3] * 4];
+		}
+		uint8_t _al = ((~p[1]) >> 1) & 1;
+		uint8_t _cl = (p[1] >> 5) & 1;
+		p = &_lar2_unkData0[p[3] * 4];
+		uint8_t _bl = p[0] >> 4;
+		if (_bl == _al) {
+			return ret;
+		}
+		_bl = (_al << 4) | (p[0] & 0xF);
+		p[0] = _bl;
+		if (_cl != 1 || _al != _cl) {
+			return ret;
+		}
+		p[3] = 4;
+	}
+	return ret;
 }
 
 extern BoundingBox _lar2_unkData2[13];

@@ -525,7 +525,7 @@ struct Game {
 
 	// level7_lar1.cpp
 	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
-	void updateLevelTick_lar_helper2(int num, uint8_t *p1, const BoundingBox *b, const BoundingBox *r);
+	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
 	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
 	void updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r);
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
