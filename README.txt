@@ -48,12 +48,12 @@ What is working :
 * Plasma Cannon
 * Level screens
 * Hint screens
-
-What is partial :
 * Monsters logic (MST)
-* Sound playback (SSS)
 * Special Powers
 * Shooting collisions
+
+What is partial :
+* Sound playback (SSS)
 
 What is missing :
 * Menus
