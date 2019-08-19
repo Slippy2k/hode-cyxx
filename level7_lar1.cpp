@@ -187,7 +187,58 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 				return ret;
 			}
 // 4068A4
-			// TODO
+			const int flag = (p[1] >> 5) & 1;
+			uint8_t _al = updateLevelTick_lar_helper5(b2, flag);
+			_al = updateLevelTick_lar_helper3(_al, p[2], p[0], num, flag);
+			p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
+			_al = p[1];
+			if ((_al & 0x40) == 0) {
+				return ret;
+			}
+			ret = 1;
+			if ((_al & 8) != 0) {
+				if (_al & 2) {
+					_al = p[3];
+				} else {
+					_al = -p[3];
+				}
+				int _bl, i;
+				if (_al < 0) {
+					i = (-_al) * 6;
+					updateLevelTick_lar_helper4(&_lar1_unkData1[i], 0);
+					_bl = 5;
+				} else {
+					i = _al * 6;
+					updateLevelTick_lar_helper4(&_lar1_unkData1[i], 1);
+					_bl = 2;
+				}
+				LvlObject *o = findLvlObject2(0, _lar1_unkData1[i + 5], _lar1_unkData1[i + 4]);
+				if (o) {
+					o->objectUpdateType = _bl;
+				}
+				return ret;
+			}
+// 40699A
+			uint8_t _cl = (_al >> 5) & 1;
+			_al = (_al >> 1) & 1;
+			uint8_t *_esi;
+			if (_currentLevel == kLvl_lar2) {
+				_esi = &_lar2_unkData0[p[3] * 4];
+			} else {
+				_esi = &_lar1_unkData0[p[3] * 4];
+			}
+			uint8_t _dl = _esi[0];
+			uint8_t _bl = _dl >> 4;
+			if (_bl == _al) {
+				return ret;
+			}
+			_bl = (_al << 4) | (_dl & 15);
+			*_esi=  _bl;
+			if (_cl != 1 || _al != _cl) {
+				return ret;
+			}
+			_esi[3] = 4;
+			return ret;
 		}
 	}
 // 406A0D
@@ -259,6 +310,32 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 		}
 	}
 	return _bl;
+}
+
+void Game::updateLevelTick_lar_helper4(uint8_t *p, int num) {
+	// TODO
+}
+
+int Game::updateLevelTick_lar_helper5(BoundingBox *b, bool flag) {
+	int ret = 0;
+	const uint8_t flags = _andyObject->flags0 & 0x1F;
+	if (flags != 3 && flags != 5 && !flag) {
+		BoundingBox b1;
+		b1.x1 = _andyObject->xPos + _andyObject->posTable[5].x - 3;
+		b1.x2 = b1.x1 + 6;
+		b1.y1 = _andyObject->yPos + _andyObject->posTable[5].y - 3;
+		b1.y2 = b1.y1 + 6;
+		ret = clipBoundingBox(&b1, b);
+		if (!ret) {
+			BoundingBox b2;
+			b2.x1 = _andyObject->xPos + _andyObject->posTable[4].x - 3;
+			b2.x2 = b2.x1 + 6;
+			b2.y1 = _andyObject->yPos + _andyObject->posTable[4].y - 3;
+			b2.y2 = b2.y1 + 6;
+			ret = clipBoundingBox(&b2, b);
+		}
+	}
+	return ret;
 }
 
 void Game::updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r) {
