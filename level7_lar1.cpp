@@ -463,7 +463,63 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 		}
 	}
 // 4063C4
-	// TODO
+	int _ebp = o->yPos + o->posTable[1].y;
+	int _ecx = o->posTable[1].y - o->posTable[2].y - 7;
+	int _edx = o->xPos + o->posTable[1].x;
+	if (_edx < 0) {
+		_edx = 0;
+	}
+	static uint8_t byte_452338[32];
+	if (_ebp < 0) {
+		_ebp = 0;
+	}
+	int offset = (_res->_screensBasePos[o->screenNum].u + _edx) >> 3;
+	offset += ((_res->_screensBasePos[o->screenNum].v + _ebp) << 6) & ~511;
+	if (_ecx < 0) {
+		_ecx = -_ecx;
+		_ecx >>= 3;
+		for (int i = 0; i < _ecx; ++i) {
+			memset(_screenMaskBuffer + offset, 0, 4);
+			offset += 4;
+		}
+	} else {
+// 406456
+		_ecx >>= 3;
+		for (int i = 0; i < _ecx; ++i) {
+			memcpy(_screenMaskBuffer + offset, byte_452338 + i * 4, 4);
+			offset += 512;
+		}
+	}
+// 40647B
+	if (o->screenNum == _currentScreen || (o->screenNum == _currentRightScreen && _res->_resLevelData0x2B88SizeTable[_currentRightScreen] != 0) || (o->screenNum == _currentLeftScreen && _res->_resLevelData0x2B88SizeTable[_currentLeftScreen] != 0)) {
+		updateAndyObject(o);
+	}
+// 4064C1
+	int _ebx = o->yPos + o->posTable[1].y;
+	_ecx = o->posTable[2].y - o->posTable[1].y + 7;
+	_edx = o->xPos + o->posTable[1].x;
+	if (_edx < 0) {
+		_edx = 0;
+	}
+	if (_ebx < 0) {
+		_ebx = 0;
+	}
+	offset = (_res->_screensBasePos[o->screenNum].u + _ebx) >> 3;
+	offset += ((_res->_screensBasePos[o->screenNum].v + _edx) << 6) & ~511;
+	if (_ecx < 0) {
+		_ecx = -_ecx;
+		_ecx >>= 3;
+		for (int i = 0; i < _ecx; ++i) {
+			memset(_screenMaskBuffer + offset, 0, 4);
+			offset += 512;
+		}
+	} else {
+		_ecx >>= 3;
+		for (int i = 0; i < _ecx; ++i) {
+			memcpy(_screenMaskBuffer + offset, byte_452338 + i * 4, 4);
+			offset += 512;
+		}
+	}
 // 406576
 	if (o->screenNum == _res->_currentScreenResourceNum && o->directionKeyMask == 4) {
 		if ((o->flags0 & 0x1F) == 1 && (o->flags0 & 0xE0) == 0x40) {
