@@ -355,7 +355,7 @@ static const uint8_t _level1OpHelper1KeyMaskTable[112] = {
 	8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 8, 0, 4, 0
 };
 
-void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_helper
+void Game::objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p) {
 	const bool sameScreen = (_andyObject->screenNum == ptr->screenNum);
 	int i = (_andyObject->width / 2 + _andyObject->xPos + (_andyObject->xPos & 7)) / 8;
 	if (i < 0 || ptr->screenNum != _res->_currentScreenResourceNum) {
@@ -392,7 +392,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 		}
 	}
 	if (_plasmaCannonDirection && (ptr->flags0 & 0x1F) != 0xB) {
-		if (level1OpHelper2(ptr->childPtr) != 0) {
+		if (plasmaCannonHit(ptr->childPtr)) {
 			ptr->actionKeyMask |= 0x20;
 			++ptr->hitCount;
 			if (ptr->hitCount > p[65]) {
@@ -409,7 +409,7 @@ void Game::level1OpHelper1(LvlObject *ptr, uint8_t *p) { // objectUpdate_rock_he
 	updateAndyObject(o);
 }
 
-int Game::level1OpHelper2(LvlObject *ptr) { // plasmaCannonHit
+bool Game::plasmaCannonHit(LvlObject *ptr) {
 	assert(ptr);
 	if (ptr->bitmapBits) {
 		int dx = 0;
@@ -418,15 +418,15 @@ int Game::level1OpHelper2(LvlObject *ptr) { // plasmaCannonHit
 		} else if (ptr->screenNum == _currentRightScreen) {
 			dx = 256;
 		} else if (ptr->screenNum != _currentScreen) {
-			return 0;
+			return false;
 		}
 		if (testPlasmaCannonPointsDirection(ptr->xPos + dx, ptr->yPos, ptr->xPos + dx + ptr->width, ptr->yPos + ptr->height)) {
-			return 1;
+			return true;
 		}
 		assert(_plasmaExplosionObject);
 		_plasmaExplosionObject->screenNum = ptr->screenNum;
 	}
-	return 0;
+	return false;
 }
 
 // shadow screen2
@@ -439,7 +439,7 @@ int Game::objectUpdate_rock_case1(LvlObject *o) {
 		0x0C, 0x07, 0x00, 0x00
 	};
 	if (_screenCounterTable[2] == 0) {
-		level1OpHelper1(o, data);
+		objectUpdate_rock_helper(o, data);
 		if ((o->flags0 & 0x3FF) == 0x4B) {
 			_screenCounterTable[2] = 1;
 		}
@@ -458,7 +458,7 @@ int Game::objectUpdate_rock_case2(LvlObject *o) {
 		0x06, 0x0B, 0x00, 0x00
 	};
 	if (_screenCounterTable[3] == 0) {
-		level1OpHelper1(o, data);
+		objectUpdate_rock_helper(o, data);
 		if ((o->flags0 & 0x3FF) == 0x4B) {
 			_screenCounterTable[3] = 1;
 		}

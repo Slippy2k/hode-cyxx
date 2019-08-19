@@ -359,8 +359,8 @@ struct Game {
 	void callLevel_postScreenUpdate_rock(int num);
 
 	int objectUpdate_rock_case0(LvlObject *o);
-	void level1OpHelper1(LvlObject *ptr, uint8_t *p);
-	int level1OpHelper2(LvlObject *ptr);
+	void objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p);
+	bool plasmaCannonHit(LvlObject *ptr);
 	int objectUpdate_rock_case1(LvlObject *o);
 	int objectUpdate_rock_case2(LvlObject *o);
 	int objectUpdate_rock_case3(LvlObject *o);
