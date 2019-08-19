@@ -313,7 +313,28 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 }
 
 void Game::updateLevelTick_lar_helper4(uint8_t *p, int num) {
-	// TODO
+	if (num != p[1]) {
+		p[1] = num;
+		const uint8_t num = p[4];
+		int offset = (_res->_screensBasePos[num].u + p[2]) >> 3;
+		offset += ((_res->_screensBasePos[num].v + p[3]) << 6) & ~511;
+		uint8_t *dst = _screenMaskBuffer + offset;
+		const uint8_t *src = off_452580[p[0]];
+		const int count = (int16_t)READ_LE_UINT16(src); src += 2;
+		if (num == 0) {
+			for (int i = 0; i < count; ++i) {
+				offset = (int16_t)READ_LE_UINT16(src); src += 2;
+				dst += offset;
+				*dst &= ~8;
+			}
+		} else {
+			for (int i = 0; i < count; ++i) {
+				offset = (int16_t)READ_LE_UINT16(src); src += 2;
+				dst += offset;
+				*dst |= 8;
+			}
+		}
+	}
 }
 
 int Game::updateLevelTick_lar_helper5(BoundingBox *b, bool flag) {
@@ -609,7 +630,7 @@ void Game::postScreenUpdate_lar1_screen12() {
 								uint8_t *dst = _screenMaskBuffer + offset;
 
 								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = READ_LE_UINT16(src); src += 2;
+								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
 								for (int i = 0; i < count; ++i) {
 									offset = (int16_t)READ_LE_UINT16(src); src += 2;
 									dst += offset;
@@ -628,7 +649,7 @@ void Game::postScreenUpdate_lar1_screen12() {
 								uint8_t *dst = _screenMaskBuffer + offset;
 
 								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = READ_LE_UINT16(src); src += 2;
+								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
 								for (int i = 0; i < count; ++i) {
 									offset = (int16_t)READ_LE_UINT16(src); src += 2;
 									dst += offset;
@@ -657,7 +678,7 @@ void Game::postScreenUpdate_lar1_screen12() {
 								uint8_t *dst = _screenMaskBuffer + offset;
 
 								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = READ_LE_UINT16(src); src += 2;
+								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
 								for (int i = 0; i < count; ++i) {
 									offset = (int16_t)READ_LE_UINT16(src); src += 2;
 									dst += offset;
@@ -676,7 +697,7 @@ void Game::postScreenUpdate_lar1_screen12() {
 								uint8_t *dst = _screenMaskBuffer + offset;
 
 								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = READ_LE_UINT16(src); src += 2;
+								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
 								for (int i = 0; i < count; ++i) {
 									offset = (int16_t)READ_LE_UINT16(src); src += 2;
 									dst += offset;
