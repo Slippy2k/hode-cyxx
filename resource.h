@@ -140,7 +140,7 @@ struct MstUnk34 { // MstBox
 	uint8_t unk10[4]; // 0x10
 }; // sizeof == 20
 
-struct MstUnk35 { // MstTrigger1
+struct MstUnk35 {
 	uint32_t *indexCodeData; // 0, offset _mstCodeData
 	uint32_t count1; // 4
 	uint8_t *data2; // 8
@@ -191,7 +191,7 @@ struct MstUnk44 { // MstPath
 	uint32_t count; // 0xC
 }; // sizeof == 16
 
-struct MstUnk45 { // MstTrigger2
+struct MstUnk45 {
 	uint8_t unk0;
 	uint8_t unk1;
 	uint16_t unk2;
@@ -307,17 +307,17 @@ struct MstUnk51 {
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstScreenInitCode { // MstScreenInitTrigger
+struct MstScreenInitCode {
 	int32_t delay;
 	uint32_t codeData;
 }; // sizeof == 8
 
-struct MstUnk59 { // MstOp240Data
+struct MstOp240Data {
 	uint32_t flags;
 	uint32_t codeData;
 }; // sizeof == 8
 
-struct MstUnk53 { // MstOp223Data
+struct MstOp223Data {
 	int16_t indexVar1;
 	int16_t indexVar2; // 2
 	int16_t indexVar3; // 4
@@ -347,7 +347,7 @@ struct MstUnk55 { // MstOp234Data
 	uint32_t codeData;
 }; // sizeof == 8
 
-struct MstUnk56 { // MstOp2Data
+struct MstOp2Data {
 	int32_t indexVar1; // 0
 	int32_t indexVar2; // 4
 	uint8_t maskVars; // 8
@@ -385,7 +385,7 @@ struct MstOp49Data { // MstOp197Data
 	int8_t unkF;
 }; // sizeof == 16
 
-struct MstOp58Data { // MstOp211Data
+struct MstOp211Data {
 	uint16_t indexVar1; // 0
 	uint16_t indexVar2; // 2
 	uint16_t unk4; // 4
@@ -566,13 +566,13 @@ struct Resource {
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
 	uint8_t *_mstUnk52; // sizeof == 4
-	MstUnk53 *_mstUnk53;
+	MstOp223Data *_mstOp223Data;
 	MstUnk54 *_mstUnk54;
 	MstUnk55 *_mstUnk55;
-	MstUnk56 *_mstUnk56;
+	MstOp2Data *_mstOp2Data;
 	MstOp49Data *_mstOp49Data;
-	MstOp58Data *_mstOp58Data;
-	MstUnk59 *_mstUnk59;
+	MstOp211Data *_mstOp211Data;
+	MstOp240Data *_mstOp240Data;
 	uint32_t *_mstUnk60; // index to _mstCodeData
 	MstOp56Data *_mstOp56Data;
 	uint8_t *_mstCodeData;
@@ -600,11 +600,11 @@ struct Resource {
 	void loadLvlScreenBackgroundData(int num);
 	void unloadLvlScreenBackgroundData(int num);
 
-	bool isLevelData0x2988Loaded(int num);
-	bool isLevelData0x2B88Loaded(int num);
+	bool isLvlSpriteDataLoaded(int num);
+	bool isLvlBackgroundDataLoaded(int num);
 
-	void incLevelData0x2988RefCounter(LvlObject *ptr);
-	void decLevelData0x2988RefCounter(LvlObject *ptr);
+	void incLvlSpriteDataRefCounter(LvlObject *ptr);
+	void decLvlSpriteDataRefCounter(LvlObject *ptr);
 
 	void loadDatHintImage(int num, uint8_t *dst, uint8_t *pal);
 	void loadDatLoadingImage(uint8_t *dst, uint8_t *pal);

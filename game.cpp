@@ -708,7 +708,7 @@ void Game::shuffleArray(uint8_t *p, int count) {
 void Game::destroyLvlObject(LvlObject *o) {
 	assert(o);
 	if (o->type == 8) {
-		_res->decLevelData0x2988RefCounter(o);
+		_res->decLvlSpriteDataRefCounter(o);
 		o->nextPtr = _declaredLvlObjectsListHead;
 		--_declaredLvlObjectsListCount;
 		_declaredLvlObjectsListHead = o;
@@ -920,7 +920,7 @@ void Game::clearLvlObjectsList0() {
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
-			_res->decLevelData0x2988RefCounter(ptr);
+			_res->decLvlSpriteDataRefCounter(ptr);
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
@@ -961,7 +961,7 @@ void Game::clearLvlObjectsList1() {
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
-			_res->decLevelData0x2988RefCounter(ptr);
+			_res->decLvlSpriteDataRefCounter(ptr);
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
@@ -993,7 +993,7 @@ void Game::clearLvlObjectsList2() {
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
-			_res->decLevelData0x2988RefCounter(ptr);
+			_res->decLvlSpriteDataRefCounter(ptr);
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
@@ -1025,7 +1025,7 @@ void Game::clearLvlObjectsList3() {
 	while (ptr != 0) {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
-			_res->decLevelData0x2988RefCounter(ptr);
+			_res->decLvlSpriteDataRefCounter(ptr);
 			ptr->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = ptr;
@@ -1060,7 +1060,7 @@ LvlObject *Game::addLvlObjectToList0(int num) {
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = 8;
-		_res->incLevelData0x2988RefCounter(ptr);
+		_res->incLvlSpriteDataRefCounter(ptr);
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
@@ -1082,7 +1082,7 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 		ptr->spriteNum = num;
 		ptr->type = type;
 		if (type == 8) {
-			_res->incLevelData0x2988RefCounter(ptr);
+			_res->incLvlSpriteDataRefCounter(ptr);
 			lvlObjectTypeCallback(ptr);
 		}
 		ptr->currentSprite = 0;
@@ -1104,7 +1104,7 @@ LvlObject *Game::addLvlObjectToList2(int num) {
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = 8;
-		_res->incLevelData0x2988RefCounter(ptr);
+		_res->incLvlSpriteDataRefCounter(ptr);
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
@@ -1125,7 +1125,7 @@ LvlObject *Game::addLvlObjectToList3(int num) {
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = 8;
-		_res->incLevelData0x2988RefCounter(ptr);
+		_res->incLvlSpriteDataRefCounter(ptr);
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
@@ -1168,7 +1168,7 @@ void Game::removeLvlObject2(LvlObject *o) {
 	}
 	o->dataPtr = 0;
 	if (o->type == 8) {
-		_res->decLevelData0x2988RefCounter(o);
+		_res->decLvlSpriteDataRefCounter(o);
 		o->nextPtr = _declaredLvlObjectsListHead;
 		_declaredLvlObjectsListHead = o;
 		--_declaredLvlObjectsListCount;
@@ -1197,7 +1197,7 @@ void Game::setAndySprite(int num) {
 	switch (num) {
 	case 0: //  Andy with plasma cannon and helmet
 		removeLvlObject(_andyObject);
-		setLvlObjectType8Resource(_andyObject, 8, 0);
+		setLvlObjectSprite(_andyObject, 8, 0);
 		_andyObject->anim = 48;
 		break;
 	case 2: // Andy
@@ -1207,7 +1207,7 @@ void Game::setAndySprite(int num) {
 		_plasmaCannonExplodeFlag = false;
 		_plasmaCannonPointsMask = 0;
 		_plasmaCannonObject = 0;
-		setLvlObjectType8Resource(_andyObject, 8, 2);
+		setLvlObjectSprite(_andyObject, 8, 2);
 		_andyObject->anim = 232;
 		break;
 	}
@@ -3780,7 +3780,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 			}
 		}
 		if (o->type == 8) {
-			_res->decLevelData0x2988RefCounter(o);
+			_res->decLvlSpriteDataRefCounter(o);
 			o->nextPtr = _declaredLvlObjectsListHead;
 			--_declaredLvlObjectsListCount;
 			_declaredLvlObjectsListHead = o;
@@ -4227,7 +4227,7 @@ LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 			ptr->spriteNum = num;
 			ptr->type = type;
 			if (type == 8) {
-				_res->incLevelData0x2988RefCounter(ptr);
+				_res->incLvlSpriteDataRefCounter(ptr);
 				lvlObjectTypeCallback(ptr);
 			}
 			ptr->currentSprite = 0;
@@ -4293,12 +4293,12 @@ void Game::initLvlObjects() {
 	}
 }
 
-void Game::setLvlObjectType8Resource(LvlObject *ptr, uint8_t type, uint8_t num) { // setLvlObjectSprite
+void Game::setLvlObjectSprite(LvlObject *ptr, uint8_t type, uint8_t num) {
 	if (ptr->type == 8) {
-		_res->decLevelData0x2988RefCounter(ptr);
+		_res->decLvlSpriteDataRefCounter(ptr);
 		ptr->spriteNum = num;
 		ptr->type = type;
-		_res->incLevelData0x2988RefCounter(ptr);
+		_res->incLvlSpriteDataRefCounter(ptr);
 	}
 }
 
@@ -4377,7 +4377,7 @@ void Game::updateCrackSprites() {
 	tmp.flags2 = 0x1001;
 	tmp.type = 8;
 	tmp.spriteNum = 20;
-	_res->incLevelData0x2988RefCounter(&tmp);
+	_res->incLvlSpriteDataRefCounter(&tmp);
 	uint32_t var68 = 0;
 	for (int i = 0; i < 6; ++i) {
 		uint32_t *flags = &spr->flags[i];
@@ -4419,7 +4419,7 @@ void Game::updateCrackSprites() {
 		}
 		var68 += 32;
 	}
-	_res->decLevelData0x2988RefCounter(&tmp);
+	_res->decLvlSpriteDataRefCounter(&tmp);
 }
 
 void Game::captureScreenshot() {

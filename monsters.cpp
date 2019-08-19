@@ -2060,7 +2060,7 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 
 		}
 // 41A560
-		// This matches disassembly byt looks like a copy-paste from the above condition
+		// This matches disassembly but looks like a copy-paste from the above condition
 /*
 		if (_esi >= _edi + _ebp) {
 			_xMstPos3 = x;
@@ -3765,7 +3765,7 @@ int Game::mstSm_main(Task *t) {
 			break;
 		case 2: { // 2 - set_var_random_range
 				const int num = READ_LE_UINT16(p + 2);
-				MstUnk56 *m = &_res->_mstUnk56[num];
+				MstOp2Data *m = &_res->_mstOp2Data[num];
 				int a = getTaskVar(t, m->indexVar1, m->maskVars >> 4); // _ebx
 				int b = getTaskVar(t, m->indexVar2, m->maskVars & 15); // _esi
 				if (a > b) {
@@ -4310,9 +4310,9 @@ int Game::mstSm_main(Task *t) {
 			// _mstCurrentMonster1 = t->monster1;
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				if (mstCollidesByFlags(t->monster1, _res->_mstUnk59[num].flags)) {
+				if (mstCollidesByFlags(t->monster1, _res->_mstOp240Data[num].flags)) {
 					t->codeData = p + 4;
-					mstTaskAttack(t, _res->_mstUnk59[num].codeData, 0x10);
+					mstTaskAttack(t, _res->_mstOp240Data[num].codeData, 0x10);
 					t->state &= ~2;
 					p = t->codeData - 4;
 				}
@@ -4399,7 +4399,7 @@ int Game::mstSm_main(Task *t) {
 						type = 2;
 						break;
 					}
-					mstOp59_1(xPos, yPos, o->screenNum, type, (o->flags2 + 1) & 0xDFFF);
+					mstOp59_addShootSpecialPowers(xPos, yPos, o->screenNum, type, (o->flags2 + 1) & 0xDFFF);
 				} else {
 					int type = 0;
 					switch (dirMask) {
@@ -4485,7 +4485,7 @@ int Game::mstSm_main(Task *t) {
 		case 224:
 		case 225: { // 67
 				const int num = READ_LE_UINT16(p + 2);
-				MstUnk53 *m = &_res->_mstUnk53[num];
+				MstOp223Data *m = &_res->_mstOp223Data[num];
 				const int mask = m->maskVars; // var8
 				int a = getTaskVar(t, m->indexVar1, (mask >> 16) & 15); // var1C
 				int b = getTaskVar(t, m->indexVar2, (mask >> 12) & 15); // var20
@@ -4795,7 +4795,7 @@ int Game::mstSm_main(Task *t) {
 			break;
 		case 240: { // 77
 				const int num = READ_LE_UINT16(p + 2);
-				MstUnk59 *m = &_res->_mstUnk59[num];
+				MstOp240Data *m = &_res->_mstOp240Data[num];
 				const uint8_t *codeData = (m->codeData == kNone) ? 0 : (_res->_mstCodeData + m->codeData * 4);
 				updateTask(t, m->flags, codeData);
 			}
@@ -6194,7 +6194,7 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 }
 
 void Game::mstOp58_addLvlObject(Task *t, int num) {
-	const MstOp58Data *dat = &_res->_mstOp58Data[num];
+	const MstOp211Data *dat = &_res->_mstOp211Data[num];
 	const int mask = dat->unkE;
 	int xPos = getTaskVar(t, dat->indexVar1, (mask >> 8) & 15); // _ebx
 	int yPos = getTaskVar(t, dat->indexVar2, (mask >> 4) & 15); // _ebp
@@ -6232,8 +6232,7 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 	}
 }
 
-// mstOp59_addShootSpecialPowers
-void Game::mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags) {
+void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, uint16_t flags) {
 	LvlObject *o = addLvlObjectToList0(3);
 	if (o) {
 		o->dataPtr = _shootLvlObjectDataList;
@@ -6998,9 +6997,9 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		mo->flags24 = 0;
 
 		uint8_t _cl  = mo->m45->unk0;
-		uint16_t _ax = mo->m45->unk2; // anim
+		uint16_t anim = mo->m45->unk2;
 
-		o = addLvlObject((_cl >> 7) & 1, x1, y1, objScreen, (_cl & 0x7F), _ax, o_flags1, o_flags2, 0, 0);
+		o = addLvlObject((_cl >> 7) & 1, x1, y1, objScreen, (_cl & 0x7F), anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
 			mo->m45 = 0;
 			if (mo->o) {

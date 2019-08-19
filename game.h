@@ -335,7 +335,7 @@ struct Game {
 	LvlObject *declareLvlObject(uint8_t type, uint8_t num);
 	void clearDeclaredLvlObjectsList();
 	void initLvlObjects();
-	void setLvlObjectType8Resource(LvlObject *ptr, uint8_t _dl, uint8_t num);
+	void setLvlObjectSprite(LvlObject *ptr, uint8_t _dl, uint8_t num);
 	LvlObject *findLvlObject(uint8_t type, uint8_t spriteNum, int screenNum);
 	LvlObject *findLvlObject2(uint8_t type, uint8_t dataNum, int screenNum);
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
@@ -691,7 +691,7 @@ struct Game {
 	int mstOp56_specialAction(Task *t, int code, int num);
 	void mstOp57_addCrackSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
-	void mstOp59_1(int x, int y, int screenNum, int type, uint16_t flags);
+	void mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, uint16_t flags);
 	void mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags);
 	void executeMstUnk1(Task *t);
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);

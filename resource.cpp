@@ -496,22 +496,22 @@ void Resource::unloadLvlScreenBackgroundData(int num) {
 	}
 }
 
-bool Resource::isLevelData0x2988Loaded(int num) {
+bool Resource::isLvlSpriteDataLoaded(int num) {
 	return _resLevelData0x2988SizeTable[num] != 0;
 }
 
-bool Resource::isLevelData0x2B88Loaded(int num) {
+bool Resource::isLvlBackgroundDataLoaded(int num) {
 	return _resLevelData0x2B88SizeTable[num] != 0;
 }
 
-void Resource::incLevelData0x2988RefCounter(LvlObject *ptr) {
+void Resource::incLvlSpriteDataRefCounter(LvlObject *ptr) {
 	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->spriteNum];
 	assert(dat);
 	++dat->refCount;
 	ptr->levelData0x2988 = dat;
 }
 
-void Resource::decLevelData0x2988RefCounter(LvlObject *ptr) {
+void Resource::decLvlSpriteDataRefCounter(LvlObject *ptr) {
 	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->spriteNum];
 	if (dat) {
 		--dat->refCount;
@@ -1442,19 +1442,19 @@ void Resource::loadMstData(File *fp, const char *name) {
 	fp->read(_mstUnk52, _mstHdr.unk0x4C * 4);
 	bytesRead += _mstHdr.unk0x4C * 4;
 
-	_mstUnk53 = (MstUnk53 *)malloc(_mstHdr.unk0x50 * sizeof(MstUnk53));
+	_mstOp223Data = (MstOp223Data *)malloc(_mstHdr.unk0x50 * sizeof(MstOp223Data));
 	for (int i = 0; i < _mstHdr.unk0x50; ++i) {
-		_mstUnk53[i].indexVar1 = fp->readUint16();
-		_mstUnk53[i].indexVar2 = fp->readUint16();
-		_mstUnk53[i].indexVar3 = fp->readUint16();
-		_mstUnk53[i].indexVar4 = fp->readUint16();
-		_mstUnk53[i].unk8      = fp->readByte();
-		_mstUnk53[i].unk9      = fp->readByte();
-		_mstUnk53[i].indexVar5 = fp->readByte();
-		_mstUnk53[i].unkB      = fp->readByte();
-		_mstUnk53[i].unkC      = fp->readUint16();
-		_mstUnk53[i].unkE      = fp->readUint16();
-		_mstUnk53[i].maskVars  = fp->readUint32();
+		_mstOp223Data[i].indexVar1 = fp->readUint16();
+		_mstOp223Data[i].indexVar2 = fp->readUint16();
+		_mstOp223Data[i].indexVar3 = fp->readUint16();
+		_mstOp223Data[i].indexVar4 = fp->readUint16();
+		_mstOp223Data[i].unk8      = fp->readByte();
+		_mstOp223Data[i].unk9      = fp->readByte();
+		_mstOp223Data[i].indexVar5 = fp->readByte();
+		_mstOp223Data[i].unkB      = fp->readByte();
+		_mstOp223Data[i].unkC      = fp->readUint16();
+		_mstOp223Data[i].unkE      = fp->readUint16();
+		_mstOp223Data[i].maskVars  = fp->readUint32();
 		bytesRead += 20;
 	}
 
@@ -1491,14 +1491,14 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstUnk56 = (MstUnk56 *)malloc(_mstHdr.unk0x60 * sizeof(MstUnk56));
+	_mstOp2Data = (MstOp2Data *)malloc(_mstHdr.unk0x60 * sizeof(MstOp2Data));
 	for (int i = 0; i < _mstHdr.unk0x60; ++i) {
-		_mstUnk56[i].indexVar1 = fp->readUint32();
-		_mstUnk56[i].indexVar2 = fp->readUint32();
-		_mstUnk56[i].maskVars  = fp->readByte();
-		_mstUnk56[i].unk9      = fp->readByte();
-		_mstUnk56[i].unkA      = fp->readByte();
-		_mstUnk56[i].unkB      = fp->readByte();
+		_mstOp2Data[i].indexVar1 = fp->readUint32();
+		_mstOp2Data[i].indexVar2 = fp->readUint32();
+		_mstOp2Data[i].maskVars  = fp->readByte();
+		_mstOp2Data[i].unk9      = fp->readByte();
+		_mstOp2Data[i].unkA      = fp->readByte();
+		_mstOp2Data[i].unkB      = fp->readByte();
 		bytesRead += 12;
 	}
 
@@ -1515,26 +1515,26 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 16;
 	}
 
-	_mstOp58Data = (MstOp58Data *)malloc(_mstHdr.unk0x68 * sizeof(MstOp58Data));
+	_mstOp211Data = (MstOp211Data *)malloc(_mstHdr.unk0x68 * sizeof(MstOp211Data));
 	for (int i = 0; i < _mstHdr.unk0x68; ++i) {
-		_mstOp58Data[i].indexVar1 = fp->readUint16();
-		_mstOp58Data[i].indexVar2 = fp->readUint16();
-		_mstOp58Data[i].unk4      = fp->readUint16();
-		_mstOp58Data[i].unk6      = fp->readUint16();
-		_mstOp58Data[i].unk8      = fp->readByte();
-		_mstOp58Data[i].unk9      = fp->readByte();
-		_mstOp58Data[i].unkA      = fp->readByte();
-		_mstOp58Data[i].unkB      = fp->readByte();
-		_mstOp58Data[i].unkC      = fp->readByte();
-		_mstOp58Data[i].unkD      = fp->readByte();
-		_mstOp58Data[i].unkE      = fp->readUint16();
+		_mstOp211Data[i].indexVar1 = fp->readUint16();
+		_mstOp211Data[i].indexVar2 = fp->readUint16();
+		_mstOp211Data[i].unk4      = fp->readUint16();
+		_mstOp211Data[i].unk6      = fp->readUint16();
+		_mstOp211Data[i].unk8      = fp->readByte();
+		_mstOp211Data[i].unk9      = fp->readByte();
+		_mstOp211Data[i].unkA      = fp->readByte();
+		_mstOp211Data[i].unkB      = fp->readByte();
+		_mstOp211Data[i].unkC      = fp->readByte();
+		_mstOp211Data[i].unkD      = fp->readByte();
+		_mstOp211Data[i].unkE      = fp->readUint16();
 		bytesRead += 16;
 	}
 
-	_mstUnk59 = (MstUnk59 *)malloc(_mstHdr.unk0x6C * sizeof(MstUnk59));
+	_mstOp240Data = (MstOp240Data *)malloc(_mstHdr.unk0x6C * sizeof(MstOp240Data));
 	for (int i = 0; i < _mstHdr.unk0x6C; ++i) {
-		_mstUnk59[i].flags    = fp->readUint32();
-		_mstUnk59[i].codeData = fp->readUint32();
+		_mstOp240Data[i].flags    = fp->readUint32();
+		_mstOp240Data[i].codeData = fp->readUint32();
 		bytesRead += 8;
 	}
 
