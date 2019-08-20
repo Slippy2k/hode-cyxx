@@ -1097,16 +1097,16 @@ void Game::clearSoundObjects() {
 	}
 	memset(_sssUpdatedObjectsTable, 0, sizeof(_sssUpdatedObjectsTable));
 	if (_res->_sssFilters) {
-		memset(_res->_sssFilters, 0, _res->_sssHdr.dataUnk2Count * sizeof(SssFilter));
-		if (_res->_sssHdr.dataUnk2Count != 0) {
-			for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
-				const int a = _res->_sssDataUnk2[i].unk0 << 16;
-				_res->_sssFilters[i].unk4 = a;
+		memset(_res->_sssFilters, 0, _res->_sssHdr.filtersDataCount * sizeof(SssFilter));
+		if (_res->_sssHdr.filtersDataCount != 0) {
+			for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
+				const int a = _res->_sssDataUnk2[i].unk0;
+				_res->_sssFilters[i].unk4 = a << 16;
 				_res->_sssFilters[i].unk0 = a;
-				const int b = _res->_sssDataUnk2[i].unk1 << 16;
-				_res->_sssFilters[i].unk14 = b;
+				const int b = _res->_sssDataUnk2[i].defaultPanning;
+				_res->_sssFilters[i].unk14 = b << 16;
 				_res->_sssFilters[i].unk10 = b;
-				const int c = _res->_sssDataUnk2[i].unk2 << 16;
+				const int c = _res->_sssDataUnk2[i].unk1;
 				_res->_sssFilters[i].unk24 = c;
 				_res->_sssFilters[i].unk20 = c;
 			}
@@ -1251,7 +1251,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 }
 
 void Game::mixSoundObjects17640(bool flag) {
-	for (int i = 0; i < _res->_sssHdr.dataUnk2Count; ++i) {
+	for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
 		_res->_sssFilters[i].unk30 = 0;
 
 		if (_res->_sssFilters[i].unkC != 0) {

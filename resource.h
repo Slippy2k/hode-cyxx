@@ -405,7 +405,7 @@ struct SssHdr {
 	int preloadPcmCount;
 	int preloadInfoCount;
 	int infosDataCount;
-	int dataUnk2Count;
+	int filtersDataCount;
 	int dataUnk3Count;
 	int samplesDataCount;
 	int codeSize;
@@ -427,8 +427,8 @@ struct SssInfo {
 
 struct SssUnk2 {
 	uint8_t unk0; // defaultPriority
-	int8_t unk1; // defaultVolume
-	int8_t unk2;
+	int8_t unk1;
+	int8_t defaultPanning;
 };
 
 struct SssBank {

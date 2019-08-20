@@ -10,8 +10,6 @@
 #include "resource.h"
 #include "util.h"
 
-static const bool kDumpBytecode = false;
-
 static bool openDat(FileSystem &fs, const char *name, File *f) {
 	FILE *fp = fs.openFile(name);
 	if (fp) {
@@ -615,9 +613,9 @@ void Resource::loadSssData(File *fp, const char *name) {
 	_sssHdr.preloadInfoCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.unk4 %d _sssHdr.preloadPcmCount %d _sssHdr.preloadInfoCount %d", _sssHdr.unk4, _sssHdr.preloadPcmCount, _sssHdr.preloadInfoCount);
 	_sssHdr.infosDataCount = fp->readUint32();
-	_sssHdr.dataUnk2Count = fp->readUint32();
+	_sssHdr.filtersDataCount = fp->readUint32();
 	_sssHdr.dataUnk3Count = fp->readUint32();
-	debug(kDebug_RESOURCE, "_sssHdr.infosDataCount %d _sssHdr.dataUnk2Count %d _sssHdr.dataUnk3Count %d", _sssHdr.infosDataCount, _sssHdr.dataUnk2Count, _sssHdr.dataUnk3Count);
+	debug(kDebug_RESOURCE, "_sssHdr.infosDataCount %d _sssHdr.filtersDataCount %d _sssHdr.dataUnk3Count %d", _sssHdr.infosDataCount, _sssHdr.filtersDataCount, _sssHdr.dataUnk3Count);
 	_sssHdr.samplesDataCount = fp->readUint32();
 	_sssHdr.codeSize = fp->readUint32();
 	debug(kDebug_RESOURCE, "_sssHdr.samplesDataCount %d _sssHdr.codeSize %d", _sssHdr.samplesDataCount, _sssHdr.codeSize);
@@ -628,7 +626,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 	_sssHdr.pcmCount = fp->readUint32();
 
-	const int bufferSize = _sssHdr.unk4 + _sssHdr.dataUnk2Count * 52 + _sssHdr.dataUnk3Count * 56;
+	const int bufferSize = _sssHdr.unk4 + _sssHdr.filtersDataCount * 52 + _sssHdr.dataUnk3Count * 56;
 	debug(kDebug_RESOURCE, "bufferSize %d", bufferSize);
 
 	// fp->flush();
@@ -651,11 +649,11 @@ void Resource::loadSssData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 	// _sssDataUnk2, indexes to _sssFilters
-	_sssDataUnk2 = (SssUnk2 *)malloc(_sssHdr.dataUnk2Count * sizeof(SssUnk2));
-	for (int i = 0; i < _sssHdr.dataUnk2Count; ++i) {
+	_sssDataUnk2 = (SssUnk2 *)malloc(_sssHdr.filtersDataCount * sizeof(SssUnk2));
+	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
 		_sssDataUnk2[i].unk0 = fp->readByte();
 		_sssDataUnk2[i].unk1 = (int8_t)fp->readByte();
-		_sssDataUnk2[i].unk2 = (int8_t)fp->readByte();
+		_sssDataUnk2[i].defaultPanning = (int8_t)fp->readByte();
 		fp->readByte(); // padding
 		// debug(kDebug_RESOURCE, "SssDataUnk2 #%d %d %d %d", i, unk0, unk1, unk2);
 		bytesRead += 4;
@@ -804,7 +802,6 @@ void Resource::loadSssData(File *fp, const char *name) {
 		}
 	}
 
-	// _res_sssPcmTable = data; // size : sssHdr.unk30 * 20
 	_sssPcmTable = (SssPcm *)malloc(_sssHdr.pcmCount * sizeof(SssPcm));
 // 429AB8
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
@@ -821,25 +818,13 @@ void Resource::loadSssData(File *fp, const char *name) {
 		}
 		bytesRead += 20;
 	}
-	// _res_sssFilters = data; // size : sssHdr.unk14 * 52
-	static const int kSizeOfSssFilter = 52;
-	_sssFilters = (SssFilter *)malloc(_sssHdr.dataUnk2Count * sizeof(SssFilter));
-	for (int i = 0; i < _sssHdr.dataUnk2Count; ++i) {
-		uint8_t buf[kSizeOfSssFilter];
-		fp->read(buf, kSizeOfSssFilter);
-		_sssFilters[i].unk4 = READ_LE_UINT32(buf + 4);
-		_sssFilters[i].unk8 = READ_LE_UINT32(buf + 8);
-		_sssFilters[i].unkC = READ_LE_UINT32(buf + 0xC);
-		_sssFilters[i].unk14 = READ_LE_UINT32(buf + 0x14);
-		_sssFilters[i].unk18 = READ_LE_UINT32(buf + 0x18);
-		_sssFilters[i].unk1C = READ_LE_UINT32(buf + 0x1C);
-		_sssFilters[i].unk24 = READ_LE_UINT32(buf + 0x24);
-		_sssFilters[i].unk30 = READ_LE_UINT32(buf + 0x30);
-		bytesRead += kSizeOfSssFilter;
-		debug(kDebug_RESOURCE, "sssFilter #%d/%d 0x%x", i, _sssHdr.dataUnk2Count, READ_LE_UINT32(buf));
-	}
 
-	// _res_sssDataUnk6 = data; // size : sssHdr.unk18 * 20
+	// skip read, structure is cleared and initialized later
+	static const int kSizeOfSssFilter = 52;
+	fp->seek(_sssHdr.filtersDataCount * kSizeOfSssFilter, SEEK_CUR);
+	_sssFilters = (SssFilter *)malloc(_sssHdr.filtersDataCount * sizeof(SssFilter));
+	bytesRead += _sssHdr.filtersDataCount * kSizeOfSssFilter;
+
 	_sssDataUnk6 = (SssUnk6 *)malloc(_sssHdr.dataUnk3Count * sizeof(SssUnk6));
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		_sssDataUnk6[i].unk0[0] = fp->readUint32();
@@ -851,7 +836,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		debug(kDebug_RESOURCE, "sssDataUnk6 #%d/%d unk10 0x%x", i, _sssHdr.dataUnk3Count, _sssDataUnk6[i].unk10);
 	}
 
-// 429AB8:
+// 429AB8
 	const int lutSize = _sssHdr.dataUnk3Count * sizeof(uint32_t);
 	for (int i = 0; i < 3; ++i) {
 		_sssLookupTable1[i] = (uint32_t *)malloc(lutSize);
@@ -912,13 +897,13 @@ void Resource::loadSssData(File *fp, const char *name) {
 		error("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
 	}
 
-// 429C96:
-	if (0 && _sssHdr.dataUnk2Count != 0) {
+// 429C96
+	if (0 && _sssHdr.filtersDataCount != 0) {
 		fp->flush();
 		uint8_t buf[256];
-		assert(_sssHdr.dataUnk2Count <= (int)sizeof(buf));
-		fp->read(buf, _sssHdr.dataUnk2Count);
-		for (int i = 0; i < _sssHdr.dataUnk2Count; i += 4) {
+		assert(_sssHdr.filtersDataCount <= (int)sizeof(buf));
+		fp->read(buf, _sssHdr.filtersDataCount);
+		for (int i = 0; i < _sssHdr.filtersDataCount; i += 4) {
 			uint32_t j = READ_LE_UINT32(buf + i);
 			debug(kDebug_RESOURCE, "unk14 offset 0x%x data 0x%x", i, j);
 		}
@@ -943,30 +928,24 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 
 // 429E09
-	memset(_sssFilters, 0, _sssHdr.dataUnk2Count * sizeof(SssFilter));
+	memset(_sssFilters, 0, _sssHdr.filtersDataCount * sizeof(SssFilter));
 // 429E64
-	for (int i = 0; i < _sssHdr.dataUnk2Count; ++i) {
-		const uint8_t a = _sssDataUnk2[i].unk0;
+	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
+		const int a = _sssDataUnk2[i].unk0;
 		_sssFilters[i].unk4 = a << 16;
 		_sssFilters[i].unk0 = a;
-		const int8_t b = (int8_t)_sssDataUnk2[i].unk2;
+		const int b = _sssDataUnk2[i].defaultPanning;
 		_sssFilters[i].unk14 = b << 16;
 		_sssFilters[i].unk10 = b;
-		const int8_t c = (int8_t)_sssDataUnk2[i].unk1;
+		const int c = _sssDataUnk2[i].unk1;
 		_sssFilters[i].unk24 = c;
 		_sssFilters[i].unk20 = c;
 	}
-// 429EFA:
+// 429EFA
 	// same as clearSoundObjects()
 
-// 429F38:
+// 429F38
 	clearSssLookupTable3();
-
-	if (kDumpBytecode) {
-		char fname[64];
-		snprintf(fname, sizeof(fname), "%s.bytecode", name);
-		fioDumpData(fname, _sssCodeData, _sssHdr.codeSize);
-	}
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) {
@@ -1562,12 +1541,6 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	if (bytesRead != _mstHdr.dataSize) {
 		warning("Unexpected .mst bytesRead %d dataSize %d", bytesRead, _mstHdr.dataSize);
-	}
-
-	if (kDumpBytecode) {
-		char fname[64];
-		snprintf(fname, sizeof(fname), "%s.bytecode", name);
-		fioDumpData(fname, _mstCodeData, _mstHdr.codeSize * 4);
 	}
 
 	if (0) {
