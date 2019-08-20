@@ -825,35 +825,32 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 // 42B865
 		uint32_t _eax = 1 << (_rnd.update() & 31);
 		SssUnk6 *unk6 = &_res->_sssDataUnk6[num];
-		if ((unk6->unk10 & _eax) == 0) {
-			if (_eax > unk6->unk10) {
+		if ((unk6->mask & _eax) == 0) {
+			if (_eax > unk6->mask) {
 				do {
 					_eax >>= 1;
-				} while ((unk6->unk10 & _eax) == 0);
+				} while ((unk6->mask & _eax) == 0);
 			} else {
 // 42B8A8
 				do {
 					_eax <<= 1;
-				} while ((unk6->unk10 & _eax) == 0);
+				} while ((unk6->mask & _eax) == 0);
 			}
 		}
 // 42B8AE
-		b = 0;
-		if (bank->count > 0) {
-			do {
-				if ((unk6->unk0[b] & _eax) != 0) {
-					break;
-				}
-			} while (++b < bank->count);
+		int b = 0;
+		for (; b < bank->count; ++b) {
+			if ((unk6->unk0[b] & _eax) != 0) {
+				break;
+			}
 		}
 // 42B8C7
 		if ((bank->flags & 2) != 0) {
-			unk6->unk10 &= ~unk6->unk0[b];
-			if (unk6->unk10 == 0 && bank->count > 0) {
-				int i = 0;
-				do {
-					unk6->unk10 |= unk6->unk0[i];
-				} while (++i < bank->count);
+			unk6->mask &= ~unk6->unk0[b];
+			if (unk6->mask == 0 && bank->count > 0) {
+				for (int i = 0; i < bank->count; ++i) {
+					unk6->mask |= unk6->unk0[i];
+				}
 			}
 		}
 // 42B8E9
@@ -993,35 +990,34 @@ void Game::playSoundObject(SssInfo *s, int lut, int bits) {
 			break;
 		}
 	}
-	int _ecx = filter->unk4;
-	int _eax = ((int8_t)s->unk3) << 16;
+	int _eax, _ecx;
+	_eax = s->unk3 << 16;
+	_ecx = filter->volumeFp16;
 	if (_ecx != _eax) {
 		if (!found) {
-			filter->unk4 = _eax; // int32_t
+			filter->volumeFp16 = _eax;
 		} else {
-			filter->unkC = 4; // uint32_t
-			filter->unk30 = 1; // uint32_t
-			_eax = ((s->unk3 << 16) - _ecx) / 4;
-			filter->unk8 = _eax; // uint32_t
+			filter->volumeSteps = 4;
+			filter->unk30 = 1;
+			filter->volumeDelta = (_eax - _ecx) / 4;
 		}
 	}
 // 42B9FD
 	_eax = ((int8_t)s->unk5) << 16;
-	_ecx = filter->unk14;
+	_ecx = filter->panningFp16;
 	if (_ecx != _eax) {
 		if (!found) {
-			filter->unk14 = _eax; // int32_t
+			filter->panningFp16 = _eax;
 		} else {
-			filter->unk1C = 4;
+			filter->panningSteps = 4;
 			filter->unk30 = 1;
-			_eax = ((s->unk5 << 16) - _ecx) / 4;
-			filter->unk18 = _eax;
+			filter->panningDelta = (_eax - _ecx) / 4;
 		}
 	}
 // 42BA37
 	_eax = (int8_t)s->unk4;
-	const int scale = filter->unk24;
-	if (scale != _eax) {
+	_ecx = filter->unk24;
+	if (_ecx != _eax) {
 		filter->unk24 = _eax;
 		for (int i = 0; i < _sssObjectsCount; ++i) {
 			SssObject *so = &_sssObjectsTable[i];
@@ -1061,18 +1057,18 @@ void Game::playSoundObject(SssInfo *s, int lut, int bits) {
 	} else if (_al & 4) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _ebp)) {
-				goto prepare;
+				createSoundObject(s->sssBankIndex, s->unk2, _ebp);
+				return;
 			}
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _ebp)) {
-				goto prepare;
+				createSoundObject(s->sssBankIndex, s->unk2, _ebp);
+				return;
 			}
 		}
-		return;
 	}
 // 42BBDD
-prepare:
 	createSoundObject(s->sssBankIndex, s->unk2, _ebp);
 }
 
@@ -1088,7 +1084,7 @@ void Game::clearSoundObjects() {
 	_playingSssObjectsCount = 0;
 	_mix._mixingQueueSize = 0;
 	if (_res->_sssHdr.infosDataCount != 0) {
-		const int size = _res->_sssHdr.dataUnk3Count * 4;
+		const int size = _res->_sssHdr.dataUnk3Count * sizeof(uint32_t);
 		for (int i = 0; i < 3; ++i) {
 			memset(_res->_sssLookupTable1[i], 0, size);
 			memset(_res->_sssLookupTable2[i], 0, size);
@@ -1101,11 +1097,11 @@ void Game::clearSoundObjects() {
 		if (_res->_sssHdr.filtersDataCount != 0) {
 			for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
 				const int a = _res->_sssDataUnk2[i].unk0;
-				_res->_sssFilters[i].unk4 = a << 16;
-				_res->_sssFilters[i].unk0 = a;
+				_res->_sssFilters[i].volumeFp16 = a << 16;
+				_res->_sssFilters[i].volume = a;
 				const int b = _res->_sssDataUnk2[i].defaultPanning;
-				_res->_sssFilters[i].unk14 = b << 16;
-				_res->_sssFilters[i].unk10 = b;
+				_res->_sssFilters[i].panningFp16 = b << 16;
+				_res->_sssFilters[i].panning = b;
 				const int c = _res->_sssDataUnk2[i].unk1;
 				_res->_sssFilters[i].unk24 = c;
 				_res->_sssFilters[i].unk20 = c;
@@ -1152,7 +1148,7 @@ int Game::getSoundObjectPanning(SssObject *so) const {
 
 void Game::setSoundObjectPanning(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
-		int volume = ((so->filter->unk4 >> 16) * so->volume) >> 7; // indexes decibel volume table
+		int volume = ((so->filter->volumeFp16 >> 16) * so->volume) >> 7; // indexes decibel volume table
 		int panning = 0;
 		if (so->panningPtr) {
 			int priority = CLIP(so->priority + so->filter->unk24, 0, 7);
@@ -1173,14 +1169,14 @@ void Game::setSoundObjectPanning(SssObject *so) {
 				}
 			}
 		} else {
-			panning = CLIP(so->panning + (so->filter->unk14 >> 16), 0, 128);
+			panning = CLIP(so->panning + (so->filter->panningFp16 >> 16), 0, 128);
 		}
 // 429094
 		if (so->pcm == 0) {
 			return;
 		}
 		if (volume >= (int)ARRAYSIZE(_dbVolumeTable)) {
-			warning("Out of bounds volume %d (filter %d volume %d)", volume, so->filter->unk4, so->volume);
+			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeFp16 >> 16), so->volume);
 			volume = ARRAYSIZE(_dbVolumeTable) - 1;
 		}
 		int _edx = _dbVolumeTable[volume];
@@ -1226,7 +1222,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
 	*sssLut2 &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if ((so->flags & 0xFFFF0FFF) == 0) {
+		if ((so->flags0 & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -1236,7 +1232,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-		if ((so->flags & 0xFFFF0FFF) == 0) {
+		if ((so->flags0 & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -1252,19 +1248,19 @@ void Game::expireSoundObjects(uint32_t flags) {
 
 void Game::mixSoundObjects17640(bool flag) {
 	for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
-		_res->_sssFilters[i].unk30 = 0;
-
-		if (_res->_sssFilters[i].unkC != 0) {
-			--_res->_sssFilters[i].unkC;
+		SssFilter *filter = &_res->_sssFilters[i];
+		filter->unk30 = 0;
+		if (filter->volumeSteps != 0) {
+			--filter->volumeSteps;
+			filter->volumeFp16 += filter->volumeDelta;
+			filter->unk30 = 1;
 		}
-		_res->_sssFilters[i].unk4 += _res->_sssFilters[i].unk8;
-		_res->_sssFilters[i].unk30 = 1;
 
-		if (_res->_sssFilters[i].unk1C != 0) {
-			--_res->_sssFilters[i].unk1C;
+		if (filter->panningSteps != 0) {
+			--filter->panningSteps;
+			filter->panningFp16 += filter->panningDelta;
+			filter->unk30 = 1;
 		}
-		_res->_sssFilters[i].unk14 += _res->_sssFilters[i].unk18;
-		_res->_sssFilters[i].unk30 = 1;
 	}
 // 42B426
 	for (int i = 0; i < _sssObjectsCount; ++i) {

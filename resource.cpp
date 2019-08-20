@@ -663,6 +663,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		_sssBanksData[i].flags = fp->readByte();
 		_sssBanksData[i].count = fp->readByte();
+		assert(_sssBanksData[i].count <= 4); // matches sizeof(_sssDataUnk6.unk0)
 		_sssBanksData[i].sssFilter = fp->readUint16();
 		_sssBanksData[i].firstSampleIndex = fp->readUint32();
 		debug(kDebug_RESOURCE, "SssBank #%d count %d codeOffset 0x%x", i, _sssBanksData[i].count, _sssBanksData[i].firstSampleIndex);
@@ -819,7 +820,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	// skip read, structure is cleared and initialized later
+	// allocate structure but skip read, as this table is cleared and initialized in clearSoundObjects()
 	static const int kSizeOfSssFilter = 52;
 	fp->seek(_sssHdr.filtersDataCount * kSizeOfSssFilter, SEEK_CUR);
 	_sssFilters = (SssFilter *)malloc(_sssHdr.filtersDataCount * sizeof(SssFilter));
@@ -831,29 +832,19 @@ void Resource::loadSssData(File *fp, const char *name) {
 		_sssDataUnk6[i].unk0[1] = fp->readUint32();
 		_sssDataUnk6[i].unk0[2] = fp->readUint32();
 		_sssDataUnk6[i].unk0[3] = fp->readUint32();
-		_sssDataUnk6[i].unk10 = fp->readUint32();
+		_sssDataUnk6[i].mask    = fp->readUint32();
 		bytesRead += 20;
-		debug(kDebug_RESOURCE, "sssDataUnk6 #%d/%d unk10 0x%x", i, _sssHdr.dataUnk3Count, _sssDataUnk6[i].unk10);
+		debug(kDebug_RESOURCE, "sssDataUnk6 #%d/%d unk10 0x%x", i, _sssHdr.dataUnk3Count);
 	}
 
 // 429AB8
 	const int lutSize = _sssHdr.dataUnk3Count * sizeof(uint32_t);
 	for (int i = 0; i < 3; ++i) {
+		// allocate structures but skip read, as these tables are initialized in clearSoundObjects()
 		_sssLookupTable1[i] = (uint32_t *)malloc(lutSize);
-		for (int j = 0; j < _sssHdr.dataUnk3Count; ++j) {
-			_sssLookupTable1[i][j] = fp->readUint32();
-		}
-		debug(kDebug_RESOURCE, "sssLookupTable1[%d] = 0x%x", i, _sssLookupTable1[i][0]);
 		_sssLookupTable2[i] = (uint32_t *)malloc(lutSize);
-		for (int j = 0; j < _sssHdr.dataUnk3Count; ++j) {
-			_sssLookupTable2[i][j] = fp->readUint32();
-		}
-		debug(kDebug_RESOURCE, "sssLookupTable2[%d] = 0x%x", i, _sssLookupTable2[i][0]);
 		_sssLookupTable3[i] = (uint32_t *)malloc(lutSize);
-		for (int j = 0; j < _sssHdr.dataUnk3Count; ++j) {
-			_sssLookupTable3[i][j] = fp->readUint32();
-		}
-		debug(kDebug_RESOURCE, "sssLookupTable3[%d] = 0x%x", i, _sssLookupTable3[i][0]);
+		fp->seek(lutSize * 3, SEEK_CUR);
 		bytesRead += lutSize * 3;
 	}
 	_sssPreloadedPcmTotalSize = 0;
@@ -911,7 +902,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 // 429D32
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		uint32_t mask = 1;
-		_sssDataUnk6[i].unk10 = 0;
+		_sssDataUnk6[i].mask = 0;
 		const SssSample *codeOffset = &_sssSamplesData[_sssBanksData[i].firstSampleIndex];
 		uint32_t *ptr = _sssDataUnk6[i].unk0;
 		for (int j = 0; j < _sssBanksData[i].count; ++j) {
@@ -922,7 +913,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 				}
 			}
 			++codeOffset;
-			_sssDataUnk6[i].unk10 |= *ptr;
+			_sssDataUnk6[i].mask |= *ptr;
 			++ptr;
 		}
 	}
@@ -932,11 +923,11 @@ void Resource::loadSssData(File *fp, const char *name) {
 // 429E64
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
 		const int a = _sssDataUnk2[i].unk0;
-		_sssFilters[i].unk4 = a << 16;
-		_sssFilters[i].unk0 = a;
+		_sssFilters[i].volumeFp16 = a << 16;
+		_sssFilters[i].volume = a;
 		const int b = _sssDataUnk2[i].defaultPanning;
-		_sssFilters[i].unk14 = b << 16;
-		_sssFilters[i].unk10 = b;
+		_sssFilters[i].panningFp16 = b << 16;
+		_sssFilters[i].panning = b;
 		const int c = _sssDataUnk2[i].unk1;
 		_sssFilters[i].unk24 = c;
 		_sssFilters[i].unk20 = c;

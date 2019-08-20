@@ -457,14 +457,14 @@ struct SssUnk4 { // SssPreloadInfo
 };
 
 struct SssFilter {
-	int32_t unk0;
-	int32_t unk4; // volume (0,127)
-	int32_t unk8; // volumeDelta
-	int32_t unkC; // volumeSteps
-	int32_t unk10;
-	int32_t unk14; // panning (0,127)
-	int32_t unk18; // panningDelta
-	int32_t unk1C; // panningSteps
+	int32_t volume; // (0,127)
+	int32_t volumeFp16; // (0,127) << 16
+	int32_t volumeDelta;
+	int32_t volumeSteps;
+	int32_t panning; // (0,127)
+	int32_t panningFp16; // (0,127) << 16
+	int32_t panningDelta;
+	int32_t panningSteps;
 	int32_t unk20;
 	int32_t unk24; // priority (0,7)
 	int32_t unk30; // flag
@@ -481,7 +481,7 @@ struct SssPcm {
 
 struct SssUnk6 {
 	uint32_t unk0[4]; // 0
-	uint32_t unk10; // 10
+	uint32_t mask; // 10
 };
 
 struct SssPreloadData {
