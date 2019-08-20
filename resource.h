@@ -418,16 +418,16 @@ struct SssHdr {
 struct SssInfo {
 	uint16_t sssBankIndex; // 0 indexes _sssBanksData
 	int8_t unk2; // 2 codeOffsetNum
-	int8_t unk3; // 3 filterDelta1
+	int8_t targetVolume; // 3
 	int8_t unk4; // 4 filterDelta2
-	int8_t unk5; // 5 filterDelta3
+	int8_t targetPanning; // 5
 	uint8_t unk6; // 6 sound source mask
 	uint8_t unk7;
 };
 
-struct SssUnk2 {
-	uint8_t unk0; // defaultPriority
-	int8_t unk1;
+struct SssDefaults {
+	int8_t defaultVolume;
+	uint8_t defaultPriority;
 	int8_t defaultPanning;
 };
 
@@ -441,10 +441,10 @@ struct SssBank {
 struct SssSample {
 	uint16_t pcm; // index to _sssPcmTable
 	uint16_t unk2; // framesCount
-	uint8_t unk4; // initVolume
+	uint8_t initVolume; // 0x4
 	uint8_t unk5;
-	int8_t unk6; // priority
-	uint8_t unk7; // initPanning
+	int8_t initPriority; // 0x6
+	uint8_t initPanning; // 0x7
 	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData
 	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
@@ -467,7 +467,7 @@ struct SssFilter {
 	int32_t panningSteps;
 	int32_t unk20;
 	int32_t unk24; // priority (0,7)
-	int32_t unk30; // flag
+	bool changed; // 0x30
 }; // sizeof == 52
 
 struct SssPcm {
@@ -527,7 +527,7 @@ struct Resource {
 	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
 
 	SssInfo *_sssInfosData;
-	SssUnk2 *_sssDataUnk2;
+	SssDefaults *_sssDefaultsData;
 	SssBank *_sssBanksData;
 	SssSample *_sssSamplesData;
 	SssUnk4 *_sssDataUnk4;

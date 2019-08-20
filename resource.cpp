@@ -635,30 +635,25 @@ void Resource::loadSssData(File *fp, const char *name) {
 	// _sssBuffer1
 	int bytesRead = 0;
 
-	// _sssInfosData
 	_sssInfosData = (SssInfo *)malloc(_sssHdr.infosDataCount * sizeof(SssInfo));
 	for (int i = 0; i < _sssHdr.infosDataCount; ++i) {
 		_sssInfosData[i].sssBankIndex = fp->readUint16(); // index _sssBanksData
 		_sssInfosData[i].unk2 = fp->readByte();
-		_sssInfosData[i].unk3 = fp->readByte();
+		_sssInfosData[i].targetVolume = fp->readByte();
 		_sssInfosData[i].unk4 = fp->readByte();
-		_sssInfosData[i].unk5 = fp->readByte();
+		_sssInfosData[i].targetPanning = fp->readByte();
 		_sssInfosData[i].unk6 = fp->readByte();
 		_sssInfosData[i].unk7 = fp->readByte();
-		// debug(kDebug_RESOURCE, "SssInfo #%d 0x%x 0x%x 0x%x", i, unk1, unk2, unk3);
 		bytesRead += 8;
 	}
-	// _sssDataUnk2, indexes to _sssFilters
-	_sssDataUnk2 = (SssUnk2 *)malloc(_sssHdr.filtersDataCount * sizeof(SssUnk2));
+	_sssDefaultsData = (SssDefaults *)malloc(_sssHdr.filtersDataCount * sizeof(SssDefaults));
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
-		_sssDataUnk2[i].unk0 = fp->readByte();
-		_sssDataUnk2[i].unk1 = (int8_t)fp->readByte();
-		_sssDataUnk2[i].defaultPanning = (int8_t)fp->readByte();
+		_sssDefaultsData[i].defaultVolume   = (int8_t)fp->readByte();
+		_sssDefaultsData[i].defaultPriority = fp->readByte();
+		_sssDefaultsData[i].defaultPanning  = (int8_t)fp->readByte();
 		fp->readByte(); // padding
-		// debug(kDebug_RESOURCE, "SssDataUnk2 #%d %d %d %d", i, unk0, unk1, unk2);
 		bytesRead += 4;
 	}
-	// _sssBanksData
 	_sssBanksData = (SssBank *)malloc(_sssHdr.dataUnk3Count * sizeof(SssBank));
 	for (int i = 0; i < _sssHdr.dataUnk3Count; ++i) {
 		_sssBanksData[i].flags = fp->readByte();
@@ -669,15 +664,14 @@ void Resource::loadSssData(File *fp, const char *name) {
 		debug(kDebug_RESOURCE, "SssBank #%d count %d codeOffset 0x%x", i, _sssBanksData[i].count, _sssBanksData[i].firstSampleIndex);
 		bytesRead += 8;
 	}
-	// _sssSamplesData
 	_sssSamplesData = (SssSample *)malloc(_sssHdr.samplesDataCount * sizeof(SssSample));
 	for (int i = 0; i < _sssHdr.samplesDataCount; ++i) {
 		_sssSamplesData[i].pcm = fp->readUint16(); // 0x0
 		_sssSamplesData[i].unk2 = fp->readUint16(); // 0x2
-		_sssSamplesData[i].unk4 = fp->readByte(); // 0x4
+		_sssSamplesData[i].initVolume = fp->readByte();
 		_sssSamplesData[i].unk5 = fp->readByte(); // 0x5
-		_sssSamplesData[i].unk6 = fp->readByte(); // 0x6
-		_sssSamplesData[i].unk7 = fp->readByte(); // 0x7
+		_sssSamplesData[i].initPriority = fp->readByte();
+		_sssSamplesData[i].initPanning = fp->readByte();
 		_sssSamplesData[i].codeOffset1 = fp->readUint32(); // 0x8 offset to sssCodeData
 		_sssSamplesData[i].codeOffset2 = fp->readUint32(); // 0xC offset to sssCodeData
 		_sssSamplesData[i].codeOffset3 = fp->readUint32(); // 0x10 offset to sssCodeData
@@ -922,13 +916,13 @@ void Resource::loadSssData(File *fp, const char *name) {
 	memset(_sssFilters, 0, _sssHdr.filtersDataCount * sizeof(SssFilter));
 // 429E64
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
-		const int a = _sssDataUnk2[i].unk0;
+		const int a = _sssDefaultsData[i].defaultVolume;
 		_sssFilters[i].volumeFp16 = a << 16;
 		_sssFilters[i].volume = a;
-		const int b = _sssDataUnk2[i].defaultPanning;
+		const int b = _sssDefaultsData[i].defaultPanning;
 		_sssFilters[i].panningFp16 = b << 16;
 		_sssFilters[i].panning = b;
-		const int c = _sssDataUnk2[i].unk1;
+		const int c = _sssDefaultsData[i].defaultPriority;
 		_sssFilters[i].unk24 = c;
 		_sssFilters[i].unk20 = c;
 	}
