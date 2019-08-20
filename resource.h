@@ -401,12 +401,12 @@ struct MstOp211Data {
 
 struct SssHdr {
 	int version;
-	int unk4;
+	int bufferSize;
 	int preloadPcmCount;
 	int preloadInfoCount;
 	int infosDataCount;
 	int filtersDataCount;
-	int dataUnk3Count;
+	int banksDataCount;
 	int samplesDataCount;
 	int codeSize;
 	int preloadData1Count; // 24
@@ -440,7 +440,7 @@ struct SssBank {
 
 struct SssSample {
 	uint16_t pcm; // index to _sssPcmTable
-	uint16_t unk2; // framesCount
+	uint16_t framesCount;
 	uint8_t initVolume; // 0x4
 	uint8_t unk5;
 	int8_t initPriority; // 0x6

@@ -63,7 +63,7 @@ static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
 	const uint32_t a = (flags >> 20) & 0xF; // 0,1,2
 	assert(a < 3);
 	const uint32_t b = flags & 0xFFF; // num indexes _sssBankIndex
-	assert(b < (uint32_t)res->_sssHdr.dataUnk3Count);
+	assert(b < (uint32_t)res->_sssHdr.banksDataCount);
 	switch (lut) {
 	case 1:
 		return &res->_sssLookupTable1[a][b];
@@ -141,7 +141,7 @@ void Game::updateSoundObject(SssObject *so) {
 	_sssUpdatedObjectsTable[so->num] = true;
 	_sssObjectsChanged = so->filter->changed;
 	if ((so->flags & 4) == 0) {
-//42B179:
+// 42B179
 		if (so->pcm == 0) {
 			if (so->codeDataStage1) {
 				so->codeDataStage1 = executeSssCode(so, so->codeDataStage1);
@@ -156,7 +156,7 @@ void Game::updateSoundObject(SssObject *so) {
 				return;
 			}
 		} else {
-//42B1B9:
+// 42B1B9
 			if (so->codeDataStage1) {
 				so->codeDataStage1 = executeSssCode(so, so->codeDataStage1);
 			}
@@ -179,6 +179,9 @@ void Game::updateSoundObject(SssObject *so) {
 			}
 			if (so->codeDataStage3) {
 				so->codeDataStage3 = executeSssCode(so, so->codeDataStage3);
+			}
+			if (so->pcm == 0) {
+				return;
 			}
 			if (so->codeDataStage4) {
 				so->codeDataStage4 = executeSssCode(so, so->codeDataStage4);
@@ -239,7 +242,7 @@ void Game::updateSoundObject(SssObject *so) {
 
 void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
 	assert(lut < 3);
-	assert(num < _res->_sssHdr.dataUnk3Count);
+	assert(num < _res->_sssHdr.banksDataCount);
 	assert(c < 32);
 	const uint32_t mask = (1 << c);
 	_res->_sssLookupTable1[lut][num] &= ~mask;
@@ -881,7 +884,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	// original loads the PCM data in a seperate thread
 	_res->loadSssPcm(_res->_sssFile, sample->pcm);
 
-	if (sample->unk2 != 0) {
+	if (sample->framesCount != 0) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[bank->sssFilter];
 		const int priority = CLIP(filter->unk24 + sample->initPriority, 0, 7);
@@ -905,7 +908,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 			so->volumeModulateDelta = 0;
 			so->panningModulateDelta = 0;
 			so->flags0 = flags;
-			so->pcmFramesCount = sample->unk2;
+			so->pcmFramesCount = sample->framesCount;
 			so->bankIndex = num;
 			so->priority = sample->initPriority;
 			so->filter = filter;
@@ -921,7 +924,6 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 					so->panning = 64;
 				}
 			} else {
-// 42B7A5
 				so->panningPtr = 0;
 			}
 // 42B7C3
@@ -1075,7 +1077,7 @@ void Game::clearSoundObjects() {
 	_playingSssObjectsCount = 0;
 	_mix._mixingQueueSize = 0;
 	if (_res->_sssHdr.infosDataCount != 0) {
-		const int size = _res->_sssHdr.dataUnk3Count * sizeof(uint32_t);
+		const int size = _res->_sssHdr.banksDataCount * sizeof(uint32_t);
 		for (int i = 0; i < 3; ++i) {
 			memset(_res->_sssLookupTable1[i], 0, size);
 			memset(_res->_sssLookupTable2[i], 0, size);
