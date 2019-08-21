@@ -805,13 +805,13 @@ void Game::updateSoundObjectLut2(uint32_t flags) {
 SssObject *Game::createSoundObject(int bankIndex, int sampleIndex, uint32_t flags) {
 	debug(kDebug_SOUND, "createSoundObject bank %d sample %d c 0x%x", bankIndex, sampleIndex, flags);
 	SssObject *ret = 0;
+	SssBank *bank = &_res->_sssBanksData[bankIndex];
 	if (sampleIndex < 0) {
-		SssBank *bank = &_res->_sssBanksData[bankIndex];
 		if ((bank->flags & 1) != 0) {
-			int firstSampleIndex = bank->firstSampleIndex;
 			if (bank->count <= 0) {
 				return 0;
 			}
+			const int firstSampleIndex = bank->firstSampleIndex;
 			assert(firstSampleIndex >= 0 && firstSampleIndex < _res->_sssHdr.samplesDataCount);
 			SssSample *sample = &_res->_sssSamplesData[firstSampleIndex];
 // 42B81D
@@ -826,47 +826,48 @@ SssObject *Game::createSoundObject(int bankIndex, int sampleIndex, uint32_t flag
 				}
 				++sample;
 			}
-		}
+		} else {
 // 42B865
-		uint32_t _eax = 1 << (_rnd.update() & 31);
-		SssUnk6 *s6 = &_res->_sssDataUnk6[bankIndex];
-		if ((s6->mask & _eax) == 0) {
-			if (_eax > s6->mask) {
-				do {
-					_eax >>= 1;
-				} while ((s6->mask & _eax) == 0);
-			} else {
+			uint32_t mask = 1 << (_rnd.update() & 31);
+			SssUnk6 *s6 = &_res->_sssDataUnk6[bankIndex];
+			if ((s6->mask & mask) == 0) {
+				if (mask > s6->mask) {
+					do {
+						mask >>= 1;
+					} while ((s6->mask & mask) == 0);
+				} else {
 // 42B8A8
-				do {
-					_eax <<= 1;
-				} while ((s6->mask & _eax) == 0);
-			}
-		}
-// 42B8AE
-		int b = 0;
-		for (; b < bank->count; ++b) {
-			if ((s6->unk0[b] & _eax) != 0) {
-				break;
-			}
-		}
-// 42B8C7
-		if ((bank->flags & 2) != 0) {
-			s6->mask &= ~s6->unk0[b];
-			if (s6->mask == 0 && bank->count > 0) {
-				for (int i = 0; i < bank->count; ++i) {
-					s6->mask |= s6->unk0[i];
+					do {
+						mask <<= 1;
+					} while ((s6->mask & mask) == 0);
 				}
 			}
+// 42B8AE
+			int b = 0;
+			for (; b < bank->count; ++b) {
+				if ((s6->unk0[b] & mask) != 0) {
+					break;
+				}
+			}
+// 42B8C7
+			if ((bank->flags & 2) != 0) {
+				s6->mask &= ~s6->unk0[b];
+				if (s6->mask == 0 && bank->count > 0) {
+					for (int i = 0; i < bank->count; ++i) {
+						s6->mask |= s6->unk0[i];
+					}
+				}
+			}
+			ret = startSoundObject(bankIndex, b, flags);
 		}
-// 42B8E9
-		ret = startSoundObject(bankIndex, b, flags);
-		if (ret && (_res->_sssBanksData[bankIndex].flags & 4) != 0) {
+// 42B909
+		if (ret && (bank->flags & 4) != 0) {
 			ret->nextSoundNum = bankIndex;
 			ret->nextSoundCounter = -1;
 		}
 	} else {
 		ret = startSoundObject(bankIndex, sampleIndex, flags);
-		if (ret && (_res->_sssBanksData[bankIndex].flags & 4) != 0) {
+		if (ret && (bank->flags & 4) != 0) {
 			ret->nextSoundNum = bankIndex;
 			ret->nextSoundCounter = sampleIndex;
 		}
