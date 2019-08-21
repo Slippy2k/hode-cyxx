@@ -345,7 +345,7 @@ struct MstUnk49Unk1;
 struct MonsterObject1 {
 	MstUnk46 *m46; // 0x0
 	MstUnk46Unk1 *m46Unk1; // 0x4
-	const uint8_t *unk8; // infos
+	const uint8_t *monsterInfos; // 0x8
 	MstUnk44Unk1 *m44Unk1; // 0xC
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
@@ -356,8 +356,8 @@ struct MonsterObject1 {
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
 	uint8_t flags49; // 0x49 facingDirectionMask
-	uint8_t flags4A; // 0x4A
-	uint8_t flags4B; // 0x4B
+	uint8_t flags4A; // 0x4A goalDirectionMask
+	uint8_t flags4B; // 0x4B goalScreenNum
 	int xPos; // 0x4C
 	int yPos; // 0x50
 	int xMstPos; // 0x54 xLevelPos
@@ -368,10 +368,10 @@ struct MonsterObject1 {
 	int unk68; // 0x68
 	int unk6C; // 0x6C
 	int unk70; // 0x70
-	int unk74; // 0x74
-	int unk78; // 0x78
-	int unk7C; // 0x7C
-	int unk80; // 0x80
+	int unk74; // 0x74 x
+	int unk78; // 0x78 y
+	int unk7C; // 0x7C x
+	int unk80; // 0x80 y
 	int unk84; // 0x84
 	int unk88; // 0x88
 	int unk8C; // 0x8C
@@ -389,8 +389,8 @@ struct MonsterObject1 {
 	int32_t unkB0;
 	int32_t unkB4; // _xMstPos2
 	int32_t unkB8; // _yMstPos2
-	int32_t unkBC;
-	int32_t unkC0;
+	int32_t unkBC; // 0xBC x
+	int32_t unkC0; // 0xC0 y
 	Task *task; // 0xC4
 	uint8_t rnd_m49[4]; // 0xC8
 	uint8_t rnd_m35[4]; // 0xCC
@@ -402,7 +402,7 @@ struct MonsterObject1 {
 	uint8_t unkE5;
 	uint8_t unkE6; // 0xE6 indexes _mstLut4
 	uint8_t directionKeyMask;
-	uint16_t unkE8; // 0xE8
+	uint16_t o_flags2; // 0xE8
 	int collideDistance; // 0xEC
 	int unkF0; // 0xF0
 	int unkF4; // 0xF4

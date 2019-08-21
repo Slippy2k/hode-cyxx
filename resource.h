@@ -167,7 +167,7 @@ struct MstUnk43 {
 	uint32_t count2; // C
 }; // sizeof == 16
 
-struct MstUnk44Unk1 { // MstPathBox
+struct MstUnk44Unk1 { // MstWalkBox
 	int32_t x1; // 0
 	int32_t x2; // 4
 	int32_t y1; // 8
@@ -184,7 +184,7 @@ struct MstUnk44Unk1 { // MstPathBox
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
 
-struct MstUnk44 { // MstPath
+struct MstUnk44 { // MstWalkBoxes
 	MstUnk44Unk1 *data;
 	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t mask; // 0x8
