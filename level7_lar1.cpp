@@ -315,9 +315,8 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 void Game::updateLevelTick_lar_helper4(uint8_t *p, int num) {
 	if (num != p[1]) {
 		p[1] = num;
-		const uint8_t num = p[4];
-		int offset = (_res->_screensBasePos[num].u + p[2]) >> 3;
-		offset += ((_res->_screensBasePos[num].v + p[3]) << 6) & ~511;
+		const uint8_t screen = p[4];
+		uint32_t offset = screenMaskOffset(_res->_screensBasePos[screen].u + p[2], _res->_screensBasePos[screen].v + p[3]);
 		uint8_t *dst = _screenMaskBuffer + offset;
 		const uint8_t *src = off_452580[p[0]];
 		const int count = (int16_t)READ_LE_UINT16(src); src += 2;
@@ -473,8 +472,7 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	if (_ebp < 0) {
 		_ebp = 0;
 	}
-	int offset = (_res->_screensBasePos[o->screenNum].u + _edx) >> 3;
-	offset += ((_res->_screensBasePos[o->screenNum].v + _ebp) << 6) & ~511;
+	uint32_t offset = screenMaskOffset(_res->_screensBasePos[o->screenNum].u + _edx, _res->_screensBasePos[o->screenNum].v + _ebp);
 	if (_ecx < 0) {
 		_ecx = -_ecx;
 		_ecx >>= 3;
@@ -504,8 +502,7 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	if (_ebx < 0) {
 		_ebx = 0;
 	}
-	offset = (_res->_screensBasePos[o->screenNum].u + _ebx) >> 3;
-	offset += ((_res->_screensBasePos[o->screenNum].v + _edx) << 6) & ~511;
+	offset = screenMaskOffset(_res->_screensBasePos[o->screenNum].u + _ebx, _res->_screensBasePos[o->screenNum].v + _edx);
 	if (_ecx < 0) {
 		_ecx = -_ecx;
 		_ecx >>= 3;

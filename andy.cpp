@@ -1438,7 +1438,7 @@ void Game::setupAndyObjectMoveState() {
 
 	yPos = _andyLevelData0x288PosTablePtr[1].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[1].x + _andyPosX;
-	_andyMaskBufferPos1 = ((yPos & ~7) << 6) + (xPos >> 3);
+	_andyMaskBufferPos1 = screenMaskOffset(xPos, yPos);
 	_andyMoveState[0x0] = _screenMaskBuffer[_andyMaskBufferPos1 - 0x800];
 	_andyMoveState[0x1] = _screenMaskBuffer[_andyMaskBufferPos1 - 0x3FD];
 	_andyMoveState[0x2] = _screenMaskBuffer[_andyMaskBufferPos1 + 6];
@@ -1450,7 +1450,7 @@ void Game::setupAndyObjectMoveState() {
 
 	yPos = _andyLevelData0x288PosTablePtr[2].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[2].x + _andyPosX;
-	_andyMaskBufferPos2 = ((yPos & ~7) << 6) + (xPos >> 3);
+	_andyMaskBufferPos2 = screenMaskOffset(xPos, yPos);
 	_andyMoveState[0x8] = _screenMaskBuffer[_andyMaskBufferPos2 - 0x800];
 	_andyMoveState[0x9] = _screenMaskBuffer[_andyMaskBufferPos2 - 0x3FD];
 	_andyMoveState[0xA] = _screenMaskBuffer[_andyMaskBufferPos2 + 6];
@@ -1462,7 +1462,7 @@ void Game::setupAndyObjectMoveState() {
 
 	yPos = _andyLevelData0x288PosTablePtr[4].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[4].x + _andyPosX;
-	_andyMaskBufferPos4 = ((yPos & ~7) << 6) + (xPos >> 3);
+	_andyMaskBufferPos4 = screenMaskOffset(xPos, yPos);
 	_andyMoveState[0x10] = _screenMaskBuffer[_andyMaskBufferPos4 - 0x600];
 	_andyMoveState[0x11] = _screenMaskBuffer[_andyMaskBufferPos4 - 0x1FD];
 	_andyMoveState[0x12] = _screenMaskBuffer[_andyMaskBufferPos4 + 0x206];
@@ -1474,7 +1474,7 @@ void Game::setupAndyObjectMoveState() {
 
 	yPos = _andyLevelData0x288PosTablePtr[5].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[5].x + _andyPosX;
-	_andyMaskBufferPos5 = ((yPos & ~7) << 6) | (xPos >> 3);
+	_andyMaskBufferPos5 = screenMaskOffset(xPos, yPos);
 	_andyMoveState[0x18] = _screenMaskBuffer[_andyMaskBufferPos5 - 0x600];
 	_andyMoveState[0x19] = _screenMaskBuffer[_andyMaskBufferPos5 - 0x1FD];
 	_andyMoveState[0x1A] = _screenMaskBuffer[_andyMaskBufferPos5 + 0x206];
@@ -1486,19 +1486,19 @@ void Game::setupAndyObjectMoveState() {
 
 	yPos = _andyLevelData0x288PosTablePtr[3].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[3].x + _andyPosX;
-	_andyMaskBufferPos3 = ((yPos & ~7) << 6) | (xPos >> 3);
+	_andyMaskBufferPos3 = screenMaskOffset(xPos, yPos);
 
 	yPos = _andyLevelData0x288PosTablePtr[0].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[0].x + _andyPosX;
-	_andyMaskBufferPos0 = ((yPos & ~7) << 6) | (xPos >> 3);
+	_andyMaskBufferPos0 = screenMaskOffset(xPos, yPos);
 
 	yPos = _andyLevelData0x288PosTablePtr[7].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[7].x + _andyPosX;
-	_andyMaskBufferPos7 = ((yPos & ~7) << 6) | (xPos >> 3);
+	_andyMaskBufferPos7 = screenMaskOffset(xPos, yPos);
 
 	yPos = _andyLevelData0x288PosTablePtr[6].y + _andyPosY;
 	xPos = _andyLevelData0x288PosTablePtr[6].x + _andyPosX;
-	_andyMaskBufferPos6 = ((yPos & ~7) << 6) | (xPos >> 3);
+	_andyMaskBufferPos6 = screenMaskOffset(xPos, yPos);
 }
 
 void Game::updateAndyObject(LvlObject *ptr) {

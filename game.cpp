@@ -353,7 +353,7 @@ int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 	}
 	int __esi = _res->_screensBasePos[num].v + yPos; // y
 	int __eax = _res->_screensBasePos[num].u + xPos; // x
-	int _esi = ((__esi << 6) & ~511) + (__eax >> 3); // screenMaskPos (8x8)
+	int _esi = screenMaskOffset(__eax, __esi);
 	int _edi = ((yPos & ~7) << 2) + (xPos >> 3); // screenPos (8x8)
 	if (_screenMaskBuffer[_esi - 512] & 1) {
 		_edi -= 32;
@@ -419,8 +419,7 @@ void Game::setupScreenMask(uint8_t num) {
 		} else {
 			memset(_screenTempMaskBuffer, 0, 768);
 		}
-		p = _screenMaskBuffer;
-		p += ((_res->_screensBasePos[num].v & ~7) << 6) + (_res->_screensBasePos[num].u >> 3);
+		p = _screenMaskBuffer + screenMaskOffset(_res->_screensBasePos[num].u, _res->_screensBasePos[num].v);
 		for (int i = 0; i < 24; ++i) {
 			memcpy(p, _screenTempMaskBuffer + i * 32, 32);
 			p += 512;
@@ -457,8 +456,8 @@ void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum
 			++w;
 		}
 
-		const uint8_t *src = _screenTempMaskBuffer + (x >> 3) + (y & ~7) * 4; // should be << 6 ?
-		uint8_t *dst = _screenMaskBuffer + (x1 >> 3) + ((y1 & ~7) << 6);
+		const uint8_t *src = _screenTempMaskBuffer + screenGridOffset(x, y);
+		uint8_t *dst = _screenMaskBuffer + screenMaskOffset(y1, x1);
 		for (int i = 0; i < h; ++i) {
 			memcpy(dst, src, w);
 			src += 32;
@@ -485,7 +484,7 @@ void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int pos) {
 }
 
 void Game::updateScreenMaskBuffer(int x, int y, int type) {
-	uint8_t *p = _screenMaskBuffer + ((y & ~7) << 6) + (x >> 3);
+	uint8_t *p = _screenMaskBuffer + screenMaskOffset(x, y);
 	switch (type) {
 	case 0:
 		p[0] &= ~8;
@@ -586,12 +585,9 @@ int Game::fixPlasmaCannonPointsScreenMask(int num) {
 			yPos = 0;
 		}
 		yPos += _ebp;
-		yPos <<= 6;
-		yPos &= ~511;
 		while ((xPos = _plasmaCannonXPointsTable1[var1]) >= 0) {
 			xPos += _edi;
-			xPos >>= 3;
-			_al = _screenMaskBuffer[xPos + yPos];
+			_al = _screenMaskBuffer[screenMaskOffset(xPos, yPos)];
 			if ((_al & _dl) != 0) {
 				_plasmaCannonLastIndex1 = var1;
 				break;
@@ -605,11 +601,8 @@ int Game::fixPlasmaCannonPointsScreenMask(int num) {
 		int xPos, yPos;
 		while ((xPos = _plasmaCannonXPointsTable1[var1]) >= 0 && (yPos = _plasmaCannonYPointsTable1[var1]) >= 0) {
 			yPos += _ebp;
-			yPos <<= 6;
-			yPos &= ~511;
 			xPos += _edi;
-			xPos >>= 3;
-			_al = _screenMaskBuffer[yPos + xPos];
+			_al = _screenMaskBuffer[screenMaskOffset(xPos, yPos)];
 			if ((_al & _dl) != 0) {
 				_plasmaCannonLastIndex1 = var1;
 				break;
@@ -3086,7 +3079,7 @@ void Game::lvlObjectType0CallbackHelper1() {
 }
 
 int Game::calcScreenMaskDx(int x, int y, int num) {
-	const int offset = ((y & ~7) << 6) + (x >> 3); // screenMaskPos (8x8)
+	const uint32_t offset = screenMaskOffset(x, y);
 	int ret = -(x & 7);
 	if (num & 1) {
 		ret += 8;
@@ -3888,7 +3881,7 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 	int _edx = _res->_screensBasePos[screenNum].v + yPos;
 	int _edi = _res->_screensBasePos[screenNum].u + var24; // _edi
 	int var8 = yPos & ~7;
-	_edx = ((_edx << 6) & ~511) + (_edi >> 3); // screenMaskPos
+	_edx = screenMaskOffset(_edi, _edx);
 	int var4 = (var8 << 2) + (var24 >> 3); // screenPos (8x8)
 	if (_cl >= 4) {
 		var2C = 0;

@@ -223,6 +223,17 @@ struct Game {
 	Game(SystemStub *system, const char *dataPath);
 	~Game();
 
+	// 32*24 pitch=512
+	static uint32_t screenMaskOffset(int x, int y) {
+		return ((y << 6) & ~511) + (x >> 3);
+		// return ((y & ~7) << 6) + (x >> 3)
+	}
+
+	// 32*24 pitch=32
+	static uint32_t screenGridOffset(int x, int y) {
+		return ((y & ~7) << 2) + (x >> 3);
+	}
+
 	// benchmark.cpp
 	uint32_t benchmarkLoop(const uint8_t *p, int count);
 	uint32_t benchmarkCpu();
