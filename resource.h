@@ -417,11 +417,11 @@ struct SssHdr {
 
 struct SssInfo {
 	uint16_t sssBankIndex; // 0 indexes _sssBanksData
-	int8_t unk2; // 2 codeOffsetNum
+	int8_t sampleIndex; // 2
 	int8_t targetVolume; // 3
 	int8_t unk4; // 4 filterDelta2
 	int8_t targetPanning; // 5
-	uint8_t unk6; // 6 sound source mask
+	uint8_t concurrencyMask; // 6
 	uint8_t unk7;
 };
 

@@ -638,11 +638,11 @@ void Resource::loadSssData(File *fp, const char *name) {
 	_sssInfosData = (SssInfo *)malloc(_sssHdr.infosDataCount * sizeof(SssInfo));
 	for (int i = 0; i < _sssHdr.infosDataCount; ++i) {
 		_sssInfosData[i].sssBankIndex = fp->readUint16(); // index _sssBanksData
-		_sssInfosData[i].unk2 = fp->readByte();
+		_sssInfosData[i].sampleIndex = fp->readByte();
 		_sssInfosData[i].targetVolume = fp->readByte();
 		_sssInfosData[i].unk4 = fp->readByte();
 		_sssInfosData[i].targetPanning = fp->readByte();
-		_sssInfosData[i].unk6 = fp->readByte();
+		_sssInfosData[i].concurrencyMask = fp->readByte();
 		_sssInfosData[i].unk7 = fp->readByte();
 		bytesRead += 8;
 	}

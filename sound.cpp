@@ -36,11 +36,11 @@ static uint32_t valueSssLut(uint8_t source, uint8_t mask, SssInfo *s) {
 
 	// bits 16..20
 	value <<= 4;
-	value |= s->unk2 & 15;
+	value |= s->sampleIndex & 15;
 
 	// bits 12..16
 	value <<= 4;
-	value |= s->unk6;
+	value |= s->concurrencyMask;
 
 	// bits 0..12
 	value <<= 12;
@@ -50,9 +50,12 @@ static uint32_t valueSssLut(uint8_t source, uint8_t mask, SssInfo *s) {
 }
 
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
-	// (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF) ?
-	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // lut index : 0,1,2 (Andy, monster1, monster2)
-		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // lut offset : num _sssBankIndex
+	if (1) {
+		return (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF);
+	}
+	// original code compares the 3 bit fields
+	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // source (lut index) : 0,1,2 (Andy, monster1, monster2)
+		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // bank index (lut offset)
 			return (flags_a >> 24) == (flags_b >> 24); // bit 0..31, used as a mask lut[][] |= 1 << bit
 		}
 	}
@@ -60,17 +63,17 @@ static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 }
 
 static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
-	const uint32_t a = (flags >> 20) & 0xF; // 0,1,2
-	assert(a < 3);
-	const uint32_t b = flags & 0xFFF; // num indexes _sssBankIndex
-	assert(b < (uint32_t)res->_sssHdr.banksDataCount);
+	const int source = (flags >> 20) & 15; // 0,1,2
+	assert(source < 3);
+	const int bankIndex = flags & 0xFFF;
+	assert(bankIndex < res->_sssHdr.banksDataCount);
 	switch (lut) {
 	case 1:
-		return &res->_sssLookupTable1[a][b];
+		return &res->_sssLookupTable1[source][bankIndex];
 	case 2:
-		return &res->_sssLookupTable2[a][b];
+		return &res->_sssLookupTable2[source][bankIndex];
 	case 3:
-		return &res->_sssLookupTable3[a][b];
+		return &res->_sssLookupTable3[source][bankIndex];
 	default:
 		error("Invalid sssLut %d", lut);
 	}
@@ -631,7 +634,6 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 }
 
 SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b) {
-	// if (!_sss_enabled) return;
 	int minIndex = -1;
 	int minPriority = -1;
 	for (int i = 0; i < kMaxSssObjects; ++i) {
@@ -800,11 +802,11 @@ void Game::updateSoundObjectLut2(uint32_t flags) {
 	}
 }
 
-SssObject *Game::createSoundObject(int num, int b, int flags) {
-	debug(kDebug_SOUND, "createSoundObject num %d b %d c 0x%x", num, b, flags);
+SssObject *Game::createSoundObject(int bankIndex, int sampleIndex, uint32_t flags) {
+	debug(kDebug_SOUND, "createSoundObject bank %d sample %d c 0x%x", bankIndex, sampleIndex, flags);
 	SssObject *ret = 0;
-	if (b < 0) {
-		SssBank *bank = &_res->_sssBanksData[num];
+	if (sampleIndex < 0) {
+		SssBank *bank = &_res->_sssBanksData[bankIndex];
 		if ((bank->flags & 1) != 0) {
 			int firstSampleIndex = bank->firstSampleIndex;
 			if (bank->count <= 0) {
@@ -816,7 +818,7 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 			int framesCount = 0;
 			for (int i = 0; i < bank->count; ++i) {
 				if (sample->pcm != 0xFFFF) {
-					SssObject *so = startSoundObject(num, i, flags);
+					SssObject *so = startSoundObject(bankIndex, i, flags);
 					if (so && so->pcmFramesCount >= framesCount) {
 						framesCount = so->pcmFramesCount;
 						ret = so;
@@ -827,56 +829,56 @@ SssObject *Game::createSoundObject(int num, int b, int flags) {
 		}
 // 42B865
 		uint32_t _eax = 1 << (_rnd.update() & 31);
-		SssUnk6 *unk6 = &_res->_sssDataUnk6[num];
-		if ((unk6->mask & _eax) == 0) {
-			if (_eax > unk6->mask) {
+		SssUnk6 *s6 = &_res->_sssDataUnk6[bankIndex];
+		if ((s6->mask & _eax) == 0) {
+			if (_eax > s6->mask) {
 				do {
 					_eax >>= 1;
-				} while ((unk6->mask & _eax) == 0);
+				} while ((s6->mask & _eax) == 0);
 			} else {
 // 42B8A8
 				do {
 					_eax <<= 1;
-				} while ((unk6->mask & _eax) == 0);
+				} while ((s6->mask & _eax) == 0);
 			}
 		}
 // 42B8AE
 		int b = 0;
 		for (; b < bank->count; ++b) {
-			if ((unk6->unk0[b] & _eax) != 0) {
+			if ((s6->unk0[b] & _eax) != 0) {
 				break;
 			}
 		}
 // 42B8C7
 		if ((bank->flags & 2) != 0) {
-			unk6->mask &= ~unk6->unk0[b];
-			if (unk6->mask == 0 && bank->count > 0) {
+			s6->mask &= ~s6->unk0[b];
+			if (s6->mask == 0 && bank->count > 0) {
 				for (int i = 0; i < bank->count; ++i) {
-					unk6->mask |= unk6->unk0[i];
+					s6->mask |= s6->unk0[i];
 				}
 			}
 		}
 // 42B8E9
-		ret = startSoundObject(num, b, flags);
-		if (ret && (_res->_sssBanksData[num].flags & 4) != 0) {
-			ret->nextSoundNum = num;
+		ret = startSoundObject(bankIndex, b, flags);
+		if (ret && (_res->_sssBanksData[bankIndex].flags & 4) != 0) {
+			ret->nextSoundNum = bankIndex;
 			ret->nextSoundCounter = -1;
 		}
 	} else {
-		ret = startSoundObject(num, b, flags);
-		if (ret && (_res->_sssBanksData[num].flags & 4) != 0) {
-			ret->nextSoundNum = num;
-			ret->nextSoundCounter = b;
+		ret = startSoundObject(bankIndex, sampleIndex, flags);
+		if (ret && (_res->_sssBanksData[bankIndex].flags & 4) != 0) {
+			ret->nextSoundNum = bankIndex;
+			ret->nextSoundCounter = sampleIndex;
 		}
 	}
 	return ret;
 }
 
-SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
-	debug(kDebug_SOUND, "startSoundObject num %d b %d flags 0x%x", num, b, flags);
+SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags) {
+	debug(kDebug_SOUND, "startSoundObject bank %d sample %d flags 0x%x", bankIndex, sampleIndex, flags);
 
-	SssBank *bank = &_res->_sssBanksData[num];
-	int sampleNum = bank->firstSampleIndex + b;
+	SssBank *bank = &_res->_sssBanksData[bankIndex];
+	const int sampleNum = bank->firstSampleIndex + sampleIndex;
 	debug(kDebug_SOUND, "startSoundObject sample %d", sampleNum);
 	assert(sampleNum >= 0 && sampleNum < _res->_sssHdr.samplesDataCount);
 	SssSample *sample = &_res->_sssSamplesData[sampleNum];
@@ -888,7 +890,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[bank->sssFilter];
 		const int priority = CLIP(filter->unk24 + sample->initPriority, 0, 7);
-		const uint32_t flags1 = (flags & 0xFFF0F000) | (num & 0xFFF);
+		const uint32_t flags1 = (flags & 0xFFF0F000) | (bankIndex & 0xFFF);
 		SssPcm *pcm = &_res->_sssPcmTable[sample->pcm];
 		SssObject *so = addSoundObject(pcm, priority, flags1, flags);
 		if (so) {
@@ -909,7 +911,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 			so->panningModulateDelta = 0;
 			so->flags0 = flags;
 			so->pcmFramesCount = sample->framesCount;
-			so->bankIndex = num;
+			so->bankIndex = bankIndex;
 			so->priority = sample->initPriority;
 			so->filter = filter;
 			so->volume = sample->initVolume;
@@ -940,7 +942,7 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	memset(&tmpObj, 0, sizeof(tmpObj));
 	tmpObj.flags0 = flags;
 	tmpObj.flags1 = flags;
-	tmpObj.bankIndex = num;
+	tmpObj.bankIndex = bankIndex;
 	tmpObj.repeatCounter = -1;
 	tmpObj.pauseCounter = -1;
 	tmpObj.lvlObject = _currentSoundLvlObject;
@@ -973,8 +975,8 @@ SssObject *Game::startSoundObject(int num, int b, uint32_t flags) {
 	return 0;
 }
 
-void Game::playSoundObject(SssInfo *s, int lut, int bits) {
-	debug(kDebug_SOUND, "playSoundObject num %d lut 0x%x bits 0x%x", s->sssBankIndex, lut, bits);
+void Game::playSoundObject(SssInfo *s, int source, int mask) {
+	debug(kDebug_SOUND, "playSoundObject num %d lut 0x%x mask 0x%x", s->sssBankIndex, source, mask);
 	if (_sssDisabled) {
 		return;
 	}
@@ -1026,8 +1028,8 @@ void Game::playSoundObject(SssInfo *s, int lut, int bits) {
 		}
 	}
 // 42BA9D
-	const uint32_t _ebp = valueSssLut(lut, bits, s);
-	const uint8_t _al = s->unk6;
+	const uint32_t _ebp = valueSssLut(source, mask, s);
+	const uint8_t _al = s->concurrencyMask;
 	_ecx = s->sssBankIndex;
 	if (_al & 2) {
 		const uint32_t mask = 1 << (_ebp >> 24);
@@ -1050,19 +1052,19 @@ void Game::playSoundObject(SssInfo *s, int lut, int bits) {
 	} else if (_al & 4) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _ebp)) {
-				createSoundObject(s->sssBankIndex, s->unk2, _ebp);
+				createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
 				return;
 			}
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _ebp)) {
-				createSoundObject(s->sssBankIndex, s->unk2, _ebp);
+				createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
 				return;
 			}
 		}
 	}
 // 42BBDD
-	createSoundObject(s->sssBankIndex, s->unk2, _ebp);
+	createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
 }
 
 void Game::clearSoundObjects() {
