@@ -464,21 +464,20 @@ void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum
 	}
 }
 
-void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int pos) {
-	const int u = _res->_screensBasePos[pos].u;
-	const int v = _res->_screensBasePos[pos].v;
-	const int screen = _res->_screensGrid[pos * 4 + kPosTopScreen];
+void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int screenNum) {
+	const int u = _res->_screensBasePos[screenNum].u;
+	const int v = _res->_screensBasePos[screenNum].v;
+	const int topScreen = _res->_screensGrid[screenNum * 4 + kPosTopScreen];
 	if (x1 < u || y1 < v || y2 >= v + 192) {
-		if (screen != 255) {
-			if (x1 >= u && y1 >= v) {
-				if (y2 < v + 192) {
-					setScreenMaskRectHelper(x1, y1, x2, v + 192, screen);
-				}
+		if (topScreen != 255) {
+			const int u2 = _res->_screensBasePos[topScreen].u;
+			const int v2 = _res->_screensBasePos[topScreen].v;
+			if (x1 >= u2 && y1 >= v2 && y2 < v + 192) {
+				setScreenMaskRectHelper(u2, y1, x2, v2 + 192, topScreen);
 			}
 		}
 	}
-// 40C111
-	setScreenMaskRectHelper(x1, v, x2, y2, screen);
+	setScreenMaskRectHelper(u, v, x2, y2, screenNum);
 }
 
 void Game::updateScreenMaskBuffer(int x, int y, int type) {

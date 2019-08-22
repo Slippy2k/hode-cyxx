@@ -312,6 +312,7 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 	return _bl;
 }
 
+// updateScreenMaskLar
 void Game::updateLevelTick_lar_helper4(uint8_t *p, int flag) {
 	if (p[1] != flag) {
 		p[1] = flag;
@@ -336,6 +337,7 @@ void Game::updateLevelTick_lar_helper4(uint8_t *p, int flag) {
 	}
 }
 
+// clipAndyLvlObjectLar
 int Game::updateLevelTick_lar_helper5(BoundingBox *b, bool flag) {
 	int ret = 0;
 	const uint8_t flags = _andyObject->flags0 & 0x1F;
