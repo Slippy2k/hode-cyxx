@@ -57,31 +57,31 @@ static uint8_t _lar1_unkData3[96] = {
 	0x12, 0x0B, 0xFF, 0x0D, 0x12, 0x0B, 0xFF, 0x0C, 0x12, 0x15, 0x02, 0x0B, 0x15, 0x2F, 0x00, 0x0E,
 };
 
-static const uint8_t byte_452538[4] = {
-	0x01, 0x00, 0x00, 0x00
+static const int16_t byte_452538[2] = {
+	1, 0
 };
 
-static const uint8_t byte_452540[6] = {
-	0x02, 0x00, 0x00, 0x00, 0x00, 0x08
+static const int16_t byte_452540[3] = {
+	2, 0, 2048
 };
 
-static const uint8_t byte_452548[8] = {
-	0x03, 0x00, 0x00, 0x00, 0x03, 0x04, 0xFD, 0x03
+static const int16_t byte_452548[4] = {
+	3, 0, 1027, 1021
 };
 
-static const uint8_t byte_452550[10] = {
-	0x04, 0x00, 0x00, 0x00, 0x03, 0x04, 0xFD, 0x03, 0x03, 0x04
+static const int16_t byte_452550[5] = {
+	4, 0, 1027, 1021, 1027
 };
 
-static const uint8_t byte_452560[10] = {
-	0x04, 0x00, 0x00, 0x00, 0x03, 0xFC, 0x00, 0x08, 0xFD, 0x03
+static const int16_t byte_452560[5] = {
+	4, 0, -1021, 2048, 1021
 };
 
-static const uint8_t byte_452570[14] = {
-	0x06, 0x00, 0x00, 0x00, 0xFD, 0x03, 0x06, 0x00, 0xFD, 0x03, 0xFD, 0x03, 0x06, 0x00
+static const int16_t byte_452570[7] = {
+	6, 0, 1021, 6, 1021, 1021, 6
 };
 
-static const uint8_t *off_452580[] = {
+static const int16_t *off_452580[] = {
 	byte_452538,
 	byte_452540,
 	byte_452548,
@@ -312,23 +312,23 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 	return _bl;
 }
 
-void Game::updateLevelTick_lar_helper4(uint8_t *p, int num) {
-	if (num != p[1]) {
-		p[1] = num;
-		const uint8_t screen = p[4];
-		uint32_t offset = screenMaskOffset(_res->_screensBasePos[screen].u + p[2], _res->_screensBasePos[screen].v + p[3]);
+void Game::updateLevelTick_lar_helper4(uint8_t *p, int flag) {
+	if (p[1] != flag) {
+		p[1] = flag;
+		const uint8_t screenNum = p[4];
+		uint32_t offset = screenMaskOffset(_res->_screensBasePos[screenNum].u + p[2], _res->_screensBasePos[screenNum].v + p[3]);
 		uint8_t *dst = _screenMaskBuffer + offset;
-		const uint8_t *src = off_452580[p[0]];
-		const int count = (int16_t)READ_LE_UINT16(src); src += 2;
-		if (num == 0) {
+		const int16_t *src = off_452580[p[0]];
+		const int count = *src++;
+		if (flag == 0) {
 			for (int i = 0; i < count; ++i) {
-				offset = (int16_t)READ_LE_UINT16(src); src += 2;
+				offset = *src++;
 				dst += offset;
 				*dst &= ~8;
 			}
 		} else {
 			for (int i = 0; i < count; ++i) {
-				offset = (int16_t)READ_LE_UINT16(src); src += 2;
+				offset = *src++;
 				dst += offset;
 				*dst |= 8;
 			}
@@ -674,41 +674,11 @@ void Game::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							if (_lar1_unkData1[_al + 1] != 0) {
-								const uint8_t _cl = _lar1_unkData1[_al + 4];
-								_lar1_unkData1[_al + 1] = 0;
-
-								int offset = (_res->_screensBasePos[_cl].u + _lar1_unkData1[_al + 2]) >> 3;
-								offset += ((_res->_screensBasePos[_cl].v + _lar1_unkData1[_al + 3]) & ~7) << 6;
-								uint8_t *dst = _screenMaskBuffer + offset;
-
-								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
-								for (int i = 0; i < count; ++i) {
-									offset = (int16_t)READ_LE_UINT16(src); src += 2;
-									dst += offset;
-									*dst &= ~8;
-								}
-							}
+							updateLevelTick_lar_helper4(_lar1_unkData1 + _al, 0);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							if (_lar1_unkData1[_al + 1] != 1) {
-								const uint8_t _cl = _lar1_unkData1[_al + 4];
-								_lar1_unkData1[_al + 1] = 1;
-
-								int offset = (_res->_screensBasePos[_cl].u + _lar1_unkData1[_al + 2]) >> 3;
-								offset += ((_res->_screensBasePos[_cl].v + _lar1_unkData1[_al + 3]) & ~7) << 6;
-								uint8_t *dst = _screenMaskBuffer + offset;
-
-								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
-								for (int i = 0; i < count; ++i) {
-									offset = (int16_t)READ_LE_UINT16(src); src += 2;
-									dst += offset;
-									*dst |= 8;
-								}
-							}
+							updateLevelTick_lar_helper4(_lar1_unkData1 + _al, 1);
 							_bl = 2;
 						}
 // 40751B
@@ -722,41 +692,11 @@ void Game::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							if (_lar1_unkData1[_al + 1] != 0) {
-								const uint8_t _cl = _lar1_unkData1[_al + 4];
-								_lar1_unkData1[_al + 1] = 0;
-
-								int offset = (_res->_screensBasePos[_cl].u + _lar1_unkData1[_al + 2]) >> 3;
-								offset += ((_res->_screensBasePos[_cl].v + _lar1_unkData1[_al + 3]) & ~7) << 6;
-								uint8_t *dst = _screenMaskBuffer + offset;
-
-								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
-								for (int i = 0; i < count; ++i) {
-									offset = (int16_t)READ_LE_UINT16(src); src += 2;
-									dst += offset;
-									*dst &= ~8;
-								}
-							}
+							updateLevelTick_lar_helper4(_lar1_unkData1 + _al, 0);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							if (_lar1_unkData1[_al + 1] != 1) {
-								const uint8_t _cl = _lar1_unkData1[_al + 4];
-								_lar1_unkData1[_al + 1] = 1;
-
-								int offset = (_res->_screensBasePos[_cl].u + _lar1_unkData1[_al + 2]) >> 3;
-								offset += ((_res->_screensBasePos[_cl].v + _lar1_unkData1[_al + 3]) & ~7) << 6;
-								uint8_t *dst = _screenMaskBuffer + offset;
-
-								const uint8_t *src = off_452580[_lar1_unkData1[_al]];
-								const int count = (int16_t)READ_LE_UINT16(src); src += 2;
-								for (int i = 0; i < count; ++i) {
-									offset = (int16_t)READ_LE_UINT16(src); src += 2;
-									dst += offset;
-									*dst |= 8;
-								}
-							}
+							updateLevelTick_lar_helper4(_lar1_unkData1 + _al, 1);
 							_bl = 2;
 						}
 						LvlObject *o = findLvlObject2(0, _lar1_unkData1[_al + 5], _lar1_unkData1[_al + 4]);

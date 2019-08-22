@@ -249,12 +249,12 @@ int main(int argc, char* argv[]) {
 
 				dumpBinary(fp, "byte_451248", 0x4EA48, 32, "0x%02X", UNSIGNED_8BITS, 0);
 
-				dumpBinary(fp, "byte_452538", 0x4FD38, 4, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_452540", 0x4FD40, 6, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_452548", 0x4FD48, 8, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_452550", 0x4FD50, 10, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_452560", 0x4FD60, 10, "0x%02X", UNSIGNED_8BITS, 0);
-				dumpBinary(fp, "byte_452570", 0x4FD70, 14, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "byte_452538", 0x4FD38,  4 / sizeof(uint16_t), "%d", SIGNED_16BITS, 0);
+				dumpBinary(fp, "byte_452540", 0x4FD40,  6 / sizeof(uint16_t), "%d", SIGNED_16BITS, 0);
+				dumpBinary(fp, "byte_452548", 0x4FD48,  8 / sizeof(uint16_t), "%d", SIGNED_16BITS, 0);
+				dumpBinary(fp, "byte_452550", 0x4FD50, 10 / sizeof(uint16_t), "%d", SIGNED_16BITS, 0);
+				dumpBinary(fp, "byte_452560", 0x4FD60, 10 / sizeof(uint16_t), "%d", SIGNED_16BITS, 0);
+				dumpBinary(fp, "byte_452570", 0x4FD70, 14 / sizeof(uint16_t), "%d", SIGNED_16BITS, 0);
 
 				dumpBinary(fp, "byte_4526D8", 0x4FED8, 32, "0x%02X", UNSIGNED_8BITS, 0);
 
