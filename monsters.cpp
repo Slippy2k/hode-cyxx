@@ -3969,6 +3969,7 @@ int Game::mstSm_main(Task *t) {
 		case 52:
 		case 53:
 		case 54:
+		case 55:
 		case 56: { // 34 - arith_task_var_task_var
 				assert(p[1] < kMaxLocals);
 				assert(p[2] < kMaxLocals);
