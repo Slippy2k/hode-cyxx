@@ -3916,12 +3916,12 @@ int Game::mstSm_main(Task *t) {
 				// mstOp26_removeMstTaskScreen(&_mstTasksList4, p[1]);
 			}
 			break;
-		case 40: // 27 - remove_monsters_screen_flags
+		case 40: // 27 - remove_monsters_screen_type
 			if (p[1] < _res->_mstHdr.pointsCount) {
-				mstOp27_removeMstTaskScreenFlags(&_monsterObjects1TasksList, p[1], p[2]);
-				mstOp27_removeMstTaskScreenFlags(&_monsterObjects2TasksList, p[1], p[2]);
-				// mstOp27_removeMstTaskScreenFlags(&_mstTasksList3, p[1], p[2]);
-				// mstOp27_removeMstTaskScreenFlags(&_mstTasksList4, p[1], p[2]);
+				mstOp27_removeMstTaskScreenType(&_monsterObjects1TasksList, p[1], p[2]);
+				mstOp27_removeMstTaskScreenType(&_monsterObjects2TasksList, p[1], p[2]);
+				// mstOp27_removeMstTaskScreenType(&_mstTasksList3, p[1], p[2]);
+				// mstOp27_removeMstTaskScreenType(&_mstTasksList4, p[1], p[2]);
 			}
 			break;
 		case 41: { // 28 - increment_task_var
@@ -4958,16 +4958,12 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 	}
 }
 
-// mstOp27_removeMstTaskScreenType
-void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int flags) {
+void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int type) {
 	Task *current = *tasksList;
 	while (current) {
 		MonsterObject1 *m = current->monster1;
 		Task *next = current->nextPtr;
-		if (m && m->o16->screenNum == screenNum) {
-			if ((m->monsterInfos[944] & 0x7F) != flags) {
-				continue;
-			}
+		if (m && m->o16->screenNum == screenNum && (m->monsterInfos[944] & 0x7F) == type) {
 			if (_m48Num != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
 				disableMonsterObject1(m);
 			}
@@ -4981,10 +4977,7 @@ void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int
 			removeTask(tasksList, current);
 		} else {
 			MonsterObject2 *mo = current->monster2;
-			if (mo && mo->o->screenNum == screenNum) {
-				if ((mo->m45->unk0 & 0x7F) != flags) {
-					continue;
-				}
+			if (mo && mo->o->screenNum == screenNum && (mo->m45->unk0 & 0x7F) == type) {
 				mo->m45 = 0;
 				mo->o->dataPtr = 0;
 				removeLvlObject2(mo->o);
