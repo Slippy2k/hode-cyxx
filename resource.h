@@ -191,10 +191,10 @@ struct MstUnk44 { // MstWalkBoxes
 	uint32_t count; // 0xC
 }; // sizeof == 16
 
-struct MstUnk45 { // MstInfoMonster2
-	uint8_t unk0; // 0x0 type
-	uint8_t unk1; // 0x1 shootMask
-	uint16_t unk2; // 0x2 anim
+struct MstInfoMonster2 {
+	uint8_t type; // 0x0
+	uint8_t shootMask; // 0x1
+	uint16_t anim; // 0x2
 	uint32_t codeData; // 4
 	uint32_t unk8;
 }; // sizeof == 12
@@ -557,7 +557,7 @@ struct Resource {
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
 	MstUnk44 *_mstUnk44;
-	MstUnk45 *_mstUnk45;
+	MstInfoMonster2 *_mstUnk45;
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;

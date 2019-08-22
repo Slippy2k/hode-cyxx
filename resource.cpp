@@ -1203,11 +1203,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstUnk45 = (MstUnk45 *)malloc(_mstHdr.unk0x2C * sizeof(MstUnk45));
+	_mstUnk45 = (MstInfoMonster2 *)malloc(_mstHdr.unk0x2C * sizeof(MstInfoMonster2));
 	for (int i = 0; i < _mstHdr.unk0x2C; ++i) {
-		_mstUnk45[i].unk0 = fp->readByte();
-		_mstUnk45[i].unk1 = fp->readByte();
-		_mstUnk45[i].unk2 = fp->readUint16();
+		_mstUnk45[i].type = fp->readByte();
+		_mstUnk45[i].shootMask = fp->readByte();
+		_mstUnk45[i].anim = fp->readUint16();
 		_mstUnk45[i].codeData = fp->readUint32();
 		_mstUnk45[i].unk8 = fp->readUint32();
 		bytesRead += 12;

@@ -334,7 +334,7 @@ struct Task;
 
 struct MstUnk35;
 struct MstUnk44;
-struct MstUnk45;
+struct MstInfoMonster2;
 struct MstUnk46;
 struct MstUnk46Unk1;
 struct MstUnk44Unk1;
@@ -411,7 +411,7 @@ struct MonsterObject1 {
 }; // sizeof == 256
 
 struct MonsterObject2 {
-	MstUnk45 *m45;
+	MstInfoMonster2 *monster2Info;
 	LvlObject *o; // 4
 	MonsterObject1 *monster1; // 8
 	int monster2Index; // 10

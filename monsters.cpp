@@ -56,7 +56,7 @@ void Game::resetMonsterObject1(MonsterObject1 *m) {
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
 		MonsterObject2 *mo = &_monsterObjects2Table[i];
-		if (mo->m45 && mo->monster1 == m) {
+		if (mo->monster2Info && mo->monster1 == m) {
 			mo->monster1 = 0;
 		}
 	}
@@ -84,7 +84,7 @@ void Game::initMonsterObject2_firefly(MonsterObject2 *m) {
 }
 
 void Game::resetMonsterObject2(MonsterObject2 *m) {
-	m->m45 = 0;
+	m->monster2Info = 0;
 	LvlObject *o = m->o;
 	if (o) {
 		o->dataPtr = 0;
@@ -2818,7 +2818,7 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 	debug(kDebug_MONSTER, "mstUpdateTaskMonsterObject2 t %p", t);
 	mstTaskSetScreenPosition(t);
 	MonsterObject2 *m = t->monster2;
-	if (_currentLevel == 1 && m->m45->unk0 == 27) {
+	if (_currentLevel == 1 && m->monster2Info->type == 27) {
 		if (_fireflyPosData[m->hPosIndex] == 0xFF) {
 			uint32_t r = _rnd.update();
 			uint8_t _dl = (r % 5) << 3;
@@ -2870,8 +2870,8 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 	}
 // 4191DC
 	LvlObject *o = m->o;
-	MstUnk45 *m45 = m->m45;
-	uint8_t _bl = m45->unk1;
+	MstInfoMonster2 *monster2Info = m->monster2Info;
+	uint8_t _bl = monster2Info->shootMask;
 	if (_bl != _dl) {
 		for (int i = 0; i < _mstMovingStateCount; ++i) {
 			MovingOpcodeState *p = &_mstMovingState[i];
@@ -2894,7 +2894,7 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 			if (p->unk40 != 2 || (_bl & 4) != 0) {
 				continue;
 			}
-			const uint32_t codeData = m45->codeData;
+			const uint32_t codeData = monster2Info->codeData;
 			if (codeData != kNone) {
 				resetTask(t, _res->_mstCodeData + codeData * 4);
 			} else {
@@ -3071,7 +3071,7 @@ void Game::updateMstHeightMapData() {
 
 void Game::mstRemoveMonsterObject2(Task *t, Task **tasksList) {
 	MonsterObject2 *m = t->monster2;
-	m->m45 = 0;
+	m->monster2Info = 0;
 	LvlObject *o = m->o;
 	if (o) {
 		o->dataPtr = 0;
@@ -3097,7 +3097,7 @@ void Game::mstRemoveMonsterObject1(Task *t, Task **tasksList) {
 		o->dataPtr = 0;
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		if (_monsterObjects2Table[i].m45 != 0 && _monsterObjects2Table[i].monster1 == m) {
+		if (_monsterObjects2Table[i].monster2Info != 0 && _monsterObjects2Table[i].monster1 == m) {
 			_monsterObjects2Table[i].monster1 = 0;
 		}
 	}
@@ -4359,7 +4359,7 @@ int Game::mstSm_main(Task *t) {
 					yPos += (int8_t)p[3];
 				}
 				int dirMask = 0;
-				if ((t->monster1 && (t->monster1->monsterInfos[944] == 10 || t->monster1->monsterInfos[944] == 25)) || (t->monster2 && (t->monster2->m45->unk0 == 10 || t->monster2->m45->unk0 == 25))) {
+				if ((t->monster1 && (t->monster1->monsterInfos[944] == 10 || t->monster1->monsterInfos[944] == 25)) || (t->monster2 && (t->monster2->monster2Info->type == 10 || t->monster2->monster2Info->type == 25))) {
 					int dx = o->posTable[6].x - o->posTable[7].x;
 					int dy = o->posTable[6].y - o->posTable[7].y;
 					if (dx >= 8) {
@@ -4949,7 +4949,7 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 		} else {
 			MonsterObject2 *mo = current->monster2;
 			if (mo && mo->o->screenNum == screenNum) {
-				mo->m45 = 0;
+				mo->monster2Info = 0;
 				mo->o->dataPtr = 0;
 				removeLvlObject2(mo->o);
 				removeTask(tasksList, current);
@@ -4978,8 +4978,8 @@ void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int 
 			removeTask(tasksList, current);
 		} else {
 			MonsterObject2 *mo = current->monster2;
-			if (mo && mo->o->screenNum == screenNum && (mo->m45->unk0 & 0x7F) == type) {
-				mo->m45 = 0;
+			if (mo && mo->o->screenNum == screenNum && (mo->monster2Info->type & 0x7F) == type) {
+				mo->monster2Info = 0;
 				mo->o->dataPtr = 0;
 				removeLvlObject2(mo->o);
 				removeTask(tasksList, current);
@@ -6969,7 +6969,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		o->dataPtr = m;
 	} else {
 		for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-			if (!_monsterObjects2Table[i].m45) {
+			if (!_monsterObjects2Table[i].monster2Info) {
 				mo = &_monsterObjects2Table[i];
 				break;
 			}
@@ -6980,7 +6980,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		}
 // 415743
 		assert(arg24 >= 0 && arg24 < _res->_mstHdr.unk0x2C);
-		mo->m45 = &_res->_mstUnk45[arg24];
+		mo->monster2Info = &_res->_mstUnk45[arg24];
 		if (currentTask->monster1) {
 			mo->monster1 = currentTask->monster1;
 		} else if (currentTask->monster2) {
@@ -6991,12 +6991,12 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 
 		mo->flags24 = 0;
 
-		uint8_t _cl  = mo->m45->unk0;
-		uint16_t anim = mo->m45->unk2;
+		uint8_t _cl  = mo->monster2Info->type;
+		uint16_t anim = mo->monster2Info->anim;
 
 		o = addLvlObject((_cl >> 7) & 1, x1, y1, objScreen, (_cl & 0x7F), anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
-			mo->m45 = 0;
+			mo->monster2Info = 0;
 			if (mo->o) {
 				mo->o->dataPtr = 0;
 			}
@@ -7015,7 +7015,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		Task *t = findFreeTask();
 		if (!t) {
 			warning("mstOp67 mo %p no free task", mo);
-			mo->m45 = 0;
+			mo->monster2Info = 0;
 			if (mo->o) {
 				mo->o->dataPtr = 0;
 			}
@@ -7032,10 +7032,10 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		appendTask(&_monsterObjects2TasksList, t);
 		t->codeData = kUndefinedMonsterByteCode;
 		mstTaskSetScreenPosition(t);
-		const uint32_t codeData = mo->m45->codeData;
+		const uint32_t codeData = mo->monster2Info->codeData;
 		assert(codeData != kNone);
 		resetTask(t, _res->_mstCodeData + codeData * 4);
-		if (_currentLevel == kLvl_fort && mo->m45->unk0 == 27) {
+		if (_currentLevel == kLvl_fort && mo->monster2Info->type == 27) {
 			initMonsterObject2_firefly(mo);
 		}
 	} else {
