@@ -154,8 +154,8 @@ struct Game {
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	bool _specialAnimFlag;
-	MovingOpcodeState _mstMovingState[kMaxMovingStates];
-	int _mstMovingStateCount;
+	MovingOpcodeState _mstMovingState[kMaxMovingStates]; // AndyShootData _andyShootsData[kMaxAndyShoots]
+	int _mstMovingStateCount; // _andyShootsCount
 	uint8_t _mstOp68_type, _mstOp68_arg9, _mstOp67_type;
 	uint8_t _mstOp67_flags1;
 	uint16_t _mstOp67_unk;

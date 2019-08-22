@@ -83,29 +83,29 @@ struct MstHdr {
 	int unk0x08;
 	int unk0x0C;
 	int unk0x10;
-	int unk0x14;
+	int unk0x14; // screenInitDataCount
 	int screenAreaCodesCount;
 	int unk0x1C;
 	int unk0x20;
 	int unk0x24;
 	int unk0x28;
-	int unk0x2C;
+	int unk0x2C; // mstInfoMonster2Count
 	int unk0x30;
 	int unk0x34;
 	int unk0x38;
-	int unk0x3C;
+	int unk0x3C; // mstInfoMonster1Count
 	int unk0x40;
 	int unk0x44;
 	int unk0x48;
 	int unk0x4C;
-	int unk0x50;
-	int unk0x54;
+	int unk0x50; // mstOp223DataCount
+	int unk0x54; // mstOp226DataCount
 	int unk0x58;
 	int unk0x5C;
 	int unk0x60;
 	int unk0x64;
 	int unk0x68;
-	int unk0x6C;
+	int unk0x6C; // mstOp240DataCount
 	int unk0x70;
 	int unk0x74;
 	int unk0x78;
@@ -123,12 +123,12 @@ struct MstScreenAreaCode { // MstScreenArea
 	int32_t x2; // 4
 	int32_t y1; // 8
 	int32_t y2; // 0xC
-	uint32_t next; // struct MstAreaCode* next; // 0x10, offset _resMstUnk38
-	uint32_t prev; // 0x14, offset _resMstUnk38
-	uint32_t unk0x18; // 0x18, offset _resMstUnk38
-	uint8_t unk0x1C; // 0x1C
-	uint8_t unk0x1D; // 0x1D
-	uint16_t unk0x1E;
+	uint32_t next; // 0x10, nextByPos _mstUnk40
+	uint32_t prev; // 0x14 unused ?
+	uint32_t unk0x18; // 0x18 nextByValue _mstUnk39
+	uint8_t unk0x1C; // 0x1C indexUnk39
+	uint8_t unk0x1D; // 0x1D value
+	uint16_t unk0x1E; // 0X1E unused?
 	uint32_t codeData; // 0x20, offset _mstCodeData
 }; // sizeof == 36
 
@@ -191,10 +191,10 @@ struct MstUnk44 { // MstWalkBoxes
 	uint32_t count; // 0xC
 }; // sizeof == 16
 
-struct MstUnk45 {
-	uint8_t unk0;
-	uint8_t unk1;
-	uint16_t unk2;
+struct MstUnk45 { // MstInfoMonster2
+	uint8_t unk0; // 0x0 type
+	uint8_t unk1; // 0x1 shootMask
+	uint16_t unk2; // 0x2 anim
 	uint32_t codeData; // 4
 	uint32_t unk8;
 }; // sizeof == 12
@@ -307,7 +307,7 @@ struct MstUnk51 {
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstScreenInitCode {
+struct MstScreenInitCode { // MstScreenInit
 	int32_t delay;
 	uint32_t codeData;
 }; // sizeof == 8

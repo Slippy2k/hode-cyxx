@@ -236,16 +236,16 @@ struct AndyLvlObjectData {
 };
 
 struct ShootLvlObjectData {
-	uint8_t unk0;
-	uint8_t unk1;
+	uint8_t unk0; // 0x0 type
+	uint8_t unk1; // 0x1 state
 	uint8_t counter; // 0x2
-	uint8_t unk3;
+	uint8_t unk3; // 0X3 value
 	int32_t dxPos; // 0x4
 	int32_t dyPos; // 0x8
-	int32_t x2; // 0xC
-	int32_t y2; // 0x10
-	int unk14; // 0x14
-	int unk18; // 0x18
+	int32_t x2; // 0xC  xPosShoot
+	int32_t y2; // 0x10 yPosShoot
+	int unk14; // 0x14 xPosObject
+	int unk18; // 0x18 yPosObject
 	LvlObject *o; // 0x1C
 	ShootLvlObjectData *nextPtr; // 0x20 next pointer to 'free' element
 };
@@ -279,22 +279,22 @@ struct CrackSprite { // mstOp57
 
 struct MonsterObject1;
 
-struct MovingOpcodeState {
+struct MovingOpcodeState { // AndyShootData
 	int32_t xPos;
 	int32_t yPos; // 4
 	BoundingBox boundingBox; // 8
-	int32_t unk18;
+	int32_t unk18; // size 0x18
 	int32_t width;
 	int32_t height;
-	int32_t unk24;
-	ShootLvlObjectData *unk28;
+	int32_t unk24; // directionMask 0x24
+	ShootLvlObjectData *unk28; // shootObjectData 0x28
 	LvlObject *o; // 0x2C
 	MonsterObject1 *m; // 0x30
-	int32_t unk34;
-	int32_t unk38;
-	int32_t unk3C;
-	uint8_t unk40;
-	uint8_t unk41;
+	int32_t unk34; // clipX 0x34
+	int32_t unk38; // clipY 0x38
+	int32_t unk3C; // monsterDistance 0x3C
+	uint8_t unk40; // 0x40 type
+	uint8_t unk41; // 0x41 plasmaCannonPointsCount
 }; // sizeof == 0x44
 
 struct AndyMoveData {
@@ -395,19 +395,19 @@ struct MonsterObject1 {
 	uint8_t rnd_m49[4]; // 0xC8
 	uint8_t rnd_m35[4]; // 0xCC
 	MstUnk35 *m35; // 0xD0
-	MstUnk49Unk1 *m49Unk1; // 0xD4, sizeof=16
+	MstUnk49Unk1 *m49Unk1; // 0xD4
 	MstUnk49 *m49; // 0xD8
-	int indexUnk49Unk1; // 0xDC // indexes _mstUnk49.data1
+	int indexUnk49Unk1; // 0xDC
 	uint8_t unkE4;
 	uint8_t unkE5;
-	uint8_t unkE6; // 0xE6 indexes _mstLut4
+	uint8_t lut4Index; // 0xE6
 	uint8_t directionKeyMask;
 	uint16_t o_flags2; // 0xE8
 	int collideDistance; // 0xEC
 	int unkF0; // 0xF0
 	int unkF4; // 0xF4
 	uint8_t unkF8; // 0xF8
-	int unkFC; // 0xFC
+	int unkFC; // 0xFC shootDirection
 }; // sizeof == 256
 
 struct MonsterObject2 {

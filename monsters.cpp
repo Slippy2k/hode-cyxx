@@ -2342,7 +2342,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	const uint8_t *_mstCurrentDataPtr = m->monsterInfos + _mstCurrentFlags0 * 28; // _ebx
 	int8_t a = _mstCurrentDataPtr[6];
 	if (a != 0) {
-		const int num = CLIP(m->unkE6 + a, 0, 17);
+		const int num = CLIP(m->lut4Index + a, 0, 17);
 		o->flags2 = (o->flags2 & ~0x1F) | _mstLut4[num];
 	} else {
 		o->flags2 = m->o_flags2;
@@ -4958,6 +4958,7 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 	}
 }
 
+// mstOp27_removeMstTaskScreenType
 void Game::mstOp27_removeMstTaskScreenFlags(Task **tasksList, int screenNum, int flags) {
 	Task *current = *tasksList;
 	while (current) {
@@ -6970,7 +6971,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		}
 // 4156FC
 		m->o_flags2 = o_flags2 & 0xFFFF;
-		m->unkE6 = _mstLut5[o_flags2 & 0x1F];
+		m->lut4Index = _mstLut5[o_flags2 & 0x1F];
 		o->dataPtr = m;
 	} else {
 		for (int i = 0; i < kMaxMonsterObjects2; ++i) {
