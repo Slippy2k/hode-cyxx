@@ -279,22 +279,22 @@ struct CrackSprite { // mstOp57
 
 struct MonsterObject1;
 
-struct MovingOpcodeState { // AndyShootData
+struct AndyShootData {
 	int32_t xPos;
 	int32_t yPos; // 4
 	BoundingBox boundingBox; // 8
-	int32_t unk18; // size 0x18
+	int32_t size; // 0x18
 	int32_t width;
 	int32_t height;
-	int32_t unk24; // directionMask 0x24
-	ShootLvlObjectData *unk28; // shootObjectData 0x28
+	int32_t directionMask; // 0x24
+	ShootLvlObjectData *shootObjectData; // 0x28
 	LvlObject *o; // 0x2C
 	MonsterObject1 *m; // 0x30
-	int32_t unk34; // clipX 0x34
-	int32_t unk38; // clipY 0x38
-	int32_t unk3C; // monsterDistance 0x3C
-	uint8_t unk40; // 0x40 type
-	uint8_t unk41; // 0x41 plasmaCannonPointsCount
+	int32_t clipX; // 0x34
+	int32_t clipY; // 0x38
+	int32_t monsterDistance; // 0x3C
+	uint8_t type; // 0x40
+	uint8_t plasmaCannonPointsCount; // 0x41
 }; // sizeof == 0x44
 
 struct AndyMoveData {
@@ -350,7 +350,7 @@ struct MonsterObject1 {
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
 	MstUnk48Unk12Unk4 *unk18; // m48Unk4
-	MovingOpcodeState *collidePtr; // 0x1C
+	AndyShootData *collidePtr; // 0x1C
 	int monster1Index; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28

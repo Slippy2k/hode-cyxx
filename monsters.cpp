@@ -503,15 +503,15 @@ int Game::mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
-	switch (p->unk24) {
+int Game::getMstDistance(int y, const AndyShootData *p) const {
+	switch (p->directionMask) {
 	case 0:
 		if (p->boundingBox.x1 <= _mstTemp_x2 && p->boundingBox.y2 >= _mstTemp_y1 && p->boundingBox.y1 <= _mstTemp_y2) {
 			const int dx = _mstTemp_x1 - p->boundingBox.x2;
 			if (dx <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dx / p->width;
+			return (p->type == 3) ? 0 : dx / p->width;
 		}
 		break;
 	case 1:
@@ -526,7 +526,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 = p->boundingBox.y2 + dx2 * 2 / 3;
 					if (dy2 > _mstTemp_y1) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->width;
+						return (p->type == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -543,7 +543,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 = p->boundingBox.y1 + dx2 * 2 / 3;
 					if (dy2 <= _mstTemp_y2) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->width;
+						return (p->type == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -560,7 +560,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 =  p->boundingBox.y2 - dx2 * 2 / 3;
 					if (dy2 >= _mstTemp_y1) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->width;
+						return (p->type == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -578,7 +578,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 					}
 					const int dy2 = dx2 * 2 / 3 + + p->boundingBox.y1;
 					if (dy2 <= _mstTemp_y2) {
-						return (p->unk40 == 3) ? 0 : dx2 / p->width;
+						return (p->type == 3) ? 0 : dx2 / p->width;
 					}
 				}
 			}
@@ -590,7 +590,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 			if (dx <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dx / p->width;
+			return (p->type == 3) ? 0 : dx / p->width;
 		}
 		break;
 	case 6:
@@ -599,7 +599,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 			if (dy <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dy / p->height;
+			return (p->type == 3) ? 0 : dy / p->height;
 		}
 		break;
 	case 7:
@@ -608,7 +608,7 @@ int Game::getMstDistance(int y, const MovingOpcodeState *p) const {
 			if (dy <= 0) {
 				return 0;
 			}
-			return (p->unk40 == 3) ? 0 : dy / p->height;
+			return (p->type == 3) ? 0 : dy / p->height;
 		}
 		break;
 	case 128: // 8
@@ -677,11 +677,11 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	m->collideDistance = -1;
 	m->collidePtr = 0;
 // 40ED0D
-	if (_mstMovingStateCount != 0 && !_specialAnimFlag && (o->flags1 & 6) != 6) {
+	if (_andyShootsCount != 0 && !_specialAnimFlag && (o->flags1 & 6) != 6) {
 		if (m->localVars[7] > 0 || m->localVars[7] < -1) {
 			if ((m->flagsA5 & 0x80) == 0) {
-				for (int i = 0; i < _mstMovingStateCount; ++i) {
-					MovingOpcodeState *p = &_mstMovingState[i];
+				for (int i = 0; i < _andyShootsCount; ++i) {
+					AndyShootData *p = &_andyShootsTable[i];
 					if (m->xDelta > 256 || m->yDelta > 192) {
 						continue;
 					}
@@ -689,10 +689,10 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 					_mstTemp_y1 = o->yPos;
 					_mstTemp_x2 = o->xPos + o->width - 1;
 					_mstTemp_y2 = o->yPos + o->height - 1;
-					uint8_t _al = p->unk40;
+					uint8_t _al = p->type;
 					if (_al == 1 || _al == 2) {
 // 40EED8
-						if (p->unk3C >= m->xDelta + m->yDelta) {
+						if (p->monsterDistance >= m->xDelta + m->yDelta) {
 							if (o->screenNum != _currentScreen) {
 								const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
 								const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
@@ -706,9 +706,9 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 								const uint8_t type = m->monsterInfos[944];
 								if (((type & 9) == 0 && clipLvlObjectsSmall(p->o, o, 132)) || ((type & 9) != 0 && clipLvlObjectsSmall(p->o, o, 20))) {
 									p->m = m;
-									p->unk3C = m->xDelta + m->yDelta;
-									p->unk34 = _clipBoxOffsetX;
-									p->unk38 = _clipBoxOffsetY;
+									p->monsterDistance = m->xDelta + m->yDelta;
+									p->clipX = _clipBoxOffsetX;
+									p->clipY = _clipBoxOffsetY;
 								}
 							}
 // 40F009
@@ -722,7 +722,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 							}
 						}
 // 40F087
-					} else if (_al == 3 && p->unk3C > m->xDelta + m->yDelta) {
+					} else if (_al == 3 && p->monsterDistance > m->xDelta + m->yDelta) {
 						if (o->screenNum != _currentScreen) {
 							const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
 							const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
@@ -734,9 +734,9 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 // 40EE68
 						if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
 							if (testPlasmaCannonPointsDirection(_mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
-								p->unk3C = m->xDelta + m->yDelta;
+								p->monsterDistance = m->xDelta + m->yDelta;
 								p->m = m;
-								p->unk41 = _plasmaCannonLastIndex1;
+								p->plasmaCannonPointsCount = _plasmaCannonLastIndex1;
 							}
 // 40F004
 						}
@@ -758,7 +758,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 					if (res < 0) {
 						continue;
 					}
-					if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->collidePtr->unk40 & 1) == 0 && p->unk40 == 2)) {
+					if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->collidePtr->type & 1) == 0 && p->type == 2)) {
 						m->collidePtr = p;
 						m->collideDistance = res;
 					}
@@ -782,7 +782,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 		m->unk8C = READ_LE_UINT32(ptr + 932);
 	}
 // 40F1B3
-	if (_mstMovingState[0].unk40 == 3 && m->unkF4 != 0 && _mstMovingState[0].unk24 == m->unkFC && m->directionKeyMask == _andyObject->directionKeyMask) {
+	if (_andyShootsTable[0].type == 3 && m->unkF4 != 0 && _andyShootsTable[0].directionMask == m->unkFC && m->directionKeyMask == _andyObject->directionKeyMask) {
 		m->flags48 |= 0x80;
 	} else {
 		m->unkFC = -1;
@@ -1020,10 +1020,10 @@ void Game::executeMstCode() {
 		executeMstCodeHelper1();
 		_mstHelper1TestValue = 0;
 	}
-	for (int i = 0; i < kMaxMovingStates; ++i) {
-		_mstMovingState[i].unk28 = 0;
-		_mstMovingState[i].m = 0;
-		_mstMovingState[i].unk3C = 0x1000000;
+	for (int i = 0; i < kMaxAndyShoots; ++i) {
+		_andyShootsTable[i].shootObjectData = 0;
+		_andyShootsTable[i].m = 0;
+		_andyShootsTable[i].monsterDistance = 0x1000000;
 	}
 	executeMstCodeHelper2();
 	if (_mstVars[31] > 0) {
@@ -1052,17 +1052,17 @@ void Game::executeMstCode() {
 		while ((this->*(t->run))(t) == 0);
 	}
 // 419C30
-	for (int i = 0; i < _mstMovingStateCount; ++i) {
-		MovingOpcodeState *p = &_mstMovingState[i];
+	for (int i = 0; i < _andyShootsCount; ++i) {
+		AndyShootData *p = &_andyShootsTable[i];
 		MonsterObject1 *m = p->m;
 		if (!m) {
 			continue;
 		}
 		const int energy = m->localVars[7];
-		ShootLvlObjectData *dat = p->unk28;
+		ShootLvlObjectData *dat = p->shootObjectData;
 		if (dat) {
 			if (energy > 0) {
-				if ((p->unk40 & 2) == 0) {
+				if ((p->type & 2) == 0) {
 					m->localVars[7] -= 4;
 					if (m->localVars[7] < 0) {
 						m->localVars[7] = 0;
@@ -1073,23 +1073,23 @@ void Game::executeMstCode() {
 				}
 // 419C79
 				dat->unk3 = 0x80;
-				dat->x2 = p->unk34;
-				dat->y2 = p->unk38;
+				dat->x2 = p->clipX;
+				dat->y2 = p->clipY;
 				dat->o = m->o16;
 			} else if (energy == -2) {
 // 419CA1
 				dat->unk3 = 0x80;
-				dat->x2 = p->unk34;
-				dat->y2 = p->unk38;
+				dat->x2 = p->clipX;
+				dat->y2 = p->clipY;
 			}
 			continue;
 		}
 // 419CC0
 		if (energy > 0) {
 			m->localVars[7] = energy - 1;
-			_plasmaCannonLastIndex1 = p->unk41;
+			_plasmaCannonLastIndex1 = p->plasmaCannonPointsCount;
 		} else if (energy == -2) {
-			_plasmaCannonLastIndex1 = p->unk41;
+			_plasmaCannonLastIndex1 = p->plasmaCannonPointsCount;
 		} else {
 			_plasmaCannonLastIndex1 = 0;
 		}
@@ -2403,8 +2403,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418384
 	assert(_mstCurrentMonster1 == m);
 	int dir = 0;
-	for (int i = 0; i < _mstMovingStateCount; ++i) {
-		MovingOpcodeState *p = &_mstMovingState[i];
+	for (int i = 0; i < _andyShootsCount; ++i) {
+		AndyShootData *p = &_andyShootsTable[i];
 		if (p->m && p->m != m) {
 			continue;
 		}
@@ -2422,12 +2422,12 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 		m->unkF0 = 8;
 		int var28 = 0;
-		MovingOpcodeState *var14 = m->collidePtr;
+		AndyShootData *var14 = m->collidePtr;
 		if (t->run != &Game::runTask_unk5 && t->run != &Game::runTask_unk6 && t->run != &Game::runTask_unk7 && t->run != &Game::runTask_unk8 && t->run != &Game::runTask_unk9 && t->run != &Game::runTask_unk10) {
 			if (m->monsterInfos[946] & 2) {
 				_mstCurrentMonster1->unk74 = _mstCurrentMonster1->unk78 = 0x80000000;
 				_mstCurrentMonster1->unk7C = _mstCurrentMonster1->unk80 = 0x7FFFFFFF;
-				switch (var14->unk24) {
+				switch (var14->directionMask) {
 				case 0:
 					var28 = 2;
 					break;
@@ -2576,7 +2576,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			mstTaskAttack(_mstCurrentTask, m50Unk1->codeData, 0x40);
 			_mstCurrentMonster1->unkF8 = m50Unk1->unk8;
 			_mstCurrentMonster1->unkF4 = dir;
-			_mstCurrentMonster1->unkFC = var14->unk24;
+			_mstCurrentMonster1->unkFC = var14->directionMask;
 			_mstCurrentMonster1->directionKeyMask = _andyObject->directionKeyMask;
 			return 0;
 		}
@@ -2860,11 +2860,11 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 	}
 // 4191B1
 	uint8_t _dl = 0;
-	for (int i = 0; i < _mstMovingStateCount; ++i) {
-		MovingOpcodeState *p = &_mstMovingState[i];
-		if (p->unk40 == 2) {
+	for (int i = 0; i < _andyShootsCount; ++i) {
+		AndyShootData *p = &_andyShootsTable[i];
+		if (p->type == 2) {
 			_dl |= 1;
-		} else if (p->unk40 == 1) {
+		} else if (p->type == 1) {
 			_dl |= 2;
 		}
 	}
@@ -2873,12 +2873,12 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 	MstInfoMonster2 *monster2Info = m->monster2Info;
 	uint8_t _bl = monster2Info->shootMask;
 	if (_bl != _dl) {
-		for (int i = 0; i < _mstMovingStateCount; ++i) {
-			MovingOpcodeState *p = &_mstMovingState[i];
-			if (p->unk40 == 2 && (_bl & 1) == 0) {
+		for (int i = 0; i < _andyShootsCount; ++i) {
+			AndyShootData *p = &_andyShootsTable[i];
+			if (p->type == 2 && (_bl & 1) == 0) {
 				continue;
 			}
-			if (p->unk40 == 1 && (_bl & 2) == 0) {
+			if (p->type == 1 && (_bl & 2) == 0) {
 				continue;
 			}
 			if (o->screenNum != _currentScreen || p->o->screenNum != _currentScreen) {
@@ -2887,11 +2887,11 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 			if (!clipLvlObjectsBoundingBox(p->o, o, 20)) {
 				continue;
 			}
-			ShootLvlObjectData *s = p->unk28;
+			ShootLvlObjectData *s = p->shootObjectData;
 			s->unk3 = 0x80;
 			s->x2 = o->xPos + o->width / 2;
 			s->y2 = o->yPos + o->height / 2;
-			if (p->unk40 != 2 || (_bl & 4) != 0) {
+			if (p->type != 2 || (_bl & 4) != 0) {
 				continue;
 			}
 			const uint32_t codeData = monster2Info->codeData;
@@ -2930,64 +2930,64 @@ void Game::mstUpdateRefPos() {
 		_mstAndyLevelPosX = _mstAndyScreenPosX + _res->_mstPointOffsets[0].xOffset;
 		_mstAndyLevelPosY = _mstAndyScreenPosY + _res->_mstPointOffsets[0].yOffset;
         }
-	_mstMovingStateCount = 0;
-	_mstMovingState[0].unk40 = 0;
+	_andyShootsCount = 0;
+	_andyShootsTable[0].type = 0;
 	if (!_lvlObjectsList0) {
 		if (_plasmaCannonDirection == 0) {
 			_executeMstLogicPrevCounter = _executeMstLogicCounter;
 			return;
 		}
-		_mstMovingState[0].width  = 512;
-		_mstMovingState[0].height = 512;
-		_mstMovingState[0].unk28 = 0;
-		_mstMovingState[0].unk40 = 3;
-		_mstMovingState[0].unk18 = 4;
-		_mstMovingState[0].xPos = _plasmaCannonPosX[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].xOffset;
-		_mstMovingState[0].yPos = _plasmaCannonPosY[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].yOffset;
+		_andyShootsTable[0].width  = 512;
+		_andyShootsTable[0].height = 512;
+		_andyShootsTable[0].shootObjectData = 0;
+		_andyShootsTable[0].type = 3;
+		_andyShootsTable[0].size = 4;
+		_andyShootsTable[0].xPos = _plasmaCannonPosX[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].xOffset;
+		_andyShootsTable[0].yPos = _plasmaCannonPosY[_plasmaCannonFirstIndex] + _res->_mstPointOffsets[_currentScreen].yOffset;
 		switch (_plasmaCannonDirection - 1) {
 		case 0:
-			_mstMovingState[0].unk24 = 6;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 6;
+			_andyShootsCount = 1;
 			break;
 		case 2:
-			_mstMovingState[0].unk24 = 3;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 3;
+			_andyShootsCount = 1;
 			break;
 		case 1:
-			_mstMovingState[0].unk24 = 0;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 0;
+			_andyShootsCount = 1;
 			break;
 		case 5:
-			_mstMovingState[0].unk24 = 4;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 4;
+			_andyShootsCount = 1;
 			break;
 		case 3:
-			_mstMovingState[0].unk24 = 7;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 7;
+			_andyShootsCount = 1;
 			break;
 		case 11:
-			_mstMovingState[0].unk24 = 2;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 2;
+			_andyShootsCount = 1;
 			break;
 		case 7:
-			_mstMovingState[0].unk24 = 5;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 5;
+			_andyShootsCount = 1;
 			break;
 		case 8:
-			_mstMovingState[0].unk24 = 1;
-			_mstMovingStateCount = 1;
+			_andyShootsTable[0].directionMask = 1;
+			_andyShootsCount = 1;
 			break;
 		default:
-			_mstMovingStateCount = 1;
+			_andyShootsCount = 1;
 			break;
 		}
 	} else {
-		MovingOpcodeState *p = _mstMovingState;
+		AndyShootData *p = _andyShootsTable;
 		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
 			p->o = o;
 			assert(o->dataPtr);
 			ShootLvlObjectData *ptr = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
-			p->unk28 = ptr;
+			p->shootObjectData = ptr;
 			if (ptr->unk3 == 0x80) {
 				continue;
 			}
@@ -2996,45 +2996,45 @@ void Game::mstUpdateRefPos() {
 			}
 			p->width  = ptr->dxPos;
 			p->height = ptr->dyPos;
-			p->unk24 = ptr->unk1;
+			p->directionMask = ptr->unk1;
 			switch (ptr->unk0) {
 			case 0:
-				p->unk40 = 1;
+				p->type = 1;
 				p->xPos = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset + o->posTable[7].x;
-				p->unk18 = 3;
+				p->size = 3;
 				p->yPos = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset + o->posTable[7].y;
 				break;
 			case 5:
-				p->unk24 |= 0x80;
+				p->directionMask |= 0x80;
 				// fall-through
 			case 4:
-				p->unk40 = 2;
+				p->type = 2;
 				p->xPos = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset + o->posTable[7].x;
-				p->unk18 = 7;
+				p->size = 7;
 				p->yPos = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset + o->posTable[7].y;
 				break;
 			default:
 				--p;
-				--_mstMovingStateCount;
+				--_andyShootsCount;
 				break;
 			}
 			++p;
-			++_mstMovingStateCount;
-			if (_mstMovingStateCount >= kMaxMovingStates) {
+			++_andyShootsCount;
+			if (_andyShootsCount >= kMaxAndyShoots) {
 				break;
 			}
 		}
-		if (_mstMovingStateCount == 0) {
+		if (_andyShootsCount == 0) {
 			_executeMstLogicPrevCounter = _executeMstLogicCounter;
 			return;
 		}
 	}
-	for (int i = 0; i < _mstMovingStateCount; ++i) {
-		MovingOpcodeState *p = &_mstMovingState[i];
-		p->boundingBox.x2 = p->xPos + p->unk18;
-		p->boundingBox.x1 = p->xPos - p->unk18;
-		p->boundingBox.y2 = p->yPos + p->unk18;
-		p->boundingBox.y1 = p->yPos - p->unk18;
+	for (int i = 0; i < _andyShootsCount; ++i) {
+		AndyShootData *p = &_andyShootsTable[i];
+		p->boundingBox.x2 = p->xPos + p->size;
+		p->boundingBox.x1 = p->xPos - p->size;
+		p->boundingBox.y2 = p->yPos + p->size;
+		p->boundingBox.y1 = p->yPos - p->size;
 	}
 }
 
@@ -3539,14 +3539,14 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _difficulty;
 	case 7:
 		if (t->monster1 && t->monster1->collidePtr) {
-			return t->monster1->collidePtr->unk40;
+			return t->monster1->collidePtr->type;
 		}
-		return _mstMovingState[0].unk40;
+		return _andyShootsTable[0].type;
 	case 8:
 		if (t->monster1 && t->monster1->collidePtr) {
-			return t->monster1->collidePtr->unk24 & 0x7F;
+			return t->monster1->collidePtr->directionMask & 0x7F;
 		}
-		return _mstMovingState[0].unk24 & 0x7F;
+		return _andyShootsTable[0].directionMask & 0x7F;
 	case 9:
 		if (t->monster1 && t->monster1->unk18) {
 			return t->monster1->unk18->unk8;

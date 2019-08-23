@@ -44,7 +44,7 @@ struct Game {
 		kMaxTasks = 128,
 		kMaxVars = 40,
 		kMaxLocals = 8,
-		kMaxMovingStates = 8,
+		kMaxAndyShoots = 8,
 		kMaxShootLvlObjectData = 32,
 		kMaxSssObjects = 32,
 		kMaxMonsterObjects1 = 32,
@@ -154,8 +154,8 @@ struct Game {
 	int16_t _mstOriginPosX;
 	int16_t _mstOriginPosY;
 	bool _specialAnimFlag;
-	MovingOpcodeState _mstMovingState[kMaxMovingStates]; // AndyShootData _andyShootsData[kMaxAndyShoots]
-	int _mstMovingStateCount; // _andyShootsCount
+	AndyShootData _andyShootsTable[kMaxAndyShoots];
+	int _andyShootsCount;
 	uint8_t _mstOp68_type, _mstOp68_arg9, _mstOp67_type;
 	uint8_t _mstOp67_flags1;
 	uint16_t _mstOp67_unk;
@@ -644,7 +644,7 @@ struct Game {
 	int mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2);
 
 	void mstTaskSetScreenPosition(Task *t);
-	int getMstDistance(int y, const MovingOpcodeState *p) const;
+	int getMstDistance(int y, const AndyShootData *p) const;
 	void mstTaskUpdateScreenPosition(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
 
