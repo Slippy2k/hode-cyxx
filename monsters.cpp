@@ -2083,8 +2083,8 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	LvlObject *o = m->o16;
-	uint8_t _al = _res->_mstUnk52[num * 4];
-	uint8_t _bl = _res->_mstUnk52[num * 4 + 2];
+	uint8_t _al = _res->_mstUnk52[num].unk0;
+	uint8_t _bl = _res->_mstUnk52[num].unk2;
 	const uint8_t *var4 = m->monsterInfos + _al * 28;
 	uint8_t _dl = (o->flags1 >> 4) & 3;
 	uint8_t _ecx = ((_dl & 1) != 0) ? 8 : 2;
@@ -3171,8 +3171,8 @@ Task *Game::createTask(const uint8_t *codeData) {
 int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	MonsterObject1 *m = t->monster1;
 	LvlObject *o = m->o16;
-	uint8_t var4 = _res->_mstUnk52[num * 4];
-	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
+	uint8_t var4 = _res->_mstUnk52[num].unk0;
+	uint8_t var8 = _res->_mstUnk52[num].unk2;
 	const uint8_t *ptr = m->monsterInfos + var4 * 28;
 	uint8_t _al = (o->flags1 >> 4) & 3;
 	uint8_t _cl = ((_al & 1) != 0) ? 8 : 2;
@@ -3182,7 +3182,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		_cl |= 1;
 	}
 	mstLvlObjectSetActionDirection(o, ptr, var8, _cl);
-	const uint8_t am = _res->_mstUnk52[num * 4 + 1];
+	const uint8_t am = _res->_mstUnk52[num].unk1;
 	o->actionKeyMask |= am;
 
 	t->flags &= ~0x80;
@@ -3787,7 +3787,7 @@ int Game::mstSm_main(Task *t) {
 		case 8: // 3 - set_monster_action_direction_imm
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				const int arg = _res->_mstUnk52[num * 4 + 3];
+				const int arg = _res->_mstUnk52[num].unk3;
 				t->codeData = p;
 				ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
 			}
@@ -3795,7 +3795,7 @@ int Game::mstSm_main(Task *t) {
 		case 4: // 4 - set_monster_action_direction_task_var
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				const int arg = _res->_mstUnk52[num * 4 + 3];
+				const int arg = _res->_mstUnk52[num].unk3;
 				t->codeData = p;
 				assert(arg < kMaxLocals);
 				ret = mstTaskSetActionDirection(t, num, t->localVars[arg]);
@@ -3805,7 +3805,7 @@ int Game::mstSm_main(Task *t) {
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				if (mstTestActionDirection(t->monster1, num)) {
-					const int arg = _res->_mstUnk52[num * 4 + 3];
+					const int arg = _res->_mstUnk52[num].unk3;
 					t->codeData = p;
 					ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
 				}

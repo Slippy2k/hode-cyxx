@@ -307,6 +307,13 @@ struct MstUnk51 {
 	uint32_t count;
 }; // sizeof == 12
 
+struct MstUnk52 {
+	uint8_t unk0;
+	uint8_t unk1;
+	uint8_t unk2;
+	uint8_t unk3;
+}; // sizeof == 4
+
 struct MstScreenInitCode { // MstScreenInit
 	int32_t delay;
 	uint32_t codeData;
@@ -565,7 +572,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
-	uint8_t *_mstUnk52; // _mstActionDirectionData sizeof == 4
+	MstUnk52 *_mstUnk52;
 	MstOp223Data *_mstOp223Data;
 	MstUnk54 *_mstUnk54;
 	MstUnk55 *_mstUnk55;
