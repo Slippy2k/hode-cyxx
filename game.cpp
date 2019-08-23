@@ -2120,6 +2120,8 @@ void Game::mixAudio(int16_t *buf, int len) {
 
 	static const int kStereoSamples = 3528; // stereo
 
+	static int count = 0;
+
 	static int16_t buffer[kStereoSamples];
 	static int bufferOffset = 0;
 	static int bufferSize = 0;
@@ -2138,7 +2140,14 @@ void Game::mixAudio(int16_t *buf, int len) {
 		// this enqueues 1764*2 bytes for mono samples and 3528*2 bytes for stereo
 		_mix._mixingQueueSize = 0;
 		// 17640 + 17640 * 25 / 100 == 22050 (1.25x)
-		mixSoundObjects17640(true);
+		if (count == 4) {
+			mixSoundObjects17640(true);
+			count = 0;
+		} else {
+			mixSoundObjects17640(false);
+			++count;
+		}
+
 		if (len >= kStereoSamples) {
 			_mix.mix(buf, kStereoSamples);
 			buf += kStereoSamples;
