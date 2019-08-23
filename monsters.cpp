@@ -2087,7 +2087,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	uint8_t _bl = _res->_mstUnk52[num * 4 + 2];
 	const uint8_t *var4 = m->monsterInfos + _al * 28;
 	uint8_t _dl = (o->flags1 >> 4) & 3;
-	uint8_t _ecx = ((_dl & 1) != 0 ? 6 : 0) + 2;
+	uint8_t _ecx = ((_dl & 1) != 0) ? 8 : 2;
 	uint8_t var8 = _ecx;
 	if (_dl & 2) {
 		var8 |= 4;
@@ -3169,13 +3169,13 @@ Task *Game::createTask(const uint8_t *codeData) {
 }
 
 int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
-	uint8_t var4 = _res->_mstUnk52[num * 4];
-	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
 	MonsterObject1 *m = t->monster1;
 	LvlObject *o = m->o16;
+	uint8_t var4 = _res->_mstUnk52[num * 4];
+	uint8_t var8 = _res->_mstUnk52[num * 4 + 2];
 	const uint8_t *ptr = m->monsterInfos + var4 * 28;
 	uint8_t _al = (o->flags1 >> 4) & 3;
-	uint8_t _cl = ((_al & 1) != 0 ? 6 : 0) + 2;
+	uint8_t _cl = ((_al & 1) != 0) ? 8 : 2;
 	if (_al & 2) {
 		_cl |= 4;
 	} else {

@@ -364,16 +364,16 @@ struct MonsterObject1 {
 	int yMstPos; // 0x58 yLevelPos
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
-	int unk64; // 0x64
-	int unk68; // 0x68
-	int unk6C; // 0x6C
-	int unk70; // 0x70
+	int unk64; // 0x64 x
+	int unk68; // 0x68 x
+	int unk6C; // 0x6C y
+	int unk70; // 0x70 y
 	int unk74; // 0x74 x
 	int unk78; // 0x78 y
 	int unk7C; // 0x7C x
 	int unk80; // 0x80 y
-	int unk84; // 0x84
-	int unk88; // 0x88
+	int unk84; // 0x84 x
+	int unk88; // 0x88 y
 	int unk8C; // 0x8C
 	int unk90; // 0x90
 	int x1; // right 0x94
@@ -385,8 +385,8 @@ struct MonsterObject1 {
 	uint8_t flagsA6; // 0xA6
 	uint8_t flagsA7; // 0xA7
 	uint8_t flagsA8[4]; // 0xA8, 0xA9, 0xAA, 0xAB collideRectNum
-	int32_t unkAC;
-	int32_t unkB0;
+	int32_t unkAC; // x (levelPos)
+	int32_t unkB0; // y (levelPos)
 	int32_t unkB4; // _xMstPos2
 	int32_t unkB8; // _yMstPos2
 	int32_t unkBC; // 0xBC x
