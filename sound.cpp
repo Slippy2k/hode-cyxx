@@ -1155,7 +1155,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 				priority = 0;
 			} else {
 				panning = CLIP(so->panning, 0, 128);
-				volume >>= 2; // _edi
+				volume >>= 2;
 				priority /= 2;
 			}
 			if (so->currentPriority != priority) {
@@ -1172,9 +1172,9 @@ void Game::setSoundObjectPanning(SssObject *so) {
 		if (so->pcm == 0) {
 			return;
 		}
-		if (volume >= (int)ARRAYSIZE(_dbVolumeTable)) {
+		if (volume < 0 || volume >= (int)ARRAYSIZE(_dbVolumeTable)) {
 			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeFp16 >> 16), so->volume);
-			volume = ARRAYSIZE(_dbVolumeTable) - 1;
+			return;
 		}
 		int _edx = _dbVolumeTable[volume];
 		int _eax = _edx << 7;
@@ -1317,7 +1317,6 @@ void Game::queueSoundObjectsPcmStride() {
 			_mix._mixingQueue[_mix._mixingQueueSize].stereo = so->stereo;
 			const int strideSize = (pcm->strideSize - 256 * sizeof(int16_t));
 			assert(strideSize == 1764 || strideSize == 3528); // words
-			//pcm->currentPcmPtr += pcm->strideSize;
 			so->currentPcmPtr += strideSize;
 			++_mix._mixingQueueSize;
 		}

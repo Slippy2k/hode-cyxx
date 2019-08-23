@@ -954,24 +954,30 @@ uint32_t Resource::getSssPcmSize(const SssPcm *pcm) const {
 }
 
 void Resource::loadSssPcm(File *fp, int num) {
-	uint32_t decompressedSize = getSssPcmSize(&_sssPcmTable[num]);
-	if (decompressedSize != 0 && !_sssPcmTable[num].ptr) {
+	if (_sssPcmTable[num].ptr) {
+		return;
+	}
+	SssPcm *pcm = &_sssPcmTable[num];
+	const uint32_t decompressedSize = getSssPcmSize(pcm);
+	if (decompressedSize != 0) {
 		debug(kDebug_SOUND, "Loading PCM %d decompressedSize %d", num, decompressedSize);
 		int16_t *p = (int16_t *)malloc(decompressedSize);
-		if (p) {
-			_sssPcmTable[num].ptr = p;
-			fp->seek(_sssPcmTable[num].offset, SEEK_SET);
-			for (int i = 0; i < _sssPcmTable[num].strideCount; ++i) {
-				int16_t lut[256];
-				for (int j = 0; j < 256; ++j) {
-					lut[j] = fp->readUint16();
-				}
-				for (uint32_t j = 256 * sizeof(int16_t); j < _sssPcmTable[num].strideSize; ++j) {
-					*p++ = lut[fp->readByte()];
-				}
-			}
-			assert((p - _sssPcmTable[num].ptr) * sizeof(int16_t) == decompressedSize);
+		if (!p) {
+			warning("Failed to allocate %d bytes for PCM %d", decompressedSize, num);
+			return;
 		}
+		pcm->ptr = p;
+		fp->seek(pcm->offset, SEEK_SET);
+		for (int i = 0; i < pcm->strideCount; ++i) {
+			int16_t lut[256];
+			for (int j = 0; j < 256; ++j) {
+				lut[j] = fp->readUint16();
+			}
+			for (uint32_t j = 256 * sizeof(int16_t); j < pcm->strideSize; ++j) {
+				*p++ = lut[fp->readByte()];
+			}
+		}
+		assert((p - pcm->ptr) * sizeof(int16_t) == decompressedSize);
 	}
 }
 
