@@ -708,8 +708,8 @@ struct Game {
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);
 	void mstResetCollisionTable();
-	void executeMstUnk13(Task *t);
-	bool executeMstUnk14(MonsterObject1 *m, int x, int y, uint8_t dir);
+	void mstRestartTask(Task *t);
+	bool mstIsMonsterFacingDirection(MonsterObject1 *m, int x, int y, uint8_t dir);
 	int executeMstUnk23(Task *t);
 	int executeMstOp67Type1(Task *t);
 	int executeMstOp67Type2(Task *t, int flag);
@@ -723,17 +723,17 @@ struct Game {
 	int runTask_mstOp232(Task *t);
 	int runTask_mstOp233(Task *t);
 	int runTask_mstOp234(Task *t);
-	int runTask_unk1(Task *t);
-	int runTask_unk2(Task *t);
-	int runTask_unk3(Task *t);
-	int runTask_unk4(Task *t);
-	int runTask_unk5(Task *t);
-	int runTask_unk6(Task *t);
-	int runTask_unk7(Task *t);
-	int runTask_unk8(Task *t);
-	int runTask_unk9(Task *t);
-	int runTask_unk10(Task *t);
-	int runTask_unk11(Task *t);
+	int mstSm_monsterWait1(Task *t);
+	int mstSm_monsterWait2(Task *t);
+	int mstSm_monsterWait3(Task *t);
+	int mstSm_monsterWait4(Task *t);
+	int mstSm_monsterWait5(Task *t);
+	int mstSm_monsterWait6(Task *t);
+	int mstSm_monsterWait7(Task *t);
+	int mstSm_monsterWait8(Task *t);
+	int mstSm_monsterWait9(Task *t);
+	int mstSm_monsterWait10(Task *t);
+	int mstSm_monsterWait11(Task *t);
 
 	// sound.cpp
 	bool _sssDisabled;

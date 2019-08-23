@@ -565,7 +565,7 @@ struct Resource {
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
-	uint8_t *_mstUnk52; // sizeof == 4
+	uint8_t *_mstUnk52; // _mstActionDirectionData sizeof == 4
 	MstOp223Data *_mstOp223Data;
 	MstUnk54 *_mstUnk54;
 	MstUnk55 *_mstUnk55;
