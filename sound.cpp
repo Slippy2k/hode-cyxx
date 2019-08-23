@@ -386,10 +386,10 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 4: { // remove_sound
-				const uint8_t _cl = code[1] & 0xF;
-				const uint16_t num = READ_LE_UINT16(code + 2);
+				const uint8_t sampleIndex = code[1];
+				const uint16_t bankIndex = READ_LE_UINT16(code + 2);
 				uint32_t flags = (so->flags0 & 0xFFF0F000);
-				flags |= (_cl << 16) | (num & 0xFFF);
+				flags |= ((sampleIndex & 0xF) << 16) | (bankIndex & 0xFFF);
 				sssOp4_removeSounds(flags);
 				code += 4;
 			}
@@ -891,7 +891,8 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[bank->sssFilter];
 		const int priority = CLIP(filter->unk24 + sample->initPriority, 0, 7);
-		const uint32_t flags1 = (flags & 0xFFF0F000) | (bankIndex & 0xFFF);
+		uint32_t flags1 = flags & 0xFFF0F000;
+		flags1 |= ((sampleIndex & 0xF) << 16) | (bankIndex & 0xFFF);
 		SssPcm *pcm = &_res->_sssPcmTable[sample->pcm];
 		SssObject *so = addSoundObject(pcm, priority, flags1, flags);
 		if (so) {

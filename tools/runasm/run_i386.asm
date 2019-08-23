@@ -18,6 +18,7 @@ GLOBAL test_imul0x55555556
 GLOBAL test_0040D136
 GLOBAL test_0041C644
 GLOBAL test_0040D7F5
+GLOBAL test_0042B67F
 
 SECTION .text
 
@@ -334,6 +335,38 @@ test_0040D7F5:
       add     dl, 9
       movzx   eax, dl
 
- pop edx
- pop ebp
- ret
+  pop edx
+  pop ebp
+  ret
+
+test_0042B67F:
+
+  push ebp
+  mov ebp, esp
+  push edx
+  push edi
+  push esi
+
+      mov     eax, [ebp + arg0] ; random data
+      mov     edi, [ebp + arg1] ; flags to update
+      mov     esi, eax
+      mov     edx, [ebp + arg3] ; sampleIndex
+      and     edx, 0Fh
+      xor     esi, edi
+      and     esi, 0F000h
+      xor     eax, esi
+      mov     esi, [ebp + arg2] ; bankIndex
+      xor     eax, edi
+      and     esi, 0FFFh
+      and     eax, 0FFFFFh
+      xor     eax, edi
+      and     eax, 0FFF0F000h
+      xor     eax, esi
+      shl     edx, 16
+      or      eax, edx
+
+  pop esi
+  pop edi
+  pop edx
+  pop ebp
+  ret

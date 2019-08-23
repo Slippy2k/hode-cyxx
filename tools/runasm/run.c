@@ -22,6 +22,7 @@ extern int test_imul0x55555556(int) __attribute__((stdcall));
 extern int test_0040D136(int) __attribute__((stdcall));
 extern int test_0041C644(int) __attribute__((stdcall));
 extern int test_0040D7F5(int) __attribute__((stdcall));
+extern int test_0042B67F(int, int, int, int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -94,6 +95,15 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < 16; ++i) {
 		const int res = (i < 7) ? 3 : 9;
 		assert(test_0040D7F5(i) == res);
+	}
+	for (int i = 0; i < 16; ++i) { // sampleIndex
+		for (int j = 0; j < 0x1000; ++j) { // bankIndex
+			const uint32_t data = 0xDEADBEEF;
+			const uint32_t flags = 0xFFF0F000;
+			uint32_t res1 = (flags & 0xFFF0F000) | ((i & 0xF) << 16) | (j & 0xFFF);
+			uint32_t res2 = test_0042B67F(data, flags, j, i);
+			assert(res1 == res2);
+		}
 	}
 	return 0;
 }
