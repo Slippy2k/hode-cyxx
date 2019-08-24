@@ -433,8 +433,8 @@ struct SssInfo {
 };
 
 struct SssDefaults {
-	int8_t defaultVolume;
-	uint8_t defaultPriority;
+	uint8_t defaultVolume;
+	int8_t defaultPriority;
 	int8_t defaultPanning;
 };
 
@@ -451,7 +451,7 @@ struct SssSample {
 	uint8_t initVolume; // 0x4
 	uint8_t unk5;
 	int8_t initPriority; // 0x6
-	uint8_t initPanning; // 0x7
+	int8_t initPanning; // 0x7
 	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
 	uint32_t codeOffset2; // 0xC offset to _sssCodeData
 	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
@@ -464,16 +464,16 @@ struct SssUnk4 { // SssPreloadInfo
 };
 
 struct SssFilter {
-	int32_t volume; // (0,127)
-	int32_t volumeFp16; // (0,127) << 16
+	int32_t volume;
+	int32_t volumeCurrent; // fp16
 	int32_t volumeDelta;
 	int32_t volumeSteps;
-	int32_t panning; // (0,127)
-	int32_t panningFp16; // (0,127) << 16
+	int32_t panning;
+	int32_t panningCurrent; // fp16
 	int32_t panningDelta;
 	int32_t panningSteps;
-	int32_t unk20;
-	int32_t unk24; // priority (0,7)
+	int32_t priority;
+	int32_t priorityCurrent;
 	bool changed; // 0x30
 }; // sizeof == 52
 

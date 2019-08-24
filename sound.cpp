@@ -889,7 +889,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 	if (sample->framesCount != 0) {
 // 42B64C
 		SssFilter *filter = &_res->_sssFilters[bank->sssFilter];
-		const int priority = CLIP(filter->unk24 + sample->initPriority, 0, 7);
+		const int priority = CLIP(filter->priorityCurrent + sample->initPriority, 0, 7);
 		uint32_t flags1 = flags & 0xFFF0F000;
 		flags1 |= ((sampleIndex & 0xF) << 16) | (bankIndex & 0xFFF);
 		SssPcm *pcm = &_res->_sssPcmTable[sample->pcm];
@@ -993,10 +993,10 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 	}
 	int _eax, _ecx;
 	_eax = s->targetVolume << 16;
-	_ecx = filter->volumeFp16;
+	_ecx = filter->volumeCurrent;
 	if (_ecx != _eax) {
 		if (!found) {
-			filter->volumeFp16 = _eax;
+			filter->volumeCurrent = _eax;
 		} else {
 			filter->volumeSteps = 4;
 			filter->changed = true;
@@ -1005,10 +1005,10 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 	}
 // 42B9FD
 	_eax = s->targetPanning << 16;
-	_ecx = filter->panningFp16;
+	_ecx = filter->panningCurrent;
 	if (_ecx != _eax) {
 		if (!found) {
-			filter->panningFp16 = _eax;
+			filter->panningCurrent = _eax;
 		} else {
 			filter->panningSteps = 4;
 			filter->changed = true;
@@ -1017,9 +1017,9 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 	}
 // 42BA37
 	_eax = s->unk4;
-	_ecx = filter->unk24;
+	_ecx = filter->priorityCurrent;
 	if (_ecx != _eax) {
-		filter->unk24 = _eax;
+		filter->priorityCurrent = _eax;
 		for (int i = 0; i < _sssObjectsCount; ++i) {
 			SssObject *so = &_sssObjectsTable[i];
 			if (so->pcm != 0 && so->filter == filter) {
@@ -1094,14 +1094,14 @@ void Game::clearSoundObjects() {
 			for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
 				SssFilter *filter = &_res->_sssFilters[i];
 				const int a = _res->_sssDefaultsData[i].defaultVolume;
-				filter->volumeFp16 = a << 16;
+				filter->volumeCurrent = a << 16;
 				filter->volume = a;
 				const int b = _res->_sssDefaultsData[i].defaultPanning;
-				filter->panningFp16 = b << 16;
+				filter->panningCurrent = b << 16;
 				filter->panning = b;
 				const int c = _res->_sssDefaultsData[i].defaultPriority;
-				filter->unk24 = c;
-				filter->unk20 = c;
+				filter->priorityCurrent = c;
+				filter->priority = c;
 			}
 		}
 	}
@@ -1145,10 +1145,10 @@ int Game::getSoundObjectPanning(SssObject *so) const {
 
 void Game::setSoundObjectPanning(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
-		int volume = ((so->filter->volumeFp16 >> 16) * so->volume) >> 7; // indexes decibel volume table
+		int volume = ((so->filter->volumeCurrent >> 16) * so->volume) >> 7; // indexes decibel volume table
 		int panning = 0;
 		if (so->panningPtr) {
-			int priority = CLIP(so->priority + so->filter->unk24, 0, 7);
+			int priority = CLIP(so->priority + so->filter->priorityCurrent, 0, 7);
 			if (so->panning == -2) {
 				volume = 0;
 				panning = 64;
@@ -1166,14 +1166,14 @@ void Game::setSoundObjectPanning(SssObject *so) {
 				}
 			}
 		} else {
-			panning = CLIP(so->panning + (so->filter->panningFp16 >> 16), 0, 128);
+			panning = CLIP(so->panning + (so->filter->panningCurrent >> 16), 0, 128);
 		}
 // 429094
 		if (so->pcm == 0) {
 			return;
 		}
 		if (volume < 0 || volume >= (int)ARRAYSIZE(_dbVolumeTable)) {
-			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeFp16 >> 16), so->volume);
+			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeCurrent >> 16), so->volume);
 			return;
 		}
 		int _edx = _dbVolumeTable[volume];
@@ -1249,13 +1249,13 @@ void Game::mixSoundObjects17640(bool flag) {
 		filter->changed = false;
 		if (filter->volumeSteps != 0) {
 			--filter->volumeSteps;
-			filter->volumeFp16 += filter->volumeDelta;
+			filter->volumeCurrent += filter->volumeDelta;
 			filter->changed = true;
 		}
 
 		if (filter->panningSteps != 0) {
 			--filter->panningSteps;
-			filter->panningFp16 += filter->panningDelta;
+			filter->panningCurrent += filter->panningDelta;
 			filter->changed = true;
 		}
 	}

@@ -648,9 +648,9 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 	_sssDefaultsData = (SssDefaults *)malloc(_sssHdr.filtersDataCount * sizeof(SssDefaults));
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
-		_sssDefaultsData[i].defaultVolume   = (int8_t)fp->readByte();
+		_sssDefaultsData[i].defaultVolume   = fp->readByte();
 		_sssDefaultsData[i].defaultPriority = fp->readByte();
-		_sssDefaultsData[i].defaultPanning  = (int8_t)fp->readByte();
+		_sssDefaultsData[i].defaultPanning  = fp->readByte();
 		fp->readByte(); // padding
 		bytesRead += 4;
 	}
@@ -917,14 +917,14 @@ void Resource::loadSssData(File *fp, const char *name) {
 // 429E64
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
 		const int a = _sssDefaultsData[i].defaultVolume;
-		_sssFilters[i].volumeFp16 = a << 16;
+		_sssFilters[i].volumeCurrent = a << 16;
 		_sssFilters[i].volume = a;
 		const int b = _sssDefaultsData[i].defaultPanning;
-		_sssFilters[i].panningFp16 = b << 16;
+		_sssFilters[i].panningCurrent = b << 16;
 		_sssFilters[i].panning = b;
 		const int c = _sssDefaultsData[i].defaultPriority;
-		_sssFilters[i].unk24 = c;
-		_sssFilters[i].unk20 = c;
+		_sssFilters[i].priorityCurrent = c;
+		_sssFilters[i].priority = c;
 	}
 // 429EFA
 	// same as clearSoundObjects()
