@@ -640,10 +640,10 @@ void Resource::loadSssData(File *fp, const char *name) {
 		_sssInfosData[i].sssBankIndex = fp->readUint16(); // index _sssBanksData
 		_sssInfosData[i].sampleIndex = fp->readByte();
 		_sssInfosData[i].targetVolume = fp->readByte();
-		_sssInfosData[i].unk4 = fp->readByte();
+		_sssInfosData[i].targetPriority = fp->readByte();
 		_sssInfosData[i].targetPanning = fp->readByte();
 		_sssInfosData[i].concurrencyMask = fp->readByte();
-		_sssInfosData[i].unk7 = fp->readByte();
+		fp->readByte(); // padding to 8 bytes
 		bytesRead += 8;
 	}
 	_sssDefaultsData = (SssDefaults *)malloc(_sssHdr.filtersDataCount * sizeof(SssDefaults));
@@ -651,7 +651,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		_sssDefaultsData[i].defaultVolume   = fp->readByte();
 		_sssDefaultsData[i].defaultPriority = fp->readByte();
 		_sssDefaultsData[i].defaultPanning  = fp->readByte();
-		fp->readByte(); // padding
+		fp->readByte(); // padding to 4 bytes
 		bytesRead += 4;
 	}
 	_sssBanksData = (SssBank *)malloc(_sssHdr.banksDataCount * sizeof(SssBank));

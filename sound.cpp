@@ -1016,7 +1016,7 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 		}
 	}
 // 42BA37
-	_eax = s->unk4;
+	_eax = s->targetPriority;
 	_ecx = filter->priorityCurrent;
 	if (_ecx != _eax) {
 		filter->priorityCurrent = _eax;
