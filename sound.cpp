@@ -56,12 +56,13 @@ static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	// original code compares the 3 bit fields
 	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // source (lut index) : 0,1,2 (Andy, monster1, monster2)
 		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // bank index (lut offset)
-			return (flags_a >> 24) == (flags_b >> 24); // bit 0..31, used as a mask lut[][] |= 1 << bit
+			return (flags_a >> 24) == (flags_b >> 24); // sample index bit 0..31, used as a mask lut[][] |= 1 << bit
 		}
 	}
 	return false;
 }
 
+// returns the active samples for the lut/source/bank
 static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
 	const int source = (flags >> 20) & 15; // 0,1,2
 	assert(source < 3);
@@ -243,14 +244,14 @@ void Game::updateSoundObject(SssObject *so) {
 	}
 }
 
-void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
-	assert(lut < 3);
+void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
+	assert(source < 3);
 	assert(num < _res->_sssHdr.banksDataCount);
-	assert(c < 32);
-	const uint32_t mask = (1 << c);
-	_res->_sssLookupTable1[lut][num] &= ~mask;
+	assert(sampleIndex < 32);
+	const uint32_t mask = (1 << sampleIndex);
+	_res->_sssLookupTable1[source][num] &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if (so->bankIndex == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == c) {
+		if (so->bankIndex == num && ((so->flags1 >> 20) & 15) == source && (so->flags1 >> 24) == sampleIndex) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -260,7 +261,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c) {
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-		if (so->bankIndex == 0 && ((so->flags1 >> 20) & 15) == lut && (so->flags1 >> 24) == c) {
+		if (so->bankIndex == num && ((so->flags1 >> 20) & 15) == source && (so->flags1 >> 24) == sampleIndex) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -343,7 +344,7 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	*getSssLutPtr(_res, 1, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if ((so->flags1 & 0xFFFF0FFF) == 0) {
+		if (((so->flags1 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -353,7 +354,7 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-		if ((so->flags1 & 0xFFFF0FFF) == 0) {
+		if (((so->flags1 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -773,7 +774,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 		if (stopSo) {
 			stopSo->flags &= ~1;
 			stopSo->pcm = 0;
-			updateSoundObjectLut2(stopSo->flags0);
+			updateSssLut2(stopSo->flags0);
 		}
 	}
 // 4292DF
@@ -782,22 +783,20 @@ void Game::prependSoundObjectToList(SssObject *so) {
 	}
 }
 
-void Game::updateSoundObjectLut2(uint32_t flags) {
-	uint32_t mask = 1 << (flags >> 24);
+void Game::updateSssLut2(uint32_t flags) {
+	const uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut = getSssLutPtr(_res, 2, flags);
 	if ((*sssLut & mask) != 0) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
 				return;
 			}
-			so = so->nextPtr;
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
 				return;
 			}
 		}
-// 42AC87
 		*sssLut &= ~mask;
 	}
 }
@@ -1220,7 +1219,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
 	*sssLut2 &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if ((so->flags0 & 0xFFFF0FFF) == 0) {
+		if (((so->flags0 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -1230,7 +1229,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 		}
 	}
 	for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-		if ((so->flags0 & 0xFFFF0FFF) == 0) {
+		if (((so->flags0 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -1350,7 +1349,7 @@ void Game::stopSoundObjectsByPcm(SssObject **sssObjectsList, int num) {
 				}
 			}
 // 429576
-			updateSoundObjectLut2(current->flags);
+			updateSssLut2(current->flags);
 			current = next;
 		} else {
 // 429583

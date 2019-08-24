@@ -753,13 +753,13 @@ struct Game {
 	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);
 	void sssOp4_removeSounds(uint32_t flags);
-	void sssOp12_removeSounds2(int num, uint8_t lut, uint8_t c);
+	void sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex);
 	void sssOp16_resumeSound(SssObject *so);
 	void sssOp17_pauseSound(SssObject *so);
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code, bool tempSssObject = false);
 	SssObject *addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b);
 	void prependSoundObjectToList(SssObject *so);
-	void updateSoundObjectLut2(uint32_t flags);
+	void updateSssLut2(uint32_t flags);
 	SssObject *createSoundObject(int bankIndex, int sampleIndex, uint32_t flags);
 	SssObject *startSoundObject(int bankIndex, int sampleIndex, uint32_t flags);
 	void playSoundObject(SssInfo *s, int source, int b);
