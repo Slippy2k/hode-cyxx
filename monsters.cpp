@@ -1079,14 +1079,14 @@ void Game::executeMstCode() {
 				}
 // 419C79
 				dat->unk3 = 0x80;
-				dat->x2 = p->clipX;
-				dat->y2 = p->clipY;
+				dat->xPosShoot = p->clipX;
+				dat->yPosShoot = p->clipY;
 				dat->o = m->o16;
 			} else if (energy == -2) {
 // 419CA1
 				dat->unk3 = 0x80;
-				dat->x2 = p->clipX;
-				dat->y2 = p->clipY;
+				dat->xPosShoot = p->clipX;
+				dat->yPosShoot = p->clipY;
 			}
 			continue;
 		}
@@ -2897,8 +2897,8 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 			}
 			ShootLvlObjectData *s = p->shootObjectData;
 			s->unk3 = 0x80;
-			s->x2 = o->xPos + o->width / 2;
-			s->y2 = o->yPos + o->height / 2;
+			s->xPosShoot = o->xPos + o->width / 2;
+			s->yPosShoot = o->yPos + o->height / 2;
 			if (p->type != 2 || (_bl & 4) != 0) {
 				continue;
 			}
@@ -3004,7 +3004,7 @@ void Game::mstUpdateRefPos() {
 			}
 			p->width  = ptr->dxPos;
 			p->height = ptr->dyPos;
-			p->directionMask = ptr->unk1;
+			p->directionMask = ptr->state;
 			switch (ptr->unk0) {
 			case 0:
 				p->type = 1;
@@ -6246,7 +6246,7 @@ void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, 
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
 		assert(s);
 		o->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
-		s->unk1 = type;
+		s->state = type;
 		s->unk0 = 0;
 		s->counter = 17;
 		s->dxPos = (int8_t)_byte_43E660[type * 2];
@@ -6271,7 +6271,7 @@ void Game::mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int ty
 		}
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
 		assert(s);
-		s->unk1 = pos;
+		s->state = pos;
 		const uint8_t *_ecx;
 		if (type >= 7) {
 			s->dxPos = (int8_t)_byte_43E6F0[type * 2];

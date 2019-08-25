@@ -237,15 +237,15 @@ struct AndyLvlObjectData {
 
 struct ShootLvlObjectData {
 	uint8_t unk0; // 0x0 type
-	uint8_t unk1; // 0x1 state
+	uint8_t state; // 0x1
 	uint8_t counter; // 0x2
-	uint8_t unk3; // 0X3 value
+	uint8_t unk3; // 0x3 value
 	int32_t dxPos; // 0x4
 	int32_t dyPos; // 0x8
-	int32_t x2; // 0xC  xPosShoot
-	int32_t y2; // 0x10 yPosShoot
-	int unk14; // 0x14 xPosObject
-	int unk18; // 0x18 yPosObject
+	int32_t xPosShoot; // 0xC
+	int32_t yPosShoot; // 0x10
+	int32_t xPosObject; // 0x14
+	int32_t yPosObject; // 0x18
 	LvlObject *o; // 0x1C
 	ShootLvlObjectData *nextPtr; // 0x20 next pointer to 'free' element
 };
