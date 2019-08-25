@@ -215,31 +215,29 @@ void Game::updateSoundObject(SssObject *so) {
 			++so->currentPcmFrame;
 		}
 	} else {
-		const int _edi = so->flags0;
+		const uint32_t flags = so->flags0;
 		removeSoundObjectFromList(so);
-		if (so->nextSoundNum != -1) {
+		if (so->nextSoundBank != -1) {
 			LvlObject *tmp = _currentSoundLvlObject;
 			_currentSoundLvlObject = so->lvlObject;
-			createSoundObject(so->nextSoundNum, so->nextSoundCounter, _edi);
+			createSoundObject(so->nextSoundBank, so->nextSoundSample, flags);
 			_currentSoundLvlObject = tmp;
 			return;
 		}
-		const uint32_t mask = 1 << (_edi >> 24);
-		uint32_t *sssLut2 = getSssLutPtr(_res, 2, _edi);
-		if ((*sssLut2 & mask) == 0) {
-			return;
-		}
-		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, _edi)) {
-                                *sssLut2 &= ~mask;
-                                return;
+		const uint32_t mask = 1 << (flags >> 24);
+		uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
+		if ((*sssLut2 & mask) != 0) {
+			for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
+				if (compareSssLut(so->flags0, flags)) {
+					return;
+				}
 			}
-		}
-		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, _edi)) {
-                                *sssLut2 &= ~mask;
-                                return;
+			for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
+				if (compareSssLut(so->flags0, flags)) {
+					return;
+				}
 			}
+			*sssLut2 &= ~mask;
 		}
 	}
 }
@@ -256,7 +254,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->nextSoundNum = -1;
+			so->nextSoundBank = -1;
 			so->delayCounter = -2;
 		}
 	}
@@ -266,7 +264,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->nextSoundNum = -1;
+			so->nextSoundBank = -1;
 			so->delayCounter = -2;
 		}
 	}
@@ -349,7 +347,7 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->nextSoundNum = -1;
+			so->nextSoundBank = -1;
 			so->delayCounter = -2;
 		}
 	}
@@ -359,7 +357,7 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->nextSoundNum = -1;
+			so->nextSoundBank = -1;
 			so->delayCounter = -2;
 		}
 	}
@@ -672,7 +670,7 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	} else {
 		so->stereo = false;
 	}
-	so->nextSoundNum = -1;
+	so->nextSoundBank = -1;
 	so->currentPcmFrame = 0;
 	so->flags = 0;
 	so->pcmFramesCount = pcm->strideCount;
@@ -861,14 +859,14 @@ SssObject *Game::createSoundObject(int bankIndex, int sampleIndex, uint32_t flag
 		}
 // 42B909
 		if (ret && (bank->flags & 4) != 0) {
-			ret->nextSoundNum = bankIndex;
-			ret->nextSoundCounter = -1;
+			ret->nextSoundBank = bankIndex;
+			ret->nextSoundSample = -1;
 		}
 	} else {
 		ret = startSoundObject(bankIndex, sampleIndex, flags);
 		if (ret && (bank->flags & 4) != 0) {
-			ret->nextSoundNum = bankIndex;
-			ret->nextSoundCounter = sampleIndex;
+			ret->nextSoundBank = bankIndex;
+			ret->nextSoundSample = sampleIndex;
 		}
 	}
 	return ret;
@@ -954,20 +952,18 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 		const uint8_t *code = _res->_sssCodeData + sample->codeOffset1;
 		executeSssCode(&tmpObj, code, true);
 	}
-
+// 42B57C
 	const uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
 	if ((*sssLut2 & mask) != 0) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
-				*sssLut2 &= ~mask;
 				return 0;
 			}
 			so = so->nextPtr;
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
-				*sssLut2 &= ~mask;
 				return 0;
 			}
 		}
@@ -1031,12 +1027,11 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 // 42BA9D
 	const uint32_t _ebp = valueSssLut(source, mask, s);
 	const uint8_t _al = s->concurrencyMask;
-	_ecx = s->sssBankIndex;
 	if (_al & 2) {
 		const uint32_t mask = 1 << (_ebp >> 24);
-		uint32_t *sssLut3 = _res->_sssLookupTable3[(_ebp >> 20) & 15] + _ecx;
+		uint32_t *sssLut3 = getSssLutPtr(_res, 3, _ebp);
 		*sssLut3 |= mask;
-		uint32_t *sssLut2 = _res->_sssLookupTable2[(_ebp >> 20) & 15] + _ecx;
+		uint32_t *sssLut2 = getSssLutPtr(_res, 2, _ebp);
 		if (*sssLut2 & mask) {
 			return;
 		}
@@ -1044,7 +1039,7 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 // 42BB26
 	} else if (_al & 1) {
 		const uint32_t mask = 1 << (_ebp >> 24);
-		uint32_t *sssLut1 = _res->_sssLookupTable1[(_ebp >> 20) & 15] + _ecx;
+		uint32_t *sssLut1 = getSssLutPtr(_res, 1, _ebp);
 		if (*sssLut1 & mask) {
 			return;
 		}
@@ -1053,13 +1048,11 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 	} else if (_al & 4) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _ebp)) {
-				createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
 				return;
 			}
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, _ebp)) {
-				createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
 				return;
 			}
 		}
@@ -1214,17 +1207,15 @@ void Game::setSoundObjectPanning(SssObject *so) {
 
 void Game::expireSoundObjects(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut1 = getSssLutPtr(_res, 1, flags);
-	*sssLut1 &= ~mask;
-	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
-	*sssLut2 &= ~mask;
+	*getSssLutPtr(_res, 1, flags) &= ~mask;
+	*getSssLutPtr(_res, 2, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (((so->flags0 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->nextSoundNum = -1;
+			so->nextSoundBank = -1;
 			so->delayCounter = -2;
 		}
 	}
@@ -1234,7 +1225,7 @@ void Game::expireSoundObjects(uint32_t flags) {
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
 			}
-			so->nextSoundNum = -1;
+			so->nextSoundBank = -1;
 			so->delayCounter = -2;
 		}
 	}
