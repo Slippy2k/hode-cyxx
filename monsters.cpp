@@ -6610,17 +6610,31 @@ int Game::executeMstOp67Type1(Task *t) {
 		} else {
 			mstSetVerticalHorizontalBounds(m);
 		}
-		warning("executeMstOp67Type1 41C6C0");
-	}
-// 41C712
-	mstSetHorizontalBounds(m);
-	_edi = 1;
-	while (_xMstPos2 < m->m49Unk1->unkC) {
-		if (--m->indexUnk49Unk1 < 0) {
-			_edi = 0;
-			break;
+		_edi = 1;
+		int _cl, _dl;
+		if (_mstLut1[m->flags4A] & 1) {
+			_cl = m->m49Unk1->unkE;
+			_dl = m->m49Unk1->unkF;
+		} else {
+			_cl = m->m49Unk1->unkC;
+			_dl = m->m49Unk1->unkD;
 		}
-		m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+		if (_xMstPos2 < _cl && _yMstPos2 < _dl) {
+			if (!executeMstUnk6(m)) {
+				_edi = 0;
+			}
+		}
+	} else {
+// 41C712
+		mstSetHorizontalBounds(m);
+		_edi = 1;
+		while (_xMstPos2 < m->m49Unk1->unkC) {
+			if (--m->indexUnk49Unk1 < 0) {
+				_edi = 0;
+				break;
+			}
+			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+		}
 	}
 // 41C774
 	if (_xMstPos2 <= 0 && ((m->monsterInfos[946] & 2) == 0 || _yMstPos2 <= 0)) {
@@ -6629,64 +6643,61 @@ int Game::executeMstOp67Type1(Task *t) {
 		}
 		executeMstUnk1(t);
 		return 0;
-	} else {
+	}
 // 41C7F6
-		if (_edi != 0) {
-			if (_xMstPos2 >= m->m49->unk14 || ((m->monsterInfos[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)) {
+	if (_edi != 0 && ((_xMstPos2 >= m->m49->unk14 || ((m->monsterInfos[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)))) {
 // 41C833
-				const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-				if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 255) {
-					const int x1 = m->xMstPos + (int8_t)p[0xC];
-					const int x2 = x1 + p[0xE] - 1;
-					const int y1 = m->yMstPos + (int8_t)p[0xD];
-					const int y2 = y1 + p[0xF] - 1;
-					if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
+		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
+		if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 255) {
+			const int x1 = m->xMstPos + (int8_t)p[0xC];
+			const int x2 = x1 + p[0xE] - 1;
+			const int y1 = m->yMstPos + (int8_t)p[0xD];
+			const int y2 = y1 + p[0xF] - 1;
+			if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
 // 41CA54
-						m->indexUnk49Unk1 = 0;
-						m->m49Unk1 = &m->m49->data1[0];
-						m->flagsA8[3] = 255;
-						m->unkAC = -1;
-						m->unkB0 = -1;
-						mstBoundingBoxClear(m, 1);
-						if (p[0xE] != 0) {
-							t->flags &= ~0x80;
-							executeMstUnk1(t);
-							return 0;
-						}
-					} else {
-						m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
-					}
+				m->indexUnk49Unk1 = 0;
+				m->m49Unk1 = &m->m49->data1[0];
+				m->flagsA8[3] = 255;
+				m->unkAC = -1;
+				m->unkB0 = -1;
+				mstBoundingBoxClear(m, 1);
+				if (p[0xE] != 0) {
+					t->flags &= ~0x80;
+					executeMstUnk1(t);
+					return 0;
 				}
+			} else {
+				m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
+			}
+		}
 // 41C976
-				if (_xMstPos2 >= m36->unk8 || ((m->monsterInfos[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
-					m->indexUnk49Unk1 = m->m49->count1 - 1;
-					m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
-					if (m->monsterInfos[946] & 4) {
-						m->flagsA8[3] = 255;
-						m->unkAC = -1;
-						m->unkB0 = -1;
-						mstBoundingBoxClear(m, 1);
-					}
-				}
-// 41CA2D
-				if (m->monsterInfos[946] & 4) {
-					t->run = &Game::mstSm_monsterWait9;
-				} else if (m->monsterInfos[946] & 2) {
-					t->run = &Game::mstSm_monsterWait7;
-				} else {
-					t->run = &Game::mstSm_monsterWait5;
-				}
-				return (this->*(t->run))(t);
-			} else if (m->monsterInfos[946] & 4) {
-// 41CB2F
+		if (_xMstPos2 >= m36->unk8 || ((m->monsterInfos[946] & 2) != 0 && _yMstPos2 >= m36->unk8)) {
+			m->indexUnk49Unk1 = m->m49->count1 - 1;
+			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+			if (m->monsterInfos[946] & 4) {
+				m->flagsA8[3] = 255;
+				m->unkAC = -1;
+				m->unkB0 = -1;
 				mstBoundingBoxClear(m, 1);
 			}
 		}
-// 41CB85
-		t->flags |= 0x80;
-		executeMstUnk1(t);
-		return -1;
+// 41CA2D
+		if (m->monsterInfos[946] & 4) {
+			t->run = &Game::mstSm_monsterWait9;
+		} else if (m->monsterInfos[946] & 2) {
+			t->run = &Game::mstSm_monsterWait7;
+		} else {
+			t->run = &Game::mstSm_monsterWait5;
+		}
+		return (this->*(t->run))(t);
+	} else if (m->monsterInfos[946] & 4) {
+// 41CB2F
+		mstBoundingBoxClear(m, 1);
 	}
+// 41CB85
+	t->flags |= 0x80;
+	executeMstUnk1(t);
+	return -1;
 }
 
 int Game::executeMstOp67Type2(Task *t, int flag) {
@@ -6732,8 +6743,10 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	if (p[946] & 2) {
 		m->unkE4 = 255;
 		if (p[946] & 4) {
-// 41CCC5
-			warning("executeMstOp67Type2 t %p flag %d p[946] %x", t, flag, p[946]);
+			m->flagsA8[3] = 255;
+			m->unkAC = -1;
+			m->unkB0 = -1;
+			mstBoundingBoxClear(m, 1);
 		}
 // 41CD22
 		m->unk64 = READ_LE_UINT32(m->monsterInfos + 900);
@@ -6860,7 +6873,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 	}
 // 41D2D2
 	if (m->monsterInfos[946] & 4) {
-		warning("executeMstOp67Type2 41D2DE");
+		mstBoundingBoxClear(m, 1);
 	}
 // 41D328
 	t->flags |= 0x80;
