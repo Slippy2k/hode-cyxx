@@ -6,11 +6,60 @@
 // rock_hod
 
 #include "game.h"
+#include "level.h"
 #include "paf.h"
 #include "util.h"
 #include "video.h"
 
-void Game::postScreenUpdate_rock_screen0() {
+struct Level_rock: Level {
+	//const CheckpointData *getCheckpointData() = 0;
+
+	virtual void initialize();
+	virtual void terminate();
+	virtual void tick();
+	virtual void preScreenUpdate(int screenNum);
+	virtual void postScreenUpdate(int screenNum);
+	virtual void setupLvlObjects(int screenNum);
+
+	void postScreenUpdate_rock_screen0();
+	void postScreenUpdate_rock_screen4();
+	void postScreenUpdate_rock_screen8();
+	void postScreenUpdate_rock_screen9();
+	void postScreenUpdate_rock_screen10();
+	void postScreenUpdate_rock_screen11();
+	void postScreenUpdate_rock_screen13();
+	void postScreenUpdate_rock_screen15();
+	void postScreenUpdate_rock_screen16();
+	void postScreenUpdate_rock_screen18();
+	void postScreenUpdate_rock_screen19();
+
+	void preScreenUpdate_rock_screen0();
+	void preScreenUpdate_rock_screen1();
+	void preScreenUpdate_rock_screen2();
+	void preScreenUpdate_rock_screen3();
+	void preScreenUpdate_rock_screen4();
+	void preScreenUpdate_rock_screen5();
+	void preScreenUpdate_rock_screen7();
+	void preScreenUpdate_rock_screen9();
+	void preScreenUpdate_rock_screen10();
+	void preScreenUpdate_rock_screen13();
+	void preScreenUpdate_rock_screen14();
+	void preScreenUpdate_rock_screen15();
+	void preScreenUpdate_rock_screen16();
+	void preScreenUpdate_rock_screen17();
+	void preScreenUpdate_rock_screen18();
+	void preScreenUpdate_rock_screen19();
+
+	void setupLvlObjects_rock_screen2();
+	void setupLvlObjects_rock_screen3();
+	void setupLvlObjects_rock_screen18();
+};
+
+Level *Level_rock_create() {
+	return new Level_rock;
+}
+
+void Level_rock::postScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:
 		if ((_andyObject->flags0 & 0x1F) == 0 && ((_andyObject->flags0 >> 5) & 7) == 6) {
@@ -18,59 +67,59 @@ void Game::postScreenUpdate_rock_screen0() {
 		}
 		break;
 	case 2:
-		++_screenCounterTable[0];
-		if (_screenCounterTable[0] > 25) {
+		++_g->_screenCounterTable[0];
+		if (_g->_screenCounterTable[0] > 25) {
 			_res->_screensState[0].s0 = 1;
 		}
-		if (_screenCounterTable[0] == 2) {
-			setShakeScreen(3, 12);
+		if (_g->_screenCounterTable[0] == 2) {
+			_g->setShakeScreen(3, 12);
 		}
 		break;
 	}
 }
 
-void Game::postScreenUpdate_rock_screen4() {
+void Level_rock::postScreenUpdate_rock_screen4() {
 	switch (_res->_screensState[4].s0) {
 	case 0:
-		if (_plasmaCannonDirection != 0 && _res->_currentScreenResourceNum == 4) {
-			if (testPlasmaCannonPointsDirection(162, 24, 224, 68) == 0) {
-				if (testPlasmaCannonPointsDirection(202, 0, 255, 48) == 0) {
-					if (testPlasmaCannonPointsDirection(173, 8, 201, 23) == 0) {
-						_plasmaCannonLastIndex1 = 0;
+		if (_g->_plasmaCannonDirection != 0 && _res->_currentScreenResourceNum == 4) {
+			if (_g->testPlasmaCannonPointsDirection(162, 24, 224, 68) == 0) {
+				if (_g->testPlasmaCannonPointsDirection(202, 0, 255, 48) == 0) {
+					if (_g->testPlasmaCannonPointsDirection(173, 8, 201, 23) == 0) {
+						_g->_plasmaCannonLastIndex1 = 0;
 						return;
 					}
 				}
 			}
-			++_screenCounterTable[4];
-			if (_screenCounterTable[4] >= 20) {
+			++_g->_screenCounterTable[4];
+			if (_g->_screenCounterTable[4] >= 20) {
 				_res->_screensState[4].s0 = 2;
 			}
-			assert(_plasmaExplosionObject);
-			_plasmaExplosionObject->screenNum = _res->_currentScreenResourceNum;
-			_plasmaCannonExplodeFlag = true;
-			if (_shakeScreenDuration == 0) {
-				setShakeScreen(3, 2);
+			assert(_g->_plasmaExplosionObject);
+			_g->_plasmaExplosionObject->screenNum = _res->_currentScreenResourceNum;
+			_g->_plasmaCannonExplodeFlag = true;
+			if (_g->_shakeScreenDuration == 0) {
+				_g->setShakeScreen(3, 2);
 			} else {
-				++_shakeScreenDuration;
+				++_g->_shakeScreenDuration;
 			}
 		}
 		break;
 	case 2:
-		++_screenCounterTable[4];
-		if (_screenCounterTable[4] == 33) {
+		++_g->_screenCounterTable[4];
+		if (_g->_screenCounterTable[4] == 33) {
 			_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = 1;
-			setupScreenMask(4);
-		} else if (_screenCounterTable[4] > 46) {
+			_g->setupScreenMask(4);
+		} else if (_g->_screenCounterTable[4] > 46) {
 			_res->_screensState[4].s0 = 1;
 		}
-		if (_screenCounterTable[4] == 31) {
-			setShakeScreen(2, 12);
+		if (_g->_screenCounterTable[4] == 31) {
+			_g->setShakeScreen(2, 12);
 		}
 		break;
 	}
 }
 
-void Game::postScreenUpdate_rock_screen8() {
+void Level_rock::postScreenUpdate_rock_screen8() {
 	if (_res->_currentScreenResourceNum == 8) {
 		if ((_andyObject->flags0 & 0x1F) == 3) {
 			_andyObject->flags2 = 0x3008;
@@ -82,7 +131,7 @@ void Game::postScreenUpdate_rock_screen8() {
 	}
 }
 
-void Game::postScreenUpdate_rock_screen9() {
+void Level_rock::postScreenUpdate_rock_screen9() {
 	int xPos;
 	if (_res->_currentScreenResourceNum == 9) {
 		switch (_res->_screensState[9].s0) {
@@ -97,136 +146,136 @@ void Game::postScreenUpdate_rock_screen9() {
 					_res->_resLvlScreenBackgroundDataTable[9].currentBackgroundId = 1;
 					_video->_paletteNeedRefresh = true;
 				}
-				if (_levelCheckpoint == 4) {
-					_levelCheckpoint = 5;
+				if (_g->_levelCheckpoint == 4) {
+					_g->_levelCheckpoint = 5;
 				}
 				_res->_screensState[9].s0 = 1;
-				setAndySprite(2);
+				_g->setAndySprite(2);
 				_andyObject->xPos = 105;
 				_andyObject->yPos = 52;
 				_andyObject->anim = 232;
 				_andyObject->frame = 0;
-				setupLvlObjectBitmap(_andyObject);
-				updateScreen(_andyObject->screenNum);
+				_g->setupLvlObjectBitmap(_andyObject);
+				_g->updateScreen(_andyObject->screenNum);
 			}
 			break;
 		case 1:
-			_plasmaCannonFlags |= 2;
+			_g->_plasmaCannonFlags |= 2;
 			break;
 		}
 	}
 }
 
-void Game::postScreenUpdate_rock_screen10() {
+void Level_rock::postScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		BoundingBox box = { 64, 0, 267, 191 };
-		setAndyAnimationForArea(&box, 12);
+		_g->setAndyAnimationForArea(&box, 12);
 	}
 }
 
-void Game::postScreenUpdate_rock_screen11() {
+void Level_rock::postScreenUpdate_rock_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		BoundingBox box = { -12, 0, 162, 191 };
-		setAndyAnimationForArea(&box, 12);
+		_g->setAndyAnimationForArea(&box, 12);
 	}
 }
 
-void Game::postScreenUpdate_rock_screen13() {
+void Level_rock::postScreenUpdate_rock_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		_plasmaCannonFlags &= ~1;
+		_g->_plasmaCannonFlags &= ~1;
 	}
 }
 
-void Game::postScreenUpdate_rock_screen15() {
+void Level_rock::postScreenUpdate_rock_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
-		_plasmaCannonFlags &= ~1;
+		_g->_plasmaCannonFlags &= ~1;
 		postScreenUpdate_rock_screen16();
 	}
 }
 
-void Game::postScreenUpdate_rock_screen16() {
+void Level_rock::postScreenUpdate_rock_screen16() {
 	switch (_res->_screensState[16].s0) {
 	case 0:
-		if (_screenCounterTable[16] < 2) {
+		if (_g->_screenCounterTable[16] < 2) {
 			if ((_andyObject->flags0 & 0x1F) == 2) {
 				break;
 			}
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (data->unk4 != 2 || _andyObject->xPos <= 155 || _andyObject->yPos >= 87) {
 				break;
 			}
-			++_screenCounterTable[16];
-			setShakeScreen(3, 4);
+			++_g->_screenCounterTable[16];
+			_g->setShakeScreen(3, 4);
 		} else {
 			_res->_screensState[16].s0 = 2;
-			_plasmaCannonFlags |= 1;
-			setShakeScreen(1, 18);
+			_g->_plasmaCannonFlags |= 1;
+			_g->setShakeScreen(1, 18);
 		}
 		break;
 	case 2:
-		++_screenCounterTable[16];
-		if (_screenCounterTable[16] == 5) {
+		++_g->_screenCounterTable[16];
+		if (_g->_screenCounterTable[16] == 5) {
 			_res->_resLvlScreenBackgroundDataTable[16].currentMaskId = 1;
-			setupScreenMask(16);
-		} else if (_screenCounterTable[16] == 23) {
+			_g->setupScreenMask(16);
+		} else if (_g->_screenCounterTable[16] == 23) {
 			_andyObject->flags1 &= ~0x30;
 			_andyObject->xPos = 131;
 			_andyObject->yPos = 177;
 			_andyObject->anim = 4;
 			_andyObject->frame = 0;
-			_plasmaCannonFlags &= ~1;
-		} else if (_screenCounterTable[16] == 37) {
+			_g->_plasmaCannonFlags &= ~1;
+		} else if (_g->_screenCounterTable[16] == 37) {
 			_res->_screensState[16].s0 = 3;
 			_res->_resLvlScreenBackgroundDataTable[16].currentBackgroundId = 1;
 		}
 		break;
 	case 3:
-		++_screenCounterTable[16];
-		if (_screenCounterTable[16] == 55) {
+		++_g->_screenCounterTable[16];
+		if (_g->_screenCounterTable[16] == 55) {
 			_res->_screensState[16].s0 = 1;
 		}
 		break;
 	}
 }
 
-void Game::postScreenUpdate_rock_screen18() {
+void Level_rock::postScreenUpdate_rock_screen18() {
 	LvlObject *o;
 	switch (_res->_screensState[18].s0) {
 	case 0:
 		if (_andyObject->yPos + _andyObject->height < 162) {
-			if ((_andyObject->flags0 & 0x1F) == 0 && _screenCounterTable[18] == 0) {
-				_screenCounterTable[18] = 1;
+			if ((_andyObject->flags0 & 0x1F) == 0 && _g->_screenCounterTable[18] == 0) {
+				_g->_screenCounterTable[18] = 1;
 			} else {
-				++_screenCounterTable[18];
-				if (_screenCounterTable[18] == 24) {
+				++_g->_screenCounterTable[18];
+				if (_g->_screenCounterTable[18] == 24) {
 					_res->_screensState[18].s0 = 2;
 					_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 2;
-					setupScreenMask(18);
+					_g->setupScreenMask(18);
 				}
 			}
 		}
 		break;
 	case 2:
-		o = findLvlObject(2, 0, 18);
+		o = _g->findLvlObject(2, 0, 18);
 		assert(o);
 		o->actionKeyMask = 1;
-		++_screenCounterTable[18];
-		if (_screenCounterTable[18] == 43) {
-			setShakeScreen(2, 5);
+		++_g->_screenCounterTable[18];
+		if (_g->_screenCounterTable[18] == 43) {
+			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 1;
-			setupScreenMask(18);
-		} else if (_screenCounterTable[18] == 51) {
+			_g->setupScreenMask(18);
+		} else if (_g->_screenCounterTable[18] == 51) {
 			_res->_screensState[18].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[18].currentBackgroundId = 1;
 		} else {
-			o = findLvlObject(2, 0, 18);
+			o = _g->findLvlObject(2, 0, 18);
 			assert(o);
 			if ((o->flags0 & 0x1F) == 11 || (o->flags0 & 0x1F) == 1) {
 				break;
 			}
 			BoundingBox box = { 24, 98, 108, 165 };
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (!clipBoundingBox(&box, &data->boundingBox)) {
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (!_g->clipBoundingBox(&box, &data->boundingBox)) {
 				return;
 			}
 			_andyObject->anim = 155;
@@ -234,19 +283,19 @@ void Game::postScreenUpdate_rock_screen18() {
 			_andyObject->yPos = 150;
 			_andyObject->frame = 0;
 			_andyObject->flags2 = 0x300C;
-			setupLvlObjectBitmap(_andyObject);
+			_g->setupLvlObjectBitmap(_andyObject);
 		}
 		break;
 	}
 }
 
-void Game::postScreenUpdate_rock_screen19() {
+void Level_rock::postScreenUpdate_rock_screen19() {
 	int fl;
 	switch (_res->_screensState[19].s0) {
 	case 0: {
 			BoundingBox box = { 155, 69, 210, 88 };
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (!clipBoundingBox(&box, &data->boundingBox)) {
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (!_g->clipBoundingBox(&box, &data->boundingBox)) {
 				return;
 			}
 			_res->_screensState[19].s0 = 3;
@@ -275,27 +324,27 @@ void Game::postScreenUpdate_rock_screen19() {
 				}
 			}
 			_video->clearPalette();
-			_quit = true;
+			_g->_quit = true;
 		}
 		break;
 	case 3:
-		++_screenCounterTable[19];
-		if (_screenCounterTable[19] == 1) {
+		++_g->_screenCounterTable[19];
+		if (_g->_screenCounterTable[19] == 1) {
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
-			setupScreenMask(19);
-			setAndySpecialAnimation(0x12);
-		} else if (_screenCounterTable[19] > 12) {
+			_g->setupScreenMask(19);
+			_g->setAndySpecialAnimation(0x12);
+		} else if (_g->_screenCounterTable[19] > 12) {
 			_res->_screensState[19].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
 		}
 		break;
 	case 4:
-		++_screenCounterTable[19];
-		if (_screenCounterTable[19] == 25) {
-			setShakeScreen(2, 5);
+		++_g->_screenCounterTable[19];
+		if (_g->_screenCounterTable[19] == 25) {
+			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 2;
-			setupScreenMask(19);
-		} else if (_screenCounterTable[19] == 33) {
+			_g->setupScreenMask(19);
+		} else if (_g->_screenCounterTable[19] == 33) {
 			_res->_screensState[19].s0 = 2;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 2;
 		}
@@ -303,7 +352,7 @@ void Game::postScreenUpdate_rock_screen19() {
 	}
 }
 
-void Game::callLevel_postScreenUpdate_rock(int num) {
+void Level_rock::postScreenUpdate(int num) {
 	switch (num) {
 	case 0:
 		postScreenUpdate_rock_screen0();
@@ -486,7 +535,7 @@ int Game::objectUpdate_rock_case4(LvlObject *o) {
 	return 1;
 }
 
-void Game::preScreenUpdate_rock_screen0() {
+void Level_rock::preScreenUpdate_rock_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 0:
 		_res->_resLvlScreenBackgroundDataTable[0].currentBackgroundId = 0;
@@ -498,49 +547,49 @@ void Game::preScreenUpdate_rock_screen0() {
 	}
 }
 
-void Game::preScreenUpdate_rock_screen1() {
-	if (_levelCheckpoint != 0) {
+void Level_rock::preScreenUpdate_rock_screen1() {
+	if (_g->_levelCheckpoint != 0) {
 		_res->_screensState[0].s0 = 1;
 	}
 }
 
-void Game::preScreenUpdate_rock_screen2() {
-	if (_res->_currentScreenResourceNum == 2 && _levelCheckpoint == 0) {
-		_levelCheckpoint = 1;
-	} else if (_levelCheckpoint > 1) {
-		LvlObject *ptr = findLvlObject(2, 0, 2);
+void Level_rock::preScreenUpdate_rock_screen2() {
+	if (_res->_currentScreenResourceNum == 2 && _g->_levelCheckpoint == 0) {
+		_g->_levelCheckpoint = 1;
+	} else if (_g->_levelCheckpoint > 1) {
+		LvlObject *ptr = _g->findLvlObject(2, 0, 2);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
 		}
-		setupLvlObjectBitmap(ptr);
-		ptr = findLvlObject(2, 1, 2);
+		_g->setupLvlObjectBitmap(ptr);
+		ptr = _g->findLvlObject(2, 1, 2);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
 		}
-		setupLvlObjectBitmap(ptr);
+		_g->setupLvlObjectBitmap(ptr);
 	}
 }
 
-void Game::preScreenUpdate_rock_screen3() {
-	if (_levelCheckpoint > 1) {
-		LvlObject *ptr = findLvlObject(2, 0, 3);
+void Level_rock::preScreenUpdate_rock_screen3() {
+	if (_g->_levelCheckpoint > 1) {
+		LvlObject *ptr = _g->findLvlObject(2, 0, 3);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
 		}
-		setupLvlObjectBitmap(ptr);
-		ptr = findLvlObject(2, 1, 3);
+		_g->setupLvlObjectBitmap(ptr);
+		ptr = _g->findLvlObject(2, 1, 3);
 		if (ptr) {
 			ptr->anim = 0;
 			ptr->frame = 0;
 		}
-		setupLvlObjectBitmap(ptr);
+		_g->setupLvlObjectBitmap(ptr);
 	}
 }
 
-void Game::preScreenUpdate_rock_screen4() {
+void Level_rock::preScreenUpdate_rock_screen4() {
 	int num;
 	switch (_res->_screensState[4].s0) {
 	case 0:
@@ -557,24 +606,24 @@ void Game::preScreenUpdate_rock_screen4() {
 	_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentShadowId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = num;
-	if (_res->_currentScreenResourceNum == 4 && _levelCheckpoint == 1) {
-		_levelCheckpoint = 2;
+	if (_res->_currentScreenResourceNum == 4 && _g->_levelCheckpoint == 1) {
+		_g->_levelCheckpoint = 2;
 	}
 }
 
-void Game::preScreenUpdate_rock_screen5() {
-	if (_res->_currentScreenResourceNum == 5 && _levelCheckpoint == 2) {
-		_levelCheckpoint = 3;
+void Level_rock::preScreenUpdate_rock_screen5() {
+	if (_res->_currentScreenResourceNum == 5 && _g->_levelCheckpoint == 2) {
+		_g->_levelCheckpoint = 3;
 	}
 }
 
-void Game::preScreenUpdate_rock_screen7() {
-	if (_res->_currentScreenResourceNum == 7 && _levelCheckpoint == 3) {
-		_levelCheckpoint = 4;
+void Level_rock::preScreenUpdate_rock_screen7() {
+	if (_res->_currentScreenResourceNum == 7 && _g->_levelCheckpoint == 3) {
+		_g->_levelCheckpoint = 4;
 	}
 }
 
-void Game::preScreenUpdate_rock_screen9() {
+void Level_rock::preScreenUpdate_rock_screen9() {
 	switch (_res->_screensState[9].s0) {
 	case 0:
 		if (!_paf->_skipCutscenes) {
@@ -589,10 +638,10 @@ void Game::preScreenUpdate_rock_screen9() {
 	}
 }
 
-void Game::preScreenUpdate_rock_screen10() {
+void Level_rock::preScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
-		if (_levelCheckpoint == 4) {
-			_levelCheckpoint = 5;
+		if (_g->_levelCheckpoint == 4) {
+			_g->_levelCheckpoint = 5;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->unload(22);
@@ -601,10 +650,10 @@ void Game::preScreenUpdate_rock_screen10() {
 	}
 }
 
-void Game::preScreenUpdate_rock_screen13() {
+void Level_rock::preScreenUpdate_rock_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		if (_levelCheckpoint == 5) {
-			_levelCheckpoint = 6;
+		if (_g->_levelCheckpoint == 5) {
+			_g->_levelCheckpoint = 6;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->unload(1);
@@ -612,24 +661,24 @@ void Game::preScreenUpdate_rock_screen13() {
 	}
 }
 
-void Game::preScreenUpdate_rock_screen14() {
+void Level_rock::preScreenUpdate_rock_screen14() {
 	if (_res->_currentScreenResourceNum == 14) {
 		_res->_screensState[16].s0 = 0;
-		_screenCounterTable[16] = 0;
+		_g->_screenCounterTable[16] = 0;
 	}
 }
 
-void Game::preScreenUpdate_rock_screen15() {
+void Level_rock::preScreenUpdate_rock_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
 		if (_res->_screensState[16].s0 != 0) {
-			_fallingAndyCounter = 2;
-			_fallingAndyFlag = true;
+			_g->_fallingAndyCounter = 2;
+			_g->_fallingAndyFlag = true;
 		}
-		playAndyFallingCutscene(1);
+		_g->playAndyFallingCutscene(1);
 	}
 }
 
-void Game::preScreenUpdate_rock_screen16() {
+void Level_rock::preScreenUpdate_rock_screen16() {
 	uint8_t _al;
 	switch (_res->_screensState[16].s0) {
 	case 0:
@@ -637,27 +686,27 @@ void Game::preScreenUpdate_rock_screen16() {
 		break;
 	default:
 		_res->_screensState[16].s0 = 1;
-		_plasmaCannonFlags &= ~1;
+		_g->_plasmaCannonFlags &= ~1;
 		_al = 1;
 		break;
 	}
 	_res->_resLvlScreenBackgroundDataTable[16].currentBackgroundId = _al;
 	_res->_resLvlScreenBackgroundDataTable[16].currentMaskId = _al;
 	if (_res->_currentScreenResourceNum == 16) {
-		playAndyFallingCutscene(1);
+		_g->playAndyFallingCutscene(1);
 	}
 }
 
-void Game::preScreenUpdate_rock_screen17() {
+void Level_rock::preScreenUpdate_rock_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
-		if (_levelCheckpoint == 6) {
-			_levelCheckpoint = 7;
+		if (_g->_levelCheckpoint == 6) {
+			_g->_levelCheckpoint = 7;
 		}
-		playAndyFallingCutscene(1);
+		_g->playAndyFallingCutscene(1);
 	}
 }
 
-void Game::preScreenUpdate_rock_screen18() {
+void Level_rock::preScreenUpdate_rock_screen18() {
 	uint8_t _al;
 	switch (_res->_screensState[18].s0) {
 	case 0:
@@ -671,11 +720,11 @@ void Game::preScreenUpdate_rock_screen18() {
 	_res->_resLvlScreenBackgroundDataTable[18].currentBackgroundId = _al;
 	_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = _al;
 	if (_res->_currentScreenResourceNum == 18) {
-		playAndyFallingCutscene(1);
+		_g->playAndyFallingCutscene(1);
 	}
 }
 
-void Game::preScreenUpdate_rock_screen19() {
+void Level_rock::preScreenUpdate_rock_screen19() {
 	uint8_t _al;
 	switch (_res->_screensState[19].s0) {
 	case 0:
@@ -698,7 +747,7 @@ void Game::preScreenUpdate_rock_screen19() {
 	}
 }
 
-void Game::callLevel_preScreenUpdate_rock(int num) {
+void Level_rock::preScreenUpdate(int num) {
 	switch (num) {
 	case 0:
 		preScreenUpdate_rock_screen0();
@@ -751,7 +800,7 @@ void Game::callLevel_preScreenUpdate_rock(int num) {
 	}
 }
 
-void Game::callLevel_initialize_rock() {
+void Level_rock::initialize() {
 	if (!_paf->_skipCutscenes) {
 		if (_andyObject->spriteNum == 0) {
 			_paf->preload(22);
@@ -761,13 +810,13 @@ void Game::callLevel_initialize_rock() {
 	}
 }
 
-void Game::callLevel_tick_rock() {
+void Level_rock::tick() {
 	if (_res->_currentScreenResourceNum > 9) {
-		_plasmaCannonFlags |= 2;
+		_g->_plasmaCannonFlags |= 2;
 	}
 }
 
-void Game::callLevel_terminate_rock() {
+void Level_rock::terminate() {
 	if (!_paf->_skipCutscenes) {
 		if (_andyObject->spriteNum == 0) {
 			_paf->unload(22);
@@ -777,8 +826,8 @@ void Game::callLevel_terminate_rock() {
 	}
 }
 
-void Game::setupLvlObjects_rock_screen2() {
-	LvlObject *ptr = findLvlObject(2, 0, 2);
+void Level_rock::setupLvlObjects_rock_screen2() {
+	LvlObject *ptr = _g->findLvlObject(2, 0, 2);
 	if (ptr) {
 		ptr->xPos = 146;
 		ptr->yPos = 0;
@@ -787,7 +836,7 @@ void Game::setupLvlObjects_rock_screen2() {
 		ptr->directionKeyMask = 0;
 		ptr->actionKeyMask = 0;
 	}
-	ptr = findLvlObject(2, 1, 2);
+	ptr = _g->findLvlObject(2, 1, 2);
 	if (ptr) {
 		ptr->xPos = 88;
 		ptr->yPos = 0;
@@ -798,8 +847,8 @@ void Game::setupLvlObjects_rock_screen2() {
 	}
 }
 
-void Game::setupLvlObjects_rock_screen3() {
-	LvlObject *ptr = findLvlObject(2, 0, 3);
+void Level_rock::setupLvlObjects_rock_screen3() {
+	LvlObject *ptr = _g->findLvlObject(2, 0, 3);
 	if (ptr) {
 		ptr->xPos = 198;
 		ptr->yPos = 0;
@@ -808,7 +857,7 @@ void Game::setupLvlObjects_rock_screen3() {
 		ptr->directionKeyMask = 0;
 		ptr->actionKeyMask = 0;
 	}
-	ptr = findLvlObject(2, 1, 3);
+	ptr = _g->findLvlObject(2, 1, 3);
 	if (ptr) {
 		ptr->xPos = 116;
 		ptr->yPos = 0;
@@ -819,8 +868,8 @@ void Game::setupLvlObjects_rock_screen3() {
 	}
 }
 
-void Game::setupLvlObjects_rock_screen18() {
-	LvlObject *ptr = findLvlObject(2, 0, 18);
+void Level_rock::setupLvlObjects_rock_screen18() {
+	LvlObject *ptr = _g->findLvlObject(2, 0, 18);
 	if (ptr) {
 		ptr->xPos = 16;
 		ptr->yPos = 78;
@@ -831,7 +880,7 @@ void Game::setupLvlObjects_rock_screen18() {
 	}
 }
 
-void Game::callLevel_setupLvlObjects_rock(int num) {
+void Level_rock::setupLvlObjects(int num) {
 	switch (num) {
 	case 2:
 		setupLvlObjects_rock_screen2();

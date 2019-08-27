@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "fileio.h"
+#include "level.h"
 #include "lzw.h"
 #include "paf.h"
 #include "screenshot.h"
@@ -31,6 +32,7 @@ static const char *_levels[] = {
 Game::Game(SystemStub *system, const char *dataPath) {
 	memset(this, 0, sizeof(Game)); // TODO: proper init
 	_difficulty = 1;
+	_level = 0;
 	_system = system;
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
@@ -1374,9 +1376,11 @@ void Game::resetScreen() {
 	}
 	resetScreenMask();
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
+		_level->setupLvlObjects(i);
+
 		switch (_currentLevel) {
 		case 0:
-			callLevel_setupLvlObjects_rock(i);
+			// callLevel_setupLvlObjects_rock(i);
 			break;
 		case 1:
 			callLevel_setupLvlObjects_fort(i);
@@ -2082,6 +2086,15 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	}
 	_quit = false;
 	resetShootLvlObjectDataTable();
+	switch (_currentLevel) {
+	case 0:
+		_level = Level_rock_create();
+		break;
+	default:
+		error("Level %d class not implemented", _currentLevel);
+		break;
+	}
+	_level->setPointers(this, _andyObject, _paf, _res, _video);
 	callLevel_initialize();
 	setupAndyLvlObject();
 	clearLvlObjectsList2();
@@ -2114,6 +2127,8 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	} while (!_system->inp.quit && !_quit);
 	_animBackgroundDataCount = 0;
 	callLevel_terminate();
+	delete _level;
+	_level = 0;
 }
 
 void Game::mixAudio(int16_t *buf, int len) {
@@ -2737,9 +2752,11 @@ void Game::levelMainLoop() {
 }
 
 void Game::callLevel_postScreenUpdate(int num) {
+	_level->postScreenUpdate(num);
+
 	switch (_currentLevel) {
 	case 0:
-		callLevel_postScreenUpdate_rock(num);
+		//callLevel_postScreenUpdate_rock(num);
 		break;
 	case 1:
 		callLevel_postScreenUpdate_fort(num);
@@ -2766,15 +2783,17 @@ void Game::callLevel_postScreenUpdate(int num) {
 		callLevel_postScreenUpdate_dark(num);
 		break;
 	default:
-		warning("callLevel_postScreenUpdate unimplemented for screen %d", num);
+		warning("callLevel_postScreenUpdate unimplemented for level %d", _currentLevel);
 		break;
 	}
 }
 
 void Game::callLevel_preScreenUpdate(int num) {
+	_level->preScreenUpdate(num);
+
 	switch (_currentLevel) {
 	case 0:
-		callLevel_preScreenUpdate_rock(num);
+		//callLevel_preScreenUpdate_rock(num);
 		break;
 	case 1:
 		callLevel_preScreenUpdate_fort(num);
@@ -2801,15 +2820,17 @@ void Game::callLevel_preScreenUpdate(int num) {
 		callLevel_preScreenUpdate_dark(num);
 		break;
 	default:
-		warning("callLevel_preScreenUpdate unimplemented for screen %d", _currentLevel);
+		warning("callLevel_preScreenUpdate unimplemented for level %d", _currentLevel);
 		break;
 	}
 }
 
 void Game::callLevel_initialize() {
+	_level->initialize();
+
 	switch (_currentLevel) {
 	case 0:
-		callLevel_initialize_rock();
+		// callLevel_initialize_rock();
 		break;
 	case 2:
 		callLevel_initialize_pwr1();
@@ -2830,9 +2851,11 @@ void Game::callLevel_initialize() {
 }
 
 void Game::callLevel_tick() {
+	_level->tick();
+
 	switch (_currentLevel) {
 	case 0:
-		callLevel_tick_rock();
+		// callLevel_tick_rock();
 		break;
 	case 1:
 		callLevel_tick_fort();
@@ -2859,9 +2882,11 @@ void Game::callLevel_tick() {
 }
 
 void Game::callLevel_terminate() {
+	_level->terminate();
+
 	switch (_currentLevel) {
 	case 0:
-		callLevel_terminate_rock();
+		// callLevel_terminate_rock();
 		break;
 	case 3:
 		callLevel_terminate_isld();

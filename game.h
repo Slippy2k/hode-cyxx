@@ -14,6 +14,7 @@
 #include "resource.h"
 
 struct Game;
+struct Level;
 struct PafPlayer;
 struct Video;
 struct SystemStub;
@@ -27,18 +28,16 @@ struct CheckpointData {
 	uint8_t spriteNum;
 };
 
+enum {
+	kObjectDataTypeAndy,
+	kObjectDataTypeAnimBackgroundData,
+	kObjectDataTypeShoot,
+	kObjectDataTypeLvlBackgroundSound,
+	kObjectDataTypeMonster1,
+	kObjectDataTypeMonster2
+};
+
 struct Game {
-	enum {
-		kObjectDataTypeAndy,
-		// LvlObject.type == 0
-		kObjectDataTypeAnimBackgroundData,
-		// LvlObject.type == 8
-		kObjectDataTypeShoot,
-		// LvlObject.type == 1
-		kObjectDataTypeLvlBackgroundSound,
-		kObjectDataTypeMonster1,
-		kObjectDataTypeMonster2
-	};
 	enum {
 		kMaxScreens = 40,
 		kMaxTasks = 128,
@@ -80,6 +79,7 @@ struct Game {
 	static const uint8_t _lava_spritesData[];
 	static const uint8_t _lar1_spritesData[];
 
+	Level *_level;
 	Mixer _mix;
 	PafPlayer *_paf;
 	Random _rnd;
@@ -356,19 +356,6 @@ struct Game {
 	void captureScreenshot();
 
 	// level1_rock.cpp
-	void postScreenUpdate_rock_screen0();
-	void postScreenUpdate_rock_screen4();
-	void postScreenUpdate_rock_screen8();
-	void postScreenUpdate_rock_screen9();
-	void postScreenUpdate_rock_screen10();
-	void postScreenUpdate_rock_screen11();
-	void postScreenUpdate_rock_screen13();
-	void postScreenUpdate_rock_screen15();
-	void postScreenUpdate_rock_screen16();
-	void postScreenUpdate_rock_screen18();
-	void postScreenUpdate_rock_screen19();
-	void callLevel_postScreenUpdate_rock(int num);
-
 	int objectUpdate_rock_case0(LvlObject *o);
 	void objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p);
 	bool plasmaCannonHit(LvlObject *ptr);
@@ -376,33 +363,6 @@ struct Game {
 	int objectUpdate_rock_case2(LvlObject *o);
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
-
-	void preScreenUpdate_rock_screen0();
-	void preScreenUpdate_rock_screen1();
-	void preScreenUpdate_rock_screen2();
-	void preScreenUpdate_rock_screen3();
-	void preScreenUpdate_rock_screen4();
-	void preScreenUpdate_rock_screen5();
-	void preScreenUpdate_rock_screen7();
-	void preScreenUpdate_rock_screen9();
-	void preScreenUpdate_rock_screen10();
-	void preScreenUpdate_rock_screen13();
-	void preScreenUpdate_rock_screen14();
-	void preScreenUpdate_rock_screen15();
-	void preScreenUpdate_rock_screen16();
-	void preScreenUpdate_rock_screen17();
-	void preScreenUpdate_rock_screen18();
-	void preScreenUpdate_rock_screen19();
-	void callLevel_preScreenUpdate_rock(int num);
-
-	void callLevel_initialize_rock();
-	void callLevel_tick_rock();
-	void callLevel_terminate_rock();
-
-	void setupLvlObjects_rock_screen2();
-	void setupLvlObjects_rock_screen3();
-	void setupLvlObjects_rock_screen18();
-	void callLevel_setupLvlObjects_rock(int hum);
 
 	// level2_fort.cpp
 	void postScreenUpdate_fort_screen1();
