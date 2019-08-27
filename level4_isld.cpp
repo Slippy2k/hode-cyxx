@@ -41,7 +41,7 @@ Level *Level_isld_create() {
 	return new Level_isld;
 }
 
-static const uint8_t byte_451DE8[] = {
+static const uint8_t _isld_dxTable[] = {
 	0, 1, 2, 3, 5, 7, 9, 10, 11, 12, 12, 12, 12, 11, 10, 9, 7, 5, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
@@ -97,7 +97,7 @@ void Level_isld::postScreenUpdate_isld_screen3() {
 			if (o) {
 				AnimBackgroundData *backgroundData = (AnimBackgroundData *)_g->getLvlObjectDataPtr(o, kObjectDataTypeAnimBackgroundData);
 				AndyLvlObjectData *andyData = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-				andyData->dxPos += byte_451DE8[backgroundData->currentFrame];
+				andyData->dxPos += _isld_dxTable[backgroundData->currentFrame];
 			}
 		}
 	}
@@ -110,7 +110,7 @@ void Level_isld::postScreenUpdate_isld_screen4() {
 			if (o) {
 				AnimBackgroundData *backgroundData = (AnimBackgroundData *)_g->getLvlObjectDataPtr(o, kObjectDataTypeAnimBackgroundData);
 				AndyLvlObjectData *andyData = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-				andyData->dxPos += byte_451DE8[backgroundData->currentFrame];
+				andyData->dxPos += _isld_dxTable[backgroundData->currentFrame];
 			}
 		}
 	}
