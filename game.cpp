@@ -2057,7 +2057,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	initMstCode();
 //	res_initIO();
 	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum, 0xFF);
-	memset(_screenCounterTable, 0, 40);
+	memset(_screenCounterTable, 0, sizeof(_screenCounterTable));
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();
 	resetPlasmaCannonState();
@@ -2742,9 +2742,6 @@ void Game::callLevel_postScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 2:
-		callLevel_postScreenUpdate_pwr1(num);
-		break;
 	case 3:
 		callLevel_postScreenUpdate_isld(num);
 		break;
@@ -2775,9 +2772,6 @@ void Game::callLevel_preScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 2:
-		callLevel_preScreenUpdate_pwr1(num);
-		break;
 	case 3:
 		callLevel_preScreenUpdate_isld(num);
 		break;
@@ -2820,12 +2814,6 @@ void Game::callLevel_initialize() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 0:
-		// callLevel_initialize_rock();
-		break;
-	case 2:
-		callLevel_initialize_pwr1();
-		break;
 	case 3:
 		callLevel_initialize_isld();
 		break;
@@ -2847,9 +2835,6 @@ void Game::callLevel_tick() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 2:
-		callLevel_tick_pwr1();
-		break;
 	case 3:
 		callLevel_tick_isld();
 		break;

@@ -39,5 +39,6 @@ struct Level {
 
 Level *Level_rock_create();
 Level *Level_fort_create();
+Level *Level_pwr1_create();
 
 #endif

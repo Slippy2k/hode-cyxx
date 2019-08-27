@@ -6,13 +6,53 @@
 // pwr1_hod
 
 #include "game.h"
+#include "level.h"
 #include "lzw.h"
 #include "paf.h"
 #include "util.h"
 #include "video.h"
 
-void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
-	LvlObject *o = _lvlObjectsList3;
+struct Level_pwr1: Level {
+        //const CheckpointData *getCheckpointData() = 0;
+
+	virtual void initialize();
+	//virtual void terminate();
+	virtual void tick();
+	virtual void preScreenUpdate(int screenNum);
+	virtual void postScreenUpdate(int screenNum);
+	//virtual void setupLvlObjects(int screenNum);
+
+	void postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy);
+	void postScreenUpdate_pwr1_screen6();
+	void postScreenUpdate_pwr1_screen10();
+	void postScreenUpdate_pwr1_screen12();
+	void postScreenUpdate_pwr1_screen14();
+	void postScreenUpdate_pwr1_screen16();
+	void postScreenUpdate_pwr1_screen18();
+	void postScreenUpdate_pwr1_screen23();
+	void postScreenUpdate_pwr1_screen27();
+	void postScreenUpdate_pwr1_screen35();
+
+	void preScreenUpdate_pwr1_screen4();
+	void preScreenUpdate_pwr1_screen6();
+	void preScreenUpdate_pwr1_screen9();
+	void preScreenUpdate_pwr1_screen15();
+	void preScreenUpdate_pwr1_screen21();
+	void preScreenUpdate_pwr1_screen23();
+	void preScreenUpdate_pwr1_screen24();
+	void preScreenUpdate_pwr1_screen26();
+	void preScreenUpdate_pwr1_screen27();
+	void preScreenUpdate_pwr1_screen29();
+	void preScreenUpdate_pwr1_screen31();
+	void preScreenUpdate_pwr1_screen35();
+};
+
+Level *Level_pwr1_create() {
+	return new Level_pwr1;
+}
+
+void Level_pwr1::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
+	LvlObject *o = _g->_lvlObjectsList3;
 	while (o) {
 		if (o->spriteNum == 4 && o->anim <= 9) {
 			BoundingBox b2;
@@ -20,7 +60,7 @@ void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
 			b2.x2 = o->posTable[3].x + o->xPos + 1;
 			b2.y1 = o->posTable[3].y + o->yPos - 1;
 			b2.y2 = o->posTable[3].y + o->yPos + 1;
-			if (clipBoundingBox(b, &b2)) {
+			if (_g->clipBoundingBox(b, &b2)) {
 				o->xPos += dx;
 				o->yPos += dy;
 			}
@@ -32,21 +72,21 @@ void Game::postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy) {
 	b2.x2 = _andyObject->posTable[3].x + _andyObject->xPos + 1;
 	b2.y1 = _andyObject->posTable[3].y + _andyObject->yPos - 1;
 	b2.y2 = _andyObject->posTable[3].y + _andyObject->yPos + 1;
-	if (clipBoundingBox(b, &b2)) {
-		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+	if (_g->clipBoundingBox(b, &b2)) {
+		AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		data->dxPos += dx;
 		data->dyPos += dy;
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen6() {
+void Level_pwr1::postScreenUpdate_pwr1_screen6() {
 	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[6];
 	switch (_res->_screensState[6].s0) {
 	case 1: {
 			BoundingBox b = { 185, 78, 225, 136 };
-			LvlObject *o = findLvlObjectBoundingBox(&b);
+			LvlObject *o = _g->findLvlObjectBoundingBox(&b);
 			if (o) {
-				ShootLvlObjectData *oosd = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
+				ShootLvlObjectData *oosd = (ShootLvlObjectData *)_g->getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 				if (oosd->unk0 == 6) {
 					_res->_screensState[6].s0 = 4;
 					dat->currentMaskId = 2;
@@ -57,39 +97,39 @@ void Game::postScreenUpdate_pwr1_screen6() {
 	case 2:
 		break;
 	case 3:
-		++_screenCounterTable[6];
-		if (_screenCounterTable[6] >= 41) {
+		++_g->_screenCounterTable[6];
+		if (_g->_screenCounterTable[6] >= 41) {
 			_res->_screensState[6].s0 = 1;
 			dat->currentMaskId = 1;
 			dat->currentBackgroundId = 1;
-			if (_levelCheckpoint == 0) {
-				_levelCheckpoint = 1;
+			if (_g->_levelCheckpoint == 0) {
+				_g->_levelCheckpoint = 1;
 			}
 		}
 		break;
 	case 4:
-		++_screenCounterTable[6];
-		if (_screenCounterTable[6] >= 54) {
+		++_g->_screenCounterTable[6];
+		if (_g->_screenCounterTable[6] >= 54) {
 			_res->_screensState[6].s0 = 2;
 			dat->currentBackgroundId = 1;
 		}
 		break;
 	default: {
 			BoundingBox b = { 93, 17, 255, 156 };
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (clipBoundingBox(&b, &data->boundingBox)) {
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				_res->_screensState[6].s0 = 3;
-				setShakeScreen(3, 31);
+				_g->setShakeScreen(3, 31);
 			}
 		}
 		break;
 	}
 	if (_res->_screensState[6].s3 != dat->currentMaskId) {
-		setupScreenMask(6);
+		_g->setupScreenMask(6);
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen10() {
+void Level_pwr1::postScreenUpdate_pwr1_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
 		BoundingBox b1 = { 50, 0, 100, 122 };
 		postScreenUpdate_pwr1_helper(&b1, 0, 2);
@@ -102,7 +142,7 @@ void Game::postScreenUpdate_pwr1_screen10() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen12() {
+void Level_pwr1::postScreenUpdate_pwr1_screen12() {
 	if (_res->_currentScreenResourceNum == 12) {
 		BoundingBox b1 = { 64, 124, 255, 166 };
 		postScreenUpdate_pwr1_helper(&b1, -1, 0);
@@ -127,7 +167,7 @@ void Game::postScreenUpdate_pwr1_screen12() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen14() {
+void Level_pwr1::postScreenUpdate_pwr1_screen14() {
 	if (_res->_currentScreenResourceNum == 14) {
 		BoundingBox b1 = { 0, 136, 104, 191 };
 		postScreenUpdate_pwr1_helper(&b1, 2, 0);
@@ -140,7 +180,7 @@ void Game::postScreenUpdate_pwr1_screen14() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen16() {
+void Level_pwr1::postScreenUpdate_pwr1_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
 		BoundingBox b1 = { 100, 130, 160, 176 };
 		postScreenUpdate_pwr1_helper(&b1, 2, 0);
@@ -157,13 +197,13 @@ void Game::postScreenUpdate_pwr1_screen16() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen18() {
+void Level_pwr1::postScreenUpdate_pwr1_screen18() {
 	if (_res->_currentScreenResourceNum == 18) {
-		if (_levelCheckpoint == 3) {
+		if (_g->_levelCheckpoint == 3) {
 			BoundingBox b = { 0, 0, 123, 125 };
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (clipBoundingBox(&b, &data->boundingBox)) {
-				++_levelCheckpoint;
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
+				++_g->_levelCheckpoint;
 			}
 		}
 		BoundingBox b1 = { 156, 80, 204, 144 };
@@ -173,26 +213,26 @@ void Game::postScreenUpdate_pwr1_screen18() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen23() {
+void Level_pwr1::postScreenUpdate_pwr1_screen23() {
 	switch (_res->_screensState[23].s0) {
 	case 2:
-		++_screenCounterTable[23];
-		if (_screenCounterTable[23] == 26) {
+		++_g->_screenCounterTable[23];
+		if (_g->_screenCounterTable[23] == 26) {
 			_res->_resLvlScreenBackgroundDataTable[23].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = 1;
-			setupScreenMask(23);
+			_g->setupScreenMask(23);
 		}
 		break;
 	case 0:
 		if (_res->_currentScreenResourceNum == 23) {
 			BoundingBox b = { 26, 94, 63, 127 };
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (clipBoundingBox(&b, &data->boundingBox)) {
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				uint8_t flags = _andyObject->flags0;
 				if ((flags & 0x1F) == 0 && (flags & 0xE0) == 0xE0) {
 					_res->_screensState[23].s0 = 2;
 				} else {
-					setAndySpecialAnimation(3);
+					_g->setAndySpecialAnimation(3);
 				}
 			}
 		}
@@ -200,13 +240,13 @@ void Game::postScreenUpdate_pwr1_screen23() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen27() {
+void Level_pwr1::postScreenUpdate_pwr1_screen27() {
 	if (_res->_screensState[27].s0 != 0) {
-		++_screenCounterTable[27];
-		if (_screenCounterTable[27] == 37) {
+		++_g->_screenCounterTable[27];
+		if (_g->_screenCounterTable[27] == 37) {
 			_res->_resLvlScreenBackgroundDataTable[27].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = 1;
-			setupScreenMask(27);
+			_g->setupScreenMask(27);
 		}
 	} else if (_res->_currentScreenResourceNum == 27) {
 		if ((_andyObject->flags0 & 0x1F) == 6) {
@@ -216,9 +256,9 @@ void Game::postScreenUpdate_pwr1_screen27() {
 			b1.y1 = _andyObject->yPos + _andyObject->posTable[7].y - 2;
 			b1.y2 = _andyObject->yPos + _andyObject->posTable[7].y + 2;
 			BoundingBox b2 = { 25, 163, 31, 188 };
-			if (clipBoundingBox(&b2, &b1)) {
-				++_screenCounterTable[27];
-				if (_screenCounterTable[27] == 9) {
+			if (_g->clipBoundingBox(&b2, &b1)) {
+				++_g->_screenCounterTable[27];
+				if (_g->_screenCounterTable[27] == 9) {
 					_res->_screensState[27].s0 = 2;
 				}
 			}
@@ -226,30 +266,30 @@ void Game::postScreenUpdate_pwr1_screen27() {
 	}
 }
 
-void Game::postScreenUpdate_pwr1_screen35() {
+void Level_pwr1::postScreenUpdate_pwr1_screen35() {
 	if (_res->_currentScreenResourceNum == 35) {
-		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 0, 193, 88 };
-		if (clipBoundingBox(&b, &data->boundingBox)) {
+		if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 			_andyObject->actionKeyMask &= ~3;
 			_andyObject->directionKeyMask &= ~4;
 			_andyObject->actionKeyMask |= 8;
 		}
 		if (_res->_screensState[35].s0 != 0) {
-			++_screenCounterTable[35];
-			if (_screenCounterTable[35] == 46) {
+			++_g->_screenCounterTable[35];
+			if (_g->_screenCounterTable[35] == 46) {
 				if (!_paf->_skipCutscenes) {
 					_paf->play(5);
 					_paf->unload(5);
 				}
 				_video->clearPalette();
-				_quit = true;
+				_g->_quit = true;
 			}
 		}
 	}
 }
 
-void Game::callLevel_postScreenUpdate_pwr1(int num) {
+void Level_pwr1::postScreenUpdate(int num) {
 	switch (num) {
 	case 6:
 		postScreenUpdate_pwr1_screen6();
@@ -281,7 +321,7 @@ void Game::callLevel_postScreenUpdate_pwr1(int num) {
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen4() {
+void Level_pwr1::preScreenUpdate_pwr1_screen4() {
         if (_res->_currentScreenResourceNum == 4) {
 		const uint8_t num = (_res->_screensState[4].s0 == 0) ? 0 : 1;
 		_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
@@ -289,22 +329,22 @@ void Game::preScreenUpdate_pwr1_screen4() {
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen6() {
+void Level_pwr1::preScreenUpdate_pwr1_screen6() {
         if (_res->_currentScreenResourceNum == 6 || _res->_currentScreenResourceNum == 5) {
 		if (_res->_screensState[6].s0 == 0) {
-			if (_levelCheckpoint != 1) {
-				_screenCounterTable[6] = 0;
+			if (_g->_levelCheckpoint != 1) {
+				_g->_screenCounterTable[6] = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 0;
 				_res->_screensState[6].s0 = 0;
 			} else {
-				_screenCounterTable[6] = 41;
+				_g->_screenCounterTable[6] = 41;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 1;
 				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 1;
 				_res->_screensState[6].s0 = 1;
 			}
 		} else {
-			_screenCounterTable[6] = 54;
+			_g->_screenCounterTable[6] = 54;
 			_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 2;
 			_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 2;
 			_res->_screensState[6].s0 = 2;
@@ -312,31 +352,31 @@ void Game::preScreenUpdate_pwr1_screen6() {
         }
 }
 
-void Game::preScreenUpdate_pwr1_screen9() {
+void Level_pwr1::preScreenUpdate_pwr1_screen9() {
 	if (_res->_currentScreenResourceNum == 9) {
-		if (_levelCheckpoint == 1) {
-			_levelCheckpoint = 2;
+		if (_g->_levelCheckpoint == 1) {
+			_g->_levelCheckpoint = 2;
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen15() {
+void Level_pwr1::preScreenUpdate_pwr1_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
-		if (_levelCheckpoint == 2) {
-			_levelCheckpoint = 3;
+		if (_g->_levelCheckpoint == 2) {
+			_g->_levelCheckpoint = 3;
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen21() {
+void Level_pwr1::preScreenUpdate_pwr1_screen21() {
 	if (_res->_currentScreenResourceNum == 15) {
-		if (_levelCheckpoint == 4) {
-			_levelCheckpoint = 5;
+		if (_g->_levelCheckpoint == 4) {
+			_g->_levelCheckpoint = 5;
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen23() {
+void Level_pwr1::preScreenUpdate_pwr1_screen23() {
 	if (_res->_currentScreenResourceNum == 23 || _res->_currentScreenResourceNum == 26) {
 		const uint8_t num = _res->_screensState[23].s0 != 0 ? 1 : 0;
 		_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = num;
@@ -344,18 +384,18 @@ void Game::preScreenUpdate_pwr1_screen23() {
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen24() {
+void Level_pwr1::preScreenUpdate_pwr1_screen24() {
 	if (_res->_currentScreenResourceNum == 24) {
 		if (_res->_screensState[27].s0 != 0) { // +0x6C
-			if (_levelCheckpoint == 6) {
-				_levelCheckpoint = 7;
+			if (_g->_levelCheckpoint == 6) {
+				_g->_levelCheckpoint = 7;
 			}
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen26() {
-	if (_levelCheckpoint >= 7) {
+void Level_pwr1::preScreenUpdate_pwr1_screen26() {
+	if (_g->_levelCheckpoint >= 7) {
 		_res->_screensState[23].s0 = 1;
 	}
 	if (_res->_currentScreenResourceNum == 23 || _res->_currentScreenResourceNum == 26) {
@@ -365,16 +405,16 @@ void Game::preScreenUpdate_pwr1_screen26() {
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen27() {
+void Level_pwr1::preScreenUpdate_pwr1_screen27() {
 	if (_res->_currentScreenResourceNum == 27) {
 		uint8_t num = 0;
-		if (_res->_screensState[27].s0 != 0 || _levelCheckpoint >= 7) {
+		if (_res->_screensState[27].s0 != 0 || _g->_levelCheckpoint >= 7) {
 			num = 1;
-			_screenCounterTable[27] = 37;
-		} else if (_levelCheckpoint <= 5) {
-			_screenCounterTable[27] = 0;
-			if (_levelCheckpoint == 5) {
-				_levelCheckpoint = 6;
+			_g->_screenCounterTable[27] = 37;
+		} else if (_g->_levelCheckpoint <= 5) {
+			_g->_screenCounterTable[27] = 0;
+			if (_g->_levelCheckpoint == 5) {
+				_g->_levelCheckpoint = 6;
 			}
 		}
 		_res->_screensState[27].s0 = num;
@@ -383,32 +423,32 @@ void Game::preScreenUpdate_pwr1_screen27() {
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen29() {
+void Level_pwr1::preScreenUpdate_pwr1_screen29() {
 	if (_res->_currentScreenResourceNum == 29) {
-		if (_levelCheckpoint == 7) {
-			_levelCheckpoint = 8;
+		if (_g->_levelCheckpoint == 7) {
+			_g->_levelCheckpoint = 8;
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen31() {
+void Level_pwr1::preScreenUpdate_pwr1_screen31() {
 	if (_res->_currentScreenResourceNum == 31) {
-		if (_levelCheckpoint == 8) {
-			_levelCheckpoint = 9;
+		if (_g->_levelCheckpoint == 8) {
+			_g->_levelCheckpoint = 9;
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr1_screen35() {
+void Level_pwr1::preScreenUpdate_pwr1_screen35() {
 	if (_res->_currentScreenResourceNum == 35) {
-		_screenCounterTable[25] = 0;
+		_g->_screenCounterTable[25] = 0;
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(5);
 		}
 	}
 }
 
-void Game::callLevel_preScreenUpdate_pwr1(int num) {
+void Level_pwr1::preScreenUpdate(int num) {
 	switch (num) {
 	case 4:
 		preScreenUpdate_pwr1_screen4();
@@ -449,12 +489,12 @@ void Game::callLevel_preScreenUpdate_pwr1(int num) {
 	}
 }
 
-void Game::callLevel_initialize_pwr1() {
-	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(_pwr1_screenTransformData, _transformShadowBuffer);
+void Level_pwr1::initialize() {
+	_g->_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	const int size = decodeLZW(Game::_pwr1_screenTransformData, _g->_transformShadowBuffer);
 	assert(size == 256 * 192);
-	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
-	resetCrackSprites();
+	memcpy(_g->_transformShadowBuffer + 256 * 192, _g->_transformShadowBuffer, 256);
+	_g->resetCrackSprites();
 }
 
 const uint8_t Game::_pwr1_screenTransformLut[] = {
@@ -464,7 +504,7 @@ const uint8_t Game::_pwr1_screenTransformLut[] = {
 	0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void Game::callLevel_tick_pwr1() {
-	_video->_displayShadowLayer = _pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
-	updateCrackSprites();
+void Level_pwr1::tick() {
+	_video->_displayShadowLayer = Game::_pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
+	_g->updateCrackSprites();
 }

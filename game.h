@@ -364,36 +364,6 @@ struct Game {
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
 
-	// level3_pwr1.cpp
-	void postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy);
-	void postScreenUpdate_pwr1_screen6();
-	void postScreenUpdate_pwr1_screen10();
-	void postScreenUpdate_pwr1_screen12();
-	void postScreenUpdate_pwr1_screen14();
-	void postScreenUpdate_pwr1_screen16();
-	void postScreenUpdate_pwr1_screen18();
-	void postScreenUpdate_pwr1_screen23();
-	void postScreenUpdate_pwr1_screen27();
-	void postScreenUpdate_pwr1_screen35();
-	void callLevel_postScreenUpdate_pwr1(int num);
-
-	void preScreenUpdate_pwr1_screen4();
-	void preScreenUpdate_pwr1_screen6();
-	void preScreenUpdate_pwr1_screen9();
-	void preScreenUpdate_pwr1_screen15();
-	void preScreenUpdate_pwr1_screen21();
-	void preScreenUpdate_pwr1_screen23();
-	void preScreenUpdate_pwr1_screen24();
-	void preScreenUpdate_pwr1_screen26();
-	void preScreenUpdate_pwr1_screen27();
-	void preScreenUpdate_pwr1_screen29();
-	void preScreenUpdate_pwr1_screen31();
-	void preScreenUpdate_pwr1_screen35();
-	void callLevel_preScreenUpdate_pwr1(int num);
-
-	void callLevel_initialize_pwr1();
-	void callLevel_tick_pwr1();
-
 	// level4_isld.cpp
 	void postScreenUpdate_isld_screen0();
 	void postScreenUpdate_isld_screen1();
