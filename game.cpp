@@ -1376,8 +1376,10 @@ void Game::resetScreen() {
 	}
 	resetScreenMask();
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
-		_level->setupLvlObjects(i);
-
+		if (_level) {
+			_level->setupLvlObjects(i);
+			continue;
+		}
 		switch (_currentLevel) {
 		case 0:
 			// callLevel_setupLvlObjects_rock(i);
@@ -2086,15 +2088,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	}
 	_quit = false;
 	resetShootLvlObjectDataTable();
-	switch (_currentLevel) {
-	case 0:
-		_level = Level_rock_create();
-		break;
-	default:
-		error("Level %d class not implemented", _currentLevel);
-		break;
-	}
-	_level->setPointers(this, _andyObject, _paf, _res, _video);
 	callLevel_initialize();
 	setupAndyLvlObject();
 	clearLvlObjectsList2();
@@ -2127,8 +2120,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	} while (!_system->inp.quit && !_quit);
 	_animBackgroundDataCount = 0;
 	callLevel_terminate();
-	delete _level;
-	_level = 0;
 }
 
 void Game::mixAudio(int16_t *buf, int len) {
@@ -2752,8 +2743,10 @@ void Game::levelMainLoop() {
 }
 
 void Game::callLevel_postScreenUpdate(int num) {
-	_level->postScreenUpdate(num);
-
+	if (_level) {
+		_level->postScreenUpdate(num);
+		return;
+	}
 	switch (_currentLevel) {
 	case 0:
 		//callLevel_postScreenUpdate_rock(num);
@@ -2789,8 +2782,10 @@ void Game::callLevel_postScreenUpdate(int num) {
 }
 
 void Game::callLevel_preScreenUpdate(int num) {
-	_level->preScreenUpdate(num);
-
+	if (_level) {
+		_level->preScreenUpdate(num);
+		return;
+	}
 	switch (_currentLevel) {
 	case 0:
 		//callLevel_preScreenUpdate_rock(num);
@@ -2826,8 +2821,19 @@ void Game::callLevel_preScreenUpdate(int num) {
 }
 
 void Game::callLevel_initialize() {
-	_level->initialize();
-
+	switch (_currentLevel) {
+	case 0:
+		_level = Level_rock_create();
+		break;
+	default:
+		warning("Level %d class not implemented", _currentLevel);
+		break;
+	}
+	if (_level) {
+		_level->setPointers(this, _andyObject, _paf, _res, _video);
+		_level->initialize();
+		return;
+	}
 	switch (_currentLevel) {
 	case 0:
 		// callLevel_initialize_rock();
@@ -2851,8 +2857,10 @@ void Game::callLevel_initialize() {
 }
 
 void Game::callLevel_tick() {
-	_level->tick();
-
+	if (_level) {
+		_level->tick();
+		return;
+	}
 	switch (_currentLevel) {
 	case 0:
 		// callLevel_tick_rock();
@@ -2882,8 +2890,12 @@ void Game::callLevel_tick() {
 }
 
 void Game::callLevel_terminate() {
-	_level->terminate();
-
+	if (_level) {
+		_level->terminate();
+		delete _level;
+		_level = 0;
+		return;
+	}
 	switch (_currentLevel) {
 	case 0:
 		// callLevel_terminate_rock();
