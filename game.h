@@ -364,35 +364,6 @@ struct Game {
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
 
-	// level4_isld.cpp
-	void postScreenUpdate_isld_screen0();
-	void postScreenUpdate_isld_screen1();
-	void postScreenUpdate_isld_screen2();
-	void postScreenUpdate_isld_screen3();
-	void postScreenUpdate_isld_screen4();
-	void postScreenUpdate_isld_screen8();
-	void postScreenUpdate_isld_screen9();
-	void postScreenUpdate_isld_screen13();
-	void postScreenUpdate_isld_screen15();
-	void postScreenUpdate_isld_screen19();
-	void postScreenUpdate_isld_screen20();
-	void postScreenUpdate_isld_screen21();
-	void callLevel_postScreenUpdate_isld(int num);
-
-	void preScreenUpdate_isld_screen1();
-	void preScreenUpdate_isld_screen2();
-	void preScreenUpdate_isld_screen3();
-	void preScreenUpdate_isld_screen9();
-	void preScreenUpdate_isld_screen14();
-	void preScreenUpdate_isld_screen15();
-	void preScreenUpdate_isld_screen16();
-	void preScreenUpdate_isld_screen21();
-	void callLevel_preScreenUpdate_isld(int num);
-
-	void callLevel_initialize_isld();
-	void callLevel_tick_isld();
-	void callLevel_terminate_isld();
-
 	// level5_lava.cpp
 	void postScreenUpdate_lava_helper(int yPos);
 	void postScreenUpdate_lava_screen0();

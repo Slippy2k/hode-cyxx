@@ -1381,12 +1381,6 @@ void Game::resetScreen() {
 			continue;
 		}
 		switch (_currentLevel) {
-		case 2:
-			// none for 'pwr1'
-			break;
-		case 3:
-			// none for 'isld'
-			break;
 		case 4:
 			callLevel_setupLvlObjects_lava(i);
 			break;
@@ -2742,9 +2736,6 @@ void Game::callLevel_postScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 3:
-		callLevel_postScreenUpdate_isld(num);
-		break;
 	case 4:
 		callLevel_postScreenUpdate_lava(num);
 		break;
@@ -2772,9 +2763,6 @@ void Game::callLevel_preScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 3:
-		callLevel_preScreenUpdate_isld(num);
-		break;
 	case 4:
 		callLevel_preScreenUpdate_lava(num);
 		break;
@@ -2804,6 +2792,12 @@ void Game::callLevel_initialize() {
 	case 1:
 		_level = Level_fort_create();
 		break;
+	case 2:
+		_level = Level_pwr1_create();
+		break;
+	case 3:
+		_level = Level_isld_create();
+		break;
 	default:
 		warning("Level %d class not implemented", _currentLevel);
 		break;
@@ -2814,9 +2808,6 @@ void Game::callLevel_initialize() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 3:
-		callLevel_initialize_isld();
-		break;
 	case 4:
 		callLevel_initialize_lava();
 		break;
@@ -2835,9 +2826,6 @@ void Game::callLevel_tick() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 3:
-		callLevel_tick_isld();
-		break;
 	case 4:
 		callLevel_tick_lava();
 		break;
@@ -2861,12 +2849,6 @@ void Game::callLevel_terminate() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 0:
-		// callLevel_terminate_rock();
-		break;
-	case 3:
-		callLevel_terminate_isld();
-		break;
 	case 2:
 	case 4:
 	case 5:
