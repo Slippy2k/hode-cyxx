@@ -364,31 +364,6 @@ struct Game {
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
 
-	// level2_fort.cpp
-	void postScreenUpdate_fort_screen1();
-	void postScreenUpdate_fort_screen6();
-	void postScreenUpdate_fort_screen7();
-	void postScreenUpdate_fort_screen8();
-	void postScreenUpdate_fort_screen16();
-	void postScreenUpdate_fort_screen17();
-	void postScreenUpdate_fort_screen21();
-	void callLevel_postScreenUpdate_fort(int num);
-
-	void preScreenUpdate_fort_screen1();
-	void preScreenUpdate_fort_screen2();
-	void preScreenUpdate_fort_screen6();
-	void preScreenUpdate_fort_screen9();
-	void preScreenUpdate_fort_screen14();
-	void preScreenUpdate_fort_screen16();
-	void preScreenUpdate_fort_screen17();
-	void preScreenUpdate_fort_screen21();
-	void callLevel_preScreenUpdate_fort(int num);
-
-	void callLevel_tick_fort();
-
-	void setupLvlObjects_fort_screen1();
-	void callLevel_setupLvlObjects_fort(int num);
-
 	// level3_pwr1.cpp
 	void postScreenUpdate_pwr1_helper(BoundingBox *b, int dx, int dy);
 	void postScreenUpdate_pwr1_screen6();

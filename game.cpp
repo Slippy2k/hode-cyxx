@@ -1381,12 +1381,6 @@ void Game::resetScreen() {
 			continue;
 		}
 		switch (_currentLevel) {
-		case 0:
-			// callLevel_setupLvlObjects_rock(i);
-			break;
-		case 1:
-			callLevel_setupLvlObjects_fort(i);
-			break;
 		case 2:
 			// none for 'pwr1'
 			break;
@@ -2748,12 +2742,6 @@ void Game::callLevel_postScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 0:
-		//callLevel_postScreenUpdate_rock(num);
-		break;
-	case 1:
-		callLevel_postScreenUpdate_fort(num);
-		break;
 	case 2:
 		callLevel_postScreenUpdate_pwr1(num);
 		break;
@@ -2787,12 +2775,6 @@ void Game::callLevel_preScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 0:
-		//callLevel_preScreenUpdate_rock(num);
-		break;
-	case 1:
-		callLevel_preScreenUpdate_fort(num);
-		break;
 	case 2:
 		callLevel_preScreenUpdate_pwr1(num);
 		break;
@@ -2824,6 +2806,9 @@ void Game::callLevel_initialize() {
 	switch (_currentLevel) {
 	case 0:
 		_level = Level_rock_create();
+		break;
+	case 1:
+		_level = Level_fort_create();
 		break;
 	default:
 		warning("Level %d class not implemented", _currentLevel);
@@ -2862,12 +2847,6 @@ void Game::callLevel_tick() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 0:
-		// callLevel_tick_rock();
-		break;
-	case 1:
-		callLevel_tick_fort();
-		break;
 	case 2:
 		callLevel_tick_pwr1();
 		break;
