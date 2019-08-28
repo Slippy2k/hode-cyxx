@@ -41,5 +41,6 @@ Level *Level_rock_create();
 Level *Level_fort_create();
 Level *Level_pwr1_create();
 Level *Level_isld_create();
+Level *Level_lava_create();
 
 #endif

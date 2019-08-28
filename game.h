@@ -351,6 +351,7 @@ struct Game {
 	LvlObject *findLvlObject2(uint8_t type, uint8_t dataNum, int screenNum);
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
+	void postScreenUpdate_lava_helper(int yPos);
 	void resetCrackSprites();
 	void updateCrackSprites();
 	void captureScreenshot();
@@ -363,36 +364,6 @@ struct Game {
 	int objectUpdate_rock_case2(LvlObject *o);
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
-
-	// level5_lava.cpp
-	void postScreenUpdate_lava_helper(int yPos);
-	void postScreenUpdate_lava_screen0();
-	void postScreenUpdate_lava_screen4();
-	void postScreenUpdate_lava_screen5();
-	void postScreenUpdate_lava_screen6();
-	void postScreenUpdate_lava_screen7();
-	void postScreenUpdate_lava_screen8();
-	void postScreenUpdate_lava_screen10();
-	void postScreenUpdate_lava_screen11();
-	void postScreenUpdate_lava_screen12();
-	void postScreenUpdate_lava_screen13();
-	void postScreenUpdate_lava_screen14();
-	void postScreenUpdate_lava_screen15();
-	void callLevel_postScreenUpdate_lava(int num);
-
-	void preScreenUpdate_lava_screen0();
-	void preScreenUpdate_lava_screen3();
-	void preScreenUpdate_lava_screen6();
-	void preScreenUpdate_lava_screen10();
-	void preScreenUpdate_lava_screen13();
-	void preScreenUpdate_lava_screen15();
-	void callLevel_preScreenUpdate_lava(int num);
-
-	void callLevel_initialize_lava();
-	void callLevel_tick_lava();
-
-	void setupLvlObjects_lava_screen3();
-	void callLevel_setupLvlObjects_lava(int num);
 
 	// level6_pwr2.cpp
 	void postScreenUpdate_pwr2_screen2();

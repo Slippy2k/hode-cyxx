@@ -16,7 +16,7 @@ struct Level_pwr1: Level {
         //const CheckpointData *getCheckpointData() = 0;
 
 	virtual void initialize();
-	//virtual void terminate();
+	virtual void terminate();
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
@@ -495,6 +495,11 @@ void Level_pwr1::initialize() {
 	assert(size == 256 * 192);
 	memcpy(_g->_transformShadowBuffer + 256 * 192, _g->_transformShadowBuffer, 256);
 	_g->resetCrackSprites();
+}
+
+void Level_pwr1::terminate() {
+	free(_g->_transformShadowBuffer);
+	_g->_transformShadowBuffer = 0;
 }
 
 const uint8_t Game::_pwr1_screenTransformLut[] = {

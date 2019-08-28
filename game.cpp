@@ -1381,9 +1381,6 @@ void Game::resetScreen() {
 			continue;
 		}
 		switch (_currentLevel) {
-		case 4:
-			callLevel_setupLvlObjects_lava(i);
-			break;
 		case 5:
 			// none for 'pwr2'
 			break;
@@ -2740,9 +2737,6 @@ void Game::callLevel_postScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 4:
-		callLevel_postScreenUpdate_lava(num);
-		break;
 	case 5:
 		callLevel_postScreenUpdate_pwr2(num);
 		break;
@@ -2767,9 +2761,6 @@ void Game::callLevel_preScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 4:
-		callLevel_preScreenUpdate_lava(num);
-		break;
 	case 5:
 		callLevel_preScreenUpdate_pwr2(num);
 		break;
@@ -2802,6 +2793,9 @@ void Game::callLevel_initialize() {
 	case 3:
 		_level = Level_isld_create();
 		break;
+	case 4:
+		_level = Level_lava_create();
+		break;
 	default:
 		warning("Level %d class not implemented", _currentLevel);
 		break;
@@ -2812,9 +2806,6 @@ void Game::callLevel_initialize() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 4:
-		callLevel_initialize_lava();
-		break;
 	case 5:
 		callLevel_initialize_pwr2();
 		break;
@@ -2830,9 +2821,6 @@ void Game::callLevel_tick() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 4:
-		callLevel_tick_lava();
-		break;
 	case 5:
 		callLevel_tick_pwr2();
 		break;
@@ -2853,8 +2841,6 @@ void Game::callLevel_terminate() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 2:
-	case 4:
 	case 5:
 	case 6:
 		if (_video->_displayShadowLayer) {
@@ -4345,6 +4331,28 @@ LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 		ptr = ptr->nextPtr;
 	}
 	return 0;
+}
+
+void Game::postScreenUpdate_lava_helper(int yPos) {
+	const uint8_t flags = (_andyObject->flags0) & 0x1F;
+	if (!_hideAndyObjectSprite) {
+		if ((_mstFlags & 0x80000000) == 0) {
+			uint8_t mask = 0;
+			const int y = _andyObject->yPos;
+			if (_andyObject->posTable[5].y + y >= yPos || _andyObject->posTable[4].y + y >= yPos) {
+				mask = 0xA3;
+			}
+			if (flags == 2 || _andyObject->posTable[7].y + y >= yPos) {
+				mask = 0xA3;
+			}
+			if (mask != 0 && _actionDirectionKeyMaskIndex > 0) {
+				_actionDirectionKeyMaskIndex = mask;
+				_actionDirectionKeyMaskCounter = 0;
+			}
+		} else if (flags == 0xB) {
+			_mstFlags &= 0x7FFFFFFF;
+		}
+	}
 }
 
 void Game::resetCrackSprites() {
