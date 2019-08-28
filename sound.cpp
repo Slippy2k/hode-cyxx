@@ -12,7 +12,7 @@ enum {
 
 static const bool kLimitSounds = false; // limit the number of active playing sounds
 
-static const uint8_t _dbVolumeTable[129] = {
+static const uint8_t _volumeRampTable[129] = {
 	0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06,
 	0x06, 0x07, 0x07, 0x07, 0x08, 0x08, 0x09, 0x09, 0x09, 0x0A, 0x0A, 0x0B, 0x0B, 0x0C, 0x0C, 0x0C,
 	0x0D, 0x0D, 0x0E, 0x0E, 0x0F, 0x0F, 0x10, 0x10, 0x10, 0x11, 0x11, 0x12, 0x12, 0x13, 0x13, 0x14,
@@ -1150,7 +1150,7 @@ int Game::getSoundObjectPanning(SssObject *so) const {
 
 void Game::setSoundObjectPanning(SssObject *so) {
 	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
-		int volume = ((so->filter->volumeCurrent >> 16) * so->volume) >> 7; // indexes decibel volume table
+		int volume = ((so->filter->volumeCurrent >> 16) * so->volume) >> 7;
 		int panning = 0;
 		if (so->panningPtr) {
 			int priority = CLIP(so->priority + so->filter->priorityCurrent, 0, 7);
@@ -1177,11 +1177,13 @@ void Game::setSoundObjectPanning(SssObject *so) {
 		if (so->pcm == 0) {
 			return;
 		}
-		if (volume < 0 || volume >= (int)ARRAYSIZE(_dbVolumeTable)) {
+		if (volume < 0 || volume >= (int)ARRAYSIZE(_volumeRampTable)) {
 			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeCurrent >> 16), so->volume);
+			so->panL = 0;
+			so->panR = 0;
 			return;
 		}
-		int _edx = _dbVolumeTable[volume];
+		int _edx = _volumeRampTable[volume];
 		int _eax = _edx << 7;
 		switch (panning) {
 		case 0: // full left
