@@ -6,10 +6,6 @@
 
 static uint8_t _plyChecksum = 0;
 
-static int READ_LE_UINT32(const uint8_t *p) {
-	return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
-}
-
 static int PlyReadNextByte(const uint8_t *p) {
 	_plyChecksum ^= *p;
 	return *p;
@@ -66,7 +62,11 @@ int main(int argc, char *argv[]) {
 				printf("=== END OF PLAYER DATA === \n");
 			}
 			_plyChecksum ^= buf[208];
+			printf("Unk208 %d (expected 8)\n", buf[208]);
+			_plyChecksum ^= buf[209];
 			printf("Current Player Config %d\n", buf[209]);
+			_plyChecksum ^= buf[210];
+			printf("Unk210 %d\n", buf[210]);
 			printf("Player Configuration Data Checksum 0x%X (expected 0x%X)\n", buf[211], _plyChecksum);
 			fclose(fp);
 		}
