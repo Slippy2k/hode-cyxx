@@ -78,6 +78,10 @@ struct Game {
 	static const uint8_t _isld_spritesData[];
 	static const uint8_t _lava_spritesData[];
 	static const uint8_t _lar1_spritesData[];
+	static uint8_t _lar1_unkData0[];
+	static uint8_t _lar2_unkData0[];
+	static BoundingBox _lar1_unkData2[]; // _lar1_bboxData
+	static BoundingBox _lar2_unkData2[]; // _lar2_bboxData
 
 	Level *_level;
 	Mixer _mix;

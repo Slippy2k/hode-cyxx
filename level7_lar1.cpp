@@ -5,7 +5,7 @@
 #include "util.h"
 #include "video.h"
 
-static uint8_t _lar1_unkData0[13 * 4] = {
+uint8_t Game::_lar1_unkData0[13 * 4] = {
         0x02, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x32, 0x09, 0x02, 0x00, 0x32, 0x0E, 0x02, 0x00,
         0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
         0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
@@ -21,7 +21,7 @@ static uint8_t _lar1_unkData1[15 * 6] = {
 	0x58, 0x60, 0x12, 0x00, 0x04, 0x00, 0xC0, 0x30, 0x17, 0x00
 };
 
-static BoundingBox _lar1_unkData2[24] = {
+BoundingBox Game::_lar1_unkData2[24] = {
 	{ 203, 162, 213, 166 },
 	{  68,  86,  78,  90 },
 	{ 195,  58, 205,  62 },
@@ -108,8 +108,6 @@ static void setLvlObjectUpdateType3_lar1(Game *g, int screenNum) {
 	}
 }
 
-extern uint8_t _lar2_unkData0[40];
-
 void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 	bool found = false;
 	for (LvlObject *o = _lvlObjectsList1; o && !found; o = o->nextPtr) {
@@ -136,9 +134,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 				continue;
 			}
 			if (_currentLevel == kLvl_lar2) {
-				_edi = &_lar2_unkData0[p[3] * 4];
+				_edi = &Game::_lar2_unkData0[p[3] * 4];
 			} else {
-				_edi = &_lar1_unkData0[p[3] * 4];
+				_edi = &Game::_lar1_unkData0[p[3] * 4];
 			}
 			uint8_t _al = (p[1] >> 1) & 1;
 			uint8_t _bl = (_edi[0] >> 4);
@@ -155,9 +153,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 				if (_currentLevel == kLvl_lar2) {
-					_edi = &_lar2_unkData0[p[3] * 4];
+					_edi = &Game::_lar2_unkData0[p[3] * 4];
 				} else {
-					_edi = &_lar1_unkData0[p[3] * 4];
+					_edi = &Game::_lar1_unkData0[p[3] * 4];
 				}
 				uint8_t _al = ((~p[1]) >> 1) & 1;
 				uint8_t _bl = (_edi[0] >> 4);
@@ -223,9 +221,9 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 			_al = (_al >> 1) & 1;
 			uint8_t *_esi;
 			if (_currentLevel == kLvl_lar2) {
-				_esi = &_lar2_unkData0[p[3] * 4];
+				_esi = &Game::_lar2_unkData0[p[3] * 4];
 			} else {
-				_esi = &_lar1_unkData0[p[3] * 4];
+				_esi = &Game::_lar1_unkData0[p[3] * 4];
 			}
 			uint8_t _dl = _esi[0];
 			uint8_t _bl = _dl >> 4;
@@ -244,13 +242,12 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 // 406A0D
 	if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 		if (_currentLevel == kLvl_lar2) {
-			p = &_lar2_unkData0[p[3] * 4];
+			p = &Game::_lar2_unkData0[p[3] * 4];
 		} else {
-			p = &_lar1_unkData0[p[3] * 4];
+			p = &Game::_lar1_unkData0[p[3] * 4];
 		}
 		uint8_t _al = ((~p[1]) >> 1) & 1;
 		uint8_t _cl = (p[1] >> 5) & 1;
-		p = &_lar2_unkData0[p[3] * 4];
 		uint8_t _bl = p[0] >> 4;
 		if (_bl == _al) {
 			return ret;
@@ -265,8 +262,6 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 	return ret;
 }
 
-extern BoundingBox _lar2_unkData2[13];
-
 int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim) {
 	uint8_t _al = (_andyObject->flags0 >> 5) & 7;
 	uint8_t _cl = (_andyObject->flags0 & 0x1F);
@@ -274,9 +269,9 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 	if (dataNum >= 0) {
 		BoundingBox *box;
 		if (_currentLevel == kLvl_lar2) {
-			box = &_lar2_unkData2[boxNum];
+			box = &Game::_lar2_unkData2[boxNum];
 		} else {
-			box = &_lar1_unkData2[boxNum];
+			box = &Game::_lar1_unkData2[boxNum];
 		}
 		int dy = box->y2 - box->y1;
 		int dx = box->x2 - box->x1;
@@ -603,16 +598,16 @@ void Game::postScreenUpdate_lar1_screen3() {
 
 void Game::postScreenUpdate_lar1_screen4() {
 	LvlObject *o = findLvlObject(2, 0, 4);
-	postScreenUpdate_lar1_helper(o, _lar1_unkData0, 0);
+	postScreenUpdate_lar1_helper(o, Game::_lar1_unkData0, 0);
 }
 
 void Game::postScreenUpdate_lar1_screen5() {
 	LvlObject *o1 = findLvlObject(2, 0, 5);
-	postScreenUpdate_lar1_helper(o1, &_lar1_unkData0[4], 1);
+	postScreenUpdate_lar1_helper(o1, &Game::_lar1_unkData0[4], 1);
 	LvlObject *o2 = findLvlObject(2, 1, 5);
-	postScreenUpdate_lar1_helper(o2, &_lar1_unkData0[8], 2);
+	postScreenUpdate_lar1_helper(o2, &Game::_lar1_unkData0[8], 2);
 	LvlObject *o3 = findLvlObject(2, 2, 5);
-	postScreenUpdate_lar1_helper(o3, &_lar1_unkData0[12], 3);
+	postScreenUpdate_lar1_helper(o3, &Game::_lar1_unkData0[12], 3);
 	if (_res->_currentScreenResourceNum == 5) {
 		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
 			_levelCheckpoint = 2;
@@ -628,9 +623,9 @@ void Game::postScreenUpdate_lar1_screen5() {
 
 void Game::postScreenUpdate_lar1_screen8() {
 	LvlObject *o1 = findLvlObject(2, 0, 8);
-	postScreenUpdate_lar1_helper(o1, &_lar1_unkData0[16], 4);
+	postScreenUpdate_lar1_helper(o1, &Game::_lar1_unkData0[16], 4);
 	LvlObject *o2 = findLvlObject(2, 1, 8);
-	postScreenUpdate_lar1_helper(o2, &_lar1_unkData0[20], 5);
+	postScreenUpdate_lar1_helper(o2, &Game::_lar1_unkData0[20], 5);
 	if (_res->_currentScreenResourceNum == 8) {
 		if (_levelCheckpoint >= 1 && _levelCheckpoint <= 3) {
 			BoundingBox b = { 104, 0, 255, 80 };
@@ -649,7 +644,7 @@ void Game::postScreenUpdate_lar1_screen8() {
 
 void Game::postScreenUpdate_lar1_screen9() {
 	LvlObject *o = findLvlObject(2, 0, 9);
-	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x18], 6);
+	postScreenUpdate_lar1_helper(o, &Game::_lar1_unkData0[0x18], 6);
 }
 
 void Game::postScreenUpdate_lar1_screen12() {
@@ -717,7 +712,7 @@ void Game::postScreenUpdate_lar1_screen12() {
 
 void Game::postScreenUpdate_lar1_screen13() {
 	LvlObject *o = findLvlObject(2, 0, 13);
-	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x1C], 7);
+	postScreenUpdate_lar1_helper(o, &Game::_lar1_unkData0[0x1C], 7);
 }
 
 void Game::postScreenUpdate_lar1_screen14() {
@@ -785,24 +780,24 @@ void Game::postScreenUpdate_lar1_screen14() {
 		}
 	}
 	LvlObject *o = findLvlObject(2, 0, 14);
-	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x20], 8);
+	postScreenUpdate_lar1_helper(o, &Game::_lar1_unkData0[0x20], 8);
 }
 
 void Game::postScreenUpdate_lar1_screen15() {
 	LvlObject *o = findLvlObject(2, 0, 15);
-	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x24], 9);
+	postScreenUpdate_lar1_helper(o, &Game::_lar1_unkData0[0x24], 9);
 }
 
 void Game::postScreenUpdate_lar1_screen16() {
 	LvlObject *o = findLvlObject(2, 0, 16);
-	postScreenUpdate_lar1_helper(o, &_lar1_unkData0[0x28], 10);
+	postScreenUpdate_lar1_helper(o, &Game::_lar1_unkData0[0x28], 10);
 }
 
 void Game::postScreenUpdate_lar1_screen18() {
 	LvlObject *o1 = findLvlObject(2, 0, 18);
-	postScreenUpdate_lar1_helper(o1, &_lar1_unkData0[0x2C], 11);
+	postScreenUpdate_lar1_helper(o1, &Game::_lar1_unkData0[0x2C], 11);
 	LvlObject *o2 = findLvlObject(2, 1, 18);
-	postScreenUpdate_lar1_helper(o2, &_lar1_unkData0[0x30], 12);
+	postScreenUpdate_lar1_helper(o2, &Game::_lar1_unkData0[0x30], 12);
 	if ((_lar1_unkData3[0x59] & 0x40) == 0 && (_lar1_unkData3[0x59] & 0x80) != 0) {
 		if ((_lar1_unkData3[0x4D] & 1) == 0) {
 			_lar1_unkData3[0x4D] |= 1;
@@ -1200,7 +1195,7 @@ void Game::callLevel_initialize_lar1() {
 }
 
 void Game::callLevel_tick_lar1() {
-	updateLevelTick_lar(24, _lar1_unkData3, _lar1_unkData2);
+	updateLevelTick_lar(24, _lar1_unkData3, Game::_lar1_unkData2);
 	updateCrackSprites();
 	if (_screenCounterTable[19] != 0) {
 		_plasmaCannonFlags |= 2;
