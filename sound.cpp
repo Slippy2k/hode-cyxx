@@ -81,6 +81,18 @@ static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
 	return 0;
 }
 
+void Game::muteSound() {
+	MixerLock ml(&_mix);
+	_snd_muted = true;
+	_mix._mixingQueueSize = 0;
+}
+
+void Game::unmuteSound() {
+	MixerLock ml(&_mix);
+	_snd_muted = false;
+	_mix._mixingQueueSize = 0;
+}
+
 void Game::resetSound() {
 	MixerLock ml(&_mix);
 	// TODO

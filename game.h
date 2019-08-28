@@ -624,7 +624,10 @@ struct Game {
 	int _snd_masterPanning;
 	int _playingSssObjectsCount;
 	int _snd_masterVolume;
+	bool _snd_muted;
 
+	void muteSound();
+	void unmuteSound();
 	void resetSound();
 	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);

@@ -2112,6 +2112,10 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 
 void Game::mixAudio(int16_t *buf, int len) {
 
+	if (_snd_muted) {
+		return;
+	}
+
 	static const int kStereoSamples = 3528; // stereo
 
 	static int count = 0;
@@ -2870,6 +2874,7 @@ int Game::displayHintScreen(int num, int pause) {
 		_video->_frontLayer,
 		_video->_shadowLayer,
 	};
+	muteSound();
 	if (num == -1) {
 		num = _res->_datHdr.yesNoQuitImage; // 'Yes'
 		_res->loadDatHintImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
@@ -2896,6 +2901,7 @@ int Game::displayHintScreen(int num, int pause) {
 		}
 		_system->sleep(30);
 	} while (!_system->inp.quit && !_system->inp.keyReleased(SYS_INP_JUMP));
+	unmuteSound();
 	_video->_paletteNeedRefresh = true;
 	return confirmQuit && quit == kQuitYes;
 }
