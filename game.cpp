@@ -1381,9 +1381,6 @@ void Game::resetScreen() {
 			continue;
 		}
 		switch (_currentLevel) {
-		case 5:
-			// none for 'pwr2'
-			break;
 		case 6:
 			callLevel_setupLvlObjects_lar1(i);
 			break;
@@ -2737,9 +2734,6 @@ void Game::callLevel_postScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 5:
-		callLevel_postScreenUpdate_pwr2(num);
-		break;
 	case 6:
 		callLevel_postScreenUpdate_lar1(num);
 		break;
@@ -2761,9 +2755,6 @@ void Game::callLevel_preScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 5:
-		callLevel_preScreenUpdate_pwr2(num);
-		break;
 	case 6:
 		callLevel_preScreenUpdate_lar1(num);
 		break;
@@ -2796,6 +2787,9 @@ void Game::callLevel_initialize() {
 	case 4:
 		_level = Level_lava_create();
 		break;
+	case 5:
+		_level = Level_pwr2_create();
+		break;
 	default:
 		warning("Level %d class not implemented", _currentLevel);
 		break;
@@ -2806,9 +2800,6 @@ void Game::callLevel_initialize() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 5:
-		callLevel_initialize_pwr2();
-		break;
 	case 6:
 		callLevel_initialize_lar1();
 		break;
@@ -2821,9 +2812,6 @@ void Game::callLevel_tick() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 5:
-		callLevel_tick_pwr2();
-		break;
 	case 6:
 		callLevel_tick_lar1();
 		break;
@@ -2841,7 +2829,6 @@ void Game::callLevel_terminate() {
 		return;
 	}
 	switch (_currentLevel) {
-	case 5:
 	case 6:
 		if (_video->_displayShadowLayer) {
 			free(_transformShadowBuffer);

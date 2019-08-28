@@ -1,10 +1,37 @@
 
 #include "game.h"
+#include "level.h"
 #include "lzw.h"
 #include "paf.h"
 #include "video.h"
 
-void Game::postScreenUpdate_pwr2_screen2() {
+
+struct Level_pwr2: Level {
+        //const CheckpointData *getCheckpointData() = 0;
+
+	virtual void initialize();
+	virtual void terminate();
+	virtual void tick();
+	virtual void preScreenUpdate(int screenNum);
+	virtual void postScreenUpdate(int screenNum);
+	//virtual void setupLvlObjects(int screenNum);
+
+	void postScreenUpdate_pwr2_screen2();
+	void postScreenUpdate_pwr2_screen3();
+	void postScreenUpdate_pwr2_screen5();
+	void postScreenUpdate_pwr2_screen8();
+
+	void preScreenUpdate_pwr2_screen2();
+	void preScreenUpdate_pwr2_screen3();
+	void preScreenUpdate_pwr2_screen5();
+	void preScreenUpdate_pwr2_screen7();
+};
+
+Level *Level_pwr2_create() {
+	return new Level_pwr2;
+}
+
+void Level_pwr2::postScreenUpdate_pwr2_screen2() {
 	uint8_t mask;
 	switch (_res->_screensState[2].s0) {
 	case 1:
@@ -19,29 +46,29 @@ void Game::postScreenUpdate_pwr2_screen2() {
 	}
 	_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = mask;
 	if (_res->_screensState[2].s3 != mask) {
-		setupScreenMask(2);
+		_g->setupScreenMask(2);
 	}
 }
 
-void Game::postScreenUpdate_pwr2_screen3() {
+void Level_pwr2::postScreenUpdate_pwr2_screen3() {
 	if (_res->_currentScreenResourceNum == 3) {
 		if ((_andyObject->flags1 & 0x30) == 0) {
-			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			BoundingBox b = { 115, 27, 127, 55 };
-			if (clipBoundingBox(&b, &data->boundingBox)) {
+			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				uint8_t _al = _andyObject->flags0;
 				if ((_al & 0x1F) == 0 && (_al & 0xE0) == 0xE0) {
-					LvlObject *o = findLvlObject2(0, 0, 3);
+					LvlObject *o = _g->findLvlObject2(0, 0, 3);
 					if (o) {
 						o->objectUpdateType = 7;
 					}
 				} else {
-					LvlObject *o = findLvlObject2(0, 0, 3);
+					LvlObject *o = _g->findLvlObject2(0, 0, 3);
 					if (o) {
 						if (o->objectUpdateType == 4) {
 							_res->_screensState[3].s0 = 2;
 						} else {
-							setAndySpecialAnimation(3);
+							_g->setAndySpecialAnimation(3);
 						}
 					}
 				}
@@ -50,33 +77,33 @@ void Game::postScreenUpdate_pwr2_screen3() {
 	}
 }
 
-void Game::postScreenUpdate_pwr2_screen5() {
+void Level_pwr2::postScreenUpdate_pwr2_screen5() {
 	if (_res->_screensState[5].s0 == 1) {
 		_res->_screensState[5].s0 = 2;
-		if (_levelCheckpoint == 1) {
-			_levelCheckpoint = 2;
+		if (_g->_levelCheckpoint == 1) {
+			_g->_levelCheckpoint = 2;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->play(9);
 			_paf->unload(9);
 		}
 		_video->clearPalette();
-		restartLevel();
+		_g->restartLevel();
 	}
 }
 
-void Game::postScreenUpdate_pwr2_screen8() {
+void Level_pwr2::postScreenUpdate_pwr2_screen8() {
 	if (_res->_screensState[8].s0 != 0) {
 		if (!_paf->_skipCutscenes) {
 			_paf->play(10);
 			_paf->unload(10);
 		}
 		_video->clearPalette();
-		_quit = true;
+		_g->_quit = true;
 	}
 }
 
-void Game::callLevel_postScreenUpdate_pwr2(int num) {
+void Level_pwr2::postScreenUpdate(int num) {
 	switch (num) {
 	case 2:
 		postScreenUpdate_pwr2_screen2();
@@ -96,8 +123,8 @@ void Game::callLevel_postScreenUpdate_pwr2(int num) {
 	}
 }
 
-void Game::preScreenUpdate_pwr2_screen2() {
-	if (_levelCheckpoint == 1) {
+void Level_pwr2::preScreenUpdate_pwr2_screen2() {
+	if (_g->_levelCheckpoint == 1) {
 		if (_res->_screensState[2].s0 == 0) {
 			_res->_screensState[2].s0 = 2;
 			_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = 2;
@@ -105,17 +132,17 @@ void Game::preScreenUpdate_pwr2_screen2() {
 	}
 }
 
-void Game::preScreenUpdate_pwr2_screen3() {
-	if (_res->_currentScreenResourceNum == 3 && _levelCheckpoint == 0) {
-		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+void Level_pwr2::preScreenUpdate_pwr2_screen3() {
+	if (_res->_currentScreenResourceNum == 3 && _g->_levelCheckpoint == 0) {
+		AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 103, 122, 191 };
-		if (clipBoundingBox(&b, &data->boundingBox)) {
-			_levelCheckpoint = 1;
+		if (_g->clipBoundingBox(&b, &data->boundingBox)) {
+			_g->_levelCheckpoint = 1;
 		}
 	}
 }
 
-void Game::preScreenUpdate_pwr2_screen5() {
+void Level_pwr2::preScreenUpdate_pwr2_screen5() {
 	if (_res->_currentScreenResourceNum == 5) {
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(9);
@@ -123,7 +150,7 @@ void Game::preScreenUpdate_pwr2_screen5() {
 	}
 }
 
-void Game::preScreenUpdate_pwr2_screen7() {
+void Level_pwr2::preScreenUpdate_pwr2_screen7() {
 	if (_res->_currentScreenResourceNum == 7) {
 		_res->_screensState[5].s0 = 2; // +0x14
 		if (!_paf->_skipCutscenes) {
@@ -132,7 +159,7 @@ void Game::preScreenUpdate_pwr2_screen7() {
 	}
 }
 
-void Game::callLevel_preScreenUpdate_pwr2(int num) {
+void Level_pwr2::preScreenUpdate(int num) {
 	switch (num) {
 	case 2:
 		preScreenUpdate_pwr2_screen2();
@@ -149,11 +176,16 @@ void Game::callLevel_preScreenUpdate_pwr2(int num) {
 	}
 }
 
-void Game::callLevel_initialize_pwr2() {
-	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(_pwr1_screenTransformData, _transformShadowBuffer);
+void Level_pwr2::initialize() {
+	_g->_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	const int size = decodeLZW(Game::_pwr1_screenTransformData, _g->_transformShadowBuffer);
 	assert(size == 256 * 192);
-	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
+	memcpy(_g->_transformShadowBuffer + 256 * 192, _g->_transformShadowBuffer, 256);
+}
+
+void Level_pwr2::terminate() {
+	free(_g->_transformShadowBuffer);
+	_g->_transformShadowBuffer = 0;
 }
 
 const uint8_t Game::_pwr2_screenTransformLut[] = {
@@ -161,6 +193,6 @@ const uint8_t Game::_pwr2_screenTransformLut[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void Game::callLevel_tick_pwr2() {
-	_video->_displayShadowLayer = _pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
+void Level_pwr2::tick() {
+	_video->_displayShadowLayer = Game::_pwr2_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
 }

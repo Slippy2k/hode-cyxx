@@ -365,22 +365,6 @@ struct Game {
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
 
-	// level6_pwr2.cpp
-	void postScreenUpdate_pwr2_screen2();
-	void postScreenUpdate_pwr2_screen3();
-	void postScreenUpdate_pwr2_screen5();
-	void postScreenUpdate_pwr2_screen8();
-	void callLevel_postScreenUpdate_pwr2(int num);
-
-	void preScreenUpdate_pwr2_screen2();
-	void preScreenUpdate_pwr2_screen3();
-	void preScreenUpdate_pwr2_screen5();
-	void preScreenUpdate_pwr2_screen7();
-	void callLevel_preScreenUpdate_pwr2(int num);
-
-	void callLevel_initialize_pwr2();
-	void callLevel_tick_pwr2();
-
 	// level7_lar1.cpp
 	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
 	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
