@@ -45,5 +45,6 @@ Level *Level_lava_create();
 Level *Level_pwr2_create();
 Level *Level_lar1_create();
 Level *Level_lar2_create();
+Level *Level_dark_create();
 
 #endif

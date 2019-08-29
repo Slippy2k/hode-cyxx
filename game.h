@@ -380,13 +380,6 @@ struct Game {
 	// level7_lar1.cpp
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
-	// level9_dark.cpp
-	void postScreenUpdate_dark_screen0();
-	void callLevel_postScreenUpdate_dark(int num);
-
-	void preScreenUpdate_dark_screen0();
-	void callLevel_preScreenUpdate_dark(int num);
-
 	// monsters.cpp
 	void resetMonsterObject1(MonsterObject1 *m);
 	void initMonsterObject1(MonsterObject1 *m);

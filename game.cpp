@@ -1376,9 +1376,7 @@ void Game::resetScreen() {
 	}
 	resetScreenMask();
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
-		if (_level) {
-			_level->setupLvlObjects(i);
-		}
+		_level->setupLvlObjects(i);
 	}
 	resetCrackSprites();
 }
@@ -2717,33 +2715,11 @@ void Game::levelMainLoop() {
 }
 
 void Game::callLevel_postScreenUpdate(int num) {
-	if (_level) {
-		_level->postScreenUpdate(num);
-		return;
-	}
-	switch (_currentLevel) {
-	case 8:
-		callLevel_postScreenUpdate_dark(num);
-		break;
-	default:
-		warning("callLevel_postScreenUpdate unimplemented for level %d", _currentLevel);
-		break;
-	}
+	_level->postScreenUpdate(num);
 }
 
 void Game::callLevel_preScreenUpdate(int num) {
-	if (_level) {
-		_level->preScreenUpdate(num);
-		return;
-	}
-	switch (_currentLevel) {
-	case 8:
-		callLevel_preScreenUpdate_dark(num);
-		break;
-	default:
-		warning("callLevel_preScreenUpdate unimplemented for level %d", _currentLevel);
-		break;
-	}
+	_level->preScreenUpdate(num);
 }
 
 void Game::callLevel_initialize() {
@@ -2769,28 +2745,25 @@ void Game::callLevel_initialize() {
 	case 6:
 		_level = Level_lar1_create();
 		break;
-	default:
-		warning("Level %d class not implemented", _currentLevel);
+	case 7:
+		_level = Level_lar2_create();
+		break;
+	case 8:
+		_level = Level_dark_create();
 		break;
 	}
-	if (_level) {
-		_level->setPointers(this, _andyObject, _paf, _res, _video);
-		_level->initialize();
-	}
+	_level->setPointers(this, _andyObject, _paf, _res, _video);
+	_level->initialize();
 }
 
 void Game::callLevel_tick() {
-	if (_level) {
-		_level->tick();
-	}
+	_level->tick();
 }
 
 void Game::callLevel_terminate() {
-	if (_level) {
-		_level->terminate();
-		delete _level;
-		_level = 0;
-	}
+	_level->terminate();
+	delete _level;
+	_level = 0;
 }
 
 int Game::displayHintScreen(int num, int pause) {
