@@ -78,6 +78,8 @@ struct Game {
 	static const uint8_t _isld_spritesData[];
 	static const uint8_t _lava_spritesData[];
 	static const uint8_t _lar1_spritesData[];
+	static const int16_t *off_452580[];
+	static uint8_t _lar1_unkData1[];
 	static uint8_t _lar1_unkData0[];
 	static uint8_t _lar2_unkData0[];
 	static BoundingBox _lar1_unkData2[]; // _lar1_bboxData
@@ -356,6 +358,12 @@ struct Game {
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void postScreenUpdate_lava_helper(int yPos);
+	void updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r);
+	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
+	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
+	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
+	void updateLevelTick_lar_helper4(uint8_t *p, int num);
+	int updateLevelTick_lar_helper5(BoundingBox *b, bool flag);
 	void resetCrackSprites();
 	void updateCrackSprites();
 	void captureScreenshot();
@@ -370,12 +378,6 @@ struct Game {
 	int objectUpdate_rock_case4(LvlObject *o);
 
 	// level7_lar1.cpp
-	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
-	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
-	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
-	void updateLevelTick_lar_helper4(uint8_t *p, int num);
-	int updateLevelTick_lar_helper5(BoundingBox *b, bool flag);
-	void updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r);
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
 	void postScreenUpdate_lar1_screen0();
