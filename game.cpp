@@ -1378,15 +1378,6 @@ void Game::resetScreen() {
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
 		if (_level) {
 			_level->setupLvlObjects(i);
-			continue;
-		}
-		switch (_currentLevel) {
-		case 7:
-			callLevel_setupLvlObjects_lar2(i);
-			break;
-		case 8:
-			// none for 'dark'
-			break;
 		}
 	}
 	resetCrackSprites();
@@ -2731,9 +2722,6 @@ void Game::callLevel_postScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 7:
-		callLevel_postScreenUpdate_lar2(num);
-		break;
 	case 8:
 		callLevel_postScreenUpdate_dark(num);
 		break;
@@ -2749,9 +2737,6 @@ void Game::callLevel_preScreenUpdate(int num) {
 		return;
 	}
 	switch (_currentLevel) {
-	case 7:
-		callLevel_preScreenUpdate_lar2(num);
-		break;
 	case 8:
 		callLevel_preScreenUpdate_dark(num);
 		break;
@@ -2797,12 +2782,6 @@ void Game::callLevel_initialize() {
 void Game::callLevel_tick() {
 	if (_level) {
 		_level->tick();
-		return;
-	}
-	switch (_currentLevel) {
-	case 7:
-		callLevel_tick_lar2();
-		break;
 	}
 }
 

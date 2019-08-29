@@ -380,38 +380,6 @@ struct Game {
 	// level7_lar1.cpp
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
-	// level8_lar2.cpp
-	bool postScreenUpdate_lar2_screen2_helper(BoundingBox *b);
-	void postScreenUpdate_lar2_screen2();
-	void postScreenUpdate_lar2_screen3();
-	void postScreenUpdate_lar2_screen4();
-	void postScreenUpdate_lar2_screen5();
-	void postScreenUpdate_lar2_screen6();
-	void postScreenUpdate_lar2_screen7();
-	void postScreenUpdate_lar2_screen8();
-	void postScreenUpdate_lar2_screen10();
-	void postScreenUpdate_lar2_screen11();
-	void postScreenUpdate_lar2_screen12();
-	void postScreenUpdate_lar2_screen13();
-	void postScreenUpdate_lar2_screen19();
-	void callLevel_postScreenUpdate_lar2(int num);
-
-	void preScreenUpdate_lar2_screen2();
-	void preScreenUpdate_lar2_screen4();
-	void preScreenUpdate_lar2_screen5();
-	void preScreenUpdate_lar2_screen6();
-	void preScreenUpdate_lar2_screen7();
-	void preScreenUpdate_lar2_screen8();
-	void preScreenUpdate_lar2_screen9();
-	void preScreenUpdate_lar2_screen15();
-	void preScreenUpdate_lar2_screen19();
-	void callLevel_preScreenUpdate_lar2(int num);
-
-	void callLevel_tick_lar2();
-
-	void setupLvlObjects_lar2_screen19();
-	void callLevel_setupLvlObjects_lar2(int num);
-
 	// level9_dark.cpp
 	void postScreenUpdate_dark_screen0();
 	void callLevel_postScreenUpdate_dark(int num);
