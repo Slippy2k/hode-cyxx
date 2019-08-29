@@ -380,48 +380,6 @@ struct Game {
 	// level7_lar1.cpp
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
-	void postScreenUpdate_lar1_screen0();
-	void postScreenUpdate_lar1_screen3();
-	void postScreenUpdate_lar1_screen4();
-	void postScreenUpdate_lar1_screen5();
-	void postScreenUpdate_lar1_screen8();
-	void postScreenUpdate_lar1_screen9();
-	void postScreenUpdate_lar1_screen12();
-	void postScreenUpdate_lar1_screen13();
-	void postScreenUpdate_lar1_screen14();
-	void postScreenUpdate_lar1_screen15();
-	void postScreenUpdate_lar1_screen16();
-	void postScreenUpdate_lar1_screen18();
-	void postScreenUpdate_lar1_screen19();
-	void postScreenUpdate_lar1_screen20();
-	void postScreenUpdate_lar1_screen22();
-	void postScreenUpdate_lar1_screen24();
-	void callLevel_postScreenUpdate_lar1(int num);
-
-	void preScreenUpdate_lar1_screen0();
-	void preScreenUpdate_lar1_screen2();
-	void preScreenUpdate_lar1_screen6();
-	void preScreenUpdate_lar1_screen8();
-	void preScreenUpdate_lar1_screen10();
-	void preScreenUpdate_lar1_screen11();
-	void preScreenUpdate_lar1_screen12();
-	void preScreenUpdate_lar1_screen13();
-	void preScreenUpdate_lar1_screen14();
-	void preScreenUpdate_lar1_screen15();
-	void preScreenUpdate_lar1_screen16();
-	void preScreenUpdate_lar1_screen17();
-	void preScreenUpdate_lar1_screen18();
-	void preScreenUpdate_lar1_screen19();
-	void preScreenUpdate_lar1_screen20();
-	void preScreenUpdate_lar1_screen23();
-	void preScreenUpdate_lar1_screen24();
-	void callLevel_preScreenUpdate_lar1(int num);
-
-	void callLevel_initialize_lar1();
-	void callLevel_tick_lar1();
-
-	void callLevel_setupLvlObjects_lar1(int num);
-
 	// level8_lar2.cpp
 	bool postScreenUpdate_lar2_screen2_helper(BoundingBox *b);
 	void postScreenUpdate_lar2_screen2();
