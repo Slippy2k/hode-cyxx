@@ -111,9 +111,23 @@ static SssObject *findLowestPrioritySssObject(SssObject *sssObjectsList) {
 	return ret;
 }
 
+static bool isSssObjectInList(SssObject *so, SssObject *sssObjectsList) {
+	for (SssObject *current = sssObjectsList; current; current = current->nextPtr) {
+		if (current == so) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Game::removeSoundObjectFromList(SssObject *so) {
 	so->pcm = 0;
 	if ((so->flags & 1) != 0) {
+
+		if (!isSssObjectInList(so, _sssObjectsList1)) {
+			warning("removeSoundObjectFromList so %p not in _sssObjectsList1", so);
+			return;
+		}
 
 		// remove from linked list1
 		SssObject *next = so->nextPtr;
@@ -139,6 +153,11 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 			}
 		}
 	} else {
+
+		if (!isSssObjectInList(so, _sssObjectsList2)) {
+			warning("removeSoundObjectFromList so %p not in _sssObjectsList2", so);
+			return;
+		}
 
 		// remove from linked list2
 		SssObject *next = so->nextPtr;
@@ -289,6 +308,10 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 
 void Game::sssOp16_resumeSound(SssObject *so) {
 	if ((so->flags & 2) != 0) {
+		if (!isSssObjectInList(so, _sssObjectsList2)) {
+			warning("sssOp16_resumeSound so %p not in _sssObjectsList2, flags 0x%x pcm %p", so, so->flags, so->pcm);
+			return;
+		}
 		SssObject *next = so->nextPtr;
 		SssObject *prev = so->prevPtr;
 		SssPcm *pcm = so->pcm;
@@ -315,6 +338,10 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 		SssObject *next = so->nextPtr;
 		so->pcm = 0;
 		if ((so->flags & 1) != 0) {
+			if (!isSssObjectInList(so, _sssObjectsList1)) {
+				warning("sssOp17_pauseSound so %p not in _sssObjectsList1", so);
+				return;
+			}
 			if (next) {
 				next->prevPtr = prev;
 			}
@@ -336,6 +363,10 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 				}
 			}
 		} else {
+			if (!isSssObjectInList(so, _sssObjectsList2)) {
+				warning("sssOp17_pauseSound so %p not in _sssObjectsList2", so);
+				return;
+			}
 			if (next) {
 				next->prevPtr = prev;
 			}
@@ -703,13 +734,9 @@ void Game::prependSoundObjectToList(SssObject *so) {
 	}
 	if (so->flags & 2) {
 		debug(kDebug_SOUND, "Adding so %p to list2 flags 0x%x", so, so->flags);
-		if (1) {
-			for (SssObject *current = _sssObjectsList2; current; current = current->nextPtr) {
-				if (current == so) {
-					warning("SoundObject %p already in _sssObjectsList2", so);
-					return;
-				}
-			}
+		if (isSssObjectInList(so, _sssObjectsList2)) {
+			warning("prependSoundObjectToList so %p already in _sssObjectsList2", so);
+			return;
 		}
 		so->prevPtr = 0;
 		so->nextPtr = _sssObjectsList2;
@@ -719,13 +746,9 @@ void Game::prependSoundObjectToList(SssObject *so) {
 		_sssObjectsList2 = so;
 	} else {
 		debug(kDebug_SOUND, "Adding so %p to list1 flags 0x%x", so, so->flags);
-		if (1) {
-			for (SssObject *current = _sssObjectsList1; current; current = current->nextPtr) {
-				if (current == so) {
-					warning("SoundObject %p already in _sssObjectsList1", so);
-					return;
-				}
-			}
+		if (isSssObjectInList(so, _sssObjectsList1)) {
+			warning("prependSoundObjectToList so %p already in _sssObjectsList1", so);
+			return;
 		}
 // 429185
 		SssObject *stopSo = so; // _edi
