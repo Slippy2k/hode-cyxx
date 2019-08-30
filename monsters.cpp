@@ -683,70 +683,40 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	m->collideDistance = -1;
 	m->collidePtr = 0;
 // 40ED0D
-	if (_andyShootsCount != 0 && !_specialAnimFlag && (o->flags1 & 6) != 6) {
-		if (m->localVars[7] > 0 || m->localVars[7] < -1) {
-			if ((m->flagsA5 & 0x80) == 0) {
-				for (int i = 0; i < _andyShootsCount; ++i) {
-					AndyShootData *p = &_andyShootsTable[i];
-					if (m->xDelta > 256 || m->yDelta > 192) {
-						continue;
-					}
-					_mstTemp_x1 = o->xPos;
-					_mstTemp_y1 = o->yPos;
-					_mstTemp_x2 = o->xPos + o->width - 1;
-					_mstTemp_y2 = o->yPos + o->height - 1;
-					uint8_t _al = p->type;
-					if (_al == 1 || _al == 2) {
+	if (_andyShootsCount != 0 && !_specialAnimFlag && (o->flags1 & 6) != 6 && (m->localVars[7] > 0 || m->localVars[7] < -1) && (m->flagsA5 & 0x80) == 0) {
+		for (int i = 0; i < _andyShootsCount; ++i) {
+			AndyShootData *p = &_andyShootsTable[i];
+			if (m->xDelta > 256 || m->yDelta > 192) {
+				continue;
+			}
+			_mstTemp_x1 = o->xPos;
+			_mstTemp_y1 = o->yPos;
+			_mstTemp_x2 = o->xPos + o->width - 1;
+			_mstTemp_y2 = o->yPos + o->height - 1;
+			uint8_t _al = p->type;
+			if (_al == 1 || _al == 2) {
 // 40EED8
-						if (p->monsterDistance >= m->xDelta + m->yDelta) {
-							if (o->screenNum != _currentScreen) {
-								const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
-								const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
-								_mstTemp_x1 += dx;
-								_mstTemp_x2 += dx;
-								_mstTemp_y1 += dy;
-								_mstTemp_y2 += dy;
-							}
+				if (p->monsterDistance >= m->xDelta + m->yDelta) {
+					if (o->screenNum != _currentScreen) {
+						const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
+						const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
+						_mstTemp_x1 += dx;
+						_mstTemp_x2 += dx;
+						_mstTemp_y1 += dy;
+						_mstTemp_y2 += dy;
+					}
 // 40EF72
-							if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
-								const uint8_t type = m->monsterInfos[944];
-								if (((type & 9) == 0 && clipLvlObjectsSmall(p->o, o, 132)) || ((type & 9) != 0 && clipLvlObjectsSmall(p->o, o, 20))) {
-									p->m = m;
-									p->monsterDistance = m->xDelta + m->yDelta;
-									p->clipX = _clipBoxOffsetX;
-									p->clipY = _clipBoxOffsetY;
-								}
-							}
+					if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
+						const uint8_t type = m->monsterInfos[944];
+						if (((type & 9) == 0 && clipLvlObjectsSmall(p->o, o, 132)) || ((type & 9) != 0 && clipLvlObjectsSmall(p->o, o, 20))) {
+							p->m = m;
+							p->monsterDistance = m->xDelta + m->yDelta;
+							p->clipX = _clipBoxOffsetX;
+							p->clipY = _clipBoxOffsetY;
+						}
+					}
 // 40F009
-							if (o->screenNum != _currentScreen) {
-								const int dx = _res->_mstPointOffsets[_currentScreen].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
-								const int dy = _res->_mstPointOffsets[_currentScreen].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
-								_mstTemp_x1 += dx;
-								_mstTemp_x2 += dx;
-								_mstTemp_y1 += dy;
-								_mstTemp_y2 += dy;
-							}
-						}
-// 40F087
-					} else if (_al == 3 && p->monsterDistance > m->xDelta + m->yDelta) {
-						if (o->screenNum != _currentScreen) {
-							const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
-							const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
-							_mstTemp_x1 += dx;
-							_mstTemp_x2 += dx;
-							_mstTemp_y1 += dy;
-							_mstTemp_y2 += dy;
-						}
-// 40EE68
-						if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
-							if (testPlasmaCannonPointsDirection(_mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
-								p->monsterDistance = m->xDelta + m->yDelta;
-								p->m = m;
-								p->plasmaCannonPointsCount = _plasmaCannonLastIndex1;
-							}
-// 40F004
-						}
-// 40F009
+					if (o->screenNum != _currentScreen) {
 						const int dx = _res->_mstPointOffsets[_currentScreen].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
 						const int dy = _res->_mstPointOffsets[_currentScreen].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
 						_mstTemp_x1 += dx;
@@ -754,21 +724,47 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 						_mstTemp_y1 += dy;
 						_mstTemp_y2 += dy;
 					}
+				}
+// 40F087
+			} else if (_al == 3 && p->monsterDistance > m->xDelta + m->yDelta) {
+				if (o->screenNum != _currentScreen) {
+					const int dx = _res->_mstPointOffsets[o->screenNum].xOffset - _res->_mstPointOffsets[_currentScreen].xOffset;
+					const int dy = _res->_mstPointOffsets[o->screenNum].yOffset - _res->_mstPointOffsets[_currentScreen].yOffset;
+					_mstTemp_x1 += dx;
+					_mstTemp_x2 += dx;
+					_mstTemp_y1 += dy;
+					_mstTemp_y2 += dy;
+				}
+// 40EE68
+				if (_mstTemp_x2 >= 0 && _mstTemp_x1 <= 255 && _mstTemp_y2 >= 0 && _mstTemp_y1 <= 191) {
+					if (testPlasmaCannonPointsDirection(_mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
+						p->monsterDistance = m->xDelta + m->yDelta;
+						p->m = m;
+						p->plasmaCannonPointsCount = _plasmaCannonLastIndex1;
+					}
+// 40F004
+				}
+// 40F009
+				const int dx = _res->_mstPointOffsets[_currentScreen].xOffset - _res->_mstPointOffsets[o->screenNum].xOffset;
+				const int dy = _res->_mstPointOffsets[_currentScreen].yOffset - _res->_mstPointOffsets[o->screenNum].yOffset;
+				_mstTemp_x1 += dx;
+				_mstTemp_x2 += dx;
+				_mstTemp_y1 += dy;
+				_mstTemp_y2 += dy;
+			}
 // 40F087
 // 40F08C
-					_mstTemp_x1 += _res->_mstPointOffsets[o->screenNum].xOffset;
-					_mstTemp_y1 += _res->_mstPointOffsets[o->screenNum].yOffset;
-					_mstTemp_x2 += _res->_mstPointOffsets[o->screenNum].xOffset;
-					_mstTemp_y2 += _res->_mstPointOffsets[o->screenNum].yOffset;
-					int res = getMstDistance((m->monsterInfos[946] & 2) != 0 ? p->boundingBox.y2 : m->yMstPos, p);
-					if (res < 0) {
-						continue;
-					}
-					if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->collidePtr->type & 1) == 0 && p->type == 2)) {
-						m->collidePtr = p;
-						m->collideDistance = res;
-					}
-				}
+			_mstTemp_x1 += _res->_mstPointOffsets[o->screenNum].xOffset;
+			_mstTemp_y1 += _res->_mstPointOffsets[o->screenNum].yOffset;
+			_mstTemp_x2 += _res->_mstPointOffsets[o->screenNum].xOffset;
+			_mstTemp_y2 += _res->_mstPointOffsets[o->screenNum].yOffset;
+			int res = getMstDistance((m->monsterInfos[946] & 2) != 0 ? p->boundingBox.y2 : m->yMstPos, p);
+			if (res < 0) {
+				continue;
+			}
+			if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->collidePtr->type & 1) == 0 && p->type == 2)) {
+				m->collidePtr = p;
+				m->collideDistance = res;
 			}
 		}
 	}
