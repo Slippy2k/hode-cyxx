@@ -12,6 +12,8 @@ enum {
 
 static const bool kLimitSounds = false; // limit the number of active playing sounds
 
+// if x < 90, f(x) = x / 2
+// if x > 90, f(x) = 45 + (x - 90) * 2
 static const uint8_t _volumeRampTable[129] = {
 	0x00, 0x01, 0x01, 0x02, 0x02, 0x02, 0x03, 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06,
 	0x06, 0x07, 0x07, 0x07, 0x08, 0x08, 0x09, 0x09, 0x09, 0x0A, 0x0A, 0x0B, 0x0B, 0x0C, 0x0C, 0x0C,
@@ -1269,11 +1271,10 @@ void Game::mixSoundObjects17640(bool flag) {
 		SssObject *so = &_sssObjectsTable[i];
 		if (so->pcm && !_sssUpdatedObjectsTable[i]) {
 			if (flag) {
-				const uint32_t mask = 1 << (so->flags1 >> 24);
-				if ((*getSssLutPtr(_res, 2, so->flags1) & mask) != 0) {
-					if ((*getSssLutPtr(_res, 3, so->flags1) & mask) == 0) {
-						expireSoundObjects(so->flags1);
-					}
+				const uint32_t flags = so->flags0;
+				const uint32_t mask = 1 << (flags >> 24);
+				if ((*getSssLutPtr(_res, 2, flags) & mask) != 0 && (*getSssLutPtr(_res, 3, flags) & mask) == 0) {
+					expireSoundObjects(flags);
 				}
 			}
 			updateSoundObject(so);
