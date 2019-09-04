@@ -62,38 +62,6 @@ FILE *android_fopen(const char *fname, const char *mode) {
 	return fopen(fname, mode);
 }
 
-char **android_listAssets(int *filesCount) {
-	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "android_listAssets");
-	int count = 0;
-	char **fnames = 0;
-	static const char *assetsDirs[] = { "", "DATA", "DATA/SOUND", 0 };
-	for (int i = 0; assetsDirs[i]; ++i) {
-		AAssetDir *dir = AAssetManager_openDir(_assetManager, assetsDirs[i]);
-		__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "android_listAssets dir '%s' %p", assetsDirs[i], dir);
-		if (dir) {
-			const bool prependDir = strlen(assetsDirs[i]) > 0;
-			const char *fname;
-			while ((fname = AAssetDir_getNextFileName(dir)) != 0) {
-				fnames = (char **)realloc(fnames, (count + 1) * sizeof(char *));
-				if (fnames) {
-					if (prependDir) {
-						char filepath[MAXPATHLEN];
-						snprintf(filepath, sizeof(filepath), "%s/%s", assetsDirs[i], fname);
-						fnames[count] = strdup(filepath);
-					} else {
-						fnames[count] = strdup(fname);
-					}
-					++count;
-				}
-				__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "android_listAssets '%s' count %d", fname, count);
-			}
-			AAssetDir_close(dir);
-		}
-	}
-	*filesCount = count;
-	return fnames;
-}
-
 //
 // FileSystem
 //
