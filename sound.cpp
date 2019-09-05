@@ -1208,8 +1208,8 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			so->panR = 0;
 			return;
 		}
-		int _edx = _volumeRampTable[volume];
-		int _eax = _edx << 7;
+		int _edx = _volumeRampTable[volume]; // 0..128
+		int _eax = _edx << 7; // 0..16384
 		switch (panning) {
 		case 0: // full left
 			so->panL = _eax;
