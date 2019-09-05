@@ -952,7 +952,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 			so->filter = filter;
 			so->volume = sample->initVolume;
 			so->panning = sample->initPanning;
-			if (sample->initPanning == 0xFF) {
+			if (sample->initPanning == -1) {
 				if (_currentSoundLvlObject) {
 					_currentSoundLvlObject->sssObject = so;
 					so->panningPtr = &_snd_masterPanning;
