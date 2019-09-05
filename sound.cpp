@@ -997,7 +997,6 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 			if (compareSssLut(so->flags0, flags)) {
 				return 0;
 			}
-			so = so->nextPtr;
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssLut(so->flags0, flags)) {
