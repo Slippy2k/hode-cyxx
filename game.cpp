@@ -4335,6 +4335,7 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 			if (_cl != 1 || _al != _cl) {
 				continue;
 			}
+			_edi[3] = 4;
 		} else {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
@@ -4354,10 +4355,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 				if (_cl != 1 || _al != _cl) {
 					continue;
 				}
+				_edi[3] = 4;
 			}
 		}
-// 406CCC
-		_edi[3] = 4;
 	}
 }
 
