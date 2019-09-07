@@ -257,21 +257,7 @@ void Game::updateSoundObject(SssObject *so) {
 			_currentSoundLvlObject = tmp;
 			return;
 		}
-		const uint32_t mask = 1 << (flags >> 24);
-		uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
-		if ((*sssLut2 & mask) != 0) {
-			for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-				if (compareSssLut(so->flags0, flags)) {
-					return;
-				}
-			}
-			for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-				if (compareSssLut(so->flags0, flags)) {
-					return;
-				}
-			}
-			*sssLut2 &= ~mask;
-		}
+		updateSssLut2(flags);
 	}
 }
 
@@ -790,15 +776,10 @@ void Game::prependSoundObjectToList(SssObject *so) {
 				if (kLimitSounds) {
 					if (_playingSssObjectsCount < _playingSssObjectsMax) {
 						_lowPrioritySssObject = 0;
-					} else {
-						if (_lowPrioritySssObject == 0) {
-							_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
-						} else {
-// 429269
-							if (so->currentPriority < _lowPrioritySssObject->currentPriority) {
-								_lowPrioritySssObject = so;
-							}
-						}
+					} else if (!_lowPrioritySssObject) {
+						_lowPrioritySssObject = findLowestPrioritySssObject(_sssObjectsList1);
+					} else if (so->currentPriority < _lowPrioritySssObject->currentPriority) {
+						_lowPrioritySssObject = so;
 					}
 				}
 			}
@@ -990,21 +971,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 		executeSssCode(&tmpObj, code, true);
 	}
 // 42B57C
-	const uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut2 = getSssLutPtr(_res, 2, flags);
-	if ((*sssLut2 & mask) != 0) {
-		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, flags)) {
-				return 0;
-			}
-		}
-		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, flags)) {
-				return 0;
-			}
-		}
-		*sssLut2 &= ~mask;
-	}
+	updateSssLut2(flags);
 	return 0;
 }
 
