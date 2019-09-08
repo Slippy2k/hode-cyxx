@@ -108,8 +108,8 @@ void Game::initMonsterObject1(MonsterObject1 *m) {
 	const uint8_t *ptr = m->monsterInfos;
 	const int num = (~m->flagsA5) & 1;
 
-	m->x1 = m->m44Unk1->unk2C[0][num] - READ_LE_UINT32(ptr + 904); // x2 ?
-	m->x2 = m->m44Unk1->unk2C[1][num] + READ_LE_UINT32(ptr + 904); // x1 ?
+	m->levelBounds_x2 = m->m44Unk1->unk2C[0][num] - READ_LE_UINT32(ptr + 904); // right x coordinate
+	m->levelBounds_x1 = m->m44Unk1->unk2C[1][num] + READ_LE_UINT32(ptr + 904); // left x coordinate
 	m->y1 = m->m44Unk1->unk2C[2][num] - READ_LE_UINT32(ptr + 908); // y2 ?
 	m->y2 = m->m44Unk1->unk2C[3][num] + READ_LE_UINT32(ptr + 908); // y1 ?
 
@@ -262,11 +262,11 @@ bool Game::updateMonsterObject1PositionHelper(MonsterObject1 *m) {
 
 	int x = m->xMstPos; // _ebp
 	int y = m->yMstPos; // _edx
-	if (m->x2 >= 0) {
-		if (x < m->x2) {
-			x = m->x2;
-		} else if (x > m->x1) {
-			x = m->x1;
+	if (m->levelBounds_x1 >= 0) {
+		if (x < m->levelBounds_x1) {
+			x = m->levelBounds_x1;
+		} else if (x > m->levelBounds_x2) {
+			x = m->levelBounds_x2;
 		}
 		if (y < m->y2) {
 			y = m->y2;
@@ -1189,8 +1189,8 @@ void Game::executeMstCodeHelper1() {
 			}
 			MstUnk44Unk1 *m44Unk1 = m->m44Unk1;
 			const int num = (~m->flagsA5) & 1;
-			m->x1 = m44Unk1->unk2C[0][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
-			m->x2 = m44Unk1->unk2C[1][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
+			m->levelBounds_x2 = m44Unk1->unk2C[0][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
+			m->levelBounds_x1 = m44Unk1->unk2C[1][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
 			m->y1 = m44Unk1->unk2C[2][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
 			m->y2 = m44Unk1->unk2C[3][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
 		}
@@ -1271,10 +1271,10 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 	int _ebp, _edi, _esi, _eax;
 	if (m->flags4B == 0xFD) {
 		MstUnk49 *m49 = m->m49;
-		if (m->x1 > _mstAndyLevelPosX + m49->unk14 - m->unk68 && m->x2 < _mstAndyLevelPosX + m->unk68 - m49->unk14 && m->y1 > _mstAndyLevelPosY + m49->unk15 - m->unk70 && m->y2 < _mstAndyLevelPosY + m49->unk15 + m->unk70) {
+		if (m->levelBounds_x2 > _mstAndyLevelPosX + m49->unk14 - m->unk68 && m->levelBounds_x1 < _mstAndyLevelPosX + m->unk68 - m49->unk14 && m->y1 > _mstAndyLevelPosY + m49->unk15 - m->unk70 && m->y2 < _mstAndyLevelPosY + m49->unk15 + m->unk70) {
 			var18 = _mstAndyLevelPosX + m49->unk14 + m->unk64;
-			if (m->x1 < var18) {
-				if (m->x2 > _mstAndyLevelPosX - m->unk64 - m49->unk14 && m->y1 < _mstAndyLevelPosY + m49->unk15 + m->unk6C && m->y2 > _mstAndyLevelPosY - m->unk6C - m49->unk15) {
+			if (m->levelBounds_x2 < var18) {
+				if (m->levelBounds_x1 > _mstAndyLevelPosX - m->unk64 - m49->unk14 && m->y1 < _mstAndyLevelPosY + m49->unk15 + m->unk6C && m->y2 > _mstAndyLevelPosY - m->unk6C - m49->unk15) {
 					goto l41B2DC;
 				}
 			}
@@ -1282,7 +1282,7 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 			int tmp = var18;
 			var18 = 0;
 			_ebp = 0x40000000;
-			if (m->x1 >= tmp) {
+			if (m->levelBounds_x2 >= tmp) {
 				if (m->xMstPos > _mstAndyLevelPosX + m->unk68) {
 					_ebp = m->xMstPos - m->unk64 - _mstAndyLevelPosX;
 // 41B191
@@ -1309,7 +1309,7 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 			}
 // 41B1BE
 			_edi = 0x40000000;
-			if (m->x2 <= _mstAndyLevelPosX - m->unk64 - m49->unk14) {
+			if (m->levelBounds_x1 <= _mstAndyLevelPosX - m->unk64 - m49->unk14) {
 				if (m->xMstPos > _mstAndyLevelPosX - m->unk64) {
 					_edi = m->xMstPos - _mstAndyLevelPosX  + m->unk68;
 					if (_edi >= 0 && _edi < m49->unk14) {
@@ -1436,16 +1436,16 @@ l41B2DC:
 // 41B3C0
 	switch (var1C & 0xF0) {
 	case 0x00:
-		m->unk74 = m->unk64;
-		m->unk7C = m->unk68;
+		m->goalPos_x1 = m->unk64;
+		m->goalPos_x2 = m->unk68;
 		break;
 	case 0x10:
-		m->unk74 = -m->unk68;
-		m->unk7C = -m->unk64;
+		m->goalPos_x1 = -m->unk68;
+		m->goalPos_x2 = -m->unk64;
 		break;
 	case 0x20:
-		m->unk74 = -m->unk68;
-		m->unk7C =  m->unk68;
+		m->goalPos_x1 = -m->unk68;
+		m->goalPos_x2 =  m->unk68;
 		break;
 	}
 // 41B404
@@ -1464,8 +1464,8 @@ l41B2DC:
 		break;
 	}
 // 41B442
-	m->unk74 += _mstAndyLevelPosX;
-	m->unk7C += _mstAndyLevelPosX;
+	m->goalPos_x1 += _mstAndyLevelPosX;
+	m->goalPos_x2 += _mstAndyLevelPosX;
 	m->unk78 += _mstAndyLevelPosY;
 	m->unk80 += _mstAndyLevelPosY;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
@@ -1473,7 +1473,7 @@ l41B2DC:
 		m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 	}
 	if ((ptr[2] & 0xA) == 0) {
-		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
+		m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
 	}
 }
 
@@ -1492,20 +1492,20 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 		m->unkBC = -1;
 	}
 	m->task->flags &= ~0x80;
-	if (m->xMstPos < m->unk74) {
-		int x = m->unk7C;
+	if (m->xMstPos < m->goalPos_x1) {
+		int x = m->goalPos_x2;
 		_xMstPos1 = x;
-		if (x > m->x1) {
-			x = m->x1;
+		if (x > m->levelBounds_x2) {
+			x = m->levelBounds_x2;
 			m->task->flags |= 0x80;
 		}
 		m->flags4A = 2;
 		_xMstPos2 = x - m->xMstPos;
-	} else if (m->xMstPos > m->unk7C) {
-		int x = m->unk74;
+	} else if (m->xMstPos > m->goalPos_x2) {
+		int x = m->goalPos_x1;
 		_xMstPos1 = x;
-		if (x < m->x2) {
-			x = m->x2;
+		if (x < m->levelBounds_x1) {
+			x = m->levelBounds_x1;
 			m->task->flags |= 0x80;
 		}
 		m->flags4A = 8;
@@ -1563,13 +1563,13 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			_xMstPos1 = _xMstPos3;
 			_yMstPos1 = _yMstPos3;
 			_cl = _edi - _al;
-			m->unk74 = m->unk7C = _xMstPos1;
+			m->goalPos_x1 = m->goalPos_x2 = _xMstPos1;
 			m->unk78 = m->unk80 = _yMstPos1;
 			_xMstPos2 = ABS(m->xMstPos - _xMstPos1);
 			_yMstPos2 = ABS(m->yMstPos - _yMstPos1);
-			if (m->xMstPos < m->unk74) {
+			if (m->xMstPos < m->goalPos_x1) {
 				m->flags4A = 2;
-			} else if (m->xMstPos > m->unk7C) {
+			} else if (m->xMstPos > m->goalPos_x2) {
 				m->flags4A = 8;
 			}
 			if (m->yMstPos < m->unk78) {
@@ -1779,12 +1779,12 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		int _edi = m->xMstPos;
 		if (var4 & 8) {
 			_edi -= _ecx;
-			if (_edi < m->x2) {
+			if (_edi < m->levelBounds_x1) {
 				continue;
 			}
 		} else if (var4 & 2) {
 			_edi += _ecx;
-			if (_edi > m->x1) {
+			if (_edi > m->levelBounds_x2) {
 				continue;
 			}
 		}
@@ -1835,7 +1835,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 			if (r > 0) {
 // 41AEA3
 				MstBoundingBox *b = &_mstBoundingBoxesTable[r - 1];
-				if (m->unk7C < b->x1 || m->unk74 > b->x2 || m->unk80 < b->y1 || m->unk78 > b->y2) {
+				if (m->goalPos_x2 < b->x1 || m->goalPos_x1 > b->x2 || m->unk80 < b->y1 || m->unk78 > b->y2) {
 					break;
 				}
 			} else {
@@ -2429,8 +2429,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		AndyShootData *var14 = m->collidePtr;
 		if (t->run != &Game::mstTask_monsterWait5 && t->run != &Game::mstTask_monsterWait6 && t->run != &Game::mstTask_monsterWait7 && t->run != &Game::mstTask_monsterWait8 && t->run != &Game::mstTask_monsterWait9 && t->run != &Game::mstTask_monsterWait10) {
 			if (m->monsterInfos[946] & 2) {
-				_mstCurrentMonster1->unk74 = _mstCurrentMonster1->unk78 = 0x80000000;
-				_mstCurrentMonster1->unk7C = _mstCurrentMonster1->unk80 = 0x7FFFFFFF;
+				_mstCurrentMonster1->goalPos_x1 = _mstCurrentMonster1->unk78 = INT32_MIN;
+				_mstCurrentMonster1->goalPos_x2 = _mstCurrentMonster1->unk80 = INT32_MAX;
 				switch (var14->directionMask) {
 				case 0:
 					var28 = 2;
@@ -2498,12 +2498,12 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 					_mstTemp_x1 = m->xMstPos + x1;
 				}
 				if (_mstTemp_x1 < m->xMstPos) {
-					if (_mstTemp_x1 < m->unk74) {
+					if (_mstTemp_x1 < m->goalPos_x1) {
 						dirMask = 8;
 					}
 					_ebp = 8;
 				} else if (_mstTemp_x1 > m->xMstPos) {
-					if (_mstTemp_x1 > m->unk7C) {
+					if (_mstTemp_x1 > m->goalPos_x2) {
 						dirMask = 2;
 					}
 					_ebp = 2;
@@ -3216,7 +3216,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			t->flags |= 0x80;
 			return 0;
 		}
-		if (((var10 & 8) != 0 && _edi < m->x2) || ((var10 & 2) != 0 && _edi > m->x1) || ((var10 & 1) != 0 && (_ebp < m->y2))) {
+		if (((var10 & 8) != 0 && _edi < m->levelBounds_x1) || ((var10 & 2) != 0 && _edi > m->levelBounds_x2) || ((var10 & 1) != 0 && (_ebp < m->y2))) {
 			t->flags |= 0x80;
 			return 0;
 		}
@@ -3608,12 +3608,12 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		break;
 	case 18:
 		if (t->monster1) {
-			return ABS(t->monster1->x2 - t->monster1->xMstPos);
+			return ABS(t->monster1->levelBounds_x1 - t->monster1->xMstPos);
 		}
 		break;
 	case 19:
 		if (t->monster1) {
-			return ABS(t->monster1->x1 - t->monster1->xMstPos);
+			return ABS(t->monster1->levelBounds_x2 - t->monster1->xMstPos);
 		}
 		break;
 	case 20:
@@ -5117,8 +5117,8 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		break;
 	}
 // 41BD34
-	m->unk74 = m->unk64;
-	m->unk7C = m->unk68;
+	m->goalPos_x1 = m->unk64;
+	m->goalPos_x2 = m->unk68;
 	m->unk78 = m->unk6C;
 	m->flagsA8[2] = 255;
 	m->unkC0 = -1;
@@ -5134,9 +5134,9 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 	if ((ptr[2] & 0xA) == 0) {
 		m->unk64 = m->xMstPos;
-		m->unk74 = m->xMstPos;
+		m->goalPos_x1 = m->xMstPos;
 		m->unk68 = m->xMstPos;
-		m->unk7C = m->xMstPos;
+		m->goalPos_x2 = m->xMstPos;
 	}
 // 41BDA9
 	if (m->monsterInfos[946] & 4) {
@@ -5255,11 +5255,11 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 // 41C355
 		if (t->run == &Game::mstTask_monsterWait6) {
 			if (m->flags4B == 0xFD && m->xMstPos < _mstAndyLevelPosX) {
-				m->unk74 = _mstAndyLevelPosX - m->unk68;
-				m->unk7C = _mstAndyLevelPosX - m->unk64;
+				m->goalPos_x1 = _mstAndyLevelPosX - m->unk68;
+				m->goalPos_x2 = _mstAndyLevelPosX - m->unk64;
 			} else {
-				m->unk74 = _mstAndyLevelPosX + m->unk64;
-				m->unk7C = _mstAndyLevelPosX + m->unk68;
+				m->goalPos_x1 = _mstAndyLevelPosX + m->unk64;
+				m->goalPos_x2 = _mstAndyLevelPosX + m->unk68;
 			}
 		}
 // 41C399
@@ -5392,11 +5392,11 @@ l1:
 							}
 							if ((var8 || var4) && m->monsterInfos[944] != 10 && m->monsterInfos[944] != 16 && m->monsterInfos[944] != 9) {
 								if (_esi <= 0) {
-									if (m->x2 > _ebx) { // var44
+									if (m->levelBounds_x1 > _ebx) { // var44
 										continue;
 									}
 								} else {
-									if (m->x1 < _ebx) { // var44
+									if (m->levelBounds_x2 < _ebx) { // var44
 										continue;
 									}
 								}
@@ -5488,11 +5488,11 @@ l2:
 							}
 							if ((var8 || var4) && m->monsterInfos[944] != 10 && m->monsterInfos[944] != 16 && m->monsterInfos[944] != 9) {
 								if (_esi <= 0) {
-									if (m->x2 > _ebx) { // var44
+									if (m->levelBounds_x1 > _ebx) { // var44
 										continue;
 									}
 								} else {
-									if (m->x1 < _ebx) { // var44
+									if (m->levelBounds_x2 < _ebx) { // var44
 										continue;
 									}
 								}
@@ -6405,28 +6405,28 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 	Task *t = m->task;
 	t->flags &= ~0x80;
 	int x = m->xMstPos;
-	if (x < m->unk74) {
-		_xMstPos1 = x = m->unk7C;
+	if (x < m->goalPos_x1) {
+		_xMstPos1 = x = m->goalPos_x2;
 		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x > m->unk84) {
 			t->flags |= 0x80;
 			x = m->unk84;
 		}
-		if (x > m->x1) {
+		if (x > m->levelBounds_x2) {
 			t->flags |= 0x80;
-			x = m->x1;
+			x = m->levelBounds_x2;
 		}
 		_xMstPos2 = x - m->xMstPos;
 		m->flags4A = 2; // go right
-	} else if (x > m->unk7C) {
+	} else if (x > m->goalPos_x2) {
 // 41A2AA
-		_xMstPos1 = x = m->unk74;
+		_xMstPos1 = x = m->goalPos_x1;
 		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x < m->unk88) {
 			t->flags |= 0x80;
 			x = m->unk88;
 		}
-		if (x < m->x2) {
+		if (x < m->levelBounds_x1) {
 			t->flags |= 0x80;
-			x = m->x2;
+			x = m->levelBounds_x1;
 		}
 		_xMstPos2 = m->xMstPos - x;
 		m->flags4A = 8; // go left
@@ -6499,10 +6499,10 @@ bool Game::mstIsMonsterFacingDirection(MonsterObject1 *m, int x, int y, uint8_t 
 	if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && !mstSetCurrentPos(m, x, y)) {
 		return true;
 	}
-	if ((dir & 8) != 0 && x < m->x2) {
+	if ((dir & 8) != 0 && x < m->levelBounds_x1) {
 		return true;
 	}
-	if ((dir & 2) != 0 && x > m->x1) {
+	if ((dir & 2) != 0 && x > m->levelBounds_x2) {
 		return true;
 	}
 	if ((dir & 1) != 0 && y < m->y2) {
@@ -6579,11 +6579,11 @@ int Game::executeMstOp67Type1(Task *t) {
 	}
 	m->unk68 -= _edi;
 	m->unk64 += _edi;
-	m->unk74 = m->unk64;
-	m->unk7C = m->unk68;
+	m->goalPos_x1 = m->unk64;
+	m->goalPos_x2 = m->unk68;
 	const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr1[2] & 0xA) == 0) {
-		m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
+		m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
 	}
 // 41C62E
 	if (m->monsterInfos[946] & 2) {
@@ -6749,8 +6749,8 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		m->unk68 = m->unk64 + READ_LE_UINT32(m->monsterInfos + 896);
 		m->unk6C = READ_LE_UINT32(m->monsterInfos + 900);
 		m->unk70 = m->unk6C + READ_LE_UINT32(m->monsterInfos + 896);
-		m->unk74 = m->unk64;
-		m->unk7C = m->unk68;
+		m->goalPos_x1 = m->unk64;
+		m->goalPos_x2 = m->unk68;
 		m->unk78 = m->unk6C;
 		m->unk80 = m->unk70;
 		const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
@@ -6758,7 +6758,7 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 			m->unk6C = m->unk78 = m->unk70 = m->unk80 = m->yMstPos;
 		}
 		if ((ptr1[2] & 0xA) == 0) {
-			m->unk64 = m->unk74 = m->unk68 = m->unk7C = m->xMstPos;
+			m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
 		}
 		if (p[946] & 4) {
 			executeMstUnk4(m);
@@ -6792,12 +6792,12 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		m->unk64 += r;
 		m->unk68 -= r;
 		if (m->flags4B == 0 && m->xMstPos < _mstAndyLevelPosX) {
-			m->unk74 = _mstAndyLevelPosX - m->unk68;
-			m->unk7C = _mstAndyLevelPosX - m->unk64;
+			m->goalPos_x1 = _mstAndyLevelPosX - m->unk68;
+			m->goalPos_x2 = _mstAndyLevelPosX - m->unk64;
 		} else {
 // 41CEA1
-			m->unk74 = _mstAndyLevelPosX + m->unk64;
-			m->unk7C = _mstAndyLevelPosX + m->unk68;
+			m->goalPos_x1 = _mstAndyLevelPosX + m->unk64;
+			m->goalPos_x2 = _mstAndyLevelPosX + m->unk68;
 		}
 // 41CEB4
 		mstSetHorizontalBounds(m);
@@ -7075,7 +7075,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		_rnd.resetMst(m->rnd_m35);
 		_rnd.resetMst(m->rnd_m49);
 
-		m->x2 = -1;
+		m->levelBounds_x1 = -1;
 		MstUnk46Unk1 *m46Unk1 = m->m46Unk1;
 		m->m44Unk1 = _res->_mstUnk44[m46Unk1->indexUnk44].data;
 
@@ -7364,11 +7364,11 @@ int Game::mstTask_monsterWait6(Task *t) {
 	debug(kDebug_MONSTER, "mstTask_monsterWait6 t %p", t);
 	MonsterObject1 *m = t->monster1;
 	if (m->flags4B == 0xFD && m->xMstPos < _mstAndyLevelPosX) {
-		m->unk74 = _mstAndyLevelPosX - m->unk68;
-		m->unk7C = _mstAndyLevelPosX - m->unk64;
+		m->goalPos_x1 = _mstAndyLevelPosX - m->unk68;
+		m->goalPos_x2 = _mstAndyLevelPosX - m->unk64;
 	} else {
-		m->unk74 = _mstAndyLevelPosX + m->unk64;
-		m->unk7C = _mstAndyLevelPosX + m->unk68;
+		m->goalPos_x1 = _mstAndyLevelPosX + m->unk64;
+		m->goalPos_x2 = _mstAndyLevelPosX + m->unk68;
 	}
 	mstSetHorizontalBounds(m);
 	if (_xMstPos2 < m->m49Unk1->unk8) {

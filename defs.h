@@ -368,16 +368,16 @@ struct MonsterObject1 {
 	int unk68; // 0x68 x
 	int unk6C; // 0x6C y
 	int unk70; // 0x70 y
-	int unk74; // 0x74 x
+	int goalPos_x1; // 0x74
 	int unk78; // 0x78 y
-	int unk7C; // 0x7C x
+	int goalPos_x2; // 0x7C
 	int unk80; // 0x80 y
 	int unk84; // 0x84 x
 	int unk88; // 0x88 y
 	int unk8C; // 0x8C
 	int unk90; // 0x90
-	int x1; // right 0x94
-	int x2; // left 0x98
+	int levelBounds_x2; // 0x94
+	int levelBounds_x1; // 0x98
 	int y1; // top 0x9C
 	int y2; // bottom 0xA0
 	uint8_t flagsA4; // 0xA4
