@@ -4264,13 +4264,13 @@ int Game::mstTask_main(Task *t) {
 		case 197: // 49
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				MstOp49Data *m = &_res->_mstOp49Data[num];
-				const uint32_t mask = m->unk8;
-				int a = getTaskVar(t, m->unk0, (mask >> 16) & 15); // var1C
-				int b = getTaskVar(t, m->unk2, (mask >> 12) & 15); // x2
-				int c = getTaskVar(t, m->unk4, (mask >>  8) & 15); // var14
-				int d = getTaskVar(t, m->unk6, (mask >>  4) & 15); // _esi
-				int e = getTaskVar(t, m->unkE,  mask        & 15); // _eax
+				MstOp49Data *op49Data = &_res->_mstOp49Data[num];
+				const uint32_t mask = op49Data->maskVars;
+				int a = getTaskVar(t, op49Data->unk0, (mask >> 16) & 15); // var1C
+				int b = getTaskVar(t, op49Data->unk2, (mask >> 12) & 15); // x2
+				int c = getTaskVar(t, op49Data->unk4, (mask >>  8) & 15); // var14
+				int d = getTaskVar(t, op49Data->unk6, (mask >>  4) & 15); // _esi
+				int e = getTaskVar(t, op49Data->unkE,  mask        & 15); // _eax
 				if (e >= _res->_mstHdr.pointsCount) {
 					e = _res->_mstHdr.pointsCount - 1;
 				}
@@ -4996,11 +4996,11 @@ void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int 
 int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num) {
 	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
 	MonsterObject1 *m = t->monster1;
-	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
-	assert(op49data->unkC < _res->_mstHdr.unk0x64);
-	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
+	const MstOp49Data *op49Data = &_res->_mstOp49Data[num];
+	assert(op49Data->indexUnk49 < _res->_mstHdr.unk0x64);
+	MstUnk49 *m49 = &_res->_mstUnk49[op49Data->indexUnk49];
 	m->m49 = m49;
-	m->indexUnk49Unk1 = op49data->unkF;
+	m->indexUnk49Unk1 = op49Data->unkF;
 	if (m->indexUnk49Unk1 < 0) {
 		if (m49->count2 == 0) {
 			m->indexUnk49Unk1 = 0;

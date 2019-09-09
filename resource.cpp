@@ -1483,8 +1483,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstOp49Data[i].unk2 = fp->readUint16();
 		_mstOp49Data[i].unk4 = fp->readUint16();
 		_mstOp49Data[i].unk6 = fp->readUint16();
-		_mstOp49Data[i].unk8 = fp->readUint32();
-		_mstOp49Data[i].unkC = fp->readUint16();
+		_mstOp49Data[i].maskVars = fp->readUint32();
+		_mstOp49Data[i].indexUnk49 = fp->readUint16();
 		_mstOp49Data[i].unkE = fp->readByte();
 		_mstOp49Data[i].unkF = fp->readByte();
 		bytesRead += 16;
