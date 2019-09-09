@@ -174,7 +174,7 @@ struct MstUnk44Unk1 { // MstWalkBox
 	int32_t y2; // 0xC
 	uint32_t indexUnk34_16; // 0x10
 	uint32_t indexUnk35_20; // 0x14
-	uint32_t indexUnk35_24; // 0x18
+	uint32_t indexUnk35_0x18; // 0x18
 	uint32_t indexUnk36_28; // 0x1C
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
@@ -387,7 +387,7 @@ struct MstOp49Data { // MstOp197Data
 	uint16_t unk4;
 	uint16_t unk6;
 	uint32_t unk8; // maskVars
-	uint16_t unkC; // indexes _mstUnk49
+	uint16_t unkC; // indexUnk49
 	int8_t unkE;
 	int8_t unkF;
 }; // sizeof == 16

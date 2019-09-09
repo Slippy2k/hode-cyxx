@@ -1180,7 +1180,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk44[i].data[j].y2 = READ_LE_UINT32(data + 12);
 			_mstUnk44[i].data[j].indexUnk34_16 = READ_LE_UINT32(data + 16); // sizeof == 20
 			_mstUnk44[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
-			_mstUnk44[i].data[j].indexUnk35_24 = READ_LE_UINT32(data + 24); // sizeof == 16
+			_mstUnk44[i].data[j].indexUnk35_0x18 = READ_LE_UINT32(data + 24); // sizeof == 16
 			_mstUnk44[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12
 			_mstUnk44[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
 			_mstUnk44[i].data[j].indexUnk35_0x24[0] = READ_LE_UINT32(data + 36); // sizeof == 16

@@ -108,10 +108,10 @@ void Game::initMonsterObject1(MonsterObject1 *m) {
 	const uint8_t *ptr = m->monsterInfos;
 	const int num = (~m->flagsA5) & 1;
 
-	m->levelBounds_x2 = m->m44Unk1->unk2C[0][num] - READ_LE_UINT32(ptr + 904); // right x coordinate
-	m->levelBounds_x1 = m->m44Unk1->unk2C[1][num] + READ_LE_UINT32(ptr + 904); // left x coordinate
-	m->y1 = m->m44Unk1->unk2C[2][num] - READ_LE_UINT32(ptr + 908); // y2 ?
-	m->y2 = m->m44Unk1->unk2C[3][num] + READ_LE_UINT32(ptr + 908); // y1 ?
+	m->levelBounds_x2 = m->m44Unk1->unk2C[0][num] - (int32_t)READ_LE_UINT32(ptr + 904); // right x coordinate
+	m->levelBounds_x1 = m->m44Unk1->unk2C[1][num] + (int32_t)READ_LE_UINT32(ptr + 904); // left x coordinate
+	m->y1 = m->m44Unk1->unk2C[2][num] - (int32_t)READ_LE_UINT32(ptr + 908); // y2 ?
+	m->y2 = m->m44Unk1->unk2C[3][num] + (int32_t)READ_LE_UINT32(ptr + 908); // y1 ?
 
 	const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_0x24[num];
 	m->m35 = (indexUnk35 == kNone) ? 0 : &_res->_mstUnk35[indexUnk35];
@@ -2650,7 +2650,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	if (dir == 1) {
 // 418AC6
 		MstUnk44Unk1 *m44Unk1 = _mstCurrentMonster1->m44Unk1;
-		if (m44Unk1->indexUnk35_24 == kNone) {
+		if (m44Unk1->indexUnk35_0x18 == kNone) {
 			return 0;
 		}
 		int _ebp = 0;
@@ -2688,7 +2688,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if (_ebp == 0) {
 			m->flagsA6 &= ~1;
 			if ((m->flagsA5 & 4) == 0) {
-				const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_24;
+				const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_0x24[0];
 				assert(indexUnk35 != kNone);
 				m->m35 = &_res->_mstUnk35[indexUnk35];
 			}
@@ -2755,7 +2755,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if (m->flagsA6 & 1) {
 			return 0;
 		}
-		const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_24;
+		const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_0x18;
 		assert(indexUnk35 != kNone);
 		MstUnk35 *m35 = &_res->_mstUnk35[indexUnk35];
 		if (m->m35 != m35) {
@@ -2770,7 +2770,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			if (!updateMonsterObject1Position(_mstCurrentMonster1)) {
 				initMonsterObject1(_mstCurrentMonster1);
 			}
-			const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_24;
+			const uint32_t indexUnk35 = m->m44Unk1->indexUnk35_0x18;
 			assert(indexUnk35 != kNone);
 			_mstCurrentMonster1->m35 = &_res->_mstUnk35[indexUnk35];
 			prepareMstTask(_mstCurrentTask);
@@ -4997,6 +4997,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
 	MonsterObject1 *m = t->monster1;
 	const MstOp49Data *op49data = &_res->_mstOp49Data[num];
+	assert(op49data->unkC < _res->_mstHdr.unk0x64);
 	MstUnk49 *m49 = &_res->_mstUnk49[op49data->unkC];
 	m->m49 = m49;
 	m->indexUnk49Unk1 = op49data->unkF;
@@ -5265,11 +5266,11 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 // 41C399
 		mstSetHorizontalBounds(m);
 		while (_xMstPos2 < m->m49Unk1->unkC) {
-			if (--m->indexUnk49Unk1 < 0) {
+			if (--m->indexUnk49Unk1 >= 0) {
+				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+			} else {
 				goto l41C2E6;
-				break;
 			}
-			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 		}
 	}
 // 41C3FD
@@ -6625,11 +6626,12 @@ int Game::executeMstOp67Type1(Task *t) {
 		mstSetHorizontalBounds(m);
 		_edi = 1;
 		while (_xMstPos2 < m->m49Unk1->unkC) {
-			if (--m->indexUnk49Unk1 < 0) {
+			if (--m->indexUnk49Unk1 >= 0) {
+				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+			} else {
 				_edi = 0;
 				break;
 			}
-			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 		}
 	}
 // 41C774
@@ -6803,11 +6805,12 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		mstSetHorizontalBounds(m);
 		_edi = 1;
 		while (_xMstPos2 < m->m49Unk1->unkC) {
-			if (--m->indexUnk49Unk1 < 0) {
+			if (--m->indexUnk49Unk1 >= 0) {
+				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
+			} else {
 				_edi = 0;
 				break;
 			}
-			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 		}
 	}
 // 41CF17
