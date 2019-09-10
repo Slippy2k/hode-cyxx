@@ -1793,7 +1793,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		}
 		break;
 	case 51:
-		obj1.x2 = obj1.x2 + o->width - 1;
+		obj1.x2 = obj1.x1 + o->width - 1;
 		obj1.y2 += o->height - 1;
 		obj2.x2 = obj2.x1 + ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
