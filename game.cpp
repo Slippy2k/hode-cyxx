@@ -1725,7 +1725,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj1.x1 += o->posTable[0].x;
 		obj1.y2 += o->posTable[1].y;
 		obj1.y1 += o->posTable[0].y;
-		obj2.x2 += ptr->width - 1;
+		obj2.x2 = obj2.x1 + ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		return clipBoundingBox(&obj1, &obj2);
 	case 17:
@@ -1761,7 +1761,7 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		obj1.x2 = obj1.x1 + o->width - 1;
 		obj1.y2 += o->height - 1;
 		obj2.x2 += ptr->width - 1;
-		obj2.y1 = obj2.y2 + ptr->height - 1;
+		obj2.y2 += ptr->height - 1;
 		return clipBoundingBox(&obj1, &obj2);
 	case 48:
 		obj1.x2 += o->width - 1;
