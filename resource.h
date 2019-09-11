@@ -376,10 +376,10 @@ struct MstOp226Data {
 }; // sizeof == 8
 
 struct MstOp56Data { // MstOp204Data
-	uint32_t unk0; // arg0 // 0
-	uint32_t unk4; // arg1 // 4
-	uint32_t unk8; // arg2 // 8
-	uint32_t unkC; // arg3 // C
+	uint32_t arg0; // 0
+	uint32_t arg1; // 4
+	uint32_t arg2; // 8
+	uint32_t arg3; // C
 }; // sizeof == 16
 
 struct MstOp49Data { // MstOp197Data

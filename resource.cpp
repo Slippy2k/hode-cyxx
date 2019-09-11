@@ -1524,10 +1524,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	_mstOp56Data = (MstOp56Data *)malloc(_mstHdr.unk0x78 * sizeof(MstOp56Data));
 	for (int i = 0; i < _mstHdr.unk0x78; ++i) {
-		_mstOp56Data[i].unk0 = fp->readUint32();
-		_mstOp56Data[i].unk4 = fp->readUint32();
-		_mstOp56Data[i].unk8 = fp->readUint32();
-		_mstOp56Data[i].unkC = fp->readUint32();
+		_mstOp56Data[i].arg0 = fp->readUint32();
+		_mstOp56Data[i].arg1 = fp->readUint32();
+		_mstOp56Data[i].arg2 = fp->readUint32();
+		_mstOp56Data[i].arg3 = fp->readUint32();
 		bytesRead += 16;
 	}
 
