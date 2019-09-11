@@ -1665,7 +1665,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 			const int direction = (o1->flags1 >> 4) & 3;
 			switch (direction) {
 			case 1:
-				for (; count-- != 0 && ret != 0; coords1 += 4) {
+				for (; count-- != 0 && !ret; coords1 += 4) {
 					BoundingBox tmp;
 					tmp.x1 = box1->x2 - coords1[2];
 					tmp.x2 = box1->x2 - coords1[0];
@@ -1675,7 +1675,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 				}
 				break;
 			case 2:
-				for (; count-- != 0 && ret != 0; coords1 += 4) {
+				for (; count-- != 0 && !ret; coords1 += 4) {
 					BoundingBox tmp;
 					tmp.x1 = box1->x1 + coords1[0];
 					tmp.x2 = box1->x1 + coords1[2];
@@ -1685,7 +1685,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 				}
 				break;
 			case 3:
-				for (; count-- != 0 && ret != 0; coords1 += 4) {
+				for (; count-- != 0 && !ret; coords1 += 4) {
 					BoundingBox tmp;
 					tmp.x1 = box1->x2 - coords1[2];
 					tmp.x2 = box1->x2 - coords1[0];
@@ -1695,7 +1695,7 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 				}
 				break;
 			default:
-				for (; count-- != 0 && ret != 0; coords1 += 4) {
+				for (; count-- != 0 && !ret; coords1 += 4) {
 					BoundingBox tmp;
 					tmp.x1 = box1->x1 + coords1[0];
 					tmp.x2 = box1->x1 + coords1[2];
