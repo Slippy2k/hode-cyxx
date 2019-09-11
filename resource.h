@@ -383,10 +383,10 @@ struct MstOp56Data { // MstOp204Data
 }; // sizeof == 16
 
 struct MstOp49Data { // MstOp197Data
-	uint16_t unk0;
-	uint16_t unk2;
-	uint16_t unk4;
-	uint16_t unk6;
+	int16_t unk0;
+	int16_t unk2;
+	int16_t unk4;
+	int16_t unk6;
 	uint32_t maskVars;
 	uint16_t indexUnk49;
 	int8_t unkE;
