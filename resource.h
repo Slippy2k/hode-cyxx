@@ -219,6 +219,7 @@ struct MstUnk46 {
 	uint32_t count;
 }; // sizeof == 8
 
+// MstAttackHitBox
 struct MstUnk47 {
 	uint8_t *data; // sizeof == 20
 	uint32_t count;

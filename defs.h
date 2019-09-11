@@ -356,37 +356,37 @@ struct MonsterObject1 {
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
 	uint8_t flags49; // 0x49 facingDirectionMask
-	uint8_t flags4A; // 0x4A goalDirectionMask
-	uint8_t flags4B; // 0x4B goalScreenNum
+	uint8_t goalDirectionMask; // 0x4A
+	uint8_t goalScreenNum; // 0x4B
 	int xPos; // 0x4C
 	int yPos; // 0x50
 	int xMstPos; // 0x54 xLevelPos
 	int yMstPos; // 0x58 yLevelPos
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
-	int unk64; // 0x64 x
-	int unk68; // 0x68 x
-	int unk6C; // 0x6C y
-	int unk70; // 0x70 y
+	int unk64; // 0x64 goalDistance_x1
+	int unk68; // 0x68 goalDistance_x2
+	int unk6C; // 0x6C goalDistance_y1
+	int unk70; // 0x70 goalDistance_y2
 	int goalPos_x1; // 0x74
-	int unk78; // 0x78 y
+	int unk78; // 0x78 y goalPos_y1
 	int goalPos_x2; // 0x7C
-	int unk80; // 0x80 y
+	int unk80; // 0x80 y goalPos_y2
 	int unk84; // 0x84 x
 	int unk88; // 0x88 y
-	int unk8C; // 0x8C
-	int unk90; // 0x90
+	int unk8C; // 0x8C unused
+	int unk90; // 0x90 unused
 	int levelBounds_x2; // 0x94 levelPosBounds_x2
 	int levelBounds_x1; // 0x98 levelPosBounds_x1
 	int y1; // 0x9C levelPosBounds_y2
 	int y2; // 0xA0 levelPosBounds_y1
-	uint8_t flagsA4; // 0xA4
+	uint8_t flagsA4; // 0xA4 o_flags0
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
 	uint8_t flagsA7; // 0xA7
 	uint8_t flagsA8[4]; // 0xA8, 0xA9, 0xAA, 0xAB collideRectNum
-	int32_t unkAC; // x (levelPos)
-	int32_t unkB0; // y (levelPos)
+	int32_t unkAC; // targetLevelPos_x
+	int32_t unkB0; // targetLevelPos_y
 	int32_t unkB4; // _xMstPos2
 	int32_t unkB8; // _yMstPos2
 	int32_t unkBC; // 0xBC x
@@ -407,7 +407,7 @@ struct MonsterObject1 {
 	int unkF0; // 0xF0
 	int unkF4; // 0xF4
 	uint8_t unkF8; // 0xF8
-	int unkFC; // 0xFC shootDirection
+	int shootDirection; // 0xFC
 }; // sizeof == 256
 
 struct MonsterObject2 {
