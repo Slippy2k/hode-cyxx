@@ -50,6 +50,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_snd_masterPanning = 64;
 	_snd_masterVolume = 128;
 	_rnd.setSeed();
+	_cheats = 0;
 }
 
 Game::~Game() {
@@ -3486,7 +3487,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 		dat->yPosObject = ptr->posTable[7].y + ptr->yPos;
 		ptr->xPos += dat->dxPos;
 		ptr->yPos += dat->dyPos;
-		if (!_hideAndyObjectSprite && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0) {
+		if (!_hideAndyObjectSprite && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0 && (_cheats & kCheatSpectreFireballNoHit) == 0) {
 			dat->unk3 = 0x80;
 			dat->xPosShoot = _clipBoxOffsetX;
 			dat->yPosShoot = _clipBoxOffsetY;

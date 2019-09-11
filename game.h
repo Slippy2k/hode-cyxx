@@ -37,6 +37,10 @@ enum {
 	kObjectDataTypeMonster2
 };
 
+enum {
+	kCheatSpectreFireballNoHit = 1 << 0
+};
+
 struct Game {
 	enum {
 		kMaxScreens = 40,
@@ -92,6 +96,7 @@ struct Game {
 	Resource *_res;
 	Video *_video;
 	SystemStub *_system;
+	uint32_t _cheats;
 
 	int _difficulty;
 	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen
