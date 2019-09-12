@@ -2880,7 +2880,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 		assert(o->dataPtr >= &_animBackgroundDataTable[0] && o->dataPtr < &_animBackgroundDataTable[kMaxBackgroundAnims]);
 		break;
 	case kObjectDataTypeShoot:
-		assert(o->dataPtr >= &_shootLvlObjectDataTable[0] && o->dataPtr < &_shootLvlObjectDataTable[32]);
+		assert(o->dataPtr >= &_shootLvlObjectDataTable[0] && o->dataPtr < &_shootLvlObjectDataTable[kMaxShootLvlObjectData]);
 		break;
 	case kObjectDataTypeLvlBackgroundSound:
 		assert(o->type == 1);

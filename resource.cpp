@@ -10,6 +10,8 @@
 #include "resource.h"
 #include "util.h"
 
+static const char *kSetupDat = "SETUP.DAT";
+
 static bool openDat(FileSystem &fs, const char *name, File *f) {
 	FILE *fp = fs.openFile(name);
 	if (fp) {
@@ -74,12 +76,16 @@ Resource::Resource(const char *dataPath)
 }
 
 Resource::~Resource() {
+	delete _datFile;
+	delete _lvlFile;
+	delete _mstFile;
+	delete _sssFile;
 }
 
 bool Resource::sectorAlignedGameData() {
-	FILE *fp = _fs.openFile("SETUP.DAT");
+	FILE *fp = _fs.openFile(kSetupDat);
 	if (!fp) {
-		error("Unable to open 'SETUP.DAT'");
+		error("Unable to open '%s'", kSetupDat);
 		return false;
 	}
 	bool ret = false;
@@ -93,7 +99,7 @@ bool Resource::sectorAlignedGameData() {
 
 void Resource::loadSetupDat() {
 	uint8_t hdr[512];
-	openDat(_fs, "SETUP.DAT", _datFile);
+	openDat(_fs, kSetupDat, _datFile);
 	_datFile->read(hdr, sizeof(hdr));
 	_datHdr.version = READ_LE_UINT32(hdr);
 	_datHdr.bufferSize0 = READ_LE_UINT32(hdr + 0x4);
@@ -177,6 +183,9 @@ void Resource::loadLevelData(const char *levelName) {
 		warning("Unable to open '%s'", filename);
 		memset(&_sssHdr, 0, sizeof(_sssHdr));
 	}
+}
+
+void Resource::unloadLevelData() {
 }
 
 void Resource::loadLvlScreenMoveData(int num) { // GridData
