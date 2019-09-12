@@ -935,6 +935,7 @@ void Game::startMstCode() {
 		if (codeData != kNone) {
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {
+				_runTaskOpcodesCount = 0;
 				while ((this->*(t->run))(t) == 0);
 			}
 		}

@@ -30,27 +30,67 @@ static const char *_levels[] = {
 };
 
 Game::Game(SystemStub *system, const char *dataPath) {
-	memset(this, 0, sizeof(Game)); // TODO: proper init
-	_difficulty = 1;
+
 	_level = 0;
-	_system = system;
 	_res = new Resource(dataPath);
 	_paf = new PafPlayer(system, &_res->_fs);
+	_rnd.setSeed();
 	_video = new Video(system);
+	_system = system;
+	_cheats = 0;
+
+	_difficulty = 1;
+
+	memset(_screenLvlObjectsList, 0, sizeof(_screenLvlObjectsList));
+	_andyObject = 0;
+	_plasmaExplosionObject = 0;
+	_plasmaCannonObject = 0;
+	memset(_spritesTable, 0, sizeof(_spritesTable));
+	memset(_spriteListPtrTable, 0, sizeof(_spriteListPtrTable));
+
+	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
+	_transformShadowBuffer = 0;
+	_transformShadowLayerDelta = 0;
+
+	_directionKeyMask = 0;
+	_actionKeyMask = 0;
+
+	_currentScreen = 0;
+
+	_lvlObjectsList0 = 0;
+	_lvlObjectsList1 = 0;
+	_lvlObjectsList2 = 0;
+	_lvlObjectsList3 = 0;
+	memset(_screenMaskBuffer, 0, sizeof(_screenMaskBuffer));
+	memset(_shootLvlObjectDataTable, 0, sizeof(_shootLvlObjectDataTable));
 	_mstAndyCurrentScreenNum = -1;
+	_plasmaCannonDirection = 0;
+	_andyActionKeyMaskAnd = 0xFF;
+	_andyActionKeyMaskOr = 0;
+	_andyDirectionKeyMaskAnd = 0xFF;
+	_andyDirectionKeyMaskOr = 0;
+
 	_specialAnimMask = 0; // original only clears ~0x30
 	_mstCurrentAnim = 0;
 	_mstOriginPosX = Video::W / 2;
 	_mstOriginPosY = Video::H / 2;
-	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
-	_transformShadowBuffer = 0;
-	_transformShadowLayerDelta = 0;
-	_mstLogicDisabled = true;
+	memset(_declaredLvlObjectsList, 0, sizeof(_declaredLvlObjectsList));
+	_declaredLvlObjectsListHead = 0;
+	_declaredLvlObjectsListCount = 0;
+
+	memset(_animBackgroundDataTable, 0, sizeof(_animBackgroundDataTable));
+	_animBackgroundDataCount = 0;
+
+	memset(_monsterObjects1Table, 0, sizeof(_monsterObjects1Table));
+	memset(_monsterObjects2Table, 0, sizeof(_monsterObjects2Table));
+
+	_sssObjectsCount = 0;
+	_sssObjectsList1 = 0;
+	_sssObjectsList2 = 0;
 	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
 	_snd_masterPanning = 64;
 	_snd_masterVolume = 128;
-	_rnd.setSeed();
-	_cheats = 0;
+	_snd_muted = false;
 }
 
 Game::~Game() {

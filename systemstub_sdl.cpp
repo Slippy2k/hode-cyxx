@@ -94,8 +94,11 @@ SystemStub *SystemStub_SDL_create() {
 	return new SystemStub_SDL();
 }
 
-SystemStub_SDL::SystemStub_SDL():
-	_paletteGrayScale(false) {
+SystemStub_SDL::SystemStub_SDL() :
+	_offscreenLut(0), _offscreenRgb(0),
+	_window(0), _renderer(0), _texture(0), _fmt(0), _widescreenTexture(0),
+	_paletteGrayScale(false),
+	_controller(0), _joystick(0) {
 	for (int i = 0; i < 256; ++i) {
 		_gammaLut[i] = i;
 	}
