@@ -16,21 +16,42 @@
 #define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
 #define PACKED __attribute__((packed))
 
-// not alignment safe
 inline uint16_t READ_LE_UINT16(const void *ptr) {
-	return le16toh(*(const uint16_t *)ptr);
+	if (1 && (((uintptr_t)ptr) & 1) != 0) {
+		uint16_t value;
+		memcpy(&value, ptr, sizeof(uint16_t));
+		return le16toh(value);
+	} else {
+		return le16toh(*(const uint16_t *)ptr);
+	}
 }
 
 inline uint32_t READ_LE_UINT32(const void *ptr) {
-	return le32toh(*(const uint32_t *)ptr);
+	if (1 && (((uintptr_t)ptr) & 3) != 0) {
+		uint32_t value;
+		memcpy(&value, ptr, sizeof(uint32_t));
+		return le32toh(value);
+	} else {
+		return le32toh(*(const uint32_t *)ptr);
+	}
 }
 
 inline void WRITE_LE_UINT16(void *ptr, uint16_t v) {
-	*((uint16_t *)ptr) = htole16(v);
+	if (1 && (((uintptr_t)ptr) & 1) != 0) {
+		const uint16_t value = htole16(v);
+		memcpy(ptr, &value, sizeof(uint16_t));
+	} else {
+		*((uint16_t *)ptr) = htole16(v);
+	}
 }
 
 inline void WRITE_LE_UINT32(void *ptr, uint32_t v) {
-	*((uint32_t *)ptr) = htole32(v);
+	if (1 && (((uintptr_t)ptr) & 3) != 0) {
+		const uint32_t value = htole32(v);
+		memcpy(ptr, &value, sizeof(uint32_t));
+	} else {
+		*((uint32_t *)ptr) = htole32(v);
+	}
 }
 
 #undef MIN
