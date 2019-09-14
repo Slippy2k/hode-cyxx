@@ -352,13 +352,13 @@ void Resource::loadLvlSpriteData(int num) {
 	_resLevelData0x2988SizeTable[num] = size;
 }
 
-uint8_t *Resource::getLevelData0x470CPtr0(int num) {
+uint8_t *Resource::getLvlScreenMaskDataPtr(int num) {
 	assert(num >= 0 && num < 160);
 	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 0);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
-uint8_t *Resource::getLevelData0x470CPtr4(int num) {
+uint8_t *Resource::getLvlScreenPosDataPtr(int num) {
 	assert(num >= 0 && num < 160);
 	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 4);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
@@ -562,12 +562,12 @@ void Resource::loadDatMenuBuffers() {
 	}
 }
 
-const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
+const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) const {
 	assert(frame < dat->framesCount);
 	return dat->framesData + READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
 }
 
-const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
+const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const {
 	assert(num < dat->animsCount);
 	return dat->animsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
 }

@@ -601,8 +601,8 @@ struct Resource {
 	void loadLvlData(File *fp, const char *name);
 	void loadLvlSpriteData(int num);
 
-	uint8_t *getLevelData0x470CPtr0(int num); // getLvlScreenMaskDataPtr
-	uint8_t *getLevelData0x470CPtr4(int num); // getLvlScreenPosDataPtr
+	uint8_t *getLvlScreenMaskDataPtr(int num);
+	uint8_t *getLvlScreenPosDataPtr(int num);
 	void loadLevelData0x470C();
 
 	void loadLvlScreenBackgroundData(int num);
@@ -618,8 +618,8 @@ struct Resource {
 	void loadDatLoadingImage(uint8_t *dst, uint8_t *pal);
 	void loadDatMenuBuffers();
 
-	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame);
-	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num);
+	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame) const;
+	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const;
 
 	void loadSssData(File *fp, const char *name);
 	void checkSssCode(const uint8_t *buf, int size);
