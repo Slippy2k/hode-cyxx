@@ -310,8 +310,10 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 	dat->hotspotsData = (hotspotsDataOffset == 0) ? 0 : base + hotspotsDataOffset;
 	dat->movesData = (movesDataOffset == 0) ? 0 : base + movesDataOffset;
 	dat->animsData = (animsDataOffset == 0) ? 0 : base + animsDataOffset;
-	if (dat->animsData != 0) {
-		dat->coordsData = dat->animsData + dat->framesCount * 4;
+	if (dat->animsData) {
+		dat->coordsData = dat->animsData;
+	} else {
+		dat->coordsData = 0;
 	}
 
 #if 0 /* ResGetLvlSpriteFramePtr - ResGetLvlSpriteAnimPtr */
@@ -319,15 +321,17 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 	dat->framesOffsetTable = ptr;
 	if (framesDataOffset != 0) {
 		assert(dat->framesCount < MAX_SPRITE_FRAMES);
-		p = dat->framesData = _ecx + framesDataOffset;
+		p = dat->framesData = base + framesDataOffset;
 		for (i = 0; i < dat->framesCount; ++i) {
-			WRITE_LE_UINT32(dat->framesOffsetsTable + i * 4, p);
+			WRITE_LE_UINT32(dat->framesOffsetsTable + i * sizeof(uint32_t), p);
 			size = READ_LE_UINT16(p);
 			p += size;
 		}
 	}
+	dat->coordsData = ptr + dat->framesCount * sizeof(uint32_t);
 	if (animsDataOffset != 0) {
 		assert(dat->animsData < MAX_SPRITE_ANIMS);
+		p = dat->animsData;
 		for (i = 0; i < dat->animsCount; ++i) {
 			WRITE_LE_UINT32(dat->coordsData + i * 4, p);
 			size = p[0];
@@ -565,7 +569,7 @@ void Resource::loadDatMenuBuffers() {
 
 const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 	assert(frame < dat->framesCount);
-	uint8_t *p = dat->framesData;
+	const uint8_t *p = dat->framesData;
 	for (int i = 0; i < frame; ++i) {
 		const int size = READ_LE_UINT16(p);
 		p += size;
@@ -575,7 +579,7 @@ const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 
 const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	assert(num < dat->animsCount);
-	uint8_t *p = dat->coordsData;
+	const uint8_t *p = dat->coordsData;
 	for (int i = 0; i < num; ++i) {
 		const int count = p[0];
 		p += count * 4 + 1;
