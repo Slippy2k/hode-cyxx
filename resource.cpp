@@ -737,7 +737,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 			fp->seek(count, SEEK_CUR);
 			bytesRead += count + 1;
 		}
-		// _sssDataUnk4 = data;
+		// _sssPreloadInfosData = data;
 	} else {
 		_sssPreloadData1 = 0;
 		_sssPreloadData2 = 0;
@@ -745,19 +745,19 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 // 429A20
 	// data += _sssHdr.preloadInfoCount * 8;
-	_sssDataUnk4 = (SssUnk4 *)malloc(_sssHdr.preloadInfoCount * sizeof(SssUnk4));
+	_sssPreloadInfosData = (SssPreloadInfo *)malloc(_sssHdr.preloadInfoCount * sizeof(SssPreloadInfo));
 	for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 		int32_t count = fp->readUint32();
 		int32_t offset = fp->readUint32();
-		_sssDataUnk4[i].count = count;
-		debug(kDebug_RESOURCE, "_sssDataUnk4 #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, count, offset);
+		_sssPreloadInfosData[i].count = count;
+		debug(kDebug_RESOURCE, "_sssPreloadInfosData #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, count, offset);
 		bytesRead += 8;
 	}
 	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
 		static const int kSizeOfUnk4Data_V11 = 32;
 
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
-			const int size = _sssDataUnk4[i].count * kSizeOfUnk4Data_V11;
+			const int size = _sssPreloadInfosData[i].count * kSizeOfUnk4Data_V11;
 			fp->seek(size, SEEK_CUR);
 			bytesRead += size;
 // 429A25
@@ -766,11 +766,11 @@ void Resource::loadSssData(File *fp, const char *name) {
 // 42E8DF
 		static const int kSizeOfUnk4Data_V6 = 68;
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
-			const int count = _sssDataUnk4[i].count;
+			const int count = _sssPreloadInfosData[i].count;
 			uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data_V6 * count);
 			assert(p);
 			fp->read(p, kSizeOfUnk4Data_V6 * count);
-			_sssDataUnk4[i].data = p;
+			_sssPreloadInfosData[i].data = p;
 
 			bytesRead += kSizeOfUnk4Data_V6 * count;
 
@@ -1095,9 +1095,9 @@ void Resource::loadMstData(File *fp, const char *name) {
 		msac->x2 = fp->readUint32();
 		msac->y1 = fp->readUint32();
 		msac->y2 = fp->readUint32();
-		msac->next = fp->readUint32();
+		msac->nextByPos = fp->readUint32();
 		msac->prev = fp->readUint32();
-		msac->unk0x18 = fp->readUint32();
+		msac->nextByValue = fp->readUint32();
 		msac->unk0x1C = fp->readByte();
 		msac->unk0x1D = fp->readByte();
 		msac->unk0x1E = fp->readUint16();
@@ -1446,23 +1446,23 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstUnk54 = (MstUnk54 *)malloc(_mstHdr.unk0x58 * sizeof(MstUnk54));
+	_mstOp227Data = (MstOp227Data *)malloc(_mstHdr.unk0x58 * sizeof(MstOp227Data));
 	for (int i = 0; i < _mstHdr.unk0x58; ++i) {
-		_mstUnk54[i].indexVar1 = fp->readUint16();
-		_mstUnk54[i].indexVar2 = fp->readUint16();
-		_mstUnk54[i].compare   = fp->readByte();
-		_mstUnk54[i].maskVars  = fp->readByte();
-		_mstUnk54[i].codeData  = fp->readUint16();
+		_mstOp227Data[i].indexVar1 = fp->readUint16();
+		_mstOp227Data[i].indexVar2 = fp->readUint16();
+		_mstOp227Data[i].compare   = fp->readByte();
+		_mstOp227Data[i].maskVars  = fp->readByte();
+		_mstOp227Data[i].codeData  = fp->readUint16();
 		bytesRead += 8;
 	}
 
-	_mstUnk55 = (MstUnk55 *)malloc(_mstHdr.unk0x5C * sizeof(MstUnk55));
+	_mstOp234Data = (MstOp234Data *)malloc(_mstHdr.unk0x5C * sizeof(MstOp234Data));
 	for (int i = 0; i < _mstHdr.unk0x5C; ++i) {
-		_mstUnk55[i].indexVar1 = fp->readUint16();
-		_mstUnk55[i].indexVar2 = fp->readUint16();
-		_mstUnk55[i].compare   = fp->readByte();
-		_mstUnk55[i].maskVars  = fp->readByte();
-		_mstUnk55[i].codeData  = fp->readUint16();
+		_mstOp234Data[i].indexVar1 = fp->readUint16();
+		_mstOp234Data[i].indexVar2 = fp->readUint16();
+		_mstOp234Data[i].compare   = fp->readByte();
+		_mstOp234Data[i].maskVars  = fp->readByte();
+		_mstOp234Data[i].codeData  = fp->readUint16();
 		bytesRead += 8;
 	}
 
@@ -1477,16 +1477,16 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 12;
 	}
 
-	_mstOp49Data = (MstOp49Data *)malloc(_mstHdr.unk0x64 * sizeof(MstOp49Data));
+	_mstOp197Data = (MstOp197Data *)malloc(_mstHdr.unk0x64 * sizeof(MstOp197Data));
 	for (int i = 0; i < _mstHdr.unk0x64; ++i) {
-		_mstOp49Data[i].unk0 = fp->readUint16();
-		_mstOp49Data[i].unk2 = fp->readUint16();
-		_mstOp49Data[i].unk4 = fp->readUint16();
-		_mstOp49Data[i].unk6 = fp->readUint16();
-		_mstOp49Data[i].maskVars = fp->readUint32();
-		_mstOp49Data[i].indexUnk49 = fp->readUint16();
-		_mstOp49Data[i].unkE = fp->readByte();
-		_mstOp49Data[i].unkF = fp->readByte();
+		_mstOp197Data[i].unk0 = fp->readUint16();
+		_mstOp197Data[i].unk2 = fp->readUint16();
+		_mstOp197Data[i].unk4 = fp->readUint16();
+		_mstOp197Data[i].unk6 = fp->readUint16();
+		_mstOp197Data[i].maskVars = fp->readUint32();
+		_mstOp197Data[i].indexUnk49 = fp->readUint16();
+		_mstOp197Data[i].unkE = fp->readByte();
+		_mstOp197Data[i].unkF = fp->readByte();
 		bytesRead += 16;
 	}
 
@@ -1545,7 +1545,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			while (j != kNone) {
 				MstScreenAreaCode *msac = &_mstScreenAreaCodes[j];
 				fprintf(stdout, ".mst screen %d pos %d,%d,%d,%d\n", i, msac->x1, msac->y1, msac->x2, msac->y2);
-				j = msac->next;
+				j = msac->nextByPos;
 			}
 		}
 	}
@@ -1571,7 +1571,7 @@ MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {
 		if (msac->x1 <= xPos && msac->x2 >= xPos && msac->unk0x1D != 0 && msac->y1 <= yPos && msac->y2 >= yPos) {
 			return msac;
 		}
-		i = msac->next;
+		i = msac->nextByPos;
 	}
 	return 0;
 }
@@ -1581,6 +1581,6 @@ void Resource::flagMstCodeForPos(int num, uint8_t value) {
 	while (i != kNone) {
 		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
 		msac->unk0x1D = value;
-		i = msac->unk0x18;
+		i = msac->nextByValue;
 	}
 }

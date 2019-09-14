@@ -4265,7 +4265,7 @@ int Game::mstTask_main(Task *t) {
 		case 197: // 49
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				MstOp49Data *op49Data = &_res->_mstOp49Data[num];
+				MstOp197Data *op49Data = &_res->_mstOp197Data[num];
 				const uint32_t mask = op49Data->maskVars;
 				int a = getTaskVar(t, op49Data->unk0, (mask >> 16) & 15); // var1C
 				int b = getTaskVar(t, op49Data->unk2, (mask >> 12) & 15); // x2
@@ -4655,7 +4655,7 @@ int Game::mstTask_main(Task *t) {
 		case 227: { // 69
 				const int num = READ_LE_UINT16(p + 2);
 				assert(num < _res->_mstHdr.unk0x58);
-				const MstUnk54 *m = &_res->_mstUnk54[num];
+				const MstOp227Data *m = &_res->_mstOp227Data[num];
 				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
@@ -4667,7 +4667,7 @@ int Game::mstTask_main(Task *t) {
 		case 228: { // 70
 				const int num = READ_LE_UINT16(p + 2);
 				assert(num < _res->_mstHdr.unk0x58);
-				const MstUnk54 *m = &_res->_mstUnk54[num];
+				const MstOp227Data *m = &_res->_mstOp227Data[num];
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
@@ -4679,7 +4679,7 @@ int Game::mstTask_main(Task *t) {
 		case 231:
 		case 232: { // 71
 				const int num = READ_LE_UINT16(p + 2);
-				const MstUnk55 *m = &_res->_mstUnk55[num];
+				const MstOp234Data *m = &_res->_mstOp234Data[num];
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
@@ -4726,7 +4726,7 @@ int Game::mstTask_main(Task *t) {
 		case 233:
 		case 234: { // 72
 				const int num = READ_LE_UINT16(p + 2);
-				const MstUnk55 *m = &_res->_mstUnk55[num];
+				const MstOp234Data *m = &_res->_mstOp234Data[num];
 				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
@@ -4997,7 +4997,7 @@ void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int 
 int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num) {
 	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
 	MonsterObject1 *m = t->monster1;
-	const MstOp49Data *op49Data = &_res->_mstOp49Data[num];
+	const MstOp197Data *op49Data = &_res->_mstOp197Data[num];
 	assert(op49Data->indexUnk49 < _res->_mstHdr.unk0x64);
 	MstUnk49 *m49 = &_res->_mstUnk49[op49Data->indexUnk49];
 	m->m49 = m49;
@@ -7214,7 +7214,7 @@ int Game::mstTask_idle(Task *t) {
 }
 
 int Game::mstTask_mstOp231(Task *t) {
-	const MstUnk55 *m = &_res->_mstUnk55[t->arg2];
+	const MstOp234Data *m = &_res->_mstOp234Data[t->arg2];
 	const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
@@ -7245,7 +7245,7 @@ int Game::mstTask_mstOp232(Task *t) {
 
 int Game::mstTask_mstOp233(Task *t) {
 	debug(kDebug_MONSTER, "mstTask_mstOp233 t %p", t);
-	const MstUnk55 *m = &_res->_mstUnk55[t->arg2];
+	const MstOp234Data *m = &_res->_mstOp234Data[t->arg2];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
@@ -7267,7 +7267,7 @@ int Game::mstTask_mstOp233(Task *t) {
 
 int Game::mstTask_mstOp234(Task *t) {
 	debug(kDebug_MONSTER, "mstTask_mstOp234 t %p", t);
-	const MstUnk55 *m = &_res->_mstUnk55[t->arg2];
+	const MstOp234Data *m = &_res->_mstOp234Data[t->arg2];
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (compareOp(m->compare, a, b)) {

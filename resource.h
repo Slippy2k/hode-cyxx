@@ -100,11 +100,11 @@ struct MstHdr {
 	int unk0x4C;
 	int unk0x50; // mstOp223DataCount
 	int unk0x54; // mstOp226DataCount
-	int unk0x58;
-	int unk0x5C;
-	int unk0x60;
-	int unk0x64;
-	int unk0x68;
+	int unk0x58; // mstOp227DataCount
+	int unk0x5C; // mstOp234DataCount
+	int unk0x60; // mstOp2DataCount
+	int unk0x64; // mstOp197DataCount
+	int unk0x68; // mstOp211DataCount
 	int unk0x6C; // mstOp240DataCount
 	int unk0x70;
 	int unk0x74;
@@ -123,12 +123,12 @@ struct MstScreenAreaCode { // MstScreenArea
 	int32_t x2; // 4
 	int32_t y1; // 8
 	int32_t y2; // 0xC
-	uint32_t next; // 0x10, nextByPos _mstUnk40
+	uint32_t nextByPos; // 0x10 _mstUnk40
 	uint32_t prev; // 0x14 unused ?
-	uint32_t unk0x18; // 0x18 nextByValue _mstUnk39
+	uint32_t nextByValue; // 0x18 indexUnk39
 	uint8_t unk0x1C; // 0x1C indexUnk39
 	uint8_t unk0x1D; // 0x1D value
-	uint16_t unk0x1E; // 0X1E unused?
+	uint16_t unk0x1E; // 0x1E unused ?
 	uint32_t codeData; // 0x20, offset _mstCodeData
 }; // sizeof == 36
 
@@ -339,7 +339,7 @@ struct MstOp223Data {
 	uint32_t maskVars; // 0x10
 }; // sizeof == 20
 
-struct MstUnk54 { // MstOp227Data
+struct MstOp227Data {
 	int16_t indexVar1; // 0
 	int16_t indexVar2; // 2
 	uint8_t compare; // 4
@@ -347,7 +347,7 @@ struct MstUnk54 { // MstOp227Data
 	uint16_t codeData; // 6
 }; // sizeof == 8
 
-struct MstUnk55 { // MstOp234Data
+struct MstOp234Data {
 	int16_t indexVar1; // 0
 	int16_t indexVar2; // 2
 	uint8_t compare; // 4
@@ -382,7 +382,7 @@ struct MstOp56Data { // MstOp204Data
 	uint32_t arg3; // C
 }; // sizeof == 16
 
-struct MstOp49Data { // MstOp197Data
+struct MstOp197Data {
 	int16_t unk0;
 	int16_t unk2;
 	int16_t unk4;
@@ -458,7 +458,7 @@ struct SssSample {
 	uint32_t codeOffset4; // 0x14 offset to _sssCodeData
 }; // sizeof == 24
 
-struct SssUnk4 { // SssPreloadInfo
+struct SssPreloadInfo {
 	uint32_t count;
 	uint8_t *data; // sizeof 32
 };
@@ -537,7 +537,7 @@ struct Resource {
 	SssDefaults *_sssDefaultsData;
 	SssBank *_sssBanksData;
 	SssSample *_sssSamplesData;
-	SssUnk4 *_sssDataUnk4;
+	SssPreloadInfo *_sssPreloadInfosData;
 	SssFilter *_sssFilters;
 	SssPcm *_sssPcmTable;
 	SssUnk6 *_sssDataUnk6;
@@ -574,10 +574,10 @@ struct Resource {
 	MstUnk51 *_mstUnk51;
 	MstUnk52 *_mstUnk52;
 	MstOp223Data *_mstOp223Data;
-	MstUnk54 *_mstUnk54;
-	MstUnk55 *_mstUnk55;
+	MstOp227Data *_mstOp227Data;
+	MstOp234Data *_mstOp234Data;
 	MstOp2Data *_mstOp2Data;
-	MstOp49Data *_mstOp49Data;
+	MstOp197Data *_mstOp197Data;
 	MstOp211Data *_mstOp211Data;
 	MstOp240Data *_mstOp240Data;
 	uint32_t *_mstUnk60; // index to _mstCodeData
