@@ -120,9 +120,9 @@ struct LvlObjectData {
 	uint8_t *animsInfoData; // 0x10, LevelSprAnimInfo
 	uint8_t *movesData; // 0x14, LvlSprMoveData
 	uint8_t *framesData; // 0x18
-	uint32_t framesDataOffset; // 0x1C, not needed
+	uint8_t *framesOffsetsTable; // 0x1C
 	uint8_t *animsData; // 0x20
-	uint8_t *coordsData; // 0x24
+	uint8_t *coordsOffsetsTable; // 0x24
 	uint8_t *hotspotsData; // 0x28, LvlSprHotspotData
 };
 

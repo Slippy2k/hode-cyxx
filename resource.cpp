@@ -306,39 +306,29 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 	}
 	dat->refCount = 0xFF;
 	dat->framesData = (framesDataOffset == 0) ? 0 : base + framesDataOffset;
-	dat->framesDataOffset = framesDataOffset;
 	dat->hotspotsData = (hotspotsDataOffset == 0) ? 0 : base + hotspotsDataOffset;
 	dat->movesData = (movesDataOffset == 0) ? 0 : base + movesDataOffset;
 	dat->animsData = (animsDataOffset == 0) ? 0 : base + animsDataOffset;
+
+	dat->framesOffsetsTable = ptr;
 	if (dat->animsData) {
-		dat->coordsData = dat->animsData;
+		dat->coordsOffsetsTable = ptr + dat->framesCount * 4;
 	} else {
-		dat->coordsData = 0;
+		dat->coordsOffsetsTable = 0;
 	}
 
-#if 0 /* ResGetLvlSpriteFramePtr - ResGetLvlSpriteAnimPtr */
-	/* original preallocated the structure */
-	dat->framesOffsetTable = ptr;
-	if (framesDataOffset != 0) {
-		assert(dat->framesCount < MAX_SPRITE_FRAMES);
-		p = dat->framesData = base + framesDataOffset;
-		for (i = 0; i < dat->framesCount; ++i) {
-			WRITE_LE_UINT32(dat->framesOffsetsTable + i * sizeof(uint32_t), p);
-			size = READ_LE_UINT16(p);
-			p += size;
-		}
+	uint32_t framesOffset = 0;
+	for (int i = 0; i < dat->framesCount; ++i) {
+		const int size = READ_LE_UINT16(dat->framesData + framesOffset);
+		WRITE_LE_UINT32(dat->framesOffsetsTable + i * sizeof(uint32_t), framesOffset);
+		framesOffset += size;
 	}
-	dat->coordsData = ptr + dat->framesCount * sizeof(uint32_t);
-	if (animsDataOffset != 0) {
-		assert(dat->animsData < MAX_SPRITE_ANIMS);
-		p = dat->animsData;
-		for (i = 0; i < dat->animsCount; ++i) {
-			WRITE_LE_UINT32(dat->coordsData + i * 4, p);
-			size = p[0];
-			p += size * 4 + 1;
-		}
+	uint32_t coordsOffset = 0;
+	for (int i = 0; i < dat->animsCount; ++i) {
+		const int count = dat->animsData[coordsOffset];
+		WRITE_LE_UINT32(dat->coordsOffsetsTable + i * sizeof(uint32_t), coordsOffset);
+		coordsOffset += count * 4 + 1;
 	}
-#endif
 }
 
 void Resource::loadLvlSpriteData(int num) {
@@ -352,6 +342,11 @@ void Resource::loadLvlSpriteData(int num) {
 
 	LvlObjectData *dat = &_resLevelData0x2988Table[num];
 	resFixPointersLevelData0x2988(ptr, ptr + readSize, dat);
+	assert(readSize <= size);
+	const uint32_t allocatedOffsetsSize = size - readSize;
+	const uint32_t readOffsetsSize = (dat->framesCount + dat->animsCount) * sizeof(uint32_t);
+	assert(allocatedOffsetsSize == readOffsetsSize);
+
 	_resLevelData0x2988PtrTable[dat->spriteNum] = dat;
 	// _resLvlScreenSpriteDataPtrTable[num] = ptr;
 	_resLevelData0x2988SizeTable[num] = size;
@@ -569,22 +564,12 @@ void Resource::loadDatMenuBuffers() {
 
 const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) {
 	assert(frame < dat->framesCount);
-	const uint8_t *p = dat->framesData;
-	for (int i = 0; i < frame; ++i) {
-		const int size = READ_LE_UINT16(p);
-		p += size;
-	}
-	return p;
+	return dat->framesData + READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
 }
 
 const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) {
 	assert(num < dat->animsCount);
-	const uint8_t *p = dat->coordsData;
-	for (int i = 0; i < num; ++i) {
-		const int count = p[0];
-		p += count * 4 + 1;
-	}
-	return p;
+	return dat->animsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
 }
 
 static int skipBytesAlign(File *f, int len) {
