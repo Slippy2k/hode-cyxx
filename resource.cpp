@@ -252,7 +252,7 @@ void Resource::loadLvlScreenObjectData(int num) {
 	dat->nextPtr = 0; _lvlFile->readUint32();
 }
 
-static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectData *dat) {
+static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectData *dat) {
 	uint8_t *base = src;
 
 	dat->unk0 = *src++;
@@ -275,7 +275,7 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 	uint32_t hotspotsDataOffset = READ_LE_UINT32(src); src += 4; // 0x28
 
 	if (dat->refCount != 0) {
-		return;
+		return 0;
 	}
 
 	assert(src == base + kLvlAnimHdrOffset);
@@ -329,6 +329,8 @@ static void resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectD
 		WRITE_LE_UINT32(dat->coordsOffsetsTable + i * sizeof(uint32_t), coordsOffset);
 		coordsOffset += count * 4 + 1;
 	}
+
+	return (dat->framesCount + dat->animsCount) * sizeof(uint32_t);
 }
 
 void Resource::loadLvlSpriteData(int num) {
@@ -341,10 +343,9 @@ void Resource::loadLvlSpriteData(int num) {
 	_lvlFile->read(ptr, readSize);
 
 	LvlObjectData *dat = &_resLevelData0x2988Table[num];
-	resFixPointersLevelData0x2988(ptr, ptr + readSize, dat);
+	const uint32_t readOffsetsSize = resFixPointersLevelData0x2988(ptr, ptr + readSize, dat);
 	assert(readSize <= size);
 	const uint32_t allocatedOffsetsSize = size - readSize;
-	const uint32_t readOffsetsSize = (dat->framesCount + dat->animsCount) * sizeof(uint32_t);
 	assert(allocatedOffsetsSize == readOffsetsSize);
 
 	_resLevelData0x2988PtrTable[dat->spriteNum] = dat;
@@ -414,7 +415,7 @@ void Resource::loadLvlData(File *fp, const char *name) {
 	}
 }
 
-static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlBackgroundData *dat) {
+static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, uint8_t *offsetsPtr, LvlBackgroundData *dat) {
 	const uint8_t *src_ = src;
 
 	dat->backgroundCount = *src++;
@@ -459,11 +460,12 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->dataUnk4Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
+	uint32_t offsetsSize = 0;
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		if (offs != 0) {
 			dat->dataUnk5Table[i] = (LvlObjectData *)malloc(sizeof(LvlObjectData));
-			resFixPointersLevelData0x2988(ptr + offs, 0, dat->dataUnk5Table[i]);
+			offsetsSize += resFixPointersLevelData0x2988(ptr + offs, offsetsPtr + offsetsSize, dat->dataUnk5Table[i]);
 		} else {
 			dat->dataUnk5Table[i] = 0;
 		}
@@ -473,6 +475,7 @@ static void resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, LvlB
 		dat->dataUnk6Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	assert((src - src_) == 160);
+	return offsetsSize;
 }
 
 void Resource::loadLvlScreenBackgroundData(int num) {
@@ -490,7 +493,11 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	uint8_t buf[160];
 	_lvlFile->read(buf, 160);
 	LvlBackgroundData *dat = &_resLvlScreenBackgroundDataTable[num];
-	resFixPointersLevelData0x2B88(buf, ptr, dat);
+	const uint32_t readOffsetsSize = resFixPointersLevelData0x2B88(buf, ptr, ptr + readSize, dat);
+
+	assert(size >= readSize);
+	const uint32_t allocatedOffsetsSize = size - readSize;
+	assert(allocatedOffsetsSize == readOffsetsSize);
 
 	_resLvlScreenBackgroundDataPtrTable[num] = ptr;
 	_resLevelData0x2B88SizeTable[num] = size;
