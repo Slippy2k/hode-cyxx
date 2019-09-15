@@ -387,17 +387,17 @@ struct Game {
 
 	// monsters.cpp
 	void resetMonsterObject1(MonsterObject1 *m);
-	void initMonsterObject1(MonsterObject1 *m);
+	void mstMonster1ResetWalkPath(MonsterObject1 *m);
 	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);
 	void disableMonsterObject1(MonsterObject1 *m);
 	void copyMonsterObject1(Task *t, MonsterObject1 *m, int num);
 	int mstTaskStopMonsterObject1(Task *t);
 	void updateMstLvlObjectPos(MonsterObject1 *m);
-	bool updateMonsterObject1PositionHelper(MonsterObject1 *m);
-	bool updateMonsterObject1Position(MonsterObject1 *m);
+	bool mstMonster1SetWalkingBounds(MonsterObject1 *m);
+	bool mstMonster1UpdateWalkPath(MonsterObject1 *m);
 	void initMonsterObject2_firefly(MonsterObject2 *m);
 	void resetMonsterObject2(MonsterObject2 *m);
-	int prepareMstTask(Task *t);
+	int mstTaskPrepare(Task *t);
 
 	void mstBoundingBoxClear(MonsterObject1 *m, int dir);
 	int mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2);
@@ -435,7 +435,7 @@ struct Game {
 	int mstUpdateTaskMonsterObject1(Task *t);
 	int mstUpdateTaskMonsterObject2(Task *t);
 	void mstUpdateRefPos();
-	void updateMstHeightMapData();
+	void mstUpdateMonstersRect();
 
 	void mstRemoveMonsterObject2(Task *t, Task **tasksList);
 	void mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags);
@@ -469,7 +469,7 @@ struct Game {
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstSetHorizontalBounds(MonsterObject1 *m);
 	void mstResetCollisionTable();
-	void mstRestartTask(Task *t);
+	void mstTaskRestart(Task *t);
 	bool mstIsMonsterFacingDirection(MonsterObject1 *m, int x, int y, uint8_t dir);
 	int executeMstUnk23(Task *t);
 	int executeMstOp67Type1(Task *t);
