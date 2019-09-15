@@ -1538,30 +1538,6 @@ void Resource::loadMstData(File *fp, const char *name) {
 	if (bytesRead != _mstHdr.dataSize) {
 		warning("Unexpected .mst bytesRead %d dataSize %d", bytesRead, _mstHdr.dataSize);
 	}
-
-	if (0) {
-		for (int i = 0; i < _lvlHdr.screensCount; ++i) {
-			uint32_t j = _mstUnk40[i];
-			while (j != kNone) {
-				MstScreenAreaCode *msac = &_mstScreenAreaCodes[j];
-				fprintf(stdout, ".mst screen %d pos %d,%d,%d,%d\n", i, msac->x1, msac->y1, msac->x2, msac->y2);
-				j = msac->nextByPos;
-			}
-		}
-	}
-
-	if (0) {
-		int histOp[256];
-		memset(histOp, 0, sizeof(histOp));
-		for (int i = 0; i < _mstHdr.codeSize; ++i) {
-			++histOp[_mstCodeData[i * 4]];
-		}
-		for (int i = 0; i < 256; ++i) {
-			if (histOp[i]) {
-				fprintf(stdout, ".mst opcode %d count %d\n", i, histOp[i]);
-			}
-		}
-	}
 }
 
 MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {

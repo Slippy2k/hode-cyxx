@@ -2685,32 +2685,7 @@ void Game::levelMainLoop() {
 		}
 	}
 	if (_res->_sssHdr.infosDataCount != 0) {
-#if 0
-		// original code had a dedicated thread for sound, that main thread/loop was signaling
-		if (_snd_numberOfBuffers != 0) {
-			SetEvent(_snd_threadEvent1);
-			while (_snd_numberOfBuffers != 0) {
-				Sleep(1);
-			}
-		}
-		EnterCriticalSection(_snd_mutex);
-		snd_prepareDirectSoundBuffers();
-		if (_snd_numberOfBuffersMixed == 0) {
-			_snd_numberOfBuffers = 4;
-			_snd_syncTimeOut = 55;
-			LeaveCriticalSection(_snd_mutex);
-			SetEvent(_snd_threadEvent1);
-			game_unmuteSound();
-		} else if (_snd_numberOfBuffersMixed - _snd_playbackDuration < 4) {
-			_snd_numberOfBuffers = 1;
-			LeaveCriticalSection(_snd_mutex);
-			SetEvent(_snd_threadEvent1);
-			game_unmuteSound();
-		} else {
-			LeaveCriticalSection(_snd_mutex);
-			game_unmuteSound();
-		}
-#endif
+		/* original code appears to have a dedicated thread for sound, that main thread/loop signals */
 	}
 	if (_video->_paletteNeedRefresh) {
 		_video->_paletteNeedRefresh = false;
@@ -4202,13 +4177,9 @@ void Game::initLvlObjects() {
 			memset(ptr->dataPtr, 0, sizeof(AnimBackgroundData));
 			break;
 		case 1:
-			debug(kDebug_GAME, "Trying to free _resLvlScreenBackgroundDataTable.backgroundSoundTable ; ignored (i=%d index=%d)", i, index);
-#if 0
 			if (ptr->dataPtr) {
-				free(ptr->dataPtr);
-				ptr->dataPtr = 0;
+				warning("Trying to free _resLvlScreenBackgroundDataTable.backgroundSoundTable (i=%d index=%d)", i, index);
 			}
-#endif
 			ptr->xPos = 0;
 			ptr->yPos = 0;
 			break;

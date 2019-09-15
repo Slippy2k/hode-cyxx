@@ -401,25 +401,25 @@ void Video::buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst) {
 	for (int i = 144; i < 256; ++i) {
 		_shadowColorLut[i] = i;
 	}
-#if 0
-        // lookup[a * 256 + b]
-        //
-        // if (a < 144) return b;
-        // else if (b < 144) return src[b]
-        // else return b;
-        //
-        // return (a >= 144 && b < 144) ? src[b] : b;
-        for (int a = 0; a < 256; ++a) {
-                for (int b = 0; b < 256; ++b) {
-                        int res1 = (a >= 144 && b < 144) ? src[b] : b;
-                        int res2 = dst[a * 256 + b - 65536];
-                        if (res1 != res2) {
-                                printf("buildShadowColorLookupTable a %d b %d res1 %d res2 %d\n", a, b, res1, res2);
-                        }
-                        assert(res1 == res2);
-                }
-        }
-#endif
+	if (0) {
+		// lookup[a * 256 + b]
+		//
+		// if (a < 144) return b;
+		// else if (b < 144) return src[b]
+		// else return b;
+		//
+		// return (a >= 144 && b < 144) ? src[b] : b;
+		for (int a = 0; a < 256; ++a) {
+			for (int b = 0; b < 256; ++b) {
+				const int res1 = (a >= 144 && b < 144) ? src[b] : b;
+				const int res2 = dst[a * 256 + b - 65536];
+				if (res1 != res2) {
+					fprintf(stdout, "buildShadowColorLookupTable a %d b %d res1 %d res2 %d\n", a, b, res1, res2);
+				}
+				assert(res1 == res2);
+			}
+		}
+	}
 }
 
 // returns the font index
