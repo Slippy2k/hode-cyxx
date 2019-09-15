@@ -260,7 +260,7 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 	dat->framesCount = READ_LE_UINT16(src); src += 2;
 	dat->hotspotsCount = READ_LE_UINT16(src); src += 2;
 	dat->movesCount = READ_LE_UINT16(src); src += 2;
-	dat->animsCount = READ_LE_UINT16(src); src += 2;
+	dat->coordsCount = READ_LE_UINT16(src); src += 2;
 	dat->refCount = *src++;
 	dat->frame = *src++;
 	dat->anim = READ_LE_UINT16(src); src += 2;
@@ -271,7 +271,7 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 	src += 4; // 0x18
 	uint32_t framesDataOffset = READ_LE_UINT32(src); src += 4; // 0x1C
 	src += 4; // 0x20
-	uint32_t animsDataOffset = READ_LE_UINT32(src); src += 4; // 0x24
+	uint32_t coordsDataOffset = READ_LE_UINT32(src); src += 4; // 0x24
 	uint32_t hotspotsDataOffset = READ_LE_UINT32(src); src += 4; // 0x28
 
 	if (dat->refCount != 0) {
@@ -308,10 +308,10 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 	dat->framesData = (framesDataOffset == 0) ? 0 : base + framesDataOffset;
 	dat->hotspotsData = (hotspotsDataOffset == 0) ? 0 : base + hotspotsDataOffset;
 	dat->movesData = (movesDataOffset == 0) ? 0 : base + movesDataOffset;
-	dat->animsData = (animsDataOffset == 0) ? 0 : base + animsDataOffset;
+	dat->coordsData = (coordsDataOffset == 0) ? 0 : base + coordsDataOffset;
 
 	dat->framesOffsetsTable = ptr;
-	if (dat->animsData) {
+	if (dat->coordsData) {
 		dat->coordsOffsetsTable = ptr + dat->framesCount * 4;
 	} else {
 		dat->coordsOffsetsTable = 0;
@@ -324,13 +324,13 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 		framesOffset += size;
 	}
 	uint32_t coordsOffset = 0;
-	for (int i = 0; i < dat->animsCount; ++i) {
-		const int count = dat->animsData[coordsOffset];
+	for (int i = 0; i < dat->coordsCount; ++i) {
+		const int count = dat->coordsData[coordsOffset];
 		WRITE_LE_UINT32(dat->coordsOffsetsTable + i * sizeof(uint32_t), coordsOffset);
 		coordsOffset += count * 4 + 1;
 	}
 
-	return (dat->framesCount + dat->animsCount) * sizeof(uint32_t);
+	return (dat->framesCount + dat->coordsCount) * sizeof(uint32_t);
 }
 
 void Resource::loadLvlSpriteData(int num) {
@@ -575,8 +575,8 @@ const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) con
 }
 
 const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const {
-	assert(num < dat->animsCount);
-	return dat->animsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
+	assert(num < dat->coordsCount);
+	return dat->coordsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
 }
 
 static int skipBytesAlign(File *f, int len) {

@@ -111,7 +111,7 @@ struct LvlObjectData {
 	uint16_t framesCount;
 	uint16_t hotspotsCount;
 	uint16_t movesCount;
-	uint16_t animsCount;
+	uint16_t coordsCount;
 	uint8_t refCount; // 0xA
 	uint8_t frame; // 0xB
 	uint16_t anim; // 0xC
@@ -121,7 +121,7 @@ struct LvlObjectData {
 	uint8_t *movesData; // 0x14, LvlSprMoveData
 	uint8_t *framesData; // 0x18
 	uint8_t *framesOffsetsTable; // 0x1C
-	uint8_t *animsData; // 0x20
+	uint8_t *coordsData; // 0x20
 	uint8_t *coordsOffsetsTable; // 0x24
 	uint8_t *hotspotsData; // 0x28, LvlSprHotspotData
 };
