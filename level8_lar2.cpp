@@ -73,7 +73,7 @@ static const uint8_t _lar2_lutData[39] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-BoundingBox Game::_lar2_unkData2[13] = {
+BoundingBox Game::_lar2_bboxData[13] = {
 	{ 210, 155, 220, 159 },
 	{ 224, 146, 234, 150 },
 	{ 193,  84, 203,  88 },
@@ -519,7 +519,7 @@ void Level_lar2::preScreenUpdate(int num) {
 }
 
 void Level_lar2::tick() {
-	_g->updateLevelTick_lar(13, _lar2_unkData3, Game::_lar2_unkData2);
+	_g->updateLevelTick_lar(13, _lar2_unkData3, Game::_lar2_bboxData);
 }
 
 void Level_lar2::setupLvlObjects_lar2_screen19() {

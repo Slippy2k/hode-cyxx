@@ -4384,7 +4384,7 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 			}
 // 4068A4
 			const int flag = (p[1] >> 5) & 1;
-			uint8_t _al = updateLevelTick_lar_helper5(b2, flag);
+			uint8_t _al = clipAndyLvlObjectLar(b2, flag);
 			_al = updateLevelTick_lar_helper3(_al, p[2], p[0], num, flag);
 			p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
 			_al = p[1];
@@ -4401,11 +4401,11 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 				int _bl, i;
 				if (_al < 0) {
 					i = (-_al) * 6;
-					updateLevelTick_lar_helper4(&_lar1_unkData1[i], 0);
+					updateScreenMaskLar(&_lar1_unkData1[i], 0);
 					_bl = 5;
 				} else {
 					i = _al * 6;
-					updateLevelTick_lar_helper4(&_lar1_unkData1[i], 1);
+					updateScreenMaskLar(&_lar1_unkData1[i], 1);
 					_bl = 2;
 				}
 				LvlObject *o = findLvlObject2(0, _lar1_unkData1[i + 5], _lar1_unkData1[i + 4]);
@@ -4467,9 +4467,9 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 	if (dataNum >= 0) {
 		BoundingBox *box;
 		if (_currentLevel == kLvl_lar2) {
-			box = &Game::_lar2_unkData2[boxNum];
+			box = &Game::_lar2_bboxData[boxNum];
 		} else {
-			box = &Game::_lar1_unkData2[boxNum];
+			box = &Game::_lar1_bboxData[boxNum];
 		}
 		int dy = box->y2 - box->y1;
 		int dx = box->x2 - box->x1;
@@ -4505,8 +4505,7 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 	return _bl;
 }
 
-// updateScreenMaskLar
-void Game::updateLevelTick_lar_helper4(uint8_t *p, int flag) {
+void Game::updateScreenMaskLar(uint8_t *p, int flag) {
 	if (p[1] != flag) {
 		p[1] = flag;
 		const uint8_t screenNum = p[4];
@@ -4530,8 +4529,7 @@ void Game::updateLevelTick_lar_helper4(uint8_t *p, int flag) {
 	}
 }
 
-// clipAndyLvlObjectLar
-int Game::updateLevelTick_lar_helper5(BoundingBox *b, bool flag) {
+int Game::clipAndyLvlObjectLar(BoundingBox *b, bool flag) {
 	int ret = 0;
 	const uint8_t flags = _andyObject->flags0 & 0x1F;
 	if (flags != 3 && flags != 5 && !flag) {

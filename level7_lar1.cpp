@@ -63,7 +63,7 @@ uint8_t Game::_lar1_unkData0[13 * 4] = {
         0x02, 0x00, 0x00, 0x00,
 };
 
-BoundingBox Game::_lar1_unkData2[24] = {
+BoundingBox Game::_lar1_bboxData[24] = {
 	{ 203, 162, 213, 166 },
 	{  68,  86,  78,  90 },
 	{ 195,  58, 205,  62 },
@@ -409,11 +409,11 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							_g->updateLevelTick_lar_helper4(Game::_lar1_unkData1 + _al, 0);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 0);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							_g->updateLevelTick_lar_helper4(Game::_lar1_unkData1 + _al, 1);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 1);
 							_bl = 2;
 						}
 // 40751B
@@ -427,11 +427,11 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							_g->updateLevelTick_lar_helper4(Game::_lar1_unkData1 + _al, 0);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 0);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							_g->updateLevelTick_lar_helper4(Game::_lar1_unkData1 + _al, 1);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 1);
 							_bl = 2;
 						}
 						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[_al + 5], Game::_lar1_unkData1[_al + 4]);
@@ -940,7 +940,7 @@ void Level_lar1::terminate() {
 }
 
 void Level_lar1::tick() {
-	_g->updateLevelTick_lar(24, _lar1_unkData3, Game::_lar1_unkData2);
+	_g->updateLevelTick_lar(24, _lar1_unkData3, Game::_lar1_bboxData);
 	_g->updateCrackSprites();
 	if (_g->_screenCounterTable[19] != 0) {
 		_g->_plasmaCannonFlags |= 2;

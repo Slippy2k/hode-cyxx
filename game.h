@@ -86,8 +86,8 @@ struct Game {
 	static uint8_t _lar1_unkData1[];
 	static uint8_t _lar1_unkData0[];
 	static uint8_t _lar2_unkData0[];
-	static BoundingBox _lar1_unkData2[]; // _lar1_bboxData
-	static BoundingBox _lar2_unkData2[]; // _lar2_bboxData
+	static BoundingBox _lar1_bboxData[];
+	static BoundingBox _lar2_bboxData[];
 
 	Level *_level;
 	Mixer _mix;
@@ -367,8 +367,8 @@ struct Game {
 	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
 	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
 	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
-	void updateLevelTick_lar_helper4(uint8_t *p, int num);
-	int updateLevelTick_lar_helper5(BoundingBox *b, bool flag);
+	void updateScreenMaskLar(uint8_t *p, int num);
+	int clipAndyLvlObjectLar(BoundingBox *b, bool flag);
 	void resetCrackSprites();
 	void updateCrackSprites();
 	void captureScreenshot();
