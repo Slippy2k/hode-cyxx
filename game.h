@@ -436,23 +436,9 @@ struct Game {
 	int mstUpdateTaskMonsterObject2(Task *t);
 	void mstUpdateRefPos();
 	void mstUpdateMonstersRect();
-
 	void mstRemoveMonsterObject2(Task *t, Task **tasksList);
 	void mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags);
 	void mstRemoveMonsterObject1(Task *t, Task **tasksList);
-	Task *findFreeTask();
-	Task *createTask(const uint8_t *codeData);
-	int mstTaskSetActionDirection(Task *t, int num, int value);
-	void updateTask(Task *t, int num, const uint8_t *codeData);
-	void resetTask(Task *t, const uint8_t *codeData);
-	void removeTask(Task **tasksList, Task *t);
-	void appendTask(Task **tasksList, Task *t);
-	int getTaskVar(Task *t, int index, int type) const;
-	void setTaskVar(Task *t, int index, int type, int value);
-	int getTaskAndyVar(int index, Task *t) const;
-	int getTaskOtherVar(int index, Task *t) const;
-	int getTaskFlag(Task *t, int index, int type) const;
-	int mstTask_main(Task *t);
 	void mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum);
 	void mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int type);
 	int mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num);
@@ -476,6 +462,22 @@ struct Game {
 	int executeMstOp67Type2(Task *t, int flag);
 	void mstOp67_addMonster(Task *t, int y1, int y2, int x1, int x2, int screen, int type, int o_flags1, int o_flags2, int arg1C, int arg20, int arg24);
 	void mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int c, int d);
+	int mstTaskSetActionDirection(Task *t, int num, int value);
+
+	Task *findFreeTask();
+	Task *createTask(const uint8_t *codeData);
+	void updateTask(Task *t, int num, const uint8_t *codeData);
+	void resetTask(Task *t, const uint8_t *codeData);
+	void removeTask(Task **tasksList, Task *t);
+	void appendTask(Task **tasksList, Task *t);
+
+	int getTaskVar(Task *t, int index, int type) const;
+	void setTaskVar(Task *t, int index, int type, int value);
+	int getTaskAndyVar(int index, Task *t) const;
+	int getTaskOtherVar(int index, Task *t) const;
+	int getTaskFlag(Task *t, int index, int type) const;
+
+	int mstTask_main(Task *t);
 	int mstTask_waitResetInput(Task *t);
 	int mstTask_wait(Task *t);
 	int mstTask_waitFlags(Task *t);

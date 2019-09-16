@@ -3133,32 +3133,6 @@ void Game::mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags) {
 	resetTask(t, _res->_mstCodeData + codeData * 4);
 }
 
-Task *Game::findFreeTask() {
-	for (int i = 0; i < kMaxTasks; ++i) {
-		Task *t = &_tasksTable[i];
-		if (!t->codeData) {
-			memset(t, 0, sizeof(Task));
-			return t;
-		}
-	}
-	return 0;
-}
-
-Task *Game::createTask(const uint8_t *codeData) {
-	Task *t = findFreeTask();
-	if (t) {
-		memset(t, 0, sizeof(Task));
-		resetTask(t, codeData);
-		t->prevPtr = 0;
-		t->nextPtr = _tasksList;
-		if (_tasksList) {
-			_tasksList->prevPtr = t;
-		}
-		_tasksList = t;
-		return t;
-	}
-	return 0;
-}
 
 int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	MonsterObject1 *m = t->monster1;
@@ -3266,6 +3240,33 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		debug(kDebug_MONSTER, "mstTaskSetActionDirection arg1 %d", t->arg1);
 	}
 	return 1;
+}
+
+Task *Game::findFreeTask() {
+	for (int i = 0; i < kMaxTasks; ++i) {
+		Task *t = &_tasksTable[i];
+		if (!t->codeData) {
+			memset(t, 0, sizeof(Task));
+			return t;
+		}
+	}
+	return 0;
+}
+
+Task *Game::createTask(const uint8_t *codeData) {
+	Task *t = findFreeTask();
+	if (t) {
+		memset(t, 0, sizeof(Task));
+		resetTask(t, codeData);
+		t->prevPtr = 0;
+		t->nextPtr = _tasksList;
+		if (_tasksList) {
+			_tasksList->prevPtr = t;
+		}
+		_tasksList = t;
+		return t;
+	}
+	return 0;
 }
 
 void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
