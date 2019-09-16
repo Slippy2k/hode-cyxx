@@ -433,7 +433,7 @@ struct Game {
 	bool lvlObjectCollidesAndy4(LvlObject *o, int type) const;
 	bool lvlObjectCollidesAndy3(LvlObject *o, int type) const;
 	bool mstCollidesByFlags(MonsterObject1 *m, uint32_t flags);
-	bool executeMstUnk27(MonsterObject1 *m, const uint8_t *p);
+	bool mstMonster1Collide(MonsterObject1 *m, const uint8_t *p);
 	int mstUpdateTaskMonsterObject1(Task *t);
 	int mstUpdateTaskMonsterObject2(Task *t);
 	void mstUpdateRefPos();
@@ -480,9 +480,9 @@ struct Game {
 	int getTaskFlag(Task *t, int index, int type) const;
 
 	int mstTask_main(Task *t);
-	int mstTask_waitResetInput(Task *t);
-	int mstTask_wait(Task *t);
-	int mstTask_waitFlags(Task *t);
+	int mstTask_wait1(Task *t);
+	int mstTask_wait2(Task *t);
+	int mstTask_wait3(Task *t);
 	int mstTask_idle(Task *t);
 	int mstTask_mstOp231(Task *t);
 	int mstTask_mstOp232(Task *t);

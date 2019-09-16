@@ -1116,10 +1116,9 @@ void Game::executeMstUnk16(MstUnk44 *m44, int index) {
 		MstUnk44Unk1 *m44Unk1 = &m44->data[i];
 		memset(buffer, 0xFF, sizeof(buffer));
 		memset(m44Unk1->unk60[index], 0, m44->count);
-		uint32_t *p = buffer + i;
 		_mstHelper1UnkTable[0] = i;
 		_mstHelper1Counter2 = 1;
-		p[0] = 0;
+		buffer[i] = 0;
 		_mstHelper1Counter1 = 0;
 // 41749C
 		if (_mstHelper1Counter1 == _mstHelper1Counter2) {
@@ -2358,7 +2357,7 @@ bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 	return true;
 }
 
-bool Game::executeMstUnk27(MonsterObject1 *m, const uint8_t *p) {
+bool Game::mstMonster1Collide(MonsterObject1 *m, const uint8_t *p) {
 	const uint32_t a = READ_LE_UINT32(p + 0x10);
 	if (a == 0 || !mstCollidesByFlags(m, a)) {
 		return false;
@@ -2452,7 +2451,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		return 0;
 	}
 	if (_mstCurrentDataPtr[0] != 0) {
-		executeMstUnk27(_mstCurrentMonster1, _mstCurrentDataPtr);
+		mstMonster1Collide(_mstCurrentMonster1, _mstCurrentDataPtr);
 		return 0;
 	}
 	if ((m->flagsA5 & 0x40) != 0) {
@@ -2682,7 +2681,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 
 					if (_mstAndyLevelPosX >= x1 /*_edx*/ && _mstAndyLevelPosX <= x2 /*_edi*/ && _mstAndyLevelPosY >= y1 /*_esi*/ && _mstAndyLevelPosY <= y2 /*_ebp*/) {
 						mstTaskAttack(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
-						executeMstUnk27(_mstCurrentMonster1, _mstCurrentDataPtr);
+						mstMonster1Collide(_mstCurrentMonster1, _mstCurrentDataPtr);
 						return 0;
 					}
 
@@ -2692,7 +2691,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 	}
 // 418939
-	if (executeMstUnk27(_mstCurrentMonster1, _mstCurrentDataPtr)) {
+	if (mstMonster1Collide(_mstCurrentMonster1, _mstCurrentDataPtr)) {
 		return 0;
 	}
 	uint8_t _al = _mstCurrentMonster1->flagsA6;
@@ -3175,7 +3174,7 @@ void Game::mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags) {
 		if (n) {
 			memcpy(n, t, sizeof(Task));
 			t->child = n;
-			if (t->run != &Game::mstTask_waitResetInput) {
+			if (t->run != &Game::mstTask_wait2) {
 				const uint8_t *p = n->codeData - 4;
 				if ((t->flags & 0x40) != 0 || p[0] == 203 || ((flags & 0x10) != 0 && (t->run == &Game::mstTask_monsterWait1 || t->run == &Game::mstTask_monsterWait2 || t->run == &Game::mstTask_monsterWait3 || t->run == &Game::mstTask_monsterWait4))) {
 					p += 4;
@@ -3812,10 +3811,10 @@ int Game::mstTask_main(Task *t) {
 				t->arg1 = delay;
 				if (delay > 0) {
 					if (p[0] == 0) {
-						t->run = &Game::mstTask_waitResetInput;
+						t->run = &Game::mstTask_wait2;
 						ret = 1;
 					} else {
-						t->run = &Game::mstTask_wait;
+						t->run = &Game::mstTask_wait1;
 						ret = 1;
 					}
 				}
@@ -3913,7 +3912,7 @@ int Game::mstTask_main(Task *t) {
 						o->actionKeyMask = 0;
 						o->directionKeyMask = 0;
 					}
-					t->run = &Game::mstTask_waitFlags;
+					t->run = &Game::mstTask_wait3;
 					ret = 1;
 				}
 			}
@@ -3941,7 +3940,7 @@ int Game::mstTask_main(Task *t) {
 							o->actionKeyMask = 0;
 							o->directionKeyMask = 0;
 						}
-						t->run = &Game::mstTask_waitFlags;
+						t->run = &Game::mstTask_wait3;
 						ret = 1;
 					}
 				}
@@ -6217,12 +6216,12 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 	if (spriteNum == 0) {
 		spriteNum = 1;
 	}
-	static const uint8_t byte_451248[32] = {
+	static const uint8_t data[32] = {
 		0x00, 0x00, 0x00, 0x02, 0x02, 0x02, 0x04, 0x04, 0x04, 0x06, 0x06, 0x06, 0x08, 0x08, 0x08, 0x0A,
 		0x0A, 0x0A, 0x0C, 0x0C, 0x0C, 0x0E, 0x0E, 0x0E, 0x10, 0x10, 0x10, 0x12, 0x12, 0x12, 0x14, 0x14,
 	};
 // 403515
-	const int pos = byte_451248[(dx >> 3) & 31];
+	const int pos = data[(dx >> 3) & 31];
 	const int num = dy >> 5;
 	if ((_crackSpritesTable[spriteNum].flags[num] & (3 << pos)) == 0) {
 		if (addLvlObjectToList3(20)) {
@@ -7209,9 +7208,8 @@ void Game::mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int 
 	}
 }
 
-// mstTask_wait1
-int Game::mstTask_wait(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_wait t %p", t);
+int Game::mstTask_wait1(Task *t) {
+	debug(kDebug_MONSTER, "mstTask_wait1 t %p", t);
 	--t->arg1;
 	if (t->arg1 == 0) {
 		t->run = &Game::mstTask_main;
@@ -7220,9 +7218,8 @@ int Game::mstTask_wait(Task *t) {
 	return 1;
 }
 
-// mstTask_wait2
-int Game::mstTask_waitResetInput(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_waitResetInput t %p", t);
+int Game::mstTask_wait2(Task *t) {
+	debug(kDebug_MONSTER, "mstTask_wait2 t %p", t);
 	--t->arg1;
 	if (t->arg1 == 0) {
 		t->run = &Game::mstTask_main;
@@ -7241,9 +7238,8 @@ int Game::mstTask_waitResetInput(Task *t) {
 	return 1;
 }
 
-// mstTask_wait3
-int Game::mstTask_waitFlags(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_waitFlags t %p", t);
+int Game::mstTask_wait3(Task *t) {
+	debug(kDebug_MONSTER, "mstTask_wait3 t %p", t);
 	if (getTaskFlag(t, t->arg2, t->arg1) == 0) {
 		return 1;
 	}
