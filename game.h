@@ -110,7 +110,7 @@ struct Game {
 	int _currentLevelCheckpoint;
 	bool _quit;
 	Sprite _spritesTable[kMaxSprites];
-	Sprite *_spritesListNextPtr; // pointer to the next free element
+	Sprite *_spritesListNextPtr; // pointer to the next free entry
 	Sprite *_spriteListPtrTable[kMaxSpriteTypes];
 	uint16_t _fadePaletteBuffer[256 * 3];
 	uint8_t *_shadowScreenMaskBuffer;
@@ -125,7 +125,7 @@ struct Game {
 	bool _fadePalette;
 	bool _hideAndyObjectSprite;
 	ShootLvlObjectData _shootLvlObjectDataTable[kMaxShootLvlObjectData];
-	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the next free element
+	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the next free entry
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -187,7 +187,7 @@ struct Game {
 	uint8_t _mstOp54Table[32];
 	bool _mstLogicDisabled;
 	LvlObject _declaredLvlObjectsList[kMaxLvlObjects];
-	LvlObject *_declaredLvlObjectsListHead; // pointer to the next free element
+	LvlObject *_declaredLvlObjectsListHead; // pointer to the next free entry
 	int _declaredLvlObjectsListCount;
 	AndyLvlObjectData _andyObjectScreenData;
 	AnimBackgroundData _animBackgroundDataTable[kMaxBackgroundAnims];
@@ -258,6 +258,8 @@ struct Game {
 	void fadeScreenPalette();
 	void shakeScreen();
 	void transformShadowLayer(int delta);
+	void loadTransformLayerData(const uint8_t *data);
+	void unloadTransformLayerData();
 	void decodeShadowScreenMask(LvlBackgroundData *lvl);
 	void playSound(int num, LvlObject *ptr, int a, int b);
 	void removeSound(LvlObject *ptr);

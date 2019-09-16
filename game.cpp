@@ -242,6 +242,19 @@ void Game::transformShadowLayer(int delta) {
 	}
 }
 
+void Game::loadTransformLayerData(const uint8_t *data) {
+	assert(!_transformShadowBuffer);
+	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	const int size = decodeLZW(data, _transformShadowBuffer);
+	assert(size == 256 * 192);
+	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
+}
+
+void Game::unloadTransformLayerData() {
+	free(_transformShadowBuffer);
+	_transformShadowBuffer = 0;
+}
+
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 	uint8_t *dst = _shadowScreenMaskBuffer;
 	for (int i = lvl->currentShadowId; i < lvl->shadowCount; ++i) {

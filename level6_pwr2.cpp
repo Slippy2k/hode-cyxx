@@ -177,15 +177,11 @@ void Level_pwr2::preScreenUpdate(int num) {
 }
 
 void Level_pwr2::initialize() {
-	_g->_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(Game::_pwr1_screenTransformData, _g->_transformShadowBuffer);
-	assert(size == 256 * 192);
-	memcpy(_g->_transformShadowBuffer + 256 * 192, _g->_transformShadowBuffer, 256);
+	_g->loadTransformLayerData(Game::_pwr1_screenTransformData);
 }
 
 void Level_pwr2::terminate() {
-	free(_g->_transformShadowBuffer);
-	_g->_transformShadowBuffer = 0;
+	_g->unloadTransformLayerData();
 }
 
 const uint8_t Game::_pwr2_screenTransformLut[] = {

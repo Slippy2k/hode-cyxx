@@ -734,10 +734,7 @@ void Level_lar1::preScreenUpdate_lar1_screen11() {
 				_g->_levelCheckpoint = 4;
 			}
 		}
-		if (_g->_transformShadowBuffer) {
-			free(_g->_transformShadowBuffer);
-			_g->_transformShadowBuffer = 0;
-		}
+		_g->unloadTransformLayerData();
 		_video->_displayShadowLayer = false;
 	}
 }
@@ -745,20 +742,13 @@ void Level_lar1::preScreenUpdate_lar1_screen11() {
 void Level_lar1::preScreenUpdate_lar1_screen12() {
 	if (_res->_currentScreenResourceNum == 12) {
 		setLvlObjectUpdateType3_lar1(_g, 12);
-		assert(!_g->_transformShadowBuffer);
-		_g->_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-		const int size = decodeLZW(Game::_pwr2_screenTransformData, _g->_transformShadowBuffer);
-		assert(size == 256 * 192);
-		memcpy(_g->_transformShadowBuffer + 256 * 192, _g->_transformShadowBuffer, 256);
+		_g->loadTransformLayerData(Game::_pwr2_screenTransformData);
 	}
 }
 
 void Level_lar1::preScreenUpdate_lar1_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		if (_g->_transformShadowBuffer) {
-			free(_g->_transformShadowBuffer);
-			_g->_transformShadowBuffer = 0;
-		}
+		_g->unloadTransformLayerData();
 		_video->_displayShadowLayer = false;
 	}
 }
@@ -933,10 +923,7 @@ void Level_lar1::initialize() {
 }
 
 void Level_lar1::terminate() {
-	if (_g->_transformShadowBuffer) {
-		free(_g->_transformShadowBuffer);
-		_g->_transformShadowBuffer = 0;
-	}
+	_g->unloadTransformLayerData();
 }
 
 void Level_lar1::tick() {

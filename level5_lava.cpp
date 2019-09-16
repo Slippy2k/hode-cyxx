@@ -300,16 +300,12 @@ static LvlObject *findLvlObject_lava(LvlObject *o) {
 }
 
 void Level_lava::initialize() {
-	_g->_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(Game::_pwr2_screenTransformData, _g->_transformShadowBuffer);
-	assert(size == 256 * 192);
-	memcpy(_g->_transformShadowBuffer + 256 * 192, _g->_transformShadowBuffer, 256);
+	_g->loadTransformLayerData(Game::_pwr2_screenTransformData);
 	_g->resetCrackSprites();
 }
 
 void Level_lava::terminate() {
-	free(_g->_transformShadowBuffer);
-	_g->_transformShadowBuffer = 0;
+	_g->unloadTransformLayerData();
 }
 
 const uint8_t Game::_lava_screenTransformLut[] = {

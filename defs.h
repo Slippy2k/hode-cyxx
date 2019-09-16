@@ -247,7 +247,7 @@ struct ShootLvlObjectData {
 	int32_t xPosObject; // 0x14
 	int32_t yPosObject; // 0x18
 	LvlObject *o; // 0x1C
-	ShootLvlObjectData *nextPtr; // 0x20 next pointer to 'free' element
+	ShootLvlObjectData *nextPtr; // 0x20 pointer to the next free entry
 };
 
 struct ScreenMask { // ShadowScreenMask
