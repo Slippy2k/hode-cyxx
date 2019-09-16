@@ -22,7 +22,7 @@ VERSION = subprocess.check_output('git rev-parse --short HEAD'.split()).strip()
 print VERSION
 
 name = ARCHIVE % VERSION
-zf = zipfile.ZipFile(name, 'w')
+zf = zipfile.ZipFile(name, 'w', compression=zipfile.ZIP_DEFLATED)
 src_dir = os.listdir('.')
 for pattern in BINS:
 	for filename in src_dir:

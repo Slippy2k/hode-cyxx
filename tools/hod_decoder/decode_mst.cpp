@@ -203,9 +203,14 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 			fprintf(_out, "task.vars[%d] %s %s", p[1], _arithOp[opcode - 137], taskOtherVar(p[2], buffer));
 		}
 		break;
-	case 147 ... 158: {
+	case 147 ... 156: {
 			char buffer[64];
 			fprintf(_out, "global.vars[%d] %s %s", p[1], _arithOp[opcode - 147], taskOtherVar(p[2], buffer));
+		}
+		break;
+	case 157 ... 166: {
+			char buffer[64];
+			fprintf(_out, "monster.vars[%d] %s %s", p[1], _arithOp[opcode - 157], taskOtherVar(p[2], buffer));
 		}
 		break;
 	case 167 ... 176:
