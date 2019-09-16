@@ -353,13 +353,13 @@ void Resource::loadLvlSpriteData(int num) {
 	_resLevelData0x2988SizeTable[num] = size;
 }
 
-uint8_t *Resource::getLvlScreenMaskDataPtr(int num) {
+const uint8_t *Resource::getLvlScreenMaskDataPtr(int num) const {
 	assert(num >= 0 && num < 160);
 	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 0);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
-uint8_t *Resource::getLvlScreenPosDataPtr(int num) {
+const uint8_t *Resource::getLvlScreenPosDataPtr(int num) const {
 	assert(num >= 0 && num < 160);
 	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 4);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
@@ -511,11 +511,11 @@ void Resource::unloadLvlScreenBackgroundData(int num) {
 	}
 }
 
-bool Resource::isLvlSpriteDataLoaded(int num) {
+bool Resource::isLvlSpriteDataLoaded(int num) const {
 	return _resLevelData0x2988SizeTable[num] != 0;
 }
 
-bool Resource::isLvlBackgroundDataLoaded(int num) {
+bool Resource::isLvlBackgroundDataLoaded(int num) const {
 	return _resLevelData0x2B88SizeTable[num] != 0;
 }
 
@@ -1580,7 +1580,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	}
 }
 
-MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) {
+const MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) const {
 	uint32_t i = _mstUnk40[num];
 	while (i != kNone) {
 		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];

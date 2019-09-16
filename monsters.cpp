@@ -1037,7 +1037,7 @@ void Game::executeMstCode() {
 			}
 		}
 	}
-	MstScreenAreaCode *msac;
+	const MstScreenAreaCode *msac;
 	while ((msac = _res->findMstCodeForPos(_currentScreen, _mstAndyLevelPosX, _mstAndyLevelPosY)) != 0) {
 		debug(kDebug_MONSTER, "trigger for %d,%d", _mstAndyLevelPosX, _mstAndyLevelPosY);
 		_res->flagMstCodeForPos(msac->unk0x1C, 0);
