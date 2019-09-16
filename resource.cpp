@@ -1003,7 +1003,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x08  = fp->readUint32();
 	_mstHdr.unk0x0C  = fp->readUint32();
 	_mstHdr.unk0x10  = fp->readUint32();
-	_mstHdr.unk0x14  = fp->readUint32();
+	_mstHdr.screenInitDataCount  = fp->readUint32();
 	_mstHdr.screenAreaCodesCount = fp->readUint32();
 	_mstHdr.unk0x1C  = fp->readUint32();
 	_mstHdr.unk0x20  = fp->readUint32();
@@ -1028,7 +1028,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x6C  = fp->readUint32();
 	_mstHdr.unk0x70  = fp->readUint32();
 	_mstHdr.unk0x74  = fp->readUint32();
-	_mstHdr.unk0x78  = fp->readUint32();
+	_mstHdr.mstOp204DataCount    = fp->readUint32();
 	_mstHdr.codeSize    = fp->readUint32();
 	_mstHdr.pointsCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_mstHdr.version %d _mstHdr.codeSize %d", _mstHdr.version, _mstHdr.codeSize);
@@ -1089,8 +1089,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstTickCodeData = fp->readUint32();
 	bytesRead += 8;
 
-	_mstScreenInitCodeData = (uint32_t *)malloc(_mstHdr.unk0x14 * sizeof(uint32_t));
-	for (int i = 0; i < _mstHdr.unk0x14; ++i) {
+	_mstScreenInitCodeData = (uint32_t *)malloc(_mstHdr.screenInitDataCount * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.screenInitDataCount; ++i) {
 		_mstScreenInitCodeData[i] = fp->readUint32();
 		bytesRead += 4;
 	}
@@ -1529,12 +1529,12 @@ void Resource::loadMstData(File *fp, const char *name) {
 	fp->seek(_mstHdr.unk0x74 * 4, SEEK_CUR); // _mstUnk61
 	bytesRead += _mstHdr.unk0x74 * 4;
 
-	_mstOp56Data = (MstOp56Data *)malloc(_mstHdr.unk0x78 * sizeof(MstOp56Data));
-	for (int i = 0; i < _mstHdr.unk0x78; ++i) {
-		_mstOp56Data[i].arg0 = fp->readUint32();
-		_mstOp56Data[i].arg1 = fp->readUint32();
-		_mstOp56Data[i].arg2 = fp->readUint32();
-		_mstOp56Data[i].arg3 = fp->readUint32();
+	_mstOp204Data = (MstOp204Data *)malloc(_mstHdr.mstOp204DataCount * sizeof(MstOp204Data));
+	for (int i = 0; i < _mstHdr.mstOp204DataCount; ++i) {
+		_mstOp204Data[i].arg0 = fp->readUint32();
+		_mstOp204Data[i].arg1 = fp->readUint32();
+		_mstOp204Data[i].arg2 = fp->readUint32();
+		_mstOp204Data[i].arg3 = fp->readUint32();
 		bytesRead += 16;
 	}
 

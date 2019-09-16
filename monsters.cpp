@@ -927,7 +927,7 @@ void Game::startMstCode() {
 		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x14], unk10 - unk34);
 		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x08], unk0C + unk34);
 	}
-	if (_levelCheckpoint < _res->_mstHdr.unk0x14) {
+	if (_levelCheckpoint < _res->_mstHdr.screenInitDataCount) {
 		const uint32_t codeData = _res->_mstScreenInitCodeData[_levelCheckpoint];
 		if (codeData != kNone) {
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
@@ -1025,7 +1025,7 @@ void Game::executeMstCode() {
 		_andyShootsTable[i].m = 0;
 		_andyShootsTable[i].monsterDistance = 0x1000000;
 	}
-	executeMstCodeHelper2();
+	mstUpdateMonster1ObjectsPosition();
 	if (_mstVars[31] > 0) {
 		--_mstVars[31];
 		if (_mstVars[31] == 0) {
@@ -1195,8 +1195,7 @@ void Game::executeMstCodeHelper1() {
 	}
 }
 
-// mstUpdateMonster1ObjectsPosition
-void Game::executeMstCodeHelper2() {
+void Game::mstUpdateMonster1ObjectsPosition() {
 	mstUpdateRefPos();
 	mstUpdateMonstersRect();
 	for (Task *t = _monsterObjects1TasksList; t; t = t->nextPtr) {
@@ -5715,16 +5714,17 @@ static uint8_t getLvlObjectFlag(uint8_t type, const LvlObject *o, const LvlObjec
 }
 
 int Game::mstOp56_specialAction(Task *t, int code, int num) {
-	assert(num < _res->_mstHdr.unk0x78);
+	assert(num < _res->_mstHdr.mstOp204DataCount);
+	const MstOp204Data *op204Data = &_res->_mstOp204Data[num];
 	debug(kDebug_MONSTER, "mstOp56_specialAction code %d", code);
 	switch (code) {
 	case 0:
 		if (!_specialAnimFlag && setAndySpecialAnimation(0x71) != 0) {
 			_plasmaCannonFlags |= 1;
 			if (_andyObject->spriteNum == 0) {
-				_mstCurrentAnim = _res->_mstOp56Data[num].arg0 & 0xFFFF;
+				_mstCurrentAnim = op204Data->arg0 & 0xFFFF;
 			} else {
-				_mstCurrentAnim = _res->_mstOp56Data[num].arg0 >> 16;
+				_mstCurrentAnim = op204Data->arg0 >> 16;
 			}
 // 411AB4
 			LvlObject *o = 0;
@@ -5733,14 +5733,14 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			} else if (t->monster1) {
 				o = t->monster1->o16;
 			}
-			if (_res->_mstOp56Data[num].arg3 != 6 && o) {
+			if (op204Data->arg3 != 6 && o) {
 				LvlObject *tmpObject = t->monster1->o16;
-				const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].arg3 & 255, tmpObject, _andyObject);
+				const uint8_t flags = getLvlObjectFlag(op204Data->arg3 & 255, tmpObject, _andyObject);
 				_specialAnimMask = ((flags & 3) << 4) | (_specialAnimMask & ~0x30);
 				// _specialAnimScreenNum = tmpObject->screenNum;
 				_specialAnimLvlObject = tmpObject;
-				_mstOriginPosX = _res->_mstOp56Data[num].arg1 & 0xFFFF;
-				_mstOriginPosY = _res->_mstOp56Data[num].arg2 & 0xFFFF;
+				_mstOriginPosX = op204Data->arg1 & 0xFFFF;
+				_mstOriginPosY = op204Data->arg2 & 0xFFFF;
 			} else {
 				_specialAnimMask = merge_bits(_specialAnimMask, _andyObject->flags1, 0x30); // _specialAnimMask ^= (_specialAnimMask ^ _andyObject->flags1) & 0x30;
 				// _specialAnimScreenNum = _andyObject->screenNum;
@@ -5762,9 +5762,9 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		if (setAndySpecialAnimation(0x61) != 0) {
 			_plasmaCannonFlags &= ~1;
 			if (_andyObject->spriteNum == 0) {
-				_mstCurrentAnim = _res->_mstOp56Data[num].arg0 & 0xFFFF;
+				_mstCurrentAnim = op204Data->arg0 & 0xFFFF;
 			} else {
-				_mstCurrentAnim = _res->_mstOp56Data[num].arg0 >> 16;
+				_mstCurrentAnim = op204Data->arg0 >> 16;
 			}
 // 4118ED
 			LvlObject *o = 0;
@@ -5773,14 +5773,14 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			} else if (t->monster1) {
 				o = t->monster1->o16;
 			}
-			if (_res->_mstOp56Data[num].arg3 != 6 && o) {
+			if (op204Data->arg3 != 6 && o) {
 				LvlObject *tmpObject = t->monster1->o16;
-				const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].arg3 & 255, tmpObject, _andyObject);
+				const uint8_t flags = getLvlObjectFlag(op204Data->arg3 & 255, tmpObject, _andyObject);
 				_specialAnimMask = ((flags & 3) << 4) | (_specialAnimMask & 0xFFCF);
 				// _specialAnimScreenNum = tmpObject->screenNum;
 				_specialAnimLvlObject = tmpObject;
-				_mstOriginPosX = _res->_mstOp56Data[num].arg1 & 0xFFFF;
-				_mstOriginPosY = _res->_mstOp56Data[num].arg2 & 0xFFFF;
+				_mstOriginPosX = op204Data->arg1 & 0xFFFF;
+				_mstOriginPosY = op204Data->arg2 & 0xFFFF;
 			} else {
 				_specialAnimMask = merge_bits(_specialAnimMask, _andyObject->flags1, 0x30); // _specialAnimMask ^= (_specialAnimMask ^ _andyObject->flags1) & 0x30;
 				// _specialAnimScreenNum = _andyObject->screenNum;
@@ -5795,7 +5795,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		break;
 	case 2: {
 			LvlObject *o = t->monster1->o16;
-			const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].arg0 & 255, o, _andyObject);
+			const uint8_t flags = getLvlObjectFlag(op204Data->arg0 & 255, o, _andyObject);
 			setAndySpecialAnimation(flags | 0x10);
 		}
 		break;
@@ -5821,28 +5821,28 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		setAndySpecialAnimation(0xA2);
 		break;
 	case 10:
-		if (_res->_mstOp56Data[num].arg0 == 1) {
-			setShakeScreen(2, _res->_mstOp56Data[num].arg1 & 255);
-		} else if (_res->_mstOp56Data[num].arg0 == 2) {
-			setShakeScreen(1, _res->_mstOp56Data[num].arg1 & 255);
+		if (op204Data->arg0 == 1) {
+			setShakeScreen(2, op204Data->arg1 & 255);
+		} else if (op204Data->arg0 == 2) {
+			setShakeScreen(1, op204Data->arg1 & 255);
 		} else {
-			setShakeScreen(3, _res->_mstOp56Data[num].arg1 & 255);
+			setShakeScreen(3, op204Data->arg1 & 255);
 		}
 		break;
 	case 11: {
 			MonsterObject2 *m = t->monster2;
-			const int type = _res->_mstOp56Data[num].arg3;
-			m->x1 = getTaskVar(t, _res->_mstOp56Data[num].arg0, (type >> 0xC) & 15);
-			m->y1 = getTaskVar(t, _res->_mstOp56Data[num].arg1, (type >> 0x8) & 15);
-			m->x2 = getTaskVar(t, _res->_mstOp56Data[num].arg2, (type >> 0x4) & 15);
+			const int type = op204Data->arg3;
+			m->x1 = getTaskVar(t, op204Data->arg0, (type >> 0xC) & 15);
+			m->y1 = getTaskVar(t, op204Data->arg1, (type >> 0x8) & 15);
+			m->x2 = getTaskVar(t, op204Data->arg2, (type >> 0x4) & 15);
 			m->y2 = getTaskVar(t, type >> 16                  ,  type         & 15);
 		}
 		break;
 	case 12: {
-			const int type1 = ((_res->_mstOp56Data[num].arg3 >> 4) & 15);
-			const int hint  = getTaskVar(t, _res->_mstOp56Data[num].arg0, type1);
-			const int type2 = (_res->_mstOp56Data[num].arg3 & 15);
-			const int pause = getTaskVar(t, _res->_mstOp56Data[num].arg1, type2);
+			const int type1 = ((op204Data->arg3 >> 4) & 15);
+			const int hint  = getTaskVar(t, op204Data->arg0, type1);
+			const int type2 = (op204Data->arg3 & 15);
+			const int pause = getTaskVar(t, op204Data->arg1, type2);
 			displayHintScreen(hint, pause);
 		}
 		break;
@@ -5852,11 +5852,10 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	case 23:
 	case 24:
 	case 25: {
-			const MstOp56Data *dat = &_res->_mstOp56Data[num];
-			const int mask = dat->arg3;
-			int xPos = getTaskVar(t, dat->arg0, (mask >> 8) & 15); // _edi
-			int yPos = getTaskVar(t, dat->arg1, (mask >> 4) & 15); // _esi
-			int screenNum = getTaskVar(t, dat->arg2, mask & 15); // _eax
+			const int mask = op204Data->arg3;
+			int xPos = getTaskVar(t, op204Data->arg0, (mask >> 8) & 15); // _edi
+			int yPos = getTaskVar(t, op204Data->arg1, (mask >> 4) & 15); // _esi
+			int screenNum = getTaskVar(t, op204Data->arg2, mask & 15); // _eax
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
@@ -5914,7 +5913,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					mstTaskUpdateScreenPosition(t);
 				}
 			} else if (code == 14) {
-				const uint16_t pos = dat->arg3 >> 16;
+				const uint16_t pos = op204Data->arg3 >> 16;
 				assert(pos < 8);
 				xPos -= _res->_mstPointOffsets[screenNum].xOffset;
 				xPos -= _andyObject->posTable[pos].x;
@@ -5939,8 +5938,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		}
 		break;
 	case 15: {
-			_andyObject->anim  = _res->_mstOp56Data[num].arg0;
-			_andyObject->frame = _res->_mstOp56Data[num].arg1;
+			_andyObject->anim  = op204Data->arg0;
+			_andyObject->frame = op204Data->arg1;
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
@@ -5949,7 +5948,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			} else {
 				o = _andyObject;
 			}
-			const uint8_t flags = getLvlObjectFlag(_res->_mstOp56Data[num].arg2 & 255, o, _andyObject);
+			const uint8_t flags = getLvlObjectFlag(op204Data->arg2 & 255, o, _andyObject);
 			_andyObject->flags1 = ((flags & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
 			const int x3 = _andyObject->posTable[3].x;
 			const int y3 = _andyObject->posTable[3].y;
@@ -5971,27 +5970,27 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					o = t->monster1->o16;
 				}
 			}
-			const int pos = _res->_mstOp56Data[num].arg2;
+			const int pos = op204Data->arg2;
 			assert(pos < 8);
 			const int xPos = o->xPos + o->posTable[pos].x;
 			const int yPos = o->yPos + o->posTable[pos].y;
-			const int type1  = (_res->_mstOp56Data[num].arg3 >> 4) & 15;
-			const int index1 = _res->_mstOp56Data[num].arg0;
+			const int type1  = (op204Data->arg3 >> 4) & 15;
+			const int index1 = op204Data->arg0;
 			setTaskVar(t, index1, type1, xPos);
-			const int type2  = _res->_mstOp56Data[num].arg3 & 15;
-			const int index2 = _res->_mstOp56Data[num].arg1;
+			const int type2  = op204Data->arg3 & 15;
+			const int index2 = op204Data->arg1;
 			setTaskVar(t, index2, type2, yPos);
 		}
 		break;
 	case 18: {
-			_mstCurrentActionKeyMask = _res->_mstOp56Data[num].arg0 & 255;
+			_mstCurrentActionKeyMask = op204Data->arg0 & 255;
 		}
 		break;
 	case 19: {
-			_andyActionKeyMaskAnd    = _res->_mstOp56Data[num].arg0 & 255;
-			_andyActionKeyMaskOr     = _res->_mstOp56Data[num].arg1 & 255;
-			_andyDirectionKeyMaskAnd = _res->_mstOp56Data[num].arg2 & 255;
-			_andyDirectionKeyMaskOr  = _res->_mstOp56Data[num].arg3 & 255;
+			_andyActionKeyMaskAnd    = op204Data->arg0 & 255;
+			_andyActionKeyMaskOr     = op204Data->arg1 & 255;
+			_andyDirectionKeyMaskAnd = op204Data->arg2 & 255;
+			_andyDirectionKeyMaskOr  = op204Data->arg3 & 255;
 		}
 		break;
 	case 20: {
@@ -6010,7 +6009,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		}
 		break;
 	case 26: {
-			int screenNum = _res->_mstOp56Data[num].arg2;
+			int screenNum = op204Data->arg2;
 			if (screenNum < -1 && !t->monster1) {
 				break;
 			}
@@ -6024,7 +6023,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			}
 			int _ebp = _res->_mstPointOffsets[screenNum].xOffset;
 			int _edx = _res->_mstPointOffsets[screenNum].yOffset;
-			int _eax = _res->_mstOp56Data[num].arg3 * 256;
+			int _eax = op204Data->arg3 * 256;
 			int _edi = _ebp + 256;
 			_ebp -= _eax;
 			_edi += _eax;
@@ -6040,21 +6039,21 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 				if (m->yMstPos < _edx || m->yMstPos > _edx + 192) {
 					continue;
 				}
-				switch (_res->_mstOp56Data[num].arg0) {
+				switch (op204Data->arg0) {
 				case 0:
-					_eax = _res->_mstOp56Data[num].arg1;
+					_eax = op204Data->arg1;
 					if (m->m46 == &_res->_mstUnk46[_eax]) {
 						++count;
 					}
 					break;
 				case 1:
-					_eax = _res->_mstOp56Data[num].arg1;
+					_eax = op204Data->arg1;
 					if (m->monsterInfos == &_res->_mstMonsterInfos[_eax * kMonsterInfoDataSize]) {
 						++count;
 					}
 					break;
 				case 2:
-					_eax = _res->_mstOp56Data[num].arg1;
+					_eax = op204Data->arg1;
 					if (m->monsterInfos[944] == _eax) {
 						++count;
 					}
@@ -6065,10 +6064,10 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		}
 		break;
 	case 27: {
-			const int type = _res->_mstOp56Data[num].arg3;
-			int a = getTaskVar(t, _res->_mstOp56Data[num].arg0, (type >> 0xC) & 15);
-			int b = getTaskVar(t, _res->_mstOp56Data[num].arg1, (type >> 0x8) & 15);
-			int c = getTaskVar(t, _res->_mstOp56Data[num].arg2, (type >> 0x4) & 15);
+			const int type = op204Data->arg3;
+			int a = getTaskVar(t, op204Data->arg0, (type >> 0xC) & 15);
+			int b = getTaskVar(t, op204Data->arg1, (type >> 0x8) & 15);
+			int c = getTaskVar(t, op204Data->arg2, (type >> 0x4) & 15);
 			int d = getTaskVar(t, type >> 16,                    type         & 15);
 			setScreenMaskRect(a - 16, b, a + 16, c, d);
 		}
@@ -6077,8 +6076,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		// no-op
 		break;
 	case 29: {
-			const uint8_t state  = _res->_mstOp56Data[num].arg1 & 255;
-			const uint8_t screen = _res->_mstOp56Data[num].arg0 & 255;
+			const uint8_t state  = op204Data->arg1 & 255;
+			const uint8_t screen = op204Data->arg0 & 255;
 			_res->_screensState[screen].s0 = state;
 		}
 		break;

@@ -146,7 +146,7 @@ void fioDumpData(const char *filename, const uint8_t *data, int size) {
 	if (fp) {
 		const int count = fwrite(data, 1, size, fp);
 		if (count != size) {
-			warning("Failed to write %d bytes, count %d\n", size, count);
+			warning("Failed to write %d bytes, count %d", size, count);
 		}
 		fclose(fp);
 	}

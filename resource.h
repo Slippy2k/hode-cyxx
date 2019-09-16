@@ -80,24 +80,24 @@ struct LvlBackgroundData {
 struct MstHdr {
 	int version;
 	int dataSize;
-	int unk0x08;
-	int unk0x0C;
-	int unk0x10;
-	int unk0x14; // screenInitDataCount
+	int unk0x08; // mstUnk34DataCount
+	int unk0x0C; // mstUnk35DataCount
+	int unk0x10; // mstUnk36DataCount
+	int screenInitDataCount;
 	int screenAreaCodesCount;
-	int unk0x1C;
-	int unk0x20;
-	int unk0x24;
-	int unk0x28;
+	int unk0x1C; // mstUnk39DataCount
+	int unk0x20; // mstUnk42DataCount
+	int unk0x24; // mstUnk43DataCount
+	int unk0x28; // mstUnk44DataCount
 	int unk0x2C; // mstInfoMonster2Count
-	int unk0x30;
-	int unk0x34;
-	int unk0x38;
+	int unk0x30; // mstUnk45DataCount
+	int unk0x34; // mstUnk47DataCount
+	int unk0x38; // mstUnk48DataCount
 	int unk0x3C; // mstInfoMonster1Count
-	int unk0x40;
-	int unk0x44;
-	int unk0x48;
-	int unk0x4C;
+	int unk0x40; // mstUnk49DataCount
+	int unk0x44; // mstUnk50DataCount
+	int unk0x48; // mstUnk51DataCount
+	int unk0x4C; // mstUnk52DataCount
 	int unk0x50; // mstOp223DataCount
 	int unk0x54; // mstOp226DataCount
 	int unk0x58; // mstOp227DataCount
@@ -106,9 +106,9 @@ struct MstHdr {
 	int unk0x64; // mstOp197DataCount
 	int unk0x68; // mstOp211DataCount
 	int unk0x6C; // mstOp240DataCount
-	int unk0x70;
-	int unk0x74;
-	int unk0x78;
+	int unk0x70; // mstUnk60DataCount
+	int unk0x74; // mstUnk61DataCount
+	int mstOp204DataCount;
 	int codeSize; // sizeof(uint32_t)
 	int pointsCount; // 0x80
 };
@@ -375,7 +375,7 @@ struct MstOp226Data {
 	uint8_t unk7;
 }; // sizeof == 8
 
-struct MstOp56Data { // MstOp204Data
+struct MstOp204Data {
 	uint32_t arg0; // 0
 	uint32_t arg1; // 4
 	uint32_t arg2; // 8
@@ -581,7 +581,7 @@ struct Resource {
 	MstOp211Data *_mstOp211Data;
 	MstOp240Data *_mstOp240Data;
 	uint32_t *_mstUnk60; // index to _mstCodeData
-	MstOp56Data *_mstOp56Data;
+	MstOp204Data *_mstOp204Data;
 	uint8_t *_mstCodeData;
 	MstOp226Data *_mstOp226Data;
 
