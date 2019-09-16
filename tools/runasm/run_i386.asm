@@ -19,6 +19,7 @@ GLOBAL test_0040D136
 GLOBAL test_0041C644
 GLOBAL test_0040D7F5
 GLOBAL test_0042B67F
+GLOBAL test_mul0x4EC4EC4F
 
 SECTION .text
 
@@ -368,5 +369,22 @@ test_0042B67F:
   pop esi
   pop edi
   pop edx
+  pop ebp
+  ret
+
+test_mul0x4EC4EC4F:
+
+  push ebp
+  mov ebp, esp
+  push ecx
+
+      mov ecx, [ebp + arg0]
+      mov eax, 4EC4EC4Fh
+      mul ecx
+      shr edx, 5
+
+      mov eax, edx
+
+  pop ecx
   pop ebp
   ret

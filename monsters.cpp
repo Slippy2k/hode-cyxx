@@ -1109,12 +1109,70 @@ void Game::executeMstCode() {
 }
 
 void Game::executeMstUnk16(MstUnk44 *m44, int index) {
-	warning("executeMstUnk16 unimplemented");
+	uint32_t _mstHelper1UnkTable[32];
+	int _mstHelper1Counter1, _mstHelper1Counter2;
+	uint32_t buffer[64];
 	for (uint32_t i = 0; i < m44->count; ++i) {
-//		MstUnk44Unk1 *m44Unk1 = &m44->data[i];
-//		assert(m44->count == 64 * 4);
-//		memset(m44Unk1->unk60[index], -1, 64 * 4);
+		MstUnk44Unk1 *m44Unk1 = &m44->data[i];
+		memset(buffer, 0xFF, sizeof(buffer));
+		memset(m44Unk1->unk60[index], 0, m44->count);
+		uint32_t *p = buffer + i;
+		_mstHelper1UnkTable[0] = i;
+		_mstHelper1Counter2 = 1;
+		p[0] = 0;
+		_mstHelper1Counter1 = 0;
 // 41749C
+		if (_mstHelper1Counter1 == _mstHelper1Counter2) {
+			continue;
+		}
+		uint32_t _edi = _mstHelper1UnkTable[_mstHelper1Counter1];
+		++_mstHelper1Counter1;
+		if (_mstHelper1Counter1 >= 32) {
+			_mstHelper1Counter1 = 0;
+		}
+		const uint32_t indexUnk34 = m44->data[_edi].indexUnk34_16;
+		assert(indexUnk34 != kNone);
+		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+// 4174DE
+		for (int j = 0; j < 4; ++j) {
+			const uint32_t indexUnk44Unk1 = m44->data[_edi].indexUnk44Unk1_76[j];
+			if (indexUnk44Unk1 == kNone) {
+				continue;
+			}
+			assert(indexUnk44Unk1 < m44->count);
+			uint32_t mask;
+			const uint8_t flags = m34->flags[j];
+			if (flags & 0x80) {
+				mask = _mstAndyVarMask & (1 << (flags & 0x7F));
+			} else {
+				mask = flags & (1 << index);
+			}
+			if (mask != 0) {
+				continue;
+			}
+// 417525
+			if (j == 0 || j == 1) {
+				buffer[i] = m34->right - m34->left + buffer[_edi];
+			} else {
+				buffer[i] = m34->top - m34->bottom + buffer[_edi];
+			}
+			if (buffer[indexUnk44Unk1] == 0xFFFFFFFF) {
+				_mstHelper1UnkTable[_mstHelper1Counter2] = indexUnk44Unk1;
+				++_mstHelper1Counter2;
+				if (_mstHelper1Counter2 >= 32) {
+					_mstHelper1Counter2 = 0;
+				}
+			}
+// 417585
+			uint8_t value;
+			if (_edi == i) {
+				static const uint8_t data[] = { 2, 8, 4, 1 };
+				value = data[j];
+			} else {
+				value = m44Unk1->unk60[index][_edi];
+			}
+			m44Unk1->unk60[index][i] = value;
+		}
 	}
 }
 
@@ -1124,10 +1182,9 @@ int Game::executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44Unk1, int num, int ind
 		assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.unk0x08);
 		MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
 		uint32_t mask;
-		uint8_t flags = m34->unk10[num];
+		const uint8_t flags = m34->flags[num];
 		if (flags & 0x80) {
-			flags &= 0x7F;
-			mask = _mstAndyVarMask & (1 << flags);
+			mask = _mstAndyVarMask & (1 << (flags & 0x7F));
 		} else {
 			mask = flags & (1 << index);
 		}

@@ -137,7 +137,7 @@ struct MstUnk34 { // MstBox
 	int32_t left; //  4
 	int32_t top; // 8
 	int32_t bottom; // 0xC
-	uint8_t unk10[4]; // 0x10
+	uint8_t flags[4]; // 0x10
 }; // sizeof == 20
 
 struct MstUnk35 {

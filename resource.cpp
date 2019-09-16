@@ -1083,10 +1083,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstUnk34[i].left   = fp->readUint32();
 		_mstUnk34[i].top    = fp->readUint32();
 		_mstUnk34[i].bottom = fp->readUint32();
-		_mstUnk34[i].unk10[0] = fp->readByte();
-		_mstUnk34[i].unk10[1] = fp->readByte();
-		_mstUnk34[i].unk10[2] = fp->readByte();
-		_mstUnk34[i].unk10[3] = fp->readByte();
+		_mstUnk34[i].flags[0] = fp->readByte();
+		_mstUnk34[i].flags[1] = fp->readByte();
+		_mstUnk34[i].flags[2] = fp->readByte();
+		_mstUnk34[i].flags[3] = fp->readByte();
 		bytesRead += 20;
 	}
 
