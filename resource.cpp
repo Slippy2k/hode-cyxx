@@ -335,9 +335,9 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 
 void Resource::loadLvlSpriteData(int num) {
 	_lvlFile->seekAlign(0x2988 + num * 16);
-	uint32_t offs = _lvlFile->readUint32();
-	uint32_t size = _lvlFile->readUint32();
-	uint32_t readSize = _lvlFile->readUint32();
+	const uint32_t offs = _lvlFile->readUint32();
+	const uint32_t size = _lvlFile->readUint32();
+	const uint32_t readSize = _lvlFile->readUint32();
 	uint8_t *ptr = (uint8_t *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
@@ -483,8 +483,8 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 
 	_lvlFile->seekAlign(0x2B88 + num * 16);
 	const uint32_t offs = _lvlFile->readUint32();
-	const int size = _lvlFile->readUint32();
-	const int readSize = _lvlFile->readUint32();
+	const uint32_t size = _lvlFile->readUint32();
+	const uint32_t readSize = _lvlFile->readUint32();
 	uint8_t *ptr = (uint8_t *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
@@ -597,16 +597,13 @@ void Resource::loadSssData(File *fp, const char *name) {
 
 	assert(fp == _sssFile || fp == _datFile);
 
-	if (0 /* _sssBuffer1 */ ) {
-		int count = _sssHdr.pcmCount;
-		if (count > _sssHdr.preloadPcmCount) {
-			count = _sssHdr.preloadPcmCount;
-		}
+	if (_sssHdr.bufferSize != 0) {
+		const int count = MIN(_sssHdr.pcmCount, _sssHdr.preloadPcmCount);
 		for (int i = 0; i < count; ++i) {
 			free(_sssPcmTable[i].ptr);
 		}
-		// free(_sssBuffer1);
-		// _sssBuffer1 = 0;
+		unloadSssData();
+		_sssHdr.bufferSize = 0;
 		_sssHdr.infosDataCount = 0;
 	}
 	_sssHdr.version = fp->readUint32();
@@ -775,7 +772,6 @@ void Resource::loadSssData(File *fp, const char *name) {
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int count = _sssPreloadInfosData[i].count;
 			uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data_V6 * count);
-			assert(p);
 			fp->read(p, kSizeOfUnk4Data_V6 * count);
 			_sssPreloadInfosData[i].data = p;
 
@@ -821,7 +817,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	// allocate structure but skip read, as this table is cleared and initialized in clearSoundObjects()
+	// allocate structure but skip read as table is cleared and initialized in clearSoundObjects()
 	static const int kSizeOfSssFilter = 52;
 	fp->seek(_sssHdr.filtersDataCount * kSizeOfSssFilter, SEEK_CUR);
 	_sssFilters = (SssFilter *)malloc(_sssHdr.filtersDataCount * sizeof(SssFilter));
@@ -841,7 +837,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 // 429AB8
 	const int lutSize = _sssHdr.banksDataCount * sizeof(uint32_t);
 	for (int i = 0; i < 3; ++i) {
-		// allocate structures but skip read, as these tables are initialized in clearSoundObjects()
+		// allocate structures but skip read as tables are initialized in clearSoundObjects()
 		_sssLookupTable1[i] = (uint32_t *)malloc(lutSize);
 		_sssLookupTable2[i] = (uint32_t *)malloc(lutSize);
 		_sssLookupTable3[i] = (uint32_t *)malloc(lutSize);
@@ -868,7 +864,6 @@ void Resource::loadSssData(File *fp, const char *name) {
 		if (_sssBanksData[i].count != 0) {
 			// const int num = _sssBanksData[i].firstSampleIndex;
 			// _sssBanksData[i].codeOffset = &_sssSamplesData[num];
-			// debug(kDebug_RESOURCE, "sssDataUnk3 %d num %d", i, num);
 		} else {
 			_sssBanksData[i].firstSampleIndex = kNone;
 		}
@@ -940,7 +935,45 @@ void Resource::loadSssData(File *fp, const char *name) {
 	clearSssLookupTable3();
 }
 
-void Resource::checkSssCode(const uint8_t *buf, int size) {
+void Resource::unloadSssData() {
+	free(_sssInfosData);
+	_sssInfosData = 0;
+	free(_sssDefaultsData);
+	_sssDefaultsData = 0;
+	free(_sssBanksData);
+	_sssBanksData = 0;
+	free(_sssSamplesData);
+	_sssSamplesData = 0;
+	free(_sssPreloadInfosData);
+	_sssPreloadInfosData = 0;
+	free(_sssFilters);
+	_sssFilters = 0;
+	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
+		free(_sssPcmTable[i].ptr);
+	}
+	free(_sssPcmTable);
+	_sssPcmTable = 0;
+        free(_sssDataUnk6);
+	_sssDataUnk6 = 0;
+	free(_sssPreloadData1);
+	_sssPreloadData1 = 0;
+	free(_sssPreloadData2);
+	_sssPreloadData2 = 0;
+	free(_sssPreloadData3);
+	_sssPreloadData3 = 0;
+	for (int i = 0; i < 3; ++i) {
+		free(_sssLookupTable1[i]);
+		_sssLookupTable1[i] = 0;
+		free(_sssLookupTable2[i]);
+		_sssLookupTable2[i] = 0;
+		free(_sssLookupTable3[i]);
+		_sssLookupTable3[i] = 0;
+	}
+	free(_sssCodeData);
+	_sssCodeData = 0;
+}
+
+void Resource::checkSssCode(const uint8_t *buf, int size) const {
 	static const uint8_t _opcodesLength[] = {
 		4, 0, 4, 0, 4, 12, 8, 0, 16, 4, 4, 4, 4, 8, 12, 0, 4, 8, 8, 4, 4, 4, 8, 4, 8, 4, 8, 16, 8, 4
 	};
