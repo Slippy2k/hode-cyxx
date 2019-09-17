@@ -5910,9 +5910,9 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	case 24:
 	case 25: {
 			const int mask = op204Data->arg3;
-			int xPos = getTaskVar(t, op204Data->arg0, (mask >> 8) & 15); // _edi
-			int yPos = getTaskVar(t, op204Data->arg1, (mask >> 4) & 15); // _esi
-			int screenNum = getTaskVar(t, op204Data->arg2, mask & 15); // _eax
+			int xPos = getTaskVar(t, op204Data->arg0, (mask >> 8) & 15);
+			int yPos = getTaskVar(t, op204Data->arg1, (mask >> 4) & 15);
+			int screenNum = getTaskVar(t, op204Data->arg2, mask & 15);
 			LvlObject *o = 0;
 			if (t->monster2) {
 				o = t->monster2->o;
@@ -5921,6 +5921,9 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			}
 			if (screenNum < 0) {
 				if (screenNum == -2) {
+					if (!o) {
+						break;
+					}
 					screenNum = o->screenNum;
 					if (t->monster2) {
 						xPos += t->monster2->xMstPos;
@@ -5928,13 +5931,17 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					} else if (t->monster1) {
 						xPos += t->monster1->xMstPos;
 						yPos += t->monster1->yMstPos;
+					} else {
+						break;
 					}
 				} else if (screenNum == -1) {
 					xPos += _mstAndyLevelPosX;
 					yPos += _mstAndyLevelPosY;
 					screenNum = _currentScreen;
 				} else {
-// 4114B3
+					if (!o) {
+						break;
+					}
 					xPos += o->posTable[6].x - o->posTable[7].x;
 					yPos += o->posTable[6].y - o->posTable[7].y;
 					if (t->monster2) {
@@ -5947,7 +5954,6 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					}
 				}
 			} else {
-// 411545
 				if (screenNum >= _res->_mstHdr.pointsCount) {
 					screenNum = _res->_mstHdr.pointsCount - 1;
 				}
@@ -5967,10 +5973,11 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 				if (t->monster2) {
 					mstTaskSetScreenPosition(t);
 				} else {
+					assert(t->monster1);
 					mstTaskUpdateScreenPosition(t);
 				}
 			} else if (code == 14) {
-				const uint16_t pos = op204Data->arg3 >> 16;
+				const int pos = op204Data->arg3 >> 16;
 				assert(pos < 8);
 				xPos -= _res->_mstPointOffsets[screenNum].xOffset;
 				xPos -= _andyObject->posTable[pos].x;
