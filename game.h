@@ -445,7 +445,7 @@ struct Game {
 	void mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int type);
 	int mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num);
 	void mstOp52();
-	bool mstCollidesDirection(MstUnk48 *m, uint8_t flag);
+	bool mstCollidesDirection(const MstUnk48 *m, uint8_t flag);
 	void mstOp53(MstUnk48 *m);
 	void mstOp54();
 	int mstOp56_specialAction(Task *t, int code, int num);

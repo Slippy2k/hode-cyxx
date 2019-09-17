@@ -212,7 +212,7 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	//   return 0;
 	// }
 
-	MstUnk48Unk12Unk4 *m48 = m->unk18;
+	const MstUnk48Unk12Unk4 *m48 = m->unk18;
 	if (!m48) {
 		return 0;
 	}
@@ -4330,7 +4330,7 @@ int Game::mstTask_main(Task *t) {
 				ret = mstOp49_setMovingBounds(a, b, c, d, e, t, num);
 			}
 			break;
-		case 198: { // 50
+		case 198: { // 50 - call_task
 				Task *child = findFreeTask();
 				if (child) {
 					t->codeData = p + 4;
@@ -4346,7 +4346,7 @@ int Game::mstTask_main(Task *t) {
 				}
 			}
 			break;
-		case 199: // 51
+		case 199: // 51 - stop_monster
 			mstTaskStopMonsterObject1(t);
 			return 0;
 		case 200: // 52
@@ -4364,7 +4364,7 @@ int Game::mstTask_main(Task *t) {
 		case 202: // 54
 			mstOp54();
 			break;
-		case 203: // 55
+		case 203: // 55 - monster_attack
 			// _mstCurrentMonster1 = t->monster1;
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
@@ -4376,20 +4376,20 @@ int Game::mstTask_main(Task *t) {
 				}
 			}
 			break;
-		case 204: // 56
+		case 204: // 56 - special_action
 			ret = mstOp56_specialAction(t, p[1], READ_LE_UINT16(p + 2));
 			break;
 		case 207:
 		case 208:
 		case 209: // 79
 			break;
-		case 210: // 57
+		case 210: // 57 - add_crack_sprite
 			{
 				MonsterObject1 *m = t->monster1;
 				mstOp57_addCrackSprite(m->xPos + (int8_t)p[2], m->yPos + (int8_t)p[3], m->o16->screenNum);
 			}
 			break;
-		case 211: // 58
+		case 211: // 58 - add_lvl_object
 			mstOp58_addLvlObject(t, READ_LE_UINT16(p + 2));
 			break;
 		case 212: { // 59
@@ -4541,7 +4541,7 @@ int Game::mstTask_main(Task *t) {
 		case 222:
 		case 223:
 		case 224:
-		case 225: { // 67
+		case 225: { // 67 - add_monster
 				const int num = READ_LE_UINT16(p + 2);
 				MstOp223Data *m = &_res->_mstOp223Data[num];
 				const int mask = m->maskVars; // var8
@@ -4628,7 +4628,7 @@ int Game::mstTask_main(Task *t) {
 				mstOp67_addMonster(t, a, b, c, d, e, m->unk8, m->unk9, m->unkC, m->unkB, 0, m->unkE);
 			}
 			break;
-		case 226: { // 68
+		case 226: { // 68 - add_monster_group
 				const int num = READ_LE_UINT16(p + 2);
 				const MstOp226Data *m226Data = &_res->_mstOp226Data[num];
 				int _edi  = _res->_mstPointOffsets[_currentScreen].xOffset; // xOffset
@@ -4704,7 +4704,7 @@ int Game::mstTask_main(Task *t) {
 				}
 			}
 			break;
-		case 227: { // 69
+		case 227: { // 69 - compare_vars
 				const int num = READ_LE_UINT16(p + 2);
 				assert(num < _res->_mstHdr.unk0x58);
 				const MstOp227Data *m = &_res->_mstOp227Data[num];
@@ -4716,7 +4716,7 @@ int Game::mstTask_main(Task *t) {
 				}
 			}
 			break;
-		case 228: { // 70
+		case 228: { // 70 - compare_flags
 				const int num = READ_LE_UINT16(p + 2);
 				assert(num < _res->_mstHdr.unk0x58);
 				const MstOp227Data *m = &_res->_mstOp227Data[num];
@@ -4835,7 +4835,7 @@ int Game::mstTask_main(Task *t) {
 				}
 			}
 			break;
-		case 238: { // 75
+		case 238: { // 75 - jmp
 				const int i = READ_LE_UINT16(p + 2);
 				const uint32_t codeData = _res->_mstUnk60[i];
 				assert(codeData != kNone);
@@ -4844,21 +4844,21 @@ int Game::mstTask_main(Task *t) {
 				p -= 4;
 			}
 			break;
-		case 239: { // 76
+		case 239: { // 76  - create_task
 				const int i = READ_LE_UINT16(p + 2);
 				const uint32_t codeData = _res->_mstUnk60[i];
 				assert(codeData != kNone);
 				createTask(_res->_mstCodeData + codeData * 4);
 			}
 			break;
-		case 240: { // 77
+		case 240: { // 77 - update_task
 				const int num = READ_LE_UINT16(p + 2);
 				MstOp240Data *m = &_res->_mstOp240Data[num];
 				const uint8_t *codeData = (m->codeData == kNone) ? 0 : (_res->_mstCodeData + m->codeData * 4);
 				updateTask(t, m->flags, codeData);
 			}
 			break;
-		case 242: // 78
+		case 242: // 78 - terminate
 			debug(kDebug_MONSTER, "child %p monster1 %p monster2 %p", t->child, t->monster1, t->monster2);
 			if (t->child) {
 				Task *child = t->child;
@@ -5379,7 +5379,7 @@ void Game::mstOp52() {
 	_m48Num = -1;
 }
 
-bool Game::mstCollidesDirection(MstUnk48 *m48, uint8_t flag) {
+bool Game::mstCollidesDirection(const MstUnk48 *m48, uint8_t flag) {
 	for (int i = 0; i < 2; ++i) {
 		for (uint32_t j = 0; j < m48->count[i]; ++j) {
 			uint32_t a = (i ^ flag); // * 32; // _edx
@@ -5398,7 +5398,7 @@ bool Game::mstCollidesDirection(MstUnk48 *m48, uint8_t flag) {
 	//int var18 = 0;
 	int _edi = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
-		MstUnk48Unk12 *m12 = &m48->unk12[i];
+		const MstUnk48Unk12 *m12 = &m48->unk12[i];
 		assert(m12->count == 1);
 		MstUnk48Unk12Unk4 *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
@@ -7163,7 +7163,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 }
 
 void Game::mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int c, int d) {
-	MstUnk42 *m42 = &_res->_mstUnk42[d];
+	const MstUnk42 *m42 = &_res->_mstUnk42[d];
 	struct {
 		int m42Index;
 		int m46Index;

@@ -1324,8 +1324,8 @@ void Game::stopSoundObjectsByPcm(SssObject **sssObjectsList, int num) {
 	SssObject *current = *sssObjectsList;
 	while (current) {
 		if (current->pcm == pcm) {
-			SssObject *prev = current->prevPtr; // _ecx
-			SssObject *next = current->nextPtr; // _esi
+			SssObject *prev = current->prevPtr;
+			SssObject *next = current->nextPtr;
 			if (next) {
 				next->prevPtr = prev;
 			}

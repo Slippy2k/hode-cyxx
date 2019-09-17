@@ -1583,7 +1583,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 const MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) const {
 	uint32_t i = _mstUnk40[num];
 	while (i != kNone) {
-		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+		const MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
 		if (msac->x1 <= xPos && msac->x2 >= xPos && msac->unk0x1D != 0 && msac->y1 <= yPos && msac->y2 >= yPos) {
 			return msac;
 		}
