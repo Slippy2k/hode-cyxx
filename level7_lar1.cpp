@@ -203,23 +203,20 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	if (_edx < 0) {
 		_edx = 0;
 	}
-	static uint8_t byte_452338[32];
 	if (_ebp < 0) {
 		_ebp = 0;
 	}
 	uint32_t offset = screenMaskOffset(_res->_screensBasePos[o->screenNum].u + _edx, _res->_screensBasePos[o->screenNum].v + _ebp);
 	if (_ecx < 0) {
 		_ecx = -_ecx;
-		_ecx >>= 3;
-		for (int i = 0; i < _ecx; ++i) {
+		for (int i = 0; i < _ecx / 8; ++i) {
 			memset(_screenMaskBuffer + offset, 0, 4);
 			offset += 4;
 		}
 	} else {
 // 406456
-		_ecx >>= 3;
-		for (int i = 0; i < _ecx; ++i) {
-			memcpy(_screenMaskBuffer + offset, byte_452338 + i * 4, 4);
+		for (int i = 0; i < _ecx / 8; ++i) {
+			memset(_screenMaskBuffer + offset, 2, 4);
 			offset += 512;
 		}
 	}
@@ -240,15 +237,13 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	offset = screenMaskOffset(_res->_screensBasePos[o->screenNum].u + _ebx, _res->_screensBasePos[o->screenNum].v + _edx);
 	if (_ecx < 0) {
 		_ecx = -_ecx;
-		_ecx >>= 3;
-		for (int i = 0; i < _ecx; ++i) {
+		for (int i = 0; i < _ecx / 8; ++i) {
 			memset(_screenMaskBuffer + offset, 0, 4);
 			offset += 512;
 		}
 	} else {
-		_ecx >>= 3;
-		for (int i = 0; i < _ecx; ++i) {
-			memcpy(_screenMaskBuffer + offset, byte_452338 + i * 4, 4);
+		for (int i = 0; i < _ecx / 8; ++i) {
+			memset(_screenMaskBuffer + offset, 2, 4);
 			offset += 512;
 		}
 	}
