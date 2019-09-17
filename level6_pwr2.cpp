@@ -56,8 +56,8 @@ void Level_pwr2::postScreenUpdate_pwr2_screen3() {
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			BoundingBox b = { 115, 27, 127, 55 };
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
-				uint8_t _al = _andyObject->flags0;
-				if ((_al & 0x1F) == 0 && (_al & 0xE0) == 0xE0) {
+				const uint8_t flags = _andyObject->flags0;
+				if ((flags & 0x1F) == 0 && (flags & 0xE0) == 0xE0) {
 					LvlObject *o = _g->findLvlObject2(0, 0, 3);
 					if (o) {
 						o->objectUpdateType = 7;
@@ -66,7 +66,7 @@ void Level_pwr2::postScreenUpdate_pwr2_screen3() {
 					LvlObject *o = _g->findLvlObject2(0, 0, 3);
 					if (o) {
 						if (o->objectUpdateType == 4) {
-							_res->_screensState[3].s0 = 2;
+							_res->_screensState[2].s0 = 2;
 						} else {
 							_g->setAndySpecialAnimation(3);
 						}
