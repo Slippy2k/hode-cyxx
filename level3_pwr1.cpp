@@ -7,7 +7,6 @@
 
 #include "game.h"
 #include "level.h"
-#include "lzw.h"
 #include "paf.h"
 #include "util.h"
 #include "video.h"
