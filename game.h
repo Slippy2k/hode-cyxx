@@ -458,7 +458,7 @@ struct Game {
 	void mstSetHorizontalBounds(MonsterObject1 *m);
 	void mstResetCollisionTable();
 	void mstTaskRestart(Task *t);
-	bool mstIsMonsterFacingDirection(MonsterObject1 *m, int x, int y, uint8_t dir);
+	bool mstMonster1CheckLevelBounds(MonsterObject1 *m, int x, int y, uint8_t dir);
 	int executeMstUnk23(Task *t);
 	int executeMstOp67Type1(Task *t);
 	int executeMstOp67Type2(Task *t, int flag);

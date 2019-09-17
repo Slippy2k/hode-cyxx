@@ -376,10 +376,10 @@ struct MonsterObject1 {
 	int unk88; // 0x88 y
 	int unk8C; // 0x8C unused
 	int unk90; // 0x90 unused
-	int levelBounds_x2; // 0x94 levelPosBounds_x2
-	int levelBounds_x1; // 0x98 levelPosBounds_x1
-	int y1; // 0x9C levelPosBounds_y2
-	int y2; // 0xA0 levelPosBounds_y1
+	int levelPosBounds_x2; // 0x94
+	int levelPosBounds_x1; // 0x98
+	int levelPosBounds_y2; // 0x9C
+	int levelPosBounds_y1; // 0xA0
 	uint8_t o_flags0; // 0xA4
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
