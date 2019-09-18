@@ -34,16 +34,18 @@ void Mixer::mix(int16_t *buf, int len) {
 		return;
 	}
 	static const int kPanBits = 14; // 0..16384
-	for (int j = 0; j < len; j += 2) {
-		for (int i = 0; i < _mixingQueueSize; ++i) {
-			const int panL = _mixingQueue[i].panL;
-			const int panR = _mixingQueue[i].panR;
-			if (_mixingQueue[i].stereo) {
-				assert(_mixingQueue[i].ptr + j + 1 < _mixingQueue[i].end);
+	for (int i = 0; i < _mixingQueueSize; ++i) {
+		const int panL = _mixingQueue[i].panL;
+		const int panR = _mixingQueue[i].panR;
+		if (_mixingQueue[i].stereo) {
+			assert(_mixingQueue[i].ptr + len <= _mixingQueue[i].end);
+			for (int j = 0; j < len; j += 2) {
 				buf[j]     = CLIP(buf[j]     + ((panL * _mixingQueue[i].ptr[j]    ) >> kPanBits), -32768, 32767);
 				buf[j + 1] = CLIP(buf[j + 1] + ((panR * _mixingQueue[i].ptr[j + 1]) >> kPanBits), -32768, 32767);
-			} else {
-				assert(_mixingQueue[i].ptr + j / 2 < _mixingQueue[i].end);
+			}
+		} else {
+			assert(_mixingQueue[i].ptr + len / 2 <= _mixingQueue[i].end);
+			for (int j = 0; j < len; j += 2) {
 				buf[j]     = CLIP(buf[j]     + ((panL * _mixingQueue[i].ptr[j / 2]) >> kPanBits), -32768, 32767);
 				buf[j + 1] = CLIP(buf[j + 1] + ((panR * _mixingQueue[i].ptr[j / 2]) >> kPanBits), -32768, 32767);
 			}

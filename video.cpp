@@ -6,6 +6,8 @@
 #include "video.h"
 #include "systemstub.h"
 
+static const bool _findBlackColor = false; // _blackColor is never read
+
 Video::Video(SystemStub *system)
 	: _system(system) {
 	_displayShadowLayer = false;
@@ -25,7 +27,6 @@ Video::Video(SystemStub *system)
 	_shadowColorLookupTable = (uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
 	_fillColor = 0xC4;
 	_blackColor = 255;
-	_findBlackColor = true;
 }
 
 Video::~Video() {

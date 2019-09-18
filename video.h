@@ -40,7 +40,6 @@ struct Video {
 	uint8_t *_shadowColorLookupTable;
 	uint8_t _fillColor;
 	uint8_t _blackColor;
-	bool _findBlackColor;
 	uint8_t _shadowColorLut[256];
 	const uint8_t *_font;
 
