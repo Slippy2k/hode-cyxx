@@ -833,7 +833,7 @@ void Game::resetMstCode() {
 			}
 		}
 	}
-	for (int i = 0; i < _res->_mstHdr.unk0x0C; ++i) { // var8
+	for (int i = 0; i < _res->_mstHdr.unk0x0C; ++i) {
 		const int count = _res->_mstUnk35[i].count2;
 		if (count != 0) {
 			uint8_t *ptr = _res->_mstUnk35[i].data2;
@@ -1350,9 +1350,6 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 					var18 = 1;
 				} else {
 					_ebp = m->unk68 - m->xMstPos + _mstAndyLevelPosX;
-					if (_ebp < 0 || _ebp >= m49->unk14) {
-						var18 = 1;
-					}
 					if (_ebp >= 0 && _ebp < m49->unk14) {
 						_ebp = 0x40000000;
 					} else {
@@ -1450,22 +1447,22 @@ l41B2DC:
 // 41B352
 			switch (var18 & 3) {
 			case 0:
-				var1C = (_esi > _eax) ? 33 : 32;
+				var1C = (_esi > _eax) ? 0x21 : 0x20;
 				break;
 			case 2:
 				if (_edi <= _eax && _edi <= _esi) {
-					var1C = 18;
+					var1C = 0x12;
 				} else {
-					var1C = (_esi >= _eax) ? 33 : 32;
+					var1C = (_esi >= _eax) ? 0x21 : 0x20;
 				}
 				break;
 			case 3:
 				if (_ebp > _edi) {
 // 41B38E
 					if (_edi <= _eax && _edi <= _esi) {
-						var1C = 18;
+						var1C = 0x12;
 					} else {
-						var1C = (_esi >= _eax) ? 33 : 32;
+						var1C = (_esi >= _eax) ? 0x21 : 0x20;
 					}
 					break;
 				}
@@ -1474,7 +1471,7 @@ l41B2DC:
 				if (_ebp <= _eax && _ebp <= _esi) {
 					var1C = 2;
 				} else {
-					var1C = (_esi >= _eax) ? 33 : 32;
+					var1C = (_esi >= _eax) ? 0x21 : 0x20;
 				}
 				break;
 			}
@@ -1822,11 +1819,11 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		int _ecx, _eax;
 		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (_mstLut1[var4] & 1) {
-			_ecx = p[0xA];
-			_eax = p[0xB];
+			_ecx = (int8_t)p[0xA];
+			_eax = (int8_t)p[0xB];
 		} else {
-			_ecx = p[0x8];
-			_eax = p[0x9];
+			_ecx = (int8_t)p[0x8];
+			_eax = (int8_t)p[0x9];
 		}
 // 41ACF5
 		int _edi = m->xMstPos;
