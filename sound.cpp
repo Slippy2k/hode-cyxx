@@ -5,9 +5,9 @@
 #include "util.h"
 
 enum {
-	kFlagPlaying   = 1 << 0,
-	kFlagIdle      = 1 << 1, // no PCM
-	kFlagNoTrigger = 1 << 2, // no bytecode
+	kFlagPlaying = 1 << 0,
+	kFlagMuted   = 1 << 1, // no PCM
+	kFlagNoCode  = 1 << 2, // no bytecode
 };
 
 static const bool kLimitSounds = false; // limit the number of active playing sounds
@@ -634,7 +634,7 @@ const uint8_t *Game::executeSssCode(SssObject *so, const uint8_t *code, bool tem
 			}
 			break;
 		case 27: { // seek_backward
-				int frame = READ_LE_UINT32(code + 12);
+				const int32_t frame = READ_LE_UINT32(code + 12);
 				if (so->currentPcmFrame > frame) {
 					so->currentPcmFrame = READ_LE_UINT32(code + 8);
 					if (so->pcm) {
@@ -1089,15 +1089,15 @@ void Game::clearSoundObjects() {
 		if (_res->_sssHdr.filtersDataCount != 0) {
 			for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
 				SssFilter *filter = &_res->_sssFilters[i];
-				const int a = _res->_sssDefaultsData[i].defaultVolume;
-				filter->volumeCurrent = a << 16;
-				filter->volume = a;
-				const int b = _res->_sssDefaultsData[i].defaultPanning;
-				filter->panningCurrent = b << 16;
-				filter->panning = b;
-				const int c = _res->_sssDefaultsData[i].defaultPriority;
-				filter->priorityCurrent = c;
-				filter->priority = c;
+				const int volume = _res->_sssDefaultsData[i].defaultVolume;
+				filter->volumeCurrent = volume << 16;
+				filter->volume = volume;
+				const int panning = _res->_sssDefaultsData[i].defaultPanning;
+				filter->panningCurrent = panning << 16;
+				filter->panning = panning;
+				const int priority = _res->_sssDefaultsData[i].defaultPriority;
+				filter->priorityCurrent = priority;
+				filter->priority = priority;
 			}
 		}
 	}
@@ -1278,6 +1278,7 @@ void Game::mixSoundObjects17640(bool flag) {
 }
 
 void Game::queueSoundObjectsPcmStride() {
+	_mix._mixingQueueSize = 0;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		const SssPcm *pcm = so->pcm;
 		if (pcm != 0) {
@@ -1288,7 +1289,6 @@ void Game::queueSoundObjectsPcmStride() {
 			if (so->currentPcmPtr < ptr) {
 				continue;
 			}
-			//const int16_t *end = ptr + pcm->strideCount * pcm->strideSize / sizeof(int16_t);
 			const int16_t *end = ptr + _res->getSssPcmSize(pcm) / sizeof(int16_t);
 			if (so->currentPcmPtr >= end) {
 				continue;

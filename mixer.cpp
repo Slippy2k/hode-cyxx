@@ -40,12 +40,12 @@ void Mixer::mix(int16_t *buf, int len) {
 			const int panR = _mixingQueue[i].panR;
 			if (_mixingQueue[i].stereo) {
 				assert(_mixingQueue[i].ptr + j + 1 < _mixingQueue[i].end);
-				buf[j]     = CLIP((panL * (buf[j]     + _mixingQueue[i].ptr[j]))     >> kPanBits, -32768, 32767);
-				buf[j + 1] = CLIP((panR * (buf[j + 1] + _mixingQueue[i].ptr[j + 1])) >> kPanBits, -32768, 32767);
+				buf[j]     = CLIP(buf[j]     + ((panL * _mixingQueue[i].ptr[j]    ) >> kPanBits), -32768, 32767);
+				buf[j + 1] = CLIP(buf[j + 1] + ((panR * _mixingQueue[i].ptr[j + 1]) >> kPanBits), -32768, 32767);
 			} else {
 				assert(_mixingQueue[i].ptr + j / 2 < _mixingQueue[i].end);
-				buf[j]     = CLIP((panL * (buf[j]     + _mixingQueue[i].ptr[j / 2])) >> kPanBits, -32768, 32767);
-				buf[j + 1] = CLIP((panR * (buf[j + 1] + _mixingQueue[i].ptr[j / 2])) >> kPanBits, -32768, 32767);
+				buf[j]     = CLIP(buf[j]     + ((panL * _mixingQueue[i].ptr[j / 2]) >> kPanBits), -32768, 32767);
+				buf[j + 1] = CLIP(buf[j + 1] + ((panR * _mixingQueue[i].ptr[j / 2]) >> kPanBits), -32768, 32767);
 			}
 		}
 	}
