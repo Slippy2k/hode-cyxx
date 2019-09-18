@@ -29,7 +29,7 @@ static const char *_levels[] = {
 	"test_hod"
 };
 
-Game::Game(SystemStub *system, const char *dataPath) {
+Game::Game(SystemStub *system, const char *dataPath, int cheats) {
 
 	_level = 0;
 	_res = new Resource(dataPath);
@@ -37,7 +37,7 @@ Game::Game(SystemStub *system, const char *dataPath) {
 	_rnd.setSeed();
 	_video = new Video(system);
 	_system = system;
-	_cheats = 0;
+	_cheats = cheats;
 
 	_difficulty = 1;
 
@@ -2710,7 +2710,7 @@ void Game::levelMainLoop() {
 		_system->inp.screenshot = false;
 		captureScreenshot();
 	}
-	if (0) {
+	if (_cheats != 0) {
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "P%d S%02d %d R%d", _currentLevel, _andyObject->screenNum, _res->_screensState[_andyObject->screenNum].s0, _levelCheckpoint);
 		_video->drawString(buffer, (Video::W - strlen(buffer) * 8) / 2, 8, _video->findWhiteColor(), _video->_frontLayer);

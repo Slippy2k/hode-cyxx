@@ -119,6 +119,10 @@ int main(int argc, char *argv[]) {
 	char *dataPath = 0;
 	int level = 0;
 	int checkpoint = 0;
+
+	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND | kDebug_MONSTER;
+	int cheats = 0;
+
 	if (argc == 2) {
 		// data path as the only command line argument
 		struct stat st;
@@ -131,6 +135,8 @@ int main(int argc, char *argv[]) {
 			{ "datapath",   required_argument, 0, 1 },
 			{ "level",      required_argument, 0, 2 },
 			{ "checkpoint", required_argument, 0, 3 },
+			{ "debug",      required_argument, 0, 4 },
+			{ "cheats",     required_argument, 0, 5 },
 			{ 0, 0, 0, 0 },
 		};
 		int index;
@@ -157,6 +163,12 @@ int main(int argc, char *argv[]) {
 		case 3:
 			checkpoint = atoi(optarg);
 			break;
+		case 4:
+			g_debugMask |= atoi(optarg);
+			break;
+		case 5:
+			cheats |= atoi(optarg);
+			break;
 		default:
 			fprintf(stdout, "%s\n", _usage);
 			return -1;
@@ -164,8 +176,7 @@ int main(int argc, char *argv[]) {
 	}
 	_system = SystemStub_SDL_create();
 	atexit(exitMain);
-	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND | kDebug_MONSTER;
-	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath);
+	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath, cheats);
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);
 	_system->init(_title, Video::W, Video::H, _fullscreen, _widescreen);

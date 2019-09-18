@@ -231,7 +231,7 @@ struct Game {
 	int _crackSpritesCount;
 	CrackSprite _crackSpritesTable[6];
 
-	Game(SystemStub *system, const char *dataPath);
+	Game(SystemStub *system, const char *dataPath, int cheats);
 	~Game();
 
 	// 32*24 pitch=512
