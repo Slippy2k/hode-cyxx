@@ -511,18 +511,18 @@ struct Resource {
 
 	uint8_t _currentScreenResourceNum;
 
-	uint8_t _screensGrid[40 * 4];
-	LvlScreenVector _screensBasePos[40];
-	LvlScreenState _screensState[40];
+	uint8_t _screensGrid[kMaxScreens * 4];
+	LvlScreenVector _screensBasePos[kMaxScreens];
+	LvlScreenState _screensState[kMaxScreens];
 	uint8_t *_resLevelData0x470CTable;
 	uint8_t *_resLevelData0x470CTablePtrHdr;
 	uint8_t *_resLevelData0x470CTablePtrData;
-	uint32_t _resLevelData0x2B88SizeTable[40];
+	uint32_t _resLevelData0x2B88SizeTable[kMaxScreens];
 	uint32_t _resLevelData0x2988SizeTable[32];
-	LvlObjectData _resLevelData0x2988Table[40];
+	LvlObjectData _resLevelData0x2988Table[kMaxScreens];
 	LvlObjectData *_resLevelData0x2988PtrTable[32];
-	LvlBackgroundData _resLvlScreenBackgroundDataTable[40];
-	uint8_t *_resLvlScreenBackgroundDataPtrTable[40];
+	LvlBackgroundData _resLvlScreenBackgroundDataTable[kMaxScreens];
+	uint8_t *_resLvlScreenBackgroundDataPtrTable[kMaxScreens];
 
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
@@ -588,7 +588,7 @@ struct Resource {
 	void unloadLevelData();
 
 	void loadSetupDat();
-	void loadLvlScreenMoveData(int num);
+	void loadLvlScreenGridData(int num);
 	void loadLvlScreenVectorData(int num);
 	void loadLvlScreenStateData(int num);
 	void loadLvlScreenObjectData(int num);

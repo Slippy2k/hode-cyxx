@@ -43,7 +43,6 @@ enum {
 
 struct Game {
 	enum {
-		kMaxScreens = 40,
 		kMaxTasks = 128,
 		kMaxVars = 40,
 		kMaxLocals = 8,

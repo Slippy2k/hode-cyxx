@@ -188,7 +188,7 @@ void Resource::loadLevelData(const char *levelName) {
 void Resource::unloadLevelData() {
 }
 
-void Resource::loadLvlScreenMoveData(int num) { // GridData
+void Resource::loadLvlScreenGridData(int num) {
 	_lvlFile->seekAlign(0x8 + num * 4);
 	_lvlFile->read(&_screensGrid[num * 4], 4);
 }
@@ -392,7 +392,7 @@ void Resource::loadLvlData(File *fp, const char *name) {
 	debug(kDebug_RESOURCE, "Resource::loadLvlData() %d %d %d %d", _lvlHdr.screensCount, _lvlHdr.staticLvlObjectsCount, _lvlHdr.otherLvlObjectsCount, _lvlHdr.spritesCount);
 
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
-		loadLvlScreenMoveData(i);
+		loadLvlScreenGridData(i);
 	}
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
 		loadLvlScreenVectorData(i);
@@ -916,17 +916,16 @@ void Resource::loadSssData(File *fp, const char *name) {
 
 // 429E09
 	memset(_sssFilters, 0, _sssHdr.filtersDataCount * sizeof(SssFilter));
-// 429E64
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
-		const int a = _sssDefaultsData[i].defaultVolume;
-		_sssFilters[i].volumeCurrent = a << 16;
-		_sssFilters[i].volume = a;
-		const int b = _sssDefaultsData[i].defaultPanning;
-		_sssFilters[i].panningCurrent = b << 16;
-		_sssFilters[i].panning = b;
-		const int c = _sssDefaultsData[i].defaultPriority;
-		_sssFilters[i].priorityCurrent = c;
-		_sssFilters[i].priority = c;
+		const int volume = _sssDefaultsData[i].defaultVolume;
+		_sssFilters[i].volumeCurrent = volume << 16;
+		_sssFilters[i].volume = volume;
+		const int panning = _sssDefaultsData[i].defaultPanning;
+		_sssFilters[i].panningCurrent = panning << 16;
+		_sssFilters[i].panning = panning;
+		const int priority = _sssDefaultsData[i].defaultPriority;
+		_sssFilters[i].priorityCurrent = priority;
+		_sssFilters[i].priority = priority;
 	}
 // 429EFA
 	// same as clearSoundObjects()
