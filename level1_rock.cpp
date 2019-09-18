@@ -444,7 +444,7 @@ void Game::objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p) {
 		if (plasmaCannonHit(ptr->childPtr)) {
 			ptr->actionKeyMask |= 0x20;
 			++ptr->hitCount;
-			if (ptr->hitCount > p[65]) {
+			if (ptr->hitCount > p[65] || (_cheats & kCheatOneHitPlasmaCannon) != 0) {
 				ptr->hitCount = 0;
 				ptr->actionKeyMask |= 7;
 			}

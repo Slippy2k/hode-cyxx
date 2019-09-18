@@ -1086,7 +1086,11 @@ void Game::executeMstCode() {
 		}
 // 419CC0
 		if (energy > 0) {
-			m->localVars[7] = energy - 1;
+			if (_cheats & kCheatOneHitPlasmaCannon) {
+				m->localVars[7] = 0;
+			} else {
+				m->localVars[7] = energy - 1;
+			}
 			_plasmaCannonLastIndex1 = p->plasmaCannonPointsCount;
 		} else if (energy == -2) {
 			_plasmaCannonLastIndex1 = p->plasmaCannonPointsCount;

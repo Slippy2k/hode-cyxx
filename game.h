@@ -38,7 +38,8 @@ enum {
 };
 
 enum {
-	kCheatSpectreFireballNoHit = 1 << 0
+	kCheatSpectreFireballNoHit = 1 << 0,
+	kCheatOneHitPlasmaCannon = 1 << 1,
 };
 
 struct Game {
