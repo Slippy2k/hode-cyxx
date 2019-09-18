@@ -1036,7 +1036,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x08  = fp->readUint32();
 	_mstHdr.unk0x0C  = fp->readUint32();
 	_mstHdr.unk0x10  = fp->readUint32();
-	_mstHdr.screenInitDataCount  = fp->readUint32();
+	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
 	_mstHdr.screenAreaCodesCount = fp->readUint32();
 	_mstHdr.unk0x1C  = fp->readUint32();
 	_mstHdr.unk0x20  = fp->readUint32();
@@ -1122,9 +1122,9 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstTickCodeData = fp->readUint32();
 	bytesRead += 8;
 
-	_mstScreenInitCodeData = (uint32_t *)malloc(_mstHdr.screenInitDataCount * sizeof(uint32_t));
-	for (int i = 0; i < _mstHdr.screenInitDataCount; ++i) {
-		_mstScreenInitCodeData[i] = fp->readUint32();
+	_mstLevelCheckpointCodeData = (uint32_t *)malloc(_mstHdr.levelCheckpointCodeDataCount * sizeof(uint32_t));
+	for (int i = 0; i < _mstHdr.levelCheckpointCodeDataCount; ++i) {
+		_mstLevelCheckpointCodeData[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 

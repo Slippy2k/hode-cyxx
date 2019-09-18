@@ -72,9 +72,9 @@ struct LvlBackgroundData {
 	uint8_t *backgroundMaskTable[4];
 	uint8_t *backgroundSoundTable[4];
 	uint8_t *backgroundAnimationTable[4];
-	uint8_t *dataUnk4Table[4]; /* unused ? */
+	uint8_t *dataUnk4Table[4]; // unused
 	LvlObjectData *dataUnk5Table[4];
-	uint8_t *dataUnk6Table[4]; /* unused ? */
+	uint8_t *dataUnk6Table[4]; // unused
 };
 
 struct MstHdr {
@@ -83,7 +83,7 @@ struct MstHdr {
 	int unk0x08; // mstUnk34DataCount
 	int unk0x0C; // mstUnk35DataCount
 	int unk0x10; // mstUnk36DataCount
-	int screenInitDataCount;
+	int levelCheckpointCodeDataCount;
 	int screenAreaCodesCount;
 	int unk0x1C; // mstUnk39DataCount
 	int unk0x20; // mstUnk42DataCount
@@ -132,7 +132,7 @@ struct MstScreenAreaCode { // MstScreenArea
 	uint32_t codeData; // 0x20, offset _mstCodeData
 }; // sizeof == 36
 
-struct MstUnk34 { // MstBox
+struct MstUnk34 { // MstWalkBox
 	int32_t right; // 0
 	int32_t left; //  4
 	int32_t top; // 8
@@ -153,7 +153,7 @@ struct MstUnk36 {
 	int32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk42 { // MonsterGroup
+struct MstUnk42 {
 	uint32_t *indexUnk46; // 0 indexes _mstUnk46
 	uint32_t count1; // 4
 	uint8_t *data2; // 8
@@ -167,7 +167,7 @@ struct MstUnk43 {
 	uint32_t count2; // C
 }; // sizeof == 16
 
-struct MstUnk44Unk1 { // MstWalkBox
+struct MstUnk44Unk1 { // MstWalkPath
 	int32_t x1; // 0
 	int32_t x2; // 4
 	int32_t y1; // 8
@@ -184,7 +184,7 @@ struct MstUnk44Unk1 { // MstWalkBox
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
 
-struct MstUnk44 { // MstWalkBoxes
+struct MstUnk44 { // MstWalkData
 	MstUnk44Unk1 *data;
 	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t mask; // 0x8
@@ -219,8 +219,7 @@ struct MstUnk46 {
 	uint32_t count;
 }; // sizeof == 8
 
-// MstAttackHitBox
-struct MstUnk47 {
+struct MstUnk47 { // MstAttackHitBox
 	uint8_t *data; // sizeof == 20
 	uint32_t count;
 }; // sizeof == 8
@@ -314,11 +313,6 @@ struct MstUnk52 {
 	uint8_t unk2;
 	uint8_t unk3;
 }; // sizeof == 4
-
-struct MstScreenInitCode { // MstScreenInit
-	int32_t delay;
-	uint32_t codeData;
-}; // sizeof == 8
 
 struct MstOp240Data {
 	uint32_t flags;
@@ -556,7 +550,7 @@ struct Resource {
 	MstUnk36 *_mstUnk36;
 	uint32_t _mstTickDelay;
 	uint32_t _mstTickCodeData;
-	uint32_t *_mstScreenInitCodeData;
+	uint32_t *_mstLevelCheckpointCodeData;
 	MstScreenAreaCode *_mstScreenAreaCodes;
 	uint32_t *_mstUnk39; // index to _mstScreenAreaCodes
 	uint32_t *_mstUnk40; // index to _mstScreenAreaCodes

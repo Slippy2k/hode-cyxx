@@ -927,8 +927,8 @@ void Game::startMstCode() {
 		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x14], unk10 - unk34);
 		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x08], unk0C + unk34);
 	}
-	if (_levelCheckpoint < _res->_mstHdr.screenInitDataCount) {
-		const uint32_t codeData = _res->_mstScreenInitCodeData[_levelCheckpoint];
+	if (_levelCheckpoint < _res->_mstHdr.levelCheckpointCodeDataCount) {
+		const uint32_t codeData = _res->_mstLevelCheckpointCodeData[_levelCheckpoint];
 		if (codeData != kNone) {
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {
