@@ -330,7 +330,7 @@ void Level_lar2::postScreenUpdate_lar2_screen19() {
 				_paf->unload(19);
 			}
 			_video->clearPalette();
-			_g->_quit = true;
+			_g->_endLevel = true;
 		}
 	}
 }

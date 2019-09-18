@@ -608,7 +608,7 @@ void Level_lar1::postScreenUpdate_lar1_screen24() {
 				_paf->unload(14);
 			}
 			_video->clearPalette();
-			_g->_quit = true;
+			_g->_endLevel = true;
 		}
 	}
 }

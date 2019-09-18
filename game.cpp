@@ -2108,7 +2108,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
-	_quit = false;
+	_endLevel = false;
 	resetShootLvlObjectDataTable();
 	callLevel_initialize();
 	setupAndyLvlObject();
@@ -2139,7 +2139,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 			diff = 10;
 		}
 		_system->sleep(diff);
-	} while (!_system->inp.quit && !_quit);
+	} while (!_system->inp.quit && !_endLevel);
 	_animBackgroundDataCount = 0;
 	callLevel_terminate();
 }

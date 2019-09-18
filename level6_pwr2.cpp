@@ -98,7 +98,7 @@ void Level_pwr2::postScreenUpdate_pwr2_screen8() {
 			_paf->unload(10);
 		}
 		_video->clearPalette();
-		_g->_quit = true;
+		_g->_endLevel = true;
 	}
 }
 

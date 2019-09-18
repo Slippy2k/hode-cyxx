@@ -188,7 +188,7 @@ void Level_fort::postScreenUpdate_fort_screen21() {
 				_paf->unload(4);
 			}
 			_video->clearPalette();
-			_g->_quit = true;
+			_g->_endLevel = true;
 			break;
 		}
 	}

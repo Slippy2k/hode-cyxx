@@ -324,7 +324,7 @@ void Level_rock::postScreenUpdate_rock_screen19() {
 				}
 			}
 			_video->clearPalette();
-			_g->_quit = true;
+			_g->_endLevel = true;
 		}
 		break;
 	case 3:

@@ -208,7 +208,7 @@ void Level_isld::postScreenUpdate_isld_screen21() {
 					_paf->unload(24);
 				}
 				_video->clearPalette();
-				_g->_quit = true;
+				_g->_endLevel = true;
 			}
 		}
 	}

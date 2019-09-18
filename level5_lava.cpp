@@ -168,7 +168,7 @@ void Level_lava::postScreenUpdate_lava_screen15() {
 			_paf->unload(8);
 		}
 		_video->clearPalette();
-		_g->_quit = true;
+		_g->_endLevel = true;
 	}
 }
 

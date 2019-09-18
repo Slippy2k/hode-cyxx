@@ -107,7 +107,7 @@ struct Game {
 	int _currentLevel;
 	int _levelCheckpoint;
 	int _currentLevelCheckpoint;
-	bool _quit;
+	bool _endLevel;
 	Sprite _spritesTable[kMaxSprites];
 	Sprite *_spritesListNextPtr; // pointer to the next free entry
 	Sprite *_spriteListPtrTable[kMaxSpriteTypes];

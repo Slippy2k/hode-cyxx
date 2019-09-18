@@ -39,7 +39,7 @@ void Level_dark::postScreenUpdate_dark_screen0() {
 			}
 			_video->clearPalette();
 			_video->fillBackBuffer();
-			_g->_quit = true;
+			_g->_endLevel = true;
 		}
 	}
 }

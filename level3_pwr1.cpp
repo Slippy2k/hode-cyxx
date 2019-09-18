@@ -282,7 +282,7 @@ void Level_pwr1::postScreenUpdate_pwr1_screen35() {
 					_paf->unload(5);
 				}
 				_video->clearPalette();
-				_g->_quit = true;
+				_g->_endLevel = true;
 			}
 		}
 	}
