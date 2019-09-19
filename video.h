@@ -38,6 +38,10 @@ struct Video {
 	uint8_t *_frontLayer;
 	uint8_t *_backgroundLayer;
 	uint8_t *_shadowColorLookupTable;
+	uint16_t _fadePaletteBuffer[256 * 3];
+	uint8_t *_shadowScreenMaskBuffer;
+	uint8_t *_transformShadowBuffer;
+	uint8_t _transformShadowLayerDelta;
 	uint8_t _fillColor;
 	uint8_t _blackColor;
 	uint8_t _shadowColorLut[256];

@@ -25,6 +25,9 @@ Video::Video(SystemStub *system)
 	_spr.w = W;
 	_spr.h = H;
 	_shadowColorLookupTable = (uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
+	_shadowScreenMaskBuffer = (uint8_t *)malloc(256 * 192 * 2 + 256 * 4);
+	_transformShadowBuffer = 0;
+	_transformShadowLayerDelta = 0;
 	_fillColor = 0xC4;
 	_blackColor = 255;
 }
@@ -34,6 +37,7 @@ Video::~Video() {
 	free(_frontLayer);
 	free(_backgroundLayer);
 	free(_shadowColorLookupTable);
+	free(_shadowScreenMaskBuffer);
 }
 
 void Video::refreshGamePalette(const uint16_t *pal) {

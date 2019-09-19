@@ -48,10 +48,6 @@ Game::Game(SystemStub *system, const char *dataPath, int cheats) {
 	memset(_spritesTable, 0, sizeof(_spritesTable));
 	memset(_spriteListPtrTable, 0, sizeof(_spriteListPtrTable));
 
-	_shadowScreenMaskBuffer = (uint8_t *)malloc(99328);
-	_transformShadowBuffer = 0;
-	_transformShadowLayerDelta = 0;
-
 	_directionKeyMask = 0;
 	_actionKeyMask = 0;
 
@@ -97,7 +93,6 @@ Game::~Game() {
 	delete _paf;
 	delete _res;
 	delete _video;
-	free(_shadowScreenMaskBuffer);
 }
 
 void Game::resetShootLvlObjectDataTable() {
@@ -139,7 +134,7 @@ void Game::fadeScreenPalette() {
 	if (!_fadePalette) {
 		assert(_levelRestartCounter != 0);
 		for (int i = 0; i < 256 * 3; ++i) {
-			_fadePaletteBuffer[i] = _video->_displayPaletteBuffer[i] / _levelRestartCounter;
+			_video->_fadePaletteBuffer[i] = _video->_displayPaletteBuffer[i] / _levelRestartCounter;
 		}
 		_fadePalette = true;
 	} else {
@@ -152,7 +147,7 @@ void Game::fadeScreenPalette() {
 		--_levelRestartCounter;
 	}
 	for (int i = 0; i < 256 * 3; ++i) {
-		int color = _video->_displayPaletteBuffer[i] - _fadePaletteBuffer[i];
+		int color = _video->_displayPaletteBuffer[i] - _video->_fadePaletteBuffer[i];
 		if (color < 0) {
 			 color = 0;
 		}
@@ -201,9 +196,9 @@ static BoundingBox _screenTransformRects[] = {
 };
 
 void Game::transformShadowLayer(int delta) {
-	const uint8_t *src = _transformShadowBuffer + _transformShadowLayerDelta; // _esi
+	const uint8_t *src = _video->_transformShadowBuffer + _video->_transformShadowLayerDelta; // _esi
 	uint8_t *dst = _video->_shadowLayer; // _eax
-	_transformShadowLayerDelta += delta; // overflow/wrap at 255
+	_video->_transformShadowLayerDelta += delta; // overflow/wrap at 255
 	for (int y = 0; y < Video::H; ++y) {
 		if (0) {
 			for (int x = 0; x < Video::W - 6; ++x) {
@@ -243,20 +238,20 @@ void Game::transformShadowLayer(int delta) {
 }
 
 void Game::loadTransformLayerData(const uint8_t *data) {
-	assert(!_transformShadowBuffer);
-	_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
-	const int size = decodeLZW(data, _transformShadowBuffer);
+	assert(!_video->_transformShadowBuffer);
+	_video->_transformShadowBuffer = (uint8_t *)malloc(256 * 192 + 256);
+	const int size = decodeLZW(data, _video->_transformShadowBuffer);
 	assert(size == 256 * 192);
-	memcpy(_transformShadowBuffer + 256 * 192, _transformShadowBuffer, 256);
+	memcpy(_video->_transformShadowBuffer + 256 * 192, _video->_transformShadowBuffer, 256);
 }
 
 void Game::unloadTransformLayerData() {
-	free(_transformShadowBuffer);
-	_transformShadowBuffer = 0;
+	free(_video->_transformShadowBuffer);
+	_video->_transformShadowBuffer = 0;
 }
 
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
-	uint8_t *dst = _shadowScreenMaskBuffer;
+	uint8_t *dst = _video->_shadowScreenMaskBuffer;
 	for (int i = lvl->currentShadowId; i < lvl->shadowCount; ++i) {
 		uint8_t *src = lvl->backgroundMaskTable[i];
 		if (src) {
@@ -1366,7 +1361,7 @@ void Game::resetDisplay() {
 	_shakeScreenDuration = 0;
 	_levelRestartCounter = 0;
 	_fadePalette = false;
-	memset(_fadePaletteBuffer, 0, sizeof(_fadePaletteBuffer));
+	memset(_video->_fadePaletteBuffer, 0, sizeof(_video->_fadePaletteBuffer));
 //	_snd_masterVolume = _plyConfigTable[_plyConfigNumber].soundVolume;
 }
 

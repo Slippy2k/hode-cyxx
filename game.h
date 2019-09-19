@@ -112,10 +112,6 @@ struct Game {
 	Sprite _spritesTable[kMaxSprites];
 	Sprite *_spritesListNextPtr; // pointer to the next free entry
 	Sprite *_spriteListPtrTable[kMaxSpriteTypes];
-	uint16_t _fadePaletteBuffer[256 * 3];
-	uint8_t *_shadowScreenMaskBuffer;
-	uint8_t *_transformShadowBuffer;
-	uint8_t _transformShadowLayerDelta;
 	uint8_t _directionKeyMask;
 	uint8_t _actionKeyMask;
 	uint8_t _currentRightScreen;
