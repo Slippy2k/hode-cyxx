@@ -264,17 +264,17 @@ struct ScreenMask { // ShadowScreenMask
 struct CrackSprite { // mstOp57
 	uint8_t screenNum;
 	uint8_t initData1;
-	int8_t initData2; // xPos
-	int8_t initData3; // yPos
+	int8_t xPos;
+	int8_t yPos;
 	uint32_t initData4;
-	uint8_t initData8; // rect1_x1
-	uint8_t initData9; // rect1_y1
-	uint8_t initDataA; // rect1_x2
-	uint8_t initDataB; // rect1_y2
-	uint8_t initDataC; // rect2_x1
-	uint8_t initDataD; // rect2_y1
-	uint8_t initDataE; // rect2_x2
-	uint8_t initDataF; // rect2_y2
+	uint8_t rect1_x1;
+	uint8_t rect1_y1;
+	uint8_t rect1_x2;
+	uint8_t rect1_y2;
+	uint8_t rect2_x1;
+	uint8_t rect2_y1;
+	uint8_t rect2_x2;
+	uint8_t rect2_y2;
 	uint32_t flags[7]; // 0x10
 }; // sizeof == 0x2C
 

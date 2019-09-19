@@ -6157,17 +6157,17 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 static void initCrackSprite(CrackSprite *s, const uint8_t *p) {
 	s->screenNum = p[0];
 	s->initData1 = p[1];
-	s->initData2 = p[2];
-	s->initData3 = p[3];
+	s->xPos = p[2];
+	s->yPos = p[3];
 	s->initData4 = READ_LE_UINT32(p + 4);
-	s->initData8 = p[8];
-	s->initData9 = p[9];
-	s->initDataA = p[0xA];
-	s->initDataB = p[0xB];
-	s->initDataC = p[0xC];
-	s->initDataD = p[0xD];
-	s->initDataE = p[0xE];
-	s->initDataF = p[0xF];
+	s->rect1_x1 = p[8];
+	s->rect1_y1 = p[9];
+	s->rect1_x2 = p[0xA];
+	s->rect1_y2 = p[0xB];
+	s->rect2_x1 = p[0xC];
+	s->rect2_y1 = p[0xD];
+	s->rect2_x2 = p[0xE];
+	s->rect2_y2 = p[0xF];
 }
 
 void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
@@ -6216,8 +6216,8 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 		}
 	}
 // 4034D2
-	const int dx = x - _crackSpritesTable[spriteNum].initData2;
-	const int dy = y + 15 - _crackSpritesTable[spriteNum].initData3;
+	const int dx = x - _crackSpritesTable[spriteNum].xPos;
+	const int dy = y + 15 - _crackSpritesTable[spriteNum].yPos;
 	spriteNum = _rnd.getSeed() & 3;
 	if (spriteNum == 0) {
 		spriteNum = 1;

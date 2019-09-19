@@ -4583,33 +4583,31 @@ void Game::updateCrackSprites() {
 	tmp.type = 8;
 	tmp.spriteNum = 20;
 	_res->incLvlSpriteDataRefCounter(&tmp);
-	uint32_t var68 = 0;
+	uint32_t yOffset = 0;
 	for (int i = 0; i < 6; ++i) {
-		uint32_t *flags = &spr->flags[i];
-		uint32_t _eax = 0;
-		if (*flags != _eax) {
-			int var70 = 0;
-			int var6C = 0;
-			for (int var75 = 0; var75 < 11; ++var75) {
-				uint8_t _al = (*flags >> (var70 * 2)) & 3;
+		const uint32_t *flags = &spr->flags[i];
+		if (*flags != 0) {
+			int xOffset = 0;
+			for (int j = 0; j < 11; ++j) {
+				uint8_t _al = (*flags >> (j * 2)) & 3;
 				if (_al != 0 && _spritesListNextPtr != 0) {
-					const int _edi = spr->initData2 + var6C + 12; // xPos
-					const int _ebp = spr->initData3 + var68 + 16; // yPos
-					if (_edi >= spr->initData8 && _edi <= spr->initDataA && _ebp >= spr->initData9 && _ebp <= spr->initDataB) {
+					const int xPos = spr->xPos + xOffset + 12;
+					const int yPos = spr->yPos + yOffset + 16;
+					if (xPos >= spr->rect1_x1 && xPos <= spr->rect1_x2 && yPos >= spr->rect1_y1 && yPos <= spr->rect1_y2) {
 						_al += 3;
-					} else if (_edi >= spr->initDataC && _edi <= spr->initDataE && _ebp >= spr->initDataD && _ebp <= spr->initDataF) {
+					} else if (xPos >= spr->rect2_x1 && xPos <= spr->rect2_x2 && yPos >= spr->rect2_y1 && yPos <= spr->rect2_y2) {
 						_al += 6;
 					}
 					tmp.anim = _al;
 					setupLvlObjectBitmap(&tmp);
-					setLvlObjectPosRelativeToPoint(&tmp, 7, _edi, _ebp);
-					if (var75 & 1) {
+					setLvlObjectPosRelativeToPoint(&tmp, 7, xPos, yPos);
+					if (j & 1) {
 						tmp.yPos -= 16;
 					}
 					if (READ_LE_UINT16(tmp.bitmapBits) != 8) {
 						Sprite *spr = _spritesListNextPtr;
-						spr->xPos = _edi;
-						spr->yPos = _ebp;
+						spr->xPos = xPos;
+						spr->yPos = yPos;
 						spr->bitmapBits = tmp.bitmapBits;
 						spr->num = tmp.flags2 & 0x3FFF;
 						const int index = spr->num & 0x1F;
@@ -4618,11 +4616,10 @@ void Game::updateCrackSprites() {
 						_spriteListPtrTable[index] = spr;
 					}
 				}
-				++var70;
-				var6C += 24;
+				xOffset += 24;
 			}
 		}
-		var68 += 32;
+		yOffset += 32;
 	}
 	_res->decLvlSpriteDataRefCounter(&tmp);
 }
