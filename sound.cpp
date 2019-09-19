@@ -26,7 +26,7 @@ static const uint8_t _volumeRampTable[129] = {
 	0x80
 };
 
-static uint32_t valueSssLut(uint8_t source, uint8_t mask, SssInfo *s) {
+static uint32_t sssConcurrencyValue(uint8_t source, uint8_t mask, SssInfo *s) {
 	uint32_t value = 0;
 	assert(source < 3); // 0,1,2
 // 42BA9D
@@ -51,7 +51,7 @@ static uint32_t valueSssLut(uint8_t source, uint8_t mask, SssInfo *s) {
 	return value;
 }
 
-static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
+static bool compareSssConcurrency(uint32_t flags_a, uint32_t flags_b) {
 	if (0) {
 		// the x86 code compares the 3 bit fields.
 		// the original code possibly used a structure with bit fields that was optimized by the compiler as a uint32_t
@@ -66,22 +66,21 @@ static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
 	return (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF);
 }
 
-// returns the active samples for the lut/source/bank
-static uint32_t *getSssLutPtr(Resource *res, int lut, uint32_t flags) {
+// returns the active samples for the table/source/bank
+static uint32_t *getSssConcurrencyPtr(Resource *res, int num, uint32_t flags) {
 	const int source = (flags >> 20) & 15; // 0,1,2
 	assert(source < 3);
 	const int bankIndex = flags & 0xFFF;
 	assert(bankIndex < res->_sssHdr.banksDataCount);
-	switch (lut) {
+	switch (num) {
 	case 1:
-		return &res->_sssLookupTable1[source][bankIndex];
+		return &res->_sssConcurrencyTable1[source][bankIndex];
 	case 2:
-		return &res->_sssLookupTable2[source][bankIndex];
+		return &res->_sssConcurrencyTable2[source][bankIndex];
 	case 3:
-		return &res->_sssLookupTable3[source][bankIndex];
-	default:
-		error("Invalid sssLut %d", lut);
+		return &res->_sssConcurrencyTable3[source][bankIndex];
 	}
+	error("Invalid sssConcurrencyTable %d", num);
 	return 0;
 }
 
@@ -268,7 +267,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 	assert(num < _res->_sssHdr.banksDataCount);
 	assert(sampleIndex < 32);
 	const uint32_t mask = (1 << sampleIndex);
-	_res->_sssLookupTable1[source][num] &= ~mask;
+	_res->_sssConcurrencyTable1[source][num] &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (so->bankIndex == num && ((so->flags1 >> 20) & 15) == source && (so->flags1 >> 24) == sampleIndex) {
 			so->codeDataStage3 = 0;
@@ -373,7 +372,7 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 
 void Game::sssOp4_removeSounds(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	*getSssLutPtr(_res, 1, flags) &= ~mask;
+	*getSssConcurrencyPtr(_res, 1, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (((so->flags1 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
@@ -803,15 +802,15 @@ void Game::prependSoundObjectToList(SssObject *so) {
 
 void Game::updateSssLut2(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut = getSssLutPtr(_res, 2, flags);
+	uint32_t *sssLut = getSssConcurrencyPtr(_res, 2, flags);
 	if ((*sssLut & mask) != 0) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, flags)) {
+			if (compareSssConcurrency(so->flags0, flags)) {
 				return;
 			}
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, flags)) {
+			if (compareSssConcurrency(so->flags0, flags)) {
 				return;
 			}
 		}
@@ -1030,13 +1029,13 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 		}
 	}
 // 42BA9D
-	const uint32_t _ebp = valueSssLut(source, mask, s);
+	const uint32_t _ebp = sssConcurrencyValue(source, mask, s);
 	const uint8_t _al = s->concurrencyMask;
 	if (_al & 2) {
 		const uint32_t mask = 1 << (_ebp >> 24);
-		uint32_t *sssLut3 = getSssLutPtr(_res, 3, _ebp);
+		uint32_t *sssLut3 = getSssConcurrencyPtr(_res, 3, _ebp);
 		*sssLut3 |= mask;
-		uint32_t *sssLut2 = getSssLutPtr(_res, 2, _ebp);
+		uint32_t *sssLut2 = getSssConcurrencyPtr(_res, 2, _ebp);
 		if (*sssLut2 & mask) {
 			return;
 		}
@@ -1044,7 +1043,7 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 // 42BB26
 	} else if (_al & 1) {
 		const uint32_t mask = 1 << (_ebp >> 24);
-		uint32_t *sssLut1 = getSssLutPtr(_res, 1, _ebp);
+		uint32_t *sssLut1 = getSssConcurrencyPtr(_res, 1, _ebp);
 		if (*sssLut1 & mask) {
 			return;
 		}
@@ -1052,12 +1051,12 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 // 42BB60
 	} else if (_al & 4) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, _ebp)) {
+			if (compareSssConcurrency(so->flags0, _ebp)) {
 				return;
 			}
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
-			if (compareSssLut(so->flags0, _ebp)) {
+			if (compareSssConcurrency(so->flags0, _ebp)) {
 				return;
 			}
 		}
@@ -1080,9 +1079,9 @@ void Game::clearSoundObjects() {
 	if (_res->_sssHdr.infosDataCount != 0) {
 		const int size = _res->_sssHdr.banksDataCount * sizeof(uint32_t);
 		for (int i = 0; i < 3; ++i) {
-			memset(_res->_sssLookupTable1[i], 0, size);
-			memset(_res->_sssLookupTable2[i], 0, size);
-			memset(_res->_sssLookupTable3[i], 0, size);
+			memset(_res->_sssConcurrencyTable1[i], 0, size);
+			memset(_res->_sssConcurrencyTable2[i], 0, size);
+			memset(_res->_sssConcurrencyTable3[i], 0, size);
 		}
 	}
 	memset(_sssUpdatedObjectsTable, 0, sizeof(_sssUpdatedObjectsTable));
@@ -1214,8 +1213,8 @@ void Game::setSoundObjectPanning(SssObject *so) {
 
 void Game::expireSoundObjects(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	*getSssLutPtr(_res, 1, flags) &= ~mask;
-	*getSssLutPtr(_res, 2, flags) &= ~mask;
+	*getSssConcurrencyPtr(_res, 1, flags) &= ~mask;
+	*getSssConcurrencyPtr(_res, 2, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (((so->flags0 ^ flags) & 0xFFFF0FFF) == 0) {
 			so->codeDataStage3 = 0;
@@ -1264,7 +1263,7 @@ void Game::mixSoundObjects17640(bool flag) {
 			if (flag) {
 				const uint32_t flags = so->flags0;
 				const uint32_t mask = 1 << (flags >> 24);
-				if ((*getSssLutPtr(_res, 2, flags) & mask) != 0 && (*getSssLutPtr(_res, 3, flags) & mask) == 0) {
+				if ((*getSssConcurrencyPtr(_res, 2, flags) & mask) != 0 && (*getSssConcurrencyPtr(_res, 3, flags) & mask) == 0) {
 					expireSoundObjects(flags);
 				}
 			}

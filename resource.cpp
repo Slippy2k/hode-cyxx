@@ -838,9 +838,9 @@ void Resource::loadSssData(File *fp, const char *name) {
 	const int lutSize = _sssHdr.banksDataCount * sizeof(uint32_t);
 	for (int i = 0; i < 3; ++i) {
 		// allocate structures but skip read as tables are initialized in clearSoundObjects()
-		_sssLookupTable1[i] = (uint32_t *)malloc(lutSize);
-		_sssLookupTable2[i] = (uint32_t *)malloc(lutSize);
-		_sssLookupTable3[i] = (uint32_t *)malloc(lutSize);
+		_sssConcurrencyTable1[i] = (uint32_t *)malloc(lutSize);
+		_sssConcurrencyTable2[i] = (uint32_t *)malloc(lutSize);
+		_sssConcurrencyTable3[i] = (uint32_t *)malloc(lutSize);
 		fp->seek(lutSize * 3, SEEK_CUR);
 		bytesRead += lutSize * 3;
 	}
@@ -961,12 +961,12 @@ void Resource::unloadSssData() {
 	free(_sssPreloadData3);
 	_sssPreloadData3 = 0;
 	for (int i = 0; i < 3; ++i) {
-		free(_sssLookupTable1[i]);
-		_sssLookupTable1[i] = 0;
-		free(_sssLookupTable2[i]);
-		_sssLookupTable2[i] = 0;
-		free(_sssLookupTable3[i]);
-		_sssLookupTable3[i] = 0;
+		free(_sssConcurrencyTable1[i]);
+		_sssConcurrencyTable1[i] = 0;
+		free(_sssConcurrencyTable2[i]);
+		_sssConcurrencyTable2[i] = 0;
+		free(_sssConcurrencyTable3[i]);
+		_sssConcurrencyTable3[i] = 0;
 	}
 	free(_sssCodeData);
 	_sssCodeData = 0;
@@ -1023,7 +1023,7 @@ void Resource::loadSssPcm(File *fp, int num) {
 void Resource::clearSssLookupTable3() {
 	if (_sssHdr.banksDataCount != 0) {
 		for (int i = 0; i < 3; ++i) {
-			memset(_sssLookupTable3[i], 0, _sssHdr.banksDataCount * sizeof(uint32_t));
+			memset(_sssConcurrencyTable3[i], 0, _sssHdr.banksDataCount * sizeof(uint32_t));
 		}
 	}
 }
