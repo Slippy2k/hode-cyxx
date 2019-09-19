@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 import os, re, tarfile, shutil
+import tempfile
 import zipfile
 
 SRC_DIR = '..'
 
 SRCS = (
-	'Makefile',
-	'.*h$',
-	'.*cpp$',
+	'Makefile$',
+	'.*\.h$',
+	'.*\.cpp$',
 	'README.txt',
 )
 
@@ -30,6 +31,20 @@ def getVersion():
 version = getVersion()
 assert version
 
+def tidyCpp(fname):
+	# only process .cpp files
+	if not fname.endswith('.cpp'):
+		return file(fname)
+	temporary = tempfile.NamedTemporaryFile(delete=False)
+	sourcefile = file(fname, 'r')
+	for line in sourcefile.readlines():
+		# remove lines with original executable address
+		if line.startswith('// 4'):
+			continue
+		temporary.write(line)
+	temporary.flush()
+	return temporary
+
 src_dir = os.listdir(SRC_DIR)
 
 filename = 'hode-%s.tar.bz2' % version
@@ -37,9 +52,12 @@ tf = tarfile.open(filename, 'w:bz2')
 for name in SRCS:
 	for filename in src_dir:
 		if re.match(name, filename):
-			entry_path = os.path.join(SRC_DIR, filename)
-			entry_name = 'hode-' + version + '/' + filename
-			tf.add(entry_path, arcname=entry_name)
+			entryname = 'hode-' + version + '/' + filename
+			entrypath = os.path.join(SRC_DIR, filename)
+			fileobj = tidyCpp(entrypath)
+			tarinfo = tf.gettarinfo(name=filename, arcname=entryname, fileobj=fileobj)
+			fileobj.seek(0)
+			tf.addfile(tarinfo, fileobj)
 tf.close()
 
 filename = 'hode-%s-win32.zip' % version
