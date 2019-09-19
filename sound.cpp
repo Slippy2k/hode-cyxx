@@ -52,16 +52,18 @@ static uint32_t valueSssLut(uint8_t source, uint8_t mask, SssInfo *s) {
 }
 
 static bool compareSssLut(uint32_t flags_a, uint32_t flags_b) {
-	if (1) {
-		return (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF);
-	}
-	// original code compares the 3 bit fields
-	if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // source (lut index) : 0,1,2 (Andy, monster1, monster2)
-		if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // bank index (lut offset)
-			return (flags_a >> 24) == (flags_b >> 24); // sample index bit 0..31, used as a mask lut[][] |= 1 << bit
+	if (0) {
+		// the x86 code compares the 3 bit fields.
+		// the original code possibly used a structure with bit fields that was optimized by the compiler as a uint32_t
+		if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // source : 0,1,2 (Andy, monster1, monster2)
+			if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // bank index
+				return (flags_a >> 24) == (flags_b >> 24); // sample index bit 0..31, used as a mask lut[][] |= 1 << bit
+			}
 		}
+		return false;
 	}
-	return false;
+	// we can instead simply compare masked integers
+	return (flags_a & 0xFFF00FFF) == (flags_b & 0xFFF00FFF);
 }
 
 // returns the active samples for the lut/source/bank
