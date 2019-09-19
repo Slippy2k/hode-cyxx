@@ -49,11 +49,9 @@ What is working :
 * Level screens
 * Hint screens
 * Monsters logic (MST)
-* Special Powers
 * Shooting collisions
-
-What is partial :
 * Sound playback (SSS)
+* Special Powers
 
 What is missing :
 * Menus
