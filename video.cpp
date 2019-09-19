@@ -16,7 +16,7 @@ Video::Video(SystemStub *system)
 	_drawLine.x2 = W - 1;
 	_drawLine.y2 = H - 1;
 	_drawLine.pitch = W;
-	_shadowLayer = (uint8_t *)malloc(W * H);
+	_shadowLayer = (uint8_t *)malloc(W * H + 1); // projectionData offset can be equal to W * H
 	_frontLayer = (uint8_t *)malloc(W * H);
 	_backgroundLayer = (uint8_t *)malloc(W * H);
 	_spr.pitch = W;
@@ -357,10 +357,7 @@ void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch,
 	for (int j = 0; j < src_h; ++j) {
 		for (int i = 0; i < src_w; ++i) {
 			int offset = READ_LE_UINT16(src1); src1 += 2;
-			// Not sure if this is an issue in the original or in the rewrite
-			if (offset >= W * H) {
-				offset = W * H - 1;
-			}
+			assert(offset <= W * H);
 			if (!src2) { // no LUT
 				dst2[i] = lookupColor(_shadowLayer[offset], dst2[i], _shadowColorLut);
 			} else {

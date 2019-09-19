@@ -2005,7 +2005,7 @@ void Game::drawScreen() {
 			_video->decodeSPR(spr->bitmapBits, _video->_backgroundLayer, spr->xPos, spr->yPos, 0);
 		}
 	}
-	memset(_video->_shadowLayer, 0, Video::W * Video::H);
+	memset(_video->_shadowLayer, 0, Video::W * Video::H + 1);
 	for (int i = 1; i < 8; ++i) {
 		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x2000) != 0) {
