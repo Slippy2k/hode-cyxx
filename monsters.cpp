@@ -2348,9 +2348,9 @@ bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 		return false;
 	} else if ((flags & 0x20000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy4(m->o16, 0))) {
 		return false;
-	} else if ((flags & 0x40000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 36))) {
+	} else if ((flags & 0x40000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(_andyObject, m->o16, 36))) {
 		return false;
-	} else if ((flags & 0x80000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(m->o16, _andyObject, 20))) {
+	} else if ((flags & 0x80000) != 0 && (m->o16->screenNum != _andyObject->screenNum || !clipLvlObjectsBoundingBox(_andyObject, m->o16, 20))) {
 		return false;
 	}
 	return true;
