@@ -47,8 +47,8 @@ Level *Level_lava_create() {
 void Level_lava::postScreenUpdate_lava_screen0() {
 	switch (_res->_screensState[0].s0) {
 	case 2:
-		++_g->_screenCounterTable[0];
-		if (_g->_screenCounterTable[0] >= 11) {
+		++_screenCounterTable[0];
+		if (_screenCounterTable[0] >= 11) {
 			_res->_screensState[0].s0 = 1;
 		}
 		break;
@@ -104,7 +104,7 @@ void Level_lava::postScreenUpdate_lava_screen8() {
 
 void Level_lava::postScreenUpdate_lava_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
-		if (_g->_screenCounterTable[10] < 37) {
+		if (_screenCounterTable[10] < 37) {
 			if (_andyObject->yPos + _andyObject->posTable[3].y < 142) {
 				_andyObject->actionKeyMask = 0x40;
 				_andyObject->directionKeyMask = 0;
@@ -114,12 +114,12 @@ void Level_lava::postScreenUpdate_lava_screen10() {
 					_res->_resLvlScreenBackgroundDataTable[10].currentMaskId = 1;
 					_g->setupScreenMask(10);
 				}
-				++_g->_screenCounterTable[10];
-				if (_g->_screenCounterTable[10] == 13) {
+				++_screenCounterTable[10];
+				if (_screenCounterTable[10] == 13) {
 					_g->_levelRestartCounter = 12;
 				} else {
-					++_g->_screenCounterTable[10];
-					if (_g->_screenCounterTable[10] == 37) {
+					++_screenCounterTable[10];
+					if (_screenCounterTable[10] == 37) {
 						if (!_paf->_skipCutscenes) {
 							_paf->play(7);
 							_paf->unload(7);

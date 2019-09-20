@@ -1415,13 +1415,13 @@ void Game::updateScreen(uint8_t num) {
 void Game::resetScreen() {
 	for (int i = 0; i < _res->_lvlHdr.screensCount; ++i) {
 		_res->_screensState[i].s0 = 0;
-		_screenCounterTable[i] = 0;
+		_level->_screenCounterTable[i] = 0;
 	}
 	const uint8_t *dat2 = _levelScreenStartData[_currentLevel];
 	const int n = _levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum;
 	for (int i = 0; i < n; ++i) {
 		_res->_screensState[i].s0 = *dat2++;
-		_screenCounterTable[i] = *dat2++;
+		_level->_screenCounterTable[i] = *dat2++;
 	}
 	resetScreenMask();
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
@@ -2080,7 +2080,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	initMstCode();
 //	res_initIO();
 	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum, 0xFF);
-	memset(_screenCounterTable, 0, sizeof(_screenCounterTable));
+//	memset(_screenCounterTable, 0, sizeof(_screenCounterTable));
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();
 	resetPlasmaCannonState();

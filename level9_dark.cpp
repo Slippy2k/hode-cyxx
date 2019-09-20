@@ -27,8 +27,8 @@ Level *Level_dark_create() {
 
 void Level_dark::postScreenUpdate_dark_screen0() {
 	if (_res->_screensState[0].s0 != 0) {
-		++_g->_screenCounterTable[0];
-		if (_g->_screenCounterTable[0] == 29) {
+		++_screenCounterTable[0];
+		if (_screenCounterTable[0] == 29) {
 			if (!_paf->_skipCutscenes) {
 				_paf->play(20);
 				_paf->unload(20);
@@ -57,7 +57,7 @@ void Level_dark::preScreenUpdate_dark_screen0() {
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(20);
 		}
-		_g->_screenCounterTable[0] = 0;
+		_screenCounterTable[0] = 0;
 		_res->_screensState[0].s0 = 0;
 	}
 }

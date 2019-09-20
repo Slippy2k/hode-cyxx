@@ -67,11 +67,11 @@ void Level_rock::postScreenUpdate_rock_screen0() {
 		}
 		break;
 	case 2:
-		++_g->_screenCounterTable[0];
-		if (_g->_screenCounterTable[0] > 25) {
+		++_screenCounterTable[0];
+		if (_screenCounterTable[0] > 25) {
 			_res->_screensState[0].s0 = 1;
 		}
-		if (_g->_screenCounterTable[0] == 2) {
+		if (_screenCounterTable[0] == 2) {
 			_g->setShakeScreen(3, 12);
 		}
 		break;
@@ -90,8 +90,8 @@ void Level_rock::postScreenUpdate_rock_screen4() {
 					}
 				}
 			}
-			++_g->_screenCounterTable[4];
-			if (_g->_screenCounterTable[4] >= 20) {
+			++_screenCounterTable[4];
+			if (_screenCounterTable[4] >= 20) {
 				_res->_screensState[4].s0 = 2;
 			}
 			assert(_g->_plasmaExplosionObject);
@@ -105,14 +105,14 @@ void Level_rock::postScreenUpdate_rock_screen4() {
 		}
 		break;
 	case 2:
-		++_g->_screenCounterTable[4];
-		if (_g->_screenCounterTable[4] == 33) {
+		++_screenCounterTable[4];
+		if (_screenCounterTable[4] == 33) {
 			_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = 1;
 			_g->setupScreenMask(4);
-		} else if (_g->_screenCounterTable[4] > 46) {
+		} else if (_screenCounterTable[4] > 46) {
 			_res->_screensState[4].s0 = 1;
 		}
-		if (_g->_screenCounterTable[4] == 31) {
+		if (_screenCounterTable[4] == 31) {
 			_g->setShakeScreen(2, 12);
 		}
 		break;
@@ -196,7 +196,7 @@ void Level_rock::postScreenUpdate_rock_screen15() {
 void Level_rock::postScreenUpdate_rock_screen16() {
 	switch (_res->_screensState[16].s0) {
 	case 0:
-		if (_g->_screenCounterTable[16] < 2) {
+		if (_screenCounterTable[16] < 2) {
 			if ((_andyObject->flags0 & 0x1F) == 2) {
 				break;
 			}
@@ -204,7 +204,7 @@ void Level_rock::postScreenUpdate_rock_screen16() {
 			if (data->unk4 != 2 || _andyObject->xPos <= 155 || _andyObject->yPos >= 87) {
 				break;
 			}
-			++_g->_screenCounterTable[16];
+			++_screenCounterTable[16];
 			_g->setShakeScreen(3, 4);
 		} else {
 			_res->_screensState[16].s0 = 2;
@@ -213,25 +213,25 @@ void Level_rock::postScreenUpdate_rock_screen16() {
 		}
 		break;
 	case 2:
-		++_g->_screenCounterTable[16];
-		if (_g->_screenCounterTable[16] == 5) {
+		++_screenCounterTable[16];
+		if (_screenCounterTable[16] == 5) {
 			_res->_resLvlScreenBackgroundDataTable[16].currentMaskId = 1;
 			_g->setupScreenMask(16);
-		} else if (_g->_screenCounterTable[16] == 23) {
+		} else if (_screenCounterTable[16] == 23) {
 			_andyObject->flags1 &= ~0x30;
 			_andyObject->xPos = 131;
 			_andyObject->yPos = 177;
 			_andyObject->anim = 4;
 			_andyObject->frame = 0;
 			_g->_plasmaCannonFlags &= ~1;
-		} else if (_g->_screenCounterTable[16] == 37) {
+		} else if (_screenCounterTable[16] == 37) {
 			_res->_screensState[16].s0 = 3;
 			_res->_resLvlScreenBackgroundDataTable[16].currentBackgroundId = 1;
 		}
 		break;
 	case 3:
-		++_g->_screenCounterTable[16];
-		if (_g->_screenCounterTable[16] == 55) {
+		++_screenCounterTable[16];
+		if (_screenCounterTable[16] == 55) {
 			_res->_screensState[16].s0 = 1;
 		}
 		break;
@@ -243,11 +243,11 @@ void Level_rock::postScreenUpdate_rock_screen18() {
 	switch (_res->_screensState[18].s0) {
 	case 0:
 		if (_andyObject->yPos + _andyObject->height < 162) {
-			if ((_andyObject->flags0 & 0x1F) == 0 && _g->_screenCounterTable[18] == 0) {
-				_g->_screenCounterTable[18] = 1;
+			if ((_andyObject->flags0 & 0x1F) == 0 && _screenCounterTable[18] == 0) {
+				_screenCounterTable[18] = 1;
 			} else {
-				++_g->_screenCounterTable[18];
-				if (_g->_screenCounterTable[18] == 24) {
+				++_screenCounterTable[18];
+				if (_screenCounterTable[18] == 24) {
 					_res->_screensState[18].s0 = 2;
 					_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 2;
 					_g->setupScreenMask(18);
@@ -259,12 +259,12 @@ void Level_rock::postScreenUpdate_rock_screen18() {
 		o = _g->findLvlObject(2, 0, 18);
 		assert(o);
 		o->actionKeyMask = 1;
-		++_g->_screenCounterTable[18];
-		if (_g->_screenCounterTable[18] == 43) {
+		++_screenCounterTable[18];
+		if (_screenCounterTable[18] == 43) {
 			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 1;
 			_g->setupScreenMask(18);
-		} else if (_g->_screenCounterTable[18] == 51) {
+		} else if (_screenCounterTable[18] == 51) {
 			_res->_screensState[18].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[18].currentBackgroundId = 1;
 		} else {
@@ -328,23 +328,23 @@ void Level_rock::postScreenUpdate_rock_screen19() {
 		}
 		break;
 	case 3:
-		++_g->_screenCounterTable[19];
-		if (_g->_screenCounterTable[19] == 1) {
+		++_screenCounterTable[19];
+		if (_screenCounterTable[19] == 1) {
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
 			_g->setupScreenMask(19);
 			_g->setAndySpecialAnimation(0x12);
-		} else if (_g->_screenCounterTable[19] > 12) {
+		} else if (_screenCounterTable[19] > 12) {
 			_res->_screensState[19].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
 		}
 		break;
 	case 4:
-		++_g->_screenCounterTable[19];
-		if (_g->_screenCounterTable[19] == 25) {
+		++_screenCounterTable[19];
+		if (_screenCounterTable[19] == 25) {
 			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 2;
 			_g->setupScreenMask(19);
-		} else if (_g->_screenCounterTable[19] == 33) {
+		} else if (_screenCounterTable[19] == 33) {
 			_res->_screensState[19].s0 = 2;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 2;
 		}
@@ -487,10 +487,10 @@ int Game::objectUpdate_rock_case1(LvlObject *o) {
 		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04,
 		0x0C, 0x07, 0x00, 0x00
 	};
-	if (_screenCounterTable[2] == 0) {
+	if (_level->_screenCounterTable[2] == 0) {
 		objectUpdate_rock_helper(o, data);
 		if ((o->flags0 & 0x3FF) == 0x4B) {
-			_screenCounterTable[2] = 1;
+			_level->_screenCounterTable[2] = 1;
 		}
 		return 1;
 	}
@@ -506,10 +506,10 @@ int Game::objectUpdate_rock_case2(LvlObject *o) {
 		0x80, 0x80, 0x80, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x04, 0x04, 0x04, 0x04, 0x04,
 		0x06, 0x0B, 0x00, 0x00
 	};
-	if (_screenCounterTable[3] == 0) {
+	if (_level->_screenCounterTable[3] == 0) {
 		objectUpdate_rock_helper(o, data);
 		if ((o->flags0 & 0x3FF) == 0x4B) {
-			_screenCounterTable[3] = 1;
+			_level->_screenCounterTable[3] = 1;
 		}
 	} else {
 		o->bitmapBits = 0;
@@ -664,7 +664,7 @@ void Level_rock::preScreenUpdate_rock_screen13() {
 void Level_rock::preScreenUpdate_rock_screen14() {
 	if (_res->_currentScreenResourceNum == 14) {
 		_res->_screensState[16].s0 = 0;
-		_g->_screenCounterTable[16] = 0;
+		_screenCounterTable[16] = 0;
 	}
 }
 

@@ -35,6 +35,8 @@ struct Level {
 	PafPlayer *_paf;
 	Resource *_res;
 	Video *_video;
+
+	uint8_t _screenCounterTable[kMaxScreens];
 };
 
 Level *Level_rock_create();

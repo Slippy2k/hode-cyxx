@@ -47,8 +47,8 @@ static const uint8_t _isld_dxTable[] = {
 
 void Level_isld::postScreenUpdate_isld_screen0() {
 	if (_res->_currentScreenResourceNum == 0) {
-		if (_g->_screenCounterTable[0] < 5) {
-			++_g->_screenCounterTable[0];
+		if (_screenCounterTable[0] < 5) {
+			++_screenCounterTable[0];
 			_andyObject->actionKeyMask |= 1;
 			_andyObject->directionKeyMask |= 2;
 		}
@@ -57,10 +57,10 @@ void Level_isld::postScreenUpdate_isld_screen0() {
 
 void Level_isld::postScreenUpdate_isld_screen1() {
 	if (_res->_screensState[1].s0 != 2) {
-		_g->_screenCounterTable[1] = 0;
+		_screenCounterTable[1] = 0;
 	} else {
-		++_g->_screenCounterTable[1];
-		if (_g->_screenCounterTable[1] > 21) {
+		++_screenCounterTable[1];
+		if (_screenCounterTable[1] > 21) {
 			_res->_screensState[1].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[1].currentBackgroundId = 1;
 		}
@@ -70,17 +70,17 @@ void Level_isld::postScreenUpdate_isld_screen1() {
 void Level_isld::postScreenUpdate_isld_screen2() {
 	if (_res->_screensState[2].s0 == 1) {
 		if (_res->_currentScreenResourceNum == 2) {
-			++_g->_screenCounterTable[2];
-			if (_g->_screenCounterTable[2] == 1) {
+			++_screenCounterTable[2];
+			if (_screenCounterTable[2] == 1) {
 				LvlObject *o = _g->findLvlObject(2, 0, 2);
 				if (o) {
 					o->actionKeyMask = 1;
 				}
-			} else if (_g->_screenCounterTable[2] == 6) {
+			} else if (_screenCounterTable[2] == 6) {
 				_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = 1;
 				_g->setupScreenMask(2);
 				_g->_plasmaCannonFlags |= 1;
-			} else if (_g->_screenCounterTable[2] == 38 && !_g->_fadePalette) {
+			} else if (_screenCounterTable[2] == 38 && !_g->_fadePalette) {
 				if ((_andyObject->flags0 & 0x1F) != 0xB) {
 					_g->_levelCheckpoint = 1;
 				}
@@ -147,8 +147,8 @@ void Level_isld::postScreenUpdate_isld_screen13() {
 void Level_isld::postScreenUpdate_isld_screen15() {
 	switch (_res->_screensState[15].s0) {
 	case 2:
-		++_g->_screenCounterTable[15];
-		if (_g->_screenCounterTable[15] >= 60) {
+		++_screenCounterTable[15];
+		if (_screenCounterTable[15] >= 60) {
 			_res->_screensState[15].s0 = 1;
 		}
 		break;
@@ -275,7 +275,7 @@ void Level_isld::preScreenUpdate_isld_screen2() {
 	if (_res->_currentScreenResourceNum == 2) {
 		_res->_screensState[2].s0 = 0;
 		_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = 0;
-		_g->_screenCounterTable[2] = 0;
+		_screenCounterTable[2] = 0;
 		LvlObject *o = _g->findLvlObject(2, 0, 2);
 		if (o) {
 			o->actionKeyMask = 0;

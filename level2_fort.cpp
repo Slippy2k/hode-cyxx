@@ -51,11 +51,11 @@ void Level_fort::postScreenUpdate_fort_screen1() {
 		if (o) {
 			o->actionKeyMask = 1;
 		}
-		++_g->_screenCounterTable[1];
-		if (_g->_screenCounterTable[1] == 25) {
+		++_screenCounterTable[1];
+		if (_screenCounterTable[1] == 25) {
 			_res->_resLvlScreenBackgroundDataTable[1].currentMaskId = 1;
 			_g->setupScreenMask(1);
-		} else if (_g->_screenCounterTable[1] == 59) {
+		} else if (_screenCounterTable[1] == 59) {
 			_res->_screensState[1].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[1].currentBackgroundId = 1;
 		}
@@ -71,17 +71,17 @@ void Level_fort::postScreenUpdate_fort_screen6() {
 			_andyObject->actionKeyMask |= 8;
 			if (_andyObject->directionKeyMask & 4) {
 				_andyObject->directionKeyMask &= ~10;
-				++_g->_screenCounterTable[6];
-				if (_g->_screenCounterTable[6] >= 188) {
+				++_screenCounterTable[6];
+				if (_screenCounterTable[6] >= 188) {
 					_andyObject->directionKeyMask &= ~4;
-					_g->_screenCounterTable[7] = 0;
+					_screenCounterTable[7] = 0;
 				}
 			}
-			if (_g->_screenCounterTable[7] < 25) {
-				++_g->_screenCounterTable[7];
+			if (_screenCounterTable[7] < 25) {
+				++_screenCounterTable[7];
 				_andyObject->directionKeyMask &= ~4;
 			} else if ((_andyObject->directionKeyMask & 4) == 0) {
-				_g->_screenCounterTable[6] = 0;
+				_screenCounterTable[6] = 0;
 			}
 		}
 	}
@@ -93,17 +93,17 @@ void Level_fort::postScreenUpdate_fort_screen7() {
 		_andyObject->actionKeyMask |= 8;
 		if (_andyObject->directionKeyMask & 4) {
 			_andyObject->directionKeyMask &= ~0xA;
-			++_g->_screenCounterTable[6];
-			if (_g->_screenCounterTable[6] >= 188) {
+			++_screenCounterTable[6];
+			if (_screenCounterTable[6] >= 188) {
 				_andyObject->directionKeyMask &= ~4;
-				_g->_screenCounterTable[7] = 0;
+				_screenCounterTable[7] = 0;
 			}
 		}
-		if (_g->_screenCounterTable[7] < 25) {
-			++_g->_screenCounterTable[7];
+		if (_screenCounterTable[7] < 25) {
+			++_screenCounterTable[7];
 			_andyObject->directionKeyMask &= ~4;
 		} else if ((_andyObject->directionKeyMask & 4) == 0) {
-			_g->_screenCounterTable[6] = 0;
+			_screenCounterTable[6] = 0;
 		}
 	}
 }
@@ -117,17 +117,17 @@ void Level_fort::postScreenUpdate_fort_screen8() {
 			_andyObject->actionKeyMask |= 8;
 			if (_andyObject->directionKeyMask & 4) {
 				_andyObject->directionKeyMask &= ~0xA;
-				++_g->_screenCounterTable[6];
-				if (_g->_screenCounterTable[6] >= 188) {
+				++_screenCounterTable[6];
+				if (_screenCounterTable[6] >= 188) {
 					_andyObject->directionKeyMask &= ~4;
-					_g->_screenCounterTable[7] = 0;
+					_screenCounterTable[7] = 0;
 				}
 			}
-			if (_g->_screenCounterTable[7] < 25) {
-				++_g->_screenCounterTable[7];
+			if (_screenCounterTable[7] < 25) {
+				++_screenCounterTable[7];
 				_andyObject->directionKeyMask &= ~4;
 			} else if ((_andyObject->directionKeyMask & 4) == 0) {
-				_g->_screenCounterTable[6] = 0;
+				_screenCounterTable[6] = 0;
 			}
 		}
 	}
@@ -143,13 +143,13 @@ void Level_fort::postScreenUpdate_fort_screen16() {
 			}
 			if ((_andyObject->flags0 & 0x1F) == 0 && (_andyObject->flags0 & 0xE0) == 0xE0) {
 				_res->_screensState[16].s0 = 1;
-				_g->_screenCounterTable[16] = 0;
+				_screenCounterTable[16] = 0;
 			} else {
 				_g->setAndySpecialAnimation(3);
 			}
 		} else {
-			++_g->_screenCounterTable[16];
-			if (_g->_screenCounterTable[16] == 5) {
+			++_screenCounterTable[16];
+			if (_screenCounterTable[16] == 5) {
 				if (_g->_levelCheckpoint == 3) {
 					_g->_levelCheckpoint = 4;
 				}
@@ -166,9 +166,9 @@ void Level_fort::postScreenUpdate_fort_screen16() {
 
 void Level_fort::postScreenUpdate_fort_screen17() {
 	if (_res->_screensState[17].s0 == 1) {
-		++_g->_screenCounterTable[17];
-		if (_g->_screenCounterTable[17] == 68) {
-			_g->_screenCounterTable[17] = 0;
+		++_screenCounterTable[17];
+		if (_screenCounterTable[17] == 68) {
+			_screenCounterTable[17] = 0;
 		}
 	}
 }
@@ -177,8 +177,8 @@ void Level_fort::postScreenUpdate_fort_screen21() {
 	if (_res->_currentScreenResourceNum == 21) {
 		switch (_res->_screensState[21].s0) {
 		case 1:
-			++_g->_screenCounterTable[21];
-			if (_g->_screenCounterTable[21] == 22) {
+			++_screenCounterTable[21];
+			if (_screenCounterTable[21] == 22) {
 				_res->_screensState[21].s0 = 2;
 			}
 			break;
@@ -265,7 +265,7 @@ void Level_fort::preScreenUpdate_fort_screen16() {
 
 void Level_fort::preScreenUpdate_fort_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
-		_res->_screensState[17].s0 = _g->_screenCounterTable[17] == 0 ? 1 : 0;
+		_res->_screensState[17].s0 = _screenCounterTable[17] == 0 ? 1 : 0;
 	}
 }
 

@@ -126,7 +126,6 @@ struct Game {
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
 	LvlObject *_lvlObjectsList3;
-	uint8_t _screenCounterTable[kMaxScreens];
 	uint8_t _screenPosTable[5][24 * 32];
 	uint8_t _screenTempMaskBuffer[24 * 32];
 	uint8_t _screenMaskBuffer[96 * 24 * 32];

@@ -96,8 +96,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen6() {
 	case 2:
 		break;
 	case 3:
-		++_g->_screenCounterTable[6];
-		if (_g->_screenCounterTable[6] >= 41) {
+		++_screenCounterTable[6];
+		if (_screenCounterTable[6] >= 41) {
 			_res->_screensState[6].s0 = 1;
 			dat->currentMaskId = 1;
 			dat->currentBackgroundId = 1;
@@ -107,8 +107,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen6() {
 		}
 		break;
 	case 4:
-		++_g->_screenCounterTable[6];
-		if (_g->_screenCounterTable[6] >= 54) {
+		++_screenCounterTable[6];
+		if (_screenCounterTable[6] >= 54) {
 			_res->_screensState[6].s0 = 2;
 			dat->currentBackgroundId = 1;
 		}
@@ -215,8 +215,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen18() {
 void Level_pwr1::postScreenUpdate_pwr1_screen23() {
 	switch (_res->_screensState[23].s0) {
 	case 2:
-		++_g->_screenCounterTable[23];
-		if (_g->_screenCounterTable[23] == 26) {
+		++_screenCounterTable[23];
+		if (_screenCounterTable[23] == 26) {
 			_res->_resLvlScreenBackgroundDataTable[23].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = 1;
 			_g->setupScreenMask(23);
@@ -241,8 +241,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen23() {
 
 void Level_pwr1::postScreenUpdate_pwr1_screen27() {
 	if (_res->_screensState[27].s0 != 0) {
-		++_g->_screenCounterTable[27];
-		if (_g->_screenCounterTable[27] == 37) {
+		++_screenCounterTable[27];
+		if (_screenCounterTable[27] == 37) {
 			_res->_resLvlScreenBackgroundDataTable[27].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = 1;
 			_g->setupScreenMask(27);
@@ -256,8 +256,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen27() {
 			b1.y2 = _andyObject->yPos + _andyObject->posTable[7].y + 2;
 			BoundingBox b2 = { 25, 163, 31, 188 };
 			if (_g->clipBoundingBox(&b2, &b1)) {
-				++_g->_screenCounterTable[27];
-				if (_g->_screenCounterTable[27] == 9) {
+				++_screenCounterTable[27];
+				if (_screenCounterTable[27] == 9) {
 					_res->_screensState[27].s0 = 2;
 				}
 			}
@@ -275,8 +275,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen35() {
 			_andyObject->actionKeyMask |= 8;
 		}
 		if (_res->_screensState[35].s0 != 0) {
-			++_g->_screenCounterTable[35];
-			if (_g->_screenCounterTable[35] == 46) {
+			++_screenCounterTable[35];
+			if (_screenCounterTable[35] == 46) {
 				if (!_paf->_skipCutscenes) {
 					_paf->play(5);
 					_paf->unload(5);
@@ -332,18 +332,18 @@ void Level_pwr1::preScreenUpdate_pwr1_screen6() {
         if (_res->_currentScreenResourceNum == 6 || _res->_currentScreenResourceNum == 5) {
 		if (_res->_screensState[6].s0 == 0) {
 			if (_g->_levelCheckpoint != 1) {
-				_g->_screenCounterTable[6] = 0;
+				_screenCounterTable[6] = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 0;
 				_res->_screensState[6].s0 = 0;
 			} else {
-				_g->_screenCounterTable[6] = 41;
+				_screenCounterTable[6] = 41;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 1;
 				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 1;
 				_res->_screensState[6].s0 = 1;
 			}
 		} else {
-			_g->_screenCounterTable[6] = 54;
+			_screenCounterTable[6] = 54;
 			_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 2;
 			_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 2;
 			_res->_screensState[6].s0 = 2;
@@ -409,9 +409,9 @@ void Level_pwr1::preScreenUpdate_pwr1_screen27() {
 		uint8_t num = 0;
 		if (_res->_screensState[27].s0 != 0 || _g->_levelCheckpoint >= 7) {
 			num = 1;
-			_g->_screenCounterTable[27] = 37;
+			_screenCounterTable[27] = 37;
 		} else if (_g->_levelCheckpoint <= 5) {
-			_g->_screenCounterTable[27] = 0;
+			_screenCounterTable[27] = 0;
 			if (_g->_levelCheckpoint == 5) {
 				_g->_levelCheckpoint = 6;
 			}
@@ -440,7 +440,7 @@ void Level_pwr1::preScreenUpdate_pwr1_screen31() {
 
 void Level_pwr1::preScreenUpdate_pwr1_screen35() {
 	if (_res->_currentScreenResourceNum == 35) {
-		_g->_screenCounterTable[25] = 0;
+		_screenCounterTable[25] = 0;
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(5);
 		}
