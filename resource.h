@@ -80,11 +80,11 @@ struct LvlBackgroundData {
 struct MstHdr {
 	int version;
 	int dataSize;
-	int unk0x08; // mstUnk34DataCount
+	int walkBoxDataCount;
 	int unk0x0C; // mstUnk35DataCount
 	int unk0x10; // mstUnk36DataCount
 	int levelCheckpointCodeDataCount;
-	int screenAreaCodesCount;
+	int screenAreaDataCount;
 	int unk0x1C; // mstUnk39DataCount
 	int unk0x20; // mstUnk42DataCount
 	int unk0x24; // mstUnk43DataCount
@@ -108,7 +108,7 @@ struct MstHdr {
 	int unk0x6C; // mstOp240DataCount
 	int unk0x70; // mstUnk60DataCount
 	int unk0x74; // mstUnk61DataCount
-	int mstOp204DataCount;
+	int op204DataCount;
 	int codeSize; // sizeof(uint32_t)
 	int pointsCount; // 0x80
 };
@@ -118,7 +118,7 @@ struct MstPointOffset { // MstPoint
 	int32_t yOffset;
 }; // sizeof == 8
 
-struct MstScreenAreaCode { // MstScreenArea
+struct MstScreenArea {
 	int32_t x1; // 0
 	int32_t x2; // 4
 	int32_t y1; // 8
@@ -132,7 +132,7 @@ struct MstScreenAreaCode { // MstScreenArea
 	uint32_t codeData; // 0x20, offset _mstCodeData
 }; // sizeof == 36
 
-struct MstUnk34 { // MstWalkBox
+struct MstWalkBox {
 	int32_t right; // 0
 	int32_t left; //  4
 	int32_t top; // 8
@@ -199,7 +199,7 @@ struct MstInfoMonster2 {
 	uint32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk46Unk1 { // MstBehaviour
+struct MstUnk46Unk1 { // MstBehavior
 	uint32_t indexMonsterInfo; // 0, indexes _mstMonsterInfos
 	uint16_t anim; // 4
 	uint16_t unk6; // 6
@@ -219,7 +219,7 @@ struct MstUnk46 {
 	uint32_t count;
 }; // sizeof == 8
 
-struct MstUnk47 { // MstAttackHitBox
+struct MstUnk47 { // MstHitBox
 	uint8_t *data; // sizeof == 20
 	uint32_t count;
 }; // sizeof == 8
@@ -545,15 +545,15 @@ struct Resource {
 	uint32_t _sssPreloadedPcmTotalSize;
 
 	MstPointOffset *_mstPointOffsets;
-	MstUnk34 *_mstUnk34;
+	MstWalkBox *_mstWalkBoxData;
 	MstUnk35 *_mstUnk35;
 	MstUnk36 *_mstUnk36;
 	uint32_t _mstTickDelay;
 	uint32_t _mstTickCodeData;
 	uint32_t *_mstLevelCheckpointCodeData;
-	MstScreenAreaCode *_mstScreenAreaCodes;
-	uint32_t *_mstUnk39; // index to _mstScreenAreaCodes
-	uint32_t *_mstUnk40; // index to _mstScreenAreaCodes
+	MstScreenArea *_mstScreenAreaData;
+	uint32_t *_mstUnk39; // index to _mstScreenAreaData
+	uint32_t *_mstUnk40; // index to _mstScreenAreaData
 	uint32_t *_mstUnk41;
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
@@ -625,7 +625,7 @@ struct Resource {
 
 	void loadMstData(File *fp, const char *name);
 
-	const MstScreenAreaCode *findMstCodeForPos(int num, int xPos, int yPos) const;
+	const MstScreenArea *findMstCodeForPos(int num, int xPos, int yPos) const;
 	void flagMstCodeForPos(int num, uint8_t value);
 };
 

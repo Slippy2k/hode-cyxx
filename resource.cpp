@@ -1032,11 +1032,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 	assert(fp == _mstFile);
 	_mstHdr.version  = fp->readUint32();
 	_mstHdr.dataSize = fp->readUint32();
-	_mstHdr.unk0x08  = fp->readUint32();
+	_mstHdr.walkBoxDataCount = fp->readUint32();
 	_mstHdr.unk0x0C  = fp->readUint32();
 	_mstHdr.unk0x10  = fp->readUint32();
 	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
-	_mstHdr.screenAreaCodesCount = fp->readUint32();
+	_mstHdr.screenAreaDataCount = fp->readUint32();
 	_mstHdr.unk0x1C  = fp->readUint32();
 	_mstHdr.unk0x20  = fp->readUint32();
 	_mstHdr.unk0x24  = fp->readUint32();
@@ -1060,7 +1060,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x6C  = fp->readUint32();
 	_mstHdr.unk0x70  = fp->readUint32();
 	_mstHdr.unk0x74  = fp->readUint32();
-	_mstHdr.mstOp204DataCount    = fp->readUint32();
+	_mstHdr.op204DataCount = fp->readUint32();
 	_mstHdr.codeSize    = fp->readUint32();
 	_mstHdr.pointsCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_mstHdr.version %d _mstHdr.codeSize %d", _mstHdr.version, _mstHdr.codeSize);
@@ -1076,16 +1076,16 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstUnk34 = (MstUnk34 *)malloc(_mstHdr.unk0x08 * sizeof(MstUnk34));
-	for (int i = 0; i < _mstHdr.unk0x08; ++i) {
-		_mstUnk34[i].right  = fp->readUint32();
-		_mstUnk34[i].left   = fp->readUint32();
-		_mstUnk34[i].top    = fp->readUint32();
-		_mstUnk34[i].bottom = fp->readUint32();
-		_mstUnk34[i].flags[0] = fp->readByte();
-		_mstUnk34[i].flags[1] = fp->readByte();
-		_mstUnk34[i].flags[2] = fp->readByte();
-		_mstUnk34[i].flags[3] = fp->readByte();
+	_mstWalkBoxData = (MstWalkBox *)malloc(_mstHdr.walkBoxDataCount * sizeof(MstWalkBox));
+	for (int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
+		_mstWalkBoxData[i].right  = fp->readUint32();
+		_mstWalkBoxData[i].left   = fp->readUint32();
+		_mstWalkBoxData[i].top    = fp->readUint32();
+		_mstWalkBoxData[i].bottom = fp->readUint32();
+		_mstWalkBoxData[i].flags[0] = fp->readByte();
+		_mstWalkBoxData[i].flags[1] = fp->readByte();
+		_mstWalkBoxData[i].flags[2] = fp->readByte();
+		_mstWalkBoxData[i].flags[3] = fp->readByte();
 		bytesRead += 20;
 	}
 
@@ -1127,9 +1127,9 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 4;
 	}
 
-	_mstScreenAreaCodes = (MstScreenAreaCode *)malloc(_mstHdr.screenAreaCodesCount * sizeof(MstScreenAreaCode)); // _mstUnk38
-	for (int i = 0; i < _mstHdr.screenAreaCodesCount; ++i) {
-		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+	_mstScreenAreaData = (MstScreenArea *)malloc(_mstHdr.screenAreaDataCount * sizeof(MstScreenArea)); // _mstUnk38
+	for (int i = 0; i < _mstHdr.screenAreaDataCount; ++i) {
+		MstScreenArea *msac = &_mstScreenAreaData[i];
 		msac->x1 = fp->readUint32();
 		msac->x2 = fp->readUint32();
 		msac->y1 = fp->readUint32();
@@ -1561,8 +1561,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 	fp->seek(_mstHdr.unk0x74 * 4, SEEK_CUR); // _mstUnk61
 	bytesRead += _mstHdr.unk0x74 * 4;
 
-	_mstOp204Data = (MstOp204Data *)malloc(_mstHdr.mstOp204DataCount * sizeof(MstOp204Data));
-	for (int i = 0; i < _mstHdr.mstOp204DataCount; ++i) {
+	_mstOp204Data = (MstOp204Data *)malloc(_mstHdr.op204DataCount * sizeof(MstOp204Data));
+	for (int i = 0; i < _mstHdr.op204DataCount; ++i) {
 		_mstOp204Data[i].arg0 = fp->readUint32();
 		_mstOp204Data[i].arg1 = fp->readUint32();
 		_mstOp204Data[i].arg2 = fp->readUint32();
@@ -1579,10 +1579,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 	}
 }
 
-const MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos) const {
+const MstScreenArea *Resource::findMstCodeForPos(int num, int xPos, int yPos) const {
 	uint32_t i = _mstUnk40[num];
 	while (i != kNone) {
-		const MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+		const MstScreenArea *msac = &_mstScreenAreaData[i];
 		if (msac->x1 <= xPos && msac->x2 >= xPos && msac->unk0x1D != 0 && msac->y1 <= yPos && msac->y2 >= yPos) {
 			return msac;
 		}
@@ -1594,7 +1594,7 @@ const MstScreenAreaCode *Resource::findMstCodeForPos(int num, int xPos, int yPos
 void Resource::flagMstCodeForPos(int num, uint8_t value) {
 	uint32_t i = _mstUnk39[num];
 	while (i != kNone) {
-		MstScreenAreaCode *msac = &_mstScreenAreaCodes[i];
+		MstScreenArea *msac = &_mstScreenAreaData[i];
 		msac->unk0x1D = value;
 		i = msac->nextByValue;
 	}

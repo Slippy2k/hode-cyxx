@@ -276,7 +276,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 
 	uint32_t indexUnk34 = m44->data[0].indexUnk34_16;
 	assert(indexUnk34 != kNone);
-	const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34]; // _esi
 	int _ecx = (m34->right - m34->left) / 2 + m34->left; // xWalkBox
 
 	int _edi = 0x1000000; // walkBox distance
@@ -286,7 +286,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	for (; i < m44->count; ++i) {
 		uint32_t indexUnk34 = m44->data[i].indexUnk34_16;
 		assert(indexUnk34 != kNone);
-		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34]; // _esi
 		if (m34->right < x || m34->left > x || m34->top < y || m34->bottom > y) {
 			// find the closest box
 			const int d1 = ABS(x - m34->left);
@@ -316,7 +316,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		// calculate the yPos for the walkBox
 		uint32_t indexUnk34 = m44Unk1->indexUnk34_16;
 		assert(indexUnk34 != kNone);
-		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34]; // _esi
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34]; // _esi
 		if (y <= m34->top) {
 			y = (m34->top - m34->bottom) / 2 + m34->bottom;
 		}
@@ -368,7 +368,7 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 		MstUnk44Unk1 *m44Unk1 = &m44->data[indexUnk44Unk1];
 		uint32_t indexUnk34 = m44Unk1->indexUnk34_16;
 		assert(indexUnk34 != kNone);
-		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 		while (m34->left <= m->xMstPos) {
 			if (m34->right >= m->xMstPos && m34->bottom <= m->yMstPos && m34->top >= m->yMstPos) {
 				if (m->m44Unk1 == m44Unk1) {
@@ -386,7 +386,7 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 			m44Unk1 = &m44->data[indexUnk44Unk1];
 			indexUnk34 = m44Unk1->indexUnk34_16;
 			assert(indexUnk34 != kNone);
-			m34 = &_res->_mstUnk34[indexUnk34];
+			m34 = &_res->_mstWalkBoxData[indexUnk34];
 		}
 	}
 	return mstMonster1SetWalkingBounds(m);
@@ -817,8 +817,8 @@ void Game::resetMstCode() {
 		resetMonsterObject2(&_monsterObjects2Table[i]);
 	}
 	clearLvlObjectsList1();
-	for (int i = 0; i < _res->_mstHdr.screenAreaCodesCount; ++i) {
-		_res->_mstScreenAreaCodes[i].unk0x1D = 1;
+	for (int i = 0; i < _res->_mstHdr.screenAreaDataCount; ++i) {
+		_res->_mstScreenAreaData[i].unk0x1D = 1;
 	}
 	_rnd.initMstTable();
 	_rnd.initTable();
@@ -1037,7 +1037,7 @@ void Game::executeMstCode() {
 			}
 		}
 	}
-	const MstScreenAreaCode *msac;
+	const MstScreenArea *msac;
 	while ((msac = _res->findMstCodeForPos(_currentScreen, _mstAndyLevelPosX, _mstAndyLevelPosY)) != 0) {
 		debug(kDebug_MONSTER, "trigger for %d,%d", _mstAndyLevelPosX, _mstAndyLevelPosY);
 		_res->flagMstCodeForPos(msac->unk0x1C, 0);
@@ -1135,7 +1135,7 @@ void Game::executeMstUnk16(MstUnk44 *m44, int index) {
 		}
 		const uint32_t indexUnk34 = m44->data[_edi].indexUnk34_16;
 		assert(indexUnk34 != kNone);
-		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 // 4174DE
 		for (int j = 0; j < 4; ++j) {
 			const uint32_t indexUnk44Unk1 = m44->data[_edi].indexUnk44Unk1_76[j];
@@ -1182,8 +1182,8 @@ void Game::executeMstUnk16(MstUnk44 *m44, int index) {
 int Game::executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44Unk1, int num, int index) {
 	if (m44Unk1->unk2C[num][index] < 0) {
 		const uint32_t indexUnk34 = m44Unk1->indexUnk34_16;
-		assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.unk0x08);
-		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.walkBoxDataCount);
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 		uint32_t mask;
 		const uint8_t flags = m34->flags[num];
 		if (flags & 0x80) {
@@ -1534,7 +1534,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	const uint8_t *p = m->monsterInfos;
 	const uint32_t indexUnk34 = m44Unk1->indexUnk34_16;
 	assert(indexUnk34 != kNone);
-	const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
 	debug(kDebug_MONSTER, "mstSetVerticalHorizontalBounds m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->bottom, m34->top);
@@ -1602,7 +1602,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 		if (_cl < m44->count) {
 			MstUnk44Unk1 *m44Unk1 = &m44->data[_cl];
 			assert(m44Unk1->indexUnk34_16 != kNone);
-			const MstUnk34 *m34 = &_res->_mstUnk34[m44Unk1->indexUnk34_16];
+			const MstWalkBox *m34 = &_res->_mstWalkBoxData[m44Unk1->indexUnk34_16];
 			if (_xMstPos1 < m34->left || _xMstPos1 > m34->right || _yMstPos1 < m34->bottom || _yMstPos1 > m34->top) {
 				_edi = -1;
 			} else {
@@ -1801,7 +1801,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 	int var10 = (~m->flagsA5) & 1;
 	uint32_t indexUnk34 = m->m44Unk1->indexUnk34_16;
 	assert(indexUnk34 != kNone);
-	const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 	int var20 = 0;
 	int varC = 0;
 	int var8 = _mstLut1[m->goalDirectionMask];
@@ -2034,7 +2034,7 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 		}
 		const uint32_t indexUnk34 = m44Unk1->indexUnk34_16;
 		assert(indexUnk34 != kNone);
-		const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 		if (x >= m34->left && x <= m34->right && y >= m34->bottom && y <= m34->top) {
 			return i;
 		}
@@ -2626,9 +2626,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 		if (_ebx >= 0) {
 // 4187BC
-			uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->unkF0];
+			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->unkF0];
 			MstUnk50Unk1 *m50Unk1 = &_res->_mstUnk50[var18->indexUnk50].data[indexUnk50Unk1];
-
 			mstTaskAttack(_mstCurrentTask, m50Unk1->codeData, 0x40);
 			_mstCurrentMonster1->unkF8 = m50Unk1->unk8;
 			_mstCurrentMonster1->unkF4 = dir;
@@ -3187,7 +3186,6 @@ void Game::mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags) {
 	assert(codeData != kNone);
 	resetTask(t, _res->_mstCodeData + codeData * 4);
 }
-
 
 int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	MonsterObject1 *m = t->monster1;
@@ -5770,7 +5768,7 @@ static uint8_t getLvlObjectFlag(uint8_t type, const LvlObject *o, const LvlObjec
 }
 
 int Game::mstOp56_specialAction(Task *t, int code, int num) {
-	assert(num < _res->_mstHdr.mstOp204DataCount);
+	assert(num < _res->_mstHdr.op204DataCount);
 	const MstOp204Data *op204Data = &_res->_mstOp204Data[num];
 	debug(kDebug_MONSTER, "mstOp56_specialAction code %d", code);
 	switch (code) {
@@ -5976,7 +5974,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					mstTaskUpdateScreenPosition(t);
 				}
 			} else if (code == 14) {
-				const int pos = op204Data->arg3 >> 16;
+				const int pos = mask >> 16;
 				assert(pos < 8);
 				xPos -= _res->_mstPointOffsets[screenNum].xOffset;
 				xPos -= _andyObject->posTable[pos].x;
@@ -6579,8 +6577,8 @@ int Game::executeMstOp67Type1(Task *t) {
 	m->flagsA5 = (m->flagsA5 & ~2) | 5;
 	mstMonster1ResetWalkPath(m);
 	const uint32_t indexUnk34 = m->m44Unk1->indexUnk34_16;
-	assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.unk0x08);
-	const MstUnk34 *m34 = &_res->_mstUnk34[indexUnk34];
+	assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.walkBoxDataCount);
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 	int y = 0;
 	int x = 0;
 	bool flag = false;
