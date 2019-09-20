@@ -2358,6 +2358,7 @@ bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 
 bool Game::mstMonster1Collide(MonsterObject1 *m, const uint8_t *p) {
 	const uint32_t a = READ_LE_UINT32(p + 0x10);
+	debug(kDebug_MONSTER, "mstMonster1Collide mask 0x%x flagsA6 0x%x", a, m->flagsA6);
 	if (a == 0 || !mstCollidesByFlags(m, a)) {
 		return false;
 	}
@@ -2377,8 +2378,7 @@ bool Game::mstMonster1Collide(MonsterObject1 *m, const uint8_t *p) {
 		t.nextPtr = _mstCurrentTask->nextPtr;
 		t.prevPtr = _mstCurrentTask->prevPtr;
 		memcpy(_mstCurrentTask, &t, sizeof(Task));
-		_mstCurrentTask->run = &Game::mstTask_idle;
-		if ((_mstCurrentTask->monster1->flagsA6 & 2) == 0) {
+		if (_mstCurrentTask->run == &Game::mstTask_idle && (_mstCurrentTask->monster1->flagsA6 & 2) == 0) {
 			_mstCurrentTask->run = &Game::mstTask_main;
 		}
 		return false;
@@ -3323,6 +3323,7 @@ Task *Game::createTask(const uint8_t *codeData) {
 }
 
 void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
+	debug(kDebug_MONSTER, "updateTask t %p offset 0x%04x", t, codeData - _res->_mstCodeData);
 	Task *current = _tasksList;
 	bool found = false;
 	while (current) {
