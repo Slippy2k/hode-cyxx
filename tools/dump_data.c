@@ -274,6 +274,8 @@ int main(int argc, char* argv[]) {
 				dumpBinary(fp, "_isld_spritesData", 0x4F448, 368, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_lava_spritesData", 0x50380, 288, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_lar1_spritesData", 0x4F9A8, 400, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_lar1_setupScreen24Data", 0x4FE40, 24, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "byte_45279", 0x4FF98, 48, "0x%02X", UNSIGNED_8BITS, 0);
 			}
 			fclose(fp);
 		}
