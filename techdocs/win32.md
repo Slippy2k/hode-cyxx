@@ -128,10 +128,10 @@ void postScreenUpdateCb(level1, screen0) {
 In addition to these callbacks, the engine has two bytecode interpreters for
 
 * the monsters logic (242 opcodes)
-* the sound and music triggers (30 opcodes)
+* the sounds (30 opcodes)
 
 
-### Monster Logic
+### Monsters Logic
 
 The monsters in the game are controlled by a bytecode interpreter.
 
@@ -164,6 +164,47 @@ struct Monster {
 ```
 
 Each opcode is 32 bits long and packs its arguments in the upper 3 bytes.
+
+
+### Sounds
+
+The engine has a bytecode interpreter dedicated to the sounds.
+
+The opcodes can be split in 3 categories :
+
+* volume and panning modulation
+* playback control (pause, resume, stop)
+* bytecode control flow (jump)
+
+Opcode | Name                            | Description
+-------|---------------------------------|---------------------------------------
+2      | addSound                        |
+4      | removeSound                     |
+5      | seekForward                     | seek to the PCM frame
+6      | repeatGreaterEqual              |
+8      | seekBackwardDelay               |
+9      | modulatePanning                 | update sound panning value
+10     | modulateVolume                  | update sound volume value
+11     | setVolume                       | set sound volume value
+12     | removeSounds                    | remove all matching sounds
+13     | initVolumeModulation            | define steps and target volume
+14     | initPanningModulation           | define steps and target panning
+16     | resumeSound                     |
+17     | pauseSound                      |
+18     | decrementRepeat                 |
+19     | setPanning                      | set sound panning value
+20     | setPauseCounter                 |
+21     | decrementDelay                  |
+22     | setDelay                        |
+23     | decrementVolumeModulationSteps  |
+24     | setVolumeModulationSteps        |
+25     | decrementPanningModulationSteps |
+26     | setPanningModulationSteps       |
+27     | seekBackward                    | seek to the PCM frame
+28     | jump                            | jump to a given offset in the bytecode
+29     | end                             |
+
+
 
 
 ## Savegame
