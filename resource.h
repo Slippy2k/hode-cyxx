@@ -538,9 +538,9 @@ struct Resource {
 	SssPreloadData *_sssPreloadData1;
 	SssPreloadData *_sssPreloadData2;
 	SssPreloadData *_sssPreloadData3;
-	uint32_t *_sssConcurrencyTable1[3];
-	uint32_t *_sssConcurrencyTable2[3];
-	uint32_t *_sssConcurrencyTable3[3];
+	uint32_t *_sssGroup1[3];
+	uint32_t *_sssGroup2[3];
+	uint32_t *_sssGroup3[3];
 	uint8_t *_sssCodeData;
 	uint32_t _sssPreloadedPcmTotalSize;
 
@@ -621,7 +621,7 @@ struct Resource {
 	void loadSssPcm(File *fp, int num);
 	uint32_t getSssPcmSize(const SssPcm *pcm) const;
 
-	void clearSssLookupTable3();
+	void clearSssGroup3();
 
 	void loadMstData(File *fp, const char *name);
 
