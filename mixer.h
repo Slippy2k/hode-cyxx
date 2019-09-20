@@ -2,6 +2,8 @@
 #ifndef MIXER_H__
 #define MIXER_H__
 
+#include "intern.h"
+
 struct Mixer {
 
 	static const int kPcmChannels = 32;
