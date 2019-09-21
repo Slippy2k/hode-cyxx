@@ -99,7 +99,13 @@ bool Resource::sectorAlignedGameData() {
 
 void Resource::loadSetupDat() {
 	openDat(_fs, kSetupDat, _datFile);
-	_datHdr.version        = _datFile->readUint32();
+
+	_datHdr.version = _datFile->readUint32();
+	if (_datHdr.version != 10 && _datHdr.version != 11) {
+		warning("Unhandled .dat version %d", _datHdr.version);
+		return;
+	}
+
 	_datHdr.bufferSize0    = _datFile->readUint32();
 	_datHdr.bufferSize1    = _datFile->readUint32();
 	_datHdr.sssOffset      = _datFile->readUint32();
@@ -614,6 +620,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		closeDat(_fs, _sssFile);
 		return;
 	}
+
 	_sssHdr.bufferSize = fp->readUint32();
 	_sssHdr.preloadPcmCount = fp->readUint32();
 	_sssHdr.preloadInfoCount = fp->readUint32();
@@ -1019,7 +1026,14 @@ void Resource::clearSssGroup3() {
 
 void Resource::loadMstData(File *fp, const char *name) {
 	assert(fp == _mstFile);
-	_mstHdr.version  = fp->readUint32();
+
+	_mstHdr.version = fp->readUint32();
+	if (_mstHdr.version != 160) {
+		warning("Unhandled .mst version %d", _mstHdr.version);
+		closeDat(_fs, _mstFile);
+		return;
+	}
+
 	_mstHdr.dataSize = fp->readUint32();
 	_mstHdr.walkBoxDataCount = fp->readUint32();
 	_mstHdr.unk0x0C  = fp->readUint32();
