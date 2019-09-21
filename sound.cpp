@@ -257,7 +257,7 @@ void Game::updateSoundObject(SssObject *so) {
 			_currentSoundLvlObject = tmp;
 			return;
 		}
-		updateSssLut2(flags);
+		updateSssGroup2(flags);
 	}
 }
 
@@ -790,7 +790,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 		if (stopSo) {
 			stopSo->flags &= ~1;
 			stopSo->pcm = 0;
-			updateSssLut2(stopSo->flags0);
+			updateSssGroup2(stopSo->flags0);
 		}
 	}
 // 4292DF
@@ -799,7 +799,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 	}
 }
 
-void Game::updateSssLut2(uint32_t flags) {
+void Game::updateSssGroup2(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	uint32_t *sssLut = getSssGroupPtr(_res, 2, flags);
 	if ((*sssLut & mask) != 0) {
@@ -971,7 +971,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 		executeSssCode(&tmpObj, code, true);
 	}
 // 42B57C
-	updateSssLut2(flags);
+	updateSssGroup2(flags);
 	return 0;
 }
 

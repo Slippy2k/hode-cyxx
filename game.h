@@ -522,7 +522,7 @@ struct Game {
 	const uint8_t *executeSssCode(SssObject *so, const uint8_t *code, bool tempSssObject = false);
 	SssObject *addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uint32_t flags_b);
 	void prependSoundObjectToList(SssObject *so);
-	void updateSssLut2(uint32_t flags);
+	void updateSssGroup2(uint32_t flags);
 	SssObject *createSoundObject(int bankIndex, int sampleIndex, uint32_t flags);
 	SssObject *startSoundObject(int bankIndex, int sampleIndex, uint32_t flags);
 	void playSoundObject(SssInfo *s, int source, int b);
