@@ -773,30 +773,17 @@ void Resource::loadSssData(File *fp, const char *name) {
 			const int count = _sssPreloadInfosData[i].count;
 			uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data_V6 * count);
 			fp->read(p, kSizeOfUnk4Data_V6 * count);
-			_sssPreloadInfosData[i].data = p;
-
+			// _sssPreloadInfosData[i].data = p;
 			bytesRead += kSizeOfUnk4Data_V6 * count;
-
 			for (int j = 0; j < count; ++j) {
-
-				const uint32_t unk0x2C = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x2C) * 2;
-				const uint32_t unk0x30 = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x30);
-				const uint32_t unk0x34 = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x34);
-				const uint32_t unk0x04 = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x04) * 2;
-				const uint32_t unk0x08 = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x08) * 2;
-				const uint32_t unk0x0C = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x0C);
-				const uint32_t unk0x10 = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x10);
-				const uint32_t unk0x14 = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + 0x14);
-
-				bytesRead += skipBytesAlign(_sssFile, unk0x2C);
-				bytesRead += skipBytesAlign(_sssFile, unk0x30);
-				bytesRead += skipBytesAlign(_sssFile, unk0x34);
-				bytesRead += skipBytesAlign(_sssFile, unk0x04);
-				bytesRead += skipBytesAlign(_sssFile, unk0x08);
-				bytesRead += skipBytesAlign(_sssFile, unk0x0C);
-				bytesRead += skipBytesAlign(_sssFile, unk0x10);
-				bytesRead += skipBytesAlign(_sssFile, unk0x14);
+				static const int8_t offsets[8] = { 0x2C, 0x30, 0x34, 0x04, 0x08, 0x0C, 0x10, 0x14 };
+				static const int8_t lengths[8] = {    2,    1,    1,    2,    2,    1,    1,    1 };
+				for (int k = 0; k < 8; ++k) {
+					const int len = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + offsets[k]) * lengths[k];
+					bytesRead += skipBytesAlign(_sssFile, len);
+				}
 			}
+			free(p);
 		}
 	}
 
