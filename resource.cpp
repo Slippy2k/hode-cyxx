@@ -98,31 +98,32 @@ bool Resource::sectorAlignedGameData() {
 }
 
 void Resource::loadSetupDat() {
-	uint8_t hdr[512];
 	openDat(_fs, kSetupDat, _datFile);
-	_datFile->read(hdr, sizeof(hdr));
-	_datHdr.version = READ_LE_UINT32(hdr);
-	_datHdr.bufferSize0 = READ_LE_UINT32(hdr + 0x4);
-	_datHdr.bufferSize1 = READ_LE_UINT32(hdr + 0x8);
-	_datHdr.sssOffset = READ_LE_UINT32(hdr + 0xC);
-	_datHdr.iconsCount = READ_LE_UINT32(hdr + 0x10);
-	_datHdr.menusCount = READ_LE_UINT32(hdr + 0x14);
-	_datHdr.cutscenesCount = READ_LE_UINT32(hdr + 0x18);
-	_datHdr.levelsCount = READ_LE_UINT32(hdr + 0x1C);
-	_datHdr.checkpointsLevel1Count = READ_LE_UINT32(hdr + 0x20);
-	_datHdr.checkpointsLevel2Count = READ_LE_UINT32(hdr + 0x24);
-	_datHdr.checkpointsLevel3Count = READ_LE_UINT32(hdr + 0x28);
-	_datHdr.checkpointsLevel4Count = READ_LE_UINT32(hdr + 0x2C);
-	_datHdr.checkpointsLevel5Count = READ_LE_UINT32(hdr + 0x30);
-	_datHdr.checkpointsLevel6Count = READ_LE_UINT32(hdr + 0x34);
-	_datHdr.checkpointsLevel7Count = READ_LE_UINT32(hdr + 0x38);
-	_datHdr.checkpointsLevel8Count = READ_LE_UINT32(hdr + 0x3C);
-	_datHdr.yesNoQuitImage = READ_LE_UINT32(hdr + 0x40);
-	_datHdr.loadingImageSize = READ_LE_UINT32(hdr + 0x48);
+	_datHdr.version        = _datFile->readUint32();
+	_datHdr.bufferSize0    = _datFile->readUint32();
+	_datHdr.bufferSize1    = _datFile->readUint32();
+	_datHdr.sssOffset      = _datFile->readUint32();
+	_datHdr.iconsCount     = _datFile->readUint32();
+	_datHdr.menusCount     = _datFile->readUint32();
+	_datHdr.cutscenesCount = _datFile->readUint32();
+	_datHdr.levelsCount    = _datFile->readUint32();
+	_datHdr.checkpointsLevel1Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel2Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel3Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel4Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel5Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel6Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel7Count = _datFile->readUint32();
+	_datHdr.checkpointsLevel8Count = _datFile->readUint32();
+	_datHdr.yesNoQuitImage         = _datFile->readUint32();
+	_datFile->readUint32(); // 0x44
+	_datHdr.loadingImageSize       = _datFile->readUint32();
 	const int hintsCount = (_datHdr.version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
-		_datHdr.hintsImageOffsetTable[i] = READ_LE_UINT32(hdr + 0x4C + i * 4);
-		_datHdr.hintsImageSizeTable[i] = READ_LE_UINT32(hdr + 0x4C + (hintsCount + i) * 4);
+		_datHdr.hintsImageOffsetTable[i] = _datFile->readUint32();
+	}
+	for (int i = 0; i < hintsCount; ++i) {
+		_datHdr.hintsImageSizeTable[i] = _datFile->readUint32();
 	}
 	_datFile->seek(2048, SEEK_SET); // fioAlignSizeTo2048(76)
 	_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
@@ -152,7 +153,8 @@ void Resource::loadSetupDat() {
 			}
 		}
 	}
-	_menuBuffersOffset = READ_LE_UINT32(hdr + 0x4C + (2 + _datHdr.yesNoQuitImage) * 4);
+	assert(_datHdr.yesNoQuitImage == hintsCount - 3);
+	_menuBuffersOffset = _datHdr.hintsImageOffsetTable[_datHdr.yesNoQuitImage + 2];
 }
 
 void Resource::loadLevelData(const char *levelName) {
