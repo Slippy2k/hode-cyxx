@@ -27,10 +27,12 @@ enum {
 };
 
 enum {
-	kDirectionKeyMaskUp    = 0x1, // climb
-	kDirectionKeyMaskRight = 0x2,
-	kDirectionKeyMaskDown  = 0x4, // crouch
-	kDirectionKeyMaskLeft  = 0x8
+	kDirectionKeyMaskUp    = 1, // climb
+	kDirectionKeyMaskRight = 2,
+	kDirectionKeyMaskDown  = 4, // crouch
+	kDirectionKeyMaskLeft  = 8,
+	kDirectionKeyMaskHorizontal = kDirectionKeyMaskLeft | kDirectionKeyMaskRight, // 0xA
+	kDirectionKeyMaskVertical   = kDirectionKeyMaskDown | kDirectionKeyMaskUp     // 0x5
 };
 
 enum {

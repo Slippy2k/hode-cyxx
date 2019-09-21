@@ -1551,7 +1551,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			x = m->levelPosBounds_x2;
 			m->task->flags |= 0x80;
 		}
-		m->goalDirectionMask = 2;
+		m->goalDirectionMask = kDirectionKeyMaskRight;
 		_xMstPos2 = x - m->xMstPos;
 	} else if (m->xMstPos > m->goalPos_x2) {
 		int x = m->goalPos_x1;
@@ -1560,7 +1560,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			x = m->levelPosBounds_x1;
 			m->task->flags |= 0x80;
 		}
-		m->goalDirectionMask = 8;
+		m->goalDirectionMask = kDirectionKeyMaskLeft;
 		_xMstPos2 = m->xMstPos - x;
 	} else {
 		_xMstPos1 = m->xMstPos;
@@ -1575,7 +1575,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			m->task->flags |= 0x80;
 		}
 		_yMstPos2 = y - m->yMstPos;
-		m->goalDirectionMask |= 4;
+		m->goalDirectionMask |= kDirectionKeyMaskDown;
 	} else if (m->yMstPos > m->goalPos_y2) {
 		int y = m->goalPos_y1;
 		_yMstPos1 = y;
@@ -1584,7 +1584,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			m->task->flags |= 0x80;
 		}
 		_yMstPos2 = m->yMstPos - y;
-		m->goalDirectionMask |= 1;
+		m->goalDirectionMask |= kDirectionKeyMaskUp;
 	} else {
 		_yMstPos1 = m->yMstPos;
 		_yMstPos2 = 0;
@@ -1620,14 +1620,14 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			_xMstPos2 = ABS(m->xMstPos - _xMstPos1);
 			_yMstPos2 = ABS(m->yMstPos - _yMstPos1);
 			if (m->xMstPos < m->goalPos_x1) {
-				m->goalDirectionMask = 2;
+				m->goalDirectionMask = kDirectionKeyMaskRight;
 			} else if (m->xMstPos > m->goalPos_x2) {
-				m->goalDirectionMask = 8;
+				m->goalDirectionMask = kDirectionKeyMaskLeft;
 			}
 			if (m->yMstPos < m->goalPos_y1) {
-				m->goalDirectionMask |= 4;
+				m->goalDirectionMask |= kDirectionKeyMaskDown;
 			} else if (m->yMstPos > m->goalPos_y2) {
-				m->goalDirectionMask |= 1;
+				m->goalDirectionMask |= kDirectionKeyMaskUp;
 			}
 		} else {
 			_cl = _al;
@@ -1702,16 +1702,16 @@ l41A879:
 		m->flagsA7 = m->goalDirectionMask;
 	}
 // 41A9F4
-	if (m->goalDirectionMask & 8) {
+	if (m->goalDirectionMask & kDirectionKeyMaskLeft) {
 		_xMstPos2 = m->xMstPos - m->m44Unk1->unk2C[1][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
-	} else if (m->goalDirectionMask & 2) {
+	} else if (m->goalDirectionMask & kDirectionKeyMaskRight) {
 		_xMstPos2 = m->m44Unk1->unk2C[0][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904) - m->xMstPos;
 	} else {
 		_xMstPos2 = 0;
 	}
-	if (m->goalDirectionMask & 1) {
+	if (m->goalDirectionMask & kDirectionKeyMaskUp) {
 		_yMstPos2 = m->yMstPos - m->m44Unk1->unk2C[3][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
-	} else if (m->goalDirectionMask & 4) {
+	} else if (m->goalDirectionMask & kDirectionKeyMaskDown) {
 		_yMstPos2 = m->m44Unk1->unk2C[2][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908) - m->yMstPos;
 	} else {
 		_yMstPos2 = 0;
@@ -1721,10 +1721,10 @@ l41A879:
 bool Game::executeMstUnk6(MonsterObject1 *m) {
 	if (_mstLut1[m->goalDirectionMask] & 1) {
 		if (_xMstPos2 < m->m49->unk14) {
-			m->goalDirectionMask &= ~0xA;
+			m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
 		}
 		if (_yMstPos2 < m->m49->unk15) {
-			m->goalDirectionMask &= ~0x5;
+			m->goalDirectionMask &= ~kDirectionKeyMaskVertical;
 		}
 	}
 	if (_mstLut1[m->goalDirectionMask] & 1) {
@@ -1737,7 +1737,7 @@ bool Game::executeMstUnk6(MonsterObject1 *m) {
 	} else {
 		while (--m->indexUnk49Unk1 >= 0) {
 			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
-			if (((m->goalDirectionMask & 0xA) == 0 || _xMstPos2 >= m->m49Unk1->unkC) && ((m->goalDirectionMask & 0x5) == 0 || _yMstPos2 >= m->m49Unk1->unkD)) {
+			if (((m->goalDirectionMask & kDirectionKeyMaskHorizontal) == 0 || _xMstPos2 >= m->m49Unk1->unkC) && ((m->goalDirectionMask & kDirectionKeyMaskVertical) == 0 || _yMstPos2 >= m->m49Unk1->unkD)) {
 				return true;
 			}
 		}
@@ -1782,7 +1782,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 	if (_mstLut1[m->goalDirectionMask] & 1) {
 		if (_xMstPos2 < _yMstPos2) {
 			if (_xMstPos2 < m->m49Unk1->unkA) {
-				m->goalDirectionMask &= ~0xA;
+				m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
 				if (m->flagsA7 != 255) {
 					_xMstPos2 = 0;
 				}
@@ -1790,7 +1790,7 @@ void Game::executeMstUnk8(MonsterObject1 *m) {
 		} else {
 // 41AC2B
 			if (_yMstPos2 < m->m49Unk1->unkB) {
-				m->goalDirectionMask &= ~0x5;
+				m->goalDirectionMask &= ~kDirectionKeyMaskVertical;
 				if (m->flagsA7 != 255) {
 					_yMstPos2 = 0;
 				}
@@ -1936,10 +1936,10 @@ int Game::executeMstUnk9(Task *t, MonsterObject1 *m) {
 int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 	if ((m->monsterInfos[946] & 4) == 0 || (_mstLut1[m->goalDirectionMask] & 1) != 0) {
 		if (_xMstPos2 < m->m49->unk14) {
-			m->goalDirectionMask &= ~0xA;
+			m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
 		}
 		if (_yMstPos2 < m->m49->unk15) {
-			m->goalDirectionMask &= ~0x5;
+			m->goalDirectionMask &= ~kDirectionKeyMaskVertical;
 		}
 	}
 // 41B64F
@@ -1955,14 +1955,14 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 		}
 		int x = m->xMstPos;
 		int y = m->yMstPos;
-		if (m->goalDirectionMask & 8) {
+		if (m->goalDirectionMask & kDirectionKeyMaskLeft) {
 			x -= _edi;
-		} else if (m->goalDirectionMask & 2) {
+		} else if (m->goalDirectionMask & kDirectionKeyMaskRight) {
 			x += _edi;
 		}
-		if (m->goalDirectionMask & 1) {
+		if (m->goalDirectionMask & kDirectionKeyMaskUp) {
 			y -= _ebp;
-		} else if (m->goalDirectionMask & 4) {
+		} else if (m->goalDirectionMask & kDirectionKeyMaskDown) {
 			y += _ebp;
 		}
 		if (!mstSetCurrentPos(m, x, y)) {
@@ -1993,7 +1993,7 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 		if (_xMstPos2 < _yMstPos2) {
 			if (_xMstPos2 < m->m49Unk1->unkA) {
 				const uint8_t _al = m->goalDirectionMask;
-				m->goalDirectionMask &= ~0xA;
+				m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
 				if (m->flagsA7 != _al) {
 					_xMstPos2 = 0;
 				}
@@ -2003,7 +2003,7 @@ int Game::executeMstUnk11(Task *t, MonsterObject1 *m) {
 // 41B7E9
 			if (_yMstPos2 < m->m49Unk1->unkB) {
 				const uint8_t _al = m->goalDirectionMask;
-				m->goalDirectionMask &= ~0x5;
+				m->goalDirectionMask &= ~kDirectionKeyMaskVertical;
 				if (m->flagsA7 != _al) {
 					_yMstPos2 = 0;
 				}
@@ -6468,7 +6468,7 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 			x = m->levelPosBounds_x2;
 		}
 		_xMstPos2 = x - m->xMstPos;
-		m->goalDirectionMask = 2; // go right
+		m->goalDirectionMask = kDirectionKeyMaskRight;
 	} else if (x > m->goalPos_x2) {
 // 41A2AA
 		_xMstPos1 = x = m->goalPos_x1;
@@ -6481,7 +6481,7 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 			x = m->levelPosBounds_x1;
 		}
 		_xMstPos2 = m->xMstPos - x;
-		m->goalDirectionMask = 8; // go left
+		m->goalDirectionMask = kDirectionKeyMaskLeft;
 	} else {
 // 41A2FC
 		_xMstPos1 = x;
