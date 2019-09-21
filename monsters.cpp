@@ -908,7 +908,7 @@ void Game::startMstCode() {
 	_mstAndyLevelPrevPosX = _mstAndyLevelPosX;
 	_mstAndyLevelPrevPosY = _mstAndyLevelPosY;
 	int offset = 0;
-	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
+	for (int i = 0; i < _res->_mstHdr.infoMonster1Count; ++i) {
 		offset += kMonsterInfoDataSize;
 		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x30]); // 900
 		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x34]); // 896
@@ -3102,7 +3102,7 @@ void Game::mstUpdateMonstersRect() {
 		return;
 	}
 	int offset = 0;
-	for (int i = 0; i < _res->_mstHdr.unk0x3C; ++i) {
+	for (int i = 0; i < _res->_mstHdr.infoMonster1Count; ++i) {
 		offset += kMonsterInfoDataSize;
 		const uint32_t unk30 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x30]); // 900
 		const uint32_t unk34 = READ_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x34]); // 896
@@ -6491,7 +6491,7 @@ void Game::mstSetHorizontalBounds(MonsterObject1 *m) {
 }
 
 void Game::mstResetCollisionTable() {
-	const int count = MIN(_res->_mstHdr.unk0x3C, 32);
+	const int count = MIN(_res->_mstHdr.infoMonster1Count, 32);
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < count; ++j) {
 			_mstCollisionTable[i][j].count = 0;
@@ -7051,7 +7051,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 			return;
 		}
 // 415743
-		assert(arg24 >= 0 && arg24 < _res->_mstHdr.unk0x2C);
+		assert(arg24 >= 0 && arg24 < _res->_mstHdr.infoMonster2Count);
 		mo->monster2Info = &_res->_mstUnk45[arg24];
 		if (currentTask->monster1) {
 			mo->monster1 = currentTask->monster1;

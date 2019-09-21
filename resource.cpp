@@ -1041,11 +1041,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x20  = fp->readUint32();
 	_mstHdr.unk0x24  = fp->readUint32();
 	_mstHdr.unk0x28  = fp->readUint32();
-	_mstHdr.unk0x2C  = fp->readUint32();
+	_mstHdr.infoMonster2Count  = fp->readUint32();
 	_mstHdr.unk0x30  = fp->readUint32();
 	_mstHdr.unk0x34  = fp->readUint32();
 	_mstHdr.unk0x38  = fp->readUint32();
-	_mstHdr.unk0x3C  = fp->readUint32();
+	_mstHdr.infoMonster1Count  = fp->readUint32();
 	_mstHdr.unk0x40  = fp->readUint32();
 	_mstHdr.unk0x44  = fp->readUint32();
 	_mstHdr.unk0x48  = fp->readUint32();
@@ -1054,7 +1054,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.op226DataCount  = fp->readUint32();
 	_mstHdr.op227DataCount  = fp->readUint32();
 	_mstHdr.op234DataCount  = fp->readUint32();
-	_mstHdr.unk0x60  = fp->readUint32();
+	_mstHdr.op2DataCount  = fp->readUint32();
 	_mstHdr.op197DataCount  = fp->readUint32();
 	_mstHdr.op211DataCount  = fp->readUint32();
 	_mstHdr.op240DataCount  = fp->readUint32();
@@ -1248,8 +1248,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstUnk45 = (MstInfoMonster2 *)malloc(_mstHdr.unk0x2C * sizeof(MstInfoMonster2));
-	for (int i = 0; i < _mstHdr.unk0x2C; ++i) {
+	_mstUnk45 = (MstInfoMonster2 *)malloc(_mstHdr.infoMonster2Count * sizeof(MstInfoMonster2));
+	for (int i = 0; i < _mstHdr.infoMonster2Count; ++i) {
 		_mstUnk45[i].type = fp->readByte();
 		_mstUnk45[i].shootMask = fp->readByte();
 		_mstUnk45[i].anim = fp->readUint16();
@@ -1365,7 +1365,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		m->unk12 = m12;
 	}
 
-	const int mapDataSize = _mstHdr.unk0x3C * kMonsterInfoDataSize;
+	const int mapDataSize = _mstHdr.infoMonster1Count * kMonsterInfoDataSize;
 	_mstMonsterInfos = (uint8_t *)malloc(mapDataSize);
 	fp->read(_mstMonsterInfos, mapDataSize);
 	bytesRead += mapDataSize;
@@ -1386,7 +1386,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		_mstUnk49[i].data1 = (MstUnk49Unk1 *)malloc(_mstUnk49[i].count1 * sizeof(MstUnk49Unk1));
 		const int start = _mstUnk49[i].indexMonsterInfo;
-		assert(start < _mstHdr.unk0x3C);
+		assert(start < _mstHdr.infoMonster1Count);
 		for (uint32_t j = 0; j < _mstUnk49[i].count1; ++j) {
 			fp->readUint32();
 			_mstUnk49[i].data1[j].unk4 = fp->readUint32();
@@ -1505,8 +1505,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstOp2Data = (MstOp2Data *)malloc(_mstHdr.unk0x60 * sizeof(MstOp2Data));
-	for (int i = 0; i < _mstHdr.unk0x60; ++i) {
+	_mstOp2Data = (MstOp2Data *)malloc(_mstHdr.op2DataCount * sizeof(MstOp2Data));
+	for (int i = 0; i < _mstHdr.op2DataCount; ++i) {
 		_mstOp2Data[i].indexVar1 = fp->readUint32();
 		_mstOp2Data[i].indexVar2 = fp->readUint32();
 		_mstOp2Data[i].maskVars  = fp->readByte();
