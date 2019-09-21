@@ -7447,7 +7447,7 @@ set_am:
 int Game::mstTask_monsterWait7(Task *t) {
 	debug(kDebug_MONSTER, "mstTask_monsterWait7 t %p", t);
 	MonsterObject1 *m = t->monster1;
-	executeMstUnk6(m);
+	mstSetVerticalHorizontalBounds(m);
 	return executeMstUnk11(t, m);
 }
 
