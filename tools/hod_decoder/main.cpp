@@ -60,6 +60,7 @@ static const int kMaxScreens = 40;
 static uint8_t _bitmapBuffer[256 * 192];
 static uint8_t _bitmapPalette[256 * 3];
 static uint8_t _spritePalette[256 * 3];
+static uint8_t _controlsPalette[256 * 3];
 
 static bool isMdec(const uint8_t *p) {
 	return READ_LE_UINT16(p + 2) == 0x3800 && (READ_LE_UINT16(p + 6) == 2 || READ_LE_UINT16(p + 6) == 3);
@@ -586,8 +587,8 @@ enum {
 	kSprLoadingAnimation,
 	kSprTitleButtons,
 	kSprAssignPlayer,
-	kSprIconsUnk1,
-	kSprIconsUnk2
+	kSprControls,
+	kSprMenuButtons
 };
 
 static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int spriteNum) {
@@ -598,6 +599,8 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 	const int w = READ_LE_UINT16(ptr + 4);
 	const int h = READ_LE_UINT16(ptr + 6);
 
+	const uint8_t *palette = (spriteGroup == kSprControls) ? _controlsPalette : _spritePalette;
+
 	if (w != 0 && h != 0) {
 
 		memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
@@ -605,7 +608,7 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 
 		char name[64];
 		snprintf(name, sizeof(name), "setup_spr_%02d_%02d.bmp", spriteGroup, spriteNum);
-		saveBMP(name, _bitmapBuffer, _spritePalette, w, h);
+		saveBMP(name, _bitmapBuffer, palette, w, h);
 	}
 
 	return compressedSize + 2;
@@ -779,9 +782,20 @@ static void DecodeSetupDat(File *fp) {
 
 		int ptrOffset = 0;
 
+		static const char *checkpoints[] = {
+			"checkpoints_level1_%02d.bmp",
+			"checkpoints_level2_%02d.bmp",
+			"checkpoints_level3_%02d.bmp",
+			"checkpoints_level4_%02d.bmp",
+			"checkpoints_level5_%02d.bmp",
+			"checkpoints_level6_%02d.bmp",
+			"checkpoints_level7_%02d.bmp",
+			"checkpoints_level8_%02d.bmp",
+		};
+
 		if (version == 10) {
 
-			uint32_t compressedSize;
+			uint32_t compressedSize, hdrOffset;
 
 			const uint32_t sprTitleButtonsOffset = ptrOffset;
 			ptrOffset += READ_LE_UINT32(ptr + ptrOffset + 8) + 16;
@@ -796,6 +810,21 @@ static void DecodeSetupDat(File *fp) {
 			compressedSize = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 8;
 			ptrOffset += DecodeSetupDatBitmap256x192("player", ptr + ptrOffset, compressedSize, _spritePalette);
 			DecodeSetupDatSpritesGroup(ptr + sprAssignPlayerOffset, kSprAssignPlayer);
+
+			const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4; // 16x10 tiles
+			assert((size % (16 * 10)) == 0);
+			ptrOffset += size;
+
+			hdrOffset = ptrOffset;
+			ptrOffset += cutscenes * 12;
+			ptrOffset += DecodeSetupDatBitmapGroup("cutscene_%02d.bmp", cutscenes, ptr + hdrOffset, ptr + ptrOffset);
+
+			for (int i = 0; i < 8; ++i) {
+				const int count = READ_LE_UINT32(buffer + 0x20 + i * 4); // checkpoints
+				hdrOffset = ptrOffset;
+				ptrOffset += count * 12;
+				ptrOffset += DecodeSetupDatBitmapGroup(checkpoints[i], count, ptr + hdrOffset, ptr + ptrOffset);
+			}
 
 		} else if (version == 11) {
 
@@ -822,7 +851,7 @@ static void DecodeSetupDat(File *fp) {
 				if (compressedSize != 0) {
 					char name[64];
 					snprintf(name, sizeof(name), "options_%02d", i);
-					ptrOffset += DecodeSetupDatBitmap256x192(name, ptr + ptrOffset, compressedSize, _bitmapPalette);
+					ptrOffset += DecodeSetupDatBitmap256x192(name, ptr + ptrOffset, compressedSize, (i == 11) ? _controlsPalette : _bitmapPalette);
 				}
 			}
 
@@ -830,29 +859,11 @@ static void DecodeSetupDat(File *fp) {
 			ptrOffset += DecodeSetupDatBitmapGroup("cutscene_%02d.bmp", cutscenes, ptr + hdrOffset, ptr + ptrOffset);
 			hdrOffset += cutscenes * 12;
 
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level1_%02d.bmp", checkpoints1, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints1 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level2_%02d.bmp", checkpoints2, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints2 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level3_%02d.bmp", checkpoints3, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints3 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level4_%02d.bmp", checkpoints4, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints4 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level5_%02d.bmp", checkpoints5, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints5 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level6_%02d.bmp", checkpoints6, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints6 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level7_%02d.bmp", checkpoints7, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints7 * 12;
-
-			ptrOffset += DecodeSetupDatBitmapGroup("checkpoints_level8_%02d.bmp", checkpoints8, ptr + hdrOffset, ptr + ptrOffset);
-			hdrOffset += checkpoints8 * 12;
+			for (int i = 0; i < 8; ++i) {
+				const int count = READ_LE_UINT32(buffer + 0x20 + i * 4); // checkpoints
+				ptrOffset += DecodeSetupDatBitmapGroup(checkpoints[i], count, ptr + hdrOffset, ptr + ptrOffset);
+				hdrOffset += checkpoints1 * 12;
+			}
 
 			ptrOffset += DecodeSetupDatBitmapGroup("levels_%d.bmp", levels, ptr + hdrOffset, ptr + ptrOffset);
 		}
@@ -887,7 +898,7 @@ static void DecodeSetupDat(File *fp) {
 			for (int i = 0; i < icons; ++i) {
 				const int count = READ_LE_UINT16(ptr + hdrOffset + i * 16 + 12);
 				for (int i = 0; i < count; ++i) {
-					ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprIconsUnk1, i);
+					ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprControls, i);
 				}
 			}
 
@@ -898,7 +909,7 @@ static void DecodeSetupDat(File *fp) {
 				for (int i = 0; i < size; ++i) {
 					const int count = READ_LE_UINT16(ptr + hdrOffset + i * 20 + 4 + 12);
 					for (int j = 0; j < count; ++j) {
-						ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprIconsUnk2, j);
+						ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprMenuButtons, j);
 					}
 				}
 			}

@@ -90,7 +90,7 @@ static const uint8_t _byte_418E58[] = {
 	8, 8, 3, 8, 8, 8, 8, 1
 };
 
-static const int _mstDefaultLutOpCount = sizeof(_mstDefaultLutOp) / sizeof(_mstDefaultLutOp[0]);
+static const int _mstDefaultLutOpCount = sizeof(_mstDefaultLutOp);
 
 int main(int argc, char *argv[]) {
 	if (argc == 2) {
@@ -99,7 +99,6 @@ int main(int argc, char *argv[]) {
 		fprintf(stdout, "case %d: // %d\n", i, _mstDefaultLutOp[i]);
 	} else {
 		for (int i = 0; i < _mstDefaultLutOpCount; ++i) {
-			assert(_mstDefaultLutOp[i] == _mstDefaultLutOp[i]);
 			if (_mstDefaultLutOp[i] != 79) {
 				fprintf(stdout, "\tcase %d: // %d\n", i, _mstDefaultLutOp[i]);
 			}
