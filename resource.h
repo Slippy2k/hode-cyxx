@@ -98,14 +98,14 @@ struct MstHdr {
 	int unk0x44; // mstUnk50DataCount
 	int unk0x48; // mstUnk51DataCount
 	int unk0x4C; // mstUnk52DataCount
-	int unk0x50; // mstOp223DataCount
-	int unk0x54; // mstOp226DataCount
-	int unk0x58; // mstOp227DataCount
-	int unk0x5C; // mstOp234DataCount
+	int op223DataCount;
+	int op226DataCount;
+	int op227DataCount;
+	int op234DataCount;
 	int unk0x60; // mstOp2DataCount
-	int unk0x64; // mstOp197DataCount
-	int unk0x68; // mstOp211DataCount
-	int unk0x6C; // mstOp240DataCount
+	int op197DataCount;
+	int op211DataCount;
+	int op240DataCount;
 	int unk0x70; // mstUnk60DataCount
 	int unk0x74; // mstUnk61DataCount
 	int op204DataCount;

@@ -1050,14 +1050,14 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x44  = fp->readUint32();
 	_mstHdr.unk0x48  = fp->readUint32();
 	_mstHdr.unk0x4C  = fp->readUint32();
-	_mstHdr.unk0x50  = fp->readUint32();
-	_mstHdr.unk0x54  = fp->readUint32();
-	_mstHdr.unk0x58  = fp->readUint32();
-	_mstHdr.unk0x5C  = fp->readUint32();
+	_mstHdr.op223DataCount  = fp->readUint32();
+	_mstHdr.op226DataCount  = fp->readUint32();
+	_mstHdr.op227DataCount  = fp->readUint32();
+	_mstHdr.op234DataCount  = fp->readUint32();
 	_mstHdr.unk0x60  = fp->readUint32();
-	_mstHdr.unk0x64  = fp->readUint32();
-	_mstHdr.unk0x68  = fp->readUint32();
-	_mstHdr.unk0x6C  = fp->readUint32();
+	_mstHdr.op197DataCount  = fp->readUint32();
+	_mstHdr.op211DataCount  = fp->readUint32();
+	_mstHdr.op240DataCount  = fp->readUint32();
 	_mstHdr.unk0x70  = fp->readUint32();
 	_mstHdr.unk0x74  = fp->readUint32();
 	_mstHdr.op204DataCount = fp->readUint32();
@@ -1456,8 +1456,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 4;
 	}
 
-	_mstOp223Data = (MstOp223Data *)malloc(_mstHdr.unk0x50 * sizeof(MstOp223Data));
-	for (int i = 0; i < _mstHdr.unk0x50; ++i) {
+	_mstOp223Data = (MstOp223Data *)malloc(_mstHdr.op223DataCount * sizeof(MstOp223Data));
+	for (int i = 0; i < _mstHdr.op223DataCount; ++i) {
 		_mstOp223Data[i].indexVar1 = fp->readUint16();
 		_mstOp223Data[i].indexVar2 = fp->readUint16();
 		_mstOp223Data[i].indexVar3 = fp->readUint16();
@@ -1472,8 +1472,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	_mstOp226Data = (MstOp226Data *)malloc(_mstHdr.unk0x54 * sizeof(MstOp226Data));
-	for (int i = 0; i < _mstHdr.unk0x54; ++i) {
+	_mstOp226Data = (MstOp226Data *)malloc(_mstHdr.op226DataCount * sizeof(MstOp226Data));
+	for (int i = 0; i < _mstHdr.op226DataCount; ++i) {
 		_mstOp226Data[i].unk0 = fp->readByte();
 		_mstOp226Data[i].unk1 = fp->readByte();
 		_mstOp226Data[i].unk2 = fp->readByte();
@@ -1485,8 +1485,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstOp227Data = (MstOp227Data *)malloc(_mstHdr.unk0x58 * sizeof(MstOp227Data));
-	for (int i = 0; i < _mstHdr.unk0x58; ++i) {
+	_mstOp227Data = (MstOp227Data *)malloc(_mstHdr.op227DataCount * sizeof(MstOp227Data));
+	for (int i = 0; i < _mstHdr.op227DataCount; ++i) {
 		_mstOp227Data[i].indexVar1 = fp->readUint16();
 		_mstOp227Data[i].indexVar2 = fp->readUint16();
 		_mstOp227Data[i].compare   = fp->readByte();
@@ -1495,8 +1495,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstOp234Data = (MstOp234Data *)malloc(_mstHdr.unk0x5C * sizeof(MstOp234Data));
-	for (int i = 0; i < _mstHdr.unk0x5C; ++i) {
+	_mstOp234Data = (MstOp234Data *)malloc(_mstHdr.op234DataCount * sizeof(MstOp234Data));
+	for (int i = 0; i < _mstHdr.op234DataCount; ++i) {
 		_mstOp234Data[i].indexVar1 = fp->readUint16();
 		_mstOp234Data[i].indexVar2 = fp->readUint16();
 		_mstOp234Data[i].compare   = fp->readByte();
@@ -1516,8 +1516,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 12;
 	}
 
-	_mstOp197Data = (MstOp197Data *)malloc(_mstHdr.unk0x64 * sizeof(MstOp197Data));
-	for (int i = 0; i < _mstHdr.unk0x64; ++i) {
+	_mstOp197Data = (MstOp197Data *)malloc(_mstHdr.op197DataCount * sizeof(MstOp197Data));
+	for (int i = 0; i < _mstHdr.op197DataCount; ++i) {
 		_mstOp197Data[i].unk0 = fp->readUint16();
 		_mstOp197Data[i].unk2 = fp->readUint16();
 		_mstOp197Data[i].unk4 = fp->readUint16();
@@ -1529,8 +1529,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 16;
 	}
 
-	_mstOp211Data = (MstOp211Data *)malloc(_mstHdr.unk0x68 * sizeof(MstOp211Data));
-	for (int i = 0; i < _mstHdr.unk0x68; ++i) {
+	_mstOp211Data = (MstOp211Data *)malloc(_mstHdr.op211DataCount * sizeof(MstOp211Data));
+	for (int i = 0; i < _mstHdr.op211DataCount; ++i) {
 		_mstOp211Data[i].indexVar1 = fp->readUint16();
 		_mstOp211Data[i].indexVar2 = fp->readUint16();
 		_mstOp211Data[i].unk4      = fp->readUint16();
@@ -1545,8 +1545,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 16;
 	}
 
-	_mstOp240Data = (MstOp240Data *)malloc(_mstHdr.unk0x6C * sizeof(MstOp240Data));
-	for (int i = 0; i < _mstHdr.unk0x6C; ++i) {
+	_mstOp240Data = (MstOp240Data *)malloc(_mstHdr.op240DataCount * sizeof(MstOp240Data));
+	for (int i = 0; i < _mstHdr.op240DataCount; ++i) {
 		_mstOp240Data[i].flags    = fp->readUint32();
 		_mstOp240Data[i].codeData = fp->readUint32();
 		bytesRead += 8;
