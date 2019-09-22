@@ -2151,67 +2151,66 @@ int Game::executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y) {
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	LvlObject *o = m->o16;
-	uint8_t _al = _res->_mstUnk52[num].unk0;
-	uint8_t _bl = _res->_mstUnk52[num].unk2;
+	const uint8_t _al = _res->_mstUnk52[num].unk0;
+	const uint8_t _bl = _res->_mstUnk52[num].unk2;
 	const uint8_t *var4 = m->monsterInfos + _al * 28;
-	uint8_t _dl = (o->flags1 >> 4) & 3;
-	uint8_t _ecx = ((_dl & 1) != 0) ? 8 : 2;
-	uint8_t var8 = _ecx;
+	const uint8_t _dl = (o->flags1 >> 4) & 3;
+	uint8_t var8 = ((_dl & 1) != 0) ? 8 : 2;
 	if (_dl & 2) {
 		var8 |= 4;
 	} else {
 		var8 |= 1;
 	}
-	_ecx = _bl & 15;
+	uint8_t directionKeyMask = _bl & 15;
 	if ((_bl & 0x10) == 0) {
-		uint32_t _ebp = _bl & 0xE0;
+		const uint32_t _ebp = _bl & 0xE0;
 		switch (_ebp) {
 		case 32:
 		case 96:
 		case 160:
 		case 192: // 0
 			if (_ebp == 192) {
-				_ecx |= m->flags49 & ~kDirectionKeyMaskVertical;
+				directionKeyMask |= m->flags49 & ~kDirectionKeyMaskVertical;
 			} else {
-				_ecx |= m->flags49;
+				directionKeyMask |= m->flags49;
 				if (m->monsterInfos[946] & 2) {
-					if (_ebp == 160 && (_mstLut1[_ecx] & 1) != 0) {
+					if (_ebp == 160 && (_mstLut1[directionKeyMask] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
-							_ecx &= ~kDirectionKeyMaskVertical;
+							directionKeyMask &= ~kDirectionKeyMaskVertical;
 						} else {
-							_ecx &= ~kDirectionKeyMaskHorizontal;
+							directionKeyMask &= ~kDirectionKeyMaskHorizontal;
 						}
 					} else {
 						if (m->xDelta >= 2 * m->yDelta) {
-							_ecx &= ~kDirectionKeyMaskVertical;
+							directionKeyMask &= ~kDirectionKeyMaskVertical;
 						} else if (m->yDelta >= 2 * m->xDelta) {
-							_ecx &= ~kDirectionKeyMaskHorizontal;
+							directionKeyMask &= ~kDirectionKeyMaskHorizontal;
 						}
 					}
 				}
 			}
 			break;
 		case 128: // 1
-			_ecx |= var8;
-			if ((m->monsterInfos[946] & 2) != 0 && (_mstLut1[_ecx] & 1) != 0) {
+			directionKeyMask |= var8;
+			if ((m->monsterInfos[946] & 2) != 0 && (_mstLut1[directionKeyMask] & 1) != 0) {
 				if (m->xDelta >= m->yDelta) {
-					_ecx &= ~kDirectionKeyMaskVertical;
+					directionKeyMask &= ~kDirectionKeyMaskVertical;
 				} else {
-					_ecx &= ~kDirectionKeyMaskHorizontal;
+					directionKeyMask &= ~kDirectionKeyMaskHorizontal;
 				}
 			}
 			break;
 		default: // 2
-			_ecx |= var8;
+			directionKeyMask |= var8;
 			break;
 		}
 	}
 // 40E5C0
-	_ecx &= var4[2];
+	directionKeyMask &= var4[2];
 	if ((_bl & 0xE0) == 0x40) {
-		_ecx ^= kDirectionKeyMaskHorizontal;
+		directionKeyMask ^= kDirectionKeyMaskHorizontal;
 	}
-	return (var8 & _ecx) != 0 ? 0 : 1;
+	return ((var8 & directionKeyMask) != 0) ? 0 : 1;
 }
 
 bool Game::lvlObjectCollidesAndy1(LvlObject *o, int flags) const {
