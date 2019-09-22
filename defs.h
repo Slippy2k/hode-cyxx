@@ -352,19 +352,19 @@ struct MonsterObject1 {
 	MstUnk44Unk1 *m44Unk1; // 0xC
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
-	MstUnk48Unk12Unk4 *unk18; // m48Unk4
+	MstUnk48Unk12Unk4 *unk18; // 0x18
 	AndyShootData *collidePtr; // 0x1C
 	int monster1Index; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
 	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
-	uint8_t flags49; // 0x49 facingDirectionMask
+	uint8_t facingDirectionMask; // 0x49
 	uint8_t goalDirectionMask; // 0x4A
 	uint8_t goalScreenNum; // 0x4B
 	int xPos; // 0x4C
 	int yPos; // 0x50
-	int xMstPos; // 0x54 xLevelPos
-	int yMstPos; // 0x58 yLevelPos
+	int xMstPos; // 0x54 currentLevelPos_x
+	int yMstPos; // 0x58 currentLevelPos_y
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
 	int unk64; // 0x64 goalDistance_x1

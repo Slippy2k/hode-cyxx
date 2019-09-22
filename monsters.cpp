@@ -686,16 +686,16 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	m->xDelta = _mstAndyLevelPosX - m->xMstPos;
 	if (m->xDelta < 0) {
 		m->xDelta = -m->xDelta;
-		m->flags49 = 8;
+		m->facingDirectionMask = 8;
 	} else {
-		m->flags49 = 2;
+		m->facingDirectionMask = 2;
 	}
 	m->yDelta = _mstAndyLevelPosY - m->yMstPos;
 	if (m->yDelta < 0) {
 		m->yDelta = -m->yDelta;
-		m->flags49 |= 1;
+		m->facingDirectionMask |= 1;
 	} else {
-		m->flags49 |= 4;
+		m->facingDirectionMask |= 4;
 	}
 	m->collideDistance = -1;
 	m->collidePtr = 0;
@@ -786,14 +786,14 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 		}
 	}
 // 40F151
-	if (m->flags49 & 8) {
+	if (m->facingDirectionMask & 8) {
 		m->unk88 = READ_LE_UINT32(ptr + 920);
 		m->unk84 = READ_LE_UINT32(ptr + 924);
 	} else {
 		m->unk88 = READ_LE_UINT32(ptr + 912);
 		m->unk84 = READ_LE_UINT32(ptr + 916);
 	}
-	if (m->flags49 & 1) {
+	if (m->facingDirectionMask & 1) {
 		m->unk90 = READ_LE_UINT32(ptr + 936);
 		m->unk8C = READ_LE_UINT32(ptr + 940);
 	} else {
@@ -1295,9 +1295,9 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 		case 160:
 		case 192:
 			if (_edi == 192) {
-				o->directionKeyMask |= (m->flags49 & ~kDirectionKeyMaskVertical);
+				o->directionKeyMask |= (m->facingDirectionMask & ~kDirectionKeyMaskVertical);
 			} else {
-				o->directionKeyMask |= m->flags49;
+				o->directionKeyMask |= m->facingDirectionMask;
 				if ((m->monsterInfos[946] & 2) != 0) {
 					if (_edi == 160 && (_mstLut1[o->directionKeyMask] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
@@ -2170,9 +2170,9 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 		case 160:
 		case 192: // 0
 			if (_ebp == 192) {
-				directionKeyMask |= m->flags49 & ~kDirectionKeyMaskVertical;
+				directionKeyMask |= m->facingDirectionMask & ~kDirectionKeyMaskVertical;
 			} else {
-				directionKeyMask |= m->flags49;
+				directionKeyMask |= m->facingDirectionMask;
 				if (m->monsterInfos[946] & 2) {
 					if (_ebp == 160 && (_mstLut1[directionKeyMask] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
@@ -2341,9 +2341,9 @@ bool Game::mstCollidesByFlags(MonsterObject1 *m, uint32_t flags) {
 		return false;
 	} else if ((flags & 0x200) != 0 && (_mstFlags & 0x40000000) != 0) {
 		return false;
-	} else if ((flags & 0x40) != 0 && (mstGetFacingDirectionMask(m->flags49) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->monsterInfos[946] & 4) == 0) {
+	} else if ((flags & 0x40) != 0 && (mstGetFacingDirectionMask(m->facingDirectionMask) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->monsterInfos[946] & 4) == 0) {
 		return false;
-	} else if ((flags & 0x80) != 0 && (mstGetFacingDirectionMask(m->flags49) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->monsterInfos[946] & 4) != 0) {
+	} else if ((flags & 0x80) != 0 && (mstGetFacingDirectionMask(m->facingDirectionMask) & 1) != ((m->o16->flags1 >> 4) & 1) && (m->monsterInfos[946] & 4) != 0) {
 		return false;
 	} else if ((flags & 0x400) != 0 && (m->o16->screenNum != _andyObject->screenNum || !lvlObjectCollidesAndy1(m->o16, 0))) {
 		return false;
@@ -2730,7 +2730,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 					if (_al & 1) {
 						_ebp = 1;
 					} else {
-						_al = mstGetFacingDirectionMask(_mstCurrentMonster1->flags49) & 1;
+						_al = mstGetFacingDirectionMask(_mstCurrentMonster1->facingDirectionMask) & 1;
 						_dl = (_mstCurrentMonster1->o16->flags1 >> 4) & 1;
 						if (_dl == _al || (_mstCurrentMonster1->monsterInfos[946] & 4) != 0) {
 							_ebp = 1;
@@ -2744,7 +2744,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				if (_al & 1) {
 					_ebp = 1;
 				} else {
-					_al = mstGetFacingDirectionMask(_mstCurrentMonster1->flags49) & 1;
+					_al = mstGetFacingDirectionMask(_mstCurrentMonster1->facingDirectionMask) & 1;
 					_dl = (_mstCurrentMonster1->o16->flags1 >> 4) & 1;
 					if (_al != _dl && (_mstCurrentMonster1->monsterInfos[946] & 4) == 0) {
 						_ebp = 2;
@@ -2853,7 +2853,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		return 0;
 	}
 	if ((m->flagsA5 & 8) == 0 && (m->monsterInfos[946] & 2) == 0) {
-		uint8_t _dl = m->flags49;
+		uint8_t _dl = m->facingDirectionMask;
 		if ((_dl & 2) != 0) {
 			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 916) <= m->m44Unk1->unk2C[1][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 912) >= m->m44Unk1->unk2C[0][1]) {
 				m->flagsA6 |= 1;
