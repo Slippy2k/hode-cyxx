@@ -704,14 +704,7 @@ static void DecodeSetupDat(File *fp) {
 	const int menus        = READ_LE_UINT32(buffer + 0x14);
 	const int cutscenes    = READ_LE_UINT32(buffer + 0x18);
 	const int levels       = READ_LE_UINT32(buffer + 0x1C);
-	const int checkpoints1 = READ_LE_UINT32(buffer + 0x20);
-	const int checkpoints2 = READ_LE_UINT32(buffer + 0x24);
-	const int checkpoints3 = READ_LE_UINT32(buffer + 0x28);
-	const int checkpoints4 = READ_LE_UINT32(buffer + 0x2C);
-	const int checkpoints5 = READ_LE_UINT32(buffer + 0x30);
-	const int checkpoints6 = READ_LE_UINT32(buffer + 0x34);
-	const int checkpoints7 = READ_LE_UINT32(buffer + 0x38);
-	const int checkpoints8 = READ_LE_UINT32(buffer + 0x3C);
+	// checkpoints
 	const int yesNoQuit    = READ_LE_UINT32(buffer + 0x40);
 	const int unk0x44      = READ_LE_UINT32(buffer + 0x44);
 	const int bufferSize2  = READ_LE_UINT32(buffer + 0x48);
@@ -776,6 +769,7 @@ static void DecodeSetupDat(File *fp) {
 
 	const int baseOffset = READ_LE_UINT32(buffer + 0x4C + (2 + yesNoQuit) * 4);
 	fp->seek(baseOffset, SEEK_SET);
+
 	ptr = (uint8_t *)malloc(bufferSize1);
 	if (ptr) {
 		fp->read(ptr, bufferSize1);
@@ -829,16 +823,12 @@ static void DecodeSetupDat(File *fp) {
 		} else if (version == 11) {
 
 			ptrOffset = 4 + 21 * 8;
-			ptrOffset += cutscenes    * 12;
-			ptrOffset += checkpoints1 * 12;
-			ptrOffset += checkpoints2 * 12;
-			ptrOffset += checkpoints3 * 12;
-			ptrOffset += checkpoints4 * 12;
-			ptrOffset += checkpoints5 * 12;
-			ptrOffset += checkpoints6 * 12;
-			ptrOffset += checkpoints7 * 12;
-			ptrOffset += checkpoints8 * 12;
-			ptrOffset += levels       * 12;
+			ptrOffset += cutscenes * 12;
+			for (int i = 0; i < 8; ++i) {
+				const int count = READ_LE_UINT32(buffer + 0x20 + i * 4); // checkpoints
+				ptrOffset += count * 12;
+			}
+			ptrOffset += levels * 12;
 
 			static const char *names[] = { "title", "player", 0 };
 			for (int i = 0; names[i]; ++i) {
@@ -862,7 +852,7 @@ static void DecodeSetupDat(File *fp) {
 			for (int i = 0; i < 8; ++i) {
 				const int count = READ_LE_UINT32(buffer + 0x20 + i * 4); // checkpoints
 				ptrOffset += DecodeSetupDatBitmapGroup(checkpoints[i], count, ptr + hdrOffset, ptr + ptrOffset);
-				hdrOffset += checkpoints1 * 12;
+				hdrOffset += count * 12;
 			}
 
 			ptrOffset += DecodeSetupDatBitmapGroup("levels_%d.bmp", levels, ptr + hdrOffset, ptr + ptrOffset);
@@ -871,7 +861,10 @@ static void DecodeSetupDat(File *fp) {
 		free(ptr);
 	}
 
-	fp->seek(baseOffset + fioAlignSizeTo2048(bufferSize1), SEEK_SET); // align to the next 2048 sector
+	if (version == 11) {
+		fp->seek(baseOffset + fioAlignSizeTo2048(bufferSize1), SEEK_SET); // align to the next 2048 sector
+	}
+
 	ptr = (uint8_t *)malloc(bufferSize0);
 	if (ptr) {
 		fp->read(ptr, bufferSize0);
@@ -887,32 +880,52 @@ static void DecodeSetupDat(File *fp) {
 
 			ptrOffset += menus * 8; // menu data
 
-			int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4; // 16x10 tiles
+			const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4; // 16x10 tiles
 			assert((size % (16 * 10)) == 0);
 			ptrOffset += size;
 
 			ptrOffset += unk0x44;
+		}
+
+		hdrOffset = ptrOffset;
+		ptrOffset += icons * 16;
+		for (int i = 0; i < icons; ++i) {
+			const int count = READ_LE_UINT16(ptr + hdrOffset + i * 16 + 12);
+			for (int i = 0; i < count; ++i) {
+				ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprControls, i);
+			}
+		}
+
+		int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+		if (size != 0) {
+			hdrOffset = ptrOffset;
+			ptrOffset += size * 20;
+			for (int i = 0; i < size; ++i) {
+				const int count = READ_LE_UINT16(ptr + hdrOffset + i * 20 + 4 + 12);
+				for (int j = 0; j < count; ++j) {
+					ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprMenuButtons, j);
+				}
+			}
+		}
+
+		if (version == 10) {
+
+			ptrOffset += menus * 8; // menu data
 
 			hdrOffset = ptrOffset;
-			ptrOffset += icons * 16;
-			for (int i = 0; i < icons; ++i) {
-				const int count = READ_LE_UINT16(ptr + hdrOffset + i * 16 + 12);
-				for (int i = 0; i < count; ++i) {
-					ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprControls, i);
+			ptrOffset += 19 * 8;
+			for (int i = 0; i < 19; ++i) {
+				const int compressedSize = READ_LE_UINT32(ptr + hdrOffset + i * 8);
+				if (compressedSize != 0) {
+					char name[64];
+					snprintf(name, sizeof(name), "options_%02d", i);
+					ptrOffset += DecodeSetupDatBitmap256x192(name, ptr + ptrOffset, compressedSize, (i == 11) ? _controlsPalette : _bitmapPalette);
 				}
 			}
 
-			size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
-			if (size != 0) {
-				hdrOffset = ptrOffset;
-				ptrOffset += size * 20;
-				for (int i = 0; i < size; ++i) {
-					const int count = READ_LE_UINT16(ptr + hdrOffset + i * 20 + 4 + 12);
-					for (int j = 0; j < count; ++j) {
-						ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprMenuButtons, j);
-					}
-				}
-			}
+			hdrOffset = ptrOffset;
+			ptrOffset += levels * 12;
+			ptrOffset += DecodeSetupDatBitmapGroup("levels_%d.bmp", levels, ptr + hdrOffset, ptr + ptrOffset);
 		}
 
 		free(ptr);
