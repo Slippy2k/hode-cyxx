@@ -7,8 +7,28 @@
 #include "resource.h"
 #include "util.h"
 
+// (lut[x] & 1) indicates a diagonal direction
 static const uint8_t _mstLut1[] = {
-	0x08, 0x00, 0x02, 0x01, 0x04, 0x00, 0x03, 0x01, 0x06, 0x07, 0x02, 0x01, 0x05, 0x07, 0x03, 0x01
+	// 0
+	0x08,
+	0x00, // kDirectionKeyMaskUp
+	0x02, // kDirectionKeyMaskRight
+	0x01, // kDirectionKeyMaskUp | kDirectionKeyMaskRight
+	// 4
+	0x04, // kDirectionKeyMaskDown
+	0x00, // kDirectionKeyMaskDown | kDirectionKeyMaskUp
+	0x03, // kDirectionKeyMaskDown | kDirectionKeyMaskRight
+	0x01, // kDirectionKeyMaskDown | kDirectionKeyMaskUp | kDirectionKeyMaskRight
+	// 8
+	0x06, // kDirectionKeyMaskLeft
+	0x07, // kDirectionKeyMaskLeft | kDirectionKeyMaskUp
+	0x02, // kDirectionKeyMaskLeft | kDirectionKeyMaskRight
+	0x01, // kDirectionKeyMaskLeft | kDirectionKeyMaskUp | kDirectionKeyMaskRight
+	// 12
+	0x05, // kDirectionKeyMaskLeft | kDirectionKeyMaskDown
+	0x07, // kDirectionKeyMaskLeft | kDirectionKeyMaskDown | kDirectionKeyMaskRight
+	0x03, // kDirectionKeyMaskLeft | kDirectionKeyMaskDown | kDirectionKeyMaskRight
+	0x01  // kDirectionKeyMaskLeft | kDirectionKeyMaskDown | kDirectionKeyMaskUp | kDirectionKeyMaskRight
 };
 
 static const uint8_t _mstLut3[] = {
@@ -1275,21 +1295,21 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 		case 160:
 		case 192:
 			if (_edi == 192) {
-				o->directionKeyMask |= (m->flags49 & ~5);
+				o->directionKeyMask |= (m->flags49 & ~kDirectionKeyMaskVertical);
 			} else {
 				o->directionKeyMask |= m->flags49;
 				if ((m->monsterInfos[946] & 2) != 0) {
 					if (_edi == 160 && (_mstLut1[o->directionKeyMask] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
-							o->directionKeyMask &= ~5;
+							o->directionKeyMask &= ~kDirectionKeyMaskVertical;
 						} else {
-							o->directionKeyMask &= ~0xA;
+							o->directionKeyMask &= ~kDirectionKeyMaskHorizontal;
 						}
 					} else {
 						if (m->xDelta >= m->yDelta * 2) {
-							o->directionKeyMask &= ~5;
+							o->directionKeyMask &= ~kDirectionKeyMaskVertical;
 						} else if (m->yDelta >= m->xDelta * 2) {
-							o->directionKeyMask &= ~0xA;
+							o->directionKeyMask &= ~kDirectionKeyMaskHorizontal;
 						}
 					}
 				}
@@ -1299,9 +1319,9 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 			o->directionKeyMask |= dirMask2;
 			if ((m->monsterInfos[946] & 2) != 0 && (_mstLut1[o->directionKeyMask] & 1) != 0) {
 				if (m->xDelta >= m->yDelta) {
-					o->directionKeyMask &= ~5;
+					o->directionKeyMask &= ~kDirectionKeyMaskVertical;
 				} else {
-					o->directionKeyMask &= ~0xA;
+					o->directionKeyMask &= ~kDirectionKeyMaskHorizontal;
 				}
 			}
 			break;
@@ -1316,7 +1336,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 // 40E3B3
 	o->directionKeyMask &= ptr[2];
 	if ((mask1 & 0xE0) == 0x40) {
-		o->directionKeyMask ^= 0xA;
+		o->directionKeyMask ^= kDirectionKeyMaskHorizontal;
 	}
 }
 
@@ -1521,10 +1541,10 @@ l41B2DC:
 	m->goalPos_y1 += _mstAndyLevelPosY;
 	m->goalPos_y2 += _mstAndyLevelPosY;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-	if ((ptr[2] & 0x5) == 0) {
+	if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
 		m->unk6C = m->goalPos_y1 = m->unk70 = m->goalPos_y2 = m->yMstPos;
 	}
-	if ((ptr[2] & 0xA) == 0) {
+	if ((ptr[2] & kDirectionKeyMaskHorizontal) == 0) {
 		m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
 	}
 }
@@ -2151,21 +2171,21 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 		case 160:
 		case 192: // 0
 			if (_ebp == 192) {
-				_ecx |= m->flags49 & ~5;
+				_ecx |= m->flags49 & ~kDirectionKeyMaskVertical;
 			} else {
 				_ecx |= m->flags49;
 				if (m->monsterInfos[946] & 2) {
 					if (_ebp == 160 && (_mstLut1[_ecx] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
-							_ecx &= ~5;
+							_ecx &= ~kDirectionKeyMaskVertical;
 						} else {
-							_ecx &= ~0xA;
+							_ecx &= ~kDirectionKeyMaskHorizontal;
 						}
 					} else {
 						if (m->xDelta >= 2 * m->yDelta) {
-							_ecx &= ~5;
+							_ecx &= ~kDirectionKeyMaskVertical;
 						} else if (m->yDelta >= 2 * m->xDelta) {
-							_ecx &= ~0xA;
+							_ecx &= ~kDirectionKeyMaskHorizontal;
 						}
 					}
 				}
@@ -2175,9 +2195,9 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 			_ecx |= var8;
 			if ((m->monsterInfos[946] & 2) != 0 && (_mstLut1[_ecx] & 1) != 0) {
 				if (m->xDelta >= m->yDelta) {
-					_ecx &= ~5;
+					_ecx &= ~kDirectionKeyMaskVertical;
 				} else {
-					_ecx &= ~0xA;
+					_ecx &= ~kDirectionKeyMaskHorizontal;
 				}
 			}
 			break;
@@ -2189,7 +2209,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 // 40E5C0
 	_ecx &= var4[2];
 	if ((_bl & 0xE0) == 0x40) {
-		_ecx ^= 0xA;
+		_ecx ^= kDirectionKeyMaskHorizontal;
 	}
 	return (var8 & _ecx) != 0 ? 0 : 1;
 }
@@ -2544,7 +2564,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			if (x1 != 0 || y1 != 0) {
 				int dirMask = 0;
 				int _ebp = 0;
-				if ((m50Unk1->unk4 & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
+				if ((m50Unk1->unk4 & kDirectionKeyMaskHorizontal) != kDirectionKeyMaskHorizontal && (m->o16->flags1 & 0x10) != 0) {
 					_mstTemp_x1 = m->xMstPos - x1;
 				} else {
 					_mstTemp_x1 = m->xMstPos + x1;
@@ -2583,7 +2603,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			}
 // 41866A
 			_mstTemp_x1 = m->xMstPos;
-			if ((m50Unk1->unk4 & 0xA) != 0xA && (m->o16->flags1 & 0x10) != 0) {
+			if ((m50Unk1->unk4 & kDirectionKeyMaskHorizontal) != kDirectionKeyMaskHorizontal && (m->o16->flags1 & 0x10) != 0) {
 				_mstTemp_x1 -= m50Unk1->unk14;
 				_mstTemp_x1 -= m50Unk1->unkC;
 			} else {
@@ -3213,7 +3233,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
 		uint8_t var11 = ptr[2];
-		if (((var11 & 0xA) == 0xA && (o->directionKeyMask & 8) != 0) || ((var11 & 0xA) != 0xA && (o->flags1 & 0x10) != 0)) {
+		if (((var11 & kDirectionKeyMaskHorizontal) == kDirectionKeyMaskHorizontal && (o->directionKeyMask & 8) != 0) || ((var11 & kDirectionKeyMaskHorizontal) != kDirectionKeyMaskHorizontal && (o->flags1 & 0x10) != 0)) {
 			_edi = m->xMstPos - _edi;
 		} else {
 			_edi = m->xMstPos + _edi;
@@ -3223,7 +3243,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		} else {
 			var10 = (_edi <= m->xMstPos) ? 0 : 2;
 		}
-		if ((var11 & 0x5) == 0x5 && (o->directionKeyMask & 1) != 0) {
+		if ((var11 & kDirectionKeyMaskVertical) == kDirectionKeyMaskVertical && (o->directionKeyMask & 1) != 0) {
 			_ebp = m->yMstPos - _ebp;
 		} else {
 			_ebp = m->yMstPos + _ebp;
@@ -5178,13 +5198,13 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->flagsA7 = 255;
 	m->goalPos_y2 = m->unk70;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-	if ((ptr[2] & 5) == 0) {
+	if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
 		m->unk6C = m->yMstPos;
 		m->goalPos_y1 = m->yMstPos;
 		m->unk70 = m->yMstPos;
 		m->goalPos_y2 = m->yMstPos;
 	}
-	if ((ptr[2] & 0xA) == 0) {
+	if ((ptr[2] & kDirectionKeyMaskHorizontal) == 0) {
 		m->unk64 = m->xMstPos;
 		m->goalPos_x1 = m->xMstPos;
 		m->unk68 = m->xMstPos;
@@ -6637,7 +6657,7 @@ int Game::executeMstOp67Type1(Task *t) {
 	m->goalPos_x1 = m->unk64;
 	m->goalPos_x2 = m->unk68;
 	const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-	if ((ptr1[2] & 0xA) == 0) {
+	if ((ptr1[2] & kDirectionKeyMaskHorizontal) == 0) {
 		m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
 	}
 // 41C62E
@@ -6653,7 +6673,7 @@ int Game::executeMstOp67Type1(Task *t) {
 		m->unk70 -= _edi;
 		m->goalPos_y2 = m->unk70;
 		const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-		if ((ptr[2] & 5) == 0) {
+		if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
 			m->unk6C = m->goalPos_y1 = m->unk70 = m->goalPos_y2 = m->yMstPos;
 		}
 		if (m->monsterInfos[946] & 4) {
@@ -6810,10 +6830,10 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		m->goalPos_y1 = m->unk6C;
 		m->goalPos_y2 = m->unk70;
 		const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-		if ((ptr1[2] & 0x5) == 0) {
+		if ((ptr1[2] & kDirectionKeyMaskVertical) == 0) {
 			m->unk6C = m->goalPos_y1 = m->unk70 = m->goalPos_y2 = m->yMstPos;
 		}
-		if ((ptr1[2] & 0xA) == 0) {
+		if ((ptr1[2] & kDirectionKeyMaskHorizontal) == 0) {
 			m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
 		}
 		if (p[946] & 4) {
