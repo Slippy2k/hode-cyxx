@@ -18,14 +18,7 @@ struct DatHdr {
 	uint32_t menusCount; // 0x14
 	uint32_t cutscenesCount; // 0x18
 	uint32_t levelsCount; // 0x1C
-	uint32_t checkpointsLevel1Count; // 0x20
-	uint32_t checkpointsLevel2Count; // 0x24
-	uint32_t checkpointsLevel3Count; // 0x28
-	uint32_t checkpointsLevel4Count; // 0x2C
-	uint32_t checkpointsLevel5Count; // 0x30
-	uint32_t checkpointsLevel6Count; // 0x34
-	uint32_t checkpointsLevel7Count; // 0x38
-	uint32_t checkpointsLevel8Count; // 0x3C
+	uint32_t levelCheckpointsCount[8]; // 0x20..0x3C
 	int yesNoQuitImage; // 0x40
 	int loadingImageSize; // 0x48
 	uint32_t hintsImageOffsetTable[46];

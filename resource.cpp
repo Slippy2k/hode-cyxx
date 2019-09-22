@@ -113,14 +113,9 @@ void Resource::loadSetupDat() {
 	_datHdr.menusCount     = _datFile->readUint32();
 	_datHdr.cutscenesCount = _datFile->readUint32();
 	_datHdr.levelsCount    = _datFile->readUint32();
-	_datHdr.checkpointsLevel1Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel2Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel3Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel4Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel5Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel6Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel7Count = _datFile->readUint32();
-	_datHdr.checkpointsLevel8Count = _datFile->readUint32();
+	for (int i = 0; i < kLvl_dark; ++i) { // last level has a single checkpoint
+		_datHdr.levelCheckpointsCount[i] = _datFile->readUint32();
+	}
 	_datHdr.yesNoQuitImage         = _datFile->readUint32();
 	_datFile->readUint32(); // 0x44
 	_datHdr.loadingImageSize       = _datFile->readUint32();
@@ -131,7 +126,7 @@ void Resource::loadSetupDat() {
 	for (int i = 0; i < hintsCount; ++i) {
 		_datHdr.hintsImageSizeTable[i] = _datFile->readUint32();
 	}
-	_datFile->seek(2048, SEEK_SET); // fioAlignSizeTo2048(76)
+	_datFile->seek(2048, SEEK_SET); // align to the next sector
 	_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
 	if (_loadingImageBuffer) {
 		_datFile->read(_loadingImageBuffer, _datHdr.loadingImageSize);
@@ -643,7 +638,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 	debug(kDebug_RESOURCE, "bufferSize %d", bufferSize);
 
 	// fp->flush();
-	fp->seek(2048, SEEK_SET); // fioAlignSizeTo2048(52) _sssHdr.bufferSize
+	fp->seek(2048, SEEK_SET); // align to the next sector
 
 	// _sssBuffer1
 	int bytesRead = 0;
@@ -1068,7 +1063,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.pointsCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_mstHdr.version %d _mstHdr.codeSize %d", _mstHdr.version, _mstHdr.codeSize);
 
-	fp->seek(2048, SEEK_SET);
+	fp->seek(2048, SEEK_SET); // align to the next sector
 
 	int bytesRead = 0;
 
