@@ -376,7 +376,7 @@ void Game::sssOp4_removeSounds(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
 	*getSssGroupPtr(_res, 1, flags) &= ~mask;
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if (((so->flags1 ^ flags) & 0xFFFF0FFF) == 0) {
+		if (((so->flags1 ^ flags) & 0xFFFF0FFF) == 0) { // (a & m) == (b & m)
 			so->codeDataStage3 = 0;
 			if (so->codeDataStage4 == 0) {
 				removeSoundObjectFromList(so);
@@ -805,8 +805,8 @@ void Game::prependSoundObjectToList(SssObject *so) {
 
 void Game::updateSssGroup2(uint32_t flags) {
 	const uint32_t mask = 1 << (flags >> 24);
-	uint32_t *sssLut = getSssGroupPtr(_res, 2, flags);
-	if ((*sssLut & mask) != 0) {
+	uint32_t *sssGroupPtr = getSssGroupPtr(_res, 2, flags);
+	if ((*sssGroupPtr & mask) != 0) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssGroup(so->flags0, flags)) {
 				return;
@@ -817,7 +817,7 @@ void Game::updateSssGroup2(uint32_t flags) {
 				return;
 			}
 		}
-		*sssLut &= ~mask;
+		*sssGroupPtr &= ~mask;
 	}
 }
 
@@ -1036,21 +1036,21 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 	const uint8_t _al = s->concurrencyMask;
 	if (_al & 2) {
 		const uint32_t mask = 1 << (_ebp >> 24);
-		uint32_t *sssLut3 = getSssGroupPtr(_res, 3, _ebp);
-		*sssLut3 |= mask;
-		uint32_t *sssLut2 = getSssGroupPtr(_res, 2, _ebp);
-		if (*sssLut2 & mask) {
+		uint32_t *sssGroupPtr3 = getSssGroupPtr(_res, 3, _ebp);
+		*sssGroupPtr3 |= mask;
+		uint32_t *sssGroupPtr2 = getSssGroupPtr(_res, 2, _ebp);
+		if (*sssGroupPtr2 & mask) {
 			return;
 		}
-		*sssLut2 |= mask;
+		*sssGroupPtr2 |= mask;
 // 42BB26
 	} else if (_al & 1) {
 		const uint32_t mask = 1 << (_ebp >> 24);
-		uint32_t *sssLut1 = getSssGroupPtr(_res, 1, _ebp);
-		if (*sssLut1 & mask) {
+		uint32_t *sssGroupPtr1 = getSssGroupPtr(_res, 1, _ebp);
+		if (*sssGroupPtr1 & mask) {
 			return;
 		}
-		*sssLut1 |= mask;
+		*sssGroupPtr1 |= mask;
 // 42BB60
 	} else if (_al & 4) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
@@ -1270,7 +1270,9 @@ void Game::mixSoundObjects17640(bool flag) {
 					expireSoundObjects(flags);
 				}
 			}
-			updateSoundObject(so);
+			if (so->pcm) {
+				updateSoundObject(so);
+			}
 		}
 	}
 // 42B4B2
