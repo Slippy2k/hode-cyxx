@@ -2624,23 +2624,23 @@ void Game::updateAndyMonsterObjects() {
 void Game::updateInput() {
 	const uint8_t inputMask = _system->inp.mask;
 	if (inputMask & SYS_INP_RUN) {
-		_actionKeyMask |= 1;
+		_actionKeyMask |= kActionKeyMaskRun;
 	}
 	if (inputMask & SYS_INP_JUMP) {
-		_actionKeyMask |= 2;
+		_actionKeyMask |= kActionKeyMaskJump;
 	}
 	if (inputMask & SYS_INP_SHOOT) {
-		_actionKeyMask |= 4;
+		_actionKeyMask |= kActionKeyMaskShoot;
 	}
 	if (inputMask & SYS_INP_UP) {
-		_directionKeyMask |= 1;
+		_directionKeyMask |= kDirectionKeyMaskUp;
 	} else if (inputMask & SYS_INP_DOWN) {
-		_directionKeyMask |= 4;
+		_directionKeyMask |= kDirectionKeyMaskDown;
 	}
 	if (inputMask & SYS_INP_RIGHT) {
-		_directionKeyMask |= 2;
+		_directionKeyMask |= kDirectionKeyMaskRight;
 	} else if (inputMask & SYS_INP_LEFT) {
-		_directionKeyMask |= 8;
+		_directionKeyMask |= kDirectionKeyMaskLeft;
 	}
 }
 
