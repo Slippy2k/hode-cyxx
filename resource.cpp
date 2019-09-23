@@ -835,19 +835,8 @@ void Resource::loadSssData(File *fp, const char *name) {
 		fp->seek(lutSize * 3, SEEK_CUR);
 		bytesRead += lutSize * 3;
 	}
-	_sssPreloadedPcmTotalSize = 0;
 // 429B4B
-	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
-		// _sssPcmTable[i].offset += baseOffset;
-		// _sssPcmTable[i].ptr = 0;
-		if (i >= _sssHdr.preloadPcmCount && _sssPcmTable[i].strideCount != 0) {
-			// *var103++ = i;
-			_sssPreloadedPcmTotalSize += _sssPcmTable[i].totalSize;
-		}
-		// if (_sssPcmTable[i].totalSize == 0) {
-		//	_sssPcmTable[i].strideCount = 1;
-		// }
-	}
+	// _sssPreloadedPcmTotalSize 0;
 
 // 429B9F
 	checkSssCode(_sssCodeData, _sssHdr.codeSize);

@@ -535,7 +535,6 @@ struct Resource {
 	uint32_t *_sssGroup2[3];
 	uint32_t *_sssGroup3[3];
 	uint8_t *_sssCodeData;
-	uint32_t _sssPreloadedPcmTotalSize;
 
 	MstPointOffset *_mstPointOffsets;
 	MstWalkBox *_mstWalkBoxData;
