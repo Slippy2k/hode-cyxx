@@ -66,6 +66,7 @@ Game::Game(SystemStub *system, const char *dataPath, int cheats) {
 	_andyDirectionKeyMaskAnd = 0xFF;
 	_andyDirectionKeyMaskOr = 0;
 
+	_mstDisabled = false;
 	_specialAnimMask = 0; // original only clears ~0x30
 	_mstCurrentAnim = 0;
 	_mstOriginPosX = Video::W / 2;
@@ -80,6 +81,7 @@ Game::Game(SystemStub *system, const char *dataPath, int cheats) {
 	memset(_monsterObjects1Table, 0, sizeof(_monsterObjects1Table));
 	memset(_monsterObjects2Table, 0, sizeof(_monsterObjects2Table));
 
+	_sssDisabled = false;
 	_sssObjectsCount = 0;
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;
@@ -1319,10 +1321,10 @@ void Game::updateScreenHelper(int num) {
 				case 5:
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case0;
 					break;
-				case 1: // shadow_screen2
+				case 1: // shadow screen2
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case1;
 					break;
-				case 2: // shadow_screen2
+				case 2: // shadow screen3
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case2;
 					break;
 				case 3:
@@ -1434,7 +1436,7 @@ void Game::restartLevel() {
 	setupAndyLvlObject();
 	clearLvlObjectsList2();
 	clearLvlObjectsList3();
-	if (!_mstLogicDisabled) {
+	if (!_mstDisabled) {
 		resetMstCode();
 		startMstCode();
 	} else {
@@ -2078,7 +2080,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
 	initMstCode();
-//	res_initIO();
 	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum, 0xFF);
 //	memset(_screenCounterTable, 0, sizeof(_screenCounterTable));
 	clearDeclaredLvlObjectsList();
@@ -2090,10 +2091,9 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_res->_currentScreenResourceNum = _andyObject->screenNum;
 	_currentRightScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen]; /* right */
 	_currentLeftScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen]; /* left */
-	if (!_mstLogicDisabled) {
+	if (!_mstDisabled) {
 		startMstCode();
 	}
-//	snd_setupResampleFunc(_ecx = 1);
 	if (!_paf->_skipCutscenes && _levelCheckpoint == 0 && !levelChanged) {
 		const uint8_t num = _cutscenes[_currentLevel];
 		_paf->preload(num);
@@ -2109,7 +2109,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	setupAndyLvlObject();
 	clearLvlObjectsList2();
 	clearLvlObjectsList3();
-	if (!_mstLogicDisabled) {
+	if (!_mstDisabled) {
 		resetMstCode();
 		startMstCode();
 	} else {
@@ -2693,7 +2693,7 @@ void Game::levelMainLoop() {
 		}
 	}
 	if (_res->_sssHdr.infosDataCount != 0) {
-		/* original code appears to have a dedicated thread for sound, that main thread/loop signals */
+		// original code appears to have a dedicated thread for sound, that main thread/loop signals
 	}
 	if (_video->_paletteNeedRefresh) {
 		_video->_paletteNeedRefresh = false;
@@ -2723,11 +2723,6 @@ void Game::levelMainLoop() {
 	_rnd.update();
 	_system->processEvents();
 	if (_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
-//			while (_res_ioStateIndex == 1) {
-//				if (!(_sync_unkCounterVar2 < _sync_unkVar1))
-//					break;
-//				res_preload_(0, 1000);
-//			}
 		if (displayHintScreen(-1, 0)) {
 			_system->inp.quit = true;
 			return;
@@ -3587,7 +3582,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 }
 
 int Game::lvlObjectType8Callback(LvlObject *ptr) {
-	if (_mstLogicDisabled) {
+	if (_mstDisabled) {
 		ptr->actionKeyMask = _andyObject->actionKeyMask;
 		ptr->directionKeyMask = _andyObject->directionKeyMask;
 		if (_andyObject->spriteNum == 2 && _lvlObjectsList0) {

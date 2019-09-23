@@ -56,7 +56,7 @@ struct Game {
 		kMaxSprites = 128,
 		kMaxSpriteTypes = 32,
 		kMaxLvlObjects = 160,
-		kFrameTimeStamp = 50 // 80
+		kFrameTimeStamp = 50 // original is ~80ms (12hz)
 	};
 
 	static const uint8_t _byte_43E660[];
@@ -180,7 +180,7 @@ struct Game {
 	int _mstOp54Counter;
 	int _mstOp56Counter;
 	uint8_t _mstOp54Table[32];
-	bool _mstLogicDisabled;
+	bool _mstDisabled;
 	LvlObject _declaredLvlObjectsList[kMaxLvlObjects];
 	LvlObject *_declaredLvlObjectsListHead; // pointer to the next free entry
 	int _declaredLvlObjectsListCount;

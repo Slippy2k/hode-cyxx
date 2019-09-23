@@ -821,7 +821,7 @@ void Game::shuffleMstUnk43(MstUnk43 *p) {
 
 void Game::initMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
-	if (_mstLogicDisabled) {
+	if (_mstDisabled) {
 		return;
 	}
 	// _mstLut initialization
@@ -829,7 +829,7 @@ void Game::initMstCode() {
 }
 
 void Game::resetMstCode() {
-	if (_mstLogicDisabled) {
+	if (_mstDisabled) {
 		return;
 	}
 	_mstFlags = 0;
@@ -1034,7 +1034,7 @@ void Game::executeMstCode() {
 	_andyDirectionKeyMaskAnd = 0xFF;
 	_andyActionKeyMaskOr = 0;
 	_andyDirectionKeyMaskOr = 0;
-	if (_mstLogicDisabled) {
+	if (_mstDisabled) {
 		return;
 	}
 	++_executeMstLogicCounter;

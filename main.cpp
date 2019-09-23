@@ -88,7 +88,7 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 		if (strcmp(name, "disable_paf") == 0) {
 			g->_paf->_skipCutscenes = configBool(value);
 		} else if (strcmp(name, "disable_mst") == 0) {
-			g->_mstLogicDisabled = configBool(value);
+			g->_mstDisabled = configBool(value);
 		} else if (strcmp(name, "disable_sss") == 0) {
 			g->_sssDisabled = configBool(value);
 		} else if (strcmp(name, "max_active_sounds") == 0) {
