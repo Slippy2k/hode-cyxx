@@ -1038,7 +1038,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x1C  = fp->readUint32();
 	_mstHdr.unk0x20  = fp->readUint32();
 	_mstHdr.unk0x24  = fp->readUint32();
-	_mstHdr.unk0x28  = fp->readUint32();
+	_mstHdr.walkPathDataCount  = fp->readUint32();
 	_mstHdr.infoMonster2Count  = fp->readUint32();
 	_mstHdr.unk0x30  = fp->readUint32();
 	_mstHdr.unk0x34  = fp->readUint32();
@@ -1196,17 +1196,17 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += readBytesAlign(fp, _mstUnk43[i].data2, _mstUnk43[i].count2);
 	}
 
-	_mstUnk44 = (MstUnk44 *)malloc(_mstHdr.unk0x28 * sizeof(MstUnk44));
-	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
+	_mstUnk44 = (MstWalkPath *)malloc(_mstHdr.walkPathDataCount * sizeof(MstWalkPath));
+	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
 		fp->readUint32();
 		fp->readUint32();
 		_mstUnk44[i].mask  = fp->readUint32();
 		_mstUnk44[i].count = fp->readUint32();
 		bytesRead += 16;
 	}
-	for (int i = 0; i < _mstHdr.unk0x28; ++i) {
+	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
 		const int count = _mstUnk44[i].count;
-		_mstUnk44[i].data = (MstUnk44Unk1 *)malloc(sizeof(MstUnk44Unk1) * count);
+		_mstUnk44[i].data = (MstWalkNode *)malloc(sizeof(MstWalkNode) * count);
 		for (int j = 0; j < count; ++j) {
 			uint8_t data[104];
 			fp->read(data, sizeof(data));

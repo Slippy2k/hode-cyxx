@@ -61,7 +61,7 @@ struct LvlBackgroundData {
 	uint16_t backgroundBitmapId;
 	uint8_t *backgroundPaletteTable[4];
 	uint8_t *backgroundBitmapTable[4];
-	uint8_t *dataUnk0Table[4];
+	uint8_t *dataUnk0Table[4]; // unused
 	uint8_t *backgroundMaskTable[4];
 	uint8_t *backgroundSoundTable[4];
 	uint8_t *backgroundAnimationTable[4];
@@ -81,7 +81,7 @@ struct MstHdr {
 	int unk0x1C; // mstUnk39DataCount
 	int unk0x20; // mstUnk42DataCount
 	int unk0x24; // mstUnk43DataCount
-	int unk0x28; // mstUnk44DataCount
+	int walkPathDataCount; // 28
 	int infoMonster2Count;
 	int unk0x30; // mstUnk45DataCount
 	int unk0x34; // mstUnk47DataCount
@@ -117,15 +117,15 @@ struct MstScreenArea {
 	int32_t y1; // 8
 	int32_t y2; // 0xC
 	uint32_t nextByPos; // 0x10 _mstUnk40
-	uint32_t prev; // 0x14 unused ?
+	uint32_t prev; // 0x14 unused
 	uint32_t nextByValue; // 0x18 indexUnk39
 	uint8_t unk0x1C; // 0x1C indexUnk39
 	uint8_t unk0x1D; // 0x1D value
-	uint16_t unk0x1E; // 0x1E unused ?
+	uint16_t unk0x1E; // 0x1E unused
 	uint32_t codeData; // 0x20, offset _mstCodeData
 }; // sizeof == 36
 
-struct MstWalkBox {
+struct MstWalkBox { // MstUnk34
 	int32_t right; // 0
 	int32_t left; //  4
 	int32_t top; // 8
@@ -160,7 +160,7 @@ struct MstUnk43 {
 	uint32_t count2; // C
 }; // sizeof == 16
 
-struct MstUnk44Unk1 { // MstWalkPath
+struct MstWalkNode { // MstUnk44Unk1
 	int32_t x1; // 0
 	int32_t x2; // 4
 	int32_t y1; // 8
@@ -177,8 +177,8 @@ struct MstUnk44Unk1 { // MstWalkPath
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
 
-struct MstUnk44 { // MstWalkData
-	MstUnk44Unk1 *data;
+struct MstWalkPath { // MstUnk44
+	MstWalkNode *data;
 	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t mask; // 0x8
 	uint32_t count; // 0xC
@@ -550,7 +550,7 @@ struct Resource {
 	uint32_t *_mstUnk41;
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
-	MstUnk44 *_mstUnk44;
+	MstWalkPath *_mstUnk44;
 	MstInfoMonster2 *_mstUnk45;
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;

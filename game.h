@@ -410,8 +410,8 @@ struct Game {
 	void resetMstCode();
 	void startMstCode();
 	void executeMstCode();
-	void executeMstUnk16(MstUnk44 *m44, int index);
-	int executeMstUnk18(MstUnk44 *m44, MstUnk44Unk1 *m44u1, int num, int index);
+	void executeMstUnk16(MstWalkPath *walkPath, int index);
+	int executeMstUnk18(MstWalkPath *walkPath, MstWalkNode *walkNode, int num, int index);
 	void executeMstCodeHelper1();
 	void mstUpdateMonster1ObjectsPosition();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
@@ -421,7 +421,7 @@ struct Game {
 	void executeMstUnk8(MonsterObject1 *m);
 	int executeMstUnk9(Task *t, MonsterObject1 *m);
 	int executeMstUnk11(Task *t, MonsterObject1 *m);
-	int executeMstUnk15(MonsterObject1 *m, MstUnk44 *m44, int x, int y);
+	int executeMstUnk15(MonsterObject1 *m, MstWalkPath *walkPath, int x, int y);
 	bool mstTestActionDirection(MonsterObject1 *m, int num);
 	bool lvlObjectCollidesAndy1(LvlObject *o, int type) const;
 	bool lvlObjectCollidesAndy2(LvlObject *o, int type) const;
