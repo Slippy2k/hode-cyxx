@@ -20,7 +20,7 @@ struct Random {
 	void init();
 	uint32_t update();
 	uint8_t getNextNumber();
-	uint8_t getSeed();
+	uint8_t getSeed() const;
 	void resetMst(uint8_t *p);
 	uint8_t getMstNextNumber(uint8_t *p);
 };

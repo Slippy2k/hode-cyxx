@@ -35,7 +35,7 @@ void Random::initTable() {
 }
 
 uint32_t Random::update() {
-	bool overflow = (_rndSeed & (1 << 31)) != 0;
+	const bool overflow = (_rndSeed & (1 << 31)) != 0;
 	_rndSeed *= 2;
 	if (!overflow) {
 		_rndSeed ^= 0xDEADBEEF;
@@ -52,7 +52,7 @@ uint8_t Random::getNextNumber() {
 	return num;
 }
 
-uint8_t Random::getSeed() {
+uint8_t Random::getSeed() const {
 	return _rndSeed & 0xFF;
 }
 
