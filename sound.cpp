@@ -121,6 +121,7 @@ static bool isSssObjectInList(SssObject *so, SssObject *sssObjectsList) {
 }
 
 void Game::removeSoundObjectFromList(SssObject *so) {
+	debug(kDebug_SOUND, "removeSoundObjectFromList so %p flags 0x%x", so, so->flags);
 	so->pcm = 0;
 	if ((so->flags & kFlagPlaying) != 0) {
 
@@ -293,6 +294,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 }
 
 void Game::sssOp16_resumeSound(SssObject *so) {
+	debug(kDebug_SOUND, "sssOp16_resumeSound so %p flags 0x%x", so, so->flags);
 	if ((so->flags & kFlagPaused) != 0) {
 		if (!isSssObjectInList(so, _sssObjectsList2)) {
 			warning("sssOp16_resumeSound so %p not in _sssObjectsList2, flags 0x%x pcm %p", so, so->flags, so->pcm);
@@ -318,6 +320,7 @@ void Game::sssOp16_resumeSound(SssObject *so) {
 }
 
 void Game::sssOp17_pauseSound(SssObject *so) {
+	debug(kDebug_SOUND, "sssOp17_pauseSound so %p flags 0x%x", so, so->flags);
 	if ((so->flags & kFlagPaused) == 0) {
 		SssPcm *pcm = so->pcm;
 		SssObject *prev = so->prevPtr;
@@ -718,6 +721,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 	if (!so->pcm || !so->pcm->ptr) {
 		so->flags = (so->flags & ~kFlagPlaying) | kFlagPaused;
 	}
+	debug(kDebug_SOUND, "prependSoundObjectToList so %p flags 0x%x", so, so->flags);
 	if (so->flags & kFlagPaused) {
 		debug(kDebug_SOUND, "Adding so %p to list2 flags 0x%x", so, so->flags);
 		if (isSssObjectInList(so, _sssObjectsList2)) {
