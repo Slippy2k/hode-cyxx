@@ -6,7 +6,7 @@
 
 enum {
 	kFlagPlaying = 1 << 0,
-	kFlagMuted   = 1 << 1, // no PCM
+	kFlagPaused  = 1 << 1, // no PCM
 	kFlagNoCode  = 1 << 2, // no bytecode
 };
 
@@ -122,7 +122,7 @@ static bool isSssObjectInList(SssObject *so, SssObject *sssObjectsList) {
 
 void Game::removeSoundObjectFromList(SssObject *so) {
 	so->pcm = 0;
-	if ((so->flags & 1) != 0) {
+	if ((so->flags & kFlagPlaying) != 0) {
 
 		if (!isSssObjectInList(so, _sssObjectsList1)) {
 			warning("removeSoundObjectFromList so %p not in _sssObjectsList1", so);
@@ -177,7 +177,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 void Game::updateSoundObject(SssObject *so) {
 	_sssUpdatedObjectsTable[so->num] = true;
 	_sssObjectsChanged = so->filter->changed;
-	if ((so->flags & 4) == 0) {
+	if ((so->flags & kFlagNoCode) == 0) {
 // 42B179
 		if (so->pcm == 0) {
 			if (so->codeDataStage1) {
@@ -226,11 +226,11 @@ void Game::updateSoundObject(SssObject *so) {
 			if (so->pcm == 0) {
 				return;
 			}
-			if (_sssObjectsChanged && (so->flags & 1) != 0) {
+			if (_sssObjectsChanged && (so->flags & kFlagPlaying) != 0) {
 				setSoundObjectPanning(so);
 			}
 		}
-	} else if ((so->flags & 1) != 0) {
+	} else if ((so->flags & kFlagPlaying) != 0) {
 		if (so->panningPtr) {
 			const int panning = getSoundObjectPanning(so);
 			if (panning != so->panning) {
@@ -244,7 +244,7 @@ void Game::updateSoundObject(SssObject *so) {
 	}
 	if (so->pcmFramesCount != 0) {
 		--so->pcmFramesCount;
-		if ((so->flags & 2) == 0) {
+		if ((so->flags & kFlagPaused) == 0) {
 			++so->currentPcmFrame;
 		}
 	} else {
@@ -293,7 +293,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 }
 
 void Game::sssOp16_resumeSound(SssObject *so) {
-	if ((so->flags & 2) != 0) {
+	if ((so->flags & kFlagPaused) != 0) {
 		if (!isSssObjectInList(so, _sssObjectsList2)) {
 			warning("sssOp16_resumeSound so %p not in _sssObjectsList2, flags 0x%x pcm %p", so, so->flags, so->pcm);
 			return;
@@ -312,18 +312,18 @@ void Game::sssOp16_resumeSound(SssObject *so) {
 			_sssObjectsList2 = next;
 		}
 		so->pcm = pcm;
-		so->flags &= ~2;
+		so->flags &= ~kFlagPaused;
 		prependSoundObjectToList(so);
 	}
 }
 
 void Game::sssOp17_pauseSound(SssObject *so) {
-	if ((so->flags & 2) == 0) {
+	if ((so->flags & kFlagPaused) == 0) {
 		SssPcm *pcm = so->pcm;
 		SssObject *prev = so->prevPtr;
 		SssObject *next = so->nextPtr;
 		so->pcm = 0;
-		if ((so->flags & 1) != 0) {
+		if ((so->flags & kFlagPlaying) != 0) {
 			if (!isSssObjectInList(so, _sssObjectsList1)) {
 				warning("sssOp17_pauseSound so %p not in _sssObjectsList1", so);
 				return;
@@ -364,7 +364,7 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 			}
 		}
 		so->pcm = pcm;
-		so->flags = (so->flags & ~1) | 2;
+		so->flags = (so->flags & ~kFlagPlaying) | kFlagPaused;
 		prependSoundObjectToList(so);
 	}
 }
@@ -707,7 +707,7 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	so->pcmFramesCount = pcm->strideCount;
 	so->currentPcmPtr = pcm->ptr;
 	if (!so->currentPcmPtr) {
-		so->flags |= 2;
+		so->flags |= kFlagPaused;
 	}
 	so->flags0 = flags_b;
 	prependSoundObjectToList(so);
@@ -716,9 +716,9 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 
 void Game::prependSoundObjectToList(SssObject *so) {
 	if (!so->pcm || !so->pcm->ptr) {
-		so->flags = (so->flags & ~1) | 2;
+		so->flags = (so->flags & ~kFlagPlaying) | kFlagPaused;
 	}
-	if (so->flags & 2) {
+	if (so->flags & kFlagPaused) {
 		debug(kDebug_SOUND, "Adding so %p to list2 flags 0x%x", so, so->flags);
 		if (isSssObjectInList(so, _sssObjectsList2)) {
 			warning("prependSoundObjectToList so %p already in _sssObjectsList2", so);
@@ -784,11 +784,11 @@ void Game::prependSoundObjectToList(SssObject *so) {
 				}
 			}
 // 4292BE
-			so->flags |= 1;
+			so->flags |= kFlagPlaying;
 		}
 // 4292C2
 		if (stopSo) {
-			stopSo->flags &= ~1;
+			stopSo->flags &= ~kFlagPlaying;
 			stopSo->pcm = 0;
 			updateSssGroup2(stopSo->flags0);
 		}
@@ -912,7 +912,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 		SssObject *so = addSoundObject(pcm, priority, flags1, flags);
 		if (so) {
 			if (sample->codeOffset1 == kNone && sample->codeOffset2 == kNone && sample->codeOffset3 == kNone && sample->codeOffset4 == kNone) {
-				so->flags |= 4;
+				so->flags |= kFlagNoCode;
 			}
 			so->codeDataStage1 = (sample->codeOffset1 == kNone) ? 0 : _res->_sssCodeData + sample->codeOffset1;
 			so->codeDataStage2 = (sample->codeOffset2 == kNone) ? 0 : _res->_sssCodeData + sample->codeOffset2;
@@ -1104,7 +1104,7 @@ void Game::clearSoundObjects() {
 }
 
 void Game::setLowPrioritySoundObject(SssObject *so) {
-	if ((so->flags & 2) == 0) {
+	if ((so->flags & kFlagPaused) == 0) {
 		if (kLimitSounds) {
 			_lowPrioritySssObject = 0;
 			if (_playingSssObjectsCount >= _playingSssObjectsMax && _sssObjectsList1) {
@@ -1140,7 +1140,7 @@ int Game::getSoundObjectPanning(SssObject *so) const {
 }
 
 void Game::setSoundObjectPanning(SssObject *so) {
-	if ((so->flags & 2) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
+	if ((so->flags & kFlagPaused) == 0 && so->volume != 0 && _snd_masterVolume != 0) {
 		int volume = ((so->filter->volumeCurrent >> 16) * so->volume) >> 7;
 		int panning = 0;
 		if (so->panningPtr) {
