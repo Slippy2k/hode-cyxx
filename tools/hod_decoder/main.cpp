@@ -62,7 +62,7 @@ static uint8_t _bitmapPalette[256 * 3];
 static uint8_t _spritePalette[256 * 3];
 static uint8_t _controlsPalette[256 * 3];
 
-static bool isMdec(const uint8_t *p) {
+static bool isMdecData(const uint8_t *p) {
 	return READ_LE_UINT16(p + 2) == 0x3800 && (READ_LE_UINT16(p + 6) == 2 || READ_LE_UINT16(p + 6) == 3);
 }
 
@@ -369,12 +369,12 @@ static void DecodeLvl(File *fp) {
 }
 
 static void CheckSssCode(const uint8_t *p, int size) {
-	static const uint8_t _opcodesLength[] = {
+	static const uint8_t opcodesLength[] = {
 		4, 0, 4, 0, 4, 12, 8, 0, 16, 4, 4, 4, 4, 8, 12, 0, 4, 8, 8, 4, 4, 4, 8, 4, 8, 4, 8, 16, 8, 4
 	};
 	int offset = 0;
 	while (offset < size) {
-		const int len = _opcodesLength[p[offset]];
+		const int len = opcodesLength[p[offset]];
 		if (len == 0) {
 			fprintf(stderr, "Invalid .sss opcode %d\n", p[offset]);
 			break;
@@ -567,11 +567,11 @@ void DecodeMstCode(const uint8_t *codeData, uint32_t codeSize);
 static void DecodeMst(File *fp) {
 
 	const int version  = fp->readUint32();
+	assert(version == 160);
+
 	const int dataSize = fp->readUint32();
 	fp->seek(29 * sizeof(uint32_t), SEEK_CUR);
 	const int codeSize = fp->readUint32() * 4;
-
-	assert(version == 160);
 
 	uint8_t *codeData = (uint8_t *)malloc(codeSize);
 	if (codeData) {
@@ -629,12 +629,19 @@ static uint32_t DecodeSetupDatSpritesGroup(const uint8_t *ptr, int spriteGroup) 
 
 static uint32_t DecodeSetupDatBitmap256x192(const char *name, const uint8_t *ptr, int compressedSize, uint8_t *palette) {
 
+	char filename[64];
+
+	if (isMdecData(ptr)) {
+		snprintf(filename, sizeof(filename), "%s.bss", name);
+		fioDumpData(filename, ptr, compressedSize);
+		return compressedSize;
+	}
+
 	const int uncompressedSize = decodeLZW(ptr, _bitmapBuffer);
 	assert(uncompressedSize == 256 * 192);
 	memcpy(palette, ptr + compressedSize, 768);
 	ConvertVgaPalette(palette);
 
-	char filename[64];
 	snprintf(filename, sizeof(filename), "%s.bmp", name);
 	saveBMP(filename, _bitmapBuffer, palette, 256, 192);
 
@@ -709,6 +716,8 @@ static void DecodeSetupDat(File *fp) {
 	const int unk0x44      = READ_LE_UINT32(buffer + 0x44);
 	const int bufferSize2  = READ_LE_UINT32(buffer + 0x48);
 
+	bool isPsx = false; // PSX is version 11 but with different binary layout and compression
+
 	// hint screens
 	const int hintsCount = (version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
@@ -717,20 +726,30 @@ static void DecodeSetupDat(File *fp) {
 		fp->seek(offset, SEEK_SET);
 		if (size > 8) {
 			fp->read(_bitmapBuffer, 8);
-			if (isMdec(_bitmapBuffer)) {
-				continue;
+			const bool mdec = isMdecData(_bitmapBuffer);
+			if (mdec) {
+				isPsx = true;
 			} else if (size != 256 * 192) {
 				continue;
 			}
 			fp->read(_bitmapBuffer + 8, size - 8);
 			fp->flush();
+
+			// PSX
+			char filename[64];
+			if (mdec) {
+				snprintf(filename, sizeof(filename), "hint_%02d.bss", i);
+				fioDumpData(filename, _bitmapBuffer, size);
+				continue;
+			}
+
+			// PC
 			if (i <= yesNoQuit) {
 				fp->read(_bitmapPalette, 256 * 3);
 				ConvertVgaPalette(_bitmapPalette);
 			}
-			char name[64];
-			snprintf(name, sizeof(name), "hint_%02d.bmp", i);
-			saveBMP(name, _bitmapBuffer, _bitmapPalette, 256, 192);
+			snprintf(filename, sizeof(filename), "hint_%02d.bmp", i);
+			saveBMP(filename, _bitmapBuffer, _bitmapPalette, 256, 192);
 		}
 	}
 
@@ -747,12 +766,15 @@ static void DecodeSetupDat(File *fp) {
 
 		int ptrOffset = 0;
 
-		// loading screen
-		const uint32_t compressedSize = READ_LE_UINT32(ptr); ptrOffset += 8;
-		ptrOffset += DecodeSetupDatBitmap256x192("loading", ptr + ptrOffset, compressedSize, _spritePalette);
+		if (!isPsx) {
 
-		// loading animation
-		ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprLoadingAnimation);
+			// loading screen
+			const uint32_t compressedSize = READ_LE_UINT32(ptr); ptrOffset += 8;
+			ptrOffset += DecodeSetupDatBitmap256x192("loading", ptr + ptrOffset, compressedSize, _spritePalette);
+
+			// loading animation
+			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprLoadingAnimation);
+		}
 
 		// font
 		const uint32_t fontSize = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
@@ -1036,8 +1058,8 @@ static void DecodeSaturn0003(FILE *fp) { // .sss
 	int data2Count = freadUint32LE(fp);
 	int data3Count = freadUint32LE(fp);
 	int infosCount = freadUint32LE(fp);
-	int codeSize  = freadUint32LE(fp);
-	int pcmCount  = freadUint32LE(fp);
+	int codeSize   = freadUint32LE(fp);
+	int pcmCount   = freadUint32LE(fp);
 
 	fseek(fp, data1Count * 8,  SEEK_CUR);
 	fseek(fp, data2Count * 4,  SEEK_CUR);
@@ -1177,7 +1199,7 @@ int main(int argc, char *argv[]) {
 			Decode(argv[i]);
 		}
 	} else {
-		fprintf(stdout, "%s [.dat|.lvl|.sss]\n", argv[0]);
+		fprintf(stdout, "%s [.dat|.lvl|.sss|.mst]\n", argv[0]);
 	}
 	return 0;
 }

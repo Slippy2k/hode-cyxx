@@ -157,6 +157,16 @@ void SectorFile::flush() {
 	_bufLen = _bufPos = 0;
 }
 
+void fioDumpData(const char *filename, const uint8_t *data, int size) {
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		const int count = fwrite(data, 1, size, fp);
+		if (count != size) {
+			fprintf(stderr, "Failed to write %d bytes, count %d\n", size, count);
+		}
+		fclose(fp);
+	}
+}
 
 void fwriteUint16LE(FILE *fp, uint16_t n) {
 	fputc(n & 0xFF, fp);

@@ -52,6 +52,7 @@ struct SectorFile : File {
 
 int fioAlignSizeTo2048(int size);
 uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size);
+void fioDumpData(const char *filename, const uint8_t *buf, int size);
 
 void fwriteUint16LE(FILE *fp, uint16_t n);
 void fwriteUint32LE(FILE *fp, uint32_t n);
