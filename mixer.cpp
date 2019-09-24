@@ -21,6 +21,20 @@ void Mixer::init(int rate) {
 void Mixer::fini() {
 }
 
+void Mixer::queue(const int16_t *ptr, const int16_t *end, int panType, int panL, int panR, bool stereo) {
+	if (_mixingQueueSize >= kPcmChannels) {
+		warning("MixingQueue overflow %d", _mixingQueueSize);
+		return;
+	}
+	_mixingQueue[_mixingQueueSize].ptr = ptr;
+	_mixingQueue[_mixingQueueSize].end = end;
+	_mixingQueue[_mixingQueueSize].panL = panL;
+	_mixingQueue[_mixingQueueSize].panR = panR;
+	_mixingQueue[_mixingQueueSize].panType = panType;
+	_mixingQueue[_mixingQueueSize].stereo = stereo;
+	++_mixingQueueSize;
+}
+
 template <bool stereo, int panning>
 static void mixS16(int16_t *dst, const int16_t *src, int len, int panL, int panR) {
 

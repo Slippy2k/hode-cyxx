@@ -27,6 +27,8 @@ struct Mixer {
 	void init(int rate);
 	void fini();
 
+	void queue(const int16_t *ptr, const int16_t *end, int panType, int panL, int panR, bool stereo);
+
 	void mix(int16_t *buf, int len);
 };
 

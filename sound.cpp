@@ -1303,23 +1303,13 @@ void Game::queueSoundObjectsPcmStride() {
 				warning("Ignore sample strideSize %d", pcm->strideSize);
 				continue;
 			}
-			if (_mix._mixingQueueSize >= Mixer::kPcmChannels) {
-				warning("MixingQueue overflow %d", _mix._mixingQueueSize);
-				break;
-			}
 			if (so->panL == 0 && so->panR == 0) {
 				continue;
 			}
-			_mix._mixingQueue[_mix._mixingQueueSize].ptr = so->currentPcmPtr;
-			_mix._mixingQueue[_mix._mixingQueueSize].end = end;
-			_mix._mixingQueue[_mix._mixingQueueSize].panL = so->panL;
-			_mix._mixingQueue[_mix._mixingQueueSize].panR = so->panR;
-			_mix._mixingQueue[_mix._mixingQueueSize].panType = so->panType;
-			_mix._mixingQueue[_mix._mixingQueueSize].stereo = so->stereo;
+			_mix.queue(so->currentPcmPtr, end, so->panType, so->panL, so->panR, so->stereo);
 			const int strideSize = (pcm->strideSize - 256 * sizeof(int16_t));
 			assert(strideSize == 1764 || strideSize == 3528); // words
 			so->currentPcmPtr += strideSize;
-			++_mix._mixingQueueSize;
 		}
 	}
 }
