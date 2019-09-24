@@ -536,25 +536,40 @@ static void DecodeSss(File *fp, uint32_t baseOffset = 0) {
 			assert(stride * count == size);
 			assert(size % stride == 0);
 
+			if (baseOffset != 0) {
+				// offsets are all equal to '0x2800' in setup.dat .sss data
+				// seek on first entry and read PCM data sequentially
+				if (i == 0) {
+					fp->seek(baseOffset + offset, SEEK_SET);
+				}
+			} else {
+				fp->seek(offset, SEEK_SET);
+			}
+
+			char filename[64];
+
+			if (stride == 512) { // PSX
+
+				uint8_t *samples = (uint8_t *)malloc(size);
+				if (samples) {
+					fp->read(samples, size);
+
+					snprintf(filename, sizeof(filename), "hod_%03d.raw", i);
+					fioDumpData(filename, samples, size);
+
+					free(samples);
+				}
+				continue;
+			}
+
 			const uint32_t decompressedSize = (stride - 256 * sizeof(int16_t)) * count * sizeof(int16_t);
 			uint8_t *samples = (uint8_t *)malloc(decompressedSize);
 			if (samples) {
 
-				if (baseOffset != 0) {
-					// offsets are all equal to '0x2800' in setup.dat .sss data
-					// seek on first entry and read PCM data sequentially
-					if (i == 0) {
-						fp->seek(baseOffset + offset, SEEK_SET);
-					}
-				} else {
-					fp->seek(offset, SEEK_SET);
-				}
-
 				DecodeSssPcm(fp, count, stride, (int16_t *)samples);
 
-				char name[64];
-				snprintf(name, sizeof(name), "hod_%03d.wav", i);
-				saveWAV(name, 22050, 16, channels, samples, decompressedSize);
+				snprintf(filename, sizeof(filename), "hod_%03d.wav", i);
+				saveWAV(filename, 22050, 16, channels, samples, decompressedSize);
 
 				free(samples);
 			}
