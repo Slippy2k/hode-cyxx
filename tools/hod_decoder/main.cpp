@@ -593,13 +593,33 @@ enum {
 
 static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int spriteNum, bool isPsx) {
 
-	const int x = ptr[0];
-	const int y = ptr[1];
 	const int compressedSize = READ_LE_UINT16(ptr + 2);
+
+	if (isPsx) {
+		assert(READ_LE_UINT16(ptr + 4) == 1);
+		assert(READ_LE_UINT16(ptr + 6) == 0);
+		assert(ptr[0] == ptr[8] && ptr[1] == ptr[9]);
+		const int size = READ_LE_UINT16(ptr + 10);
+		assert(size == compressedSize - 6);
+
+		if (!isMdecData(ptr + 16)) {
+			assert(READ_LE_UINT32(ptr + 16) == 0x3020100 && size == 1144);
+		}
+
+		char filename[64];
+		snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d.bss", spriteGroup, spriteNum);
+		fioDumpData(filename, ptr + 16, size - 4);
+
+		return compressedSize + 2;
+	}
+
 	const int w = READ_LE_UINT16(ptr + 4);
 	const int h = READ_LE_UINT16(ptr + 6);
 
-	if (w != 0 && h != 0 && !isPsx) {
+	if (w != 0 && h != 0) {
+
+		const int x = ptr[0];
+		const int y = ptr[1];
 
 		memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
 		DecodeRLE(ptr + 8, _bitmapBuffer, w);
@@ -620,9 +640,12 @@ static uint32_t DecodeSetupDatSpritesGroup(const uint8_t *ptr, int spriteGroup, 
 	const int count = READ_LE_UINT16(ptr + 12);
 	ptr += 16;
 
+	int ptrOffset = 0;
 	for (int i = 0; i < count; ++i) {
-		ptr += DecodeSetupDatSprite(ptr, spriteGroup, i, isPsx);
+		ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, spriteGroup, i, isPsx);
 	}
+
+	assert(size == ptrOffset);
 
 	return 16 + size;
 }
