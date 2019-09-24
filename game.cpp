@@ -1263,7 +1263,7 @@ void Game::setupAndyLvlObject() {
 	LvlObject *ptr = _andyObject;
 	_fallingAndyFlag = false;
 	_andyActionKeysFlags = 0;
-	_hideAndyObjectSprite = false;
+	_hideAndyObjectFlag = false;
 	const CheckpointData *dat = &_levelCheckpointData[_currentLevel][_level->_checkpoint];
 	_plasmaCannonFlags = 0;
 	_actionDirectionKeyMaskIndex = 0;
@@ -1890,7 +1890,7 @@ int Game::clipLvlObjectsSmall(LvlObject *o1, LvlObject *o2, int type) {
 
 int Game::restoreAndyCollidesLava() {
 	int ret = 0;
-	if (_lvlObjectsList1 && !_hideAndyObjectSprite && (_mstFlags & 0x80000000) == 0) {
+	if (_lvlObjectsList1 && !_hideAndyObjectFlag && (_mstFlags & 0x80000000) == 0) {
 		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		for (LvlObject *o = _lvlObjectsList1; o; o = o->nextPtr) {
 			if (o->spriteNum != 21 || o->screenNum != _res->_currentScreenResourceNum) {
@@ -2575,7 +2575,7 @@ void Game::updateAndyMonsterObjects() {
 	LvlObject *ptr = _andyObject;
 	switch (_actionDirectionKeyMaskIndex >> 4) {
 	case 6:
-		_hideAndyObjectSprite = false;
+		_hideAndyObjectFlag = false;
 		if (_actionDirectionKeyMaskIndex == 0x61) {
 			assert(_specialAnimLvlObject);
 			_mstOriginPosX += _specialAnimLvlObject->posTable[6].x + _specialAnimLvlObject->xPos;
@@ -2584,7 +2584,7 @@ void Game::updateAndyMonsterObjects() {
 		ptr->childPtr = 0;
 		break;
 	case 7: // replace Andy sprite with a custom animation
-		_hideAndyObjectSprite = true;
+		_hideAndyObjectFlag = true;
 		if (_actionDirectionKeyMaskIndex == 0x71) {
 			assert(_specialAnimLvlObject);
 			_mstOriginPosX += _specialAnimLvlObject->posTable[6].x + _specialAnimLvlObject->xPos;
@@ -2603,7 +2603,7 @@ void Game::updateAndyMonsterObjects() {
 		ptr->directionKeyMask = _actionDirectionKeyMaskTable[_actionDirectionKeyMaskIndex * 2 + 1];
 		updateAndyObject(ptr);
 		_actionDirectionKeyMaskIndex = 0;
-		_hideAndyObjectSprite = false;
+		_hideAndyObjectFlag = false;
 		_mstFlags |= 0x80000000;
 		_dl = 1;
 		break;
@@ -2684,7 +2684,7 @@ void Game::levelMainLoop() {
 	updateLvlObjectLists();
 	callLevel_tick();
 	updateAndyMonsterObjects();
-	if (!_hideAndyObjectSprite) {
+	if (!_hideAndyObjectFlag) {
 		addToSpriteList(_andyObject);
 	}
 	((AndyLvlObjectData *)_andyObject->dataPtr)->dxPos = 0;
@@ -3377,7 +3377,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 
 int Game::lvlObjectType0Callback(LvlObject *ptr) {
 	AndyLvlObjectData *_edi = 0;
-	if (!_hideAndyObjectSprite) {
+	if (!_hideAndyObjectFlag) {
 		_edi = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
 		_edi->unk4 = ptr->flags0 & 0x1F;
 		_edi->unk5 = (ptr->flags0 >> 5) & 7;
@@ -3421,7 +3421,7 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 		}
 		break;
 	case 2: // pwr1_hod
-		if (!_hideAndyObjectSprite && _edi->unk4 == 6) {
+		if (!_hideAndyObjectFlag && _edi->unk4 == 6) {
 			lvlObjectType0CallbackBreathBubbles(ptr);
 		}
 		// fall through
@@ -3435,11 +3435,11 @@ int Game::lvlObjectType0Callback(LvlObject *ptr) {
 	case 8:
 		break;
 	}
-	if (!_hideAndyObjectSprite) {
+	if (!_hideAndyObjectFlag) {
 		assert(_edi);
 		_edi->unk0 = ptr->actionKeyMask;
 	}
-	return _hideAndyObjectSprite;
+	return _hideAndyObjectFlag;
 }
 
 int Game::lvlObjectType1Callback(LvlObject *ptr) {
@@ -3492,7 +3492,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 		dat->yPosObject = ptr->posTable[7].y + ptr->yPos;
 		ptr->xPos += dat->dxPos;
 		ptr->yPos += dat->dyPos;
-		if (!_hideAndyObjectSprite && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0 && (_cheats & kCheatSpectreFireballNoHit) == 0) {
+		if (!_hideAndyObjectFlag && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0 && (_cheats & kCheatSpectreFireballNoHit) == 0) {
 			dat->unk3 = 0x80;
 			dat->xPosShoot = _clipBoxOffsetX;
 			dat->yPosShoot = _clipBoxOffsetY;
@@ -4268,7 +4268,7 @@ LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 
 void Game::postScreenUpdate_lava_helper(int yPos) {
 	const uint8_t flags = (_andyObject->flags0) & 0x1F;
-	if (!_hideAndyObjectSprite) {
+	if (!_hideAndyObjectFlag) {
 		if ((_mstFlags & 0x80000000) == 0) {
 			uint8_t mask = 0;
 			const int y = _andyObject->yPos;

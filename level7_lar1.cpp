@@ -258,7 +258,7 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 // 406576
 	if (o->screenNum == _res->_currentScreenResourceNum && o->directionKeyMask == 4) {
 		if ((o->flags0 & 0x1F) == 1 && (o->flags0 & 0xE0) == 0x40) {
-			if (!_hideAndyObjectSprite && (_mstFlags & 0x80000000) == 0) {
+			if (!_hideAndyObjectFlag && (_mstFlags & 0x80000000) == 0) {
 				if (clipLvlObjectsBoundingBox(_andyObject, o, 132)) {
 					setAndySpecialAnimation(0xA1);
 				}

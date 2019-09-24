@@ -119,7 +119,7 @@ struct Game {
 	uint8_t _currentScreen;
 	int8_t _levelRestartCounter;
 	bool _fadePalette;
-	bool _hideAndyObjectSprite;
+	bool _hideAndyObjectFlag;
 	ShootLvlObjectData _shootLvlObjectDataTable[kMaxShootLvlObjectData];
 	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the next free entry
 	LvlObject *_lvlObjectsList0;
