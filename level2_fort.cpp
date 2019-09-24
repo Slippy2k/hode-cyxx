@@ -150,8 +150,8 @@ void Level_fort::postScreenUpdate_fort_screen16() {
 		} else {
 			++_screenCounterTable[16];
 			if (_screenCounterTable[16] == 5) {
-				if (_g->_levelCheckpoint == 3) {
-					_g->_levelCheckpoint = 4;
+				if (_checkpoint == 3) {
+					_checkpoint = 4;
 				}
 				if (!_paf->_skipCutscenes) {
 					_paf->play(3);
@@ -221,7 +221,7 @@ void Level_fort::postScreenUpdate(int num) {
 }
 
 void Level_fort::preScreenUpdate_fort_screen1() {
-	if (_res->_currentScreenResourceNum == 1 && _g->_levelCheckpoint >= 1) {
+	if (_res->_currentScreenResourceNum == 1 && _checkpoint >= 1) {
 		_res->_screensState[1].s0 = 1;
 	}
 	const int num = _res->_screensState[1].s0 == 0 ? 0 : 1;
@@ -230,20 +230,20 @@ void Level_fort::preScreenUpdate_fort_screen1() {
 }
 
 void Level_fort::preScreenUpdate_fort_screen2() {
-	if (_res->_currentScreenResourceNum == 2 && _g->_levelCheckpoint == 0) {
-		_g->_levelCheckpoint = 1;
+	if (_res->_currentScreenResourceNum == 2 && _checkpoint == 0) {
+		_checkpoint = 1;
 	}
 }
 
 void Level_fort::preScreenUpdate_fort_screen6() {
-	if (_res->_currentScreenResourceNum == 6 && _g->_levelCheckpoint == 1) {
-		_g->_levelCheckpoint = 2;
+	if (_res->_currentScreenResourceNum == 6 && _checkpoint == 1) {
+		_checkpoint = 2;
 	}
 }
 
 void Level_fort::preScreenUpdate_fort_screen9() {
-	if (_res->_currentScreenResourceNum == 9 && _g->_levelCheckpoint == 2) {
-		_g->_levelCheckpoint = 3;
+	if (_res->_currentScreenResourceNum == 9 && _checkpoint == 2) {
+		_checkpoint = 3;
 	}
 }
 

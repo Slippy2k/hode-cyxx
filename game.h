@@ -106,7 +106,6 @@ struct Game {
 	LvlObject *_specialAnimLvlObject;
 	LvlObject *_currentSoundLvlObject;
 	int _currentLevel;
-	int _levelCheckpoint;
 	int _currentLevelCheckpoint;
 	bool _endLevel;
 	Sprite _spritesTable[kMaxSprites];
@@ -324,6 +323,7 @@ struct Game {
 	void updateAndyMonsterObjects();
 	void updateInput();
 	void levelMainLoop();
+	Level *createLevel();
 	void callLevel_postScreenUpdate(int num);
 	void callLevel_preScreenUpdate(int num);
 	void callLevel_initialize();

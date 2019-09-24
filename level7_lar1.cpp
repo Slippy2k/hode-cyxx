@@ -289,7 +289,7 @@ void Level_lar1::postScreenUpdate_lar1_screen0() {
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				if (!_g->_fadePalette) {
-					_g->_levelCheckpoint = 1;
+					_checkpoint = 1;
 					_g->_levelRestartCounter = 6;
 				} else {
 					_andyObject->directionKeyMask = 0;
@@ -350,12 +350,12 @@ void Level_lar1::postScreenUpdate_lar1_screen5() {
 	LvlObject *o3 = _g->findLvlObject(2, 2, 5);
 	_g->postScreenUpdate_lar1_helper(o3, &Game::_lar1_unkData0[12], 3);
 	if (_res->_currentScreenResourceNum == 5) {
-		if (_g->_levelCheckpoint >= 1 && _g->_levelCheckpoint <= 3) {
-			_g->_levelCheckpoint = 2;
+		if (_checkpoint >= 1 && _checkpoint <= 3) {
+			_checkpoint = 2;
 			BoundingBox b = { 194, 0, 255, 88 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox) && (Game::_lar1_unkData0[0x18] & 0xF0) == 0x10) {
-				_g->_levelCheckpoint = 2;
+				_checkpoint = 2;
 				_screenCounterTable[26] = (Game::_lar1_unkData0[0x1C] < 16) ? 1 : 3;
 			}
 		}
@@ -368,11 +368,11 @@ void Level_lar1::postScreenUpdate_lar1_screen8() {
 	LvlObject *o2 = _g->findLvlObject(2, 1, 8);
 	_g->postScreenUpdate_lar1_helper(o2, &Game::_lar1_unkData0[20], 5);
 	if (_res->_currentScreenResourceNum == 8) {
-		if (_g->_levelCheckpoint >= 1 && _g->_levelCheckpoint <= 3) {
+		if (_checkpoint >= 1 && _checkpoint <= 3) {
 			BoundingBox b = { 104, 0, 255, 80 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
-				_g->_levelCheckpoint = 3;
+				_checkpoint = 3;
 				const int a = (Game::_lar1_unkData0[0x18] & 0xF0) != 0 ? 3 : 4;
 				_screenCounterTable[26] = a;
 				if ((Game::_lar1_unkData0[0x1C] & 0xF0) == 0x10) {
@@ -461,8 +461,8 @@ void Level_lar1::postScreenUpdate_lar1_screen14() {
 		switch (_res->_screensState[14].s0) {
 		case 0:
 			if (_g->_currentLevelCheckpoint == 4) {
-				if (_g->_levelCheckpoint == 5) {
-					_g->_currentLevelCheckpoint = _g->_levelCheckpoint;
+				if (_checkpoint == 5) {
+					_g->_currentLevelCheckpoint = _checkpoint;
 					if (!_paf->_skipCutscenes) {
 						_paf->play(11);
 						_paf->unload();
@@ -701,17 +701,17 @@ void Level_lar1::preScreenUpdate_lar1_screen0() {
 
 void Level_lar1::preScreenUpdate_lar1_screen2() {
 	if (_res->_currentScreenResourceNum == 2) {
-		if (_g->_levelCheckpoint == 0) {
-			_g->_levelCheckpoint = 1;
+		if (_checkpoint == 0) {
+			_checkpoint = 1;
 		}
 	}
 }
 
 void Level_lar1::preScreenUpdate_lar1_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		if (_g->_levelCheckpoint >= 1 && _g->_levelCheckpoint <= 3) {
+		if (_checkpoint >= 1 && _checkpoint <= 3) {
 			if ((Game::_lar1_unkData0[0x18] & 0xF0) == 0) {
-				_g->_levelCheckpoint = 2;
+				_checkpoint = 2;
 				_screenCounterTable[26] = ((Game::_lar1_unkData0[0x1C] & 0xF0) != 0) ? 2 : 0;
 			}
 		}
@@ -732,9 +732,9 @@ void Level_lar1::preScreenUpdate_lar1_screen10() {
 
 void Level_lar1::preScreenUpdate_lar1_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
-		if (_g->_levelCheckpoint >= 2 && _g->_levelCheckpoint <= 3) {
+		if (_checkpoint >= 2 && _checkpoint <= 3) {
 			if ((Game::_lar1_unkData0[0x1C] & 0xF) == 1 && (Game::_lar1_unkData0[0x18] & 0xF) == 1) {
-				_g->_levelCheckpoint = 4;
+				_checkpoint = 4;
 			}
 		}
 		_g->unloadTransformLayerData();
@@ -789,8 +789,8 @@ void Level_lar1::preScreenUpdate_lar1_screen15() {
 
 void Level_lar1::preScreenUpdate_lar1_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
-		if (_g->_levelCheckpoint == 5) {
-			_g->_levelCheckpoint = 6;
+		if (_checkpoint == 5) {
+			_checkpoint = 6;
 		}
 	}
 }
@@ -802,7 +802,7 @@ void Level_lar1::preScreenUpdate_lar1_screen17() {
 }
 
 void Level_lar1::preScreenUpdate_lar1_screen18() {
-	if (_g->_levelCheckpoint >= 7) {
+	if (_checkpoint >= 7) {
 		Game::_lar1_unkData0[0x30] &= 0xF;
 		Game::_lar1_unkData0[0x30] |= 0x10;
 	}
@@ -813,7 +813,7 @@ void Level_lar1::preScreenUpdate_lar1_screen18() {
 
 void Level_lar1::preScreenUpdate_lar1_screen19() {
 	if (_res->_currentScreenResourceNum == 19) {
-		if (_g->_levelCheckpoint == 6) {
+		if (_checkpoint == 6) {
 			_res->_screensState[19].s0 = 0;
 		}
 		_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 0;
@@ -838,9 +838,9 @@ void Level_lar1::preScreenUpdate_lar1_screen19() {
 
 void Level_lar1::preScreenUpdate_lar1_screen20() {
 	if (_res->_currentScreenResourceNum == 20) {
-		if (_g->_levelCheckpoint == 6) {
+		if (_checkpoint == 6) {
 			if ((_andyObject->flags0 & 0x1F) == 0xB) {
-				_g->_levelCheckpoint = 7;
+				_checkpoint = 7;
 			}
 		}
 	}
@@ -941,7 +941,7 @@ void Level_lar1::tick() {
 }
 
 void Level_lar1::setupLvlObjects_lar1_screen24_helper1() {
-	const int num = _g->_levelCheckpoint;
+	const int num = _checkpoint;
 	for (int i = _lar1_setupScreen24Data[num * 3 + 2]; i < 24; ++i) {
 		_lar1_unkData3[i * 4 + 1] &= ~0x40;
 		_lar1_unkData3[i * 4 + 1] |= 1;
@@ -1016,7 +1016,7 @@ void Level_lar1::setupLvlObjects_lar1_screen24_helper2(int num) {
 
 void Level_lar1::setupLvlObjects_lar1_screen24() {
 	setupLvlObjects_lar1_screen24_helper1();
-	const int num = _g->_levelCheckpoint;
+	const int num = _checkpoint;
 	for (int b = _lar1_setupScreen24Data[num * 3]; b < 15; ++b) {
 		_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 1);
 		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[b * 6 + 5], Game::_lar1_unkData1[b * 6 + 4]);

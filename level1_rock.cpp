@@ -146,8 +146,8 @@ void Level_rock::postScreenUpdate_rock_screen9() {
 					_res->_resLvlScreenBackgroundDataTable[9].currentBackgroundId = 1;
 					_video->_paletteNeedRefresh = true;
 				}
-				if (_g->_levelCheckpoint == 4) {
-					_g->_levelCheckpoint = 5;
+				if (_checkpoint == 4) {
+					_checkpoint = 5;
 				}
 				_res->_screensState[9].s0 = 1;
 				_g->setAndySprite(2);
@@ -548,15 +548,15 @@ void Level_rock::preScreenUpdate_rock_screen0() {
 }
 
 void Level_rock::preScreenUpdate_rock_screen1() {
-	if (_g->_levelCheckpoint != 0) {
+	if (_checkpoint != 0) {
 		_res->_screensState[0].s0 = 1;
 	}
 }
 
 void Level_rock::preScreenUpdate_rock_screen2() {
-	if (_res->_currentScreenResourceNum == 2 && _g->_levelCheckpoint == 0) {
-		_g->_levelCheckpoint = 1;
-	} else if (_g->_levelCheckpoint > 1) {
+	if (_res->_currentScreenResourceNum == 2 && _checkpoint == 0) {
+		_checkpoint = 1;
+	} else if (_checkpoint > 1) {
 		LvlObject *ptr = _g->findLvlObject(2, 0, 2);
 		if (ptr) {
 			ptr->anim = 0;
@@ -573,7 +573,7 @@ void Level_rock::preScreenUpdate_rock_screen2() {
 }
 
 void Level_rock::preScreenUpdate_rock_screen3() {
-	if (_g->_levelCheckpoint > 1) {
+	if (_checkpoint > 1) {
 		LvlObject *ptr = _g->findLvlObject(2, 0, 3);
 		if (ptr) {
 			ptr->anim = 0;
@@ -606,20 +606,20 @@ void Level_rock::preScreenUpdate_rock_screen4() {
 	_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentShadowId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = num;
-	if (_res->_currentScreenResourceNum == 4 && _g->_levelCheckpoint == 1) {
-		_g->_levelCheckpoint = 2;
+	if (_res->_currentScreenResourceNum == 4 && _checkpoint == 1) {
+		_checkpoint = 2;
 	}
 }
 
 void Level_rock::preScreenUpdate_rock_screen5() {
-	if (_res->_currentScreenResourceNum == 5 && _g->_levelCheckpoint == 2) {
-		_g->_levelCheckpoint = 3;
+	if (_res->_currentScreenResourceNum == 5 && _checkpoint == 2) {
+		_checkpoint = 3;
 	}
 }
 
 void Level_rock::preScreenUpdate_rock_screen7() {
-	if (_res->_currentScreenResourceNum == 7 && _g->_levelCheckpoint == 3) {
-		_g->_levelCheckpoint = 4;
+	if (_res->_currentScreenResourceNum == 7 && _checkpoint == 3) {
+		_checkpoint = 4;
 	}
 }
 
@@ -640,8 +640,8 @@ void Level_rock::preScreenUpdate_rock_screen9() {
 
 void Level_rock::preScreenUpdate_rock_screen10() {
 	if (_res->_currentScreenResourceNum == 10) {
-		if (_g->_levelCheckpoint == 4) {
-			_g->_levelCheckpoint = 5;
+		if (_checkpoint == 4) {
+			_checkpoint = 5;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->unload(22);
@@ -652,8 +652,8 @@ void Level_rock::preScreenUpdate_rock_screen10() {
 
 void Level_rock::preScreenUpdate_rock_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		if (_g->_levelCheckpoint == 5) {
-			_g->_levelCheckpoint = 6;
+		if (_checkpoint == 5) {
+			_checkpoint = 6;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->unload(1);
@@ -699,8 +699,8 @@ void Level_rock::preScreenUpdate_rock_screen16() {
 
 void Level_rock::preScreenUpdate_rock_screen17() {
 	if (_res->_currentScreenResourceNum == 17) {
-		if (_g->_levelCheckpoint == 6) {
-			_g->_levelCheckpoint = 7;
+		if (_checkpoint == 6) {
+			_checkpoint = 7;
 		}
 		_g->playAndyFallingCutscene(1);
 	}

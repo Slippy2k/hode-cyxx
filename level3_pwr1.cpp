@@ -101,8 +101,8 @@ void Level_pwr1::postScreenUpdate_pwr1_screen6() {
 			_res->_screensState[6].s0 = 1;
 			dat->currentMaskId = 1;
 			dat->currentBackgroundId = 1;
-			if (_g->_levelCheckpoint == 0) {
-				_g->_levelCheckpoint = 1;
+			if (_checkpoint == 0) {
+				_checkpoint = 1;
 			}
 		}
 		break;
@@ -198,11 +198,11 @@ void Level_pwr1::postScreenUpdate_pwr1_screen16() {
 
 void Level_pwr1::postScreenUpdate_pwr1_screen18() {
 	if (_res->_currentScreenResourceNum == 18) {
-		if (_g->_levelCheckpoint == 3) {
+		if (_checkpoint == 3) {
 			BoundingBox b = { 0, 0, 123, 125 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
-				++_g->_levelCheckpoint;
+				++_checkpoint;
 			}
 		}
 		BoundingBox b1 = { 156, 80, 204, 144 };
@@ -331,7 +331,7 @@ void Level_pwr1::preScreenUpdate_pwr1_screen4() {
 void Level_pwr1::preScreenUpdate_pwr1_screen6() {
         if (_res->_currentScreenResourceNum == 6 || _res->_currentScreenResourceNum == 5) {
 		if (_res->_screensState[6].s0 == 0) {
-			if (_g->_levelCheckpoint != 1) {
+			if (_checkpoint != 1) {
 				_screenCounterTable[6] = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentBackgroundId = 0;
 				_res->_resLvlScreenBackgroundDataTable[6].currentMaskId = 0;
@@ -353,24 +353,24 @@ void Level_pwr1::preScreenUpdate_pwr1_screen6() {
 
 void Level_pwr1::preScreenUpdate_pwr1_screen9() {
 	if (_res->_currentScreenResourceNum == 9) {
-		if (_g->_levelCheckpoint == 1) {
-			_g->_levelCheckpoint = 2;
+		if (_checkpoint == 1) {
+			_checkpoint = 2;
 		}
 	}
 }
 
 void Level_pwr1::preScreenUpdate_pwr1_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
-		if (_g->_levelCheckpoint == 2) {
-			_g->_levelCheckpoint = 3;
+		if (_checkpoint == 2) {
+			_checkpoint = 3;
 		}
 	}
 }
 
 void Level_pwr1::preScreenUpdate_pwr1_screen21() {
 	if (_res->_currentScreenResourceNum == 15) {
-		if (_g->_levelCheckpoint == 4) {
-			_g->_levelCheckpoint = 5;
+		if (_checkpoint == 4) {
+			_checkpoint = 5;
 		}
 	}
 }
@@ -386,15 +386,15 @@ void Level_pwr1::preScreenUpdate_pwr1_screen23() {
 void Level_pwr1::preScreenUpdate_pwr1_screen24() {
 	if (_res->_currentScreenResourceNum == 24) {
 		if (_res->_screensState[27].s0 != 0) { // +0x6C
-			if (_g->_levelCheckpoint == 6) {
-				_g->_levelCheckpoint = 7;
+			if (_checkpoint == 6) {
+				_checkpoint = 7;
 			}
 		}
 	}
 }
 
 void Level_pwr1::preScreenUpdate_pwr1_screen26() {
-	if (_g->_levelCheckpoint >= 7) {
+	if (_checkpoint >= 7) {
 		_res->_screensState[23].s0 = 1;
 	}
 	if (_res->_currentScreenResourceNum == 23 || _res->_currentScreenResourceNum == 26) {
@@ -407,13 +407,13 @@ void Level_pwr1::preScreenUpdate_pwr1_screen26() {
 void Level_pwr1::preScreenUpdate_pwr1_screen27() {
 	if (_res->_currentScreenResourceNum == 27) {
 		uint8_t num = 0;
-		if (_res->_screensState[27].s0 != 0 || _g->_levelCheckpoint >= 7) {
+		if (_res->_screensState[27].s0 != 0 || _checkpoint >= 7) {
 			num = 1;
 			_screenCounterTable[27] = 37;
-		} else if (_g->_levelCheckpoint <= 5) {
+		} else if (_checkpoint <= 5) {
 			_screenCounterTable[27] = 0;
-			if (_g->_levelCheckpoint == 5) {
-				_g->_levelCheckpoint = 6;
+			if (_checkpoint == 5) {
+				_checkpoint = 6;
 			}
 		}
 		_res->_screensState[27].s0 = num;
@@ -424,16 +424,16 @@ void Level_pwr1::preScreenUpdate_pwr1_screen27() {
 
 void Level_pwr1::preScreenUpdate_pwr1_screen29() {
 	if (_res->_currentScreenResourceNum == 29) {
-		if (_g->_levelCheckpoint == 7) {
-			_g->_levelCheckpoint = 8;
+		if (_checkpoint == 7) {
+			_checkpoint = 8;
 		}
 	}
 }
 
 void Level_pwr1::preScreenUpdate_pwr1_screen31() {
 	if (_res->_currentScreenResourceNum == 31) {
-		if (_g->_levelCheckpoint == 8) {
-			_g->_levelCheckpoint = 9;
+		if (_checkpoint == 8) {
+			_checkpoint = 9;
 		}
 	}
 }

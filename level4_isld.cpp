@@ -82,7 +82,7 @@ void Level_isld::postScreenUpdate_isld_screen2() {
 				_g->_plasmaCannonFlags |= 1;
 			} else if (_screenCounterTable[2] == 38 && !_g->_fadePalette) {
 				if ((_andyObject->flags0 & 0x1F) != 0xB) {
-					_g->_levelCheckpoint = 1;
+					_checkpoint = 1;
 				}
 				_g->_levelRestartCounter = 6;
 			}
@@ -301,8 +301,8 @@ void Level_isld::preScreenUpdate_isld_screen3() {
 
 void Level_isld::preScreenUpdate_isld_screen9() {
 	if (_res->_currentScreenResourceNum == 9) {
-		if (_g->_levelCheckpoint == 1) {
-			_g->_levelCheckpoint = 2;
+		if (_checkpoint == 1) {
+			_checkpoint = 2;
 		}
 	}
 }
@@ -316,8 +316,8 @@ void Level_isld::preScreenUpdate_isld_screen14() {
 		_res->_resLvlScreenBackgroundDataTable[14].currentMaskId = 0;
 	}
 	if (_res->_currentScreenResourceNum == 14) {
-		if (_g->_levelCheckpoint == 2) {
-			_g->_levelCheckpoint = 3;
+		if (_checkpoint == 2) {
+			_checkpoint = 3;
 		}
 	}
 }
@@ -335,8 +335,8 @@ void Level_isld::preScreenUpdate_isld_screen15() {
 
 void Level_isld::preScreenUpdate_isld_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
-		if (_g->_levelCheckpoint == 3) {
-			_g->_levelCheckpoint = 4;
+		if (_checkpoint == 3) {
+			_checkpoint = 4;
 		}
 		if (_res->_screensState[14].s0 == 0) {
 			_res->_screensState[14].s0 = 1;

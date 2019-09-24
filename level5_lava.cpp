@@ -80,11 +80,11 @@ void Level_lava::postScreenUpdate_lava_screen6() {
 
 void Level_lava::postScreenUpdate_lava_screen7() {
 	if (_res->_currentScreenResourceNum == 7) {
-		if (_g->_levelCheckpoint == 2) {
+		if (_checkpoint == 2) {
 			BoundingBox b = { 104, 0, 239, 50 };
                         AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
                         if (_g->clipBoundingBox(&b, &data->boundingBox)) {
-				_g->_levelCheckpoint = 3;
+				_checkpoint = 3;
 			}
 		}
 		_g->postScreenUpdate_lava_helper(175);
@@ -108,8 +108,8 @@ void Level_lava::postScreenUpdate_lava_screen10() {
 			if (_andyObject->yPos + _andyObject->posTable[3].y < 142) {
 				_andyObject->actionKeyMask = 0x40;
 				_andyObject->directionKeyMask = 0;
-				if (_g->_levelCheckpoint == 3) {
-					_g->_levelCheckpoint = 4;
+				if (_checkpoint == 3) {
+					_checkpoint = 4;
 					_res->_screensState[10].s0 = 1;
 					_res->_resLvlScreenBackgroundDataTable[10].currentMaskId = 1;
 					_g->setupScreenMask(10);
@@ -221,16 +221,16 @@ void Level_lava::preScreenUpdate_lava_screen0() {
 
 void Level_lava::preScreenUpdate_lava_screen3() {
 	if (_res->_currentScreenResourceNum == 3) {
-		if (_g->_levelCheckpoint == 0) {
-			_g->_levelCheckpoint = 1;
+		if (_checkpoint == 0) {
+			_checkpoint = 1;
 		}
 	}
 }
 
 void Level_lava::preScreenUpdate_lava_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		if (_g->_levelCheckpoint == 1) {
-			_g->_levelCheckpoint = 2;
+		if (_checkpoint == 1) {
+			_checkpoint = 2;
 		}
 	}
 }
@@ -250,8 +250,8 @@ void Level_lava::preScreenUpdate_lava_screen10() {
 
 void Level_lava::preScreenUpdate_lava_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		if (_g->_levelCheckpoint == 4) {
-			_g->_levelCheckpoint = 5;
+		if (_checkpoint == 4) {
+			_checkpoint = 5;
 		}
 	}
 }

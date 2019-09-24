@@ -4,6 +4,7 @@
  */
 
 #include "game.h"
+#include "level.h"
 #include "resource.h"
 #include "util.h"
 
@@ -950,8 +951,8 @@ void Game::startMstCode() {
 		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x14], unk10 - unk34);
 		WRITE_LE_UINT32(&_res->_mstMonsterInfos[offset - 0x08], unk0C + unk34);
 	}
-	if (_levelCheckpoint < _res->_mstHdr.levelCheckpointCodeDataCount) {
-		const uint32_t codeData = _res->_mstLevelCheckpointCodeData[_levelCheckpoint];
+	if (_level->_checkpoint < _res->_mstHdr.levelCheckpointCodeDataCount) {
+		const uint32_t codeData = _res->_mstLevelCheckpointCodeData[_level->_checkpoint];
 		if (codeData != kNone) {
 			Task *t = createTask(_res->_mstCodeData + codeData * 4);
 			if (t) {
@@ -3759,7 +3760,7 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		}
 		break;
 	case 34:
-		return _levelCheckpoint;
+		return _level->_checkpoint;
 	case 35:
 		return _mstAndyCurrentScreenNum;
 	default:
@@ -6166,7 +6167,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 		}
 		break;
 	case 30:
-		++_levelCheckpoint;
+		++_level->_checkpoint;
 		break;
 	default:
 		warning("Unhandled opcode %d in mstOp56_specialAction", code);

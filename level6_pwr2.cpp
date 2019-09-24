@@ -79,8 +79,8 @@ void Level_pwr2::postScreenUpdate_pwr2_screen3() {
 void Level_pwr2::postScreenUpdate_pwr2_screen5() {
 	if (_res->_screensState[5].s0 == 1) {
 		_res->_screensState[5].s0 = 2;
-		if (_g->_levelCheckpoint == 1) {
-			_g->_levelCheckpoint = 2;
+		if (_checkpoint == 1) {
+			_checkpoint = 2;
 		}
 		if (!_paf->_skipCutscenes) {
 			_paf->play(9);
@@ -123,7 +123,7 @@ void Level_pwr2::postScreenUpdate(int num) {
 }
 
 void Level_pwr2::preScreenUpdate_pwr2_screen2() {
-	if (_g->_levelCheckpoint == 1) {
+	if (_checkpoint == 1) {
 		if (_res->_screensState[2].s0 == 0) {
 			_res->_screensState[2].s0 = 2;
 			_res->_resLvlScreenBackgroundDataTable[2].currentMaskId = 2;
@@ -132,11 +132,11 @@ void Level_pwr2::preScreenUpdate_pwr2_screen2() {
 }
 
 void Level_pwr2::preScreenUpdate_pwr2_screen3() {
-	if (_res->_currentScreenResourceNum == 3 && _g->_levelCheckpoint == 0) {
+	if (_res->_currentScreenResourceNum == 3 && _checkpoint == 0) {
 		AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		BoundingBox b = { 0, 103, 122, 191 };
 		if (_g->clipBoundingBox(&b, &data->boundingBox)) {
-			_g->_levelCheckpoint = 1;
+			_checkpoint = 1;
 		}
 	}
 }

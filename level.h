@@ -37,6 +37,7 @@ struct Level {
 	Video *_video;
 
 	uint8_t _screenCounterTable[kMaxScreens];
+	int _checkpoint;
 };
 
 Level *Level_rock_create();

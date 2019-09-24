@@ -1262,7 +1262,7 @@ void Game::setupAndyLvlObject() {
 	_fallingAndyFlag = false;
 	_andyActionKeysFlags = 0;
 	_hideAndyObjectSprite = false;
-	const CheckpointData *dat = &_levelCheckpointData[_currentLevel][_levelCheckpoint];
+	const CheckpointData *dat = &_levelCheckpointData[_currentLevel][_level->_checkpoint];
 	_plasmaCannonFlags = 0;
 	_actionDirectionKeyMaskIndex = 0;
 	_mstAndyCurrentScreenNum = ptr->screenNum;
@@ -1420,7 +1420,7 @@ void Game::resetScreen() {
 		_level->_screenCounterTable[i] = 0;
 	}
 	const uint8_t *dat2 = _levelScreenStartData[_currentLevel];
-	const int n = _levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum;
+	const int n = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
 	for (int i = 0; i < n; ++i) {
 		_res->_screensState[i].s0 = *dat2++;
 		_level->_screenCounterTable[i] = *dat2++;
@@ -1445,7 +1445,7 @@ void Game::restartLevel() {
 	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
-	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum;
+	const int num = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	resetScreen();
@@ -2073,15 +2073,16 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
 	_currentLevel = level;
-	_levelCheckpoint = checkpoint;
+	createLevel();
+	_level->_checkpoint = checkpoint;
 	_mix._lock(1);
 	_res->loadLevelData(_levels[_currentLevel]);
 	_mix._lock(0);
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
 	initMstCode();
-	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum, 0xFF);
-//	memset(_screenCounterTable, 0, sizeof(_screenCounterTable));
+	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum, 0xFF);
+	memset(_level->_screenCounterTable, 0, sizeof(_level->_screenCounterTable));
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();
 	resetPlasmaCannonState();
@@ -2094,7 +2095,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	if (!_mstDisabled) {
 		startMstCode();
 	}
-	if (!_paf->_skipCutscenes && _levelCheckpoint == 0 && !levelChanged) {
+	if (!_paf->_skipCutscenes && _level->_checkpoint == 0 && !levelChanged) {
 		const uint8_t num = _cutscenes[_currentLevel];
 		_paf->preload(num);
 		_paf->play(num);
@@ -2118,7 +2119,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
-	const int num = _levelCheckpointData[_currentLevel][_levelCheckpoint].screenNum;
+	const int num = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	resetScreen();
@@ -2671,7 +2672,7 @@ void Game::levelMainLoop() {
 			callLevel_postScreenUpdate(_currentRightScreen);
 		}
 	}
-	_currentLevelCheckpoint = _levelCheckpoint;
+	_currentLevelCheckpoint = _level->_checkpoint;
 	if (updateAndyLvlObject() != 0) {
 		callLevel_tick();
 //		_time_counter1 -= _time_counter2;
@@ -2707,7 +2708,7 @@ void Game::levelMainLoop() {
 	}
 	if (_cheats != 0) {
 		char buffer[256];
-		snprintf(buffer, sizeof(buffer), "P%d S%02d %d R%d", _currentLevel, _andyObject->screenNum, _res->_screensState[_andyObject->screenNum].s0, _levelCheckpoint);
+		snprintf(buffer, sizeof(buffer), "P%d S%02d %d R%d", _currentLevel, _andyObject->screenNum, _res->_screensState[_andyObject->screenNum].s0, _level->_checkpoint);
 		_video->drawString(buffer, (Video::W - strlen(buffer) * 8) / 2, 8, _video->findWhiteColor(), _video->_frontLayer);
 	}
 	if (_shakeScreenDuration != 0 || _levelRestartCounter != 0 || _video->_displayShadowLayer) {
@@ -2741,7 +2742,7 @@ void Game::callLevel_preScreenUpdate(int num) {
 	_level->preScreenUpdate(num);
 }
 
-void Game::callLevel_initialize() {
+Level *Game::createLevel() {
 	switch (_currentLevel) {
 	case 0:
 		_level = Level_rock_create();
@@ -2771,6 +2772,10 @@ void Game::callLevel_initialize() {
 		_level = Level_dark_create();
 		break;
 	}
+	return _level;
+}
+
+void Game::callLevel_initialize() {
 	_level->setPointers(this, _andyObject, _paf, _res, _video);
 	_level->initialize();
 }
@@ -2878,7 +2883,7 @@ void *Game::getLvlObjectDataPtr(LvlObject *o, int type) const {
 // Andy
 void Game::lvlObjectType0Init(LvlObject *ptr) {
 	uint8_t num = ptr->spriteNum;
-	if (_currentLevel == kLvl_rock && _levelCheckpoint >= 5) {
+	if (_currentLevel == kLvl_rock && _level->_checkpoint >= 5) {
 		num = 2; // sprite without 'plasma cannon'
 	}
 	_andyObject = declareLvlObject(ptr->type, num);

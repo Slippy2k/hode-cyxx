@@ -167,13 +167,13 @@ void Level_lar2::postScreenUpdate_lar2_screen3() {
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen4() {
-	if (_g->_currentLevelCheckpoint == 8 && _g->_levelCheckpoint == 9) {
+	if (_g->_currentLevelCheckpoint == 8 && _checkpoint == 9) {
 		Game::_lar2_unkData0[8] = (Game::_lar2_unkData0[8] & 0xF) | 0x10;
 		if (!_paf->_skipCutscenes) {
 			_paf->play(18);
 			_paf->unload(18);
 			_video->clearPalette();
-			_g->_currentLevelCheckpoint = _g->_levelCheckpoint;
+			_g->_currentLevelCheckpoint = _checkpoint;
 			_g->updateScreen(_andyObject->screenNum);
 		}
 		LvlObject *o = _g->findLvlObject(2, 0, 4);
@@ -182,7 +182,7 @@ void Level_lar2::postScreenUpdate_lar2_screen4() {
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen5() {
-	if (_g->_currentLevelCheckpoint == 7 && _g->_levelCheckpoint == 8) {
+	if (_g->_currentLevelCheckpoint == 7 && _checkpoint == 8) {
 		Game::_lar2_unkData0[0xC] &= 0xF;
 	}
 	LvlObject *o = _g->findLvlObject(2, 0, 5);
@@ -191,13 +191,13 @@ void Level_lar2::postScreenUpdate_lar2_screen5() {
 
 void Level_lar2::postScreenUpdate_lar2_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		if (_g->_levelCheckpoint != 3) {
+		if (_checkpoint != 3) {
 			if (!_paf->_skipCutscenes) {
 				if (_g->_currentLevelCheckpoint == 6) {
 					_paf->play(17);
 					_paf->unload(17);
 					_video->clearPalette();
-					_g->_currentLevelCheckpoint = _g->_levelCheckpoint;
+					_g->_currentLevelCheckpoint = _checkpoint;
 					_g->updateScreen(_andyObject->screenNum);
 				}
 			}
@@ -220,7 +220,7 @@ void Level_lar2::postScreenUpdate_lar2_screen7() {
 	if (_res->_currentScreenResourceNum == 7) {
 		if (!_paf->_skipCutscenes) {
 			const uint8_t state = _res->_screensState[7].s0;
-			if (state != 0 && _g->_levelCheckpoint == 5 && state > 1) {
+			if (state != 0 && _checkpoint == 5 && state > 1) {
 				_paf->play(16);
 				_paf->unload(16);
 				_video->clearPalette();
@@ -324,7 +324,7 @@ void Level_lar2::postScreenUpdate_lar2_screen13() {
 
 void Level_lar2::postScreenUpdate_lar2_screen19() {
 	if (_res->_currentScreenResourceNum == 19) {
-		if (_g->_currentLevelCheckpoint == 10 && _g->_levelCheckpoint == 11) {
+		if (_g->_currentLevelCheckpoint == 10 && _checkpoint == 11) {
 			if (!_paf->_skipCutscenes) {
 				_paf->play(19);
 				_paf->unload(19);
@@ -380,20 +380,20 @@ void Level_lar2::preScreenUpdate_lar2_screen2() {
 	LvlObject *o = _g->findLvlObject(2, 0, 2);
 	_g->postScreenUpdate_lar1_helper(o, Game::_lar2_unkData0, 1);
 	if (_res->_currentScreenResourceNum == 2) {
-		if (_g->_levelCheckpoint == 0) {
-			_g->_levelCheckpoint = 1;
+		if (_checkpoint == 0) {
+			_checkpoint = 1;
 		}
 	}
 }
 
 void Level_lar2::preScreenUpdate_lar2_screen4() {
 	if (_res->_currentScreenResourceNum == 4) {
-		if (_g->_levelCheckpoint == 1) {
-			_g->_levelCheckpoint = 2;
+		if (_checkpoint == 1) {
+			_checkpoint = 2;
 		}
-		if (_g->_levelCheckpoint >= 2) {
+		if (_checkpoint >= 2) {
 			Game::_lar2_unkData0[4] &= 0xF;
-			if (_g->_levelCheckpoint == 8) {
+			if (_checkpoint == 8) {
 				Game::_lar2_unkData0[8] &= 0xF;
 				if (!_paf->_skipCutscenes) {
 					_paf->preload(18);
@@ -405,9 +405,9 @@ void Level_lar2::preScreenUpdate_lar2_screen4() {
 
 void Level_lar2::preScreenUpdate_lar2_screen5() {
 	if (_res->_currentScreenResourceNum == 5) {
-		if (_g->_levelCheckpoint == 7) {
+		if (_checkpoint == 7) {
 			Game::_lar2_unkData0[0xC] = (Game::_lar2_unkData0[4] & 0xF) | 0x10;
-		} else if (_g->_levelCheckpoint >= 3) {
+		} else if (_checkpoint >= 3) {
 			Game::_lar2_unkData0[0xC] &= 0xF;
 		}
 	}
@@ -415,14 +415,14 @@ void Level_lar2::preScreenUpdate_lar2_screen5() {
 
 void Level_lar2::preScreenUpdate_lar2_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		if (_g->_levelCheckpoint == 2) {
-			_g->_levelCheckpoint = 3;
+		if (_checkpoint == 2) {
+			_checkpoint = 3;
 		}
 		if (!_paf->_skipCutscenes) {
-			if (_g->_levelCheckpoint == 3) {
+			if (_checkpoint == 3) {
 				_paf->preload(15);
 				Game::_lar2_unkData0[0xC] &= 0xF;
-			} else if (_g->_levelCheckpoint == 6) {
+			} else if (_checkpoint == 6) {
 				_paf->preload(17);
 			}
 		}
@@ -431,12 +431,12 @@ void Level_lar2::preScreenUpdate_lar2_screen6() {
 
 void Level_lar2::preScreenUpdate_lar2_screen7() {
 	if (_res->_currentScreenResourceNum == 7) {
-		if (_g->_levelCheckpoint >= 4 && _g->_levelCheckpoint < 7) {
+		if (_checkpoint >= 4 && _checkpoint < 7) {
 			_res->_screensState[7].s0 = 1;
 		} else {
 			_res->_screensState[7].s0 = 0;
 		}
-		if (_g->_levelCheckpoint == 5) {
+		if (_checkpoint == 5) {
 			if (!_paf->_skipCutscenes) {
 				_paf->preload(16);
 			}
@@ -469,15 +469,15 @@ void Level_lar2::preScreenUpdate_lar2_screen9() {
 
 void Level_lar2::preScreenUpdate_lar2_screen15() {
 	if (_res->_currentScreenResourceNum == 15) {
-		if (_g->_levelCheckpoint == 9) {
-			_g->_levelCheckpoint = 10;
+		if (_checkpoint == 9) {
+			_checkpoint = 10;
 		}
 	}
 }
 
 void Level_lar2::preScreenUpdate_lar2_screen19() {
 	if (_res->_currentScreenResourceNum == 19) {
-		if (_g->_levelCheckpoint == 10) {
+		if (_checkpoint == 10) {
 			if (!_paf->_skipCutscenes) {
 				_paf->preload(19);
 			}
@@ -523,14 +523,14 @@ void Level_lar2::tick() {
 }
 
 void Level_lar2::setupLvlObjects_lar2_screen19() {
-	int num1 = _lar2_lutData[_g->_levelCheckpoint * 3 + 1];
+	int num1 = _lar2_lutData[_checkpoint * 3 + 1];
 	for (int i = num1; i < 13; ++i) {
 		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~0x40) | 1;
 	}
 	for (int i = num1; i != 0; --i) {
 		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~1) | 0x40;
 	}
-	int num2 = _lar2_lutData[_g->_levelCheckpoint * 3];
+	int num2 = _lar2_lutData[_checkpoint * 3];
 	for (int i = num2; i < 10; ++i) {
 // 408CBC
 		const int num = i;
