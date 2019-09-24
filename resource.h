@@ -202,7 +202,7 @@ struct MstUnk46Unk1 { // MstBehavior
 	uint32_t count; // 0x14
 	uint32_t unk18; // 0x18
 	uint32_t indexUnk51; // 0x1C indexes _mstUnk51
-	uint32_t indexUnk44; // 0x20 indexes _mstUnk44
+	uint32_t indexUnk44; // 0x20 indexes _mstWalkPathData
 	uint32_t indexUnk47; // 0x24 indexes _mstUnk47
 	uint32_t codeData; // 0x28 indexes _mstCodeData
 }; // sizeof == 44
@@ -549,7 +549,7 @@ struct Resource {
 	uint32_t *_mstUnk41;
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
-	MstWalkPath *_mstUnk44;
+	MstWalkPath *_mstWalkPathData;
 	MstInfoMonster2 *_mstUnk45;
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;

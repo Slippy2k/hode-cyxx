@@ -1185,52 +1185,52 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += readBytesAlign(fp, _mstUnk43[i].data2, _mstUnk43[i].count2);
 	}
 
-	_mstUnk44 = (MstWalkPath *)malloc(_mstHdr.walkPathDataCount * sizeof(MstWalkPath));
+	_mstWalkPathData = (MstWalkPath *)malloc(_mstHdr.walkPathDataCount * sizeof(MstWalkPath));
 	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
 		fp->readUint32();
 		fp->readUint32();
-		_mstUnk44[i].mask  = fp->readUint32();
-		_mstUnk44[i].count = fp->readUint32();
+		_mstWalkPathData[i].mask  = fp->readUint32();
+		_mstWalkPathData[i].count = fp->readUint32();
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
-		const int count = _mstUnk44[i].count;
-		_mstUnk44[i].data = (MstWalkNode *)malloc(sizeof(MstWalkNode) * count);
+		const int count = _mstWalkPathData[i].count;
+		_mstWalkPathData[i].data = (MstWalkNode *)malloc(sizeof(MstWalkNode) * count);
 		for (int j = 0; j < count; ++j) {
 			uint8_t data[104];
 			fp->read(data, sizeof(data));
 			bytesRead += 104;
-			_mstUnk44[i].data[j].x1 = READ_LE_UINT32(data);
-			_mstUnk44[i].data[j].x2 = READ_LE_UINT32(data + 4);
-			_mstUnk44[i].data[j].y1 = READ_LE_UINT32(data + 8);
-			_mstUnk44[i].data[j].y2 = READ_LE_UINT32(data + 12);
-			_mstUnk44[i].data[j].indexUnk34_16 = READ_LE_UINT32(data + 16); // sizeof == 20
-			_mstUnk44[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
-			_mstUnk44[i].data[j].indexUnk35_0x18 = READ_LE_UINT32(data + 24); // sizeof == 16
-			_mstUnk44[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12
-			_mstUnk44[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
-			_mstUnk44[i].data[j].indexUnk35_0x24[0] = READ_LE_UINT32(data + 36); // sizeof == 16
-			_mstUnk44[i].data[j].indexUnk35_0x24[1] = READ_LE_UINT32(data + 40); // sizeof == 16
+			_mstWalkPathData[i].data[j].x1 = READ_LE_UINT32(data);
+			_mstWalkPathData[i].data[j].x2 = READ_LE_UINT32(data + 4);
+			_mstWalkPathData[i].data[j].y1 = READ_LE_UINT32(data + 8);
+			_mstWalkPathData[i].data[j].y2 = READ_LE_UINT32(data + 12);
+			_mstWalkPathData[i].data[j].indexUnk34_16 = READ_LE_UINT32(data + 16); // sizeof == 20
+			_mstWalkPathData[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
+			_mstWalkPathData[i].data[j].indexUnk35_0x18 = READ_LE_UINT32(data + 24); // sizeof == 16
+			_mstWalkPathData[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12
+			_mstWalkPathData[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
+			_mstWalkPathData[i].data[j].indexUnk35_0x24[0] = READ_LE_UINT32(data + 36); // sizeof == 16
+			_mstWalkPathData[i].data[j].indexUnk35_0x24[1] = READ_LE_UINT32(data + 40); // sizeof == 16
 			for (int k = 0; k < 4; ++k) {
-				_mstUnk44[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
-				_mstUnk44[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
+				_mstWalkPathData[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
+				_mstWalkPathData[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
 			}
-			_mstUnk44[i].data[j].indexUnk44Unk1_76[0] = READ_LE_UINT32(data + 76); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44Unk1_76[1] = READ_LE_UINT32(data + 80); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44Unk1_76[2] = READ_LE_UINT32(data + 84); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44Unk1_76[3] = READ_LE_UINT32(data + 88); // sizeof == 104
-			_mstUnk44[i].data[j].indexUnk44Unk1_92 = READ_LE_UINT32(data + 92); // sizeof == 104
-			_mstUnk44[i].data[j].unk60[0] = (uint8_t *)malloc(count);
-			_mstUnk44[i].data[j].unk60[1] = (uint8_t *)malloc(count);
+			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[0] = READ_LE_UINT32(data + 76); // sizeof == 104
+			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[1] = READ_LE_UINT32(data + 80); // sizeof == 104
+			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[2] = READ_LE_UINT32(data + 84); // sizeof == 104
+			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[3] = READ_LE_UINT32(data + 88); // sizeof == 104
+			_mstWalkPathData[i].data[j].indexUnk44Unk1_92 = READ_LE_UINT32(data + 92); // sizeof == 104
+			_mstWalkPathData[i].data[j].unk60[0] = (uint8_t *)malloc(count);
+			_mstWalkPathData[i].data[j].unk60[1] = (uint8_t *)malloc(count);
 		}
-		_mstUnk44[i].indexUnk44Unk1 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
+		_mstWalkPathData[i].indexUnk44Unk1 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
 		for (int j = 0; j < _mstHdr.pointsCount; ++j) {
-			_mstUnk44[i].indexUnk44Unk1[j] = fp->readUint32();
+			_mstWalkPathData[i].indexUnk44Unk1[j] = fp->readUint32();
 			bytesRead += 4;
 		}
 		for (int j = 0; j < count; ++j) {
 			for (int k = 0; k < 2; ++k) {
-				bytesRead += readBytesAlign(fp, _mstUnk44[i].data[j].unk60[k], count);
+				bytesRead += readBytesAlign(fp, _mstWalkPathData[i].data[j].unk60[k], count);
 			}
 		}
 	}
