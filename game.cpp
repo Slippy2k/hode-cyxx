@@ -39,6 +39,8 @@ Game::Game(SystemStub *system, const char *dataPath, int cheats) {
 	_system = system;
 	_cheats = cheats;
 
+	_frameMs = kFrameTimeStamp;
+
 	_difficulty = 1;
 
 	memset(_screenLvlObjectsList, 0, sizeof(_screenLvlObjectsList));
@@ -2090,8 +2092,8 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		_res->_screensState[i].s2 = 0;
 	}
 	_res->_currentScreenResourceNum = _andyObject->screenNum;
-	_currentRightScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen]; /* right */
-	_currentLeftScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen]; /* left */
+	_currentRightScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen];
+	_currentLeftScreen = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosLeftScreen];
 	if (!_mstDisabled) {
 		startMstCode();
 	}
@@ -2128,7 +2130,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	}
 	updateScreen(_andyObject->screenNum);
 	do {
-		int frameTimeStamp = _system->getTimeStamp() + kFrameTimeStamp;
+		const int frameTimeStamp = _system->getTimeStamp() + _frameMs;
 		levelMainLoop();
 		int diff = frameTimeStamp - _system->getTimeStamp();
 		if (diff < 10) {

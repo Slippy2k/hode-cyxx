@@ -67,7 +67,7 @@ struct PafPlayer {
 		kVideoWidth = 256,
 		kVideoHeight = 192,
 		kPageBufferSize = 256 * 256,
-		kFramesPerSec = 10,
+		kFramesPerSec = 10, // 10hz
 		kAudioSamples = 2205,
 		kAudioStrideSize = 4922 // 256 * sizeof(int16_t) + 2205 * 2
 	};

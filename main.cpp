@@ -95,6 +95,8 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 			g->_playingSssObjectsMax = atoi(value);
 		} else if (strcmp(name, "difficulty") == 0) {
 			g->_difficulty = atoi(value);
+		} else if (strcmp(name, "frame_duration") == 0) {
+			g->_frameMs = atoi(value);
 		}
 	} else if (strcmp(section, "display") == 0) {
 		if (strcmp(name, "scale_factor") == 0) {

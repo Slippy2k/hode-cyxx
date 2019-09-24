@@ -56,7 +56,7 @@ struct Game {
 		kMaxSprites = 128,
 		kMaxSpriteTypes = 32,
 		kMaxLvlObjects = 160,
-		kFrameTimeStamp = 50 // original is ~80ms (12hz)
+		kFrameTimeStamp = 50 // original is 80ms (12.5hz)
 	};
 
 	static const uint8_t _byte_43E660[];
@@ -97,6 +97,7 @@ struct Game {
 	Video *_video;
 	SystemStub *_system;
 	uint32_t _cheats;
+	int _frameMs;
 
 	int _difficulty;
 	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen
