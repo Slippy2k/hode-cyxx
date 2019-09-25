@@ -1064,7 +1064,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	}
 
 	_mstWalkBoxData = (MstWalkBox *)malloc(_mstHdr.walkBoxDataCount * sizeof(MstWalkBox));
-	for (int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
+	for (uint i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
 		_mstWalkBoxData[i].right  = fp->readUint32();
 		_mstWalkBoxData[i].left   = fp->readUint32();
 		_mstWalkBoxData[i].top    = fp->readUint32();
@@ -1204,7 +1204,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstWalkPathData[i].data[j].x2 = READ_LE_UINT32(data + 4);
 			_mstWalkPathData[i].data[j].y1 = READ_LE_UINT32(data + 8);
 			_mstWalkPathData[i].data[j].y2 = READ_LE_UINT32(data + 12);
-			_mstWalkPathData[i].data[j].indexUnk34_16 = READ_LE_UINT32(data + 16); // sizeof == 20
+			_mstWalkPathData[i].data[j].indexWalkBox = READ_LE_UINT32(data + 16); // sizeof == 20
 			_mstWalkPathData[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
 			_mstWalkPathData[i].data[j].indexUnk35_0x18 = READ_LE_UINT32(data + 24); // sizeof == 16
 			_mstWalkPathData[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12

@@ -73,37 +73,37 @@ struct LvlBackgroundData {
 struct MstHdr {
 	int version;
 	int dataSize;
-	int walkBoxDataCount;
+	uint32_t walkBoxDataCount; // 8
 	int unk0x0C; // mstUnk35DataCount
 	int unk0x10; // mstUnk36DataCount
-	int levelCheckpointCodeDataCount;
-	int screenAreaDataCount;
+	int levelCheckpointCodeDataCount; // 14
+	int screenAreaDataCount; // 18
 	int unk0x1C; // mstUnk39DataCount
 	int unk0x20; // mstUnk42DataCount
 	int unk0x24; // mstUnk43DataCount
 	int walkPathDataCount; // 28
-	int infoMonster2Count;
+	int infoMonster2Count; // 2C
 	int unk0x30; // mstUnk45DataCount
 	int unk0x34; // mstUnk47DataCount
 	int unk0x38; // mstUnk48DataCount
-	int infoMonster1Count;
+	int infoMonster1Count; // 3C
 	int unk0x40; // mstUnk49DataCount
 	int unk0x44; // mstUnk50DataCount
 	int unk0x48; // mstUnk51DataCount
 	int unk0x4C; // mstUnk52DataCount
-	int op223DataCount;
-	int op226DataCount;
-	int op227DataCount;
-	int op234DataCount;
-	int op2DataCount;
-	int op197DataCount;
-	int op211DataCount;
-	int op240DataCount;
+	int op223DataCount; // 50
+	int op226DataCount; // 54
+	int op227DataCount; // 58
+	int op234DataCount; // 5C
+	int op2DataCount; // 60
+	int op197DataCount; // 64
+	int op211DataCount; // 68
+	int op240DataCount; // 6C
 	int unk0x70; // mstUnk60DataCount
 	int unk0x74; // mstUnk61DataCount
-	int op204DataCount;
+	int op204DataCount; // 78
 	int codeSize; // sizeof(uint32_t)
-	int pointsCount; // 0x80
+	int pointsCount; // 80
 };
 
 struct MstPointOffset { // MstPoint
@@ -165,7 +165,7 @@ struct MstWalkNode { // MstUnk44Unk1
 	int32_t x2; // 4
 	int32_t y1; // 8
 	int32_t y2; // 0xC
-	uint32_t indexUnk34_16; // 0x10
+	uint32_t indexWalkBox; // 0x10
 	uint32_t indexUnk35_20; // 0x14
 	uint32_t indexUnk35_0x18; // 0x18
 	uint32_t indexUnk36_28; // 0x1C
@@ -622,4 +622,3 @@ struct Resource {
 };
 
 #endif // RESOURCE_H__
-
