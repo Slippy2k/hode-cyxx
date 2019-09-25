@@ -7,9 +7,11 @@
 #include "wav.h"
 
 #define SECTOR_FILE (1 << 0)
+#define PSX         (1 << 1)
 
 enum {
 	kDat,
+	kDax,
 	kLvl,
 	kSss,
 	kMst,
@@ -25,6 +27,7 @@ static const struct {
 	{ "setup.dat",    kDat, 0x9ebe2677, SECTOR_FILE }, // hod_demo-weben1_2.exe
 	{ "setup.dat",    kDat, 0xb60fe7af, SECTOR_FILE }, // Coca Cola edition 1.4
 	{ "rock_hod.lvl", kLvl, 0x7e50e77d, SECTOR_FILE },
+	{ "rock_hod.lvl", kLvl, 0x7e37bbdd, SECTOR_FILE | PSX }, // SLED_013.51, SLUS_006.96
 	{ "rock_hod.sss", kSss, 0x69682a22, SECTOR_FILE }, // demo v1.2
 	{ "rock_hod.sss", kSss, 0xc50c13bb, SECTOR_FILE }, // demo v1.4
 	{ "fort_hod.lvl", kLvl, 0x3e6aebec, SECTOR_FILE },
@@ -37,7 +40,7 @@ static const struct {
 	int type;
 } _exts[] = {
 	{ ".dat", kDat },
-	{ ".dax", kDat },
+	{ ".dax", kDax }, // PSX is version 11 but with different binary layout and compression
 	{ ".lvl", kLvl },
 	{ ".sss", kSss },
 	{ ".mst", kMst },
@@ -56,6 +59,8 @@ static const struct {
 };
 
 static const int kMaxScreens = 40;
+
+static bool _isPsx;
 
 static uint8_t _bitmapBuffer[256 * 192];
 static uint8_t _bitmapPalette[256 * 3];
@@ -211,7 +216,7 @@ static void DecodeRLE(const uint8_t *src, uint8_t *dst, int dstPitch) {
 	}
 }
 
-static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data, int num) {
+static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data, uint32_t dataSize, int num) {
 	header += 16;
 	const uint8_t *paletteData[4];
 	for (int i = 0; i < 4; ++i) {
@@ -224,14 +229,26 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 		bitmapData[i] = (offset != 0) ? data + offset : 0;
 	}
 
+	char filename[64];
+
 	for (int i = 0; i < 4; ++i) {
+		if (_isPsx) {
+			if (bitmapData[i] && isMdecData(bitmapData[i])) {
+				snprintf(filename, sizeof(filename), "lvl_screen_%02d_state_%d.bss", num, i);
+				fioDumpData(filename, bitmapData[i], dataSize - (bitmapData[i] - data));
+			}
+			continue;
+		}
 		if (bitmapData[i] && paletteData[i]) {
 			const int uncompressedSize = decodeLZW(bitmapData[i] + 2, _bitmapBuffer);
 			assert(uncompressedSize == 256 * 192);
-			char name[64];
-			snprintf(name, sizeof(name), "lvl_screen_%02d_state_%d.bmp", num, i);
-			saveBMP(name, _bitmapBuffer, paletteData[i] + 2, 256, 192);
+			snprintf(filename, sizeof(filename), "lvl_screen_%02d_state_%d.bmp", num, i);
+			saveBMP(filename, _bitmapBuffer, paletteData[i] + 2, 256, 192);
 		}
+	}
+
+	if (_isPsx) {
+		return;
 	}
 
 	header += 4 * sizeof(uint32_t) * 2;
@@ -248,9 +265,9 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 				const int h = READ_LE_UINT16(p + 6);
 				memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
 				DecodeRLE(p + 8, _bitmapBuffer, w);
-				char name[64];
-				snprintf(name, sizeof(name), "lvl_screen_%02d_static_%d_x_%03d_y_%03d.bmp", num, i, x, y);
-				saveBMP(name, _bitmapBuffer, paletteData[0] + 2, w, h);
+
+				snprintf(filename, sizeof(filename), "lvl_screen_%02d_static_%d_x_%03d_y_%03d.bmp", num, i, x, y);
+				saveBMP(filename, _bitmapBuffer, paletteData[0] + 2, w, h);
 			}
 		}
 	}
@@ -324,9 +341,11 @@ static void DecodeLvl(File *fp) {
 	fp->read(gridData, screensCount * 4);
 	GenerateLevelMap(gridData, screensCount);
 
+	static const uint32_t kBackgroundsOffset = 0x2B88;
+
 	// background screens
 	for (int i = 0; i < screensCount; ++i) {
-		fp->seekAlign(0x2B88 + i * 16);
+		fp->seekAlign(kBackgroundsOffset + i * 16);
 		const uint32_t offset = fp->readUint32();
 		const uint32_t size = fp->readUint32();
 		const uint32_t readSize = fp->readUint32();
@@ -337,15 +356,25 @@ static void DecodeLvl(File *fp) {
 			continue;
 		}
 		fp->seek(offset, SEEK_SET);
+
+		if (_isPsx) {
+			static const uint32_t kPsxMdecDataOffset = 0x67D0; // rock_hod.lvl
+			fp->seek(kPsxMdecDataOffset, SEEK_CUR);
+		}
+
 		fp->read(ptr, readSize);
 
-		fp->seekAlign(0x2E08 + i * 160);
+		fp->seekAlign(kBackgroundsOffset + kMaxScreens * 16 + i * 160);
 		uint8_t buffer[160];
 		fp->read(buffer, sizeof(buffer));
 
-		DecodeLvlBackgroundBitmap(buffer, ptr, i);
+		DecodeLvlBackgroundBitmap(buffer, ptr, readSize, i);
 
 		free(ptr);
+	}
+
+	if (_isPsx) {
+		return;
 	}
 
 	// sprites
@@ -607,11 +636,11 @@ enum {
 	kSprMenuButtons
 };
 
-static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int spriteNum, bool isPsx) {
+static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int spriteNum) {
 
 	const int compressedSize = READ_LE_UINT16(ptr + 2);
 
-	if (isPsx) {
+	if (_isPsx) {
 		assert(READ_LE_UINT16(ptr + 4) == 1);
 		assert(READ_LE_UINT16(ptr + 6) == 0);
 		assert(ptr[0] == ptr[8] && ptr[1] == ptr[9]);
@@ -650,7 +679,7 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 	return compressedSize + 2;
 }
 
-static uint32_t DecodeSetupDatSpritesGroup(const uint8_t *ptr, int spriteGroup, bool isPsx) {
+static uint32_t DecodeSetupDatSpritesGroup(const uint8_t *ptr, int spriteGroup) {
 
 	const int size  = READ_LE_UINT32(ptr + 8);
 	const int count = READ_LE_UINT16(ptr + 12);
@@ -658,7 +687,7 @@ static uint32_t DecodeSetupDatSpritesGroup(const uint8_t *ptr, int spriteGroup, 
 
 	int ptrOffset = 0;
 	for (int i = 0; i < count; ++i) {
-		ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, spriteGroup, i, isPsx);
+		ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, spriteGroup, i);
 	}
 
 	assert(size == ptrOffset);
@@ -766,28 +795,20 @@ static void DecodeSetupDat(File *fp) {
 	const int unk0x44      = READ_LE_UINT32(buffer + 0x44);
 	const int bufferSize2  = READ_LE_UINT32(buffer + 0x48);
 
-	bool isPsx = false; // PSX is version 11 but with different binary layout and compression
-
 	// hint screens
 	const int hintsCount = (version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
 		const uint32_t offset = READ_LE_UINT32(buffer + 0x4C + i * 4);
 		const uint32_t size = READ_LE_UINT32(buffer + 0x4C + (hintsCount + i) * 4);
-		fp->seek(offset, SEEK_SET);
-		if (size > 8) {
-			fp->read(_bitmapBuffer, 8);
-			const bool mdec = isMdecData(_bitmapBuffer);
-			if (mdec) {
-				isPsx = true;
-			} else if (size != 256 * 192) {
-				continue;
-			}
-			fp->read(_bitmapBuffer + 8, size - 8);
+		if (size != 0) {
+			fp->seek(offset, SEEK_SET);
+			fp->read(_bitmapBuffer, size);
 			fp->flush();
 
-			// PSX
 			char filename[64];
-			if (mdec) {
+
+			if (_isPsx) {
+				assert(isMdecData(_bitmapBuffer));
 				snprintf(filename, sizeof(filename), "hint_%02d.bss", i);
 				fioDumpData(filename, _bitmapBuffer, size);
 				continue;
@@ -816,14 +837,14 @@ static void DecodeSetupDat(File *fp) {
 
 		int ptrOffset = 0;
 
-		if (!isPsx) {
+		if (!_isPsx) {
 
 			// loading screen
 			const uint32_t compressedSize = READ_LE_UINT32(ptr); ptrOffset += 8;
 			ptrOffset += DecodeSetupDatBitmap256x192("loading", ptr + ptrOffset, compressedSize, _spritePalette);
 
 			// loading animation
-			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprLoadingAnimation, isPsx);
+			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprLoadingAnimation);
 		}
 
 		// font
@@ -873,11 +894,11 @@ static void DecodeSetupDat(File *fp) {
 
 			compressedSize = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 8;
 			ptrOffset += DecodeSetupDatBitmap256x192("title", ptr + ptrOffset, compressedSize, _spritePalette);
-			DecodeSetupDatSpritesGroup(ptr + sprTitleButtonsOffset, kSprTitleButtons, isPsx);
+			DecodeSetupDatSpritesGroup(ptr + sprTitleButtonsOffset, kSprTitleButtons);
 
 			compressedSize = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 8;
 			ptrOffset += DecodeSetupDatBitmap256x192("player", ptr + ptrOffset, compressedSize, _spritePalette);
-			DecodeSetupDatSpritesGroup(ptr + sprAssignPlayerOffset, kSprAssignPlayer, isPsx);
+			DecodeSetupDatSpritesGroup(ptr + sprAssignPlayerOffset, kSprAssignPlayer);
 
 			const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4; // 16x10 tiles
 			assert((size % (16 * 10)) == 0);
@@ -948,9 +969,9 @@ static void DecodeSetupDat(File *fp) {
 
 		if (version == 11) {
 
-			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprTitleButtons, isPsx);
+			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprTitleButtons);
 
-			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprAssignPlayer, isPsx);
+			ptrOffset += DecodeSetupDatSpritesGroup(ptr + ptrOffset, kSprAssignPlayer);
 
 			ptrOffset += menus * 8; // menu data
 
@@ -961,7 +982,7 @@ static void DecodeSetupDat(File *fp) {
 			ptrOffset += unk0x44;
 		}
 
-		if (isPsx) {
+		if (_isPsx) {
 			return;
 		}
 
@@ -970,7 +991,7 @@ static void DecodeSetupDat(File *fp) {
 		for (int i = 0; i < icons; ++i) {
 			const int count = READ_LE_UINT16(ptr + hdrOffset + i * 16 + 12);
 			for (int i = 0; i < count; ++i) {
-				ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprControls, i, isPsx);
+				ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprControls, i);
 			}
 		}
 
@@ -981,7 +1002,7 @@ static void DecodeSetupDat(File *fp) {
 			for (int i = 0; i < size; ++i) {
 				const int count = READ_LE_UINT16(ptr + hdrOffset + i * 20 + 4 + 12);
 				for (int j = 0; j < count; ++j) {
-					ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprMenuButtons, j, isPsx);
+					ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprMenuButtons, j);
 				}
 			}
 		}
@@ -1017,9 +1038,11 @@ static void DecodePC(const char *filename, int type, uint32_t flags) {
 	} else {
 		fp = new File;
 	}
+	_isPsx = ((flags & PSX) != 0) || (type == kDax);
 	if (fp->open(filename)) {
 		switch (type) {
 		case kDat:
+		case kDax:
 			DecodeSetupDat(fp);
 			break;
 		case kLvl:
@@ -1181,9 +1204,10 @@ static void DecodeSaturn0003(FILE *fp) { // .sss
 static void Decode(const char *filename) {
 	FILE *fp = fopen(filename, "rb");
 	if (fp) {
-		uint32_t flags = 0;
+		uint32_t crc, flags = 0;
+
 		uint8_t buf[2048];
-		uint32_t crc = crc32(0, Z_NULL, 0);
+		crc = crc32(0, Z_NULL, 0);
 		int count = fread(buf, 1, sizeof(buf), fp);
 		if (count == sizeof(buf)) {
 			if (fioUpdateCRC(0, buf, sizeof(buf)) == 0) {
@@ -1195,6 +1219,7 @@ static void Decode(const char *filename) {
 			}
 		}
 		fclose(fp);
+
 		const char *ext = strrchr(filename, '.');
 		if (ext) {
 			for (int i = 0; _files[i].name; ++i) {
