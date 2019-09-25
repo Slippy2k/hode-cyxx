@@ -283,6 +283,7 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 
 	assert(src == base + kLvlAnimHdrOffset);
 	dat->animsInfoData = base;
+#ifdef __BYTE_ORDER
 	if (__BYTE_ORDER == __BIG_ENDIAN) {
 		for (int i = 0; i < dat->hotspotsCount; ++i) {
 			LvlAnimHeader *ah = ((LvlAnimHeader *)(base + kLvlAnimHdrOffset)) + i;
@@ -307,6 +308,7 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 			}
 		}
 	}
+#endif
 	dat->refCount = 0xFF;
 	dat->framesData = (framesDataOffset == 0) ? 0 : base + framesDataOffset;
 	dat->hotspotsData = (hotspotsDataOffset == 0) ? 0 : base + hotspotsDataOffset;
@@ -1066,7 +1068,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	}
 
 	_mstWalkBoxData = (MstWalkBox *)malloc(_mstHdr.walkBoxDataCount * sizeof(MstWalkBox));
-	for (uint i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
+	for (unsigned int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
 		_mstWalkBoxData[i].right  = fp->readUint32();
 		_mstWalkBoxData[i].left   = fp->readUint32();
 		_mstWalkBoxData[i].top    = fp->readUint32();

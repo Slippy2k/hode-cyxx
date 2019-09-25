@@ -11,7 +11,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#ifdef _WIN32
+#define le16toh(x) x
+#define le32toh(x) x
+#define htole16(x) x
+#define htole32(x) x
+#else
 #include <endian.h>
+#endif
 
 #define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
 #define PACKED __attribute__((packed))
