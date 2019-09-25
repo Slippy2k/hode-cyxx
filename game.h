@@ -56,6 +56,10 @@ struct Game {
 		kMaxSprites = 128,
 		kMaxSpriteTypes = 32,
 		kMaxLvlObjects = 160,
+
+		kDefaultSoundPanning = 64,
+		kDefaultSoundVolume = 128,
+
 		kFrameTimeStamp = 50 // original is 80ms (12.5hz)
 	};
 

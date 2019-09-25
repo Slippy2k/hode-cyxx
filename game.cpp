@@ -85,8 +85,8 @@ Game::Game(SystemStub *system, const char *dataPath, uint32_t cheats) {
 
 	_sssDisabled = false;
 	_snd_muted = false;
-	_snd_masterPanning = 64;
-	_snd_masterVolume = 128;
+	_snd_masterPanning = kDefaultSoundPanning;
+	_snd_masterVolume = kDefaultSoundVolume;
 	_sssObjectsCount = 0;
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;

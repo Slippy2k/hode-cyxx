@@ -697,13 +697,9 @@ SssObject *Game::addSoundObject(SssPcm *pcm, int priority, uint32_t flags_a, uin
 	so->flags1 = flags_a;
 	so->currentPriority = priority;
 	so->pcm = pcm;
-	so->volume = 128;
-	so->panning = 64;
-	if (pcm->flags & 1) {
-		so->stereo = true;
-	} else {
-		so->stereo = false;
-	}
+	so->volume = kDefaultSoundVolume;
+	so->panning = kDefaultSoundPanning;
+	so->stereo = (pcm->flags & 1) != 0;
 	so->nextSoundBank = -1;
 	so->currentPcmFrame = 0;
 	so->flags = 0;
@@ -944,7 +940,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 					so->panning = getSoundObjectPanning(so);
 				} else {
 					so->panningPtr = 0;
-					so->panning = 64;
+					so->panning = kDefaultSoundPanning;
 				}
 			} else {
 				so->panningPtr = 0;
@@ -1151,7 +1147,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			int priority = CLIP(so->priority + so->filter->priorityCurrent, 0, 7);
 			if (so->panning == -2) {
 				volume = 0;
-				panning = 64;
+				panning = kDefaultSoundPanning;
 				priority = 0;
 			} else {
 				panning = CLIP(so->panning, 0, 128);

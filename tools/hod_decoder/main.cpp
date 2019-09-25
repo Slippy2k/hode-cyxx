@@ -562,6 +562,7 @@ static void DecodeSss(File *fp, uint32_t baseOffset = 0) {
 				continue;
 			}
 
+			assert(stride == 2276 || stride == 4040);
 			const uint32_t decompressedSize = (stride - 256 * sizeof(int16_t)) * count * sizeof(int16_t);
 			uint8_t *samples = (uint8_t *)malloc(decompressedSize);
 			if (samples) {
