@@ -6343,17 +6343,32 @@ void Game::mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int ty
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
 		assert(s);
 		s->state = pos;
+// dx, dy
+		static const uint8_t _byte_43E6E0[16] = {
+			0x0A, 0x00, 0xF7, 0xFA, 0xF7, 0x06, 0x09, 0xFA, 0x09, 0x06, 0xF6, 0x00, 0x00, 0xF6, 0x00, 0x0A
+		};
+		static const uint8_t _byte_43E6F0[16] = {
+			0x0D, 0x00, 0xF5, 0xF9, 0xF5, 0x07, 0x0B, 0xF9, 0x0B, 0x07, 0xF3, 0x00, 0x00, 0xF3, 0x00, 0x0D
+		};
+// 43E740
+		static const uint8_t data1[16] = {
+			0x02, 0x00, 0x01, 0x01, 0x01, 0x03, 0x01, 0x00, 0x01, 0x02, 0x02, 0x01, 0x00, 0x00, 0x00, 0x02
+		};
+// 43E760
+		static const uint8_t data2[16] = {
+			0x0D, 0x00, 0xF5, 0xF9, 0xF5, 0x07, 0x0B, 0xF9, 0x0B, 0x07, 0xF3, 0x00, 0x00, 0xF3, 0x00, 0x0D
+		};
 		const uint8_t *_ecx;
 		if (type >= 7) {
 			s->dxPos = (int8_t)_byte_43E6F0[type * 2];
 			s->dyPos = (int8_t)_byte_43E6F0[type * 2 + 1];
 			s->counter = 33;
-			_ecx = &_byte_43E760[type * 2];
+			_ecx = &data2[type * 2];
 		} else {
 			s->dxPos = (int8_t)_byte_43E6E0[type * 2];
 			s->dyPos = (int8_t)_byte_43E6E0[type * 2 + 1];
 			s->counter = 39;
-			_ecx = &_byte_43E740[type * 2];
+			_ecx = &data1[type * 2];
 		}
 		s->unk0 = type;
 		o->anim = _ecx[0];

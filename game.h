@@ -61,11 +61,7 @@ struct Game {
 
 	static const uint8_t _byte_43E660[];
 	static const uint8_t _byte_43E670[];
-	static const uint8_t _byte_43E6E0[];
-	static const uint8_t _byte_43E6F0[];
 	static const uint8_t _byte_43E730[];
-	static const uint8_t _byte_43E740[];
-	static const uint8_t _byte_43E760[];
 	static const uint8_t _pointDstIndexTable[];
 	static const uint8_t _pointRandomizeShiftTable[];
 	static const uint8_t _pointSrcIndex2Table[];
@@ -226,7 +222,7 @@ struct Game {
 	int _crackSpritesCount;
 	CrackSprite _crackSpritesTable[6];
 
-	Game(SystemStub *system, const char *dataPath, int cheats);
+	Game(SystemStub *system, const char *dataPath, uint32_t cheats);
 	~Game();
 
 	// 32*24 pitch=512
@@ -462,6 +458,7 @@ struct Game {
 	void mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int c, int d);
 	int mstTaskSetActionDirection(Task *t, int num, int value);
 
+	// Task list
 	Task *findFreeTask();
 	Task *createTask(const uint8_t *codeData);
 	void updateTask(Task *t, int num, const uint8_t *codeData);
@@ -469,12 +466,14 @@ struct Game {
 	void removeTask(Task **tasksList, Task *t);
 	void appendTask(Task **tasksList, Task *t);
 
+	// Task storage
 	int getTaskVar(Task *t, int index, int type) const;
 	void setTaskVar(Task *t, int index, int type, int value);
 	int getTaskAndyVar(int index, Task *t) const;
 	int getTaskOtherVar(int index, Task *t) const;
 	int getTaskFlag(Task *t, int index, int type) const;
 
+	// Task.run functions
 	int mstTask_main(Task *t);
 	int mstTask_wait1(Task *t);
 	int mstTask_wait2(Task *t);
@@ -498,6 +497,9 @@ struct Game {
 
 	// sound.cpp
 	bool _sssDisabled;
+	bool _snd_muted;
+	int _snd_masterPanning;
+	int _snd_masterVolume;
 	SssObject _sssObjectsTable[kMaxSssObjects];
 	bool _sssObjectsChanged;
 	int _sssObjectsCount;
@@ -506,10 +508,7 @@ struct Game {
 	SssObject *_lowPrioritySssObject; // point to the object in _sssObjectsList1 with the highest 'priority'
 	bool _sssUpdatedObjectsTable[kMaxSssObjects];
 	int _playingSssObjectsMax;
-	int _snd_masterPanning;
 	int _playingSssObjectsCount;
-	int _snd_masterVolume;
-	bool _snd_muted;
 
 	void muteSound();
 	void unmuteSound();

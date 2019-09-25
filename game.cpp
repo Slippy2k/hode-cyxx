@@ -13,7 +13,7 @@
 #include "util.h"
 #include "video.h"
 
-// cutscene number when starting a level
+// starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
 static const char *_levels[] = {
@@ -29,7 +29,7 @@ static const char *_levels[] = {
 	"test_hod"
 };
 
-Game::Game(SystemStub *system, const char *dataPath, int cheats) {
+Game::Game(SystemStub *system, const char *dataPath, uint32_t cheats) {
 
 	_level = 0;
 	_res = new Resource(dataPath);
@@ -84,13 +84,13 @@ Game::Game(SystemStub *system, const char *dataPath, int cheats) {
 	memset(_monsterObjects2Table, 0, sizeof(_monsterObjects2Table));
 
 	_sssDisabled = false;
+	_snd_muted = false;
+	_snd_masterPanning = 64;
+	_snd_masterVolume = 128;
 	_sssObjectsCount = 0;
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;
 	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
-	_snd_masterPanning = 64;
-	_snd_masterVolume = 128;
-	_snd_muted = false;
 }
 
 Game::~Game() {
