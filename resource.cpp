@@ -484,7 +484,9 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 void Resource::loadLvlScreenBackgroundData(int num) {
 	assert(num >= 0 && num < 40);
 
-	_lvlFile->seekAlign(0x2B88 + num * 16);
+	static const uint32_t baseOffset = 0x2B88;
+
+	_lvlFile->seekAlign(baseOffset + num * 16);
 	const uint32_t offs = _lvlFile->readUint32();
 	const uint32_t size = _lvlFile->readUint32();
 	const uint32_t readSize = _lvlFile->readUint32();
@@ -492,7 +494,7 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
-	_lvlFile->seekAlign(0x2E08 + num * 160);
+	_lvlFile->seekAlign(baseOffset + kMaxScreens * 16 + num * 160);
 	uint8_t buf[160];
 	_lvlFile->read(buf, 160);
 	LvlBackgroundData *dat = &_resLvlScreenBackgroundDataTable[num];

@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
 
 //				dumpBinary(fp, "Game::_transformBufferData1", 0x3EA78, 4536, "0x%02X", UNSIGNED_8BITS); // _benchmarkData1
 //				dumpBinary(fp, "Game::_transformBufferData2", 0x3D960, 2152, "0x%02X", UNSIGNED_8BITS); // _benchmarkData2
-				dumpBinary(fp, "_byte_43E660", 0x3E660, 16, "0x%02X", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "_specialPowersDxDyTable", 0x3E660, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E670", 0x3E670, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E6E0", 0x3E6E0, 16, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_byte_43E6F0", 0x3E6F0, 16, "0x%02X", UNSIGNED_8BITS, 0);

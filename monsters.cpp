@@ -6320,10 +6320,14 @@ void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, 
 		s->state = type;
 		s->unk0 = 0;
 		s->counter = 17;
-		s->dxPos = (int8_t)_byte_43E660[type * 2];
-		s->dyPos = (int8_t)_byte_43E660[type * 2 + 1];
-		o->anim = _byte_43E730[type * 2];
-		o->flags1 = ((_byte_43E730[type * 2 + 1] & 3) << 4) | (o->flags1 & ~0x0030);
+		s->dxPos = (int8_t)_specialPowersDxDyTable[type * 2];
+		s->dyPos = (int8_t)_specialPowersDxDyTable[type * 2 + 1];
+// 43E730
+		static const uint8_t data[16] = {
+			0x0D, 0x00, 0x0C, 0x01, 0x0C, 0x03, 0x0C, 0x00, 0x0C, 0x02, 0x0D, 0x01, 0x0B, 0x00, 0x0B, 0x02,
+		};
+		o->anim = data[type * 2];
+		o->flags1 = ((data[type * 2 + 1] & 3) << 4) | (o->flags1 & ~0x0030);
 		o->frame = 0;
 		o->flags2 = o->flags1;
 		o->screenNum = screenNum;

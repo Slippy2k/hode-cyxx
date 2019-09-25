@@ -3175,6 +3175,11 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				_eax->state = 7;
 				break;
 			}
+// 43E670
+			// dx, dy
+			static const uint8_t _byte_43E670[16] = {
+				0x0F, 0x00, 0xF1, 0xF6, 0xF1, 0x0A, 0x0F, 0xF6, 0x0F, 0x0A, 0xF1, 0x00, 0x00, 0xF1, 0x00, 0x0F
+			};
 // 40DBCE
 			_eax->dxPos = (int8_t)_byte_43E670[_eax->state * 2];
 			_eax->dyPos = (int8_t)_byte_43E670[_eax->state * 2 + 1];
@@ -3222,8 +3227,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				break;
 			}
 // 40DCCE
-			_eax->dxPos = (int8_t)_byte_43E660[_eax->state * 2];
-			_eax->dyPos = (int8_t)_byte_43E660[_eax->state * 2 + 1];
+			_eax->dxPos = (int8_t)_specialPowersDxDyTable[_eax->state * 2];
+			_eax->dyPos = (int8_t)_specialPowersDxDyTable[_eax->state * 2 + 1];
 		}
 // 40DCE9
 		_esi->frame = 0;

@@ -63,9 +63,7 @@ struct Game {
 		kFrameTimeStamp = 50 // original is 80ms (12.5hz)
 	};
 
-	static const uint8_t _byte_43E660[];
-	static const uint8_t _byte_43E670[];
-	static const uint8_t _byte_43E730[];
+	static const uint8_t _specialPowersDxDyTable[];
 	static const uint8_t _pointDstIndexTable[];
 	static const uint8_t _pointRandomizeShiftTable[];
 	static const uint8_t _pointSrcIndex2Table[];
