@@ -319,6 +319,15 @@ int main(int argc, char *argv[]) {
 				}
 				continue;
 			}
+			if (strcasecmp(ext, ".bss") == 0) {
+				FILE *fp = fopen(argv[1], "rb");
+				if (fp) {
+					const int count = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
+					decodeMdec(tempBuffer, count, "temp.tga");
+					fclose(fp);
+				}
+				continue;
+			}
 		}
 	}
 	return 0;
