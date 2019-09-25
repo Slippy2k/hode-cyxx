@@ -419,11 +419,11 @@ void SystemStub_SDL::updateScreen(bool drawWidescreen) {
 	SDL_UnlockTexture(_texture);
 
 	SDL_RenderClear(_renderer);
-	SDL_Rect r;
 	if (_widescreenTexture) {
 		if (drawWidescreen) {
 			SDL_RenderCopy(_renderer, _widescreenTexture, 0, 0);
 		}
+		SDL_Rect r;
 		r.x = _shakeDx * _scalerMultiplier;
 		r.y = _shakeDy * _scalerMultiplier;
 		SDL_RenderGetLogicalSize(_renderer, &r.w, &r.h);
@@ -431,8 +431,10 @@ void SystemStub_SDL::updateScreen(bool drawWidescreen) {
 		r.w = _texW;
 		r.y += (r.h - _texH) / 2;
 		r.h = _texH;
+		SDL_RenderCopy(_renderer, _texture, 0, &r);
+	} else {
+		SDL_RenderCopy(_renderer, _texture, 0, 0);
 	}
-	SDL_RenderCopy(_renderer, _texture, 0, &r);
 	SDL_RenderPresent(_renderer);
 	_shakeDx = _shakeDy = 0;
 }
