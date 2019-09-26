@@ -31,6 +31,7 @@ static const struct {
 	{ "rock_hod.sss", kSss, 0x69682a22, SECTOR_FILE }, // demo v1.2
 	{ "rock_hod.sss", kSss, 0xc50c13bb, SECTOR_FILE }, // demo v1.4
 	{ "fort_hod.lvl", kLvl, 0x3e6aebec, SECTOR_FILE },
+	{ "fort_hod.lvl", kLvl, 0xcaf0e23c, SECTOR_FILE | PSX }, // SLUS_006.96
 	{ "fort_hod.sss", kSss, 0x6ad13bbb, SECTOR_FILE },
 	{ 0, -1, 0, 0 }
 };
@@ -56,6 +57,19 @@ static const struct {
 	{ 2, 0xa97b41a8 }, // level graphics
 	{ 3, 0xadf6d56c }, // sound
 	{ -1, 0 }
+};
+
+static const char *_levels[] = {
+	"rock_hod",
+	"fort_hod",
+	"pwr1_hod",
+	"isld_hod",
+	"lava_hod",
+	"pwr2_hod",
+	"lar1_hod",
+	"lar2_hod",
+	"dark_hod",
+	0
 };
 
 static const int kMaxScreens = 40;
@@ -325,7 +339,7 @@ static void DecodeLvlSprite(const uint8_t *data, int num) {
 	free(buffer);
 }
 
-static void DecodeLvl(File *fp) {
+static void DecodeLvl(File *fp, int levelNum) {
 
 	const uint32_t tag = fp->readUint32();
 	assert(tag == 0x484F4400);
@@ -358,9 +372,19 @@ static void DecodeLvl(File *fp) {
 		}
 		fp->seek(offset, SEEK_SET);
 
-		if (_isPsx) {
-			static const uint32_t kPsxMdecDataOffset = 0x67D0; // rock_hod.lvl
-			fp->seek(kPsxMdecDataOffset, SEEK_CUR);
+		if (_isPsx && levelNum != -1) {
+			static const uint32_t mdecDataOffset[] = {
+				0x67D0, // rock
+				0x5FD4, // fort
+				0, // pwr1
+				0, // isld
+				0, // lava
+				0, // pwr2
+				0, // lar1
+				0, // lar2
+				0, // dark
+			};
+			fp->seek(mdecDataOffset[levelNum], SEEK_CUR);
 		}
 
 		fp->read(ptr, readSize);
@@ -1032,6 +1056,17 @@ static void DecodeSetupDat(File *fp) {
 	}
 }
 
+static int LookupLevelNum(const char *filename) {
+	const char *sep = strrchr(filename, '/');
+	const char *p = sep ? (sep + 1) : filename;
+	for (int i = 0; _levels[i]; ++i) {
+		if (strncasecmp(p, _levels[i], strlen(_levels[i])) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 static void DecodePC(const char *filename, int type, uint32_t flags) {
 	File *fp;
 	if (flags & SECTOR_FILE) {
@@ -1047,7 +1082,7 @@ static void DecodePC(const char *filename, int type, uint32_t flags) {
 			DecodeSetupDat(fp);
 			break;
 		case kLvl:
-			DecodeLvl(fp);
+			DecodeLvl(fp, LookupLevelNum(filename));
 			break;
 		case kSss:
 			DecodeSss(fp);

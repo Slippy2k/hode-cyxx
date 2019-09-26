@@ -220,12 +220,11 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	ctx->height = h;
 	avcodec_open2(ctx, codec, 0);
 
-	AVFrame *frame = av_frame_alloc();
-
 	AVPacket pkt;
 	av_new_packet(&pkt, len);
 	memcpy(pkt.data, src, len);
 
+	AVFrame *frame = av_frame_alloc();
 	int hasFrame = 0;
 	const int ret = avcodec_decode_video2(ctx, frame, &hasFrame, &pkt);
 	if (ret < 0) {
