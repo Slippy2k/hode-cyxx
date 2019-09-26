@@ -234,8 +234,8 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 	for (int i = 0; i < 4; ++i) {
 		if (_isPsx) {
 			if (bitmapData[i] && isMdecData(bitmapData[i])) {
-				snprintf(filename, sizeof(filename), "lvl_screen_%02d_state_%d.bss", num, i);
-				fioDumpData(filename, bitmapData[i], dataSize - (bitmapData[i] - data));
+				snprintf(filename, sizeof(filename), "lvl_screen_%02d_state_%d.jpg", num, i);
+				savePSX(filename, bitmapData[i], dataSize - (bitmapData[i] - data), 256, 192);
 			}
 			continue;
 		}
@@ -700,8 +700,8 @@ static uint32_t DecodeSetupDatBitmap256x192(const char *name, const uint8_t *ptr
 	char filename[64];
 
 	if (isMdecData(ptr)) {
-		snprintf(filename, sizeof(filename), "%s.bss", name);
-		fioDumpData(filename, ptr, compressedSize);
+		snprintf(filename, sizeof(filename), "%s.jpg", name);
+		savePSX(filename, ptr, compressedSize, 256, 192);
 		return compressedSize;
 	} else if (READ_LE_UINT32(ptr) == 0x06000003 && compressedSize == 300) {
 		return compressedSize;
@@ -809,8 +809,8 @@ static void DecodeSetupDat(File *fp) {
 
 			if (_isPsx) {
 				assert(isMdecData(_bitmapBuffer));
-				snprintf(filename, sizeof(filename), "hint_%02d.bss", i);
-				fioDumpData(filename, _bitmapBuffer, size);
+				snprintf(filename, sizeof(filename), "hint_%02d.jpg", i);
+				savePSX(filename, _bitmapBuffer, size, 256, 192);
 				continue;
 			}
 

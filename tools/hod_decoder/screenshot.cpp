@@ -1,6 +1,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <sys/param.h>
 #include "fileio.h"
 #include "screenshot.h"
 
@@ -185,3 +186,114 @@ void saveLZW(const char *filename, const uint8_t *bits, int len, const uint8_t *
 		fclose(fp);
 	}
 }
+
+#ifdef _WIN32
+void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
+	char filename2[MAXPATHLEN];
+	strcpy(filename2, filename);
+	char *ext = strrchr(filename2, '.');
+	if (ext && strcmp(ext, ".jpg") == 0) {
+		strcpy(ext + 1, "bss");
+		fioDumpData(filename2, src, len);
+	}
+}
+#else
+extern "C" {
+	#include <jpeglib.h>
+	#include <libavcodec/avcodec.h>
+}
+
+void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
+	static bool codec_inited = false;
+
+	if (!codec_inited) {
+		avcodec_register_all();
+		codec_inited = true;
+	}
+
+	fprintf(stdout, "MDEC len %d, VLC_ID 0x%x\n", READ_LE_UINT16(src), READ_LE_UINT16(src + 2));
+	fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
+
+	const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MDEC);
+	AVCodecContext *ctx = avcodec_alloc_context3(codec);
+	ctx->width  = w;
+	ctx->height = h;
+	avcodec_open2(ctx, codec, 0);
+
+	AVFrame *frame = av_frame_alloc();
+
+	AVPacket pkt;
+	av_new_packet(&pkt, len);
+	memcpy(pkt.data, src, len);
+
+	int hasFrame = 0;
+	const int ret = avcodec_decode_video2(ctx, frame, &hasFrame, &pkt);
+	if (ret < 0) {
+		fprintf(stderr, "avcodec_decode_video2 ret %d\n", ret);
+	} else {
+
+		struct jpeg_compress_struct cinfo;
+		struct jpeg_error_mgr jerr;
+
+		cinfo.err = jpeg_std_error(&jerr);
+		jpeg_create_compress(&cinfo);
+
+		FILE *fp = fopen(filename, "wb");
+		if (fp) {
+			jpeg_stdio_dest(&cinfo, fp);
+
+			cinfo.image_width = w;
+			cinfo.image_height = h;
+			cinfo.input_components = 3;
+			cinfo.in_color_space = JCS_YCbCr;
+
+			jpeg_set_defaults(&cinfo);
+			cinfo.raw_data_in = TRUE;
+
+			cinfo.comp_info[0].h_samp_factor = 2;
+			cinfo.comp_info[0].v_samp_factor = 2;
+			cinfo.comp_info[0].dc_tbl_no = 0;
+			cinfo.comp_info[0].ac_tbl_no = 0;
+			cinfo.comp_info[0].quant_tbl_no = 0;
+
+			cinfo.comp_info[1].h_samp_factor = 1;
+			cinfo.comp_info[1].v_samp_factor = 1;
+			cinfo.comp_info[1].dc_tbl_no = 1;
+			cinfo.comp_info[1].ac_tbl_no = 1;
+			cinfo.comp_info[1].quant_tbl_no = 1;
+
+			cinfo.comp_info[2].h_samp_factor = 1;
+			cinfo.comp_info[2].v_samp_factor = 1;
+			cinfo.comp_info[2].dc_tbl_no = 1;
+			cinfo.comp_info[2].ac_tbl_no = 1;
+			cinfo.comp_info[2].quant_tbl_no = 1;
+
+			jpeg_set_quality(&cinfo, 100, TRUE);
+			cinfo.optimize_coding = TRUE;
+
+			JSAMPROW y[16], cb[16], cr[16];
+			JSAMPARRAY p[3] = { y, cr, cb };
+
+			jpeg_start_compress(&cinfo, TRUE);
+
+			for (unsigned int j = 0; j < cinfo.image_height; j += 16) {
+				int offset = j;
+				for (unsigned int i = 0; i < 16; i++) {
+					y[i]       = frame->data[0] + frame->linesize[0] *  offset;
+					cr[i >> 1] = frame->data[1] + frame->linesize[1] * (offset >> 1);
+					cb[i >> 1] = frame->data[2] + frame->linesize[2] * (offset >> 1);
+					++offset;
+				}
+				jpeg_write_raw_data(&cinfo, p, 16);
+			}
+
+			jpeg_finish_compress(&cinfo);
+			jpeg_destroy_compress(&cinfo);
+
+			fclose(fp);
+		}
+	}
+	avcodec_free_context(&ctx);
+	av_frame_free(&frame);
+}
+#endif // _WIN32
