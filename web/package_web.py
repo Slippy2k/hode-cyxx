@@ -31,6 +31,8 @@ def getVersion():
 version = getVersion()
 assert version
 
+X86_REGS = { '_eax':'va', '_ebx':'vb', '_ecx':'vc', '_edx':'vd', '_ebp':'ve', '_edi':'vf', '_esi':'vg' }
+
 def tidyCpp(fname):
 	# only process .cpp files
 	if not fname.endswith('.cpp'):
@@ -41,6 +43,9 @@ def tidyCpp(fname):
 		# remove lines with original executable address
 		if line.startswith('// 4'):
 			continue
+		# replace variables named after x86 registers
+		for reg, varname in X86_REGS.items():
+			line = line.replace(reg, varname)
 		temporary.write(line)
 	temporary.flush()
 	return temporary
