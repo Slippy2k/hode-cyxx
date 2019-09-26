@@ -341,7 +341,8 @@ static void DecodeLvl(File *fp) {
 	fp->read(gridData, screensCount * 4);
 	GenerateLevelMap(gridData, screensCount);
 
-	static const uint32_t kBackgroundsOffset = 0x2B88;
+	static const uint32_t kSpritesOffset = 0x2988;
+	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
 	// background screens
 	for (int i = 0; i < screensCount; ++i) {
@@ -379,7 +380,7 @@ static void DecodeLvl(File *fp) {
 
 	// sprites
 	for (int i = 0; i < spritesCount; ++i) {
-		fp->seekAlign(0x2988 + i * 16);
+		fp->seekAlign(kSpritesOffset + i * 16);
 		const uint32_t offset = fp->readUint32();
 		const uint32_t size = fp->readUint32();
 		const uint32_t readSize = fp->readUint32();
