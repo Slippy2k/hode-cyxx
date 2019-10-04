@@ -33,6 +33,7 @@ static const struct {
 	{ "fort_hod.lvl", kLvl, 0x3e6aebec, SECTOR_FILE },
 	{ "fort_hod.lvl", kLvl, 0xcaf0e23c, SECTOR_FILE | PSX }, // SLUS_006.96
 	{ "fort_hod.sss", kSss, 0x6ad13bbb, SECTOR_FILE },
+	{ "pwr1_hod.lvl", kLvl, 0x8add9bce, SECTOR_FILE | PSX }, // SLUS_006.96
 	{ 0, -1, 0, 0 }
 };
 
@@ -76,7 +77,7 @@ static const int kMaxScreens = 40;
 
 static bool _isPsx;
 
-static uint8_t _bitmapBuffer[256 * 192];
+static uint8_t _bitmapBuffer[256 * 256]; // PSX compressed data can be larger than 256x192 bytes
 static uint8_t _bitmapPalette[256 * 3];
 static uint8_t _spritePalette[256 * 3];
 static uint8_t _controlsPalette[256 * 3];
@@ -355,6 +356,12 @@ static void DecodeLvl(File *fp, int levelNum) {
 	fp->read(gridData, screensCount * 4);
 	GenerateLevelMap(gridData, screensCount);
 
+	// screen masks (shadows, grids)
+	static const uint32_t kMaskOffsets = 0x4708;
+	fp->seekAlign(kMaskOffsets);
+	const uint32_t masksOffset = fp->readUint32();
+	const uint32_t masksSize = fp->readUint32();
+
 	static const uint32_t kSpritesOffset = 0x2988;
 	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
@@ -370,23 +377,13 @@ static void DecodeLvl(File *fp, int levelNum) {
 			fprintf(stderr, "Failed to allocate %d bytes", size);
 			continue;
 		}
-		fp->seek(offset, SEEK_SET);
-
-		if (_isPsx && levelNum != -1) {
-			static const uint32_t mdecDataOffset[] = {
-				0x67D0, // rock
-				0x5FD4, // fort
-				0, // pwr1
-				0, // isld
-				0, // lava
-				0, // pwr2
-				0, // lar1
-				0, // lar2
-				0, // dark
-			};
-			fp->seek(mdecDataOffset[levelNum], SEEK_CUR);
+		if (_isPsx) {
+			const uint32_t pos = offset + masksOffset + fioAlignSizeTo2048(masksSize);
+			fp->seek(pos, SEEK_SET);
+			fp->readUint32();
+		} else {
+			fp->seek(offset, SEEK_SET);
 		}
-
 		fp->read(ptr, readSize);
 
 		fp->seekAlign(kBackgroundsOffset + kMaxScreens * 16 + i * 160);
@@ -833,9 +830,10 @@ static void DecodeSetupDat(File *fp) {
 			char filename[64];
 
 			if (_isPsx) {
-				assert(isMdecData(_bitmapBuffer));
-				snprintf(filename, sizeof(filename), "hint_%02d.jpg", i);
-				savePSX(filename, _bitmapBuffer, size, 256, 192);
+				if (isMdecData(_bitmapBuffer)) {
+					snprintf(filename, sizeof(filename), "hint_%02d.jpg", i);
+					savePSX(filename, _bitmapBuffer, size, 256, 192);
+				}
 				continue;
 			}
 

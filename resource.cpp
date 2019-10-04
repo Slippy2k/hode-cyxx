@@ -393,7 +393,7 @@ void Resource::loadLevelData0x470C() {
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
-	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + 1280;
+	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + 160 * 8;
 }
 
 static const uint32_t kLvlHdrTag = 0x484F4400; // 'HOD\x00'
