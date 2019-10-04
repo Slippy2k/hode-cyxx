@@ -387,8 +387,8 @@ const uint8_t *Resource::getLvlScreenPosDataPtr(int num) const {
 
 void Resource::loadLevelData0x470C() {
 	_lvlFile->seekAlign(0x4708);
-	uint32_t offs = _lvlFile->readUint32();
-	uint32_t size = _lvlFile->readUint32();
+	const uint32_t offs = _lvlFile->readUint32();
+	const uint32_t size = _lvlFile->readUint32();
 	_resLevelData0x470CTable = (uint8_t *)calloc(size, 1);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
@@ -403,7 +403,11 @@ void Resource::loadLvlData(File *fp, const char *name) {
 	assert(fp == _lvlFile);
 
 	const uint32_t tag = _lvlFile->readUint32();
-	assert(tag == kLvlHdrTag);
+	if (tag != kLvlHdrTag) {
+		error("Unhandled .lvl tag 0x%x", tag);
+		closeDat(_fs, _lvlFile);
+		return;
+	}
 
 	_lvlHdr.screensCount = _lvlFile->readByte();
 	_lvlHdr.staticLvlObjectsCount = _lvlFile->readByte();
