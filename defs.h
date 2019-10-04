@@ -142,9 +142,9 @@ struct LvlObject {
 	uint16_t anim;
 	uint8_t type;
 	uint8_t spriteNum;
-	uint16_t flags0; // hFlags
-	uint16_t flags1; // vFlags
-	uint16_t flags2; // spriteType
+	uint16_t flags0;
+	uint16_t flags1;
+	uint16_t flags2;
 	uint8_t objectUpdateType;
 	uint8_t hitCount;
 	LvlObject *childPtr; // _andyObject : plasma cannon object or specialAnimation
@@ -180,8 +180,8 @@ struct SssObject {
 	uint32_t flags1; // 0x10
 	int32_t panning; // 0x14 panning default:64
 	int32_t volume; // 0x18 volume (db) default:128
-	int panL; // 0x1C leftGain
-	int panR; // 0x20 rightGain
+	int panL; // 0x1C
+	int panR; // 0x20
 	int panType; // 0x24 : 0: silent, 1:fullRight 2:fullLeft 3:both
 	const int16_t *currentPcmPtr; // 0x28
 	int32_t pcmFramesCount; // 0x2C
@@ -353,7 +353,7 @@ struct MonsterObject1 {
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
 	MstUnk48Unk12Unk4 *unk18; // 0x18
-	AndyShootData *collidePtr; // 0x1C
+	AndyShootData *shootData; // 0x1C
 	int monster1Index; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
@@ -367,10 +367,10 @@ struct MonsterObject1 {
 	int yMstPos; // 0x58 currentLevelPos_y
 	int xDelta; // 0x5C
 	int yDelta; // 0x60
-	int unk64; // 0x64 goalDistance_x1
-	int unk68; // 0x68 goalDistance_x2
-	int unk6C; // 0x6C goalDistance_y1
-	int unk70; // 0x70 goalDistance_y2
+	int goalDistance_x1; // 0x64
+	int goalDistance_x2; // 0x68
+	int goalDistance_y1; // 0x6C
+	int goalDistance_y2; // 0x70
 	int goalPos_x1; // 0x74
 	int goalPos_y1; // 0x78
 	int goalPos_x2; // 0x7C

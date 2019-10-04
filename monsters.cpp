@@ -702,7 +702,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 		m->facingDirectionMask |= 4;
 	}
 	m->collideDistance = -1;
-	m->collidePtr = 0;
+	m->shootData = 0;
 // 40ED0D
 	if (_andyShootsCount != 0 && !_specialAnimFlag && (o->flags1 & 6) != 6 && (m->localVars[7] > 0 || m->localVars[7] < -1) && (m->flagsA5 & 0x80) == 0) {
 		for (int i = 0; i < _andyShootsCount; ++i) {
@@ -783,8 +783,8 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 			if (res < 0) {
 				continue;
 			}
-			if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->collidePtr->type & 1) == 0 && p->type == 2)) {
-				m->collidePtr = p;
+			if (m->collideDistance == -1 || m->collideDistance > res || (m->collideDistance == 0 && res == 0 && (m->shootData->type & 1) == 0 && p->type == 2)) {
+				m->shootData = p;
 				m->collideDistance = res;
 			}
 		}
@@ -1350,10 +1350,10 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 	int _ebp, _edi, _esi, _eax;
 	if (m->goalScreenNum == 0xFD) {
 		MstUnk49 *m49 = m->m49;
-		if (m->levelPosBounds_x2 > _mstAndyLevelPosX + m49->unk14 - m->unk68 && m->levelPosBounds_x1 < _mstAndyLevelPosX + m->unk68 - m49->unk14 && m->levelPosBounds_y2 > _mstAndyLevelPosY + m49->unk15 - m->unk70 && m->levelPosBounds_y1 < _mstAndyLevelPosY + m49->unk15 + m->unk70) {
-			var18 = _mstAndyLevelPosX + m49->unk14 + m->unk64;
+		if (m->levelPosBounds_x2 > _mstAndyLevelPosX + m49->unk14 - m->goalDistance_x2 && m->levelPosBounds_x1 < _mstAndyLevelPosX + m->goalDistance_x2 - m49->unk14 && m->levelPosBounds_y2 > _mstAndyLevelPosY + m49->unk15 - m->goalDistance_y2 && m->levelPosBounds_y1 < _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y2) {
+			var18 = _mstAndyLevelPosX + m49->unk14 + m->goalDistance_x1;
 			if (m->levelPosBounds_x2 < var18) {
-				if (m->levelPosBounds_x1 > _mstAndyLevelPosX - m->unk64 - m49->unk14 && m->levelPosBounds_y2 < _mstAndyLevelPosY + m49->unk15 + m->unk6C && m->levelPosBounds_y1 > _mstAndyLevelPosY - m->unk6C - m49->unk15) {
+				if (m->levelPosBounds_x1 > _mstAndyLevelPosX - m->goalDistance_x1 - m49->unk14 && m->levelPosBounds_y2 < _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y1 && m->levelPosBounds_y1 > _mstAndyLevelPosY - m->goalDistance_y1 - m49->unk15) {
 					goto l41B2DC;
 				}
 			}
@@ -1362,8 +1362,8 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 			var18 = 0;
 			_ebp = 0x40000000;
 			if (m->levelPosBounds_x2 >= tmp) {
-				if (m->xMstPos > _mstAndyLevelPosX + m->unk68) {
-					_ebp = m->xMstPos - m->unk64 - _mstAndyLevelPosX;
+				if (m->xMstPos > _mstAndyLevelPosX + m->goalDistance_x2) {
+					_ebp = m->xMstPos - m->goalDistance_x1 - _mstAndyLevelPosX;
 // 41B191
 					if (_ebp >= 0 && _ebp < m49->unk14) {
 						_ebp = 0x40000000;
@@ -1371,11 +1371,11 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 						var18 = 1;
 					}
 // 41B1A2
-				} else if (m->xMstPos >= _mstAndyLevelPosX + m->unk64) {
+				} else if (m->xMstPos >= _mstAndyLevelPosX + m->goalDistance_x1) {
 					_ebp = -1;
 					var18 = 1;
 				} else {
-					_ebp = m->unk68 - m->xMstPos + _mstAndyLevelPosX;
+					_ebp = m->goalDistance_x2 - m->xMstPos + _mstAndyLevelPosX;
 					if (_ebp >= 0 && _ebp < m49->unk14) {
 						_ebp = 0x40000000;
 					} else {
@@ -1385,20 +1385,20 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 			}
 // 41B1BE
 			_edi = 0x40000000;
-			if (m->levelPosBounds_x1 <= _mstAndyLevelPosX - m->unk64 - m49->unk14) {
-				if (m->xMstPos > _mstAndyLevelPosX - m->unk64) {
-					_edi = m->xMstPos - _mstAndyLevelPosX  + m->unk68;
+			if (m->levelPosBounds_x1 <= _mstAndyLevelPosX - m->goalDistance_x1 - m49->unk14) {
+				if (m->xMstPos > _mstAndyLevelPosX - m->goalDistance_x1) {
+					_edi = m->xMstPos - _mstAndyLevelPosX  + m->goalDistance_x2;
 					if (_edi >= 0 && _edi < m49->unk14) {
 						_edi = 0x40000000;
 					} else {
 						var18 |= 2;
 					}
 // 41B1F8
-				} else if (m->xMstPos >= _mstAndyLevelPosX - m->unk68) {
+				} else if (m->xMstPos >= _mstAndyLevelPosX - m->goalDistance_x2) {
 					_edi = -1;
 					var18 |= 2;
 				} else {
-					_edi = _mstAndyLevelPosX - m->unk64 - m->xMstPos;
+					_edi = _mstAndyLevelPosX - m->goalDistance_x1 - m->xMstPos;
 					if (_edi >= 0 && _edi < m49->unk14) {
 						_edi = 0x40000000;
 					} else {
@@ -1408,20 +1408,20 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 			}
 // 41B21A
 			_esi = 0x40000000;
-			if (m->levelPosBounds_y2 >= _mstAndyLevelPosY + m->unk6C + m49->unk15) {
-				if (m->yMstPos > _mstAndyLevelPosY + m->unk70) {
-					_esi = m->yMstPos - m->unk6C - _mstAndyLevelPosY;
+			if (m->levelPosBounds_y2 >= _mstAndyLevelPosY + m->goalDistance_y1 + m49->unk15) {
+				if (m->yMstPos > _mstAndyLevelPosY + m->goalDistance_y2) {
+					_esi = m->yMstPos - m->goalDistance_y1 - _mstAndyLevelPosY;
 					if (_esi >= 0 && _esi < m49->unk15) {
 						_esi = 0x40000000;
 					} else {
 						var18 |= 4;
 					}
 // 41B252
-				} else if (m->yMstPos >= _mstAndyLevelPosY + m->unk6C) {
+				} else if (m->yMstPos >= _mstAndyLevelPosY + m->goalDistance_y1) {
 					_esi = -1;
 					var18 |= 4;
 				} else {
-					_esi = m->unk70 - m->yMstPos - _mstAndyLevelPosY;
+					_esi = m->goalDistance_y2 - m->yMstPos - _mstAndyLevelPosY;
 					if (_esi >= 0 && _esi < m49->unk15) {
 						_esi = 0x40000000;
 					} else {
@@ -1431,20 +1431,20 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 			}
 // 41B276
 			_eax = 0x40000000;
-			if (m->levelPosBounds_y1 <= _mstAndyLevelPosY - m->unk6C - m49->unk15) {
-				if (m->yMstPos > _mstAndyLevelPosY - m->unk6C) {
-					_eax = m->yMstPos - _mstAndyLevelPosY + m->unk70;
+			if (m->levelPosBounds_y1 <= _mstAndyLevelPosY - m->goalDistance_y1 - m49->unk15) {
+				if (m->yMstPos > _mstAndyLevelPosY - m->goalDistance_y1) {
+					_eax = m->yMstPos - _mstAndyLevelPosY + m->goalDistance_y2;
 					if (_eax >= 0 && _eax < m49->unk15) {
 						_eax = 0x40000000;
 					} else {
 						var18 |= 8;
 					}
-				} else if (m->yMstPos >= _mstAndyLevelPosY - m->unk70) {
+				} else if (m->yMstPos >= _mstAndyLevelPosY - m->goalDistance_y2) {
 // 41B2B0
 					_eax = -1;
 					var18 |= 8;
 				} else {
-					_eax = _mstAndyLevelPosY - m->unk6C - m->yMstPos;
+					_eax = _mstAndyLevelPosY - m->goalDistance_y1 - m->yMstPos;
 					if (_eax >= 0 && _eax < m49->unk15) {
 						_eax = 0x40000000;
 					} else {
@@ -1459,10 +1459,10 @@ void Game::executeMstUnk4(MonsterObject1 *m) {
 		} else {
 // 41B2DC
 l41B2DC:
-			_ebp = ABS(m->xMstPos - _mstAndyLevelPosX + m49->unk14 - m->unk68);
-			_edi = ABS(m->xMstPos - _mstAndyLevelPosX - m49->unk14 + m->unk68);
-			_esi = ABS(m->yMstPos - _mstAndyLevelPosY + m49->unk15 - m->unk70);
-			_eax = ABS(m->yMstPos - _mstAndyLevelPosX - m49->unk15 + m->unk70);
+			_ebp = ABS(m->xMstPos - _mstAndyLevelPosX + m49->unk14 - m->goalDistance_x2);
+			_edi = ABS(m->xMstPos - _mstAndyLevelPosX - m49->unk14 + m->goalDistance_x2);
+			_esi = ABS(m->yMstPos - _mstAndyLevelPosY + m49->unk15 - m->goalDistance_y2);
+			_eax = ABS(m->yMstPos - _mstAndyLevelPosX - m49->unk15 + m->goalDistance_y2);
 // 41B338
 			var18 = 15;
 		}
@@ -1512,31 +1512,31 @@ l41B2DC:
 // 41B3C0
 	switch (var1C & 0xF0) {
 	case 0x00:
-		m->goalPos_x1 = m->unk64;
-		m->goalPos_x2 = m->unk68;
+		m->goalPos_x1 = m->goalDistance_x1;
+		m->goalPos_x2 = m->goalDistance_x2;
 		break;
 	case 0x10:
-		m->goalPos_x1 = -m->unk68;
-		m->goalPos_x2 = -m->unk64;
+		m->goalPos_x1 = -m->goalDistance_x2;
+		m->goalPos_x2 = -m->goalDistance_x1;
 		break;
 	case 0x20:
-		m->goalPos_x1 = -m->unk68;
-		m->goalPos_x2 =  m->unk68;
+		m->goalPos_x1 = -m->goalDistance_x2;
+		m->goalPos_x2 =  m->goalDistance_x2;
 		break;
 	}
 // 41B404
 	switch (var1C & 0xF) {
 	case 0:
-		m->goalPos_y1 = m->unk6C;
-		m->goalPos_y2 = m->unk70;
+		m->goalPos_y1 = m->goalDistance_y1;
+		m->goalPos_y2 = m->goalDistance_y2;
 		break;
 	case 1:
-		m->goalPos_y1 = -m->unk70;
-		m->goalPos_y2 = -m->unk6C;
+		m->goalPos_y1 = -m->goalDistance_y2;
+		m->goalPos_y2 = -m->goalDistance_y1;
 		break;
 	case 2:
-		m->goalPos_y2 =  m->unk70;
-		m->goalPos_y1 = -m->unk70;
+		m->goalPos_y2 =  m->goalDistance_y2;
+		m->goalPos_y1 = -m->goalDistance_y2;
 		break;
 	}
 // 41B442
@@ -1546,10 +1546,10 @@ l41B2DC:
 	m->goalPos_y2 += _mstAndyLevelPosY;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
-		m->unk6C = m->goalPos_y1 = m->unk70 = m->goalPos_y2 = m->yMstPos;
+		m->goalDistance_y1 = m->goalPos_y1 = m->goalDistance_y2 = m->goalPos_y2 = m->yMstPos;
 	}
 	if ((ptr[2] & kDirectionKeyMaskHorizontal) == 0) {
-		m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
+		m->goalDistance_x1 = m->goalPos_x1 = m->goalDistance_x2 = m->goalPos_x2 = m->xMstPos;
 	}
 }
 
@@ -2501,7 +2501,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 		m->unkF0 = 8;
 		int var28 = 0;
-		AndyShootData *var14 = m->collidePtr;
+		AndyShootData *var14 = m->shootData;
 		if (t->run != &Game::mstTask_monsterWait5 && t->run != &Game::mstTask_monsterWait6 && t->run != &Game::mstTask_monsterWait7 && t->run != &Game::mstTask_monsterWait8 && t->run != &Game::mstTask_monsterWait9 && t->run != &Game::mstTask_monsterWait10) {
 			if (m->monsterInfos[946] & 2) {
 				_mstCurrentMonster1->goalPos_x1 = _mstCurrentMonster1->goalPos_y1 = INT32_MIN;
@@ -3616,13 +3616,13 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 	case 6:
 		return _difficulty;
 	case 7:
-		if (t->monster1 && t->monster1->collidePtr) {
-			return t->monster1->collidePtr->type;
+		if (t->monster1 && t->monster1->shootData) {
+			return t->monster1->shootData->type;
 		}
 		return _andyShootsTable[0].type;
 	case 8:
-		if (t->monster1 && t->monster1->collidePtr) {
-			return t->monster1->collidePtr->directionMask & 0x7F;
+		if (t->monster1 && t->monster1->shootData) {
+			return t->monster1->shootData->directionMask & 0x7F;
 		}
 		return _andyShootsTable[0].directionMask & 0x7F;
 	case 9:
@@ -5086,18 +5086,18 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->m49Unk1 = &m49->data1[m->indexUnk49Unk1];
 	m->goalScreenNum = screen;
 	if (a > b) {
-		m->unk64 = b;
-		m->unk68 = a;
+		m->goalDistance_x1 = b;
+		m->goalDistance_x2 = a;
 	} else {
-		m->unk64 = a;
-		m->unk68 = b;
+		m->goalDistance_x1 = a;
+		m->goalDistance_x2 = b;
 	}
 	if (c > d) {
-		m->unk6C = d;
-		m->unk70 = c;
+		m->goalDistance_y1 = d;
+		m->goalDistance_y2 = c;
 	} else {
-		m->unk6C = c;
-		m->unk70 = d;
+		m->goalDistance_y1 = c;
+		m->goalDistance_y2 = d;
 	}
 	switch (screen + 4) {
 	case 1: {
@@ -5110,18 +5110,18 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			} else {
 				t->run = &Game::mstTask_monsterWait6;
 			}
-			if (m->unk68 <= 0) {
+			if (m->goalDistance_x2 <= 0) {
 				m->goalScreenNum = 255;
 				if (m->xMstPos < _mstAndyLevelPosX) {
-					m->unk64 = -m->unk64;
-					m->unk68 = -m->unk68;
+					m->goalDistance_x1 = -m->goalDistance_x1;
+					m->goalDistance_x2 = -m->goalDistance_x2;
 				}
 			}
-			if ((_al & 2) != 0 && m->unk70 <= 0) {
+			if ((_al & 2) != 0 && m->goalDistance_y2 <= 0) {
 				m->goalScreenNum = 255;
 				if (m->yMstPos < _mstAndyLevelPosY) {
-					m->unk6C = -m->unk70;
-					m->unk70 = -m->unk6C;
+					m->goalDistance_y1 = -m->goalDistance_y2;
+					m->goalDistance_y2 = -m->goalDistance_y1;
 				}
 			}
 			// goto 41DB34
@@ -5132,26 +5132,26 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			if (_al & 8) {
 				b = -b;
 				a = -a;
-				m->unk64 = b;
-				m->unk68 = a;
+				m->goalDistance_x1 = b;
+				m->goalDistance_x2 = a;
 			} else if (_al & 2) {
-				m->unk64 = a;
-				m->unk68 = b;
+				m->goalDistance_x1 = a;
+				m->goalDistance_x2 = b;
 			} else {
-				m->unk64 = 0;
-				m->unk68 = 0;
+				m->goalDistance_x1 = 0;
+				m->goalDistance_x2 = 0;
 			}
 			if (_al & 1) {
 				c = -c;
 				d = -d;
-				m->unk6C = d;
-				m->unk70 = c;
+				m->goalDistance_y1 = d;
+				m->goalDistance_y2 = c;
 			} else if (_al & 4) {
-				m->unk6C = c;
-				m->unk70 = d;
+				m->goalDistance_y1 = c;
+				m->goalDistance_y2 = d;
 			} else {
-				m->unk6C = 0;
-				m->unk70 = 0;
+				m->goalDistance_y1 = 0;
+				m->goalDistance_y2 = 0;
 			}
 		}
 		// fall-through
@@ -5163,10 +5163,10 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		} else {
 			t->run = &Game::mstTask_monsterWait5;
 		}
-		m->unk64 += m->xMstPos;
-		m->unk68 += m->xMstPos;
-		m->unk6C += m->yMstPos;
-		m->unk70 += m->yMstPos;
+		m->goalDistance_x1 += m->xMstPos;
+		m->goalDistance_x2 += m->xMstPos;
+		m->goalDistance_y1 += m->yMstPos;
+		m->goalDistance_y2 += m->yMstPos;
 		break;
 	case 3:
 		if (m->monsterInfos[946] & 4) {
@@ -5185,32 +5185,32 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		} else {
 			t->run = &Game::mstTask_monsterWait5;
 		}
-		m->unk64 += _res->_mstPointOffsets[screen].xOffset;
-		m->unk68 += _res->_mstPointOffsets[screen].xOffset;
-		m->unk6C += _res->_mstPointOffsets[screen].yOffset;
-		m->unk70 += _res->_mstPointOffsets[screen].yOffset;
+		m->goalDistance_x1 += _res->_mstPointOffsets[screen].xOffset;
+		m->goalDistance_x2 += _res->_mstPointOffsets[screen].xOffset;
+		m->goalDistance_y1 += _res->_mstPointOffsets[screen].yOffset;
+		m->goalDistance_y2 += _res->_mstPointOffsets[screen].yOffset;
 		break;
 	}
 // 41BD34
-	m->goalPos_x1 = m->unk64;
-	m->goalPos_x2 = m->unk68;
-	m->goalPos_y1 = m->unk6C;
+	m->goalPos_x1 = m->goalDistance_x1;
+	m->goalPos_x2 = m->goalDistance_x2;
+	m->goalPos_y1 = m->goalDistance_y1;
 	m->flagsA8[2] = 255;
 	m->unkC0 = -1;
 	m->unkBC = -1;
 	m->flagsA7 = 255;
-	m->goalPos_y2 = m->unk70;
+	m->goalPos_y2 = m->goalDistance_y2;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
-		m->unk6C = m->yMstPos;
+		m->goalDistance_y1 = m->yMstPos;
 		m->goalPos_y1 = m->yMstPos;
-		m->unk70 = m->yMstPos;
+		m->goalDistance_y2 = m->yMstPos;
 		m->goalPos_y2 = m->yMstPos;
 	}
 	if ((ptr[2] & kDirectionKeyMaskHorizontal) == 0) {
-		m->unk64 = m->xMstPos;
+		m->goalDistance_x1 = m->xMstPos;
 		m->goalPos_x1 = m->xMstPos;
-		m->unk68 = m->xMstPos;
+		m->goalDistance_x2 = m->xMstPos;
 		m->goalPos_x2 = m->xMstPos;
 	}
 // 41BDA9
@@ -5251,20 +5251,20 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			}
 			int _edx, _edi;
 			if (_dl == 0xFD && m->xMstPos < _mstAndyLevelPosX) {
-				_edx = -m->unk68;
-				_edi = -m->unk64;
+				_edx = -m->goalDistance_x2;
+				_edi = -m->goalDistance_x1;
 			} else {
-				_edx = m->unk64;
-				_edi = m->unk68;
+				_edx = m->goalDistance_x1;
+				_edi = m->goalDistance_x2;
 			}
 			uint8_t _bl = m->monsterInfos[946] & 2;
 			int _eax, _ecx;
 			if (_bl != 0 && _dl == 0xFD && m->yMstPos < _mstAndyLevelPosY) {
-				_eax = -m->unk70;
-				_ecx = -m->unk6C;
+				_eax = -m->goalDistance_y2;
+				_ecx = -m->goalDistance_y1;
 			} else {
-				_eax = m->unk6C;
-				_ecx = m->unk70;
+				_eax = m->goalDistance_y1;
+				_ecx = m->goalDistance_y2;
 			}
 			if (_edx < a || _edi < b || (_bl != 0 && (_eax < _ebp || _ecx > var4))) {
 				if ((m->monsterInfos[946] & 4) != 0) {
@@ -5330,11 +5330,11 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 // 41C355
 		if (t->run == &Game::mstTask_monsterWait6) {
 			if (m->goalScreenNum == 0xFD && m->xMstPos < _mstAndyLevelPosX) {
-				m->goalPos_x1 = _mstAndyLevelPosX - m->unk68;
-				m->goalPos_x2 = _mstAndyLevelPosX - m->unk64;
+				m->goalPos_x1 = _mstAndyLevelPosX - m->goalDistance_x2;
+				m->goalPos_x2 = _mstAndyLevelPosX - m->goalDistance_x1;
 			} else {
-				m->goalPos_x1 = _mstAndyLevelPosX + m->unk64;
-				m->goalPos_x2 = _mstAndyLevelPosX + m->unk68;
+				m->goalPos_x1 = _mstAndyLevelPosX + m->goalDistance_x1;
+				m->goalPos_x2 = _mstAndyLevelPosX + m->goalDistance_x2;
 			}
 		}
 // 41C399
@@ -6669,34 +6669,34 @@ int Game::executeMstOp67Type1(Task *t) {
 	assert((uint32_t)m->indexUnk49Unk1 < m49->count1);
 	m->m49Unk1 = &m49->data1[m->indexUnk49Unk1];
 	int _edi = (m34->right - x) / 4;
-	m->unk64 = x + _edi;
-	m->unk68 = m34->right - _edi;
+	m->goalDistance_x1 = x + _edi;
+	m->goalDistance_x2 = m34->right - _edi;
 	if (_edi != 0) {
 		_edi = _rnd.update() % _edi;
 	}
-	m->unk68 -= _edi;
-	m->unk64 += _edi;
-	m->goalPos_x1 = m->unk64;
-	m->goalPos_x2 = m->unk68;
+	m->goalDistance_x2 -= _edi;
+	m->goalDistance_x1 += _edi;
+	m->goalPos_x1 = m->goalDistance_x1;
+	m->goalPos_x2 = m->goalDistance_x2;
 	const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr1[2] & kDirectionKeyMaskHorizontal) == 0) {
-		m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
+		m->goalDistance_x1 = m->goalPos_x1 = m->goalDistance_x2 = m->goalPos_x2 = m->xMstPos;
 	}
 // 41C62E
 	if (m->monsterInfos[946] & 2) {
 		int _edi = (m34->top - y) / 4;
-		m->unk70 = m34->top - _edi;
-		m->unk6C = y + _edi;
+		m->goalDistance_y2 = m34->top - _edi;
+		m->goalDistance_y1 = y + _edi;
 		if (_edi != 0) {
 			_edi = _rnd.update() % _edi;
 		}
-		m->unk6C += _edi;
-		m->goalPos_y1 = m->unk6C;
-		m->unk70 -= _edi;
-		m->goalPos_y2 = m->unk70;
+		m->goalDistance_y1 += _edi;
+		m->goalPos_y1 = m->goalDistance_y1;
+		m->goalDistance_y2 -= _edi;
+		m->goalPos_y2 = m->goalDistance_y2;
 		const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
-			m->unk6C = m->goalPos_y1 = m->unk70 = m->goalPos_y2 = m->yMstPos;
+			m->goalDistance_y1 = m->goalPos_y1 = m->goalDistance_y2 = m->goalPos_y2 = m->yMstPos;
 		}
 		if (m->monsterInfos[946] & 4) {
 			executeMstUnk8(m);
@@ -6843,20 +6843,20 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 			mstBoundingBoxClear(m, 1);
 		}
 // 41CD22
-		m->unk64 = READ_LE_UINT32(m->monsterInfos + 900);
-		m->unk68 = m->unk64 + READ_LE_UINT32(m->monsterInfos + 896);
-		m->unk6C = READ_LE_UINT32(m->monsterInfos + 900);
-		m->unk70 = m->unk6C + READ_LE_UINT32(m->monsterInfos + 896);
-		m->goalPos_x1 = m->unk64;
-		m->goalPos_x2 = m->unk68;
-		m->goalPos_y1 = m->unk6C;
-		m->goalPos_y2 = m->unk70;
+		m->goalDistance_x1 = READ_LE_UINT32(m->monsterInfos + 900);
+		m->goalDistance_x2 = m->goalDistance_x1 + READ_LE_UINT32(m->monsterInfos + 896);
+		m->goalDistance_y1 = READ_LE_UINT32(m->monsterInfos + 900);
+		m->goalDistance_y2 = m->goalDistance_y1 + READ_LE_UINT32(m->monsterInfos + 896);
+		m->goalPos_x1 = m->goalDistance_x1;
+		m->goalPos_x2 = m->goalDistance_x2;
+		m->goalPos_y1 = m->goalDistance_y1;
+		m->goalPos_y2 = m->goalDistance_y2;
 		const uint8_t *ptr1 = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if ((ptr1[2] & kDirectionKeyMaskVertical) == 0) {
-			m->unk6C = m->goalPos_y1 = m->unk70 = m->goalPos_y2 = m->yMstPos;
+			m->goalDistance_y1 = m->goalPos_y1 = m->goalDistance_y2 = m->goalPos_y2 = m->yMstPos;
 		}
 		if ((ptr1[2] & kDirectionKeyMaskHorizontal) == 0) {
-			m->unk64 = m->goalPos_x1 = m->unk68 = m->goalPos_x2 = m->xMstPos;
+			m->goalDistance_x1 = m->goalPos_x1 = m->goalDistance_x2 = m->goalPos_x2 = m->xMstPos;
 		}
 		if (p[946] & 4) {
 			executeMstUnk4(m);
@@ -6882,20 +6882,20 @@ int Game::executeMstOp67Type2(Task *t, int flag) {
 		int32_t _ebp = READ_LE_UINT32(p + 900);
 		int32_t _ecx = READ_LE_UINT32(p + 896);
 		int r = _ecx / 4;
-		m->unk64 = _ebp + r;
-		m->unk68 = _ecx + _ebp - r;
+		m->goalDistance_x1 = _ebp + r;
+		m->goalDistance_x2 = _ecx + _ebp - r;
 		if (r != 0) {
 			r = _rnd.update() % r;
 		}
-		m->unk64 += r;
-		m->unk68 -= r;
+		m->goalDistance_x1 += r;
+		m->goalDistance_x2 -= r;
 		if (m->goalScreenNum == 0 && m->xMstPos < _mstAndyLevelPosX) {
-			m->goalPos_x1 = _mstAndyLevelPosX - m->unk68;
-			m->goalPos_x2 = _mstAndyLevelPosX - m->unk64;
+			m->goalPos_x1 = _mstAndyLevelPosX - m->goalDistance_x2;
+			m->goalPos_x2 = _mstAndyLevelPosX - m->goalDistance_x1;
 		} else {
 // 41CEA1
-			m->goalPos_x1 = _mstAndyLevelPosX + m->unk64;
-			m->goalPos_x2 = _mstAndyLevelPosX + m->unk68;
+			m->goalPos_x1 = _mstAndyLevelPosX + m->goalDistance_x1;
+			m->goalPos_x2 = _mstAndyLevelPosX + m->goalDistance_x2;
 		}
 // 41CEB4
 		mstSetHorizontalBounds(m);
@@ -7462,11 +7462,11 @@ int Game::mstTask_monsterWait6(Task *t) {
 	MonsterObject1 *m = t->monster1;
 	// horizontal move with goal
 	if (m->goalScreenNum == 0xFD && m->xMstPos < _mstAndyLevelPosX) {
-		m->goalPos_x1 = _mstAndyLevelPosX - m->unk68;
-		m->goalPos_x2 = _mstAndyLevelPosX - m->unk64;
+		m->goalPos_x1 = _mstAndyLevelPosX - m->goalDistance_x2;
+		m->goalPos_x2 = _mstAndyLevelPosX - m->goalDistance_x1;
 	} else {
-		m->goalPos_x1 = _mstAndyLevelPosX + m->unk64;
-		m->goalPos_x2 = _mstAndyLevelPosX + m->unk68;
+		m->goalPos_x1 = _mstAndyLevelPosX + m->goalDistance_x1;
+		m->goalPos_x2 = _mstAndyLevelPosX + m->goalDistance_x2;
 	}
 	mstSetHorizontalBounds(m);
 	if (_xMstPos2 < m->m49Unk1->unk8) {
