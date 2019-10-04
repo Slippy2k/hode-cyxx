@@ -686,13 +686,16 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 		const int size = READ_LE_UINT16(ptr + 10);
 		assert(size == compressedSize - 6);
 
-		if (!isMdecData(ptr + 16)) {
+		const int w = ptr[12] * 16;
+		const int h = ptr[13] * 16;
+
+		if (isMdecData(ptr + 16)) {
+			char filename[64];
+			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d.jpg", spriteGroup, spriteNum);
+			savePSX(filename, ptr + 16, size - 4, w, h);
+		} else {
 			assert(READ_LE_UINT32(ptr + 16) == 0x3020100 && size == 1144);
 		}
-
-		char filename[64];
-		snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d.bss", spriteGroup, spriteNum);
-		fioDumpData(filename, ptr + 16, size - 4);
 
 		return compressedSize + 2;
 	}
@@ -795,8 +798,8 @@ static uint32_t DecodeSetupDatBitmapGroup(const char *name, int count, const uin
 		snprintf(filename, sizeof(filename), name, i);
 
 		if (isMdecData(p)) {
-			strcat(filename, ".bss");
-			fioDumpData(filename, p, size);
+			strcat(filename, ".jpg");
+			savePSX(filename, p + offset, size, w, h);
 			offset += size;
 			continue;
 		}
