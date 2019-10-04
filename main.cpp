@@ -1,5 +1,5 @@
 /*
- * Heart Of Darkness engine rewrite
+ * Heart of Darkness engine rewrite
  * Copyright (C) 2009-2011 Gregory Montoir (cyx@users.sourceforge.net)
  */
 
@@ -22,7 +22,7 @@ static const char *_title = "Heart of Darkness";
 static const char *_configIni = "hode.ini";
 
 static const char *_usage =
-	"HODe - Heart Of Darkness Interpreter\n"
+	"hode - Heart of Darkness Interpreter\n"
 	"Usage: %s [OPTIONS]...\n"
 	"  --datapath=PATH   Path to data files (default '.')\n"
 	"  --level=NUM       Start at level NUM\n"
