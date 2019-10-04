@@ -16,19 +16,6 @@
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
-static const char *_levels[] = {
-	"rock_hod",
-	"fort_hod",
-	"pwr1_hod",
-	"isld_hod",
-	"lava_hod",
-	"pwr2_hod",
-	"lar1_hod",
-	"lar2_hod",
-	"dark_hod",
-	"test_hod"
-};
-
 Game::Game(SystemStub *system, const char *dataPath, uint32_t cheats) {
 
 	_level = 0;
@@ -2078,7 +2065,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	createLevel();
 	_level->_checkpoint = checkpoint;
 	_mix._lock(1);
-	_res->loadLevelData(_levels[_currentLevel]);
+	_res->loadLevelData(_currentLevel);
 	_mix._lock(0);
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();

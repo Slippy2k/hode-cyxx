@@ -12,6 +12,19 @@
 
 static const char *kSetupDat = "SETUP.DAT";
 
+static const char *kLevelNames[] = {
+	"rock",
+	"fort",
+	"pwr1",
+	"isld",
+	"lava",
+	"pwr2",
+	"lar1",
+	"lar2",
+	"dark",
+	"test"
+};
+
 static bool openDat(FileSystem &fs, const char *name, File *f) {
 	FILE *fp = fs.openFile(name);
 	if (fp) {
@@ -158,11 +171,13 @@ void Resource::loadSetupDat() {
 	_menuBuffersOffset = _datHdr.hintsImageOffsetTable[_datHdr.yesNoQuitImage + 2];
 }
 
-void Resource::loadLevelData(const char *levelName) {
+void Resource::loadLevelData(int levelNum) {
 	char filename[32];
 
+	const char *levelName = kLevelNames[levelNum];
+
 	closeDat(_fs, _lvlFile);
-	snprintf(filename, sizeof(filename), "%s.LVL", levelName);
+	snprintf(filename, sizeof(filename), "%s_HOD.LVL", levelName);
 	if (openDat(_fs, filename, _lvlFile)) {
 		loadLvlData(_lvlFile, filename);
 	} else {
@@ -170,7 +185,7 @@ void Resource::loadLevelData(const char *levelName) {
 	}
 
 	closeDat(_fs, _mstFile);
-	snprintf(filename, sizeof(filename), "%s.MST", levelName);
+	snprintf(filename, sizeof(filename), "%s_HOD.MST", levelName);
 	if (openDat(_fs, filename, _mstFile)) {
 		loadMstData(_mstFile, filename);
 	} else {
@@ -179,7 +194,7 @@ void Resource::loadLevelData(const char *levelName) {
 	}
 
 	closeDat(_fs, _sssFile);
-	snprintf(filename, sizeof(filename), "%s.SSS", levelName);
+	snprintf(filename, sizeof(filename), "%s_HOD.SSS", levelName);
 	if (openDat(_fs, filename, _sssFile)) {
 		loadSssData(_sssFile, filename);
 	} else {

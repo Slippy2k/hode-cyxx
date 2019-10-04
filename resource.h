@@ -576,7 +576,7 @@ struct Resource {
 
 	bool sectorAlignedGameData();
 
-	void loadLevelData(const char *levelName);
+	void loadLevelData(int levelNum);
 	void unloadLevelData();
 
 	void loadSetupDat();
