@@ -31,9 +31,15 @@ static const struct {
 	{ "rock_hod.sss", kSss, 0x69682a22, SECTOR_FILE }, // demo v1.2
 	{ "rock_hod.sss", kSss, 0xc50c13bb, SECTOR_FILE }, // demo v1.4
 	{ "fort_hod.lvl", kLvl, 0x3e6aebec, SECTOR_FILE },
-	{ "fort_hod.lvl", kLvl, 0xcaf0e23c, SECTOR_FILE | PSX }, // SLUS_006.96
+	{ "fort_hod.lvl", kLvl, 0xcaf0e23c, SECTOR_FILE | PSX },
 	{ "fort_hod.sss", kSss, 0x6ad13bbb, SECTOR_FILE },
-	{ "pwr1_hod.lvl", kLvl, 0x8add9bce, SECTOR_FILE | PSX }, // SLUS_006.96
+	{ "pwr1_hod.lvl", kLvl, 0x8add9bce, SECTOR_FILE | PSX },
+	{ "isld_hod.lvl", kLvl, 0xcfe30753, SECTOR_FILE | PSX },
+	{ "lava_hod.lvl", kLvl, 0x4e494f1c, SECTOR_FILE | PSX },
+	{ "pwr2_hod.lvl", kLvl, 0xcd8652be, SECTOR_FILE | PSX },
+	{ "lar1_hod.lvl", kLvl, 0x8968efb8, SECTOR_FILE | PSX },
+	{ "lar2_hod.lvl", kLvl, 0x449c8dd4, SECTOR_FILE | PSX },
+	{ "dark_hod.lvl", kLvl, 0x79c01b55, SECTOR_FILE | PSX },
 	{ 0, -1, 0, 0 }
 };
 
@@ -81,6 +87,8 @@ static uint8_t _bitmapBuffer[256 * 256]; // PSX compressed data can be larger th
 static uint8_t _bitmapPalette[256 * 3];
 static uint8_t _spritePalette[256 * 3];
 static uint8_t _controlsPalette[256 * 3];
+
+static void DecodeSss(File *fp, uint32_t baseOffset = 0);
 
 static bool isMdecData(const uint8_t *p) {
 	return READ_LE_UINT16(p + 2) == 0x3800 && (READ_LE_UINT16(p + 6) == 2 || READ_LE_UINT16(p + 6) == 3);
@@ -362,6 +370,14 @@ static void DecodeLvl(File *fp, int levelNum) {
 	const uint32_t masksOffset = fp->readUint32();
 	const uint32_t masksSize = fp->readUint32();
 
+	// .sss data is embedded in .lvl on PSX
+	const uint32_t sssOffset = masksOffset + fioAlignSizeTo2048(masksSize);
+	if (_isPsx) {
+		assert((sssOffset & 0x7FF) == 0);
+		fp->seek(sssOffset, SEEK_SET);
+		DecodeSss(fp, sssOffset);
+	}
+
 	static const uint32_t kSpritesOffset = 0x2988;
 	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
@@ -378,8 +394,7 @@ static void DecodeLvl(File *fp, int levelNum) {
 			continue;
 		}
 		if (_isPsx) {
-			const uint32_t pos = offset + masksOffset + fioAlignSizeTo2048(masksSize);
-			fp->seek(pos, SEEK_SET);
+			fp->seek(offset + sssOffset, SEEK_SET);
 			fp->readUint32();
 		} else {
 			fp->seek(offset, SEEK_SET);
@@ -474,7 +489,7 @@ static void DecodeSssAdpcm(const uint8_t *src, int size, int16_t *data) {
 	}
 }
 
-static void DecodeSss(File *fp, uint32_t baseOffset = 0) {
+static void DecodeSss(File *fp, uint32_t baseOffset) {
 
 	const int version = fp->readUint32();
 	assert(version == 6 || version == 10 || version == 12);
@@ -600,6 +615,8 @@ static void DecodeSss(File *fp, uint32_t baseOffset = 0) {
 			char filename[64];
 
 			if (stride == 512) { // PSX
+
+				assert(_isPsx);
 
 				uint8_t *samples = (uint8_t *)malloc(size);
 				if (samples) {
