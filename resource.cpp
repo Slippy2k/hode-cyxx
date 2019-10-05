@@ -10,9 +10,9 @@
 #include "resource.h"
 #include "util.h"
 
-static const char *kSetupDat = "SETUP.DAT";
+static const char *_setupDat = "SETUP.DAT";
 
-static const char *kLevelNames[] = {
+static const char *_prefixes[] = {
 	"rock",
 	"fort",
 	"pwr1",
@@ -111,9 +111,9 @@ Resource::~Resource() {
 }
 
 bool Resource::sectorAlignedGameData() {
-	FILE *fp = _fs.openFile(kSetupDat);
+	FILE *fp = _fs.openFile(_setupDat);
 	if (!fp) {
-		error("Unable to open '%s'", kSetupDat);
+		error("Unable to open '%s'", _setupDat);
 		return false;
 	}
 	bool ret = false;
@@ -126,7 +126,7 @@ bool Resource::sectorAlignedGameData() {
 }
 
 void Resource::loadSetupDat() {
-	openDat(_fs, kSetupDat, _datFile);
+	openDat(_fs, _setupDat, _datFile);
 
 	_datHdr.version = _datFile->readUint32();
 	if (_datHdr.version != 10 && _datHdr.version != 11) {
@@ -214,9 +214,10 @@ void Resource::loadDatMenuBuffers() {
 	if (_menuBuffer1) {
 		_datFile->read(_menuBuffer1, _datHdr.bufferSize1);
 	}
-
-	baseOffset += fioAlignSizeTo2048(_datHdr.bufferSize1); // align to the next sector
-	_datFile->seek(baseOffset, SEEK_SET);
+	if (_datHdr.version == 11) {
+		baseOffset += fioAlignSizeTo2048(_datHdr.bufferSize1); // align to the next sector
+		_datFile->seek(baseOffset, SEEK_SET);
+	}
 	_menuBuffer0 = (uint8_t *)malloc(_datHdr.bufferSize0);
 	if (_menuBuffer0) {
 		_datFile->read(_menuBuffer0, _datHdr.bufferSize0);
@@ -224,9 +225,9 @@ void Resource::loadDatMenuBuffers() {
 }
 
 void Resource::loadLevelData(int levelNum) {
-	char filename[32];
 
-	const char *levelName = kLevelNames[levelNum];
+	char filename[32];
+	const char *levelName = _prefixes[levelNum];
 
 	closeDat(_fs, _lvlFile);
 	snprintf(filename, sizeof(filename), "%s_HOD.LVL", levelName);
@@ -403,12 +404,14 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 }
 
 void Resource::loadLvlSpriteData(int num) {
-	_lvlFile->seekAlign(0x2988 + num * 16);
-	const uint32_t offs = _lvlFile->readUint32();
+	static const uint32_t baseOffset = 0x2988;
+
+	_lvlFile->seekAlign(baseOffset + num * 16);
+	const uint32_t offset = _lvlFile->readUint32();
 	const uint32_t size = _lvlFile->readUint32();
 	const uint32_t readSize = _lvlFile->readUint32();
 	uint8_t *ptr = (uint8_t *)calloc(size, 1);
-	_lvlFile->seek(offs, SEEK_SET);
+	_lvlFile->seek(offset, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
 	LvlObjectData *dat = &_resLevelData0x2988Table[num];
@@ -436,23 +439,23 @@ const uint8_t *Resource::getLvlScreenPosDataPtr(int num) const {
 
 void Resource::loadLevelData0x470C() {
 	_lvlFile->seekAlign(0x4708);
-	const uint32_t offs = _lvlFile->readUint32();
+	const uint32_t offset = _lvlFile->readUint32();
 	const uint32_t size = _lvlFile->readUint32();
 	_resLevelData0x470CTable = (uint8_t *)malloc(size);
-	_lvlFile->seek(offs, SEEK_SET);
+	_lvlFile->seek(offset, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
 	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + (kMaxScreens * 4) * (2 * sizeof(uint32_t));
 }
 
-static const uint32_t kLvlHdrTag = 0x484F4400; // 'HOD\x00'
+static const uint32_t _lvlTag = 0x484F4400; // 'HOD\x00'
 
 void Resource::loadLvlData(File *fp, const char *name) {
 
 	assert(fp == _lvlFile);
 
 	const uint32_t tag = _lvlFile->readUint32();
-	if (tag != kLvlHdrTag) {
+	if (tag != _lvlTag) {
 		error("Unhandled .lvl tag 0x%x", tag);
 		closeDat(_fs, _lvlFile);
 		return;
@@ -501,7 +504,7 @@ void Resource::unloadLvlData() {
 }
 
 static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, uint8_t *offsetsPtr, LvlBackgroundData *dat) {
-	const uint8_t *src_ = src;
+	const uint8_t *start = src;
 
 	dat->backgroundCount = *src++;
 	dat->currentBackgroundId = *src++;
@@ -559,7 +562,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->dataUnk6Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
-	assert((src - src_) == 160);
+	assert((src - start) == 160);
 	return offsetsSize;
 }
 
@@ -569,11 +572,11 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	static const uint32_t baseOffset = 0x2B88;
 
 	_lvlFile->seekAlign(baseOffset + num * 16);
-	const uint32_t offs = _lvlFile->readUint32();
+	const uint32_t offset = _lvlFile->readUint32();
 	const uint32_t size = _lvlFile->readUint32();
 	const uint32_t readSize = _lvlFile->readUint32();
 	uint8_t *ptr = (uint8_t *)calloc(size, 1);
-	_lvlFile->seek(offs, SEEK_SET);
+	_lvlFile->seek(offset, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
 	_lvlFile->seekAlign(baseOffset + kMaxScreens * 16 + num * 160);
@@ -638,6 +641,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		const int count = MIN(_sssHdr.pcmCount, _sssHdr.preloadPcmCount);
 		for (int i = 0; i < count; ++i) {
 			free(_sssPcmTable[i].ptr);
+			_sssPcmTable[i].ptr = 0;
 		}
 		unloadSssData();
 		_sssHdr.bufferSize = 0;
@@ -785,7 +789,6 @@ void Resource::loadSssData(File *fp, const char *name) {
 			const int size = _sssPreloadInfosData[i].count * kSizeOfUnk4Data_V11;
 			fp->seek(size, SEEK_CUR);
 			bytesRead += size;
-// 429A25
 		}
 	} else if (_sssHdr.version == 6) {
 // 42E8DF
@@ -1272,7 +1275,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstUnk47.allocate(_mstHdr.unk0x34);
 	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
 		fp->readUint32();
-		_mstUnk47[i].count  = fp->readUint32();
+		_mstUnk47[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
 	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
@@ -1576,6 +1579,12 @@ void Resource::unloadMstData() {
 		free(_mstUnk43[i].indexUnk48);
 		free(_mstUnk43[i].data2);
 	}
+
+	free(_mstMonsterInfos);
+	_mstMonsterInfos = 0;
+
+	free(_mstCodeData);
+	_mstCodeData = 0;
 }
 
 const MstScreenArea *Resource::findMstCodeForPos(int num, int xPos, int yPos) const {
