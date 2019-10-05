@@ -185,6 +185,43 @@ void Resource::loadSetupDat() {
 	_menuBuffersOffset = _datHdr.hintsImageOffsetTable[_datHdr.yesNoQuitImage + 2];
 }
 
+
+void Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
+	const int offset = _datHdr.hintsImageOffsetTable[num];
+	const int size = _datHdr.hintsImageSizeTable[num];
+	assert(size == 256 * 192);
+	_datFile->seek(offset, SEEK_SET);
+	_datFile->read(dst, size);
+	_datFile->flush();
+	_datFile->read(pal, 768);
+}
+
+void Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
+	if (_loadingImageBuffer) {
+		const uint32_t bufferSize = READ_LE_UINT32(_loadingImageBuffer);
+		const int size = decodeLZW(_loadingImageBuffer + 8, dst);
+		assert(size == 256 * 192);
+		// palette follows compressed bitmap (and uses 8 bits per color)
+		memcpy(pal, _loadingImageBuffer + 8 + bufferSize, 256 * 3);
+	}
+}
+
+void Resource::loadDatMenuBuffers() {
+	uint32_t baseOffset = _menuBuffersOffset;
+	_datFile->seek(baseOffset, SEEK_SET);
+	_menuBuffer1 = (uint8_t *)malloc(_datHdr.bufferSize1);
+	if (_menuBuffer1) {
+		_datFile->read(_menuBuffer1, _datHdr.bufferSize1);
+	}
+
+	baseOffset += fioAlignSizeTo2048(_datHdr.bufferSize1); // align to the next sector
+	_datFile->seek(baseOffset, SEEK_SET);
+	_menuBuffer0 = (uint8_t *)malloc(_datHdr.bufferSize0);
+	if (_menuBuffer0) {
+		_datFile->read(_menuBuffer0, _datHdr.bufferSize0);
+	}
+}
+
 void Resource::loadLevelData(int levelNum) {
 	char filename[32];
 
@@ -570,42 +607,6 @@ void Resource::decLvlSpriteDataRefCounter(LvlObject *ptr) {
 	LvlObjectData *dat = _resLevelData0x2988PtrTable[ptr->spriteNum];
 	if (dat) {
 		--dat->refCount;
-	}
-}
-
-void Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
-	const int offset = _datHdr.hintsImageOffsetTable[num];
-	const int size = _datHdr.hintsImageSizeTable[num];
-	assert(size == 256 * 192);
-	_datFile->seek(offset, SEEK_SET);
-	_datFile->read(dst, size);
-	_datFile->flush();
-	_datFile->read(pal, 768);
-}
-
-void Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
-	if (_loadingImageBuffer) {
-		const uint32_t bufferSize = READ_LE_UINT32(_loadingImageBuffer);
-		const int size = decodeLZW(_loadingImageBuffer + 8, dst);
-		assert(size == 256 * 192);
-		// palette follows compressed bitmap (and uses 8 bits per color)
-		memcpy(pal, _loadingImageBuffer + 8 + bufferSize, 256 * 3);
-	}
-}
-
-void Resource::loadDatMenuBuffers() {
-	uint32_t baseOffset = _menuBuffersOffset;
-	_datFile->seek(baseOffset, SEEK_SET);
-	_menuBuffer1 = (uint8_t *)malloc(_datHdr.bufferSize1);
-	if (_menuBuffer1) {
-		_datFile->read(_menuBuffer1, _datHdr.bufferSize1);
-	}
-
-	baseOffset += fioAlignSizeTo2048(_datHdr.bufferSize1); // align to the next sector
-	_datFile->seek(baseOffset, SEEK_SET);
-	_menuBuffer0 = (uint8_t *)malloc(_datHdr.bufferSize0);
-	if (_menuBuffer0) {
-		_datFile->read(_menuBuffer0, _datHdr.bufferSize0);
 	}
 }
 

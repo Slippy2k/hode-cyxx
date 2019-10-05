@@ -605,34 +605,29 @@ struct Resource {
 
 	bool sectorAlignedGameData();
 
+	void loadSetupDat();
+	void loadDatHintImage(int num, uint8_t *dst, uint8_t *pal);
+	void loadDatLoadingImage(uint8_t *dst, uint8_t *pal);
+	void loadDatMenuBuffers();
+
 	void loadLevelData(int levelNum);
 	void unloadLevelData();
 
-	void loadSetupDat();
 	void loadLvlScreenGridData(int num);
 	void loadLvlScreenVectorData(int num);
 	void loadLvlScreenStateData(int num);
 	void loadLvlScreenObjectData(int num);
 	void loadLvlData(File *fp, const char *name);
 	void loadLvlSpriteData(int num);
-
 	const uint8_t *getLvlScreenMaskDataPtr(int num) const;
 	const uint8_t *getLvlScreenPosDataPtr(int num) const;
 	void loadLevelData0x470C();
-
 	void loadLvlScreenBackgroundData(int num);
 	void unloadLvlScreenBackgroundData(int num);
-
 	bool isLvlSpriteDataLoaded(int num) const;
 	bool isLvlBackgroundDataLoaded(int num) const;
-
 	void incLvlSpriteDataRefCounter(LvlObject *ptr);
 	void decLvlSpriteDataRefCounter(LvlObject *ptr);
-
-	void loadDatHintImage(int num, uint8_t *dst, uint8_t *pal);
-	void loadDatLoadingImage(uint8_t *dst, uint8_t *pal);
-	void loadDatMenuBuffers();
-
 	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame) const;
 	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const;
 
@@ -641,12 +636,10 @@ struct Resource {
 	void checkSssCode(const uint8_t *buf, int size) const;
 	void loadSssPcm(File *fp, int num);
 	uint32_t getSssPcmSize(const SssPcm *pcm) const;
-
 	void clearSssGroup3();
 	void resetSssFilters();
 
 	void loadMstData(File *fp, const char *name);
-
 	const MstScreenArea *findMstCodeForPos(int num, int xPos, int yPos) const;
 	void flagMstCodeForPos(int num, uint8_t value);
 };
