@@ -106,8 +106,6 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 			_system->setScaler(value, 0);
 		} else if (strcmp(name, "gamma") == 0) {
 			_system->setGamma(atof(value));
-		} else if (strcmp(name, "grayscale") == 0) {
-			_system->setPaletteScale(configBool(value));
 		} else if (strcmp(name, "fullscreen") == 0) {
 			_fullscreen = configBool(value);
 		} else if (strcmp(name, "widescreen") == 0) {

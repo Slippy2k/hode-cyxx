@@ -55,7 +55,6 @@ struct SystemStub_SDL : SystemStub {
 	KeyMapping _keyMappings[kKeyMappingsSize];
 	int _keyMappingsCount;
 	AudioCallback _audioCb;
-	bool _paletteGrayScale;
 	uint8_t _gammaLut[256];
 	SDL_GameController *_controller;
 	SDL_Joystick *_joystick;
@@ -66,7 +65,6 @@ struct SystemStub_SDL : SystemStub {
 	virtual void destroy();
 	virtual void setScaler(const char *name, int multiplier);
 	virtual void setGamma(float gamma);
-	virtual void setPaletteScale(bool gray);
 	virtual void setPalette(const uint8_t *pal, int n, int depth);
 	virtual void copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch);
 	virtual void fillRect(int x, int y, int w, int h, uint8_t color);
@@ -97,7 +95,6 @@ SystemStub *SystemStub_SDL_create() {
 SystemStub_SDL::SystemStub_SDL() :
 	_offscreenLut(0), _offscreenRgb(0),
 	_window(0), _renderer(0), _texture(0), _fmt(0), _widescreenTexture(0),
-	_paletteGrayScale(false),
 	_controller(0), _joystick(0) {
 	for (int i = 0; i < 256; ++i) {
 		_gammaLut[i] = i;
@@ -315,10 +312,6 @@ void SystemStub_SDL::setGamma(float gamma) {
 	}
 }
 
-void SystemStub_SDL::setPaletteScale(bool gray) {
-	_paletteGrayScale = gray;
-}
-
 void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 	assert(n <= 256);
 	assert(depth <= 8);
@@ -331,10 +324,6 @@ void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 			r = (r << shift) | (r >> depth);
 			g = (g << shift) | (g >> depth);
 			b = (b << shift) | (b >> depth);
-		}
-		if (_paletteGrayScale) {
-			const int gray = (r * 30 + g * 59 + b * 11) / 100;
-			r = g = b = gray;
 		}
 		r = _gammaLut[r];
 		g = _gammaLut[g];
