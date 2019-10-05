@@ -150,7 +150,7 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
 		}
 		while ((this->*(t->run))(t) == 0);
 	}
-	_m48Num = m48 - _res->_mstUnk48;
+	_m48Num = m48 - &_res->_mstUnk48[0];
 	_mstChasingMonstersCount = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;

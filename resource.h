@@ -505,7 +505,7 @@ struct ResStruct {
 		ptr = (T *)malloc(size * sizeof(T));
 	}
 
-	T operator[](int i) const {
+	const T& operator[](int i) const {
 		assert((unsigned int)i < count);
 		return ptr[i];
 	}
@@ -566,40 +566,40 @@ struct Resource {
 	uint32_t *_sssGroup3[3];
 	uint8_t *_sssCodeData;
 
-	MstPointOffset *_mstPointOffsets;
-	MstWalkBox *_mstWalkBoxData;
-	MstUnk35 *_mstUnk35;
-	MstUnk36 *_mstUnk36;
+	ResStruct<MstPointOffset> _mstPointOffsets;
+	ResStruct<MstWalkBox> _mstWalkBoxData;
+	ResStruct<MstUnk35> _mstUnk35;
+	ResStruct<MstUnk36> _mstUnk36;
 	uint32_t _mstTickDelay;
 	uint32_t _mstTickCodeData;
-	uint32_t *_mstLevelCheckpointCodeData;
-	MstScreenArea *_mstScreenAreaData;
-	uint32_t *_mstUnk39; // index to _mstScreenAreaData
-	uint32_t *_mstUnk40; // index to _mstScreenAreaData
-	uint32_t *_mstUnk41;
-	MstUnk42 *_mstUnk42;
-	MstUnk43 *_mstUnk43;
-	MstWalkPath *_mstWalkPathData;
-	MstInfoMonster2 *_mstInfoMonster2Data;
-	MstUnk46 *_mstUnk46;
-	MstUnk47 *_mstUnk47;
-	MstUnk48 *_mstUnk48;
+	ResStruct<uint32_t> _mstLevelCheckpointCodeData;
+	ResStruct<MstScreenArea> _mstScreenAreaData;
+	ResStruct<uint32_t> _mstUnk39; // index to _mstScreenAreaData
+	ResStruct<uint32_t> _mstUnk40; // index to _mstScreenAreaData
+	ResStruct<uint32_t> _mstUnk41;
+	ResStruct<MstUnk42> _mstUnk42;
+	ResStruct<MstUnk43> _mstUnk43;
+	ResStruct<MstWalkPath> _mstWalkPathData;
+	ResStruct<MstInfoMonster2> _mstInfoMonster2Data;
+	ResStruct<MstUnk46> _mstUnk46;
+	ResStruct<MstUnk47> _mstUnk47;
+	ResStruct<MstUnk48> _mstUnk48;
 	uint8_t *_mstMonsterInfos; // sizeof == 948
 	MstUnk49 *_mstUnk49;
 	MstUnk50 *_mstUnk50;
 	MstUnk51 *_mstUnk51;
 	MstUnk52 *_mstUnk52;
-	MstOp223Data *_mstOp223Data;
-	MstOp227Data *_mstOp227Data;
-	MstOp234Data *_mstOp234Data;
-	MstOp2Data *_mstOp2Data;
-	MstOp197Data *_mstOp197Data;
-	MstOp211Data *_mstOp211Data;
-	MstOp240Data *_mstOp240Data;
+	ResStruct<MstOp223Data> _mstOp223Data;
+	ResStruct<MstOp227Data> _mstOp227Data;
+	ResStruct<MstOp234Data> _mstOp234Data;
+	ResStruct<MstOp2Data> _mstOp2Data;
+	ResStruct<MstOp197Data> _mstOp197Data;
+	ResStruct<MstOp211Data> _mstOp211Data;
+	ResStruct<MstOp240Data> _mstOp240Data;
 	uint32_t *_mstUnk60; // index to _mstCodeData
-	MstOp204Data *_mstOp204Data;
+	ResStruct<MstOp204Data> _mstOp204Data;
 	uint8_t *_mstCodeData;
-	MstOp226Data *_mstOp226Data;
+	ResStruct<MstOp226Data> _mstOp226Data;
 
 	Resource(const char *dataPath);
 	~Resource();
@@ -641,6 +641,7 @@ struct Resource {
 	void resetSssFilters();
 
 	void loadMstData(File *fp, const char *name);
+	void unloadMstData();
 	const MstScreenArea *findMstCodeForPos(int num, int xPos, int yPos) const;
 	void flagMstCodeForPos(int num, uint8_t value);
 };

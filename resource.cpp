@@ -1055,14 +1055,14 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	int bytesRead = 0;
 
-	_mstPointOffsets = (MstPointOffset *)malloc(_mstHdr.pointsCount * sizeof(MstPointOffset));
+	_mstPointOffsets.allocate(_mstHdr.pointsCount);
 	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
 		_mstPointOffsets[i].xOffset = fp->readUint32();
 		_mstPointOffsets[i].yOffset = fp->readUint32();
 		bytesRead += 8;
 	}
 
-	_mstWalkBoxData = (MstWalkBox *)malloc(_mstHdr.walkBoxDataCount * sizeof(MstWalkBox));
+	_mstWalkBoxData.allocate(_mstHdr.walkBoxDataCount);
 	for (unsigned int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
 		_mstWalkBoxData[i].right  = fp->readUint32();
 		_mstWalkBoxData[i].left   = fp->readUint32();
@@ -1075,7 +1075,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	_mstUnk35 = (MstUnk35 *)malloc(_mstHdr.unk0x0C * sizeof(MstUnk35));
+	_mstUnk35.allocate(_mstHdr.unk0x0C);
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
 		fp->readUint32();
 		_mstUnk35[i].count1 = fp->readUint32();
@@ -1093,27 +1093,25 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += readBytesAlign(fp, _mstUnk35[i].data2, _mstUnk35[i].count2);
 	}
 
-	_mstUnk36 = (MstUnk36 *)malloc(_mstHdr.unk0x10 * sizeof(MstUnk36));
-	if (_mstUnk36) {
-		for (int i = 0; i < _mstHdr.unk0x10; ++i) {
-			_mstUnk36[i].indexUnk49 = fp->readUint32();
-			_mstUnk36[i].unk4 = fp->readUint32();
-			_mstUnk36[i].unk8 = fp->readUint32();
-			bytesRead += 12;
-		}
+	_mstUnk36.allocate(_mstHdr.unk0x10);
+	for (int i = 0; i < _mstHdr.unk0x10; ++i) {
+		_mstUnk36[i].indexUnk49 = fp->readUint32();
+		_mstUnk36[i].unk4 = fp->readUint32();
+		_mstUnk36[i].unk8 = fp->readUint32();
+		bytesRead += 12;
 	}
 
 	_mstTickDelay    = fp->readUint32();
 	_mstTickCodeData = fp->readUint32();
 	bytesRead += 8;
 
-	_mstLevelCheckpointCodeData = (uint32_t *)malloc(_mstHdr.levelCheckpointCodeDataCount * sizeof(uint32_t));
+	_mstLevelCheckpointCodeData.allocate(_mstHdr.levelCheckpointCodeDataCount);
 	for (int i = 0; i < _mstHdr.levelCheckpointCodeDataCount; ++i) {
 		_mstLevelCheckpointCodeData[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
-	_mstScreenAreaData = (MstScreenArea *)malloc(_mstHdr.screenAreaDataCount * sizeof(MstScreenArea)); // _mstUnk38
+	_mstScreenAreaData.allocate(_mstHdr.screenAreaDataCount);
 	for (int i = 0; i < _mstHdr.screenAreaDataCount; ++i) {
 		MstScreenArea *msac = &_mstScreenAreaData[i];
 		msac->x1 = fp->readUint32();
@@ -1130,25 +1128,25 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 36;
 	}
 
-	_mstUnk39 = (uint32_t *)malloc(_mstHdr.unk0x1C * sizeof(uint32_t));
+	_mstUnk39.allocate(_mstHdr.unk0x1C);
 	for (int i = 0; i < _mstHdr.unk0x1C; ++i) {
 		_mstUnk39[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
-	_mstUnk40 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
+	_mstUnk40.allocate(_mstHdr.pointsCount);
 	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
 		_mstUnk40[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
-	_mstUnk41 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
+	_mstUnk41.allocate(_mstHdr.pointsCount);
 	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
 		_mstUnk41[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
-	_mstUnk42 = (MstUnk42 *)malloc(_mstHdr.unk0x20 * sizeof(MstUnk42));
+	_mstUnk42.allocate(_mstHdr.unk0x20);
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		fp->readUint32();
 		_mstUnk42[i].count1 = fp->readUint32();
@@ -1166,7 +1164,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += readBytesAlign(fp, _mstUnk42[i].data2, _mstUnk42[i].count2);
 	}
 
-	_mstUnk43 = (MstUnk43 *)malloc(_mstHdr.unk0x24 * sizeof(MstUnk43));
+	_mstUnk43.allocate(_mstHdr.unk0x24);
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
 		fp->readUint32();
 		_mstUnk43[i].count1 = fp->readUint32();
@@ -1184,7 +1182,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += readBytesAlign(fp, _mstUnk43[i].data2, _mstUnk43[i].count2);
 	}
 
-	_mstWalkPathData = (MstWalkPath *)malloc(_mstHdr.walkPathDataCount * sizeof(MstWalkPath));
+	_mstWalkPathData.allocate(_mstHdr.walkPathDataCount);
 	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
 		fp->readUint32();
 		fp->readUint32();
@@ -1234,7 +1232,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstInfoMonster2Data = (MstInfoMonster2 *)malloc(_mstHdr.infoMonster2Count * sizeof(MstInfoMonster2));
+	_mstInfoMonster2Data.allocate(_mstHdr.infoMonster2Count);
 	for (int i = 0; i < _mstHdr.infoMonster2Count; ++i) {
 		_mstInfoMonster2Data[i].type = fp->readByte();
 		_mstInfoMonster2Data[i].shootMask = fp->readByte();
@@ -1244,7 +1242,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 12;
 	}
 
-	_mstUnk46 = (MstUnk46 *)malloc(_mstHdr.unk0x30 * sizeof(MstUnk46));
+	_mstUnk46.allocate(_mstHdr.unk0x30);
 	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
 		fp->readUint32();
 		_mstUnk46[i].count = fp->readUint32();
@@ -1271,7 +1269,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstUnk47 = (MstUnk47 *)malloc(_mstHdr.unk0x34 * sizeof(MstUnk47));
+	_mstUnk47.allocate(_mstHdr.unk0x34);
 	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
 		fp->readUint32();
 		_mstUnk47[i].count  = fp->readUint32();
@@ -1283,7 +1281,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += _mstUnk47[i].count * 20;
 	}
 
-	_mstUnk48 = (MstUnk48 *)malloc(_mstHdr.unk0x38 * sizeof(MstUnk48));
+	_mstUnk48.allocate(_mstHdr.unk0x38);
 	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
 		MstUnk48 *m = &_mstUnk48[i];
 		m->unk0 = fp->readUint16();
@@ -1442,7 +1440,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 4;
 	}
 
-	_mstOp223Data = (MstOp223Data *)malloc(_mstHdr.op223DataCount * sizeof(MstOp223Data));
+	_mstOp223Data.allocate(_mstHdr.op223DataCount);
 	for (int i = 0; i < _mstHdr.op223DataCount; ++i) {
 		_mstOp223Data[i].indexVar1 = fp->readUint16();
 		_mstOp223Data[i].indexVar2 = fp->readUint16();
@@ -1458,7 +1456,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	_mstOp226Data = (MstOp226Data *)malloc(_mstHdr.op226DataCount * sizeof(MstOp226Data));
+	_mstOp226Data.allocate(_mstHdr.op226DataCount);
 	for (int i = 0; i < _mstHdr.op226DataCount; ++i) {
 		_mstOp226Data[i].unk0 = fp->readByte();
 		_mstOp226Data[i].unk1 = fp->readByte();
@@ -1471,7 +1469,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstOp227Data = (MstOp227Data *)malloc(_mstHdr.op227DataCount * sizeof(MstOp227Data));
+	_mstOp227Data.allocate(_mstHdr.op227DataCount);
 	for (int i = 0; i < _mstHdr.op227DataCount; ++i) {
 		_mstOp227Data[i].indexVar1 = fp->readUint16();
 		_mstOp227Data[i].indexVar2 = fp->readUint16();
@@ -1481,7 +1479,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstOp234Data = (MstOp234Data *)malloc(_mstHdr.op234DataCount * sizeof(MstOp234Data));
+	_mstOp234Data.allocate(_mstHdr.op234DataCount);
 	for (int i = 0; i < _mstHdr.op234DataCount; ++i) {
 		_mstOp234Data[i].indexVar1 = fp->readUint16();
 		_mstOp234Data[i].indexVar2 = fp->readUint16();
@@ -1491,7 +1489,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstOp2Data = (MstOp2Data *)malloc(_mstHdr.op2DataCount * sizeof(MstOp2Data));
+	_mstOp2Data.allocate(_mstHdr.op2DataCount);
 	for (int i = 0; i < _mstHdr.op2DataCount; ++i) {
 		_mstOp2Data[i].indexVar1 = fp->readUint32();
 		_mstOp2Data[i].indexVar2 = fp->readUint32();
@@ -1502,7 +1500,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 12;
 	}
 
-	_mstOp197Data = (MstOp197Data *)malloc(_mstHdr.op197DataCount * sizeof(MstOp197Data));
+	_mstOp197Data.allocate(_mstHdr.op197DataCount);
 	for (int i = 0; i < _mstHdr.op197DataCount; ++i) {
 		_mstOp197Data[i].unk0 = fp->readUint16();
 		_mstOp197Data[i].unk2 = fp->readUint16();
@@ -1515,7 +1513,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 16;
 	}
 
-	_mstOp211Data = (MstOp211Data *)malloc(_mstHdr.op211DataCount * sizeof(MstOp211Data));
+	_mstOp211Data.allocate(_mstHdr.op211DataCount);
 	for (int i = 0; i < _mstHdr.op211DataCount; ++i) {
 		_mstOp211Data[i].indexVar1 = fp->readUint16();
 		_mstOp211Data[i].indexVar2 = fp->readUint16();
@@ -1531,7 +1529,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 16;
 	}
 
-	_mstOp240Data = (MstOp240Data *)malloc(_mstHdr.op240DataCount * sizeof(MstOp240Data));
+	_mstOp240Data.allocate(_mstHdr.op240DataCount);
 	for (int i = 0; i < _mstHdr.op240DataCount; ++i) {
 		_mstOp240Data[i].flags    = fp->readUint32();
 		_mstOp240Data[i].codeData = fp->readUint32();
@@ -1547,7 +1545,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	fp->seek(_mstHdr.unk0x74 * 4, SEEK_CUR); // _mstUnk61
 	bytesRead += _mstHdr.unk0x74 * 4;
 
-	_mstOp204Data = (MstOp204Data *)malloc(_mstHdr.op204DataCount * sizeof(MstOp204Data));
+	_mstOp204Data.allocate(_mstHdr.op204DataCount);
 	for (int i = 0; i < _mstHdr.op204DataCount; ++i) {
 		_mstOp204Data[i].arg0 = fp->readUint32();
 		_mstOp204Data[i].arg1 = fp->readUint32();
@@ -1562,6 +1560,21 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	if (bytesRead != _mstHdr.dataSize) {
 		warning("Unexpected .mst bytesRead %d dataSize %d", bytesRead, _mstHdr.dataSize);
+	}
+}
+
+void Resource::unloadMstData() {
+	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
+		free(_mstUnk35[i].indexCodeData);
+		free(_mstUnk35[i].data2);
+	}
+	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
+		free(_mstUnk42[i].indexUnk46);
+		free(_mstUnk42[i].data2);
+	}
+	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
+		free(_mstUnk43[i].indexUnk48);
+		free(_mstUnk43[i].data2);
 	}
 }
 
