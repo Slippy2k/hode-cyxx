@@ -33,6 +33,8 @@ static bool _fullscreen = false;
 static bool _widescreen = false;
 static SystemStub *_system = 0;
 
+static const bool _runBenchmark = false;
+
 static void exitMain() {
 	if (_system) {
 		_system->destroy();
@@ -180,8 +182,10 @@ int main(int argc, char *argv[]) {
 	ini_parse(_configIni, handleConfigIni, g);
 	setupAudio(g);
 	_system->init(_title, Video::W, Video::H, _fullscreen, _widescreen);
+	if (_runBenchmark) {
+		g->benchmarkCpu();
+	}
 	g->_res->loadSetupDat();
-	g->benchmarkCpu();
 	bool levelChanged = false;
 	do {
 		g->mainLoop(level, checkpoint, levelChanged);
