@@ -1078,23 +1078,18 @@ void Game::clearSoundObjects() {
 			memset(_res->_sssGroup3[i], 0, size);
 		}
 	}
-	memset(_sssUpdatedObjectsTable, 0, sizeof(_sssUpdatedObjectsTable));
-	if (_res->_sssFilters) {
-		memset(_res->_sssFilters, 0, _res->_sssHdr.filtersDataCount * sizeof(SssFilter));
-		if (_res->_sssHdr.filtersDataCount != 0) {
-			for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
-				SssFilter *filter = &_res->_sssFilters[i];
-				const int volume = _res->_sssDefaultsData[i].defaultVolume;
-				filter->volumeCurrent = volume << 16;
-				filter->volume = volume;
-				const int panning = _res->_sssDefaultsData[i].defaultPanning;
-				filter->panningCurrent = panning << 16;
-				filter->panning = panning;
-				const int priority = _res->_sssDefaultsData[i].defaultPriority;
-				filter->priorityCurrent = priority;
-				filter->priority = priority;
-			}
-		}
+	for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
+		memset(&_res->_sssFilters[i], 0, sizeof(SssFilter));
+		SssFilter *filter = &_res->_sssFilters[i];
+		const int volume = _res->_sssDefaultsData[i].defaultVolume;
+		filter->volumeCurrent = volume << 16;
+		filter->volume = volume;
+		const int panning = _res->_sssDefaultsData[i].defaultPanning;
+		filter->panningCurrent = panning << 16;
+		filter->panning = panning;
+		const int priority = _res->_sssDefaultsData[i].defaultPriority;
+		filter->priorityCurrent = priority;
+		filter->priority = priority;
 	}
 }
 

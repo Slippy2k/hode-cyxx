@@ -916,6 +916,7 @@ void Game::preloadLevelScreenData(int num, int prev) {
 
 void Game::loadLevelScreenSounds(int num) {
 	MixerLock ml(&_mix);
+#if 0
 	if (_res->_sssHdr.pcmCount > 0 && _res->_sssPreloadData1) {
 		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
 			const int j = _res->_sssPreloadData1[num].ptr[i];
@@ -934,6 +935,7 @@ void Game::loadLevelScreenSounds(int num) {
 			debug(kDebug_GAME, "levelScreen preloadData3 #%d res %d", i, j);
 		}
 	}
+#endif
 }
 
 void Game::setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2) {

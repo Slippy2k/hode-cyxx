@@ -483,6 +483,38 @@ struct SssPreloadData {
 	uint8_t *ptr;
 };
 
+template <typename T>
+struct ResStruct {
+	T *ptr;
+	unsigned int count;
+
+	ResStruct()
+		: ptr(0), count(0) {
+	}
+	~ResStruct() {
+		deallocate();
+	}
+
+	void deallocate() {
+		free(ptr);
+		count = 0;
+	}
+	void allocate(unsigned int size) {
+		free(ptr);
+		count = size;
+		ptr = (T *)malloc(size * sizeof(T));
+	}
+
+	T operator[](int i) const {
+		assert((unsigned int)i < count);
+		return ptr[i];
+	}
+	T& operator[](int i) {
+		assert((unsigned int)i < count);
+		return ptr[i];
+	}
+};
+
 struct Resource {
 
 	FileSystem _fs;
@@ -520,17 +552,14 @@ struct Resource {
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
 
-	SssInfo *_sssInfosData;
-	SssDefaults *_sssDefaultsData;
-	SssBank *_sssBanksData;
-	SssSample *_sssSamplesData;
-	SssPreloadInfo *_sssPreloadInfosData;
-	SssFilter *_sssFilters;
-	SssPcm *_sssPcmTable;
-	SssUnk6 *_sssDataUnk6;
-	SssPreloadData *_sssPreloadData1;
-	SssPreloadData *_sssPreloadData2;
-	SssPreloadData *_sssPreloadData3;
+	ResStruct<SssInfo> _sssInfosData;
+	ResStruct<SssDefaults> _sssDefaultsData;
+	ResStruct<SssBank> _sssBanksData;
+	ResStruct<SssSample> _sssSamplesData;
+	ResStruct<SssPreloadInfo> _sssPreloadInfosData;
+	ResStruct<SssFilter> _sssFilters;
+	ResStruct<SssPcm> _sssPcmTable;
+	ResStruct<SssUnk6> _sssDataUnk6;
 	uint32_t *_sssGroup1[3];
 	uint32_t *_sssGroup2[3];
 	uint32_t *_sssGroup3[3];

@@ -41,6 +41,20 @@ static void closeDat(FileSystem &fs, File *f) {
 	}
 }
 
+static int skipBytesAlign(File *f, int len) {
+	const int size = (len + 3) & ~3;
+	f->seek(size, SEEK_CUR);
+	return size;
+}
+
+static int readBytesAlign(File *f, uint8_t *buf, int len) {
+	f->read(buf, len);
+	if ((len & 3) != 0) {
+		f->seek(4 - (len & 3), SEEK_CUR);
+	}
+	return (len + 3) & ~3;
+}
+
 Resource::Resource(const char *dataPath)
 	: _fs(dataPath) {
 
@@ -605,20 +619,6 @@ const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const
 	return dat->coordsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
 }
 
-static int skipBytesAlign(File *f, int len) {
-	const int size = (len + 3) & ~3;
-	f->seek(size, SEEK_CUR);
-	return size;
-}
-
-static int readBytesAlign(File *f, uint8_t *buf, int len) {
-	f->read(buf, len);
-	if ((len & 3) != 0) {
-		f->seek(4 - (len & 3), SEEK_CUR);
-	}
-	return (len + 3) & ~3;
-}
-
 void Resource::loadSssData(File *fp, const char *name) {
 
 	assert(fp == _sssFile || fp == _datFile);
@@ -666,7 +666,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 	// _sssBuffer1
 	int bytesRead = 0;
 
-	_sssInfosData = (SssInfo *)malloc(_sssHdr.infosDataCount * sizeof(SssInfo));
+	_sssInfosData.allocate(_sssHdr.infosDataCount);
 	for (int i = 0; i < _sssHdr.infosDataCount; ++i) {
 		_sssInfosData[i].sssBankIndex = fp->readUint16(); // index _sssBanksData
 		_sssInfosData[i].sampleIndex = fp->readByte();
@@ -677,7 +677,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		fp->readByte(); // padding to 8 bytes
 		bytesRead += 8;
 	}
-	_sssDefaultsData = (SssDefaults *)malloc(_sssHdr.filtersDataCount * sizeof(SssDefaults));
+	_sssDefaultsData.allocate(_sssHdr.filtersDataCount);
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
 		_sssDefaultsData[i].defaultVolume   = fp->readByte();
 		_sssDefaultsData[i].defaultPriority = fp->readByte();
@@ -685,7 +685,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		fp->readByte(); // padding to 4 bytes
 		bytesRead += 4;
 	}
-	_sssBanksData = (SssBank *)malloc(_sssHdr.banksDataCount * sizeof(SssBank));
+	_sssBanksData.allocate(_sssHdr.banksDataCount);
 	for (int i = 0; i < _sssHdr.banksDataCount; ++i) {
 		_sssBanksData[i].flags = fp->readByte();
 		_sssBanksData[i].count = fp->readByte();
@@ -695,7 +695,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		debug(kDebug_RESOURCE, "SssBank #%d count %d codeOffset 0x%x", i, _sssBanksData[i].count, _sssBanksData[i].firstSampleIndex);
 		bytesRead += 8;
 	}
-	_sssSamplesData = (SssSample *)malloc(_sssHdr.samplesDataCount * sizeof(SssSample));
+	_sssSamplesData.allocate(_sssHdr.samplesDataCount);
 	for (int i = 0; i < _sssHdr.samplesDataCount; ++i) {
 		_sssSamplesData[i].pcm = fp->readUint16(); // 0x0
 		_sssSamplesData[i].framesCount = fp->readUint16();
@@ -732,34 +732,22 @@ void Resource::loadSssData(File *fp, const char *name) {
 			debug(kDebug_RESOURCE, "sssPreloadData3 #%d 0x%x", i, addr);
 			bytesRead += 4;
 		}
-		_sssPreloadData1 = (SssPreloadData *)malloc(_sssHdr.preloadData1Count * sizeof(SssPreloadData));
 		for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
-			// _sssPreloadData1[i] = data
 			const int count = (_sssHdr.version == 12) ? fp->readUint16() * 2 : fp->readByte();
-			_sssPreloadData1[i].count = count;
-			_sssPreloadData1[i].ptr = (uint8_t *)malloc(count);
+			fp->seek(count, SEEK_CUR);
 			debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
-			fp->read(_sssPreloadData1[i].ptr, count);
 			bytesRead += count + ((_sssHdr.version == 12) ? 2 : 1);
 		}
-		_sssPreloadData2 = (SssPreloadData *)malloc(_sssHdr.preloadData2Count * sizeof(SssPreloadData));
 		for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
-			// _sssPreloadData2[i] = data
 			const int count = fp->readByte();
-			_sssPreloadData2[i].count = count;
-			_sssPreloadData2[i].ptr = (uint8_t *)malloc(count);
+			fp->seek(count, SEEK_CUR);
 			debug(kDebug_RESOURCE, "sssPreloadData2 #%d count %d", i, count);
-			fp->read(_sssPreloadData2[i].ptr, count);
 			bytesRead += count + 1;
 		}
-		_sssPreloadData3 = (SssPreloadData *)malloc(_sssHdr.preloadData3Count * sizeof(SssPreloadData));
 		for (int i = 0; i < _sssHdr.preloadData3Count; ++i) {
-			// _sssPreloadData3[i] = data
 			const int count = fp->readByte();
-			_sssPreloadData3[i].count = count;
-			_sssPreloadData3[i].ptr = (uint8_t *)malloc(count);
+			fp->seek(count, SEEK_CUR);
 			debug(kDebug_RESOURCE, "sssPreloadData3 #%d count %d", i, count);
-			fp->read(_sssPreloadData3[i].ptr, count);
 			bytesRead += count + 1;
 		}
 // 429A06
@@ -769,14 +757,10 @@ void Resource::loadSssData(File *fp, const char *name) {
 			bytesRead += count + 1;
 		}
 		// _sssPreloadInfosData = data;
-	} else {
-		_sssPreloadData1 = 0;
-		_sssPreloadData2 = 0;
-		_sssPreloadData3 = 0;
 	}
 // 429A20
 	// data += _sssHdr.preloadInfoCount * 8;
-	_sssPreloadInfosData = (SssPreloadInfo *)malloc(_sssHdr.preloadInfoCount * sizeof(SssPreloadInfo));
+	_sssPreloadInfosData.allocate(_sssHdr.preloadInfoCount);
 	for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 		int32_t count = fp->readUint32();
 		int32_t offset = fp->readUint32();
@@ -814,7 +798,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 		}
 	}
 
-	_sssPcmTable = (SssPcm *)malloc(_sssHdr.pcmCount * sizeof(SssPcm));
+	_sssPcmTable.allocate(_sssHdr.pcmCount);
 // 429AB8
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 		_sssPcmTable[i].ptr = 0; fp->readUint32();
@@ -834,10 +818,10 @@ void Resource::loadSssData(File *fp, const char *name) {
 	// allocate structure but skip read as table is cleared and initialized in clearSoundObjects()
 	static const int kSizeOfSssFilter = 52;
 	fp->seek(_sssHdr.filtersDataCount * kSizeOfSssFilter, SEEK_CUR);
-	_sssFilters = (SssFilter *)malloc(_sssHdr.filtersDataCount * sizeof(SssFilter));
+	_sssFilters.allocate(_sssHdr.filtersDataCount);
 	bytesRead += _sssHdr.filtersDataCount * kSizeOfSssFilter;
 
-	_sssDataUnk6 = (SssUnk6 *)malloc(_sssHdr.banksDataCount * sizeof(SssUnk6));
+	_sssDataUnk6.allocate(_sssHdr.banksDataCount);
 	for (int i = 0; i < _sssHdr.banksDataCount; ++i) {
 		_sssDataUnk6[i].unk0[0] = fp->readUint32();
 		_sssDataUnk6[i].unk0[1] = fp->readUint32();
@@ -918,8 +902,8 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 
 // 429E09
-	memset(_sssFilters, 0, _sssHdr.filtersDataCount * sizeof(SssFilter));
 	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
+		memset(&_sssFilters[i], 0, sizeof(SssFilter));
 		const int volume = _sssDefaultsData[i].defaultVolume;
 		_sssFilters[i].volumeCurrent = volume << 16;
 		_sssFilters[i].volume = volume;
@@ -938,31 +922,10 @@ void Resource::loadSssData(File *fp, const char *name) {
 }
 
 void Resource::unloadSssData() {
-	free(_sssInfosData);
-	_sssInfosData = 0;
-	free(_sssDefaultsData);
-	_sssDefaultsData = 0;
-	free(_sssBanksData);
-	_sssBanksData = 0;
-	free(_sssSamplesData);
-	_sssSamplesData = 0;
-	free(_sssPreloadInfosData);
-	_sssPreloadInfosData = 0;
-	free(_sssFilters);
-	_sssFilters = 0;
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 		free(_sssPcmTable[i].ptr);
+		_sssPcmTable[i].ptr = 0;
 	}
-	free(_sssPcmTable);
-	_sssPcmTable = 0;
-        free(_sssDataUnk6);
-	_sssDataUnk6 = 0;
-	free(_sssPreloadData1);
-	_sssPreloadData1 = 0;
-	free(_sssPreloadData2);
-	_sssPreloadData2 = 0;
-	free(_sssPreloadData3);
-	_sssPreloadData3 = 0;
 	for (int i = 0; i < 3; ++i) {
 		free(_sssGroup1[i]);
 		_sssGroup1[i] = 0;
