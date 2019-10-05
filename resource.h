@@ -172,7 +172,7 @@ struct MstWalkNode { // MstUnk44Unk1
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
 	int32_t unk2C[4][2]; // 0x2C, 0x34, 0x3C, 0x44
-	uint32_t indexUnk44Unk1_76[4]; // next per direction 0x4C
+	uint32_t neighborNodes[4]; // per direction 0x4C
 	uint32_t indexUnk44Unk1_92; // next 0x5C
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
@@ -550,7 +550,7 @@ struct Resource {
 	MstUnk42 *_mstUnk42;
 	MstUnk43 *_mstUnk43;
 	MstWalkPath *_mstWalkPathData;
-	MstInfoMonster2 *_mstUnk45;
+	MstInfoMonster2 *_mstInfoMonster2Data;
 	MstUnk46 *_mstUnk46;
 	MstUnk47 *_mstUnk47;
 	MstUnk48 *_mstUnk48;

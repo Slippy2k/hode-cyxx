@@ -1162,7 +1162,7 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 // 4174DE
 		for (int j = 0; j < 4; ++j) {
-			const uint32_t indexUnk44Unk1 = walkPath->data[_edi].indexUnk44Unk1_76[j];
+			const uint32_t indexUnk44Unk1 = walkPath->data[_edi].neighborNodes[j];
 			if (indexUnk44Unk1 == kNone) {
 				continue;
 			}
@@ -1231,7 +1231,7 @@ int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode
 				break;
 			}
 		} else {
-			const uint32_t indexUnk44Unk1 = walkNode->indexUnk44Unk1_76[num];
+			const uint32_t indexUnk44Unk1 = walkNode->neighborNodes[num];
 			assert(indexUnk44Unk1 != kNone && indexUnk44Unk1 < walkPath->count);
 			walkNode->unk2C[num][index] = mstWalkPathUpdateWalkNode(walkPath, &walkPath->data[indexUnk44Unk1], num, index);
 		}
@@ -1711,7 +1711,7 @@ l41A879:
 					var1C = 3;
 					break;
 				}
-				const uint32_t indexUnk44Unk1 = walkNode->indexUnk44Unk1_76[var1C];
+				const uint32_t indexUnk44Unk1 = walkNode->neighborNodes[var1C];
 				assert(indexUnk44Unk1 != kNone);
 				walkNode = &walkPath->data[indexUnk44Unk1];
 				if (walkNode == &walkPath->data[_cl]) {
@@ -7094,7 +7094,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		}
 // 415743
 		assert(arg24 >= 0 && arg24 < _res->_mstHdr.infoMonster2Count);
-		mo->monster2Info = &_res->_mstUnk45[arg24];
+		mo->monster2Info = &_res->_mstInfoMonster2Data[arg24];
 		if (currentTask->monster1) {
 			mo->monster1 = currentTask->monster1;
 		} else if (currentTask->monster2) {

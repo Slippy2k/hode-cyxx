@@ -1238,10 +1238,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 				_mstWalkPathData[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
 				_mstWalkPathData[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
 			}
-			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[0] = READ_LE_UINT32(data + 76); // sizeof == 104
-			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[1] = READ_LE_UINT32(data + 80); // sizeof == 104
-			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[2] = READ_LE_UINT32(data + 84); // sizeof == 104
-			_mstWalkPathData[i].data[j].indexUnk44Unk1_76[3] = READ_LE_UINT32(data + 88); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborNodes[0] = READ_LE_UINT32(data + 76); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborNodes[1] = READ_LE_UINT32(data + 80); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborNodes[2] = READ_LE_UINT32(data + 84); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborNodes[3] = READ_LE_UINT32(data + 88); // sizeof == 104
 			_mstWalkPathData[i].data[j].indexUnk44Unk1_92 = READ_LE_UINT32(data + 92); // sizeof == 104
 			_mstWalkPathData[i].data[j].unk60[0] = (uint8_t *)malloc(count);
 			_mstWalkPathData[i].data[j].unk60[1] = (uint8_t *)malloc(count);
@@ -1258,13 +1258,13 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstUnk45 = (MstInfoMonster2 *)malloc(_mstHdr.infoMonster2Count * sizeof(MstInfoMonster2));
+	_mstInfoMonster2Data = (MstInfoMonster2 *)malloc(_mstHdr.infoMonster2Count * sizeof(MstInfoMonster2));
 	for (int i = 0; i < _mstHdr.infoMonster2Count; ++i) {
-		_mstUnk45[i].type = fp->readByte();
-		_mstUnk45[i].shootMask = fp->readByte();
-		_mstUnk45[i].anim = fp->readUint16();
-		_mstUnk45[i].codeData = fp->readUint32();
-		_mstUnk45[i].unk8 = fp->readUint32();
+		_mstInfoMonster2Data[i].type = fp->readByte();
+		_mstInfoMonster2Data[i].shootMask = fp->readByte();
+		_mstInfoMonster2Data[i].anim = fp->readUint16();
+		_mstInfoMonster2Data[i].codeData = fp->readUint32();
+		_mstInfoMonster2Data[i].unk8 = fp->readUint32();
 		bytesRead += 12;
 	}
 
