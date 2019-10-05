@@ -543,9 +543,9 @@ struct Resource {
 	uint8_t *_resLevelData0x470CTablePtrHdr;
 	uint8_t *_resLevelData0x470CTablePtrData;
 	uint32_t _resLevelData0x2B88SizeTable[kMaxScreens];
-	uint32_t _resLevelData0x2988SizeTable[32];
+	uint32_t _resLevelData0x2988SizeTable[kMaxSpriteTypes];
 	LvlObjectData _resLevelData0x2988Table[kMaxScreens];
-	LvlObjectData *_resLevelData0x2988PtrTable[32];
+	LvlObjectData *_resLevelData0x2988PtrTable[kMaxSpriteTypes];
 	LvlBackgroundData _resLvlScreenBackgroundDataTable[kMaxScreens];
 	uint8_t *_resLvlScreenBackgroundDataPtrTable[kMaxScreens];
 
@@ -643,6 +643,7 @@ struct Resource {
 	uint32_t getSssPcmSize(const SssPcm *pcm) const;
 
 	void clearSssGroup3();
+	void resetSssFilters();
 
 	void loadMstData(File *fp, const char *name);
 

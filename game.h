@@ -54,7 +54,6 @@ struct Game {
 		kMaxMonsterObjects2 = 64,
 		kMaxBackgroundAnims = 64,
 		kMaxSprites = 128,
-		kMaxSpriteTypes = 32,
 		kMaxLvlObjects = 160,
 
 		kDefaultSoundPanning = 64,

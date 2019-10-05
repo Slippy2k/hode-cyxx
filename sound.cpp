@@ -1078,19 +1078,7 @@ void Game::clearSoundObjects() {
 			memset(_res->_sssGroup3[i], 0, size);
 		}
 	}
-	for (int i = 0; i < _res->_sssHdr.filtersDataCount; ++i) {
-		memset(&_res->_sssFilters[i], 0, sizeof(SssFilter));
-		SssFilter *filter = &_res->_sssFilters[i];
-		const int volume = _res->_sssDefaultsData[i].defaultVolume;
-		filter->volumeCurrent = volume << 16;
-		filter->volume = volume;
-		const int panning = _res->_sssDefaultsData[i].defaultPanning;
-		filter->panningCurrent = panning << 16;
-		filter->panning = panning;
-		const int priority = _res->_sssDefaultsData[i].defaultPriority;
-		filter->priorityCurrent = priority;
-		filter->priority = priority;
-	}
+	_res->resetSssFilters();
 }
 
 void Game::setLowPrioritySoundObject(SssObject *so) {

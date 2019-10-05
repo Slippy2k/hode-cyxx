@@ -2395,8 +2395,8 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 			spr->yPos = ptr->yPos;
 			spr->xPos = ptr->xPos;
 			spr->bitmapBits = _edi;
-			int index = spr->num = _ecx;
-			index &= 0x1F;
+			spr->num = _ecx;
+			const int index = spr->num & 0x1F;
 			_spritesListNextPtr = spr->nextPtr;
 			spr->nextPtr = _spriteListPtrTable[index];
 			_spriteListPtrTable[index] = spr;

@@ -388,13 +388,13 @@ void Resource::loadLvlSpriteData(int num) {
 }
 
 const uint8_t *Resource::getLvlScreenMaskDataPtr(int num) const {
-	assert(num >= 0 && num < 160);
-	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 0);
+	assert((unsigned int)num < kMaxScreens * 4);
+	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
 const uint8_t *Resource::getLvlScreenPosDataPtr(int num) const {
-	assert(num >= 0 && num < 160);
+	assert((unsigned int)num < kMaxScreens * 4);
 	const uint32_t offset = READ_LE_UINT32(_resLevelData0x470CTablePtrHdr + num * 8 + 4);
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
@@ -407,7 +407,7 @@ void Resource::loadLevelData0x470C() {
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
-	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + 160 * 8;
+	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + (kMaxScreens * 4) * (2 * sizeof(uint32_t));
 }
 
 static const uint32_t kLvlHdrTag = 0x484F4400; // 'HOD\x00'
@@ -517,7 +517,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 }
 
 void Resource::loadLvlScreenBackgroundData(int num) {
-	assert(num >= 0 && num < 40);
+	assert((unsigned int)num < kMaxScreens);
 
 	static const uint32_t baseOffset = 0x2B88;
 
@@ -770,7 +770,6 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
 		static const int kSizeOfUnk4Data_V11 = 32;
-
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int size = _sssPreloadInfosData[i].count * kSizeOfUnk4Data_V11;
 			fp->seek(size, SEEK_CUR);
@@ -900,20 +899,8 @@ void Resource::loadSssData(File *fp, const char *name) {
 			++ptr;
 		}
 	}
-
 // 429E09
-	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
-		memset(&_sssFilters[i], 0, sizeof(SssFilter));
-		const int volume = _sssDefaultsData[i].defaultVolume;
-		_sssFilters[i].volumeCurrent = volume << 16;
-		_sssFilters[i].volume = volume;
-		const int panning = _sssDefaultsData[i].defaultPanning;
-		_sssFilters[i].panningCurrent = panning << 16;
-		_sssFilters[i].panning = panning;
-		const int priority = _sssDefaultsData[i].defaultPriority;
-		_sssFilters[i].priorityCurrent = priority;
-		_sssFilters[i].priority = priority;
-	}
+	resetSssFilters();
 // 429EFA
 	// same as clearSoundObjects()
 
@@ -991,6 +978,21 @@ void Resource::clearSssGroup3() {
 		for (int i = 0; i < 3; ++i) {
 			memset(_sssGroup3[i], 0, _sssHdr.banksDataCount * sizeof(uint32_t));
 		}
+	}
+}
+
+void Resource::resetSssFilters() {
+	for (int i = 0; i < _sssHdr.filtersDataCount; ++i) {
+		memset(&_sssFilters[i], 0, sizeof(SssFilter));
+		const int volume = _sssDefaultsData[i].defaultVolume;
+		_sssFilters[i].volumeCurrent = volume << 16;
+		_sssFilters[i].volume = volume;
+		const int panning = _sssDefaultsData[i].defaultPanning;
+		_sssFilters[i].panningCurrent = panning << 16;
+		_sssFilters[i].panning = panning;
+		const int priority = _sssDefaultsData[i].defaultPriority;
+		_sssFilters[i].priorityCurrent = priority;
+		_sssFilters[i].priority = priority;
 	}
 }
 

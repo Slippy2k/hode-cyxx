@@ -17,6 +17,7 @@ enum {
 	kNone = 0xFFFFFFFF, // (uint32_t)-1
 	kLvlAnimHdrOffset = 0x2C,
 	kMaxScreens = 40,
+	kMaxSpriteTypes = 32,
 	kMonsterInfoDataSize = 948 // (32 * 28 + 52)
 };
 
