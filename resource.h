@@ -548,6 +548,7 @@ struct Resource {
 	LvlObjectData *_resLevelData0x2988PtrTable[kMaxSpriteTypes];
 	LvlBackgroundData _resLvlScreenBackgroundDataTable[kMaxScreens];
 	uint8_t *_resLvlScreenBackgroundDataPtrTable[kMaxScreens];
+	uint8_t *_resLvlSpriteDataPtrTable[kMaxSpriteTypes];
 
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
@@ -611,13 +612,13 @@ struct Resource {
 	void loadDatMenuBuffers();
 
 	void loadLevelData(int levelNum);
-	void unloadLevelData();
 
 	void loadLvlScreenGridData(int num);
 	void loadLvlScreenVectorData(int num);
 	void loadLvlScreenStateData(int num);
 	void loadLvlScreenObjectData(int num);
 	void loadLvlData(File *fp, const char *name);
+	void unloadLvlData();
 	void loadLvlSpriteData(int num);
 	const uint8_t *getLvlScreenMaskDataPtr(int num) const;
 	const uint8_t *getLvlScreenPosDataPtr(int num) const;

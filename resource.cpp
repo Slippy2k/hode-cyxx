@@ -71,6 +71,7 @@ Resource::Resource(const char *dataPath)
 	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
 	memset(_resLevelData0x2988Table, 0, sizeof(_resLevelData0x2988Table));
 	memset(_resLevelData0x2988PtrTable, 0, sizeof(_resLevelData0x2988PtrTable));
+	memset(_resLvlSpriteDataPtrTable, 0, sizeof(_resLvlSpriteDataPtrTable));
 
 	// backgrounds
 	memset(_resLvlScreenBackgroundDataTable, 0, sizeof(_resLvlScreenBackgroundDataTable));
@@ -254,9 +255,6 @@ void Resource::loadLevelData(int levelNum) {
 	}
 }
 
-void Resource::unloadLevelData() {
-}
-
 void Resource::loadLvlScreenGridData(int num) {
 	_lvlFile->seekAlign(0x8 + num * 4);
 	_lvlFile->read(&_screensGrid[num * 4], 4);
@@ -420,7 +418,7 @@ void Resource::loadLvlSpriteData(int num) {
 	assert(allocatedOffsetsSize == readOffsetsSize);
 
 	_resLevelData0x2988PtrTable[dat->spriteNum] = dat;
-	// _resLvlScreenSpriteDataPtrTable[num] = ptr;
+	_resLvlSpriteDataPtrTable[num] = ptr;
 	_resLevelData0x2988SizeTable[num] = size;
 }
 
@@ -440,7 +438,7 @@ void Resource::loadLevelData0x470C() {
 	_lvlFile->seekAlign(0x4708);
 	const uint32_t offs = _lvlFile->readUint32();
 	const uint32_t size = _lvlFile->readUint32();
-	_resLevelData0x470CTable = (uint8_t *)calloc(size, 1);
+	_resLevelData0x470CTable = (uint8_t *)malloc(size);
 	_lvlFile->seek(offs, SEEK_SET);
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
@@ -487,6 +485,18 @@ void Resource::loadLvlData(File *fp, const char *name) {
 
 	for (int i = 0; i < _lvlHdr.spritesCount; ++i) {
 		loadLvlSpriteData(i);
+	}
+}
+
+void Resource::unloadLvlData() {
+	free(_resLevelData0x470CTable);
+	_resLevelData0x470CTable = 0;
+	for (unsigned int i = 0; i < kMaxScreens; ++i) {
+		unloadLvlScreenBackgroundData(i);
+	}
+	for (unsigned int i = 0; i < kMaxSpriteTypes; ++i) {
+		free(_resLvlSpriteDataPtrTable[i]);
+		_resLvlSpriteDataPtrTable[i] = 0;
 	}
 }
 
