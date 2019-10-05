@@ -211,8 +211,8 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 		codec_inited = true;
 	}
 
-	fprintf(stdout, "MDEC len %d, VLC_ID 0x%x\n", READ_LE_UINT16(src), READ_LE_UINT16(src + 2));
-	fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
+	// fprintf(stdout, "MDEC len %d, VLC_ID 0x%x\n", READ_LE_UINT16(src), READ_LE_UINT16(src + 2));
+	// fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
 
 	const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MDEC);
 	AVCodecContext *ctx = avcodec_alloc_context3(codec);

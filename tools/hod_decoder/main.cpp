@@ -595,6 +595,14 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		const uint16_t count  = READ_LE_UINT16(header + i * kSizeOfPcm + 16);
 		const uint16_t flags  = READ_LE_UINT16(header + i * kSizeOfPcm + 18);
 
+		if (baseOffset != 0) {
+			// offsets are all equal to '0x2800' in setup.dat .sss data
+			// seek on first entry and read PCM data sequentially
+			if (i == 0) {
+				fp->seek(baseOffset + offset, SEEK_SET);
+			}
+		}
+
 		if (size != 0) {
 
 			const int channels = ((flags & 1) != 0) ? 2 : 1;
@@ -602,21 +610,14 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 			assert(stride * count == size);
 			assert(size % stride == 0);
 
-			if (baseOffset != 0) {
-				// offsets are all equal to '0x2800' in setup.dat .sss data
-				// seek on first entry and read PCM data sequentially
-				if (i == 0) {
-					fp->seek(baseOffset + offset, SEEK_SET);
-				}
-			} else {
+			if (baseOffset == 0) {
 				fp->seek(offset, SEEK_SET);
 			}
 
 			char filename[64];
 
-			if (stride == 512) { // PSX
-
-				assert(_isPsx);
+			if (_isPsx) {
+				assert(stride == 512);
 
 				uint8_t *samples = (uint8_t *)malloc(size);
 				if (samples) {
