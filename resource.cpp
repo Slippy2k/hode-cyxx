@@ -712,10 +712,10 @@ void Resource::loadSssData(File *fp, const char *name) {
 	}
 	_sssSamplesData.allocate(_sssHdr.samplesDataCount);
 	for (int i = 0; i < _sssHdr.samplesDataCount; ++i) {
-		_sssSamplesData[i].pcm = fp->readUint16(); // 0x0
+		_sssSamplesData[i].pcm = fp->readUint16();
 		_sssSamplesData[i].framesCount = fp->readUint16();
 		_sssSamplesData[i].initVolume = fp->readByte();
-		_sssSamplesData[i].unk5 = fp->readByte(); // 0x5
+		_sssSamplesData[i].unk5 = fp->readByte();
 		_sssSamplesData[i].initPriority = fp->readByte();
 		_sssSamplesData[i].initPanning = fp->readByte();
 		_sssSamplesData[i].codeOffset1 = fp->readUint32();
@@ -921,7 +921,6 @@ void Resource::loadSssData(File *fp, const char *name) {
 	resetSssFilters();
 // 429EFA
 	// same as clearSoundObjects()
-
 // 429F38
 	clearSssGroup3();
 }

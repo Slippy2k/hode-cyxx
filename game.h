@@ -362,7 +362,7 @@ struct Game {
 	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
 	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
 	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
-	void updateScreenMaskLar(uint8_t *p, int num);
+	void updateScreenMaskLar(uint8_t *p, bool flag);
 	int clipAndyLvlObjectLar(BoundingBox *b, bool flag);
 	void resetCrackSprites();
 	void updateCrackSprites();

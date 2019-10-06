@@ -412,11 +412,11 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 0);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, false);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 1);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, true);
 							_bl = 2;
 						}
 // 40751B
@@ -430,11 +430,11 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 0);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, false);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 1);
+							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, true);
 							_bl = 2;
 						}
 						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[_al + 5], Game::_lar1_unkData1[_al + 4]);
@@ -1018,7 +1018,7 @@ void Level_lar1::setupLvlObjects_lar1_screen24() {
 	setupLvlObjects_lar1_screen24_helper1();
 	const int num = _checkpoint;
 	for (int b = _lar1_setupScreen24Data[num * 3]; b < 15; ++b) {
-		_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 1);
+		_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, true);
 		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[b * 6 + 5], Game::_lar1_unkData1[b * 6 + 4]);
 		if (o) {
 			o->objectUpdateType = 6;
@@ -1028,11 +1028,11 @@ void Level_lar1::setupLvlObjects_lar1_screen24() {
 	for (int b = _lar1_setupScreen24Data[num * 3]; b != 0; --b) {
 		int _bl = -b;
 		if (_bl < 0) {
-			_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 0);
+			_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, false);
 			_bl = 5;
 		} else {
 // 408B28
-			_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 1);
+			_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, true);
 			_bl = 2;
 		}
 // 408BAE

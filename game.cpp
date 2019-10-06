@@ -4401,11 +4401,11 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 				int _bl, i;
 				if (_al < 0) {
 					i = (-_al) * 6;
-					updateScreenMaskLar(&_lar1_unkData1[i], 0);
+					updateScreenMaskLar(&_lar1_unkData1[i], false);
 					_bl = 5;
 				} else {
 					i = _al * 6;
-					updateScreenMaskLar(&_lar1_unkData1[i], 1);
+					updateScreenMaskLar(&_lar1_unkData1[i], true);
 					_bl = 2;
 				}
 				LvlObject *o = findLvlObject2(0, _lar1_unkData1[i + 5], _lar1_unkData1[i + 4]);
@@ -4505,7 +4505,7 @@ int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int
 	return _bl;
 }
 
-void Game::updateScreenMaskLar(uint8_t *p, int flag) {
+void Game::updateScreenMaskLar(uint8_t *p, bool flag) {
 	if (p[1] != flag) {
 		p[1] = flag;
 		const uint8_t screenNum = p[4];
@@ -4513,7 +4513,7 @@ void Game::updateScreenMaskLar(uint8_t *p, int flag) {
 		uint8_t *dst = _screenMaskBuffer + maskOffset;
 		const int16_t *src = _lar_screenMaskOffsets[p[0]];
 		const int count = *src++;
-		if (flag == 0) {
+		if (!flag) {
 			for (int i = 0; i < count; ++i) {
 				const int16_t offset = *src++;
 				dst += offset;
