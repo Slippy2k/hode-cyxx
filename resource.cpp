@@ -777,33 +777,37 @@ void Resource::loadSssData(File *fp, const char *name) {
 	// data += _sssHdr.preloadInfoCount * 8;
 	_sssPreloadInfosData.allocate(_sssHdr.preloadInfoCount);
 	for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
-		int32_t count = fp->readUint32();
-		int32_t offset = fp->readUint32();
-		_sssPreloadInfosData[i].count = count;
-		debug(kDebug_RESOURCE, "_sssPreloadInfosData #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, count, offset);
+		_sssPreloadInfosData[i].count = fp->readUint32();
+		fp->readUint32();
+		debug(kDebug_RESOURCE, "_sssPreloadInfosData #%d/%d count %d offset 0x%x", i, _sssHdr.preloadInfoCount, _sssPreloadInfosData[i].count);
 		bytesRead += 8;
 	}
 	if (_sssHdr.version == 10 || _sssHdr.version == 12) {
-		static const int kSizeOfUnk4Data_V11 = 32;
+		static const int kSizeOfPreloadInfoData_V10 = 32;
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
-			const int size = _sssPreloadInfosData[i].count * kSizeOfUnk4Data_V11;
-			fp->seek(size, SEEK_CUR);
-			bytesRead += size;
+			const int count = _sssPreloadInfosData[i].count;
+			uint8_t *p = (uint8_t *)malloc(kSizeOfPreloadInfoData_V10 * count);
+			fp->read(p, kSizeOfPreloadInfoData_V10 * count);
+			bytesRead += kSizeOfPreloadInfoData_V10 * count;
+			for (int j = 0; j < count; ++j) {
+				const int len = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V10 + 0x1C) * 4;
+				bytesRead += skipBytesAlign(_sssFile, len);
+			}
+			free(p);
 		}
 	} else if (_sssHdr.version == 6) {
 // 42E8DF
-		static const int kSizeOfUnk4Data_V6 = 68;
+		static const int kSizeOfPreloadInfoData_V6 = 68;
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int count = _sssPreloadInfosData[i].count;
-			uint8_t *p = (uint8_t *)malloc(kSizeOfUnk4Data_V6 * count);
-			fp->read(p, kSizeOfUnk4Data_V6 * count);
-			// _sssPreloadInfosData[i].data = p;
-			bytesRead += kSizeOfUnk4Data_V6 * count;
+			uint8_t *p = (uint8_t *)malloc(kSizeOfPreloadInfoData_V6 * count);
+			fp->read(p, kSizeOfPreloadInfoData_V6 * count);
+			bytesRead += kSizeOfPreloadInfoData_V6 * count;
 			for (int j = 0; j < count; ++j) {
 				static const int8_t offsets[8] = { 0x2C, 0x30, 0x34, 0x04, 0x08, 0x0C, 0x10, 0x14 };
 				static const int8_t lengths[8] = {    2,    1,    1,    2,    2,    1,    1,    1 };
 				for (int k = 0; k < 8; ++k) {
-					const int len = READ_LE_UINT32(p + j * kSizeOfUnk4Data_V6 + offsets[k]) * lengths[k];
+					const int len = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V6 + offsets[k]) * lengths[k];
 					bytesRead += skipBytesAlign(_sssFile, len);
 				}
 			}
