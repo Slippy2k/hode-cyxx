@@ -813,7 +813,7 @@ static const int16_t byte_452570[7] = {
 	6, 0, 1021, 6, 1021, 1021, 6
 };
 
-const int16_t *Game::off_452580[] = {
+const int16_t *Game::_lar_screenMaskOffsets[] = {
 	byte_452538,
 	byte_452540,
 	byte_452548,

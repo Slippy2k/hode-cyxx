@@ -4509,19 +4509,19 @@ void Game::updateScreenMaskLar(uint8_t *p, int flag) {
 	if (p[1] != flag) {
 		p[1] = flag;
 		const uint8_t screenNum = p[4];
-		uint32_t offset = screenMaskOffset(_res->_screensBasePos[screenNum].u + p[2], _res->_screensBasePos[screenNum].v + p[3]);
-		uint8_t *dst = _screenMaskBuffer + offset;
-		const int16_t *src = off_452580[p[0]];
+		uint32_t maskOffset = screenMaskOffset(_res->_screensBasePos[screenNum].u + p[2], _res->_screensBasePos[screenNum].v + p[3]);
+		uint8_t *dst = _screenMaskBuffer + maskOffset;
+		const int16_t *src = _lar_screenMaskOffsets[p[0]];
 		const int count = *src++;
 		if (flag == 0) {
 			for (int i = 0; i < count; ++i) {
-				offset = *src++;
+				const int16_t offset = *src++;
 				dst += offset;
 				*dst &= ~8;
 			}
 		} else {
 			for (int i = 0; i < count; ++i) {
-				offset = *src++;
+				const int16_t offset = *src++;
 				dst += offset;
 				*dst |= 8;
 			}

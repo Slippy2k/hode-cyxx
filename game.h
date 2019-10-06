@@ -79,7 +79,7 @@ struct Game {
 	static const uint8_t _isld_spritesData[];
 	static const uint8_t _lava_spritesData[];
 	static const uint8_t _lar1_spritesData[];
-	static const int16_t *off_452580[];
+	static const int16_t *_lar_screenMaskOffsets[];
 	static uint8_t _lar1_unkData1[];
 	static uint8_t _lar1_unkData0[];
 	static uint8_t _lar2_unkData0[];
