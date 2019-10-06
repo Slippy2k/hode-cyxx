@@ -543,17 +543,32 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		const uint8_t len = fp->readByte();
 		fp->seek(len, SEEK_CUR);
 
-		int total = 0;
+		assert(data4Count < 48);
+		uint32_t counts[48];
 		for (int i = 0; i < data4Count; ++i) {
-			total += fp->readUint32() * 32;
+			counts[i] = fp->readUint32();
 			fp->readUint32();
 		}
-		fp->seek(total, SEEK_CUR);
+
+		static const int kSizeOfData4 = 32;
+		for (int i = 0; i < data4Count; ++i) {
+			const int count = counts[i];
+			assert(count < 32);
+			uint8_t buffer[kSizeOfData4 * 32];
+			fp->read(buffer, kSizeOfData4 * count);
+
+			int total = 0;
+			for (int j = 0; j < count; ++j) {
+				const int len = READ_LE_UINT32(buffer + j * kSizeOfData4 + 0x1C) * 4;
+				total += len;
+			}
+			fp->seek(total, SEEK_CUR);
+		}
 
 	} else if (version == 6) {
 
-		assert(data4Count < 32);
-		uint32_t counts[32];
+		assert(data4Count < 48);
+		uint32_t counts[48];
 		for (int i = 0; i < data4Count; ++i) {
 			counts[i] = fp->readUint32();
 			fp->readUint32();
@@ -562,24 +577,22 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		static const int kSizeOfData4 = 68;
 		for (int i = 0; i < data4Count; ++i) {
 			const int count = counts[i];
-
 			assert(count < 32);
 			uint8_t buffer[kSizeOfData4 * 32];
 			fp->read(buffer, kSizeOfData4 * count);
 
+			int total = 0;
 			for (int j = 0; j < count; ++j) {
 				static const int8_t offsets[] = { 0x2C, 0x30, 0x34, 0x04, 0x08, 0x0C, 0x10, 0x14, -1 };
 				static const int8_t lengths[] = {    2,    1,    1,    2,    2,    1,    1,    1, -1 };
 
-				int total = 0;
 				for (int k = 0; offsets[k] != -1; ++k) {
 					int len = READ_LE_UINT32(buffer + j * kSizeOfData4 + offsets[k]);
 					len *= lengths[k];
 					total += (len + 3) & ~3;
 				}
-
-				fp->seek(total, SEEK_CUR);
 			}
+			fp->seek(total, SEEK_CUR);
 		}
 	}
 
