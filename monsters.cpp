@@ -6544,8 +6544,8 @@ void Game::mstResetCollisionTable() {
 		if (!m->m46) {
 			continue;
 		}
-		uint8_t _bl = m->flagsA5;
-		if ((_bl & 2) != 0 || ((_bl & 1) != 0 && m->m35 == &_res->_mstUnk35[m->walkNode->indexUnk35_20])) {
+		const uint8_t _bl = m->flagsA5;
+		if ((_bl & 2) != 0 || ((_bl & 1) != 0 && ((m->walkNode->indexUnk35_20 == kNone && !m->m35) || (m->walkNode->indexUnk35_20 != kNone && m->m35 == &_res->_mstUnk35[m->walkNode->indexUnk35_20])))) {
 			if ((_bl & 0xB0) != 0) {
 				continue;
 			}
