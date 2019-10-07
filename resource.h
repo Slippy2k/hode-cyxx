@@ -585,10 +585,10 @@ struct Resource {
 	ResStruct<MstUnk47> _mstUnk47;
 	ResStruct<MstUnk48> _mstUnk48;
 	uint8_t *_mstMonsterInfos; // sizeof == 948
-	MstUnk49 *_mstUnk49;
-	MstUnk50 *_mstUnk50;
-	MstUnk51 *_mstUnk51;
-	MstUnk52 *_mstUnk52;
+	ResStruct<MstUnk49> _mstUnk49;
+	ResStruct<MstUnk50> _mstUnk50;
+	ResStruct<MstUnk51> _mstUnk51;
+	ResStruct<MstUnk52> _mstUnk52;
 	ResStruct<MstOp223Data> _mstOp223Data;
 	ResStruct<MstOp227Data> _mstOp227Data;
 	ResStruct<MstOp234Data> _mstOp234Data;
@@ -596,7 +596,7 @@ struct Resource {
 	ResStruct<MstOp197Data> _mstOp197Data;
 	ResStruct<MstOp211Data> _mstOp211Data;
 	ResStruct<MstOp240Data> _mstOp240Data;
-	uint32_t *_mstUnk60; // index to _mstCodeData
+	ResStruct<uint32_t> _mstUnk60; // index to _mstCodeData
 	ResStruct<MstOp204Data> _mstOp204Data;
 	uint8_t *_mstCodeData;
 	ResStruct<MstOp226Data> _mstOp226Data;

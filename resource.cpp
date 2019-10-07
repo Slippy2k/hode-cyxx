@@ -1322,6 +1322,9 @@ void Resource::loadMstData(File *fp, const char *name) {
 					m->data2[j][k] = fp->readUint32();
 				}
 				bytesRead += count * 4;
+			} else {
+				m->data1[j] = 0;
+				m->data2[j] = 0;
 			}
 		}
 		MstUnk48Unk12 *m12 = (MstUnk48Unk12 *)malloc(m->countUnk12 * sizeof(MstUnk48Unk12));
@@ -1360,7 +1363,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	fp->read(_mstMonsterInfos, mapDataSize);
 	bytesRead += mapDataSize;
 
-	_mstUnk49 = (MstUnk49 *)malloc(_mstHdr.unk0x40 * sizeof(MstUnk49));
+	_mstUnk49.allocate(_mstHdr.unk0x40);
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		_mstUnk49[i].indexMonsterInfo = fp->readUint32();
 		fp->readUint32();
@@ -1398,7 +1401,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += _mstUnk49[i].count2;
 	}
 
-	_mstUnk50 = (MstUnk50 *)malloc(_mstHdr.unk0x44 * sizeof(MstUnk50));
+	_mstUnk50.allocate(_mstHdr.unk0x44);
 	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
 		_mstUnk50[i].data  = 0; fp->readUint32();
 		_mstUnk50[i].count = fp->readUint32();
@@ -1421,7 +1424,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstUnk51 = (MstUnk51 *)malloc(_mstHdr.unk0x48 * sizeof(MstUnk51));
+	_mstUnk51.allocate(_mstHdr.unk0x48);
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
 		_mstUnk51[i].indexUnk50 = fp->readUint32();
 		assert(_mstUnk51[i].indexUnk50 < (uint32_t)_mstHdr.unk0x44);
@@ -1437,7 +1440,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			bytesRead += 4;
 		}
 	}
-	_mstUnk52 = (MstUnk52 *)malloc(_mstHdr.unk0x4C * sizeof(MstUnk52));
+	_mstUnk52.allocate(_mstHdr.unk0x4C);
 	for (int i = 0; i < _mstHdr.unk0x4C; ++i) {
 		_mstUnk52[i].unk0 = fp->readByte();
 		_mstUnk52[i].unk1 = fp->readByte();
@@ -1542,7 +1545,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 8;
 	}
 
-	_mstUnk60 = (uint32_t *)malloc(_mstHdr.unk0x70 * sizeof(uint32_t));
+	_mstUnk60.allocate(_mstHdr.unk0x70);
 	for (int i = 0; i < _mstHdr.unk0x70; ++i) {
 		_mstUnk60[i] = fp->readUint32();
 		bytesRead += 4;
@@ -1582,9 +1585,31 @@ void Resource::unloadMstData() {
 		free(_mstUnk43[i].indexUnk48);
 		free(_mstUnk43[i].data2);
 	}
+	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
+		free(_mstUnk47[i].data);
+	}
+	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
+		MstUnk48 *m = &_mstUnk48[i];
+		for (int j = 0; j < 2; ++j) {
+			free(m->data1[j]);
+			free(m->data2[j]);
+		}
+		free(m->unk12);
+	}
 
 	free(_mstMonsterInfos);
 	_mstMonsterInfos = 0;
+
+	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
+		free(_mstUnk49[i].data1);
+		free(_mstUnk49[i].data2);
+	}
+	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
+		free(_mstUnk50[i].data);
+	}
+	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
+		free(_mstUnk51[i].indexUnk50Unk1);
+	}
 
 	free(_mstCodeData);
 	_mstCodeData = 0;
