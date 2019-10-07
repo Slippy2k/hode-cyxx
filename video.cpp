@@ -4,11 +4,11 @@
  */
 
 #include "video.h"
-#include "systemstub.h"
+#include "system.h"
 
 static const bool _findBlackColor = false; // _blackColor is never read
 
-Video::Video(SystemStub *system)
+Video::Video(System *system)
 	: _system(system) {
 	_displayShadowLayer = false;
 	_drawLine.x1 = 0;

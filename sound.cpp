@@ -1,7 +1,7 @@
 
 #include "game.h"
 #include "resource.h"
-#include "systemstub.h"
+#include "system.h"
 #include "util.h"
 
 enum {

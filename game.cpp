@@ -9,14 +9,14 @@
 #include "lzw.h"
 #include "paf.h"
 #include "screenshot.h"
-#include "systemstub.h"
+#include "system.h"
 #include "util.h"
 #include "video.h"
 
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
-Game::Game(SystemStub *system, const char *dataPath, uint32_t cheats) {
+Game::Game(System *system, const char *dataPath, uint32_t cheats) {
 
 	_level = 0;
 	_res = new Resource(dataPath);

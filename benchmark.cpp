@@ -1,7 +1,7 @@
 
 #include "game.h"
 #include "lzw.h"
-#include "systemstub.h"
+#include "system.h"
 #include "util.h"
 #include "video.h"
 

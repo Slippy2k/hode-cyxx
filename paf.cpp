@@ -5,7 +5,7 @@
 
 #include "fs.h"
 #include "paf.h"
-#include "systemstub.h"
+#include "system.h"
 #include "util.h"
 
 static const char *_filenames[] = {
@@ -33,7 +33,7 @@ static void closePaf(FileSystem *fs, File *f) {
 	}
 }
 
-PafPlayer::PafPlayer(SystemStub *system, FileSystem *fs)
+PafPlayer::PafPlayer(System *system, FileSystem *fs)
 	: _skipCutscenes(false), _system(system), _fs(fs) {
 	if (!openPaf(_fs, &_file)) {
 		_skipCutscenes = true;

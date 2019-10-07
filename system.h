@@ -35,10 +35,10 @@ struct AudioCallback {
 	void *userdata;
 };
 
-struct SystemStub {
+struct System {
 	PlayerInput inp, pad;
 
-	virtual ~SystemStub() {}
+	virtual ~System() {}
 
 	virtual void init(const char *title, int w, int h, bool fullscreen, bool widescreen) = 0;
 	virtual void destroy() = 0;
@@ -65,6 +65,6 @@ struct SystemStub {
 	virtual AudioCallback setAudioCallback(AudioCallback callback) = 0;
 };
 
-extern SystemStub *SystemStub_SDL_create();
+extern System *System_SDL2_create();
 
 #endif // SYSTEMSTUB_H__

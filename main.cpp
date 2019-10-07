@@ -14,7 +14,7 @@
 #include "paf.h"
 #include "util.h"
 #include "resource.h"
-#include "systemstub.h"
+#include "system.h"
 #include "video.h"
 
 static const char *_title = "Heart of Darkness";
@@ -31,7 +31,7 @@ static const char *_usage =
 
 static bool _fullscreen = false;
 static bool _widescreen = false;
-static SystemStub *_system = 0;
+static System *_system = 0;
 
 static const bool _runBenchmark = false;
 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 			return -1;
 		}
 	}
-	_system = SystemStub_SDL_create();
+	_system = System_SDL2_create();
 	atexit(exitMain);
 	Game *g = new Game(_system, dataPath ? dataPath : _defaultDataPath, cheats);
 	ini_parse(_configIni, handleConfigIni, g);

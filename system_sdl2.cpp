@@ -7,7 +7,7 @@
 #include <stdarg.h>
 #include <math.h>
 #include "scaler.h"
-#include "systemstub.h"
+#include "system.h"
 #include "util.h"
 
 static const char *kIconBmp = "icon.bmp";
@@ -34,7 +34,7 @@ struct KeyMapping {
 	int mask;
 };
 
-struct SystemStub_SDL : SystemStub {
+struct System_SDL2 : System {
 	enum {
 		kCopyRectsSize = 200,
 		kKeyMappingsSize = 20,
@@ -59,8 +59,8 @@ struct SystemStub_SDL : SystemStub {
 	SDL_GameController *_controller;
 	SDL_Joystick *_joystick;
 
-	SystemStub_SDL();
-	virtual ~SystemStub_SDL() {}
+	System_SDL2();
+	virtual ~System_SDL2() {}
 	virtual void init(const char *title, int w, int h, bool fullscreen, bool widescreen);
 	virtual void destroy();
 	virtual void setScaler(const char *name, int multiplier);
@@ -88,11 +88,11 @@ struct SystemStub_SDL : SystemStub {
 	void prepareScaledGfx(const char *caption, bool fullscreen, bool widescreen);
 };
 
-SystemStub *SystemStub_SDL_create() {
-	return new SystemStub_SDL();
+System *System_SDL2_create() {
+	return new System_SDL2();
 }
 
-SystemStub_SDL::SystemStub_SDL() :
+System_SDL2::System_SDL2() :
 	_offscreenLut(0), _offscreenRgb(0),
 	_window(0), _renderer(0), _texture(0), _fmt(0), _widescreenTexture(0),
 	_controller(0), _joystick(0) {
@@ -101,7 +101,7 @@ SystemStub_SDL::SystemStub_SDL() :
 	}
 }
 
-void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen, bool widescreen) {
+void System_SDL2::init(const char *title, int w, int h, bool fullscreen, bool widescreen) {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 	SDL_ShowCursor(SDL_DISABLE);
 	setupDefaultKeyMappings();
@@ -114,11 +114,11 @@ void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen, bool
 	const int offscreenSize = w * h;
 	_offscreenLut = (uint8_t *)malloc(offscreenSize);
 	if (!_offscreenLut) {
-		error("SystemStub_SDL::init() Unable to allocate offscreen buffer");
+		error("System_SDL2::init() Unable to allocate offscreen buffer");
 	}
 	_offscreenRgb = (uint32_t *)malloc(offscreenSize * sizeof(uint32_t));
 	if (!_offscreenRgb) {
-		error("SystemStub_SDL::init() Unable to allocate RGB offscreen buffer");
+		error("System_SDL2::init() Unable to allocate RGB offscreen buffer");
 	}
 	memset(_offscreenLut, 0, offscreenSize);
 	prepareScaledGfx(title, fullscreen, widescreen);
@@ -144,7 +144,7 @@ void SystemStub_SDL::init(const char *title, int w, int h, bool fullscreen, bool
 	}
 }
 
-void SystemStub_SDL::destroy() {
+void System_SDL2::destroy() {
 	free(_offscreenLut);
 	_offscreenLut = 0;
 	free(_offscreenRgb);
@@ -260,7 +260,7 @@ static void blur_v(int radius, const uint32_t *src, int srcPitch, int w, int h, 
 	}
 }
 
-void SystemStub_SDL::copyRectWidescreen(int w, int h, const uint8_t *buf, const uint8_t *pal) {
+void System_SDL2::copyRectWidescreen(int w, int h, const uint8_t *buf, const uint8_t *pal) {
 	if (!_widescreenTexture) {
 		return;
 	}
@@ -292,7 +292,7 @@ void SystemStub_SDL::copyRectWidescreen(int w, int h, const uint8_t *buf, const 
 	}
 }
 
-void SystemStub_SDL::setScaler(const char *name, int multiplier) {
+void System_SDL2::setScaler(const char *name, int multiplier) {
 	if (multiplier != 0) {
 		_scalerMultiplier = multiplier;
 	}
@@ -306,13 +306,13 @@ void SystemStub_SDL::setScaler(const char *name, int multiplier) {
 	}
 }
 
-void SystemStub_SDL::setGamma(float gamma) {
+void System_SDL2::setGamma(float gamma) {
 	for (int i = 0; i < 256; ++i) {
 		_gammaLut[i] = (uint8_t)round(pow(i / 255., 1. / gamma) * 255);
 	}
 }
 
-void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
+void System_SDL2::setPalette(const uint8_t *pal, int n, int depth) {
 	assert(n <= 256);
 	assert(depth <= 8);
 	const int shift = 8 - depth;
@@ -332,7 +332,7 @@ void SystemStub_SDL::setPalette(const uint8_t *pal, int n, int depth) {
 	}
 }
 
-void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) {
+void System_SDL2::copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
 	for (int i = 0; i < h; ++i) {
 		memcpy(_offscreenLut + y * _screenW + x, buf, w);
@@ -341,7 +341,7 @@ void SystemStub_SDL::copyRect(int x, int y, int w, int h, const uint8_t *buf, in
 	}
 }
 
-void SystemStub_SDL::fillRect(int x, int y, int w, int h, uint8_t color) {
+void System_SDL2::fillRect(int x, int y, int w, int h, uint8_t color) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
 	for (int i = 0; i < h; ++i) {
 		memset(_offscreenLut + y * _screenW + x, color, w);
@@ -349,7 +349,7 @@ void SystemStub_SDL::fillRect(int x, int y, int w, int h, uint8_t color) {
 	}
 }
 
-void SystemStub_SDL::shakeScreen(int dx, int dy) {
+void System_SDL2::shakeScreen(int dx, int dy) {
 	_shakeDx = dx;
 	_shakeDy = dy;
 }
@@ -362,7 +362,7 @@ static void clearScreen(uint32_t *dst, int dstPitch, int x, int y, int w, int h)
 	}
 }
 
-void SystemStub_SDL::updateScreen(bool drawWidescreen) {
+void System_SDL2::updateScreen(bool drawWidescreen) {
 	void *texturePtr = 0;
 	int texturePitch = 0;
 	if (SDL_LockTexture(_texture, 0, &texturePtr, &texturePitch) != 0) {
@@ -428,7 +428,7 @@ void SystemStub_SDL::updateScreen(bool drawWidescreen) {
 	_shakeDx = _shakeDy = 0;
 }
 
-void SystemStub_SDL::processEvents() {
+void System_SDL2::processEvents() {
 	SDL_Event ev;
 	pad.prevMask = pad.mask;
 	while (SDL_PollEvent(&ev)) {
@@ -610,21 +610,21 @@ void SystemStub_SDL::processEvents() {
 	updateKeys(&inp);
 }
 
-void SystemStub_SDL::sleep(int duration) {
+void System_SDL2::sleep(int duration) {
 	SDL_Delay(duration);
 }
 
-uint32_t SystemStub_SDL::getTimeStamp() {
+uint32_t System_SDL2::getTimeStamp() {
 	return SDL_GetTicks();
 }
 
 static void mixAudioS16(void *param, uint8_t *buf, int len) {
-	SystemStub_SDL *stub = (SystemStub_SDL *)param;
+	System_SDL2 *stub = (System_SDL2 *)param;
 	memset(buf, 0, len);
 	stub->_audioCb.proc(stub->_audioCb.userdata, (int16_t *)buf, len / 2);
 }
 
-void SystemStub_SDL::startAudio(AudioCallback callback) {
+void System_SDL2::startAudio(AudioCallback callback) {
 	SDL_AudioSpec desired;
 	memset(&desired, 0, sizeof(desired));
 	desired.freq = kAudioHz;
@@ -637,27 +637,27 @@ void SystemStub_SDL::startAudio(AudioCallback callback) {
 		_audioCb = callback;
 		SDL_PauseAudio(0);
 	} else {
-		error("SystemStub_SDL::startAudio() Unable to open sound device");
+		error("System_SDL2::startAudio() Unable to open sound device");
 	}
 }
 
-void SystemStub_SDL::stopAudio() {
+void System_SDL2::stopAudio() {
 	SDL_CloseAudio();
 }
 
-uint32_t SystemStub_SDL::getOutputSampleRate() {
+uint32_t System_SDL2::getOutputSampleRate() {
 	return kAudioHz;
 }
 
-void SystemStub_SDL::lockAudio() {
+void System_SDL2::lockAudio() {
 	SDL_LockAudio();
 }
 
-void SystemStub_SDL::unlockAudio() {
+void System_SDL2::unlockAudio() {
 	SDL_UnlockAudio();
 }
 
-AudioCallback SystemStub_SDL::setAudioCallback(AudioCallback callback) {
+AudioCallback System_SDL2::setAudioCallback(AudioCallback callback) {
 	SDL_LockAudio();
 	AudioCallback cb = _audioCb;
 	_audioCb = callback;
@@ -665,7 +665,7 @@ AudioCallback SystemStub_SDL::setAudioCallback(AudioCallback callback) {
 	return cb;
 }
 
-void SystemStub_SDL::addKeyMapping(int key, uint8_t mask) {
+void System_SDL2::addKeyMapping(int key, uint8_t mask) {
 	if (_keyMappingsCount < kKeyMappingsSize) {
 		for (int i = 0; i < _keyMappingsCount; ++i) {
 			if (_keyMappings[i].keyCode == key) {
@@ -681,7 +681,7 @@ void SystemStub_SDL::addKeyMapping(int key, uint8_t mask) {
 	}
 }
 
-void SystemStub_SDL::setupDefaultKeyMappings() {
+void System_SDL2::setupDefaultKeyMappings() {
 	_keyMappingsCount = 0;
 	memset(_keyMappings, 0, sizeof(_keyMappings));
 
@@ -708,7 +708,7 @@ void SystemStub_SDL::setupDefaultKeyMappings() {
 	addKeyMapping(SDL_SCANCODE_ESCAPE,   SYS_INP_ESC);
 }
 
-void SystemStub_SDL::updateKeys(PlayerInput *inp) {
+void System_SDL2::updateKeys(PlayerInput *inp) {
 	inp->prevMask = inp->mask;
 	const uint8_t *keyState = SDL_GetKeyboardState(NULL);
 	for (int i = 0; i < _keyMappingsCount; ++i) {
@@ -722,7 +722,7 @@ void SystemStub_SDL::updateKeys(PlayerInput *inp) {
 	inp->mask |= pad.mask;
 }
 
-void SystemStub_SDL::prepareScaledGfx(const char *caption, bool fullscreen, bool widescreen) {
+void System_SDL2::prepareScaledGfx(const char *caption, bool fullscreen, bool widescreen) {
 	int flags = 0;
 	if (fullscreen) {
 		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
