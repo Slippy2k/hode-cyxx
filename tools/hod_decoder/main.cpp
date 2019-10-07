@@ -256,9 +256,9 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 
 	for (int i = 0; i < 4; ++i) {
 		if (_isPsx) {
-			if (bitmapData[i] && isMdecData(bitmapData[i])) {
+			if (bitmapData[i] && isMdecData(bitmapData[i] + 4)) {
 				snprintf(filename, sizeof(filename), "lvl_screen_%02d_state_%d.jpg", num, i);
-				savePSX(filename, bitmapData[i], dataSize - (bitmapData[i] - data), 256, 192);
+				savePSX(filename, bitmapData[i] + 4, dataSize - (bitmapData[i] + 4 - data), 256, 192);
 			}
 			continue;
 		}
@@ -274,10 +274,6 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 	if (num == 0) {
 		assert(paletteData[0]);
 		memcpy(_spritePalette, paletteData[0] + 2, 256 * 3);
-	}
-
-	if (_isPsx) {
-		return;
 	}
 
 	header += 4 * sizeof(uint32_t) * 2;
@@ -411,7 +407,6 @@ static void DecodeLvl(File *fp, int levelNum) {
 		}
 		if (_isPsx) {
 			fp->seek(offset + sssOffset, SEEK_SET);
-			fp->readUint32();
 		} else {
 			fp->seek(offset, SEEK_SET);
 		}
