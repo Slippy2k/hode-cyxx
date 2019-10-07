@@ -26,12 +26,13 @@ void Mixer::queue(const int16_t *ptr, const int16_t *end, int panType, int panL,
 		warning("MixingQueue overflow %d", _mixingQueueSize);
 		return;
 	}
-	_mixingQueue[_mixingQueueSize].ptr = ptr;
-	_mixingQueue[_mixingQueueSize].end = end;
-	_mixingQueue[_mixingQueueSize].panL = panL;
-	_mixingQueue[_mixingQueueSize].panR = panR;
-	_mixingQueue[_mixingQueueSize].panType = panType;
-	_mixingQueue[_mixingQueueSize].stereo = stereo;
+	MixerChannel *channel = &_mixingQueue[_mixingQueueSize];
+	channel->ptr = ptr;
+	channel->end = end;
+	channel->panL = panL;
+	channel->panR = panR;
+	channel->panType = panType;
+	channel->stereo = stereo;
 	++_mixingQueueSize;
 }
 
@@ -69,32 +70,33 @@ void Mixer::mix(int16_t *buf, int len) {
 		return;
 	}
 	for (int i = 0; i < _mixingQueueSize; ++i) {
-		const int panL = _mixingQueue[i].panL;
-		const int panR = _mixingQueue[i].panR;
-		if (_mixingQueue[i].stereo) {
-			assert(_mixingQueue[i].ptr + len <= _mixingQueue[i].end);
-			switch (_mixingQueue[i].panType) {
+		const MixerChannel *channel = &_mixingQueue[i];
+		const int panL = channel->panL;
+		const int panR = channel->panR;
+		if (channel->stereo) {
+			assert(channel->ptr + len <= channel->end);
+			switch (channel->panType) {
 			case 1:
-				mixS16<true, 1>(buf, _mixingQueue[i].ptr, len, panL, panR);
+				mixS16<true, 1>(buf, channel->ptr, len, panL, panR);
 				break;
 			case 2:
-				mixS16<true, 2>(buf, _mixingQueue[i].ptr, len, panL, panR);
+				mixS16<true, 2>(buf, channel->ptr, len, panL, panR);
 				break;
 			default:
-				mixS16<true, 0>(buf, _mixingQueue[i].ptr, len, panL, panR);
+				mixS16<true, 0>(buf, channel->ptr, len, panL, panR);
 				break;
 			}
 		} else {
-			assert(_mixingQueue[i].ptr + len / 2 <= _mixingQueue[i].end);
-			switch (_mixingQueue[i].panType) {
+			assert(channel->ptr + len / 2 <= channel->end);
+			switch (channel->panType) {
 			case 1:
-				mixS16<false, 1>(buf, _mixingQueue[i].ptr, len, panL, panR);
+				mixS16<false, 1>(buf, channel->ptr, len, panL, panR);
 				break;
 			case 2:
-				mixS16<false, 2>(buf, _mixingQueue[i].ptr, len, panL, panR);
+				mixS16<false, 2>(buf, channel->ptr, len, panL, panR);
 				break;
 			default:
-				mixS16<false, 0>(buf, _mixingQueue[i].ptr, len, panL, panR);
+				mixS16<false, 0>(buf, channel->ptr, len, panL, panR);
 				break;
 			}
 		}

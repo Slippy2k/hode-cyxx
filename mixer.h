@@ -4,6 +4,15 @@
 
 #include "intern.h"
 
+struct MixerChannel {
+	const int16_t *ptr;
+	const int16_t *end;
+	int panL;
+	int panR;
+	uint8_t panType;
+	bool stereo;
+};
+
 struct Mixer {
 
 	static const int kPcmChannels = 32;
@@ -11,14 +20,7 @@ struct Mixer {
 	void (*_lock)(int);
 	int _rate;
 
-	struct {
-		const int16_t *ptr;
-		const int16_t *end;
-		int panL;
-		int panR;
-		uint8_t panType;
-		bool stereo;
-	} _mixingQueue[kPcmChannels];
+	MixerChannel _mixingQueue[kPcmChannels];
 	int _mixingQueueSize;
 
 	Mixer();
