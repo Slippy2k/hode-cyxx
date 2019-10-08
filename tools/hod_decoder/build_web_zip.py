@@ -15,7 +15,6 @@ SRCS = [
 
 BINS = [
 	'hod_decoder.exe',
-	'offs_00000001.txt',
 ]
 
 VERSION = subprocess.check_output('git rev-parse --short HEAD'.split()).strip()

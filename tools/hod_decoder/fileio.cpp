@@ -187,3 +187,13 @@ uint32_t freadUint32LE(FILE *fp) {
 	const uint32_t n = freadUint16LE(fp);
 	return n | (freadUint16LE(fp) << 16);
 }
+
+uint16_t freadUint16BE(FILE *fp) {
+	const uint16_t n = fgetc(fp);
+	return (n << 8) | fgetc(fp);
+}
+
+uint32_t freadUint32BE(FILE *fp) {
+	const uint32_t n = freadUint16BE(fp);
+	return (n << 16) | freadUint16BE(fp);
+}

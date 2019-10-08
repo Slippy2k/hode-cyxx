@@ -60,5 +60,7 @@ void fwriteUint32LE(FILE *fp, uint32_t n);
 uint16_t freadUint16LE(FILE *fp);
 uint32_t freadUint32LE(FILE *fp);
 
-#endif // FILEIO_H__
+uint16_t freadUint16BE(FILE *fp);
+uint32_t freadUint32BE(FILE *fp);
 
+#endif // FILEIO_H__

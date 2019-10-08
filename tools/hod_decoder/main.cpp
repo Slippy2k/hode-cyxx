@@ -1159,7 +1159,7 @@ static void DecodePC(const char *filename, int type, uint32_t flags) {
 	delete fp;
 }
 
-static void DecodeSaturn0000(FILE *fp, FILE *fp_offsets) {
+static void DecodeSaturn0000(FILE *fp) {
 	static const struct {
 		uint32_t offset;
 		int w, h;
@@ -1183,26 +1183,40 @@ static void DecodeSaturn0000(FILE *fp, FILE *fp_offsets) {
 	}
 }
 
-static void DecodeSaturn0001(FILE *fp, FILE *fp_offsets) {
+static void DecodeSaturn0001(FILE *fp) {
 	uint8_t tag[4];
 	fread(tag, 1, 4, fp);
 	assert(memcmp(tag, "DCD\x02", 4) == 0);
 
-	char buffer[256];
-	while (fgets(buffer, sizeof(buffer), fp_offsets)) {
-		if (buffer[0] != '#') {
-			int screen, state;
-			uint32_t lzwOffset, paletteOffset;
-			if (sscanf(buffer, "%d %d 0x%x 0x%x", &screen, &state, &lzwOffset, &paletteOffset) == 4) {
+	std::queue<uint32_t> palettes;
 
+	int screen = 0;
+	int state = 0;
+
+	while (1) {
+		uint32_t size = freadUint32BE(fp);
+		if (feof(fp)) {
+			break;
+		}
+		if (size > 2) {
+			const uint16_t type = freadUint16LE(fp);
+			size -= 2;
+
+			if (size == 0x300) { // palette
+				palettes.push(ftell(fp));
+			} else if (type == 0xAD00 || type == 0xBD00) { // lzw bitmap
+				const uint32_t lzwOffset = ftell(fp);
+
+				const uint32_t paletteOffset = palettes.front();
+				palettes.pop();
 				fseek(fp, paletteOffset, SEEK_SET);
 				fread(_bitmapPalette, 1, sizeof(_bitmapPalette), fp);
 				ConvertVgaPalette(_bitmapPalette);
 
-				uint8_t *ptr = (uint8_t *)malloc(256 * 192);
+				fseek(fp, lzwOffset, SEEK_SET);
+				uint8_t *ptr = (uint8_t *)malloc(size);
 				if (ptr) {
-					fseek(fp, lzwOffset, SEEK_SET);
-					fread(ptr, 1, 256 * 192, fp);
+					fread(ptr, 1, size, fp);
 
 					const int uncompressedSize = decodeLZW(ptr, _bitmapBuffer);
 					assert(uncompressedSize == 256 * 192);
@@ -1212,7 +1226,16 @@ static void DecodeSaturn0001(FILE *fp, FILE *fp_offsets) {
 
 					free(ptr);
 				}
+
+				if (palettes.size() == 0) {
+					++screen;
+					state = 0;
+				} else {
+					++state;
+				}
+				continue;
 			}
+			fseek(fp, size, SEEK_CUR);
 		}
 	}
 }
@@ -1337,21 +1360,10 @@ static void Decode(const char *filename) {
 					if (fp) {
 						switch (_saturn[i].num) {
 						case 0:
-						case 1: {
-								char name[32];
-								snprintf(name, sizeof(name), "offs_%08d.txt", _saturn[i].num);
-								FILE *fp_offsets = fopen(name, "rb");
-								if (!fp_offsets) {
-									fprintf(stderr, "Failed to open '%s'\n", name);
-								} else {
-									if (_saturn[i].num == 0) {
-										DecodeSaturn0000(fp, fp_offsets);
-									} else {
-										DecodeSaturn0001(fp, fp_offsets);
-									}
-									fclose(fp_offsets);
-								}
-							}
+							DecodeSaturn0000(fp);
+							break;
+						case 1:
+							DecodeSaturn0001(fp);
 							break;
 						case 2:
 							DecodeSaturn0002(fp);
