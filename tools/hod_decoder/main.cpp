@@ -66,19 +66,6 @@ static const struct {
 	{ -1, 0 }
 };
 
-static const char *_levels[] = {
-	"rock_hod",
-	"fort_hod",
-	"pwr1_hod",
-	"isld_hod",
-	"lava_hod",
-	"pwr2_hod",
-	"lar1_hod",
-	"lar2_hod",
-	"dark_hod",
-	0
-};
-
 static const int kMaxScreens = 40;
 
 static bool _isPsx;
@@ -360,7 +347,7 @@ static void DecodeLvlSprite(const uint8_t *data, int num) {
 	free(buffer);
 }
 
-static void DecodeLvl(File *fp, int levelNum) {
+static void DecodeLvl(File *fp) {
 
 	const uint32_t tag = fp->readUint32();
 	assert(tag == 0x484F4400);
@@ -1120,17 +1107,6 @@ static void DecodeSetupDat(File *fp) {
 	}
 }
 
-static int LookupLevelNum(const char *filename) {
-	const char *sep = strrchr(filename, '/');
-	const char *p = sep ? (sep + 1) : filename;
-	for (int i = 0; _levels[i]; ++i) {
-		if (strncasecmp(p, _levels[i], strlen(_levels[i])) == 0) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 static void DecodePC(const char *filename, int type, uint32_t flags) {
 	File *fp;
 	if (flags & SECTOR_FILE) {
@@ -1146,7 +1122,7 @@ static void DecodePC(const char *filename, int type, uint32_t flags) {
 			DecodeSetupDat(fp);
 			break;
 		case kLvl:
-			DecodeLvl(fp, LookupLevelNum(filename));
+			DecodeLvl(fp);
 			break;
 		case kSss:
 			DecodeSss(fp);
