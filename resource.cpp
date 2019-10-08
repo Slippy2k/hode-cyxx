@@ -1088,22 +1088,22 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	_mstUnk35.allocate(_mstHdr.unk0x0C);
+	_mstWalkCodeData.allocate(_mstHdr.unk0x0C);
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
 		fp->readUint32();
-		_mstUnk35[i].count1 = fp->readUint32();
-		_mstUnk35[i].indexCodeData = (uint32_t *)malloc(_mstUnk35[i].count1 * sizeof(uint32_t));
+		_mstWalkCodeData[i].codeDataCount = fp->readUint32();
+		_mstWalkCodeData[i].codeData = (uint32_t *)malloc(_mstWalkCodeData[i].codeDataCount * sizeof(uint32_t));
 		fp->readUint32();
-		_mstUnk35[i].count2 = fp->readUint32();
-		_mstUnk35[i].data2 = (uint8_t *)malloc(_mstUnk35[i].count2);
+		_mstWalkCodeData[i].dataCount = fp->readUint32();
+		_mstWalkCodeData[i].data = (uint8_t *)malloc(_mstWalkCodeData[i].dataCount);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
-		for (uint32_t j = 0; j < _mstUnk35[i].count1; ++j) {
-			_mstUnk35[i].indexCodeData[j] = fp->readUint32();
+		for (uint32_t j = 0; j < _mstWalkCodeData[i].codeDataCount; ++j) {
+			_mstWalkCodeData[i].codeData[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		bytesRead += readBytesAlign(fp, _mstUnk35[i].data2, _mstUnk35[i].count2);
+		bytesRead += readBytesAlign(fp, _mstWalkCodeData[i].data, _mstWalkCodeData[i].dataCount);
 	}
 
 	_mstUnk36.allocate(_mstHdr.unk0x10);
@@ -1225,11 +1225,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 				_mstWalkPathData[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
 				_mstWalkPathData[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
 			}
-			_mstWalkPathData[i].data[j].neighborNodes[0] = READ_LE_UINT32(data + 76); // sizeof == 104
-			_mstWalkPathData[i].data[j].neighborNodes[1] = READ_LE_UINT32(data + 80); // sizeof == 104
-			_mstWalkPathData[i].data[j].neighborNodes[2] = READ_LE_UINT32(data + 84); // sizeof == 104
-			_mstWalkPathData[i].data[j].neighborNodes[3] = READ_LE_UINT32(data + 88); // sizeof == 104
-			_mstWalkPathData[i].data[j].indexUnk44Unk1_92 = READ_LE_UINT32(data + 92); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborWalkNode[0] = READ_LE_UINT32(data + 76); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborWalkNode[1] = READ_LE_UINT32(data + 80); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborWalkNode[2] = READ_LE_UINT32(data + 84); // sizeof == 104
+			_mstWalkPathData[i].data[j].neighborWalkNode[3] = READ_LE_UINT32(data + 88); // sizeof == 104
+			_mstWalkPathData[i].data[j].nextWalkNode = READ_LE_UINT32(data + 92); // sizeof == 104
 			_mstWalkPathData[i].data[j].unk60[0] = (uint8_t *)malloc(count);
 			_mstWalkPathData[i].data[j].unk60[1] = (uint8_t *)malloc(count);
 		}
@@ -1581,10 +1581,10 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 void Resource::unloadMstData() {
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
-		free(_mstUnk35[i].indexCodeData);
-		_mstUnk35[i].indexCodeData = 0;
-		free(_mstUnk35[i].data2);
-		_mstUnk35[i].data2 = 0;
+		free(_mstWalkCodeData[i].codeData);
+		_mstWalkCodeData[i].codeData = 0;
+		free(_mstWalkCodeData[i].data);
+		_mstWalkCodeData[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		free(_mstUnk42[i].indexUnk46);

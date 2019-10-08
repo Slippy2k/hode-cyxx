@@ -133,11 +133,11 @@ struct MstWalkBox { // MstUnk34
 	uint8_t flags[4]; // 0x10
 }; // sizeof == 20
 
-struct MstUnk35 { // MstWalkCode
-	uint32_t *indexCodeData; // 0, offset _mstCodeData codeData
-	uint32_t count1; // 4 codeDataCount
-	uint8_t *data2; // 8 data
-	uint32_t count2; // C dataCount
+struct MstWalkCode { // u35
+	uint32_t *codeData; // 0, offset _mstCodeData
+	uint32_t codeDataCount; // 4
+	uint8_t *data; // 8 data
+	uint32_t dataCount; // C
 }; // sizeof == 16
 
 struct MstUnk36 {
@@ -172,8 +172,8 @@ struct MstWalkNode { // u44u1
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t indexUnk35_0x24[2];
 	int32_t unk2C[4][2]; // 0x2C, 0x34, 0x3C, 0x44
-	uint32_t neighborNodes[4]; // per direction 0x4C
-	uint32_t indexUnk44Unk1_92; // next 0x5C
+	uint32_t neighborWalkNode[4]; // per direction 0x4C
+	uint32_t nextWalkNode; // next 0x5C
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
 
@@ -568,7 +568,7 @@ struct Resource {
 
 	ResStruct<MstPointOffset> _mstPointOffsets;
 	ResStruct<MstWalkBox> _mstWalkBoxData;
-	ResStruct<MstUnk35> _mstUnk35;
+	ResStruct<MstWalkCode> _mstWalkCodeData;
 	ResStruct<MstUnk36> _mstUnk36;
 	uint32_t _mstTickDelay;
 	uint32_t _mstTickCodeData;
