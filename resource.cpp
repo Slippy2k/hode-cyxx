@@ -1032,7 +1032,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 
 	_mstHdr.dataSize = fp->readUint32();
 	_mstHdr.walkBoxDataCount = fp->readUint32();
-	_mstHdr.unk0x0C  = fp->readUint32();
+	_mstHdr.walkCodeDataCount = fp->readUint32();
 	_mstHdr.unk0x10  = fp->readUint32();
 	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
 	_mstHdr.screenAreaDataCount = fp->readUint32();
@@ -1088,8 +1088,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 20;
 	}
 
-	_mstWalkCodeData.allocate(_mstHdr.unk0x0C);
-	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
+	_mstWalkCodeData.allocate(_mstHdr.walkCodeDataCount);
+	for (int i = 0; i < _mstHdr.walkCodeDataCount; ++i) {
 		fp->readUint32();
 		_mstWalkCodeData[i].codeDataCount = fp->readUint32();
 		_mstWalkCodeData[i].codeData = (uint32_t *)malloc(_mstWalkCodeData[i].codeDataCount * sizeof(uint32_t));
@@ -1098,7 +1098,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstWalkCodeData[i].data = (uint8_t *)malloc(_mstWalkCodeData[i].dataCount);
 		bytesRead += 16;
 	}
-	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
+	for (int i = 0; i < _mstHdr.walkCodeDataCount; ++i) {
 		for (uint32_t j = 0; j < _mstWalkCodeData[i].codeDataCount; ++j) {
 			_mstWalkCodeData[i].codeData[j] = fp->readUint32();
 			bytesRead += 4;
@@ -1580,7 +1580,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 }
 
 void Resource::unloadMstData() {
-	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
+	for (int i = 0; i < _mstHdr.walkCodeDataCount; ++i) {
 		free(_mstWalkCodeData[i].codeData);
 		_mstWalkCodeData[i].codeData = 0;
 		free(_mstWalkCodeData[i].data);

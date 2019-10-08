@@ -74,7 +74,7 @@ struct MstHdr {
 	int version;
 	int dataSize;
 	uint32_t walkBoxDataCount; // 8
-	int unk0x0C; // mstUnk35DataCount
+	int walkCodeDataCount;
 	int unk0x10; // mstUnk36DataCount
 	int levelCheckpointCodeDataCount; // 14
 	int screenAreaDataCount; // 18

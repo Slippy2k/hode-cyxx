@@ -857,7 +857,7 @@ void Game::resetMstCode() {
 			}
 		}
 	}
-	for (int i = 0; i < _res->_mstHdr.unk0x0C; ++i) {
+	for (int i = 0; i < _res->_mstHdr.walkCodeDataCount; ++i) {
 		const int count = _res->_mstWalkCodeData[i].dataCount;
 		if (count != 0) {
 			uint8_t *ptr = _res->_mstWalkCodeData[i].data;
