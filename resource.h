@@ -106,7 +106,7 @@ struct MstHdr {
 	int pointsCount; // 80
 };
 
-struct MstPointOffset { // MstPoint
+struct MstPointOffset {
 	int32_t xOffset;
 	int32_t yOffset;
 }; // sizeof == 8
@@ -133,11 +133,11 @@ struct MstWalkBox { // MstUnk34
 	uint8_t flags[4]; // 0x10
 }; // sizeof == 20
 
-struct MstUnk35 {
-	uint32_t *indexCodeData; // 0, offset _mstCodeData
-	uint32_t count1; // 4
-	uint8_t *data2; // 8
-	uint32_t count2; // C
+struct MstUnk35 { // MstWalkCode
+	uint32_t *indexCodeData; // 0, offset _mstCodeData codeData
+	uint32_t count1; // 4 codeDataCount
+	uint8_t *data2; // 8 data
+	uint32_t count2; // C dataCount
 }; // sizeof == 16
 
 struct MstUnk36 {
@@ -160,7 +160,7 @@ struct MstUnk43 {
 	uint32_t count2; // C
 }; // sizeof == 16
 
-struct MstWalkNode { // MstUnk44Unk1
+struct MstWalkNode { // u44u1
 	int32_t x1; // 0
 	int32_t x2; // 4
 	int32_t y1; // 8
@@ -177,7 +177,7 @@ struct MstWalkNode { // MstUnk44Unk1
 	uint8_t *unk60[2]; // 0x60
 }; // sizeof == 104
 
-struct MstWalkPath { // MstUnk44
+struct MstWalkPath { // u44
 	MstWalkNode *data;
 	uint32_t *indexUnk44Unk1; // indexed by screen number
 	uint32_t mask; // 0x8
@@ -447,7 +447,7 @@ struct SssSample {
 
 struct SssPreloadInfo {
 	uint32_t count;
-	uint8_t *data; // sizeof 32
+	uint8_t *data; // sizeof == 32 (v10,v11) 68 (v6)
 };
 
 struct SssFilter {

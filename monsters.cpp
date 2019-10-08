@@ -889,6 +889,7 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	_m43Num3 = _m43Num1 = _m43Num2 = _m48Num = -1;
+	_mstOp54Counter = 0; // not reset in the original, causes uninitialized reads at the beginning of 'fort'
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	_mstUnk8 = 0;
 	_specialAnimFlag = false;

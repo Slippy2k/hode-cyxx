@@ -454,6 +454,8 @@ void Resource::loadLvlData(File *fp, const char *name) {
 
 	assert(fp == _lvlFile);
 
+	unloadLvlData();
+
 	const uint32_t tag = _lvlFile->readUint32();
 	if (tag != _lvlTag) {
 		error("Unhandled .lvl tag 0x%x", tag);
@@ -943,12 +945,12 @@ void Resource::unloadSssData() {
 }
 
 void Resource::checkSssCode(const uint8_t *buf, int size) const {
-	static const uint8_t _opcodesLength[] = {
+	static const uint8_t opcodesLength[] = {
 		4, 0, 4, 0, 4, 12, 8, 0, 16, 4, 4, 4, 4, 8, 12, 0, 4, 8, 8, 4, 4, 4, 8, 4, 8, 4, 8, 16, 8, 4
 	};
 	int offset = 0;
 	while (offset < size) {
-		const int len = _opcodesLength[buf[offset]];
+		const int len = opcodesLength[buf[offset]];
 		if (len == 0) {
 			warning("Invalid .sss opcode %d", buf[offset]);
 			break;
@@ -1015,6 +1017,11 @@ void Resource::resetSssFilters() {
 
 void Resource::loadMstData(File *fp, const char *name) {
 	assert(fp == _mstFile);
+
+	if (_mstHdr.dataSize != 0) {
+		unloadMstData();
+		_mstHdr.dataSize = 0;
+	}
 
 	_mstHdr.version = fp->readUint32();
 	if (_mstHdr.version != 160) {
@@ -1575,26 +1582,46 @@ void Resource::loadMstData(File *fp, const char *name) {
 void Resource::unloadMstData() {
 	for (int i = 0; i < _mstHdr.unk0x0C; ++i) {
 		free(_mstUnk35[i].indexCodeData);
+		_mstUnk35[i].indexCodeData = 0;
 		free(_mstUnk35[i].data2);
+		_mstUnk35[i].data2 = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		free(_mstUnk42[i].indexUnk46);
+		_mstUnk42[i].indexUnk46 = 0;
 		free(_mstUnk42[i].data2);
+		_mstUnk42[i].data2 = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
 		free(_mstUnk43[i].indexUnk48);
+		_mstUnk43[i].indexUnk48 = 0;
 		free(_mstUnk43[i].data2);
+		_mstUnk43[i].data2 = 0;
+	}
+	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
+		free(_mstWalkPathData[i].data);
+		_mstWalkPathData[i].data = 0;
+		free(_mstWalkPathData[i].indexUnk44Unk1);
+		_mstWalkPathData[i].indexUnk44Unk1 = 0;
+	}
+	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
+		free(_mstUnk46[i].data);
+		_mstUnk46[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
 		free(_mstUnk47[i].data);
+		_mstUnk47[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
 		MstUnk48 *m = &_mstUnk48[i];
 		for (int j = 0; j < 2; ++j) {
 			free(m->data1[j]);
+			m->data1[j] = 0;
 			free(m->data2[j]);
+			m->data2[j] = 0;
 		}
 		free(m->unk12);
+		m->unk12 = 0;
 	}
 
 	free(_mstMonsterInfos);
@@ -1602,13 +1629,17 @@ void Resource::unloadMstData() {
 
 	for (int i = 0; i < _mstHdr.unk0x40; ++i) {
 		free(_mstUnk49[i].data1);
+		_mstUnk49[i].data1 = 0;
 		free(_mstUnk49[i].data2);
+		_mstUnk49[i].data2 = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
 		free(_mstUnk50[i].data);
+		_mstUnk50[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
 		free(_mstUnk51[i].indexUnk50Unk1);
+		_mstUnk51[i].indexUnk50Unk1 = 0;
 	}
 
 	free(_mstCodeData);

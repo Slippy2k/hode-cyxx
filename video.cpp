@@ -6,7 +6,7 @@
 #include "video.h"
 #include "system.h"
 
-static const bool _findBlackColor = false; // _blackColor is never read
+static const bool _findBlackColor = false;
 
 Video::Video(System *system)
 	: _system(system) {
