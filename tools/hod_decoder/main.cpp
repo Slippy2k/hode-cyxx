@@ -370,11 +370,33 @@ static void DecodeLvl(File *fp, int levelNum) {
 	fp->readByte();
 	const int spritesCount = fp->readByte();
 
-	// level map
+	// level map (0x8)
 	uint8_t gridData[kMaxScreens * 4];
 	assert(screensCount <= kMaxScreens);
 	fp->read(gridData, screensCount * 4);
 	GenerateLevelMap(gridData, screensCount);
+
+	// level screen x/y pos (0xA8)
+	fp->seekAlign(0xA8);
+	for (int i = 0; i < screensCount; ++i) {
+		fp->readUint32();
+		fp->readUint32();
+	}
+
+	// level screen states (0x1E8)
+	fp->seekAlign(0x1E8);
+	for (int i = 0; i < screensCount; ++i) {
+		fp->readByte();
+		fp->readByte();
+		fp->readByte();
+		fp->readByte();
+	}
+
+	// level objects (sizeof == 96) count == 104
+	fp->seekAlign(0x288);
+
+	static const uint32_t kSpritesOffset = 0x2988;
+	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
 	// screen masks (shadows, grids)
 	static const uint32_t kMaskOffsets = 0x4708;
@@ -389,9 +411,6 @@ static void DecodeLvl(File *fp, int levelNum) {
 		fp->seek(sssOffset, SEEK_SET);
 		DecodeSss(fp, sssOffset);
 	}
-
-	static const uint32_t kSpritesOffset = 0x2988;
-	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
 	// background screens
 	for (int i = 0; i < screensCount; ++i) {
@@ -647,7 +666,9 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 				if (samples) {
 					fp->read(samples, size);
 
-					snprintf(filename, sizeof(filename), "hod_%03d.raw", i);
+					// ffplay -acodec adpcm_psx -f s16le -ar 11025 -ac 1 -i $fn.pcm
+
+					snprintf(filename, sizeof(filename), "hod_%03d.pcm", i);
 					fioDumpData(filename, samples, size);
 
 					free(samples);
@@ -1256,11 +1277,7 @@ static void DecodeSaturn0003(FILE *fp) { // .sss
 
 				char name[64];
 				snprintf(name, sizeof(name), "hod_%03d.pcm", i);
-				FILE *out = fopen(name, "wb");
-				if (out) {
-					fwrite(samples, 1, size, out);
-					fclose(out);
-				}
+				fioDumpData(name, samples, size);
 
 				int decompressedSize = (size - 2) * 2 * sizeof(int16_t) + sizeof(int16_t);
 				uint8_t *pcm = (uint8_t *)malloc(decompressedSize);
