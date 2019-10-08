@@ -1439,6 +1439,7 @@ void Game::restartLevel() {
 	const int num = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
 	preloadLevelScreenData(num, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
+	memset(_video->_backgroundLayer, 0, Video::W * Video::H);
 	resetScreen();
 	if (_andyObject->screenNum != num) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
@@ -2068,6 +2069,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_level->_checkpoint = checkpoint;
 	_mix._lock(1);
 	_res->loadLevelData(_currentLevel);
+	clearSoundObjects();
 	_mix._lock(0);
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
@@ -2098,26 +2100,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_endLevel = false;
 	resetShootLvlObjectDataTable();
 	callLevel_initialize();
-	setupAndyLvlObject();
-	clearLvlObjectsList2();
-	clearLvlObjectsList3();
-	if (!_mstDisabled) {
-		resetMstCode();
-		startMstCode();
-	} else {
-		_mstFlags = 0;
-	}
-	if (_res->_sssHdr.infosDataCount != 0) {
-		resetSound();
-	}
-	const int num = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
-	preloadLevelScreenData(num, 0xFF);
-	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
-	resetScreen();
-	if (_andyObject->screenNum != num) {
-		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
-	}
-	updateScreen(_andyObject->screenNum);
+	restartLevel();
 	do {
 		const int frameTimeStamp = _system->getTimeStamp() + _frameMs;
 		levelMainLoop();
