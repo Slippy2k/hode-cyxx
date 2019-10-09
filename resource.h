@@ -192,7 +192,7 @@ struct MstInfoMonster2 {
 	uint32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk46Unk1 { // MstBehavior
+struct MstUnk46Unk1 { // MstBehaviorState
 	uint32_t indexMonsterInfo; // 0, indexes _mstMonsterInfos
 	uint16_t anim; // 4
 	uint16_t unk6; // 6
@@ -207,7 +207,7 @@ struct MstUnk46Unk1 { // MstBehavior
 	uint32_t codeData; // 0x28 indexes _mstCodeData
 }; // sizeof == 44
 
-struct MstUnk46 {
+struct MstUnk46 { // MstBehavior
 	MstUnk46Unk1 *data;
 	uint32_t count;
 }; // sizeof == 8
@@ -428,21 +428,21 @@ struct SssDefaults {
 struct SssBank {
 	uint8_t flags; // 0 flags0
 	int8_t count; // 1 codeOffsetCount
-	uint16_t sssFilter; // 2 index to _sssFilters
-	uint32_t firstSampleIndex; // 4 offset to _sssSamplesData
+	uint16_t sssFilter; // 2 indexes _sssFilters
+	uint32_t firstSampleIndex; // 4 indexes _sssSamplesData
 };
 
 struct SssSample {
-	uint16_t pcm; // index to _sssPcmTable
+	uint16_t pcm; // indexes _sssPcmTable
 	uint16_t framesCount;
 	uint8_t initVolume; // 0x4
 	uint8_t unk5;
 	int8_t initPriority; // 0x6
 	int8_t initPanning; // 0x7
-	uint32_t codeOffset1; // 0x8 offset to _sssCodeData
-	uint32_t codeOffset2; // 0xC offset to _sssCodeData
-	uint32_t codeOffset3; // 0x10 offset to _sssCodeData
-	uint32_t codeOffset4; // 0x14 offset to _sssCodeData
+	uint32_t codeOffset1; // 0x8 indexes _sssCodeData
+	uint32_t codeOffset2; // 0xC indexes _sssCodeData
+	uint32_t codeOffset3; // 0x10 indexes _sssCodeData
+	uint32_t codeOffset4; // 0x14 indexes _sssCodeData
 }; // sizeof == 24
 
 struct SssPreloadInfo {
@@ -574,8 +574,8 @@ struct Resource {
 	uint32_t _mstTickCodeData;
 	ResStruct<uint32_t> _mstLevelCheckpointCodeData;
 	ResStruct<MstScreenArea> _mstScreenAreaData;
-	ResStruct<uint32_t> _mstUnk39; // index to _mstScreenAreaData
-	ResStruct<uint32_t> _mstUnk40; // index to _mstScreenAreaData
+	ResStruct<uint32_t> _mstUnk39; // indexes _mstScreenAreaData
+	ResStruct<uint32_t> _mstUnk40; // indexes _mstScreenAreaData
 	ResStruct<uint32_t> _mstUnk41;
 	ResStruct<MstUnk42> _mstUnk42;
 	ResStruct<MstUnk43> _mstUnk43;
@@ -596,7 +596,7 @@ struct Resource {
 	ResStruct<MstOp197Data> _mstOp197Data;
 	ResStruct<MstOp211Data> _mstOp211Data;
 	ResStruct<MstOp240Data> _mstOp240Data;
-	ResStruct<uint32_t> _mstUnk60; // index to _mstCodeData
+	ResStruct<uint32_t> _mstUnk60; // indexes _mstCodeData
 	ResStruct<MstOp204Data> _mstOp204Data;
 	uint8_t *_mstCodeData;
 	ResStruct<MstOp226Data> _mstOp226Data;

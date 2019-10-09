@@ -115,7 +115,7 @@ void Game::resetMonsterObject2(MonsterObject2 *m) {
 	}
 }
 
-void Game::mstTaskSetScreenPosition(Task *t) {
+void Game::mstTaskSetMonster2ScreenPosition(Task *t) {
 	MonsterObject2 *m = t->monster2;
 	LvlObject *o = m->o;
 	m->xPos = o->xPos + o->posTable[7].x;
@@ -267,7 +267,7 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 }
 
 // set lvlObject position from monster position
-void Game::updateMstLvlObjectPos(MonsterObject1 *m) {
+void Game::mstMonster1SetScreenPosition(MonsterObject1 *m) {
 	LvlObject *o = m->o16;
 	o->xPos = m->xPos - o->posTable[7].x;
 	o->yPos = m->yPos - o->posTable[7].y;
@@ -373,7 +373,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	o->screenNum = screenNum;
 	m->xPos = xWalkBox - xMst;
 	m->yPos = _edx - yMst;
-	updateMstLvlObjectPos(m);
+	mstMonster1SetScreenPosition(m);
 	m->walkNode = walkNode;
 	mstMonster1ResetWalkPath(m);
 	return true;
@@ -875,7 +875,7 @@ void Game::resetMstCode() {
 			for (int j = 0; j < count; ++j) {
 				ptr[j] &= ~0x80;
 			}
-			for (int j = 0; j < count; ++j) {
+			for (int j = 0; j < count * 2; ++j) {
 				const int index1 = _rnd.update() % count;
 				const int index2 = _rnd.update() % count;
 				SWAP(ptr[index1], ptr[index2]);
@@ -891,7 +891,7 @@ void Game::resetMstCode() {
 	_m43Num3 = _m43Num1 = _m43Num2 = _m48Num = -1;
 	_mstOp54Counter = 0; // not reset in the original, causes uninitialized reads at the beginning of 'fort'
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
-	_mstUnk8 = 0;
+	// _mstUnk8 = 0;
 	_specialAnimFlag = false;
 	_mstAndyRectNum = 255;
 	_mstBoundingBoxesCount = 0;
@@ -2895,7 +2895,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 
 int Game::mstUpdateTaskMonsterObject2(Task *t) {
 	debug(kDebug_MONSTER, "mstUpdateTaskMonsterObject2 t %p", t);
-	mstTaskSetScreenPosition(t);
+	mstTaskSetMonster2ScreenPosition(t);
 	MonsterObject2 *m = t->monster2;
 	if (_currentLevel == kLvl_fort && m->monster2Info->type == 27) {
 		if (_fireflyPosData[m->hPosIndex] == 0xFF) {
@@ -5993,7 +5993,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 				o->yPos = yPos;
 				setLvlObjectPosInScreenGrid(o, 7);
 				if (t->monster2) {
-					mstTaskSetScreenPosition(t);
+					mstTaskSetMonster2ScreenPosition(t);
 				} else {
 					assert(t->monster1);
 					mstTaskUpdateScreenPosition(t);
@@ -7146,7 +7146,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		t->codeData = 0;
 		appendTask(&_monsterObjects2TasksList, t);
 		t->codeData = kUndefinedMonsterByteCode;
-		mstTaskSetScreenPosition(t);
+		mstTaskSetMonster2ScreenPosition(t);
 		const uint32_t codeData = mo->monster2Info->codeData;
 		assert(codeData != kNone);
 		resetTask(t, _res->_mstCodeData + codeData * 4);

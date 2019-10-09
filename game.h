@@ -205,7 +205,6 @@ struct Game {
 	int _yMstPos1, _yMstPos2, _yMstPos3;
 	int _mstHelper1Count;
 	int _m48Num;
-	uint8_t _mstUnk8;
 	uint32_t _mstAndyVarMask;
 	int _mstChasingMonstersCount;
 	int _mstPosXmin, _mstPosXmax;
@@ -387,7 +386,7 @@ struct Game {
 	void disableMonsterObject1(MonsterObject1 *m);
 	void copyMonsterObject1(Task *t, MonsterObject1 *m, int num);
 	int mstTaskStopMonsterObject1(Task *t);
-	void updateMstLvlObjectPos(MonsterObject1 *m);
+	void mstMonster1SetScreenPosition(MonsterObject1 *m);
 	bool mstMonster1SetWalkingBounds(MonsterObject1 *m);
 	bool mstMonster1UpdateWalkPath(MonsterObject1 *m);
 	void initMonsterObject2_firefly(MonsterObject2 *m);
@@ -399,7 +398,7 @@ struct Game {
 	int mstBoundingBoxUpdate(int num, int a, int x1, int y1, int x2, int y2);
 	int mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2);
 
-	void mstTaskSetScreenPosition(Task *t);
+	void mstTaskSetMonster2ScreenPosition(Task *t);
 	int getMstDistance(int y, const AndyShootData *p) const;
 	void mstTaskUpdateScreenPosition(Task *t);
 	void shuffleMstUnk43(MstUnk43 *p);
