@@ -46,6 +46,10 @@ def tidyCpp(fname):
 		# replace variables named after x86 registers
 		for reg, varname in X86_REGS.items():
 			line = line.replace(reg, varname)
+		# strip comments with 'goto address'
+		ndx = line.find('// goto')
+		if ndx != -1:
+			line = line[:ndx] + '\n'
 		temporary.write(line)
 	temporary.flush()
 	return temporary
