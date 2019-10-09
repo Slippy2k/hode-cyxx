@@ -2664,15 +2664,15 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
 		MstUnk46Unk1 *m46 = m->m46Unk1;
 		if (m46->indexUnk47 != kNone) {
-			MstUnk47 *m47 = &_res->_mstUnk47[m46->indexUnk47];
+			MstAttackBox *m47 = &_res->_mstAttackBoxData[m46->indexUnk47];
 			if (m47->count > 0) {
 				const uint8_t dir = (o->flags1 >> 4) & 3;
 				const uint8_t *p = m47->data;
 				for (uint32_t i = 0; i < m47->count; ++i) {
-					int32_t a = READ_LE_UINT32(p);
-					int32_t b = READ_LE_UINT32(p + 4);
-					int32_t c = READ_LE_UINT32(p + 8);
-					int32_t d = READ_LE_UINT32(p + 12);
+					int32_t a = READ_LE_UINT32(p); // x1
+					int32_t b = READ_LE_UINT32(p + 4); // y1
+					int32_t c = READ_LE_UINT32(p + 8); // x2
+					int32_t d = READ_LE_UINT32(p + 12); // y2
 					int x1, x2, y1, y2;
 					switch (dir) {
 					case 1:

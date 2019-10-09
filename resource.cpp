@@ -1042,7 +1042,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.walkPathDataCount  = fp->readUint32();
 	_mstHdr.infoMonster2Count  = fp->readUint32();
 	_mstHdr.unk0x30  = fp->readUint32();
-	_mstHdr.unk0x34  = fp->readUint32();
+	_mstHdr.attackBoxDataCount = fp->readUint32();
 	_mstHdr.unk0x38  = fp->readUint32();
 	_mstHdr.infoMonster1Count  = fp->readUint32();
 	_mstHdr.unk0x40  = fp->readUint32();
@@ -1282,16 +1282,16 @@ void Resource::loadMstData(File *fp, const char *name) {
 		}
 	}
 
-	_mstUnk47.allocate(_mstHdr.unk0x34);
-	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
+	_mstAttackBoxData.allocate(_mstHdr.attackBoxDataCount);
+	for (int i = 0; i < _mstHdr.attackBoxDataCount; ++i) {
 		fp->readUint32();
-		_mstUnk47[i].count = fp->readUint32();
+		_mstAttackBoxData[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
-	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
-		_mstUnk47[i].data = (uint8_t *)malloc(_mstUnk47[i].count * 20);
-		fp->read(_mstUnk47[i].data, _mstUnk47[i].count * 20);
-		bytesRead += _mstUnk47[i].count * 20;
+	for (int i = 0; i < _mstHdr.attackBoxDataCount; ++i) {
+		_mstAttackBoxData[i].data = (uint8_t *)malloc(_mstAttackBoxData[i].count * 20);
+		fp->read(_mstAttackBoxData[i].data, _mstAttackBoxData[i].count * 20);
+		bytesRead += _mstAttackBoxData[i].count * 20;
 	}
 
 	_mstUnk48.allocate(_mstHdr.unk0x38);
@@ -1608,9 +1608,9 @@ void Resource::unloadMstData() {
 		free(_mstUnk46[i].data);
 		_mstUnk46[i].data = 0;
 	}
-	for (int i = 0; i < _mstHdr.unk0x34; ++i) {
-		free(_mstUnk47[i].data);
-		_mstUnk47[i].data = 0;
+	for (int i = 0; i < _mstHdr.attackBoxDataCount; ++i) {
+		free(_mstAttackBoxData[i].data);
+		_mstAttackBoxData[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
 		MstUnk48 *m = &_mstUnk48[i];
