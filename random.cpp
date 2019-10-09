@@ -52,10 +52,6 @@ uint8_t Random::getNextNumber() {
 	return num;
 }
 
-uint8_t Random::getSeed() const {
-	return _rndSeed & 0xFF;
-}
-
 void Random::resetMst(uint8_t *p) {
 	p[0] = update() & 7; // row
 	p[1] = update() & 31; // start

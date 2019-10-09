@@ -873,7 +873,7 @@ void Game::resetMstCode() {
 		if (count != 0) {
 			uint8_t *ptr = _res->_mstUnk43[i].data2;
 			for (int j = 0; j < count; ++j) {
-				ptr[j] &= ~0x80;
+				ptr[j] &= 0x7F;
 			}
 			for (int j = 0; j < count * 2; ++j) {
 				const int index1 = _rnd.update() % count;
@@ -5639,15 +5639,15 @@ void Game::mstOp53(MstUnk48 *m) {
 		if (mstCollidesDirection(m, 0)) {
 			addChasingMonster(m, 0);
 		}
-		return;
-	}
-	int dir = _rnd.update() & 1;
-	if (mstCollidesDirection(m, dir) && addChasingMonster(m, dir)) {
-		return;
-	}
-	dir ^= 1;
-	if (mstCollidesDirection(m, dir) && addChasingMonster(m, dir)) {
-		return;
+	} else {
+		int dir = _rnd.update() & 1;
+		if (mstCollidesDirection(m, dir) && addChasingMonster(m, dir)) {
+		} else {
+			dir ^= 1;
+			if (mstCollidesDirection(m, dir)) {
+				addChasingMonster(m, dir);
+			}
+		}
 	}
 }
 
@@ -5695,12 +5695,12 @@ void Game::mstOp54() {
 				addChasingMonster(m48, 0);
 			}
 		} else {
-			uint8_t flag = _rnd.update() & 1;
-			if (mstCollidesDirection(m48, flag) && addChasingMonster(m48, flag)) {
+			uint8_t dir = _rnd.update() & 1;
+			if (mstCollidesDirection(m48, dir) && addChasingMonster(m48, dir)) {
 			} else {
-				flag ^= 1;
-				if (mstCollidesDirection(m48, flag)) {
-					addChasingMonster(m48, flag);
+				dir ^= 1;
+				if (mstCollidesDirection(m48, dir)) {
+					addChasingMonster(m48, dir);
 				}
 			}
 		}
@@ -5712,11 +5712,7 @@ void Game::mstOp54() {
 			return;
 		}
 		_mstOp54Counter = 0;
-		for (uint32_t i = 0; i < m43->count2; ++i) {
-			m43->data2[i] &= ~0x80;
-		}
-		shuffleArray(m43->data2, m43->count2);
-
+		shuffleMstUnk43(m43);
 	} else {
 // 41E3CA
 		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
@@ -5762,10 +5758,7 @@ void Game::mstOp54() {
 			}
 			_mstOp54Counter = 0;
 			if (m43->count2 != 0) {
-				for (uint32_t i = 0; i < m43->count2; ++i) {
-					m43->data2[i] &= 0x7F;
-				}
-				shuffleArray(m43->data2, m43->count2);
+				shuffleMstUnk43(m43);
 			}
 		}
 	}
@@ -6241,7 +6234,7 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 // 4034D2
 	const int dx = x - _crackSpritesTable[spriteNum].xPos;
 	const int dy = y + 15 - _crackSpritesTable[spriteNum].yPos;
-	spriteNum = _rnd.getSeed() & 3;
+	spriteNum = _rnd._rndSeed & 3;
 	if (spriteNum == 0) {
 		spriteNum = 1;
 	}
