@@ -18,22 +18,22 @@ Most of the information presented here was found by studying the binary code and
 
 ## Assets
 
-There are three files for each level :
-
-* .LVL : contains the palettes, bitmaps, sprites and pre-calculated tables for shadows
-* .MST : contains the bytecode and triggers for the monster logic
-* .SSS : contains the sound and music files also some bytecode and triggers for playback
-
 SETUP.DAT contains several files for the options, menus and the hint screens.
 
 ![Hint 3](img/hint03.png) ![Hint 6](img/hint06.png)
 
 HOD.PAF contains the cinematics. PAF stands for Packed Animation File.
 
+There are three files for each level :
+
+* .LVL : contains the palettes, bitmaps, sprites and pre-calculated tables for shadows
+* .MST : contains the bytecode and triggers for the monster logic
+* .SSS : contains the sound and triggers
+
 
 ## Compression
 
-The engine uses two different compressions :
+The engine uses two different compressions for graphics :
 
 * RLE for graphics decoded at runtime (sprites)
 * LZW for static bitmaps (menu, hints and level screen backgrounds)
@@ -44,7 +44,7 @@ Prepending a TIFF header to a LZW compressed data block allows to open the file 
 
 Such programs indicate the compression is based on 'Old style LZW codes' (eg. the bitstream starts with a 0x100 clearcode).
 
-[libtiff](https://gitlab.com/libtiff/libtiff) needs to be compiled with LZW_COMPAT to be able to handle such files.
+[libtiff](https://gitlab.com/libtiff/libtiff) needs to be compiled with LZW_COMPAT to handle such files.
 
 ```
 // libtiff/tif_lzw.c
@@ -56,8 +56,7 @@ Such programs indicate the compression is based on 'Old style LZW codes' (eg. th
 
 ## Debug Mode
 
-Pressing the left or right shift key when loading the quit confirmation or a hint screen shows some statistics
-and debug information.
+Pressing the left or right shift key when loading the quit confirmation or a hint screen shows some statistics and debug information.
 
 ![Debug Mode](img/debug_mode.png)
 
@@ -72,7 +71,17 @@ The last line gives information about the game progress. V is the version of the
 
 ## Engine
 
-The main loop of the engine is built around a set of callbacks :
+The engine code can be split in 4 major parts :
+
+* C code handling collision, path finding, sprites, rendering and game objects
+* C code (callbacks) for each screen level
+* a bytecode interpreter (242 opcodes) for the monsters logic
+* a bytecode interpreter (30 opcodes) for the sounds
+
+
+### Callbacks
+
+For each level and screen, the below callbacks can be found in the executable.
 
 ```
 // called before and after the screen graphics are redrawn
@@ -90,14 +99,18 @@ callLevel_initialize()
 callLevel_terminate()
 ```
 
-For each level and screen, the callback code can be found in the executable.
+These callbacks will usually :
 
-As an example, the first screen has two different states. One before and another one after the explosion.
+* keep track of the user progress (checkpoints)
+* update the background bitmap and state
+* update sprites and game objects
+
+
+As an example, the first screen of the 'rock' level has two different states. One before and another one after the explosion.
 
 ![rock_hod screen0](img/rock_hod_00_0.png) ![rock_hod screen1](img/rock_hod_00_1.png)
 
 The callback code simply relies on some state and counter variables to change the asset for the background.
-The contents of the screen are also shaken during the switch.
 
 ```
 void preScreenUpdateCb(level1, screen0) {
@@ -124,12 +137,6 @@ void postScreenUpdateCb(level1, screen0) {
   }
 }
 ```
-
-In addition to these callbacks, the engine has two bytecode interpreters for
-
-* the monsters logic (242 opcodes)
-* the sounds (30 opcodes)
-
 
 ### Monsters Logic
 
@@ -204,7 +211,7 @@ Opcode | Name                            | Description
 28     | jump                            | jump to a given offset in the bytecode
 29     | end                             |
 
-
+Each opcode has variable length, from 4 to 16 bytes.
 
 
 ## Savegame
@@ -352,7 +359,6 @@ for (y = 0; y < 192; ++y) {
 ## Sprites Blitting
 
 Similar to Flashback, the sprites are not cached in RAM but decompressed in realtime when drawn.
-Although the compression scheme is a simple RLE, the x86 code to decompress and blit the graphics has been optimized.
 
 The RLE code byte uses the upper two bits for the operation type and the lower 6 bits for the length.
 
@@ -362,5 +368,3 @@ Type | Operation
 1    | repeat
 2    | transparent
 3    | next line
-
-The x86 routine is basically a 256 entries jump table. The code also handles vertical and horizontal clipping.
