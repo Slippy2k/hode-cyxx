@@ -36,19 +36,19 @@ These defaults can be changed using command line switches :
     --level=NUM       Start at level NUM
     --checkpoint=NUM  Start at checkpoint NUM
 
-Display settings can be configured in the 'hode.ini' file.
+Display and engine settings can be configured in the 'hode.ini' file.
 
 
 Status:
 -------
 
 What is working :
-* Cinematics (PAF)
 * Andy
-* Plasma Cannon
-* Level screens
+* Cinematics (PAF)
 * Hint screens
+* Level screens
 * Monsters logic (MST)
+* Plasma Cannon
 * Shooting collisions
 * Sound playback (SSS)
 * Special Powers
