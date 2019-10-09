@@ -278,7 +278,7 @@ void System_SDL2::copyRectWidescreen(int w, int h, const uint8_t *buf, const uin
 		if (src && tmp) {
 			for (int i = 0; i < w * h; ++i) {
 				const uint8_t color = buf[i];
-				src[i] = SDL_MapRGB(_fmt, pal[color * 3], pal[color * 3 + 1], pal[color * 3 + 2]);
+				src[i] = SDL_MapRGB(_fmt, _gammaLut[pal[color * 3]], _gammaLut[pal[color * 3 + 1]], _gammaLut[pal[color * 3 + 2]]);
 			}
 			static const int radius = 8;
 			blur_h(radius, src, w, w, h, _fmt, tmp, w);
