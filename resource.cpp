@@ -1041,7 +1041,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x24  = fp->readUint32();
 	_mstHdr.walkPathDataCount  = fp->readUint32();
 	_mstHdr.infoMonster2Count  = fp->readUint32();
-	_mstHdr.unk0x30  = fp->readUint32();
+	_mstHdr.behaviorDataCount  = fp->readUint32();
 	_mstHdr.attackBoxDataCount = fp->readUint32();
 	_mstHdr.unk0x38  = fp->readUint32();
 	_mstHdr.infoMonster1Count  = fp->readUint32();
@@ -1255,30 +1255,30 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 12;
 	}
 
-	_mstUnk46.allocate(_mstHdr.unk0x30);
-	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
+	_mstBehaviorData.allocate(_mstHdr.behaviorDataCount);
+	for (int i = 0; i < _mstHdr.behaviorDataCount; ++i) {
 		fp->readUint32();
-		_mstUnk46[i].count = fp->readUint32();
+		_mstBehaviorData[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
-	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
-		_mstUnk46[i].data  = (MstUnk46Unk1 *)malloc(_mstUnk46[i].count * sizeof(MstUnk46Unk1));
-		for (uint32_t j = 0; j < _mstUnk46[i].count; ++j) {
+	for (int i = 0; i < _mstHdr.behaviorDataCount; ++i) {
+		_mstBehaviorData[i].data  = (MstBehaviorState *)malloc(_mstBehaviorData[i].count * sizeof(MstBehaviorState));
+		for (uint32_t j = 0; j < _mstBehaviorData[i].count; ++j) {
 			uint8_t data[44];
 			fp->read(data, sizeof(data));
 			bytesRead += 44;
-			_mstUnk46[i].data[j].indexMonsterInfo = READ_LE_UINT32(data);
-			_mstUnk46[i].data[j].anim        = READ_LE_UINT16(data + 0x04);
-			_mstUnk46[i].data[j].unk6        = READ_LE_UINT16(data + 0x06);
-			_mstUnk46[i].data[j].unk8        = READ_LE_UINT32(data + 0x08);
-			_mstUnk46[i].data[j].energy      = READ_LE_UINT32(data + 0x0C);
-			_mstUnk46[i].data[j].unk10       = READ_LE_UINT32(data + 0x10);
-			_mstUnk46[i].data[j].count       = READ_LE_UINT32(data + 0x14);
-			_mstUnk46[i].data[j].unk18       = READ_LE_UINT32(data + 0x18);
-			_mstUnk46[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
-			_mstUnk46[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);
-			_mstUnk46[i].data[j].indexUnk47  = READ_LE_UINT32(data + 0x24);
-			_mstUnk46[i].data[j].codeData    = READ_LE_UINT32(data + 0x28);
+			_mstBehaviorData[i].data[j].indexMonsterInfo = READ_LE_UINT32(data);
+			_mstBehaviorData[i].data[j].anim        = READ_LE_UINT16(data + 0x04);
+			_mstBehaviorData[i].data[j].unk6        = READ_LE_UINT16(data + 0x06);
+			_mstBehaviorData[i].data[j].unk8        = READ_LE_UINT32(data + 0x08);
+			_mstBehaviorData[i].data[j].energy      = READ_LE_UINT32(data + 0x0C);
+			_mstBehaviorData[i].data[j].unk10       = READ_LE_UINT32(data + 0x10);
+			_mstBehaviorData[i].data[j].count       = READ_LE_UINT32(data + 0x14);
+			_mstBehaviorData[i].data[j].unk18       = READ_LE_UINT32(data + 0x18);
+			_mstBehaviorData[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
+			_mstBehaviorData[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);
+			_mstBehaviorData[i].data[j].indexUnk47  = READ_LE_UINT32(data + 0x24);
+			_mstBehaviorData[i].data[j].codeData    = READ_LE_UINT32(data + 0x28);
 		}
 	}
 
@@ -1604,9 +1604,9 @@ void Resource::unloadMstData() {
 		free(_mstWalkPathData[i].indexUnk44Unk1);
 		_mstWalkPathData[i].indexUnk44Unk1 = 0;
 	}
-	for (int i = 0; i < _mstHdr.unk0x30; ++i) {
-		free(_mstUnk46[i].data);
-		_mstUnk46[i].data = 0;
+	for (int i = 0; i < _mstHdr.behaviorDataCount; ++i) {
+		free(_mstBehaviorData[i].data);
+		_mstBehaviorData[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.attackBoxDataCount; ++i) {
 		free(_mstAttackBoxData[i].data);

@@ -339,16 +339,16 @@ struct Task;
 struct MstWalkCode;
 struct MstWalkPath;
 struct MstInfoMonster2;
-struct MstUnk46;
-struct MstUnk46Unk1;
+struct MstBehavior;
+struct MstBehaviorState;
 struct MstWalkNode;
 struct MstUnk48Unk12Unk4;
 struct MstUnk49;
 struct MstUnk49Unk1;
 
 struct MonsterObject1 {
-	MstUnk46 *m46; // 0x0
-	MstUnk46Unk1 *m46Unk1; // 0x4
+	MstBehavior *m46; // 0x0
+	MstBehaviorState *m46Unk1; // 0x4
 	const uint8_t *monsterInfos; // 0x8
 	MstWalkNode *walkNode; // 0xC
 	LvlObject *o16; // 0x10
