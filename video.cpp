@@ -40,21 +40,25 @@ Video::~Video() {
 	free(_shadowScreenMaskBuffer);
 }
 
+static int colorBrightness(int r, int g, int b) {
+	return (r + g * 2) * 19 + b * 7;
+}
+
 void Video::refreshGamePalette(const uint16_t *pal) {
 	_refreshPalette = true;
 	for (int i = 0; i < 256 * 3; ++i) {
 		_palette[i] = pal[i] >> 8;
 	}
-	int colorQuant = -1;
+	int blackQuant = INT32_MAX;
 	_blackColor = 255;
 	if (_findBlackColor) {
 		const int r = _palette[255 * 3];
 		const int g = _palette[255 * 3 + 1];
 		const int b = _palette[255 * 3 + 2];
 		for (int i = 1; i < 255; ++i) {
-			const int q = ABS(_palette[i * 3] - r) * 19 + ABS(_palette[i * 3 + 2] - b) * 7 + ABS(_palette[i * 3 + 1] - g) * 38;
-			if (colorQuant < 0 || q < colorQuant) {
-				colorQuant = q;
+			const int q = colorBrightness(ABS(_palette[i * 3] - r), ABS(_palette[i * 3 + 1] - g), ABS(_palette[i * 3 + 2] - b));
+			if (q < blackQuant) {
+				blackQuant = q;
 				_blackColor = i;
 			}
 		}
@@ -470,10 +474,7 @@ uint8_t Video::findWhiteColor() const {
 	uint8_t color = 0;
 	int whiteQuant = 0;
 	for (int i = 0; i < 256; ++i) {
-		const int r = _palette[i * 3];
-		const int g = _palette[i * 3 + 1];
-		const int b = _palette[i * 3 + 2];
-		const int q = (r + g * 2) * 19 + b * 7;
+		const int q = colorBrightness(_palette[i * 3], _palette[i * 3 + 1], _palette[i * 3 + 2]);
 		if (q > whiteQuant) {
 			whiteQuant = q;
 			color = i;
