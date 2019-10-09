@@ -1061,15 +1061,15 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x74  = fp->readUint32();
 	_mstHdr.op204DataCount = fp->readUint32();
 	_mstHdr.codeSize    = fp->readUint32();
-	_mstHdr.pointsCount = fp->readUint32();
+	_mstHdr.screensCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_mstHdr.version %d _mstHdr.codeSize %d", _mstHdr.version, _mstHdr.codeSize);
 
 	fp->seek(2048, SEEK_SET); // align to the next sector
 
 	int bytesRead = 0;
 
-	_mstPointOffsets.allocate(_mstHdr.pointsCount);
-	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
+	_mstPointOffsets.allocate(_mstHdr.screensCount);
+	for (int i = 0; i < _mstHdr.screensCount; ++i) {
 		_mstPointOffsets[i].xOffset = fp->readUint32();
 		_mstPointOffsets[i].yOffset = fp->readUint32();
 		bytesRead += 8;
@@ -1147,14 +1147,14 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 4;
 	}
 
-	_mstUnk40.allocate(_mstHdr.pointsCount);
-	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
+	_mstUnk40.allocate(_mstHdr.screensCount);
+	for (int i = 0; i < _mstHdr.screensCount; ++i) {
 		_mstUnk40[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
-	_mstUnk41.allocate(_mstHdr.pointsCount);
-	for (int i = 0; i < _mstHdr.pointsCount; ++i) {
+	_mstUnk41.allocate(_mstHdr.screensCount);
+	for (int i = 0; i < _mstHdr.screensCount; ++i) {
 		_mstUnk41[i] = fp->readUint32();
 		bytesRead += 4;
 	}
@@ -1233,9 +1233,9 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstWalkPathData[i].data[j].unk60[0] = (uint8_t *)malloc(count);
 			_mstWalkPathData[i].data[j].unk60[1] = (uint8_t *)malloc(count);
 		}
-		_mstWalkPathData[i].indexUnk44Unk1 = (uint32_t *)malloc(_mstHdr.pointsCount * sizeof(uint32_t));
-		for (int j = 0; j < _mstHdr.pointsCount; ++j) {
-			_mstWalkPathData[i].indexUnk44Unk1[j] = fp->readUint32();
+		_mstWalkPathData[i].walkNodeData = (uint32_t *)malloc(_mstHdr.screensCount * sizeof(uint32_t));
+		for (int j = 0; j < _mstHdr.screensCount; ++j) {
+			_mstWalkPathData[i].walkNodeData[j] = fp->readUint32();
 			bytesRead += 4;
 		}
 		for (int j = 0; j < count; ++j) {
@@ -1351,8 +1351,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 				fp->read(data, sizeof(data));
 				m12[j].data[k].unk0 = READ_LE_UINT32(data);
 				m12[j].data[k].indexUnk51 = READ_LE_UINT32(data + 0x4);
-				m12[j].data[k].unk8 = READ_LE_UINT32(data + 0x8);
-				m12[j].data[k].unkC = READ_LE_UINT32(data + 0xC);
+				m12[j].data[k].xPos = READ_LE_UINT32(data + 0x8);
+				m12[j].data[k].yPos = READ_LE_UINT32(data + 0xC);
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);
 				m12[j].data[k].codeData2 = READ_LE_UINT32(data + 0x14);
 				m12[j].data[k].unk18 = data[0x18];
@@ -1601,8 +1601,8 @@ void Resource::unloadMstData() {
 	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
 		free(_mstWalkPathData[i].data);
 		_mstWalkPathData[i].data = 0;
-		free(_mstWalkPathData[i].indexUnk44Unk1);
-		_mstWalkPathData[i].indexUnk44Unk1 = 0;
+		free(_mstWalkPathData[i].walkNodeData);
+		_mstWalkPathData[i].walkNodeData = 0;
 	}
 	for (int i = 0; i < _mstHdr.behaviorDataCount; ++i) {
 		free(_mstBehaviorData[i].data);

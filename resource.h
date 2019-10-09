@@ -103,7 +103,7 @@ struct MstHdr {
 	int unk0x74; // mstUnk61DataCount
 	int op204DataCount; // 78
 	int codeSize; // sizeof(uint32_t)
-	int pointsCount; // 80
+	int screensCount; // 80
 };
 
 struct MstPointOffset {
@@ -179,7 +179,7 @@ struct MstWalkNode { // u44u1
 
 struct MstWalkPath { // u44
 	MstWalkNode *data;
-	uint32_t *indexUnk44Unk1; // indexed by screen number
+	uint32_t *walkNodeData; // indexed by screen number
 	uint32_t mask; // 0x8
 	uint32_t count; // 0xC
 }; // sizeof == 16
@@ -220,8 +220,8 @@ struct MstAttackBox { // u47
 struct MstUnk48Unk12Unk4 {
 	uint32_t unk0; // 0x0, indexes _mstMonsterInfos
 	uint32_t indexUnk51; // 0x4
-	int32_t unk8; // 0x8 xPos
-	int32_t unkC; // 0xC yPos
+	int32_t xPos; // 0x8
+	int32_t yPos; // 0xC
 	uint32_t codeData; // 0x10
 	uint32_t codeData2; // 0x14
 	uint8_t unk18; // 0x18

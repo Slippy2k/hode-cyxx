@@ -352,7 +352,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	int screenNum = -1;
 	int xMst; // xLevelPos
 	int yMst; // yLevelPos
-	for (int i = 0; i < _res->_mstHdr.pointsCount; ++i) {
+	for (int i = 0; i < _res->_mstHdr.screensCount; ++i) {
 		xMst = _res->_mstPointOffsets[i].xOffset;
 		if (xMst > xWalkBox || xMst + 255 < xWalkBox) {
 			continue;
@@ -387,7 +387,7 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 	assert(indexUnk44 != kNone);
 	MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
 	// start from screen number
-	uint32_t indexUnk44Unk1 = walkPath->indexUnk44Unk1[screenNum];
+	uint32_t indexUnk44Unk1 = walkPath->walkNodeData[screenNum];
 	if (indexUnk44Unk1 != kNone) {
 		MstWalkNode *walkNode = &walkPath->data[indexUnk44Unk1];
 		uint32_t indexUnk34 = walkNode->indexWalkBox;
@@ -3628,12 +3628,12 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		return _andyShootsTable[0].directionMask & 0x7F;
 	case 9:
 		if (t->monster1 && t->monster1->unk18) {
-			return t->monster1->unk18->unk8;
+			return t->monster1->unk18->xPos;
 		}
 		break;
 	case 10:
 		if (t->monster1 && t->monster1->unk18) {
-			return t->monster1->unk18->unkC;
+			return t->monster1->unk18->yPos;
 		}
 		break;
 	case 11:
@@ -3988,7 +3988,7 @@ int Game::mstTask_main(Task *t) {
 			}
 			break;
 		case 39: // 26 - remove_monsters_screen
-			if (p[1] < _res->_mstHdr.pointsCount) {
+			if (p[1] < _res->_mstHdr.screensCount) {
 				mstOp26_removeMstTaskScreen(&_monsterObjects1TasksList, p[1]);
 				mstOp26_removeMstTaskScreen(&_monsterObjects2TasksList, p[1]);
 				// mstOp26_removeMstTaskScreen(&_mstTasksList3, p[1]);
@@ -3996,7 +3996,7 @@ int Game::mstTask_main(Task *t) {
 			}
 			break;
 		case 40: // 27 - remove_monsters_screen_type
-			if (p[1] < _res->_mstHdr.pointsCount) {
+			if (p[1] < _res->_mstHdr.screensCount) {
 				mstOp27_removeMstTaskScreenType(&_monsterObjects1TasksList, p[1], p[2]);
 				mstOp27_removeMstTaskScreenType(&_monsterObjects2TasksList, p[1], p[2]);
 				// mstOp27_removeMstTaskScreenType(&_mstTasksList3, p[1], p[2]);
@@ -4346,8 +4346,8 @@ int Game::mstTask_main(Task *t) {
 				int c = getTaskVar(t, op197Data->unk4, (mask >>  8) & 15); // var14
 				int d = getTaskVar(t, op197Data->unk6, (mask >>  4) & 15); // _esi
 				int e = getTaskVar(t, op197Data->unkE,  mask        & 15); // _eax
-				if (e >= _res->_mstHdr.pointsCount) {
-					e = _res->_mstHdr.pointsCount - 1;
+				if (e >= _res->_mstHdr.screensCount) {
+					e = _res->_mstHdr.screensCount - 1;
 				}
 				ret = mstOp49_setMovingBounds(a, b, c, d, e, t, num);
 			}
@@ -4613,7 +4613,7 @@ int Game::mstTask_main(Task *t) {
 					e = o->screenNum;
 				}
 // 4136E8
-				e = CLIP(e, -1, _res->_mstHdr.pointsCount - 1);
+				e = CLIP(e, -1, _res->_mstHdr.screensCount - 1);
 				if (p[0] == 224) {
 					_mstOp67_type = m->unk8;
 					_mstOp67_flags1 = m->unk9;
@@ -5432,9 +5432,9 @@ bool Game::mstCollidesDirection(const MstUnk48 *m48, uint8_t flag) {
 l1:
 			int var4C = _edi;
 
-			int var8 = m12u4->unk8;
+			int var8 = m12u4->xPos;
 			int _ebx = var8; // xPos
-			int var4 = m12u4->unkC;
+			int var4 = m12u4->yPos;
 			int _esi = var4; // yPos
 
 			int _eax = _edi ^ flag;
@@ -5530,9 +5530,9 @@ l1:
 			int _edx = var4C;
 // 41DE98
 l2:
-			int var4 = m12u4->unk8;
+			int var4 = m12u4->xPos;
 			int _ebx = var4;
-			int var8 = m12u4->unkC;
+			int var8 = m12u4->yPos;
 			int _esi = var8;
 			int _eax = _edx ^ flag;
 			if (_eax == 1) {
@@ -5976,8 +5976,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 					}
 				}
 			} else {
-				if (screenNum >= _res->_mstHdr.pointsCount) {
-					screenNum = _res->_mstHdr.pointsCount - 1;
+				if (screenNum >= _res->_mstHdr.screensCount) {
+					screenNum = _res->_mstHdr.screensCount - 1;
 				}
 				xPos += _res->_mstPointOffsets[screenNum].xOffset;
 				yPos += _res->_mstPointOffsets[screenNum].yOffset;
@@ -6104,8 +6104,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			} else if (screenNum < -1) {
 				screenNum = t->monster1->o16->screenNum;
 			}
-			if (screenNum >= _res->_mstHdr.pointsCount) {
-				screenNum = _res->_mstHdr.pointsCount - 1;
+			if (screenNum >= _res->_mstHdr.screensCount) {
+				screenNum = _res->_mstHdr.screensCount - 1;
 			}
 			int _ebp = _res->_mstPointOffsets[screenNum].xOffset;
 			int _edx = _res->_mstPointOffsets[screenNum].yOffset;
