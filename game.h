@@ -384,7 +384,7 @@ struct Game {
 	void mstMonster1ResetWalkPath(MonsterObject1 *m);
 	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);
 	void disableMonsterObject1(MonsterObject1 *m);
-	void copyMonsterObject1(Task *t, MonsterObject1 *m, int num);
+	void mstTaskSetMonster1BehaviorState(Task *t, MonsterObject1 *m, int num);
 	int mstTaskStopMonsterObject1(Task *t);
 	void mstMonster1SetScreenPosition(MonsterObject1 *m);
 	bool mstMonster1SetWalkingBounds(MonsterObject1 *m);

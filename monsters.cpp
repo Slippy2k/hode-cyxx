@@ -196,14 +196,16 @@ void Game::disableMonsterObject1(MonsterObject1 *m) {
 	}
 }
 
-void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
+void Game::mstTaskSetMonster1BehaviorState(Task *t, MonsterObject1 *m, int num) {
 	MstBehaviorState *behaviorState = &m->m46->data[num];
 	m->behaviorState = behaviorState;
 	m->monsterInfos = _res->_mstMonsterInfos + behaviorState->indexMonsterInfo * kMonsterInfoDataSize;
 	if (behaviorState->indexUnk51 == kNone) {
 		m->flags48 &= ~4;
 	}
-	m->walkNode = _res->_mstWalkPathData[behaviorState->walkPath].data;
+	const uint32_t indexWalkPath = behaviorState->walkPath;
+	assert(indexWalkPath != kNone);
+	m->walkNode = _res->_mstWalkPathData[indexWalkPath].data;
 	mstTaskUpdateScreenPosition(t);
 	if (!mstMonster1UpdateWalkPath(m)) {
 		mstMonster1ResetWalkPath(m);
@@ -2390,7 +2392,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		MstBehavior *m46 = _mstCurrentMonster1->m46;
 		for (uint32_t i = 0; i < m46->count; ++i) {
 			if (m46->data[i].indexMonsterInfo == _edi) {
-				copyMonsterObject1(_mstCurrentTask, _mstCurrentMonster1, i);
+				mstTaskSetMonster1BehaviorState(_mstCurrentTask, _mstCurrentMonster1, i);
 				return 0;
 			}
 		}
