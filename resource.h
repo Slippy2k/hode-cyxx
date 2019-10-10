@@ -136,7 +136,7 @@ struct MstWalkBox { // MstUnk34
 struct MstWalkCode { // u35
 	uint32_t *codeData; // 0, offset _mstCodeData
 	uint32_t codeDataCount; // 4
-	uint8_t *data; // 8 data
+	uint8_t *data; // 8
 	uint32_t dataCount; // C
 }; // sizeof == 16
 
@@ -147,17 +147,17 @@ struct MstUnk36 {
 }; // sizeof == 12
 
 struct MstUnk42 {
-	uint32_t *indexUnk46; // 0 indexes _mstBehaviorData
+	uint32_t *behavior; // 0 indexes _mstBehaviorData
 	uint32_t count1; // 4
-	uint8_t *data2; // 8
-	uint32_t count2; // C
+	uint8_t *data; // 8 indexes .indexUnk46
+	uint32_t dataCount; // C
 }; // sizeof == 16
 
 struct MstUnk43 {
 	uint32_t *indexUnk48; // indexes _mstUnk48
 	uint32_t count1; // 4
-	uint8_t *data2; // 8
-	uint32_t count2; // C
+	uint8_t *data; // 8 indexes .indexUnk48
+	uint32_t dataCount; // C
 }; // sizeof == 16
 
 struct MstWalkNode { // u44u1

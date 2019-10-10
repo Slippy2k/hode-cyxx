@@ -348,7 +348,7 @@ struct MstUnk49Unk1;
 
 struct MonsterObject1 {
 	MstBehavior *m46; // 0x0
-	MstBehaviorState *m46Unk1; // 0x4
+	MstBehaviorState *behaviorState; // 0x4
 	const uint8_t *monsterInfos; // 0x8
 	MstWalkNode *walkNode; // 0xC
 	LvlObject *o16; // 0x10

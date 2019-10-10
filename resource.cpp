@@ -1163,18 +1163,18 @@ void Resource::loadMstData(File *fp, const char *name) {
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		fp->readUint32();
 		_mstUnk42[i].count1 = fp->readUint32();
-		_mstUnk42[i].indexUnk46 = (uint32_t *)malloc(_mstUnk42[i].count1 * sizeof(uint32_t));
+		_mstUnk42[i].behavior = (uint32_t *)malloc(_mstUnk42[i].count1 * sizeof(uint32_t));
 		fp->readUint32();
-		_mstUnk42[i].count2 = fp->readUint32();
-		_mstUnk42[i].data2  = (uint8_t *)malloc(_mstUnk42[i].count2);
+		_mstUnk42[i].dataCount = fp->readUint32();
+		_mstUnk42[i].data = (uint8_t *)malloc(_mstUnk42[i].dataCount);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
 		for (uint32_t j = 0; j < _mstUnk42[i].count1; ++j) {
-			_mstUnk42[i].indexUnk46[j] = fp->readUint32();
+			_mstUnk42[i].behavior[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		bytesRead += readBytesAlign(fp, _mstUnk42[i].data2, _mstUnk42[i].count2);
+		bytesRead += readBytesAlign(fp, _mstUnk42[i].data, _mstUnk42[i].dataCount);
 	}
 
 	_mstUnk43.allocate(_mstHdr.unk0x24);
@@ -1183,8 +1183,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstUnk43[i].count1 = fp->readUint32();
 		_mstUnk43[i].indexUnk48 = (uint32_t *)malloc(_mstUnk43[i].count1 * sizeof(uint32_t));
 		fp->readUint32();
-		_mstUnk43[i].count2 = fp->readUint32();
-		_mstUnk43[i].data2  = (uint8_t *)malloc(_mstUnk43[i].count2);
+		_mstUnk43[i].dataCount = fp->readUint32();
+		_mstUnk43[i].data = (uint8_t *)malloc(_mstUnk43[i].dataCount);
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
@@ -1192,7 +1192,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstUnk43[i].indexUnk48[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		bytesRead += readBytesAlign(fp, _mstUnk43[i].data2, _mstUnk43[i].count2);
+		bytesRead += readBytesAlign(fp, _mstUnk43[i].data, _mstUnk43[i].dataCount);
 	}
 
 	_mstWalkPathData.allocate(_mstHdr.walkPathDataCount);
@@ -1587,16 +1587,16 @@ void Resource::unloadMstData() {
 		_mstWalkCodeData[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
-		free(_mstUnk42[i].indexUnk46);
-		_mstUnk42[i].indexUnk46 = 0;
-		free(_mstUnk42[i].data2);
-		_mstUnk42[i].data2 = 0;
+		free(_mstUnk42[i].behavior);
+		_mstUnk42[i].behavior = 0;
+		free(_mstUnk42[i].data);
+		_mstUnk42[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
 		free(_mstUnk43[i].indexUnk48);
 		_mstUnk43[i].indexUnk48 = 0;
-		free(_mstUnk43[i].data2);
-		_mstUnk43[i].data2 = 0;
+		free(_mstUnk43[i].data);
+		_mstUnk43[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
 		free(_mstWalkPathData[i].data);
