@@ -387,9 +387,9 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 	assert(indexUnk44 != kNone);
 	MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
 	// start from screen number
-	uint32_t indexUnk44Unk1 = walkPath->walkNodeData[screenNum];
-	if (indexUnk44Unk1 != kNone) {
-		MstWalkNode *walkNode = &walkPath->data[indexUnk44Unk1];
+	uint32_t indexWalkNode = walkPath->walkNodeData[screenNum];
+	if (indexWalkNode != kNone) {
+		MstWalkNode *walkNode = &walkPath->data[indexWalkNode];
 		uint32_t indexUnk34 = walkNode->indexWalkBox;
 		assert(indexUnk34 != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
@@ -403,11 +403,11 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 				return true;
 			}
 
-			indexUnk44Unk1 = walkNode->nextWalkNode;
-			if (indexUnk44Unk1 == kNone) {
+			indexWalkNode = walkNode->nextWalkNode;
+			if (indexWalkNode == kNone) {
 				break;
 			}
-			walkNode = &walkPath->data[indexUnk44Unk1];
+			walkNode = &walkPath->data[indexWalkNode];
 			indexUnk34 = walkNode->indexWalkBox;
 			assert(indexUnk34 != kNone);
 			m34 = &_res->_mstWalkBoxData[indexUnk34];
@@ -1117,36 +1117,36 @@ void Game::executeMstCode() {
 }
 
 void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
-	uint32_t _mstHelper1UnkTable[32];
-	int _mstHelper1Counter1, _mstHelper1Counter2;
+	uint32_t _walkNodesTable[32];
+	int _walkNodesFirstIndex, _walkNodesLastIndex;
 	uint32_t buffer[64];
 	for (uint32_t i = 0; i < walkPath->count; ++i) {
 		MstWalkNode *walkNode = &walkPath->data[i];
 		memset(buffer, 0xFF, sizeof(buffer));
 		memset(walkNode->unk60[index], 0, walkPath->count);
-		_mstHelper1UnkTable[0] = i;
-		_mstHelper1Counter2 = 1;
+		_walkNodesTable[0] = i;
+		_walkNodesLastIndex = 1;
 		buffer[i] = 0;
-		_mstHelper1Counter1 = 0;
+		_walkNodesFirstIndex = 0;
 // 41749C
-		if (_mstHelper1Counter1 == _mstHelper1Counter2) {
+		if (_walkNodesFirstIndex == _walkNodesLastIndex) {
 			continue;
 		}
-		uint32_t _edi = _mstHelper1UnkTable[_mstHelper1Counter1];
-		++_mstHelper1Counter1;
-		if (_mstHelper1Counter1 >= 32) {
-			_mstHelper1Counter1 = 0;
+		uint32_t _edi = _walkNodesTable[_walkNodesFirstIndex];
+		++_walkNodesFirstIndex;
+		if (_walkNodesFirstIndex >= 32) {
+			_walkNodesFirstIndex = 0;
 		}
 		const uint32_t indexUnk34 = walkPath->data[_edi].indexWalkBox;
 		assert(indexUnk34 != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 // 4174DE
 		for (int j = 0; j < 4; ++j) {
-			const uint32_t indexUnk44Unk1 = walkPath->data[_edi].neighborWalkNode[j];
-			if (indexUnk44Unk1 == kNone) {
+			const uint32_t indexWalkNode = walkPath->data[_edi].neighborWalkNode[j];
+			if (indexWalkNode == kNone) {
 				continue;
 			}
-			assert(indexUnk44Unk1 < walkPath->count);
+			assert(indexWalkNode < walkPath->count);
 			uint32_t mask;
 			const uint8_t flags = m34->flags[j];
 			if (flags & 0x80) {
@@ -1163,11 +1163,11 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 			} else {
 				buffer[i] = m34->top - m34->bottom + buffer[_edi];
 			}
-			if (buffer[indexUnk44Unk1] == 0xFFFFFFFF) {
-				_mstHelper1UnkTable[_mstHelper1Counter2] = indexUnk44Unk1;
-				++_mstHelper1Counter2;
-				if (_mstHelper1Counter2 >= 32) {
-					_mstHelper1Counter2 = 0;
+			if (buffer[indexWalkNode] == 0xFFFFFFFF) {
+				_walkNodesTable[_walkNodesLastIndex] = indexWalkNode;
+				++_walkNodesLastIndex;
+				if (_walkNodesLastIndex >= 32) {
+					_walkNodesLastIndex = 0;
 				}
 			}
 // 417585
@@ -1211,9 +1211,9 @@ int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode
 				break;
 			}
 		} else {
-			const uint32_t indexUnk44Unk1 = walkNode->neighborWalkNode[num];
-			assert(indexUnk44Unk1 != kNone && indexUnk44Unk1 < walkPath->count);
-			walkNode->unk2C[num][index] = mstWalkPathUpdateWalkNode(walkPath, &walkPath->data[indexUnk44Unk1], num, index);
+			const uint32_t indexWalkNode = walkNode->neighborWalkNode[num];
+			assert(indexWalkNode != kNone && indexWalkNode < walkPath->count);
+			walkNode->unk2C[num][index] = mstWalkPathUpdateWalkNode(walkPath, &walkPath->data[indexWalkNode], num, index);
 		}
 	}
 	return walkNode->unk2C[num][index];
@@ -1691,9 +1691,9 @@ l41A879:
 					var1C = 3;
 					break;
 				}
-				const uint32_t indexUnk44Unk1 = walkNode->neighborWalkNode[var1C];
-				assert(indexUnk44Unk1 != kNone);
-				walkNode = &walkPath->data[indexUnk44Unk1];
+				const uint32_t indexWalkNode = walkNode->neighborWalkNode[var1C];
+				assert(indexWalkNode != kNone);
+				walkNode = &walkPath->data[indexWalkNode];
 				if (walkNode == &walkPath->data[_cl]) {
 					m->flagsA7 = 0xFF;
 					return;
