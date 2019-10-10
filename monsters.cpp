@@ -305,7 +305,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
 	int xWalkBox = (m34->right - m34->left) / 2 + m34->left; // _ecx
 
-	int _edi = 0x1000000; // walkBox distance
+	int minDistance = 0x1000000; // _edi
 	int yWalkBox = y;
 
 	uint32_t i = 0;
@@ -316,20 +316,20 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		if (!rect_contains(m34->left, m34->top, m34->right, m34->bottom, x, y)) {
 			// find the closest box
 			const int d1 = ABS(x - m34->left);
-			if (d1 < _edi) {
-				_edi = d1;
+			if (d1 < minDistance) {
+				minDistance = d1;
 				walkNode = &walkPath->data[i];
 				xWalkBox = m34->left;
 			}
 			const int d2 = ABS(x - m34->right);
-			if (d2 < _edi) {
-				_edi = d2;
+			if (d2 < minDistance) {
+				minDistance = d2;
 				walkNode = &walkPath->data[i];
 				xWalkBox = m34->right;
 			}
 		} else {
 // 41E6FD
-			// exact match, point is in the box
+			// find match, point is in the box
 			xWalkBox = x;
 			yWalkBox = y;
 			walkNode = &walkPath->data[i];
@@ -337,7 +337,6 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		}
 	}
 // 41E70B
-	int _edx = yWalkBox;
 	if (i == walkPath->count) {
 		// calculate the yPos for the walkBox
 		const uint32_t indexWalkBox = walkNode->indexWalkBox;
@@ -346,31 +345,31 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		if (y <= m34->bottom) {
 			y = (m34->bottom - m34->top) / 2 + m34->top;
 		}
-		_edx = yWalkBox = y;
+		yWalkBox = y; // _edx
 	}
 
 // 41E737
 	// find screenNum for level position
 	int screenNum = -1;
-	int xMst; // xLevelPos
-	int yMst; // yLevelPos
+	int xLevelPos;
+	int yLevelPos;
 	for (int i = 0; i < _res->_mstHdr.screensCount; ++i) {
-		xMst = _res->_mstPointOffsets[i].xOffset;
-		yMst = _res->_mstPointOffsets[i].yOffset;
-		if (rect_contains(xMst, yMst, xMst + 255, yMst + 191, xWalkBox, _edx)) {
+		xLevelPos = _res->_mstPointOffsets[i].xOffset;
+		yLevelPos = _res->_mstPointOffsets[i].yOffset;
+		if (rect_contains(xLevelPos, yLevelPos, xLevelPos + 255, yLevelPos + 191, xWalkBox, yWalkBox)) {
 			screenNum = i;
 			break;
 		}
 	}
 	if (screenNum == -1) {
 		screenNum = 0;
-		xMst = _res->_mstPointOffsets[0].xOffset + 256 / 2;
-		yMst = _res->_mstPointOffsets[0].yOffset + 192 / 2;
+		xLevelPos = _res->_mstPointOffsets[0].xOffset + 256 / 2;
+		yLevelPos = _res->_mstPointOffsets[0].yOffset + 192 / 2;
 	}
 	LvlObject *o = m->o16;
 	o->screenNum = screenNum;
-	m->xPos = xWalkBox - xMst;
-	m->yPos = _edx - yMst;
+	m->xPos = xWalkBox - xLevelPos;
+	m->yPos = yWalkBox - yLevelPos;
 	mstMonster1SetScreenPosition(m);
 	m->walkNode = walkNode;
 	mstMonster1ResetWalkPath(m);
