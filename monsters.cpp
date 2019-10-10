@@ -311,7 +311,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		const uint32_t indexWalkBox = walkPath->data[i].indexWalkBox;
 		assert(indexWalkBox != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
-		if (m34->right < x || m34->left > x || m34->bottom < y || m34->top > y) {
+		if (!rect_contains(m34->left, m34->top, m34->right, m34->bottom, x, y)) {
 			// find the closest box
 			const int d1 = ABS(x - m34->left);
 			if (d1 < _edi) {
@@ -1517,7 +1517,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
 	debug(kDebug_MONSTER, "mstSetVerticalHorizontalBounds m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->top, m34->bottom);
-	if (m->xMstPos < m34->left - w || m->xMstPos > m34->right + w || m->yMstPos < m34->top - h || m->yMstPos > m34->bottom + h) {
+	if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, m->xMstPos, m->yMstPos)) {
 		mstMonster1UpdateWalkPath(m);
 		m->unkC0 = -1;
 		m->unkBC = -1;
@@ -1841,7 +1841,7 @@ void Game::mstMonster1UpdateLevelBounds(MonsterObject1 *m) {
 // 41AD7B
 		int w = READ_LE_UINT32(m->monsterInfos + 904);
 		int h = READ_LE_UINT32(m->monsterInfos + 908);
-		if (_edi < m34->left - w || _edi > m34->right + w || _ebp < m34->top - h || _ebp > m34->bottom + h) {
+		if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, _edi, _ebp)) {
 			const uint32_t indexUnk44 = m->behaviorState->indexUnk44;
 			assert(indexUnk44 != kNone);
 			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
@@ -2014,7 +2014,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 		const uint32_t indexWalkBox = walkNode->indexWalkBox;
 		assert(indexWalkBox != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
-		if (rect_contains(m34->left, m34->bottom, m34->right, m34->top, x, y)) {
+		if (rect_contains(m34->left, m34->top, m34->right, m34->bottom, x, y)) {
 			return i;
 		}
 // 41A3CE
@@ -5573,7 +5573,7 @@ void Game::mstOp53(MstUnk48 *m) {
 	if (_m48Num != -1) {
 		return;
 	}
-	int x = MIN(_mstAndyScreenPosX, 255);
+	const int x = MIN(_mstAndyScreenPosX, 255);
 	if (_mstAndyScreenPosX < 0) {
 		_mstPosXmin = x;
 		_mstPosXmax = 255 + x;
@@ -5581,7 +5581,7 @@ void Game::mstOp53(MstUnk48 *m) {
 		_mstPosXmin = -x;
 		_mstPosXmax = 255 - x;
 	}
-	int y = MIN(_mstAndyScreenPosY, 191);
+	const int y = MIN(_mstAndyScreenPosY, 191);
 	if (_mstAndyScreenPosY < 0) {
 		_mstPosYmin = y;
 		_mstPosYmax = 191 + y;
@@ -6987,7 +6987,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		m->flagsA6 = 0;
 
 		assert((uint32_t)arg1C < _res->_mstUnk42[arg24].count1);
-		const int indexBehavior = _res->_mstUnk42[arg24].behavior[arg1C];
+		const uint32_t indexBehavior = _res->_mstUnk42[arg24].behavior[arg1C];
 		MstBehavior *m46 = &_res->_mstBehaviorData[indexBehavior];
 		m->m46 = m46;
 		assert((uint32_t)arg20 < m46->count);
