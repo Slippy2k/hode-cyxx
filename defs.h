@@ -358,7 +358,7 @@ struct MonsterObject1 {
 	int monster1Index; // 0x20
 	int executeCounter; // 0x24
 	int32_t localVars[8]; // 0x28
-	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:indexUnk47!=kNone
+	uint8_t flags48; // 0x48 0x4:indexUnk51!=kNone, 0x10:attackBox!=kNone
 	uint8_t facingDirectionMask; // 0x49
 	uint8_t goalDirectionMask; // 0x4A
 	uint8_t goalScreenNum; // 0x4B

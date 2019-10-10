@@ -2617,8 +2617,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 41882E
 	if (o->screenNum == _currentScreen && (m->flagsA5 & 0x20) == 0 && (m->flags48 & 0x10) != 0) {
 		MstBehaviorState *behaviorState = m->behaviorState;
-		if (behaviorState->indexUnk47 != kNone) {
-			MstAttackBox *m47 = &_res->_mstAttackBoxData[behaviorState->indexUnk47];
+		if (behaviorState->attackBox != kNone) {
+			const MstAttackBox *m47 = &_res->_mstAttackBoxData[behaviorState->attackBox];
 			if (m47->count > 0) {
 				const uint8_t dir = (o->flags1 >> 4) & 3;
 				const uint8_t *p = m47->data;
@@ -3372,7 +3372,7 @@ void Game::resetTask(Task *t, const uint8_t *codeData) {
 				if (behaviorState->indexUnk51 != kNone) {
 					m->flags48 |= 4;
 				}
-				if (behaviorState->indexUnk47 != kNone) {
+				if (behaviorState->attackBox != kNone) {
 					m->flags48 |= 0x10;
 				}
 			}
