@@ -298,9 +298,9 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	}
 // 41E659
 
-	uint32_t indexUnk34 = walkPath->data[0].indexWalkBox;
-	assert(indexUnk34 != kNone);
-	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34]; // _esi
+	const uint32_t indexWalkBox = walkPath->data[0].indexWalkBox;
+	assert(indexWalkBox != kNone);
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
 	int xWalkBox = (m34->right - m34->left) / 2 + m34->left; // _ecx
 
 	int _edi = 0x1000000; // walkBox distance
@@ -308,9 +308,9 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 
 	uint32_t i = 0;
 	for (; i < walkPath->count; ++i) {
-		uint32_t indexUnk34 = walkPath->data[i].indexWalkBox;
-		assert(indexUnk34 != kNone);
-		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34]; // _esi
+		const uint32_t indexWalkBox = walkPath->data[i].indexWalkBox;
+		assert(indexWalkBox != kNone);
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
 		if (m34->right < x || m34->left > x || m34->top < y || m34->bottom > y) {
 			// find the closest box
 			const int d1 = ABS(x - m34->left);
@@ -338,9 +338,9 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	int _edx = yWalkBox;
 	if (i == walkPath->count) {
 		// calculate the yPos for the walkBox
-		uint32_t indexUnk34 = walkNode->indexWalkBox;
-		assert(indexUnk34 != kNone);
-		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34]; // _esi
+		const uint32_t indexWalkBox = walkNode->indexWalkBox;
+		assert(indexWalkBox != kNone);
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
 		if (y <= m34->top) {
 			y = (m34->top - m34->bottom) / 2 + m34->bottom;
 		}
@@ -386,9 +386,9 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 	uint32_t indexWalkNode = walkPath->walkNodeData[screenNum];
 	if (indexWalkNode != kNone) {
 		MstWalkNode *walkNode = &walkPath->data[indexWalkNode];
-		uint32_t indexUnk34 = walkNode->indexWalkBox;
-		assert(indexUnk34 != kNone);
-		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+		uint32_t indexWalkBox = walkNode->indexWalkBox;
+		assert(indexWalkBox != kNone);
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 		while (m34->left <= m->xMstPos) {
 			if (m34->right >= m->xMstPos && m34->bottom <= m->yMstPos && m34->top >= m->yMstPos) {
 				if (m->walkNode == walkNode) {
@@ -404,9 +404,9 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 				break;
 			}
 			walkNode = &walkPath->data[indexWalkNode];
-			indexUnk34 = walkNode->indexWalkBox;
-			assert(indexUnk34 != kNone);
-			m34 = &_res->_mstWalkBoxData[indexUnk34];
+			indexWalkBox = walkNode->indexWalkBox;
+			assert(indexWalkBox != kNone);
+			m34 = &_res->_mstWalkBoxData[indexWalkBox];
 		}
 	}
 	return mstMonster1SetWalkingBounds(m);
@@ -1111,9 +1111,9 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 			if (_walkNodesFirstIndex >= 32) {
 				_walkNodesFirstIndex = 0;
 			}
-			const uint32_t indexUnk34 = walkPath->data[_edi].indexWalkBox;
-			assert(indexUnk34 != kNone);
-			const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+			const uint32_t indexWalkBox = walkPath->data[_edi].indexWalkBox;
+			assert(indexWalkBox != kNone);
+			const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 // 4174DE
 			for (int j = 0; j < 4; ++j) {
 				const uint32_t indexWalkNode = walkPath->data[_edi].neighborWalkNode[j];
@@ -1160,9 +1160,9 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 
 int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode, int num, int index) {
 	if (walkNode->unk2C[num][index] < 0) {
-		const uint32_t indexUnk34 = walkNode->indexWalkBox;
-		assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.walkBoxDataCount);
-		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+		const uint32_t indexWalkBox = walkNode->indexWalkBox;
+		assert(indexWalkBox != kNone && indexWalkBox < (uint32_t)_res->_mstHdr.walkBoxDataCount);
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 		uint32_t mask;
 		const uint8_t flags = m34->flags[num];
 		if (flags & 0x80) {
@@ -1511,9 +1511,9 @@ l41B2DC:
 void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	MstWalkNode *walkNode = m->walkNode;
 	const uint8_t *p = m->monsterInfos;
-	const uint32_t indexUnk34 = walkNode->indexWalkBox;
-	assert(indexUnk34 != kNone);
-	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+	const uint32_t indexWalkBox = walkNode->indexWalkBox;
+	assert(indexWalkBox != kNone);
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
 	debug(kDebug_MONSTER, "mstSetVerticalHorizontalBounds m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->bottom, m34->top);
@@ -1778,9 +1778,9 @@ void Game::mstMonster1UpdateLevelBounds(MonsterObject1 *m) {
 	}
 // 41AC4F
 	int var10 = (~m->flagsA5) & 1;
-	uint32_t indexUnk34 = m->walkNode->indexWalkBox;
-	assert(indexUnk34 != kNone);
-	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+	uint32_t indexWalkBox = m->walkNode->indexWalkBox;
+	assert(indexWalkBox != kNone);
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 	int var20 = 0;
 	int varC = 0;
 	int var8 = _mstLut1[m->goalDirectionMask];
@@ -2011,9 +2011,9 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 		if (walkNode->unk60[num][i] == 0 && m->walkNode != walkNode) {
 			continue;
 		}
-		const uint32_t indexUnk34 = walkNode->indexWalkBox;
-		assert(indexUnk34 != kNone);
-		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+		const uint32_t indexWalkBox = walkNode->indexWalkBox;
+		assert(indexWalkBox != kNone);
+		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 		if (rect_contains(m34->left, m34->top, m34->right, m34->bottom, x, y)) {
 			return i;
 		}
@@ -6567,9 +6567,9 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~2) | 5;
 	mstMonster1ResetWalkPath(m);
-	const uint32_t indexUnk34 = m->walkNode->indexWalkBox;
-	assert(indexUnk34 != kNone && indexUnk34 < (uint32_t)_res->_mstHdr.walkBoxDataCount);
-	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+	const uint32_t indexWalkBox = m->walkNode->indexWalkBox;
+	assert(indexWalkBox != kNone && indexWalkBox < (uint32_t)_res->_mstHdr.walkBoxDataCount);
+	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 	int y = 0;
 	int x = 0;
 	bool flag = false;
