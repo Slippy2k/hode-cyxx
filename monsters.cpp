@@ -1129,56 +1129,55 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 		buffer[i] = 0;
 		_walkNodesFirstIndex = 0;
 // 41749C
-		if (_walkNodesFirstIndex == _walkNodesLastIndex) {
-			continue;
-		}
-		uint32_t _edi = _walkNodesTable[_walkNodesFirstIndex];
-		++_walkNodesFirstIndex;
-		if (_walkNodesFirstIndex >= 32) {
-			_walkNodesFirstIndex = 0;
-		}
-		const uint32_t indexUnk34 = walkPath->data[_edi].indexWalkBox;
-		assert(indexUnk34 != kNone);
-		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
+		while (_walkNodesFirstIndex != _walkNodesLastIndex) {
+			uint32_t _edi = _walkNodesTable[_walkNodesFirstIndex];
+			++_walkNodesFirstIndex;
+			if (_walkNodesFirstIndex >= 32) {
+				_walkNodesFirstIndex = 0;
+			}
+			const uint32_t indexUnk34 = walkPath->data[_edi].indexWalkBox;
+			assert(indexUnk34 != kNone);
+			const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
 // 4174DE
-		for (int j = 0; j < 4; ++j) {
-			const uint32_t indexWalkNode = walkPath->data[_edi].neighborWalkNode[j];
-			if (indexWalkNode == kNone) {
-				continue;
-			}
-			assert(indexWalkNode < walkPath->count);
-			uint32_t mask;
-			const uint8_t flags = m34->flags[j];
-			if (flags & 0x80) {
-				mask = _mstAndyVarMask & (1 << (flags & 0x7F));
-			} else {
-				mask = flags & (1 << index);
-			}
-			if (mask != 0) {
-				continue;
-			}
-// 417525
-			if (j == 0 || j == 1) {
-				buffer[i] = m34->right - m34->left + buffer[_edi];
-			} else {
-				buffer[i] = m34->top - m34->bottom + buffer[_edi];
-			}
-			if (buffer[indexWalkNode] == 0xFFFFFFFF) {
-				_walkNodesTable[_walkNodesLastIndex] = indexWalkNode;
-				++_walkNodesLastIndex;
-				if (_walkNodesLastIndex >= 32) {
-					_walkNodesLastIndex = 0;
+			for (int j = 0; j < 4; ++j) {
+				const uint32_t indexWalkNode = walkPath->data[_edi].neighborWalkNode[j];
+				if (indexWalkNode == kNone) {
+					continue;
 				}
-			}
+				assert(indexWalkNode < walkPath->count);
+				uint32_t mask;
+				const uint8_t flags = m34->flags[j];
+				if (flags & 0x80) {
+					mask = _mstAndyVarMask & (1 << (flags & 0x7F));
+				} else {
+					mask = flags & (1 << index);
+				}
+				if (mask != 0) {
+					continue;
+				}
+// 417525
+				if (j == 0 || j == 1) {
+					buffer[i] = m34->right - m34->left + buffer[_edi];
+				} else {
+					buffer[i] = m34->top - m34->bottom + buffer[_edi];
+				}
+				if (buffer[indexWalkNode] == 0xFFFFFFFF) {
+					_walkNodesTable[_walkNodesLastIndex] = indexWalkNode;
+					++_walkNodesLastIndex;
+					if (_walkNodesLastIndex >= 32) {
+						_walkNodesLastIndex = 0;
+					}
+				}
 // 417585
-			uint8_t value;
-			if (_edi == i) {
-				static const uint8_t data[] = { 2, 8, 4, 1 };
-				value = data[j];
-			} else {
-				value = walkNode->unk60[index][_edi];
+				uint8_t value;
+				if (_edi == i) {
+					static const uint8_t data[] = { 2, 8, 4, 1 };
+					value = data[j];
+				} else {
+					value = walkNode->unk60[index][_edi];
+				}
+				walkNode->unk60[index][i] = value;
 			}
-			walkNode->unk60[index][i] = value;
 		}
 	}
 }
