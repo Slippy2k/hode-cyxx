@@ -849,38 +849,17 @@ void Game::resetMstCode() {
 	for (int i = 0; i < _res->_mstHdr.unk0x40; ++i) {
 		const int count = _res->_mstUnk49[i].count2;
 		if (count != 0) {
-			uint8_t *ptr = _res->_mstUnk49[i].data2;
-			for (int j = 0; j < count * 2; ++j) {
-				const int index1 = _rnd.update() % count;
-				const int index2 = _rnd.update() % count;
-				SWAP(ptr[index1], ptr[index2]);
-			}
+			shuffleArray(_res->_mstUnk49[i].data2, count);
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.walkCodeDataCount; ++i) {
 		const int count = _res->_mstWalkCodeData[i].dataCount;
 		if (count != 0) {
-			uint8_t *ptr = _res->_mstWalkCodeData[i].data;
-			for (int j = 0; j < count * 2; ++j) {
-				const int index1 = _rnd.update() % count;
-				const int index2 = _rnd.update() % count;
-				SWAP(ptr[index1], ptr[index2]);
-			}
+			shuffleArray(_res->_mstWalkCodeData[i].data, count);
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.unk0x24; ++i) {
-		const int count = _res->_mstUnk43[i].dataCount;
-		if (count != 0) {
-			uint8_t *ptr = _res->_mstUnk43[i].data;
-			for (int j = 0; j < count; ++j) {
-				ptr[j] &= 0x7F;
-			}
-			for (int j = 0; j < count * 2; ++j) {
-				const int index1 = _rnd.update() % count;
-				const int index2 = _rnd.update() % count;
-				SWAP(ptr[index1], ptr[index2]);
-			}
-		}
+		shuffleMstUnk43(&_res->_mstUnk43[i]);
 	}
 	_mstOp67_x1 = -256;
 	_mstOp67_x2 = -256;
