@@ -1,21 +1,9 @@
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <assert.h>
+#include "intern.h"
 
 static FILE *_out = stdout;
 
 static uint32_t (*visitOpcode)(uint32_t addr, const uint8_t *p);
-
-static int16_t read16(const uint8_t *p) {
-	return (p[1] << 8) | p[0];
-}
-
-static int32_t read32(const uint8_t *p) {
-	const uint16_t lo = read16(p); p += 2;
-	return lo | (read16(p) << 16);
-}
 
 enum {
 	op_count = 30
@@ -32,23 +20,23 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x02:
-		fprintf(_out, "add_sound %d num:%d", read16(p + offset + 2), (int8_t)p[offset + 1]);
+		fprintf(_out, "add_sound %d num:%d", READ_LE_UINT16(p + offset + 2), (int8_t)p[offset + 1]);
 		offset += 4;
 		break;
 	case 0x04:
-		fprintf(_out, "remove_sound %d num:%d", read16(p + offset + 2), p[offset + 1]);
+		fprintf(_out, "remove_sound %d num:%d", READ_LE_UINT16(p + offset + 2), p[offset + 1]);
 		offset += 4;
 		break;
 	case 0x05:
-		fprintf(_out, "seek_forward keyframe:%d pos:%d", read32(p + offset + 4), read32(p + offset + 8));
+		fprintf(_out, "seek_forward keyframe:%d pos:%d", READ_LE_UINT32(p + offset + 4), READ_LE_UINT32(p + offset + 8));
 		offset += 12;
 		break;
 	case 0x06:
-		fprintf(_out, "repeat_jge offset:-%d", read32(p + offset + 4));
+		fprintf(_out, "repeat_jge offset:-%d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x08:
-		fprintf(_out, "seek_backward_delay pos:%d frame:%d keyframe:%d", read32(p + offset + 4), read32(p + offset + 8), read32(p + offset + 12));
+		fprintf(_out, "seek_backward_delay pos:%d frame:%d keyframe:%d", READ_LE_UINT32(p + offset + 4), READ_LE_UINT32(p + offset + 8), READ_LE_UINT32(p + offset + 12));
 		offset += 16;
 		break;
 	case 0x09:
@@ -64,15 +52,15 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x0C:
-		fprintf(_out, "remove_sounds2 flags:0x%x", read16(p + offset + 2));
+		fprintf(_out, "remove_sounds2 flags:0x%x", READ_LE_UINT16(p + offset + 2));
 		offset += 4;
 		break;
 	case 0x0D:
-		fprintf(_out, "init_volume_modulation value:%d steps:%d", read16(p + offset + 2), read32(p + offset + 4));
+		fprintf(_out, "init_volume_modulation value:%d steps:%d", READ_LE_UINT16(p + offset + 2), READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x0E:
-		fprintf(_out, "init_panning_modulation value:%d steps:%d", read16(p + offset + 2), read32(p + offset + 8));
+		fprintf(_out, "init_panning_modulation value:%d steps:%d", READ_LE_UINT16(p + offset + 2), READ_LE_UINT32(p + offset + 8));
 		offset += 12;
 		break;
 	case 0x10:
@@ -80,11 +68,11 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x11:
-		fprintf(_out, "pause_sound counter:%d", read32(p + offset + 4));
+		fprintf(_out, "pause_sound counter:%d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x12:
-		fprintf(_out, "decrement_repeat_counter %d", read32(p + offset + 4));
+		fprintf(_out, "decrement_repeat_counter %d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x13:
@@ -92,7 +80,7 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x14:
-		fprintf(_out, "set_pause_counter %d", read16(p + offset + 2));
+		fprintf(_out, "set_pause_counter %d", READ_LE_UINT16(p + offset + 2));
 		offset += 4;
 		break;
 	case 0x15:
@@ -100,7 +88,7 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x16:
-		fprintf(_out, "set_delay_counter %d", read32(p + offset + 4));
+		fprintf(_out, "set_delay_counter %d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x17:
@@ -108,7 +96,7 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x18:
-		fprintf(_out, "set_volume_modulate_steps %d", read32(p + offset + 4));
+		fprintf(_out, "set_volume_modulate_steps %d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x19:
@@ -116,15 +104,15 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x1A:
-		fprintf(_out, "set_panning_modulate_steps %d", read32(p + offset + 4));
+		fprintf(_out, "set_panning_modulate_steps %d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x1B:
-		fprintf(_out, "seek_backward pos:%d frame:%d keyframe:%d", read32(p + offset + 4), read32(p + offset + 8), read32(p + offset + 12));
+		fprintf(_out, "seek_backward pos:%d frame:%d keyframe:%d", READ_LE_UINT32(p + offset + 4), READ_LE_UINT32(p + offset + 8), READ_LE_UINT32(p + offset + 12));
 		offset += 16;
 		break;
 	case 0x1C:
-		fprintf(_out, "jmp offset:-%d", read32(p + offset + 4));
+		fprintf(_out, "jmp offset:-%d", READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x1D:

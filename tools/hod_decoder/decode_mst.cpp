@@ -1,16 +1,9 @@
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <assert.h>
+#include "intern.h"
 
 static FILE *_out = stdout;
 
 static void (*visitOpcode)(uint32_t addr, const uint8_t *p);
-
-static int16_t read16(const uint8_t *p) {
-	return (p[1] << 8) | p[0];
-}
 
 enum {
 	op_count = 243
@@ -82,30 +75,30 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 	case 0:
 	case 1: {
 			char buffer[64];
-			fprintf(_out, "sm_wait delay:%s", taskVar(read16(p + 2), p[1], buffer));
+			fprintf(_out, "sm_wait delay:%s", taskVar(READ_LE_UINT16(p + 2), p[1], buffer));
 		}
 		break;
 	case 2:
-		fprintf(_out, "set_var_random_range num:%d", read16(p + 2));
+		fprintf(_out, "set_var_random_range num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 3:
 	case 8:
-		fprintf(_out, "set_monster_action_direction_imm num:%d", read16(p + 2));
+		fprintf(_out, "set_monster_action_direction_imm num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 4:
-		fprintf(_out, "set_monster_action_direction_task_var num:%d", read16(p + 2));
+		fprintf(_out, "set_monster_action_direction_task_var num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 5:
-		fprintf(_out, "set_monster_action_direction_global_var num:%d", read16(p + 2));
+		fprintf(_out, "set_monster_action_direction_global_var num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 6:
-		fprintf(_out, "set_monster_action_direction_other_var num:%d", read16(p + 2));
+		fprintf(_out, "set_monster_action_direction_other_var num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 7:
-		fprintf(_out, "set_monster_action_direction_monster_var num:%d", read16(p + 2));
+		fprintf(_out, "set_monster_action_direction_monster_var num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 13:
-		fprintf(_out, "set_monster_action_direction_cond_imm num:%d", read16(p + 2));
+		fprintf(_out, "set_monster_action_direction_cond_imm num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 23:
 		fprintf(_out, "set_flag_global bit:%d", p[1]);
@@ -136,16 +129,16 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		break;
 	case 33:
 	case 229:
-		fprintf(_out, "jmp_imm offset:0x%x", 4 * read16(p + 2));
+		fprintf(_out, "jmp_imm offset:0x%x", 4 * READ_LE_UINT16(p + 2));
 		break;
 	case 34:
 		fprintf(_out, "nop");
 		break;
 	case 35:
-		fprintf(_out, "enable_trigger num:%d", read16(p + 2));
+		fprintf(_out, "enable_trigger num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 36:
-		fprintf(_out, "disable_trigger num:%d", read16(p + 2));
+		fprintf(_out, "disable_trigger num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 39:
 		fprintf(_out, "remove_monsters_screen screen:%d", p[1]);
@@ -214,19 +207,19 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		}
 		break;
 	case 167 ... 176:
-		fprintf(_out, "task.vars[%d] %s %d", p[1], _arithOp[opcode - 167], read16(p + 2));
+		fprintf(_out, "task.vars[%d] %s %d", p[1], _arithOp[opcode - 167], READ_LE_UINT16(p + 2));
 		break;
 	case 177 ... 186:
-		fprintf(_out, "global.vars[%d] %s %d", p[1], _arithOp[opcode - 177], read16(p + 2));
+		fprintf(_out, "global.vars[%d] %s %d", p[1], _arithOp[opcode - 177], READ_LE_UINT16(p + 2));
 		break;
 	case 187 ... 196:
-		fprintf(_out, "monster.vars[%d] %s %d", p[1], _arithOp[opcode - 187], read16(p + 2));
+		fprintf(_out, "monster.vars[%d] %s %d", p[1], _arithOp[opcode - 187], READ_LE_UINT16(p + 2));
 		break;
 	case 197:
-		fprintf(_out, "set_moving_bounds num:%d", read16(p + 2));
+		fprintf(_out, "set_moving_bounds num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 198:
-		fprintf(_out, "child_task num:%d", read16(p + 2));
+		fprintf(_out, "child_task num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 199:
 		fprintf(_out, "stop_current_monster_object");
@@ -244,7 +237,7 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "op55");
 		break;
 	case 204:
-		printMstOpcode56(p[1], read16(p + 2));
+		printMstOpcode56(p[1], READ_LE_UINT16(p + 2));
 		break;
 	case 207:
 	case 208:
@@ -252,7 +245,7 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "nop");
 		break;
 	case 211:
-		fprintf(_out, "add_lvl_object num:%d", read16(p + 2));
+		fprintf(_out, "add_lvl_object num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 212:
 		fprintf(_out, "op59 type:%d dx:%d dy:%d", p[1], (int8_t)p[2], (int8_t)p[3]);
@@ -269,49 +262,49 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "reset_monster_energy");
 		break;
 	case 215:
-		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
+		fprintf(_out, "shuffle m43 num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 217:
-		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
+		fprintf(_out, "shuffle m43 num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 218:
-		fprintf(_out, "shuffle m43 num:%d", read16(p + 2));
+		fprintf(_out, "shuffle m43 num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 220 ... 225:
-		fprintf(_out, "add_monster num:%d", read16(p + 2));
+		fprintf(_out, "add_monster num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 226:
-		fprintf(_out, "add_monster_group num:%d", read16(p + 2));
+		fprintf(_out, "add_monster_group num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 227:
-		fprintf(_out, "compare_vars num:%d", read16(p + 2));
+		fprintf(_out, "compare_vars num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 228:
-		fprintf(_out, "compare_flags num:%d", read16(p + 2));
+		fprintf(_out, "compare_flags num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 231:
-		fprintf(_out, "sm_wait flag_task num:%d", read16(p + 2));
+		fprintf(_out, "sm_wait flag_task num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 232:
-		fprintf(_out, "sm_not_wait flag_task num:%d", read16(p + 2));
+		fprintf(_out, "sm_not_wait flag_task num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 233:
-		fprintf(_out, "sm_not_flags num:%d", read16(p + 2));
+		fprintf(_out, "sm_not_flags num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 234:
-		fprintf(_out, "sm_flags num:%d", read16(p + 2));
+		fprintf(_out, "sm_flags num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 237:
 		fprintf(_out, "remove_monster_task");
 		break;
 	case 238:
-		fprintf(_out, "jmp num:%d", read16(p + 2));
+		fprintf(_out, "jmp num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 239:
-		fprintf(_out, "create_task num:%d", read16(p + 2));
+		fprintf(_out, "create_task num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 240:
-		fprintf(_out, "update_task num:%d", read16(p + 2));
+		fprintf(_out, "update_task num:%d", READ_LE_UINT16(p + 2));
 		break;
 	case 242:
 		fprintf(_out, "break\n");
