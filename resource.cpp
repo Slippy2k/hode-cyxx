@@ -1079,8 +1079,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 	for (unsigned int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
 		_mstWalkBoxData[i].right  = fp->readUint32();
 		_mstWalkBoxData[i].left   = fp->readUint32();
-		_mstWalkBoxData[i].top    = fp->readUint32();
 		_mstWalkBoxData[i].bottom = fp->readUint32();
+		_mstWalkBoxData[i].top    = fp->readUint32();
 		_mstWalkBoxData[i].flags[0] = fp->readByte();
 		_mstWalkBoxData[i].flags[1] = fp->readByte();
 		_mstWalkBoxData[i].flags[2] = fp->readByte();

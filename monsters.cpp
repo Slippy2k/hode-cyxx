@@ -133,8 +133,8 @@ void Game::mstMonster1ResetWalkPath(MonsterObject1 *m) {
 
 	m->levelPosBounds_x2 = m->walkNode->unk2C[0][num] - (int32_t)READ_LE_UINT32(ptr + 904); // right x coordinate
 	m->levelPosBounds_x1 = m->walkNode->unk2C[1][num] + (int32_t)READ_LE_UINT32(ptr + 904); // left x coordinate
-	m->levelPosBounds_y2 = m->walkNode->unk2C[2][num] - (int32_t)READ_LE_UINT32(ptr + 908); // top y coordinate
-	m->levelPosBounds_y1 = m->walkNode->unk2C[3][num] + (int32_t)READ_LE_UINT32(ptr + 908); // bottom y coordinate
+	m->levelPosBounds_y2 = m->walkNode->unk2C[2][num] - (int32_t)READ_LE_UINT32(ptr + 908); // bottom y coordinate
+	m->levelPosBounds_y1 = m->walkNode->unk2C[3][num] + (int32_t)READ_LE_UINT32(ptr + 908); // top y coordinate
 
 	const uint32_t indexUnk35 = m->walkNode->indexUnk35_0x24[num];
 	m->m35 = (indexUnk35 == kNone) ? 0 : &_res->_mstWalkCodeData[indexUnk35];
@@ -311,7 +311,7 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		const uint32_t indexWalkBox = walkPath->data[i].indexWalkBox;
 		assert(indexWalkBox != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
-		if (m34->right < x || m34->left > x || m34->top < y || m34->bottom > y) {
+		if (m34->right < x || m34->left > x || m34->bottom < y || m34->top > y) {
 			// find the closest box
 			const int d1 = ABS(x - m34->left);
 			if (d1 < _edi) {
@@ -341,8 +341,8 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 		const uint32_t indexWalkBox = walkNode->indexWalkBox;
 		assert(indexWalkBox != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox]; // _esi
-		if (y <= m34->top) {
-			y = (m34->top - m34->bottom) / 2 + m34->bottom;
+		if (y <= m34->bottom) {
+			y = (m34->bottom - m34->top) / 2 + m34->top;
 		}
 		_edx = yWalkBox = y;
 	}
@@ -390,7 +390,7 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 		assert(indexWalkBox != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 		while (m34->left <= m->xMstPos) {
-			if (m34->right >= m->xMstPos && m34->bottom <= m->yMstPos && m34->top >= m->yMstPos) {
+			if (m34->right >= m->xMstPos && m34->top <= m->yMstPos && m34->bottom >= m->yMstPos) {
 				if (m->walkNode == walkNode) {
 					return false;
 				}
@@ -1135,7 +1135,7 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 				if (j == 0 || j == 1) {
 					buffer[i] = m34->right - m34->left + buffer[_edi];
 				} else {
-					buffer[i] = m34->top - m34->bottom + buffer[_edi];
+					buffer[i] = m34->bottom - m34->top + buffer[_edi];
 				}
 				if (buffer[indexWalkNode] == 0xFFFFFFFF) {
 					_walkNodesTable[_walkNodesLastIndex] = indexWalkNode;
@@ -1179,10 +1179,10 @@ int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode
 				walkNode->unk2C[num][index] = m34->left;
 				break;
 			case 2:
-				walkNode->unk2C[num][index] = m34->top;
+				walkNode->unk2C[num][index] = m34->bottom;
 				break;
 			case 3:
-				walkNode->unk2C[num][index] = m34->bottom;
+				walkNode->unk2C[num][index] = m34->top;
 				break;
 			}
 		} else {
@@ -1516,8 +1516,8 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
-	debug(kDebug_MONSTER, "mstSetVerticalHorizontalBounds m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->bottom, m34->top);
-	if (m->xMstPos < m34->left - w || m->xMstPos > m34->right + w || m->yMstPos < m34->bottom - h || m->yMstPos > m34->top + h) {
+	debug(kDebug_MONSTER, "mstSetVerticalHorizontalBounds m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->top, m34->bottom);
+	if (m->xMstPos < m34->left - w || m->xMstPos > m34->right + w || m->yMstPos < m34->top - h || m->yMstPos > m34->bottom + h) {
 		mstMonster1UpdateWalkPath(m);
 		m->unkC0 = -1;
 		m->unkBC = -1;
@@ -1582,7 +1582,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			MstWalkNode *walkNode = &walkPath->data[_cl];
 			assert(walkNode->indexWalkBox != kNone);
 			const MstWalkBox *m34 = &_res->_mstWalkBoxData[walkNode->indexWalkBox];
-			if (!rect_contains(m34->left, m34->top, m34->right, m34->bottom, _xMstPos1, _yMstPos1)) {
+			if (!rect_contains(m34->left, m34->bottom, m34->right, m34->top, _xMstPos1, _yMstPos1)) {
 				_edi = -1;
 			} else {
 				goto l41A879;
@@ -1841,7 +1841,7 @@ void Game::mstMonster1UpdateLevelBounds(MonsterObject1 *m) {
 // 41AD7B
 		int w = READ_LE_UINT32(m->monsterInfos + 904);
 		int h = READ_LE_UINT32(m->monsterInfos + 908);
-		if (_edi < m34->left - w || _edi > m34->right + w || _ebp < m34->bottom - h || _ebp > m34->top + h) {
+		if (_edi < m34->left - w || _edi > m34->right + w || _ebp < m34->top - h || _ebp > m34->bottom + h) {
 			const uint32_t indexUnk44 = m->behaviorState->indexUnk44;
 			assert(indexUnk44 != kNone);
 			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
@@ -2014,15 +2014,15 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 		const uint32_t indexWalkBox = walkNode->indexWalkBox;
 		assert(indexWalkBox != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
-		if (rect_contains(m34->left, m34->top, m34->right, m34->bottom, x, y)) {
+		if (rect_contains(m34->left, m34->bottom, m34->right, m34->top, x, y)) {
 			return i;
 		}
 // 41A3CE
 		if (x >= m34->left && x <= m34->right) {
-			int var4 = m34->top;
-			int var8 = ABS(y - m34->top);
-			int _ebx = m34->bottom;
-			int _eax = ABS(y - m34->bottom);
+			int var4 = m34->bottom;
+			int var8 = ABS(y - m34->bottom);
+			int _ebx = m34->top;
+			int _eax = ABS(y - m34->top);
 			if (_eax >= var8) {
 				_ebx = var4;
 			}
@@ -2034,7 +2034,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 				_yMstPos3 = _ebx;
 				var20 = var24;
 			}
-		} else if (y >= m34->bottom && y <= m34->top) {
+		} else if (y >= m34->top && y <= m34->bottom) {
 // 41A435
 			int var8 = m34->right;
 			int var4 = ABS(x - m34->right);
@@ -2056,12 +2056,12 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 // 41A49C
 			int _edx = (x - m34->left);
 			_edx *= _edx;
-			int _eax = (y - m34->bottom);
+			int _eax = (y - m34->top);
 			_eax *= _eax;
 			_edx += _eax;
 			if (_esi >= _edx) {
 				_xMstPos3 = m34->left;
-				_yMstPos3 = m34->bottom;
+				_yMstPos3 = m34->top;
 				var20 = var24;
 				_esi = _edx;
 			}
@@ -2071,16 +2071,16 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			_eax += _edx;
 			if (_esi >= _edx) {
 				_xMstPos3 = m34->right;
-				_yMstPos3 = m34->bottom;
+				_yMstPos3 = m34->top;
 				var20 = var24;
 			}
 // 41A4FB
-			_edi = y - m34->top;
+			_edi = y - m34->bottom;
 			_edi *= _edi;
 			_edx += _edi;
 			if (_esi >= _edi) {
 				_xMstPos3 = m34->right;
-				_yMstPos3 = m34->top;
+				_yMstPos3 = m34->bottom;
 				var20 = var24;
 			}
 // 41A529
@@ -2089,7 +2089,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			_eax = _edi + _ebp;
 			if (_esi >= _eax) {
 				_xMstPos3 = m34->left;
-				_yMstPos3 = m34->top;
+				_yMstPos3 = m34->bottom;
 				var20 = var24;
 			}
 
@@ -6578,8 +6578,8 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 		m->unkBC = -1;
 		m->flagsA8[2] = 255;
 		m->flagsA7 = 255;
-		y = m34->bottom;
-		if (m->yMstPos < m34->bottom || m->yMstPos > m34->top) {
+		y = m34->top;
+		if (m->yMstPos < m34->top || m->yMstPos > m34->bottom) {
 			flag = true;
 		}
 	}
@@ -6632,8 +6632,8 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	}
 // 41C62E
 	if (m->monsterInfos[946] & 2) {
-		int _edi = (m34->top - y) / 4;
-		m->goalDistance_y2 = m34->top - _edi;
+		int _edi = (m34->bottom - y) / 4;
+		m->goalDistance_y2 = m34->bottom - _edi;
 		m->goalDistance_y1 = y + _edi;
 		if (_edi != 0) {
 			_edi = _rnd.update() % _edi;
