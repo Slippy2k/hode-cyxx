@@ -22,7 +22,7 @@ struct PafHeader {
 	uint32_t maxAudioFrameBlocksCount;
 };
 
-// names taken from the PSX version
+// names taken from the PSX filenames
 enum {
 	kPafAnimation_intro = 0,
 	kPafAnimation_cine14l = 1,

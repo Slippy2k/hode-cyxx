@@ -354,15 +354,11 @@ bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	int yMst; // yLevelPos
 	for (int i = 0; i < _res->_mstHdr.screensCount; ++i) {
 		xMst = _res->_mstPointOffsets[i].xOffset;
-		if (xMst > xWalkBox || xMst + 255 < xWalkBox) {
-			continue;
-		}
 		yMst = _res->_mstPointOffsets[i].yOffset;
-		if (yMst > _edx || yMst + 191 < _edx) {
-			continue;
+		if (rect_contains(xMst, yMst, xMst + 255, yMst + 191, xWalkBox, _edx)) {
+			screenNum = i;
+			break;
 		}
-		screenNum = i;
-		break;
 	}
 	if (screenNum == -1) {
 		screenNum = 0;
@@ -455,19 +451,9 @@ int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) {
 	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
 		const MstBoundingBox *p = &_mstBoundingBoxesTable[i];
 		if (p->monster1Index != 0xFF && num != p->monster1Index) {
-			if (p->x2 < x1) { // 16 - 8
-				continue;
+			if (rect_intersects(x1, y1, x2, y2, p->x1, p->y1, p->x2, p->y2)) {
+				return i + 1;
 			}
-			if (p->x1 > x2) { // 16 - 16
-				continue;
-			}
-			if (p->y2 < y1) { // 16 - 4
-				continue;
-			}
-			if (p->x1 > y2) { // 16 - 12
-				continue;
-			}
-			return i + 1;
 		}
 	}
 	return 0;
@@ -513,19 +499,9 @@ int Game::mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) {
 				continue;
 			}
 		}
-		if (p->x2 < x1) {
-			continue;
+		if (rect_intersects(x1, y1, x2, y2, p->x1, p->y1, p->x2, p->y2)) {
+			return i + 1;
 		}
-		if (p->x1 > x2) {
-			continue;
-		}
-		if (p->y2 < y1) {
-			continue;
-		}
-		if (p->y1 > y2) {
-			continue;
-		}
-		return i + 1;
 	}
 	return 0;
 }
@@ -1606,7 +1582,7 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			MstWalkNode *walkNode = &walkPath->data[_cl];
 			assert(walkNode->indexWalkBox != kNone);
 			const MstWalkBox *m34 = &_res->_mstWalkBoxData[walkNode->indexWalkBox];
-			if (_xMstPos1 < m34->left || _xMstPos1 > m34->right || _yMstPos1 < m34->bottom || _yMstPos1 > m34->top) {
+			if (!rect_contains(m34->left, m34->top, m34->right, m34->bottom, _xMstPos1, _yMstPos1)) {
 				_edi = -1;
 			} else {
 				goto l41A879;
@@ -2038,7 +2014,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 		const uint32_t indexUnk34 = walkNode->indexWalkBox;
 		assert(indexUnk34 != kNone);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexUnk34];
-		if (x >= m34->left && x <= m34->right && y >= m34->bottom && y <= m34->top) {
+		if (rect_contains(m34->left, m34->top, m34->right, m34->bottom, x, y)) {
 			return i;
 		}
 // 41A3CE
@@ -2223,9 +2199,9 @@ bool Game::lvlObjectCollidesAndy1(LvlObject *o, int flags) const {
 			y2 += dy;
 		}
 	}
-	int x = _andyObject->xPos + _andyObject->width / 2;
-	int y = _andyObject->yPos + _andyObject->height / 2;
-	return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
+	const int x = _andyObject->xPos + _andyObject->width / 2;
+	const int y = _andyObject->yPos + _andyObject->height / 2;
+	return rect_contains(x1, y1, x2, y2, x, y);
 }
 
 bool Game::lvlObjectCollidesAndy2(LvlObject *o, int type) const {
@@ -2278,7 +2254,7 @@ bool Game::lvlObjectCollidesAndy3(LvlObject *o, int type) const {
 		}
 		const int xPos = _andyObject->xPos + _andyObject->posTable[3].x;
 		const int yPos = _andyObject->yPos + _andyObject->posTable[3].y;
-		if (xPos >= x1 && xPos <= x2 && yPos >= y1 && yPos <= y2) {
+		if (rect_contains(x1, y1, x2, y2, xPos, yPos)) {
 			return true;
 		}
 	}
@@ -2307,7 +2283,7 @@ bool Game::lvlObjectCollidesAndy4(LvlObject *o, int type) const {
 		for (int i = 0; i < 4; ++i) {
 			const int xPos = _andyObject->xPos + _andyObject->posTable[indexes[i]].x;
 			const int yPos = _andyObject->yPos + _andyObject->posTable[indexes[i]].y;
-			if (xPos >= x1 && xPos <= x2 && yPos >= y1 && yPos <= y2) {
+			if (rect_contains(x1, y1, x2, y2, xPos, yPos)) {
 				return true;
 			}
 		}
@@ -2679,7 +2655,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 						break;
 					}
 
-					if (_mstAndyLevelPosX >= x1 /*_edx*/ && _mstAndyLevelPosX <= x2 /*_edi*/ && _mstAndyLevelPosY >= y1 /*_esi*/ && _mstAndyLevelPosY <= y2 /*_ebp*/) {
+					if (rect_contains(x1, y1, x2, y2, _mstAndyLevelPosX, _mstAndyLevelPosY)) {
 						mstTaskAttack(_mstCurrentTask, READ_LE_UINT32(p + 16), 0x20);
 						mstMonster1Collide(_mstCurrentMonster1, _mstCurrentDataPtr);
 						return 0;

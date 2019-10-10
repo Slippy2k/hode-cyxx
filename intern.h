@@ -100,4 +100,12 @@ inline int merge_bits(int dbit, int sbit, int mask) {
 //	return (dbit & ~mask) | (sbit & mask);
 }
 
+inline bool rect_contains(int left, int top, int right, int bottom, int x, int y) {
+	return x >= left && x <= right && y >= top && y <= bottom;
+}
+
+inline bool rect_intersects(int left1, int top1, int right1, int bottom1, int left2, int top2, int right2, int bottom2) {
+	return right2 >= left1 && left2 <= right1 && bottom2 >= top1 && top2 <= bottom1;
+}
+
 #endif // INTERN_H__
