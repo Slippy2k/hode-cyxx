@@ -437,7 +437,7 @@ const uint8_t *Resource::getLvlScreenPosDataPtr(int num) const {
 	return (offset != 0) ? _resLevelData0x470CTable + offset : 0;
 }
 
-void Resource::loadLevelData0x470C() {
+void Resource::loadLvlScreenMaskData() {
 	_lvlFile->seekAlign(0x4708);
 	const uint32_t offset = _lvlFile->readUint32();
 	const uint32_t size = _lvlFile->readUint32();
@@ -482,7 +482,7 @@ void Resource::loadLvlData(File *fp, const char *name) {
 		loadLvlScreenObjectData(i);
 	}
 
-	loadLevelData0x470C();
+	loadLvlScreenMaskData();
 
 	memset(_resLevelData0x2B88SizeTable, 0, sizeof(_resLevelData0x2B88SizeTable));
 	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
