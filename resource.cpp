@@ -1276,7 +1276,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstBehaviorData[i].data[j].count       = READ_LE_UINT32(data + 0x14);
 			_mstBehaviorData[i].data[j].unk18       = READ_LE_UINT32(data + 0x18);
 			_mstBehaviorData[i].data[j].indexUnk51  = READ_LE_UINT32(data + 0x1C);
-			_mstBehaviorData[i].data[j].indexUnk44  = READ_LE_UINT32(data + 0x20);
+			_mstBehaviorData[i].data[j].walkPath  = READ_LE_UINT32(data + 0x20);
 			_mstBehaviorData[i].data[j].attackBox   = READ_LE_UINT32(data + 0x24);
 			_mstBehaviorData[i].data[j].codeData    = READ_LE_UINT32(data + 0x28);
 		}

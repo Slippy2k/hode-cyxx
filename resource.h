@@ -202,7 +202,7 @@ struct MstBehaviorState { // u46u1
 	uint32_t count; // 0x14
 	uint32_t unk18; // 0x18
 	uint32_t indexUnk51; // 0x1C indexes _mstUnk51
-	uint32_t indexUnk44; // 0x20 indexes _mstWalkPathData
+	uint32_t walkPath; // 0x20 indexes _mstWalkPathData
 	uint32_t attackBox; // 0x24 indexes _mstAttackBoxData
 	uint32_t codeData; // 0x28 indexes _mstCodeData
 }; // sizeof == 44

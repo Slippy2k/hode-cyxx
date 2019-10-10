@@ -203,7 +203,7 @@ void Game::copyMonsterObject1(Task *t, MonsterObject1 *m, int num) {
 	if (behaviorState->indexUnk51 == kNone) {
 		m->flags48 &= ~4;
 	}
-	m->walkNode = _res->_mstWalkPathData[behaviorState->indexUnk44].data;
+	m->walkNode = _res->_mstWalkPathData[behaviorState->walkPath].data;
 	mstTaskUpdateScreenPosition(t);
 	if (!mstMonster1UpdateWalkPath(m)) {
 		mstMonster1ResetWalkPath(m);
@@ -277,9 +277,9 @@ void Game::mstMonster1SetScreenPosition(MonsterObject1 *m) {
 
 bool Game::mstMonster1SetWalkingBounds(MonsterObject1 *m) {
 	MstBehaviorState *behaviorState = m->behaviorState;
-	const uint32_t indexUnk44 = behaviorState->indexUnk44;
-	assert(indexUnk44 != kNone);
-	MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
+	const uint32_t indexWalkPath = behaviorState->walkPath;
+	assert(indexWalkPath != kNone);
+	MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
 	MstWalkNode *walkNode = walkPath->data;
 
 	int x = m->xMstPos; // _ebp
@@ -379,9 +379,9 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 	debug(kDebug_MONSTER, "mstMonster1UpdateWalkPath m %p", m);
 	const uint8_t screenNum = m->o16->screenNum;
 	MstBehaviorState *behaviorState = m->behaviorState;
-	const uint32_t indexUnk44 = behaviorState->indexUnk44;
-	assert(indexUnk44 != kNone);
-	MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
+	const uint32_t indexWalkPath = behaviorState->walkPath;
+	assert(indexWalkPath != kNone);
+	MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
 	// start from screen number
 	uint32_t indexWalkNode = walkPath->walkNodeData[screenNum];
 	if (indexWalkNode != kNone) {
@@ -1574,8 +1574,8 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 // 41A759
 	int _edi = 0;
 	MstBehaviorState *behaviorState = m->behaviorState;
-	assert(behaviorState->indexUnk44 != kNone);
-	MstWalkPath *walkPath = &_res->_mstWalkPathData[behaviorState->indexUnk44];
+	assert(behaviorState->walkPath != kNone);
+	MstWalkPath *walkPath = &_res->_mstWalkPathData[behaviorState->walkPath];
 	uint8_t _cl = m->flagsA8[2];
 	if (m->unkBC != _xMstPos1 || m->unkC0 != _yMstPos1) {
 		if (_cl < walkPath->count) {
@@ -1632,9 +1632,9 @@ l41A879:
 // 41A8DD
 		m->unkBC = _xMstPos1;
 		m->unkC0 = _yMstPos1;
-		uint32_t indexUnk44 = m->behaviorState->indexUnk44;
-		assert(indexUnk44 != kNone && indexUnk44 < (uint32_t)_res->_mstHdr.walkPathDataCount);
-		MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
+		const uint32_t indexWalkPath = m->behaviorState->walkPath;
+		assert(indexWalkPath != kNone);
+		MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
 		uint8_t var1D = m->walkNode->unk60[_edi][_cl];
 		if (var1D != 0) {
 			MstWalkNode *walkNode = m->walkNode;
@@ -1842,9 +1842,9 @@ void Game::mstMonster1UpdateLevelBounds(MonsterObject1 *m) {
 		int w = READ_LE_UINT32(m->monsterInfos + 904);
 		int h = READ_LE_UINT32(m->monsterInfos + 908);
 		if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, _edi, _ebp)) {
-			const uint32_t indexUnk44 = m->behaviorState->indexUnk44;
-			assert(indexUnk44 != kNone);
-			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexUnk44];
+			const uint32_t indexWalkPath = m->behaviorState->walkPath;
+			assert(indexWalkPath != kNone);
+			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
 			const int num = mstMonster1FindWalkPathRect(m, walkPath, _edi, _ebp);
 			if (num < 0) {
 				continue;
@@ -7123,7 +7123,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 
 		m->levelPosBounds_x1 = -1;
 		MstBehaviorState *behaviorState = m->behaviorState;
-		m->walkNode = _res->_mstWalkPathData[behaviorState->indexUnk44].data;
+		m->walkNode = _res->_mstWalkPathData[behaviorState->walkPath].data;
 
 		if (m->monsterInfos[946] & 4) {
 			m->flagsA8[0] = 0xFF;
