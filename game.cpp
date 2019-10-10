@@ -4243,7 +4243,7 @@ LvlObject *Game::findLvlObjectBoundingBox(BoundingBox *box) {
 	return 0;
 }
 
-void Game::postScreenUpdate_lava_helper(int yPos) {
+void Game::postScreenUpdateHelperLava(int yPos) {
 	const uint8_t flags = (_andyObject->flags0) & 0x1F;
 	if (!_hideAndyObjectFlag) {
 		if ((_mstFlags & 0x80000000) == 0) {
