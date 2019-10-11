@@ -87,19 +87,17 @@ void Level_lava::postScreenUpdate_lava_screen1() {
 	b.y1 = _andyObject->yPos + _andyObject->posTable[4].y;
 	b.x2 = _andyObject->xPos + _andyObject->posTable[5].x;
 	b.y2 = _andyObject->yPos + _andyObject->posTable[5].y;
-	if (_res->_currentScreenResourceNum == 1 && (_andyObject->flags0 & 0x1F) != 2) {
-		BoundingBox b2 = { 48, 156, 79, 167 };
-		if (_g->clipBoundingBox(&b, &b2)) {
-			LvlObject *o = _g->findLvlObject2(0, 0, 1);
-			if (o) {
-				o->objectUpdateType = 7;
-			}
-			_screen1Counter = 51;
-			return;
+	BoundingBox b2 = { 48, 156, 79, 167 };
+	if (_res->_currentScreenResourceNum == 1 && (_andyObject->flags0 & 0x1F) != 2 && _g->clipBoundingBox(&b, &b2)) {
+		LvlObject *o = _g->findLvlObject2(0, 0, 1);
+		if (o) {
+			o->objectUpdateType = 7;
 		}
-	}
-	if (_screen1Counter != 0) {
-		--_screen1Counter;
+		_screen1Counter = 51;
+	} else {
+		if (_screen1Counter != 0) {
+			--_screen1Counter;
+		}
 	}
 }
 
@@ -169,22 +167,21 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	b.y1 = _andyObject->yPos + _andyObject->posTable[4].y;
 	b.x2 = _andyObject->xPos + _andyObject->posTable[5].x;
 	b.y2 = _andyObject->yPos + _andyObject->posTable[5].y;
-	if (_res->_currentScreenResourceNum == 2 && (_andyObject->flags0 & 0x1F) != 2) {
-		BoundingBox b2 = { 40, 156, 72, 165 };
-		if (_g->clipBoundingBox(&b, &b2)) {
-			LvlObject *o = _g->findLvlObject2(0, 0, 2);
-			if (o) {
-				o->objectUpdateType = 7;
-			}
-			_screen2Counter = 13;
-			return;
+	BoundingBox b2 = { 40, 156, 72, 165 };
+	if (_res->_currentScreenResourceNum == 2 && (_andyObject->flags0 & 0x1F) != 2 && _g->clipBoundingBox(&b, &b2)) {
+		LvlObject *o = _g->findLvlObject2(0, 0, 2);
+		if (o) {
+			o->objectUpdateType = 7;
 		}
-	}
-	if (_screen2Counter != 0) {
-		--_screen2Counter;
+		_screen2Counter = 13;
+	} else {
+		if (_screen2Counter != 0) {
+			--_screen2Counter;
+		}
 	}
 // 409271
 	LvlObject *o = _g->findLvlObject(2, 0, 2);
+	assert(o);
 	if (_screen2Counter == 0) {
 		o->directionKeyMask = 4;
 	} else {
@@ -193,12 +190,14 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 // 452B68
 	static const uint8_t data1[] = { 0, 0, 0, 0, 0, 1, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2 };
 	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -3, o->screenNum, data1);
-	if (_res->_currentScreenResourceNum > 2 && (o->flags0 & 0x1F) == 2) {
+	if (_res->_currentScreenResourceNum <= 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
-	_g->updateAndyObject(o);
+	if (o->levelData0x2988) {
+		_g->updateAndyObject(o);
+	}
 	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 3, o->screenNum, data1);
-	if (_res->_currentScreenResourceNum == 2 || _res->_currentScreenResourceNum == 1) {
+	if (_res->_currentScreenResourceNum == 2 && (o->flags0 & 0x1F) == 1) {
 		if ((o->flags0 & 0xE0) == 0x20) {
 // 452CC0
 			static const uint8_t data[] = {
@@ -212,6 +211,7 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	}
 // 40932B
 	o = _g->findLvlObject(2, 1, 2);
+	assert(o);
 	if (_screen1Counter == 0) {
 		o->directionKeyMask = 1;
 	} else {
@@ -223,36 +223,40 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 		2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0, 0
 	};
 	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -5, o->screenNum, data2);
-	if (_res->_currentScreenResourceNum > 2 && (o->flags0 & 0x1F) == 2) {
+	if (_res->_currentScreenResourceNum <= 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
-	_g->updateAndyObject(o);
-	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, data2);
-	if (_res->_currentScreenResourceNum == 2) {
-		if ((o->flags0 & 0xE0) == 0x20) {
-// 452CA0
-			static const uint8_t data[] = {
-				0xC8, 0xAC, 0x06, 0, 0x0F, 0x90,
-				0xB9, 0xA5, 0x08, 0, 0x0F, 0x10,
-				0xDC, 0xA5, 0x09, 0, 0x09, 0x50,
-				0xAB, 0xA0, 0x09, 0, 0x0F, 0x10,
-				0xFF, 0xFF, 0xFF, 0, 0xFF, 0xFF
-			};
-			postScreenUpdate_lava_screen2_addLvlObjects(data);
-		}
+	if (o->levelData0x2988) {
+		_g->updateAndyObject(o);
 	}
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, data2);
+	if ((o->flags0 & 0x1F) == 1) {
+		if (_res->_currentScreenResourceNum == 2) {
+			if ((o->flags0 & 0xE0) == 0x20) {
+// 452CA0
+				static const uint8_t data[] = {
+					0xC8, 0xAC, 0x06, 0, 0x0F, 0x90,
+					0xB9, 0xA5, 0x08, 0, 0x0F, 0x10,
+					0xDC, 0xA5, 0x09, 0, 0x09, 0x50,
+					0xAB, 0xA0, 0x09, 0, 0x0F, 0x10,
+					0xFF, 0xFF, 0xFF, 0, 0xFF, 0xFF
+				};
+				postScreenUpdate_lava_screen2_addLvlObjects(data);
+			}
+		}
 // 4093E2
-	if (_res->_currentScreenResourceNum <= 2) {
-		_g->setShakeScreen(3, 2);
+		if (_res->_currentScreenResourceNum <= 2) {
+			_g->setShakeScreen(3, 2);
+		}
 	}
 // 4093F2
 	if (_res->_currentScreenResourceNum == 2 && _g->clipLvlObjectsBoundingBox(_andyObject, o, 0x44)) {
 		const int x = o->xPos + o->width / 2;
 		if (_andyObject->xPos > x) {
-			o->xPos = _andyObject->xPos + 10;
+			_andyObject->xPos += 10;
 			_g->setAndySpecialAnimation(0x10);
 		} else {
-			o->xPos = _andyObject->xPos - 10;
+			_andyObject->xPos -= 10;
 			_g->setAndySpecialAnimation(0x11);
 		}
 	}
