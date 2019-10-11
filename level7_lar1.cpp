@@ -447,7 +447,7 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 		}
 // 40768C
 		_g->restoreAndyCollidesLava();
-		_g->postScreenUpdateHelperLava(0xB6);
+		_g->setLavaAndyAnimation(0xB6);
 	}
 }
 

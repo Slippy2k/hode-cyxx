@@ -18,6 +18,8 @@ struct Level_lava: Level {
 	virtual void setupLvlObjects(int screenNum);
 
 	void postScreenUpdate_lava_screen0();
+	void postScreenUpdate_lava_screen1();
+	void postScreenUpdate_lava_screen2();
 	void postScreenUpdate_lava_screen3_helper(LvlObject *o, BoundingBox *b);
 	void postScreenUpdate_lava_screen3();
 	void postScreenUpdate_lava_screen4();
@@ -40,6 +42,8 @@ struct Level_lava: Level {
 	void preScreenUpdate_lava_screen15();
 
 	void setupLvlObjects_lava_screen3();
+
+	uint8_t _screen1Counter;
 };
 
 Level *Level_lava_create() {
@@ -73,6 +77,28 @@ void Level_lava::postScreenUpdate_lava_screen0() {
 	}
 }
 
+void Level_lava::postScreenUpdate_lava_screen1() {
+	BoundingBox b;
+	b.x1 = _andyObject->xPos + _andyObject->posTable[4].x;
+	b.y1 = _andyObject->yPos + _andyObject->posTable[4].y;
+	b.x2 = _andyObject->xPos + _andyObject->posTable[5].x;
+	b.y2 = _andyObject->yPos + _andyObject->posTable[5].y;
+	if (_res->_currentScreenResourceNum == 1 && (_andyObject->flags0 & 0x1F) != 2) {
+		BoundingBox b2 = { 48, 156, 79, 167 };
+		if (_g->clipBoundingBox(&b, &b2)) {
+			LvlObject *o = _g->findLvlObject2(0, 0, 1);
+			if (o) {
+				o->objectUpdateType = 7;
+			}
+			_screen1Counter = 51;
+			return;
+		}
+	}
+	if (_screen1Counter != 0) {
+		--_screen1Counter;
+	}
+}
+
 void Level_lava::postScreenUpdate_lava_screen3_helper(LvlObject *o, BoundingBox *b) {
 	warning("postScreenUpdate_lava_screen3_helper unimplemented");
 }
@@ -88,25 +114,25 @@ void Level_lava::postScreenUpdate_lava_screen3() {
 		postScreenUpdate_lava_screen3_helper(o, &b);
 		o = findLvlObject_lava(o);
 		postScreenUpdate_lava_screen3_helper(o, &b);
-		_g->postScreenUpdateHelperLava(0xAF);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen4() {
 	if (_res->_currentScreenResourceNum == 4) {
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen5() {
 	if (_res->_currentScreenResourceNum == 5) {
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
@@ -119,7 +145,7 @@ void Level_lava::postScreenUpdate_lava_screen7() {
 				_checkpoint = 3;
 			}
 		}
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
@@ -128,7 +154,7 @@ void Level_lava::postScreenUpdate_lava_screen8() {
 		if (_andyObject->xPos + _andyObject->posTable[5].x < 72 || _andyObject->xPos + _andyObject->posTable[4].x < 72) {
 			const uint8_t flags = _andyObject->flags0 & 0x1F;
 			if (flags != 3 && flags != 7 && flags != 4) {
-				_g->postScreenUpdateHelperLava(175);
+				_g->setLavaAndyAnimation(175);
 			}
 		}
 	}
@@ -167,19 +193,19 @@ void Level_lava::postScreenUpdate_lava_screen10() {
 
 void Level_lava::postScreenUpdate_lava_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen12() {
 	if (_res->_currentScreenResourceNum == 12) {
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		_g->postScreenUpdateHelperLava(175);
+		_g->setLavaAndyAnimation(175);
 	}
 }
 
@@ -188,7 +214,7 @@ void Level_lava::postScreenUpdate_lava_screen14() {
 		const int x = _andyObject->xPos;
 		const Point16_t *pos = _andyObject->posTable;
 		if (x + pos[5].x < 114 || x + pos[4].x < 114 || x + pos[3].x < 114 || x + pos[0].x < 114) {
-			_g->postScreenUpdateHelperLava(175);
+			_g->setLavaAndyAnimation(175);
 		}
 	}
 }
@@ -210,7 +236,7 @@ void Level_lava::postScreenUpdate(int num) {
 		postScreenUpdate_lava_screen0();
 		break;
 	case 1:
-		warning("postScreenUpdate_lava_screen1 unimplemented");
+		postScreenUpdate_lava_screen1();
 		break;
 	case 2:
 		warning("postScreenUpdate_lava_screen2 unimplemented");
@@ -331,6 +357,7 @@ void Level_lava::preScreenUpdate(int num) {
 void Level_lava::initialize() {
 	_g->loadTransformLayerData(Game::_pwr2_screenTransformData);
 	_g->resetCrackSprites();
+	_screen1Counter = 0;
 }
 
 void Level_lava::terminate() {

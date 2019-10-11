@@ -356,7 +356,7 @@ struct Game {
 	LvlObject *findLvlObject2(uint8_t type, uint8_t dataNum, int screenNum);
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
-	void postScreenUpdateHelperLava(int yPos);
+	void setLavaAndyAnimation(int yPos);
 	void updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r);
 	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
 	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
