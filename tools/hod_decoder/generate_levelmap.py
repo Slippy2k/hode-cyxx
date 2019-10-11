@@ -12,6 +12,7 @@ y = 0
 
 count = 0
 f = file(sys.argv[1])
+ext = sys.argv[2]
 for line in f.readlines():
 	if count == 0:
 		assert line.startswith('levelMap')
@@ -23,10 +24,12 @@ for line in f.readlines():
 		for x in range(0, w):
 			num = line[x * 4 + 1:x * 4 + 3]
 			if num != '  ':
-				fname = 'lvl_screen_%02d_state_0.bmp' % int(num, 16)
+				fname = 'lvl_screen_%02d_state_0.%s' % (int(num, 16), ext)
 				im.paste(Image.open(fname), (x * W, y))
 		y += H
 	count += 1
+	if count == h:
+		break
 
 fname = os.path.splitext(sys.argv[1])[0] + '.png'
 im.save(fname)

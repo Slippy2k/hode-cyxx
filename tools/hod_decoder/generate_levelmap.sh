@@ -4,7 +4,7 @@ DATADIR=~/Data/heart_of_darkness/DATA_retail/
 
 do_levelmap () {
 	./hod_decoder $DATADIR/$1.lvl > levelmap_$1.txt
-	python generate_levelmap.py levelmap_$1.txt
+	python generate_levelmap.py levelmap_$1.txt bmp
 	optipng -o9 -strip all levelmap_$1.png
 }
 
