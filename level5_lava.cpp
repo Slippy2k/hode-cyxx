@@ -19,7 +19,7 @@ struct Level_lava: Level {
 
 	void postScreenUpdate_lava_screen0();
 	void postScreenUpdate_lava_screen1();
-	void postScreenUpdate_lava_screen2_helper1(int x, int y, int h, int unk, int screenNum, const uint8_t *p);
+	void postScreenUpdate_lava_screen2_updateMask(int x, int y, int h, int unk, int screenNum, const uint8_t *p);
 	void postScreenUpdate_lava_screen2_addLvlObjects(const uint8_t *p);
 	void postScreenUpdate_lava_screen2();
 	void postScreenUpdate_lava_screen3_helper2(int x, int y, uint8_t mask, int h, int screenNum, bool flag);
@@ -103,8 +103,31 @@ void Level_lava::postScreenUpdate_lava_screen1() {
 	}
 }
 
-void Level_lava::postScreenUpdate_lava_screen2_helper1(int x, int y, int h, int unk, int screenNum, const uint8_t *p) {
-	warning("postScreenUpdate_lava_screen2_helper1 unimplemented");
+void Level_lava::postScreenUpdate_lava_screen2_updateMask(int x, int y, int h, int flag, int screenNum, const uint8_t *p) {
+	if (x < 0) {
+		x = 0;
+	}
+	if (y < 0) {
+		y = 0;
+	}
+	uint32_t maskOffset = Game::screenMaskOffset(_res->_screensBasePos[screenNum].u + x, _res->_screensBasePos[screenNum].v + y);
+	uint8_t *dst = _g->_screenMaskBuffer + maskOffset;
+	if (flag < 0) {
+		h >>= 3;
+		const int count = -flag;
+		for (int i = 0; i < h; ++i) {
+			memset(dst + (int8_t)p[0], 0, count); p += 2;
+			dst -= 512;
+		}
+	} else {
+// 408F25
+		h >>= 3;
+		const int count = flag;
+		for (int i = 0; i < h; ++i) {
+			memset(dst + (int8_t)p[0], p[1], count); p += 2;
+			dst -= 512;
+		}
+	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen2_addLvlObjects(const uint8_t *p) {
@@ -169,12 +192,12 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	}
 // 452B68
 	static const uint8_t data1[] = { 0, 0, 0, 0, 0, 1, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2 };
-	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -3, o->screenNum, data1);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -3, o->screenNum, data1);
 	if (_res->_currentScreenResourceNum > 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
 	_g->updateAndyObject(o);
-	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 3, o->screenNum, data1);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 3, o->screenNum, data1);
 	if (_res->_currentScreenResourceNum == 2 || _res->_currentScreenResourceNum == 1) {
 		if ((o->flags0 & 0xE0) == 0x20) {
 // 452CC0
@@ -199,12 +222,12 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 		0, 0, 1, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE,
 		2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0, 0
 	};
-	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -5, o->screenNum, data2);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -5, o->screenNum, data2);
 	if (_res->_currentScreenResourceNum > 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
 	_g->updateAndyObject(o);
-	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, data2);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, data2);
 	if (_res->_currentScreenResourceNum == 2) {
 		if ((o->flags0 & 0xE0) == 0x20) {
 // 452CA0
