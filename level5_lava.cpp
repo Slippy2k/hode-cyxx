@@ -19,8 +19,11 @@ struct Level_lava: Level {
 
 	void postScreenUpdate_lava_screen0();
 	void postScreenUpdate_lava_screen1();
+	void postScreenUpdate_lava_screen2_helper1(int x, int y, int h, int unk, int screenNum, const uint8_t *p);
+	void postScreenUpdate_lava_screen2_addLvlObjects(const uint8_t *p);
 	void postScreenUpdate_lava_screen2();
-	void postScreenUpdate_lava_screen3_helper(LvlObject *o, BoundingBox *b);
+	void postScreenUpdate_lava_screen3_helper2(int x, int y, uint8_t mask, int h, int screenNum, bool flag);
+	void postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox *b);
 	void postScreenUpdate_lava_screen3();
 	void postScreenUpdate_lava_screen4();
 	void postScreenUpdate_lava_screen5();
@@ -100,6 +103,43 @@ void Level_lava::postScreenUpdate_lava_screen1() {
 	}
 }
 
+void Level_lava::postScreenUpdate_lava_screen2_helper1(int x, int y, int h, int unk, int screenNum, const uint8_t *p) {
+	warning("postScreenUpdate_lava_screen2_helper1 unimplemented");
+}
+
+void Level_lava::postScreenUpdate_lava_screen2_addLvlObjects(const uint8_t *p) {
+	do {
+		LvlObject *ptr = 0;
+		if (_g->_declaredLvlObjectsListCount < Game::kMaxLvlObjects) {
+			ptr = _g->_declaredLvlObjectsListHead;
+			_g->_declaredLvlObjectsListHead = _g->_declaredLvlObjectsListHead->nextPtr;
+			++_g->_declaredLvlObjectsListCount;
+			ptr->spriteNum = 22;
+			ptr->type = 8;
+			_res->incLvlSpriteDataRefCounter(ptr);
+			_g->lvlObjectTypeCallback(ptr);
+			ptr->currentSprite = 0;
+			ptr->sssObject = 0;
+			ptr->nextPtr = 0;
+		}
+// 40F96C
+		if (ptr) {
+			ptr->nextPtr = _g->_lvlObjectsList3;
+			_g->_lvlObjectsList3 = ptr;
+			ptr->callbackFuncPtr = &Game::lvlObjectList3Callback;
+			ptr->screenNum = _res->_currentScreenResourceNum;
+			const uint16_t flags2 = READ_LE_UINT16(p + 4);
+			ptr->flags2 = flags2;
+			ptr->flags1 = (ptr->flags1 & ~0x30) | ((flags2 >> 10) & 0x30);
+			ptr->anim = READ_LE_UINT16(p + 2);
+			ptr->frame = 0;
+			_g->setupLvlObjectBitmap(ptr);
+			_g->setLvlObjectPosRelativeToPoint(ptr, 7, p[0], p[1]);
+		}
+		p += 6;
+	} while (READ_LE_UINT16(p + 4) != 0xFFFF);
+}
+
 void Level_lava::postScreenUpdate_lava_screen2() {
 	BoundingBox b;
 	b.x1 = _andyObject->xPos + _andyObject->posTable[4].x;
@@ -127,15 +167,24 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	} else {
 		o->directionKeyMask = 1;
 	}
-	// postScreenUpdate_lava_screen2_helper1
+// 452B68
+	static const uint8_t data1[] = { 0, 0, 0, 0, 0, 1, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2 };
+	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -3, o->screenNum, data1);
 	if (_res->_currentScreenResourceNum > 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
 	_g->updateAndyObject(o);
-	// postScreenUpdate_lava_screen2_helper1
+	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 3, o->screenNum, data1);
 	if (_res->_currentScreenResourceNum == 2 || _res->_currentScreenResourceNum == 1) {
 		if ((o->flags0 & 0xE0) == 0x20) {
-			// postScreenUpdate_lava_screen2_helper2
+// 452CC0
+			static const uint8_t data[] = {
+				0x75, 0xAA, 0x06, 0, 0x0F, 0x90,
+				0x65, 0x9E, 0x09, 0, 0x0F, 0x10,
+				0x80, 0x9E, 0x08, 0, 0x09, 0x10,
+				0xFF, 0xFF, 0xFF, 0, 0xFF, 0xFF
+			};
+			postScreenUpdate_lava_screen2_addLvlObjects(data);
 		}
 	}
 // 40932B
@@ -145,15 +194,28 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	} else {
 		o->directionKeyMask = 4;
 	}
-	// postScreenUpdate_lava_screen2_helper1
+// 452B40
+	static const uint8_t data2[] = {
+		0, 0, 1, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE,
+		2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0, 0
+	};
+	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -5, o->screenNum, data2);
 	if (_res->_currentScreenResourceNum > 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
 	_g->updateAndyObject(o);
-	// postScreenUpdate_lava_screen2_helper1
+	postScreenUpdate_lava_screen2_helper1(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, data2);
 	if (_res->_currentScreenResourceNum == 2) {
 		if ((o->flags0 & 0xE0) == 0x20) {
-			// postScreenUpdate_lava_screen2_helper2
+// 452CA0
+			static const uint8_t data[] = {
+				0xC8, 0xAC, 0x06, 0, 0x0F, 0x90,
+				0xB9, 0xA5, 0x08, 0, 0x0F, 0x10,
+				0xDC, 0xA5, 0x09, 0, 0x09, 0x50,
+				0xAB, 0xA0, 0x09, 0, 0x0F, 0x10,
+				0xFF, 0xFF, 0xFF, 0, 0xFF, 0xFF
+			};
+			postScreenUpdate_lava_screen2_addLvlObjects(data);
 		}
 	}
 // 4093E2
@@ -173,8 +235,26 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	}
 }
 
-void Level_lava::postScreenUpdate_lava_screen3_helper(LvlObject *o, BoundingBox *b) {
-	warning("postScreenUpdate_lava_screen3_helper unimplemented");
+void Level_lava::postScreenUpdate_lava_screen3_helper2(int x, int y, uint8_t mask, int h, int screenNum, bool flag) {
+	warning("postScreenUpdate_lava_screen3_helper2 unimplemented");
+}
+
+void Level_lava::postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox *b2) {
+	BoundingBox b;
+	b.x1 = o->xPos + o->posTable[1].x;
+	b.y1 = o->yPos + o->posTable[1].y - 2;
+	b.x2 = o->xPos + o->posTable[2].x;
+	b.y2 = o->yPos + o->posTable[1].y + 4;
+	postScreenUpdate_lava_screen3_helper2(b.x1, b.y2, 0x20, 8, o->screenNum, false);
+	if ((o->flags0 & 0x1F) != 0xB) {
+		if ((o->flags0 & 0x1F) != 2 && _g->clipBoundingBox(&b, b2)) {
+			o->directionKeyMask = 4;
+		}
+		_g->updateAndyObject(o);
+		const int x = o->xPos + o->posTable[1].x + 6;
+		const int y = o->yPos + o->posTable[1].y + 4;
+		postScreenUpdate_lava_screen3_helper2(x, y, 0x20, 8, o->screenNum, true);
+	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen3() {
@@ -185,9 +265,9 @@ void Level_lava::postScreenUpdate_lava_screen3() {
 		b.x2 = _andyObject->xPos + _andyObject->posTable[5].x;
 		b.y2 = _andyObject->yPos + _andyObject->posTable[5].y;
 		LvlObject *o = _g->findLvlObject(2, 0, 3);
-		postScreenUpdate_lava_screen3_helper(o, &b);
+		postScreenUpdate_lava_screen3_helper1(o, &b);
 		o = findLvlObject_lava(o);
-		postScreenUpdate_lava_screen3_helper(o, &b);
+		postScreenUpdate_lava_screen3_helper1(o, &b);
 		_g->setLavaAndyAnimation(175);
 	}
 }
