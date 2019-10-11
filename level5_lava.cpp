@@ -22,7 +22,7 @@ struct Level_lava: Level {
 	void postScreenUpdate_lava_screen2_updateMask(int x, int y, int h, int unk, int screenNum, const uint8_t *p);
 	void postScreenUpdate_lava_screen2_addLvlObjects(const uint8_t *p);
 	void postScreenUpdate_lava_screen2();
-	void postScreenUpdate_lava_screen3_helper2(int x, int y, uint8_t mask, int h, int screenNum, bool flag);
+	void postScreenUpdate_lava_screen3_updateMask(int x, int y, int w, int h, int screenNum, uint8_t mask);
 	void postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox *b);
 	void postScreenUpdate_lava_screen3();
 	void postScreenUpdate_lava_screen4();
@@ -258,8 +258,29 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 	}
 }
 
-void Level_lava::postScreenUpdate_lava_screen3_helper2(int x, int y, uint8_t mask, int h, int screenNum, bool flag) {
-	warning("postScreenUpdate_lava_screen3_helper2 unimplemented");
+void Level_lava::postScreenUpdate_lava_screen3_updateMask(int x, int y, int w, int h, int screenNum, uint8_t mask) {
+	if (x < 0) {
+		x = 0;
+	}
+	if (y < 0) {
+		y = 0;
+	}
+	if (x + w >= 256) {
+		w = 256 - x;
+	}
+	if (y + h >= 192) {
+		h = 192 - y;
+	}
+	uint32_t maskOffset = Game::screenMaskOffset(_res->_screensBasePos[screenNum].u + x, _res->_screensBasePos[screenNum].v + y);
+	uint32_t gridOffset = Game::screenGridOffset(x, y);
+	w >>= 3;
+	h >>= 3;
+	for (int y = 0; y < h; ++y) {
+		memset(_g->_screenMaskBuffer + maskOffset, mask, w);
+		maskOffset += w;
+		memset(_g->_screenPosTable[4] + gridOffset, 1, w);
+		gridOffset += w;
+	}
 }
 
 void Level_lava::postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox *b2) {
@@ -268,7 +289,7 @@ void Level_lava::postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox
 	b.y1 = o->yPos + o->posTable[1].y - 2;
 	b.x2 = o->xPos + o->posTable[2].x;
 	b.y2 = o->yPos + o->posTable[1].y + 4;
-	postScreenUpdate_lava_screen3_helper2(b.x1, b.y2, 0x20, 8, o->screenNum, false);
+	postScreenUpdate_lava_screen3_updateMask(b.x1, b.y2, 32, 8, o->screenNum, 0);
 	if ((o->flags0 & 0x1F) != 0xB) {
 		if ((o->flags0 & 0x1F) != 2 && _g->clipBoundingBox(&b, b2)) {
 			o->directionKeyMask = 4;
@@ -276,7 +297,7 @@ void Level_lava::postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox
 		_g->updateAndyObject(o);
 		const int x = o->xPos + o->posTable[1].x + 6;
 		const int y = o->yPos + o->posTable[1].y + 4;
-		postScreenUpdate_lava_screen3_helper2(x, y, 0x20, 8, o->screenNum, true);
+		postScreenUpdate_lava_screen3_updateMask(x, y, 32, 8, o->screenNum, 1);
 	}
 }
 
