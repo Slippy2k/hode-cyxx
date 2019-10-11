@@ -290,8 +290,7 @@ static void DecodeLvlSprite(const uint8_t *data, int num) {
 	const int framesCount = READ_LE_UINT16(data + 2);
 	const uint32_t framesDataOffset = READ_LE_UINT32(data + 0x1C);
 
-	assert(framesCount < 512);
-	uint32_t framesOffsets[512];
+	uint32_t *framesOffsets = (uint32_t *)alloca(framesCount * sizeof(uint32_t));
 
 	int bitmapW = 0;
 	int bitmapH = 0;
@@ -614,9 +613,8 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 	}
 
 	static const int kSizeOfPcm = 20;
-	assert(pcmCount < 256);
-	uint8_t header[kSizeOfPcm * 256];
-	fp->read(header, sizeof(header));
+	uint8_t *header = (uint8_t *)alloca(pcmCount * kSizeOfPcm);
+	fp->read(header, pcmCount * kSizeOfPcm);
 
 	for (int i = 0; i < pcmCount; ++i) {
 		const uint32_t offset = READ_LE_UINT32(header + i * kSizeOfPcm + 4);
