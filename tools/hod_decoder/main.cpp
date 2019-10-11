@@ -286,11 +286,15 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 }
 
 static void DecodeLvlSprite(const uint8_t *data, int num) {
+	if (_isPsx) {
+		return;
+	}
+
 	const int spriteNum = data[1];
 	const int framesCount = READ_LE_UINT16(data + 2);
 	const uint32_t framesDataOffset = READ_LE_UINT32(data + 0x1C);
 
-	uint32_t *framesOffsets = (uint32_t *)alloca(framesCount * sizeof(uint32_t));
+	uint32_t *framesOffsets = (uint32_t *)alloca((framesCount + 1) * sizeof(uint32_t));
 
 	int bitmapW = 0;
 	int bitmapH = 0;
@@ -301,6 +305,10 @@ static void DecodeLvlSprite(const uint8_t *data, int num) {
 		const uint16_t size = READ_LE_UINT16(framesData);
 		const int w = READ_LE_UINT16(framesData + 2);
 		const int h = READ_LE_UINT16(framesData + 4);
+		if (_isPsx && (w > 255 || h > 191)) {
+			fprintf(stderr, "Invalid sprite dimensions %d,%d\n", w, h);
+			return;
+		}
 		bitmapW += w;
 		if (bitmapH < h) {
 			bitmapH = h;
