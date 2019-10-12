@@ -398,7 +398,7 @@ struct MonsterObject1 {
 	Task *task; // 0xC4
 	uint8_t rnd_m49[4]; // 0xC8
 	uint8_t rnd_m35[4]; // 0xCC
-	MstWalkCode *m35; // 0xD0
+	MstWalkCode *walkCode; // 0xD0
 	MstUnk49Unk1 *m49Unk1; // 0xD4
 	MstUnk49 *m49; // 0xD8
 	int indexUnk49Unk1; // 0xDC

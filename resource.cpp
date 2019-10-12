@@ -1214,13 +1214,13 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstWalkPathData[i].data[j].x2 = READ_LE_UINT32(data + 4);
 			_mstWalkPathData[i].data[j].y1 = READ_LE_UINT32(data + 8);
 			_mstWalkPathData[i].data[j].y2 = READ_LE_UINT32(data + 12);
-			_mstWalkPathData[i].data[j].indexWalkBox = READ_LE_UINT32(data + 16); // sizeof == 20
-			_mstWalkPathData[i].data[j].indexUnk35_20 = READ_LE_UINT32(data + 20); // sizeof == 16
-			_mstWalkPathData[i].data[j].indexUnk35_0x18 = READ_LE_UINT32(data + 24); // sizeof == 16
+			_mstWalkPathData[i].data[j].walkBox = READ_LE_UINT32(data + 16); // sizeof == 20
+			_mstWalkPathData[i].data[j].walkCodeStage1 = READ_LE_UINT32(data + 20); // sizeof == 16
+			_mstWalkPathData[i].data[j].walkCodeStage2 = READ_LE_UINT32(data + 24); // sizeof == 16
 			_mstWalkPathData[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12
 			_mstWalkPathData[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
-			_mstWalkPathData[i].data[j].indexUnk35_0x24[0] = READ_LE_UINT32(data + 36); // sizeof == 16
-			_mstWalkPathData[i].data[j].indexUnk35_0x24[1] = READ_LE_UINT32(data + 40); // sizeof == 16
+			_mstWalkPathData[i].data[j].walkCodeReset[0] = READ_LE_UINT32(data + 36); // sizeof == 16
+			_mstWalkPathData[i].data[j].walkCodeReset[1] = READ_LE_UINT32(data + 40); // sizeof == 16
 			for (int k = 0; k < 4; ++k) {
 				_mstWalkPathData[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
 				_mstWalkPathData[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);

@@ -912,6 +912,10 @@ endDir:
 void Game::preloadLevelScreenData(int num, int prev) {
 	_res->loadLvlScreenBackgroundData(num);
 	loadLevelScreenSounds(num);
+
+	// we should also -
+	//  load the adjacent left and right screens
+	//  unload previous screens
 }
 
 void Game::loadLevelScreenSounds(int num) {
