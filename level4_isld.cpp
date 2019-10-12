@@ -104,7 +104,7 @@ void Level_isld::postScreenUpdate_isld_screen3() {
 }
 
 void Level_isld::postScreenUpdate_isld_screen4() {
-	if (_res->_currentScreenResourceNum == 3) {
+	if (_res->_currentScreenResourceNum == 4) {
 		if (_andyObject->xPos < 150) {
 			LvlObject *o = _g->findLvlObject2(0, 1, 4);
 			if (o) {
