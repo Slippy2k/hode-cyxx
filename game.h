@@ -391,7 +391,8 @@ struct Game {
 	bool mstMonster1UpdateWalkPath(MonsterObject1 *m);
 	void initMonsterObject2_firefly(MonsterObject2 *m);
 	void resetMonsterObject2(MonsterObject2 *m);
-	int mstTaskPrepare(Task *t);
+	uint32_t mstMonster1GetNextWalkCode(MonsterObject1 *m);
+	int mstTaskSetNextWalkCode(Task *t);
 
 	void mstBoundingBoxClear(MonsterObject1 *m, int dir);
 	int mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2);
