@@ -1424,7 +1424,7 @@ void Game::resetScreen() {
 	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
 		_level->setupLvlObjects(i);
 	}
-	resetCrackSprites();
+	resetWormHoleSprites();
 }
 
 void Game::restartLevel() {
@@ -4538,17 +4538,17 @@ int Game::clipAndyLvlObjectLar(BoundingBox *b, bool flag) {
 	return ret;
 }
 
-void Game::resetCrackSprites() {
-	memset(_crackSpritesTable, 0, sizeof(_crackSpritesTable));
-	_crackSpritesCount = 0;
+void Game::resetWormHoleSprites() {
+	memset(_wormHoleSpritesTable, 0, sizeof(_wormHoleSpritesTable));
+	_wormHoleSpritesCount = 0;
 }
 
-void Game::updateCrackSprites() {
+void Game::updateWormHoleSprites() {
 	const uint8_t screenNum = _res->_currentScreenResourceNum;
-	CrackSprite *spr = 0;
-	for (int i = 0; i < _crackSpritesCount; ++i) {
-		if (_crackSpritesTable[i].screenNum == screenNum) {
-			spr = &_crackSpritesTable[i];
+	WormHoleSprite *spr = 0;
+	for (int i = 0; i < _wormHoleSpritesCount; ++i) {
+		if (_wormHoleSpritesTable[i].screenNum == screenNum) {
+			spr = &_wormHoleSpritesTable[i];
 			break;
 		}
 	}

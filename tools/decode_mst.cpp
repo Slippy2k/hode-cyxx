@@ -295,7 +295,7 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "nop");
 		break;
 	case 210:
-		fprintf(_out, "add_crack_sprite dx:%d dy:%d\n", (int8_t)p[2], (int8_t)p[3]);
+		fprintf(_out, "add_worm dx:%d dy:%d\n", (int8_t)p[2], (int8_t)p[3]);
 		break;
 	case 211:
 		fprintf(_out, "add_lvl_object num:%d", read16(p + 2));

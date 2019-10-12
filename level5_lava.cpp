@@ -558,7 +558,7 @@ void Level_lava::preScreenUpdate(int num) {
 
 void Level_lava::initialize() {
 	_g->loadTransformLayerData(Game::_pwr2_screenTransformData);
-	_g->resetCrackSprites();
+	_g->resetWormHoleSprites();
 	_screen1Counter = 0;
 	_screen2Counter = 0;
 }
@@ -576,7 +576,7 @@ void Level_lava::tick() {
 	_video->_displayShadowLayer = Game::_lava_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
 	assert(Game::_lava_screenTransformLut[_res->_currentScreenResourceNum * 2 + 1] == 0);
 	_g->restoreAndyCollidesLava();
-	_g->updateCrackSprites();
+	_g->updateWormHoleSprites();
 }
 
 void Level_lava::setupLvlObjects_lava_screen3() {

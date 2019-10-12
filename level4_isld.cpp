@@ -386,11 +386,11 @@ void Level_isld::initialize() {
 	if (!_paf->_skipCutscenes) {
 		_paf->preload(24);
 	}
-	_g->resetCrackSprites();
+	_g->resetWormHoleSprites();
 }
 
 void Level_isld::tick() {
-	_g->updateCrackSprites();
+	_g->updateWormHoleSprites();
 }
 
 void Level_isld::terminate() {

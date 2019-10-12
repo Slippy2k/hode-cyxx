@@ -220,8 +220,8 @@ struct Game {
 	MstBoundingBox _mstBoundingBoxesTable[64];
 	Task *_mstCurrentTask;
 	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
-	int _crackSpritesCount;
-	CrackSprite _crackSpritesTable[6];
+	int _wormHoleSpritesCount;
+	WormHoleSprite _wormHoleSpritesTable[6];
 
 	Game(System *system, const char *dataPath, uint32_t cheats);
 	~Game();
@@ -364,8 +364,8 @@ struct Game {
 	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
 	void updateScreenMaskLar(uint8_t *p, bool flag);
 	int clipAndyLvlObjectLar(BoundingBox *b, bool flag);
-	void resetCrackSprites();
-	void updateCrackSprites();
+	void resetWormHoleSprites();
+	void updateWormHoleSprites();
 	void captureScreenshot();
 
 	// level1_rock.cpp
@@ -443,7 +443,7 @@ struct Game {
 	void mstOp53(MstUnk48 *m);
 	void mstOp54();
 	int mstOp56_specialAction(Task *t, int code, int num);
-	void mstOp57_addCrackSprite(int x, int y, int screenNum);
+	void mstOp57_addWormHoleSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, uint16_t flags);
 	void mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags);

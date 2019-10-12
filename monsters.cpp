@@ -4365,10 +4365,10 @@ int Game::mstTask_main(Task *t) {
 		case 208:
 		case 209: // 79
 			break;
-		case 210: // 57 - add_crack_sprite
+		case 210: // 57 - add_worm
 			{
 				MonsterObject1 *m = t->monster1;
-				mstOp57_addCrackSprite(m->xPos + (int8_t)p[2], m->yPos + (int8_t)p[3], m->o16->screenNum);
+				mstOp57_addWormHoleSprite(m->xPos + (int8_t)p[2], m->yPos + (int8_t)p[3], m->o16->screenNum);
 			}
 			break;
 		case 211: // 58 - add_lvl_object
@@ -6118,7 +6118,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 	return 0;
 }
 
-static void initCrackSprite(CrackSprite *s, const uint8_t *p) {
+static void initWormHoleSprite(WormHoleSprite *s, const uint8_t *p) {
 	s->screenNum = p[0];
 	s->initData1 = p[1];
 	s->xPos = p[2];
@@ -6134,15 +6134,15 @@ static void initCrackSprite(CrackSprite *s, const uint8_t *p) {
 	s->rect2_y2 = p[0xF];
 }
 
-void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
+void Game::mstOp57_addWormHoleSprite(int x, int y, int screenNum) {
 	bool found = false;
 	int spriteNum = 0;
 	for (int i = 0; i < 6; ++i) {
-		if (_crackSpritesTable[i].screenNum == screenNum) {
+		if (_wormHoleSpritesTable[i].screenNum == screenNum) {
 			found = true;
 			break;
 		}
-		if (_crackSpritesTable[i].screenNum == 0xFF) {
+		if (_wormHoleSpritesTable[i].screenNum == 0xFF) {
 			break;
 		}
 		++spriteNum;
@@ -6150,29 +6150,29 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 	if (!found) {
 		found = true;
 		if (spriteNum == 6) {
-			++_crackSpritesCount;
-			if (_crackSpritesCount >= spriteNum) {
-				_crackSpritesCount = 0;
+			++_wormHoleSpritesCount;
+			if (_wormHoleSpritesCount >= spriteNum) {
+				_wormHoleSpritesCount = 0;
 				spriteNum = 0;
 			} else {
-				spriteNum = _crackSpritesCount - 1;
+				spriteNum = _wormHoleSpritesCount - 1;
 			}
 		} else {
-			spriteNum = _crackSpritesCount;
+			spriteNum = _wormHoleSpritesCount;
 		}
 // 40347C
 		switch (_currentLevel) {
 		case 2:
-			initCrackSprite(&_crackSpritesTable[spriteNum], _pwr1_spritesData + screenNum * 16);
+			initWormHoleSprite(&_wormHoleSpritesTable[spriteNum], _pwr1_spritesData + screenNum * 16);
 			break;
 		case 3:
-			initCrackSprite(&_crackSpritesTable[spriteNum], _isld_spritesData + screenNum * 16);
+			initWormHoleSprite(&_wormHoleSpritesTable[spriteNum], _isld_spritesData + screenNum * 16);
 			break;
 		case 4:
-			initCrackSprite(&_crackSpritesTable[spriteNum], _lava_spritesData + screenNum * 16);
+			initWormHoleSprite(&_wormHoleSpritesTable[spriteNum], _lava_spritesData + screenNum * 16);
 			break;
 		case 6:
-			initCrackSprite(&_crackSpritesTable[spriteNum], _lar1_spritesData + screenNum * 16);
+			initWormHoleSprite(&_wormHoleSpritesTable[spriteNum], _lar1_spritesData + screenNum * 16);
 			break;
 		default:
 			warning("mstOp57 unhandled level %d", _currentLevel);
@@ -6180,8 +6180,9 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 		}
 	}
 // 4034D2
-	const int dx = x - _crackSpritesTable[spriteNum].xPos;
-	const int dy = y + 15 - _crackSpritesTable[spriteNum].yPos;
+	WormHoleSprite *boulderWormSprite = &_wormHoleSpritesTable[spriteNum];
+	const int dx = x - boulderWormSprite->xPos;
+	const int dy = y + 15 - boulderWormSprite->yPos;
 	spriteNum = _rnd._rndSeed & 3;
 	if (spriteNum == 0) {
 		spriteNum = 1;
@@ -6193,7 +6194,7 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 // 403515
 	const int pos = data[(dx >> 3) & 31];
 	const int num = dy >> 5;
-	if ((_crackSpritesTable[spriteNum].flags[num] & (3 << pos)) == 0) {
+	if ((boulderWormSprite->flags[num] & (3 << pos)) == 0) {
 		if (addLvlObjectToList3(20)) {
 			LvlObject *o = _lvlObjectsList3;
 			o->flags0 = _andyObject->flags0;
@@ -6205,8 +6206,8 @@ void Game::mstOp57_addCrackSprite(int x, int y, int screenNum) {
 			setupLvlObjectBitmap(o);
 			setLvlObjectPosRelativeToPoint(o, 7, x, y);
 		}
+		boulderWormSprite->flags[num] |= (spriteNum << pos);
 	}
-	_crackSpritesTable[spriteNum].flags[num] |= (spriteNum << pos);
 }
 
 void Game::mstOp58_addLvlObject(Task *t, int num) {

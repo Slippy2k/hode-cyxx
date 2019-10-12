@@ -490,7 +490,7 @@ void Level_pwr1::preScreenUpdate(int num) {
 
 void Level_pwr1::initialize() {
 	_g->loadTransformLayerData(Game::_pwr1_screenTransformData);
-	_g->resetCrackSprites();
+	_g->resetWormHoleSprites();
 }
 
 void Level_pwr1::terminate() {
@@ -506,5 +506,5 @@ const uint8_t Game::_pwr1_screenTransformLut[] = {
 
 void Level_pwr1::tick() {
 	_video->_displayShadowLayer = Game::_pwr1_screenTransformLut[_res->_currentScreenResourceNum * 2] != 0;
-	_g->updateCrackSprites();
+	_g->updateWormHoleSprites();
 }

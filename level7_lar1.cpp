@@ -921,7 +921,7 @@ void Level_lar1::preScreenUpdate(int num) {
 }
 
 void Level_lar1::initialize() {
-	_g->resetCrackSprites();
+	_g->resetWormHoleSprites();
 	_screenCounterTable[26] = 0;
 }
 
@@ -931,7 +931,7 @@ void Level_lar1::terminate() {
 
 void Level_lar1::tick() {
 	_g->updateLevelTick_lar(24, _lar1_unkData3, Game::_lar1_bboxData);
-	_g->updateCrackSprites();
+	_g->updateWormHoleSprites();
 	if (_screenCounterTable[19] != 0) {
 		_g->_plasmaCannonFlags |= 2;
 	}

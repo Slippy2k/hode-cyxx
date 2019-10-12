@@ -264,7 +264,7 @@ struct ScreenMask { // ShadowScreenMask
 	uint16_t h;
 }; // sizeof == 0x14
 
-struct CrackSprite { // mstOp57
+struct WormHoleSprite {
 	uint8_t screenNum;
 	uint8_t initData1;
 	int8_t xPos;
