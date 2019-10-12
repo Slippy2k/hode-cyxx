@@ -990,10 +990,10 @@ void Game::clearLvlObjectsList1() {
 		return;
 	}
 	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
-		resetMonsterObject1(&_monsterObjects1Table[i]);
+		mstMonster1ResetData(&_monsterObjects1Table[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		resetMonsterObject2(&_monsterObjects2Table[i]);
+		mstMonster2ResetData(&_monsterObjects2Table[i]);
 	}
 	LvlObject *ptr = _lvlObjectsList1;
 	while (ptr) {

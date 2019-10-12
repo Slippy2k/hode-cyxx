@@ -23,7 +23,7 @@ struct Level_lava: Level {
 	void postScreenUpdate_lava_screen2_addLvlObjects(const uint8_t *p);
 	void postScreenUpdate_lava_screen2();
 	void postScreenUpdate_lava_screen3_updateMask(int x, int y, int w, int h, int screenNum, uint8_t mask);
-	void postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox *b);
+	void postScreenUpdate_lava_screen3_updatePlatform(LvlObject *o, BoundingBox *b);
 	void postScreenUpdate_lava_screen3();
 	void postScreenUpdate_lava_screen4();
 	void postScreenUpdate_lava_screen5();
@@ -188,15 +188,19 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 		o->directionKeyMask = 1;
 	}
 // 452B68
-	static const uint8_t data1[] = { 0, 0, 0, 0, 0, 1, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2 };
-	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -3, o->screenNum, data1);
+	static const uint8_t maskData1[3 * 8] = {
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02,
+		0x00, 0x02, 0x00, 0x02, 0x01, 0x02, 0x01, 0x02,
+		0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02
+	};
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -3, o->screenNum, maskData1);
 	if (_res->_currentScreenResourceNum <= 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
 	if (o->levelData0x2988) {
 		_g->updateAndyObject(o);
 	}
-	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 3, o->screenNum, data1);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 3, o->screenNum, maskData1);
 	if (_res->_currentScreenResourceNum == 2 && (o->flags0 & 0x1F) == 1) {
 		if ((o->flags0 & 0xE0) == 0x20) {
 // 452CC0
@@ -218,18 +222,21 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 		o->directionKeyMask = 4;
 	}
 // 452B40
-	static const uint8_t data2[] = {
-		0, 0, 1, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFF, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE, 2, 0xFE,
-		2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0xFD, 2, 0, 0
+	static const uint8_t maskData2[5 * 8] = {
+		0x00, 0x00, 0x00, 0x01, 0xFF, 0x02, 0xFF, 0x02,
+		0xFF, 0x02, 0xFF, 0x02, 0xFF, 0x02, 0xFE, 0x02,
+		0xFE, 0x02, 0xFE, 0x02, 0xFE, 0x02, 0xFE, 0x02,
+		0xFE, 0x02, 0xFD, 0x02, 0xFD, 0x02, 0xFD, 0x02,
+		0xFD, 0x02, 0xFD, 0x02, 0xFD, 0x02, 0x00, 0x00
 	};
-	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -5, o->screenNum, data2);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, -5, o->screenNum, maskData2);
 	if (_res->_currentScreenResourceNum <= 2 && (o->flags0 & 0x1F) == 2) {
 		_g->setShakeScreen(2, 2);
 	}
 	if (o->levelData0x2988) {
 		_g->updateAndyObject(o);
 	}
-	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, data2);
+	postScreenUpdate_lava_screen2_updateMask(o->xPos + o->posTable[7].x, o->yPos + o->height - 1, o->height - 1, 5, o->screenNum, maskData2);
 	if ((o->flags0 & 0x1F) == 1) {
 		if (_res->_currentScreenResourceNum == 2) {
 			if ((o->flags0 & 0xE0) == 0x20) {
@@ -287,7 +294,7 @@ void Level_lava::postScreenUpdate_lava_screen3_updateMask(int x, int y, int w, i
 	}
 }
 
-void Level_lava::postScreenUpdate_lava_screen3_helper1(LvlObject *o, BoundingBox *b2) {
+void Level_lava::postScreenUpdate_lava_screen3_updatePlatform(LvlObject *o, BoundingBox *b2) {
 	BoundingBox b;
 	b.x1 = o->xPos + o->posTable[1].x;
 	b.y1 = o->yPos + o->posTable[1].y - 2;
@@ -313,9 +320,9 @@ void Level_lava::postScreenUpdate_lava_screen3() {
 		b.x2 = _andyObject->xPos + _andyObject->posTable[5].x;
 		b.y2 = _andyObject->yPos + _andyObject->posTable[5].y;
 		LvlObject *o = _g->findLvlObject(2, 0, 3);
-		postScreenUpdate_lava_screen3_helper1(o, &b);
+		postScreenUpdate_lava_screen3_updatePlatform(o, &b);
 		o = findLvlObject_lava(o);
-		postScreenUpdate_lava_screen3_helper1(o, &b);
+		postScreenUpdate_lava_screen3_updatePlatform(o, &b);
 		_g->setLavaAndyAnimation(175);
 	}
 }

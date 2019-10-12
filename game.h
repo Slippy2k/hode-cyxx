@@ -381,17 +381,17 @@ struct Game {
 	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
 
 	// monsters.cpp
-	void resetMonsterObject1(MonsterObject1 *m);
+	void mstMonster1ResetData(MonsterObject1 *m);
 	void mstMonster1ResetWalkPath(MonsterObject1 *m);
 	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);
-	void disableMonsterObject1(MonsterObject1 *m);
+	void mstMonster1ClearChasingMonster(MonsterObject1 *m);
 	void mstTaskSetMonster1BehaviorState(Task *t, MonsterObject1 *m, int num);
 	int mstTaskStopMonsterObject1(Task *t);
 	void mstMonster1SetScreenPosition(MonsterObject1 *m);
 	bool mstMonster1SetWalkingBounds(MonsterObject1 *m);
 	bool mstMonster1UpdateWalkPath(MonsterObject1 *m);
 	void initMonsterObject2_firefly(MonsterObject2 *m);
-	void resetMonsterObject2(MonsterObject2 *m);
+	void mstMonster2ResetData(MonsterObject2 *m);
 	uint32_t mstMonster1GetNextWalkCode(MonsterObject1 *m);
 	int mstTaskSetNextWalkCode(Task *t);
 

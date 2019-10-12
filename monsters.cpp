@@ -72,7 +72,7 @@ static uint8_t mstGetFacingDirectionMask(uint8_t a) {
 	return r;
 }
 
-void Game::resetMonsterObject1(MonsterObject1 *m) {
+void Game::mstMonster1ResetData(MonsterObject1 *m) {
 	m->m46 = 0;
 	LvlObject *o = m->o16;
 	if (o) {
@@ -107,7 +107,7 @@ void Game::initMonsterObject2_firefly(MonsterObject2 *m) {
 	m->vDir = (num >> 17) & 1;
 }
 
-void Game::resetMonsterObject2(MonsterObject2 *m) {
+void Game::mstMonster2ResetData(MonsterObject2 *m) {
 	m->monster2Info = 0;
 	LvlObject *o = m->o;
 	if (o) {
@@ -186,7 +186,7 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
 	return true;
 }
 
-void Game::disableMonsterObject1(MonsterObject1 *m) {
+void Game::mstMonster1ClearChasingMonster(MonsterObject1 *m) {
 	m->flags48 &= ~0x50;
 	m->unk18->monster1Index = 255;
 	m->unk18 = 0;
@@ -245,10 +245,10 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	const uint32_t codeData = m48->codeData2;
 	if (codeData != kNone) {
 		resetTask(t, _res->_mstCodeData + codeData * 4);
-		disableMonsterObject1(m);
+		mstMonster1ClearChasingMonster(m);
 		return 0;
 	}
-	disableMonsterObject1(m);
+	mstMonster1ClearChasingMonster(m);
 	if (m->flagsA5 & 0x80) {
 		m->flagsA5 &= ~8;
 		const uint32_t codeData = m->behaviorState->codeData;
@@ -817,10 +817,10 @@ void Game::resetMstCode() {
 	}
 	_mstFlags = 0;
 	for (int i = 0; i < kMaxMonsterObjects1; ++i) {
-		resetMonsterObject1(&_monsterObjects1Table[i]);
+		mstMonster1ResetData(&_monsterObjects1Table[i]);
 	}
 	for (int i = 0; i < kMaxMonsterObjects2; ++i) {
-		resetMonsterObject2(&_monsterObjects2Table[i]);
+		mstMonster2ResetData(&_monsterObjects2Table[i]);
 	}
 	clearLvlObjectsList1();
 	for (int i = 0; i < _res->_mstHdr.screenAreaDataCount; ++i) {
@@ -3122,7 +3122,7 @@ void Game::mstRemoveMonsterObject1(Task *t, Task **tasksList) {
 	MonsterObject1 *m = t->monster1;
 	if (_m48Num != -1) {
 		if ((m->flagsA5 & 8) != 0 && m->unk18) {
-			disableMonsterObject1(m);
+			mstMonster1ClearChasingMonster(m);
 		}
 	}
 	if (m->monsterInfos[946] & 4) {
@@ -4906,7 +4906,7 @@ int Game::mstTask_main(Task *t) {
 					} else {
 // 413FE3
 						if (m->unk18) {
-							disableMonsterObject1(m);
+							mstMonster1ClearChasingMonster(m);
 						}
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
 						return mstTaskInitMonster1Type2(t, 1);
@@ -4963,14 +4963,14 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 		Task *next = current->nextPtr; // _ebp
 		if (m && m->o16->screenNum == screenNum) {
 			if (_m48Num != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
-				disableMonsterObject1(m);
+				mstMonster1ClearChasingMonster(m);
 			}
 			const uint8_t *ptr = m->monsterInfos;
 			if (ptr[946] & 4) {
 				mstBoundingBoxClear(m, 0);
 				mstBoundingBoxClear(m, 1);
 			}
-			resetMonsterObject1(m);
+			mstMonster1ResetData(m);
 			removeLvlObject2(m->o16);
 			removeTask(tasksList, current);
 		} else {
@@ -4993,14 +4993,14 @@ void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int 
 		Task *next = current->nextPtr;
 		if (m && m->o16->screenNum == screenNum && (m->monsterInfos[944] & 0x7F) == type) {
 			if (_m48Num != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
-				disableMonsterObject1(m);
+				mstMonster1ClearChasingMonster(m);
 			}
 			const uint8_t *ptr = m->monsterInfos;
 			if (ptr[946] & 4) {
 				mstBoundingBoxClear(m, 0);
 				mstBoundingBoxClear(m, 1);
 			}
-			resetMonsterObject1(m);
+			mstMonster1ResetData(m);
 			removeLvlObject2(m->o16);
 			removeTask(tasksList, current);
 		} else {
@@ -5323,7 +5323,7 @@ void Game::mstOp52() {
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
 			MonsterObject1 *m = &_monsterObjects1Table[num];
-			disableMonsterObject1(m);
+			mstMonster1ClearChasingMonster(m);
 			if ((m->flagsA5 & 0x70) == 0) {
 				assert(m->task->monster1 == m);
 				Task *t = m->task;
@@ -7000,7 +7000,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		int anim = behaviorState->anim;
 		o = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
-			resetMonsterObject1(m);
+			mstMonster1ResetData(m);
 			return;
 		}
 // 41562C
@@ -7009,7 +7009,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], behaviorState->anim + 1, o_flags1, 0x3001, 0, 0);
 			if (!m->o20) {
 				warning("mstOp67 failed to addLvlObject in kLvl_lar2");
-				resetMonsterObject1(m);
+				mstMonster1ResetData(m);
 				return;
 			}
 			if (screen < 0) {
@@ -7099,7 +7099,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		Task *t = findFreeTask();
 		if (!t) {
 			warning("mstOp67_addMonster no free task found");
-			resetMonsterObject1(m);
+			mstMonster1ResetData(m);
 			removeLvlObject2(o);
 			return;
 		}
