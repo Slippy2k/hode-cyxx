@@ -74,9 +74,9 @@ The last line gives information about the game progress. V is the version of the
 The engine code can be split in 4 major parts :
 
 * C code handling collision, path finding, sprites, rendering and game objects
-* C code (callbacks) for each screen level
+* C code (callbacks) for each level and screen
 * a bytecode interpreter (242 opcodes) for the monsters logic
-* a bytecode interpreter (30 opcodes) for the sounds
+* a bytecode interpreter (30 opcodes) for sounds
 
 
 ### Callbacks
@@ -110,7 +110,7 @@ As an example, the first screen of the 'rock' level has two different states. On
 
 ![rock_hod screen0](img/rock_hod_00_0.png) ![rock_hod screen1](img/rock_hod_00_1.png)
 
-The callback code simply relies on some state and counter variables to change the asset for the background.
+The callback code relies on some state and counter variables to change the asset for the background when Andy jumps.
 
 ```
 void preScreenUpdateCb(level1, screen0) {
@@ -140,19 +140,21 @@ void postScreenUpdateCb(level1, screen0) {
 
 ### Monsters Logic
 
-The monsters in the game are controlled by a bytecode interpreter.
+There is a bytecode interpreter for controlling the monsters in the game.
+The interpreter can handle up to 64 concurrent tasks (coroutines).
 
-The interpreter can handle up to 64 tasks (coroutines).
-
-Communication between the game state and coroutines are achieved by global vars (40), flags or task local storage :
+The game state and coroutines can communicate via global vars (40), 32 bits flags or task local storage :
 
 * each task has 8 integers of local storage ; var[7] holds a task identifier
 * each coroutine can be associated to a monster
-* each monster also hs 8 integers of local storage ; var[7] holds the energy
+* each monster also has 8 integers of local storage ; var[7] holds the energy
 
 Using C structures, this corresponds to :
 
 ```
+uint32_t _flags;
+int32_t  _vars[40];
+
 struct Task {
 	const uint8_t *bytecode;
 	Monster *monster;
@@ -160,9 +162,6 @@ struct Task {
 	uint8_t flags;
 	...
 } _tasks[64];
-
-uint32_t _flags;
-int32_t  _vars[40];
 
 struct Monster {
 	int32_t vars[8];
@@ -172,12 +171,21 @@ struct Monster {
 
 Each opcode is 32 bits long and packs its arguments in the upper 3 bytes.
 
+The 242 opcodes can be divided in 6 categories :
+
+* arithmetic on variables
+* monsters state, behavior and path finding
+* sprites
+* general game triggers (hints display)
+* tasks handling
+* bytecode control flow (jmp)
+
 
 ### Sounds
 
 The engine has a bytecode interpreter dedicated to the sounds.
 
-The opcodes can be split in 3 categories :
+The 30 opcodes can be divided in 3 categories :
 
 * volume and panning modulation
 * playback control (pause, resume, stop)
