@@ -219,7 +219,7 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 		_ecx = -_ecx;
 		for (int i = 0; i < _ecx / 8; ++i) {
 			memset(_screenMaskBuffer + offset, 0, 4);
-			offset += 4;
+			offset += 512;
 		}
 	} else {
 // 406456
@@ -230,7 +230,9 @@ void Game::postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num) {
 	}
 // 40647B
 	if (o->screenNum == _currentScreen || (o->screenNum == _currentRightScreen && _res->_resLevelData0x2B88SizeTable[_currentRightScreen] != 0) || (o->screenNum == _currentLeftScreen && _res->_resLevelData0x2B88SizeTable[_currentLeftScreen] != 0)) {
-		updateAndyObject(o);
+		if (o->levelData0x2988) {
+			updateAndyObject(o);
+		}
 	}
 // 4064C1
 	int _ebx = o->yPos + o->posTable[1].y;

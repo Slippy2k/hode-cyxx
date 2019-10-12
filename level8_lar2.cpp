@@ -452,13 +452,11 @@ void Level_lar2::preScreenUpdate_lar2_screen7() {
 }
 
 void Level_lar2::preScreenUpdate_lar2_screen8() {
-	if (_res->_currentScreenResourceNum == 8) {
-		if (Game::_lar2_unkData0[0x1E] > 1) {
-			Game::_lar2_unkData0[0x1E] = 1;
-		}
-		LvlObject *o = _g->findLvlObject(2, 0, 8);
-		_g->postScreenUpdate_lar1_helper(o, Game::_lar2_unkData0 + 0x1C, 7);
+	if (_res->_currentScreenResourceNum == 8 && Game::_lar2_unkData0[0x1E] > 1) {
+		Game::_lar2_unkData0[0x1E] = 1;
 	}
+	LvlObject *o = _g->findLvlObject(2, 0, 8);
+	_g->postScreenUpdate_lar1_helper(o, Game::_lar2_unkData0 + 0x1C, 7);
 }
 
 void Level_lar2::preScreenUpdate_lar2_screen9() {
