@@ -1657,30 +1657,28 @@ sameAnim:
 	if (_andyUpdatePositionFlag) {
 		ptr->flags1 &= ~0x30;
 	}
-	int w = ptr->width - 1;
-	int h = ptr->height - 1;
+	const int w = ptr->width - 1;
+	const int h = ptr->height - 1;
 	const int type = (ptr->flags1 >> 4) & 3;
 	for (int i = 0; i < 8; ++i) {
 		switch (type) {
 		case 0:
-			xPos = hs->pts[i].x;
-			yPos = hs->pts[i].y;
+			ptr->posTable[i].x = hs->pts[i].x;
+			ptr->posTable[i].y = hs->pts[i].y;
 			break;
 		case 1:
-			xPos = w - hs->pts[i].x;
-			yPos = hs->pts[i].y;
+			ptr->posTable[i].x = w - hs->pts[i].x;
+			ptr->posTable[i].y = hs->pts[i].y;
 			break;
 		case 2:
-			xPos = hs->pts[i].x;
-			yPos = h - hs->pts[i].y;
+			ptr->posTable[i].x = hs->pts[i].x;
+			ptr->posTable[i].y = h - hs->pts[i].y;
 			break;
 		case 3:
-			xPos = w - hs->pts[i].x;
-			yPos = h - hs->pts[i].y;
+			ptr->posTable[i].x = w - hs->pts[i].x;
+			ptr->posTable[i].y = h - hs->pts[i].y;
 			break;
 		}
-		ptr->posTable[i].x = xPos;
-		ptr->posTable[i].y = yPos;
 	}
 	if (_andyUpdatePositionFlag) {
 		ptr->xPos = xPos - ptr->posTable[7].x;
