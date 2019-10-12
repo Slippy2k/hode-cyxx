@@ -1309,7 +1309,7 @@ void Game::updateScreenHelper(int num) {
 			}
 			break;
 		case 2:
-			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].dataUnk5Table[ptr->dataNum];
+			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].backgroundLvlObjectDataTable[ptr->dataNum];
 			if (_currentLevel == kLvl_rock) {
 				switch (ptr->objectUpdateType) {
 				case 0:

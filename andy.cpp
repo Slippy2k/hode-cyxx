@@ -7,6 +7,8 @@
 #include "random.h"
 #include "util.h"
 
+// probably rename this to anim.cpp as this updates most LvlObject, not only Andy
+
 static const uint8_t andyOp1LookupTable[] = {
 	 0,  0,  0,  0,  1,  1,  2,  2,  3,  4,  3,  4,  2,  2,  1,  1,
 	 4,  3,  4,  3,  5,  6,  7,  8,  7,  8,  5,  6,  8,  7,  6,  5,

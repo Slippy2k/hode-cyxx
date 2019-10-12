@@ -554,10 +554,10 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		if (offs != 0) {
-			dat->dataUnk5Table[i] = (LvlObjectData *)malloc(sizeof(LvlObjectData));
-			offsetsSize += resFixPointersLevelData0x2988(ptr + offs, offsetsPtr + offsetsSize, dat->dataUnk5Table[i]);
+			dat->backgroundLvlObjectDataTable[i] = (LvlObjectData *)malloc(sizeof(LvlObjectData));
+			offsetsSize += resFixPointersLevelData0x2988(ptr + offs, offsetsPtr + offsetsSize, dat->backgroundLvlObjectDataTable[i]);
 		} else {
-			dat->dataUnk5Table[i] = 0;
+			dat->backgroundLvlObjectDataTable[i] = 0;
 		}
 	}
 	for (int i = 0; i < 4; ++i) {
