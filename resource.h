@@ -87,7 +87,7 @@ struct MstHdr {
 	int attackBoxDataCount; // 34
 	int unk0x38; // mstUnk48DataCount
 	int infoMonster1Count; // 3C
-	int unk0x40; // mstUnk49DataCount
+	int movingBoundsDataCount; // 40
 	int unk0x44; // mstUnk50DataCount
 	int unk0x48; // mstUnk51DataCount
 	int mstActionDirectionDataCount; // 4C
@@ -141,8 +141,8 @@ struct MstWalkCode { // u35
 }; // sizeof == 16
 
 struct MstUnk36 {
-	uint32_t indexUnk49; // indexes _mstUnk49
-	uint32_t unk4; // indexes _mstUnk49.data1
+	uint32_t indexUnk49; // indexes _mstMovingBoundsData
+	uint32_t unk4; // indexes _mstMovingBoundsData.data1
 	int32_t unk8;
 }; // sizeof == 12
 
@@ -251,7 +251,7 @@ struct MstUnk48 { // MstInRangeMonster
 	uint32_t count[2]; // 0x24, 0x28
 }; // sizeof == 44
 
-struct MstUnk49Unk1 {
+struct MstMovingBoundsUnk1 {
 	uint32_t offsetMonsterInfo; // 0, offset _mstMonsterInfos[32]
 	uint32_t unk4;
 	uint8_t unk8;
@@ -264,9 +264,9 @@ struct MstUnk49Unk1 {
 	uint8_t unkF;
 }; // sizeof == 16
 
-struct MstUnk49 {
+struct MstMovingBounds { // u49
 	uint32_t indexMonsterInfo; // 0, indexes _mstMonsterInfos
-	MstUnk49Unk1 *data1; // 0x4, sizeof == 16
+	MstMovingBoundsUnk1 *data1; // 0x4, sizeof == 16
 	uint32_t count1; // 0x8
 	uint8_t *data2; // 0xC
 	uint32_t count2; // 0x10
@@ -585,7 +585,7 @@ struct Resource {
 	ResStruct<MstAttackBox> _mstAttackBoxData;
 	ResStruct<MstUnk48> _mstUnk48;
 	uint8_t *_mstMonsterInfos; // sizeof == 948
-	ResStruct<MstUnk49> _mstUnk49;
+	ResStruct<MstMovingBounds> _mstMovingBoundsData;
 	ResStruct<MstUnk50> _mstUnk50;
 	ResStruct<MstUnk51> _mstUnk51;
 	ResStruct<MstActionDirectionMask> _mstActionDirectionData;

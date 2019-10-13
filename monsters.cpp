@@ -845,10 +845,10 @@ void Game::resetMstCode() {
 	}
 	_rnd.initMstTable();
 	_rnd.initTable();
-	for (int i = 0; i < _res->_mstHdr.unk0x40; ++i) {
-		const int count = _res->_mstUnk49[i].count2;
+	for (int i = 0; i < _res->_mstHdr.movingBoundsDataCount; ++i) {
+		const int count = _res->_mstMovingBoundsData[i].count2;
 		if (count != 0) {
-			shuffleArray(_res->_mstUnk49[i].data2, count);
+			shuffleArray(_res->_mstMovingBoundsData[i].data2, count);
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.walkCodeDataCount; ++i) {
@@ -1327,7 +1327,7 @@ void Game::mstMonster1UpdateGoalPosition(MonsterObject1 *m) {
 	int var18 = 0;
 	int _ebp, _edi, _esi, _eax;
 	if (m->goalScreenNum == 0xFD) {
-		MstUnk49 *m49 = m->m49;
+		MstMovingBounds *m49 = m->m49;
 		if (m->levelPosBounds_x2 > _mstAndyLevelPosX + m49->unk14 - m->goalDistance_x2 && m->levelPosBounds_x1 < _mstAndyLevelPosX + m->goalDistance_x2 - m49->unk14 && m->levelPosBounds_y2 > _mstAndyLevelPosY + m49->unk15 - m->goalDistance_y2 && m->levelPosBounds_y1 < _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y2) {
 			var18 = _mstAndyLevelPosX + m49->unk14 + m->goalDistance_x1;
 			if (m->levelPosBounds_x2 < var18) {
@@ -1763,7 +1763,7 @@ void Game::mstMonster1UpdateLevelBounds(MonsterObject1 *m) {
 	}
 	m->unkB4 = _xMstPos2;
 	m->unkB8 = _yMstPos2;
-	MstUnk49Unk1 *m49Unk1 = m->m49Unk1;
+	MstMovingBoundsUnk1 *m49Unk1 = m->m49Unk1;
 	int _ecx, _edx;
 	if (_mstLut1[m->goalDirectionMask] & 1) {
 		_ecx = m49Unk1->unkA;
@@ -2779,7 +2779,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				assert(indexUnk36 != kNone);
 				const uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
 				assert(indexUnk49 != kNone);
-				uint8_t _bl = _res->_mstUnk49[indexUnk49].unk14;
+				uint8_t _bl = _res->_mstMovingBoundsData[indexUnk49].unk14;
 				if (ABS(_eax - _ebx) <= _bl) {
 					uint32_t indexWalkCode = walkPath->walkCodeStage1;
 					if (indexWalkCode != kNone) {
@@ -5037,8 +5037,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	debug(kDebug_MONSTER, "mstOp49 %d %d %d %d %d %d", a, b, c, d, screen, num);
 	MonsterObject1 *m = t->monster1;
 	const MstOp197Data *op197Data = &_res->_mstOp197Data[num];
-	assert(op197Data->indexUnk49 < _res->_mstHdr.op197DataCount);
-	MstUnk49 *m49 = &_res->_mstUnk49[op197Data->indexUnk49];
+	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[op197Data->indexUnk49];
 	m->m49 = m49;
 	m->indexUnk49Unk1 = op197Data->unkF;
 	if (m->indexUnk49Unk1 < 0) {
@@ -6576,9 +6575,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	const uint32_t indexUnk36 = m->walkNode->indexUnk36_28;
 	assert(indexUnk36 != kNone);
 	MstUnk36 *m36 = &_res->_mstUnk36[indexUnk36];
-	const uint32_t indexUnk49 = m36->indexUnk49;
-	assert(indexUnk49 != kNone);
-	MstUnk49 *m49 = &_res->_mstUnk49[indexUnk49];
+	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[m36->indexUnk49];
 	m->m49 = m49;
 	m->indexUnk49Unk1 = m36->unk4;
 	if (m->indexUnk49Unk1 < 0) {
@@ -6726,9 +6723,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	const int i = m->walkNode->indexUnk36_32;
 	assert(i >= 0 && i < _res->_mstHdr.unk0x10);
 	MstUnk36 *m36 = &_res->_mstUnk36[i];
-	const int j = m36->indexUnk49;
-	assert(j >= 0 && j < _res->_mstHdr.unk0x40);
-	MstUnk49 *m49 = &_res->_mstUnk49[j];
+	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[m36->indexUnk49];
 	m->m49 = m49;
 	if (flag != 0) {
 		m->indexUnk49Unk1 = m49->count1 - 1;

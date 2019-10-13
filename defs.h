@@ -343,8 +343,8 @@ struct MstBehavior;
 struct MstBehaviorState;
 struct MstWalkNode;
 struct MstUnk48Unk12Unk4;
-struct MstUnk49;
-struct MstUnk49Unk1;
+struct MstMovingBounds;
+struct MstMovingBoundsUnk1;
 
 struct MonsterObject1 {
 	MstBehavior *m46; // 0x0
@@ -399,8 +399,8 @@ struct MonsterObject1 {
 	uint8_t rnd_m49[4]; // 0xC8
 	uint8_t rnd_m35[4]; // 0xCC
 	MstWalkCode *walkCode; // 0xD0
-	MstUnk49Unk1 *m49Unk1; // 0xD4
-	MstUnk49 *m49; // 0xD8
+	MstMovingBoundsUnk1 *m49Unk1; // 0xD4
+	MstMovingBounds *m49; // 0xD8
 	int indexUnk49Unk1; // 0xDC
 	uint8_t unkE4;
 	uint8_t unkE5;
