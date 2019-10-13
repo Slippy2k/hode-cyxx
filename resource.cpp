@@ -1048,7 +1048,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x40  = fp->readUint32();
 	_mstHdr.unk0x44  = fp->readUint32();
 	_mstHdr.unk0x48  = fp->readUint32();
-	_mstHdr.unk0x4C  = fp->readUint32();
+	_mstHdr.mstActionDirectionDataCount = fp->readUint32();
 	_mstHdr.op223DataCount  = fp->readUint32();
 	_mstHdr.op226DataCount  = fp->readUint32();
 	_mstHdr.op227DataCount  = fp->readUint32();
@@ -1300,7 +1300,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		m->unk0 = fp->readUint16();
 		m->unk2 = fp->readUint16();
 		m->unk4 = fp->readByte();
-		m->unk5 = fp->readByte();
+		m->direction = fp->readByte();
 		m->unk6 = fp->readByte();
 		m->unk7 = fp->readByte();
 		m->codeData = fp->readUint32();
@@ -1356,7 +1356,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 				m12[j].data[k].codeData = READ_LE_UINT32(data + 0x10);
 				m12[j].data[k].codeData2 = READ_LE_UINT32(data + 0x14);
 				m12[j].data[k].unk18 = data[0x18];
-				m12[j].data[k].unk19 = data[0x19];
+				m12[j].data[k].direction = data[0x19];
 				m12[j].data[k].screenNum = data[0x1A];
 				m12[j].data[k].monster1Index = data[0x1B];
 				bytesRead += 28;
@@ -1447,12 +1447,12 @@ void Resource::loadMstData(File *fp, const char *name) {
 			bytesRead += 4;
 		}
 	}
-	_mstUnk52.allocate(_mstHdr.unk0x4C);
-	for (int i = 0; i < _mstHdr.unk0x4C; ++i) {
-		_mstUnk52[i].unk0 = fp->readByte();
-		_mstUnk52[i].unk1 = fp->readByte();
-		_mstUnk52[i].unk2 = fp->readByte();
-		_mstUnk52[i].unk3 = fp->readByte();
+	_mstActionDirectionData.allocate(_mstHdr.mstActionDirectionDataCount);
+	for (int i = 0; i < _mstHdr.mstActionDirectionDataCount; ++i) {
+		_mstActionDirectionData[i].unk0 = fp->readByte();
+		_mstActionDirectionData[i].unk1 = fp->readByte();
+		_mstActionDirectionData[i].unk2 = fp->readByte();
+		_mstActionDirectionData[i].unk3 = fp->readByte();
 		bytesRead += 4;
 	}
 

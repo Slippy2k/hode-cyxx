@@ -90,7 +90,7 @@ struct MstHdr {
 	int unk0x40; // mstUnk49DataCount
 	int unk0x44; // mstUnk50DataCount
 	int unk0x48; // mstUnk51DataCount
-	int unk0x4C; // mstUnk52DataCount
+	int mstActionDirectionDataCount; // 4C
 	int op223DataCount; // 50
 	int op226DataCount; // 54
 	int op227DataCount; // 58
@@ -217,7 +217,7 @@ struct MstAttackBox { // u47
 	uint32_t count;
 }; // sizeof == 8
 
-struct MstUnk48Unk12Unk4 {
+struct MstUnk48Unk12Unk4 { // MstInRangeMonsterAction
 	uint32_t unk0; // 0x0, indexes _mstMonsterInfos
 	uint32_t indexUnk51; // 0x4
 	int32_t xPos; // 0x8
@@ -225,22 +225,22 @@ struct MstUnk48Unk12Unk4 {
 	uint32_t codeData; // 0x10
 	uint32_t codeData2; // 0x14
 	uint8_t unk18; // 0x18
-	uint8_t unk19; // 0x19
+	uint8_t direction; // 0x19
 	int8_t screenNum; // 0x1A
 	uint8_t monster1Index; // 0x1B
 }; // sizeof == 28
 
-struct MstUnk48Unk12 {
+struct MstUnk48Unk12 { // MstInRangeMonsterData
 	uint8_t unk0;
 	MstUnk48Unk12Unk4 *data; // 0x4 sizeof == 28
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstUnk48 {
+struct MstUnk48 { // MstInRangeMonster
 	uint16_t unk0;
 	uint16_t unk2;
 	uint8_t unk4;
-	uint8_t unk5;
+	uint8_t direction;
 	uint8_t unk6;
 	uint8_t unk7;
 	uint32_t codeData; // 0x8 indexes _mstCodeData
@@ -300,7 +300,7 @@ struct MstUnk51 {
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstUnk52 {
+struct MstActionDirectionMask { // u52
 	uint8_t unk0;
 	uint8_t unk1;
 	uint8_t unk2;
@@ -588,7 +588,7 @@ struct Resource {
 	ResStruct<MstUnk49> _mstUnk49;
 	ResStruct<MstUnk50> _mstUnk50;
 	ResStruct<MstUnk51> _mstUnk51;
-	ResStruct<MstUnk52> _mstUnk52;
+	ResStruct<MstActionDirectionMask> _mstActionDirectionData;
 	ResStruct<MstOp223Data> _mstOp223Data;
 	ResStruct<MstOp227Data> _mstOp227Data;
 	ResStruct<MstOp234Data> _mstOp234Data;

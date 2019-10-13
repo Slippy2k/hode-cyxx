@@ -140,9 +140,27 @@ void Game::mstMonster1ResetWalkPath(MonsterObject1 *m) {
 	m->walkCode = (indexWalkCode == kNone) ? 0 : &_res->_mstWalkCodeData[indexWalkCode];
 }
 
-bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
-	debug(kDebug_MONSTER, "addChasingMonster %d", flag);
-	m48->unk5 = flag;
+bool Game::mstUpdateInRange(MstUnk48 *m) {
+	if (m->unk4 == 0) {
+		if (mstHasMonsterInRange(m, 0) && addChasingMonster(m, 0)) {
+			return true;
+		}
+	} else {
+		int direction = _rnd.update() & 1;
+		if (mstHasMonsterInRange(m, direction) && addChasingMonster(m, direction)) {
+			return true;
+		}
+		direction ^= 1;
+		if (mstHasMonsterInRange(m, direction) && addChasingMonster(m, direction)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Game::addChasingMonster(MstUnk48 *m48, uint8_t direction) {
+	debug(kDebug_MONSTER, "addChasingMonster %d", direction);
+	m48->direction = direction;
 	if (m48->codeData != kNone) {
 		Task *t = createTask(_res->_mstCodeData + m48->codeData * 4);
 		if (!t) {
@@ -157,7 +175,7 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t flag) {
 		const uint8_t num = unk4->monster1Index;
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
-			unk4->unk19 = flag;
+			unk4->direction = direction;
 			MonsterObject1 *m = &_monsterObjects1Table[num];
 			m->unk18 = unk4;
 			m->flags48 |= 0x40;
@@ -268,7 +286,6 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	return mstTaskInitMonster1Type2(t, 1);
 }
 
-// set lvlObject position from monster position
 void Game::mstMonster1SetScreenPosition(MonsterObject1 *m) {
 	LvlObject *o = m->o16;
 	o->xPos = m->xPos - o->posTable[7].x;
@@ -2116,8 +2133,8 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	LvlObject *o = m->o16;
-	const uint8_t _al = _res->_mstUnk52[num].unk0;
-	const uint8_t _bl = _res->_mstUnk52[num].unk2;
+	const uint8_t _al = _res->_mstActionDirectionData[num].unk0;
+	const uint8_t _bl = _res->_mstActionDirectionData[num].unk2;
 	const uint8_t *var4 = m->monsterInfos + _al * 28;
 	const uint8_t _dl = (o->flags1 >> 4) & 3;
 	uint8_t var8 = ((_dl & 1) != 0) ? 8 : 2;
@@ -3174,8 +3191,8 @@ void Game::mstTaskAttack(Task *t, uint32_t codeData, uint8_t flags) {
 int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	MonsterObject1 *m = t->monster1;
 	LvlObject *o = m->o16;
-	uint8_t var4 = _res->_mstUnk52[num].unk0;
-	uint8_t var8 = _res->_mstUnk52[num].unk2;
+	uint8_t var4 = _res->_mstActionDirectionData[num].unk0;
+	uint8_t var8 = _res->_mstActionDirectionData[num].unk2;
 	const uint8_t *ptr = m->monsterInfos + var4 * 28;
 	uint8_t _al = (o->flags1 >> 4) & 3;
 	uint8_t _cl = ((_al & 1) != 0) ? 8 : 2;
@@ -3185,7 +3202,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		_cl |= 1;
 	}
 	mstLvlObjectSetActionDirection(o, ptr, var8, _cl);
-	const uint8_t am = _res->_mstUnk52[num].unk1;
+	const uint8_t am = _res->_mstActionDirectionData[num].unk1;
 	o->actionKeyMask |= am;
 
 	t->flags &= ~0x80;
@@ -3818,7 +3835,7 @@ int Game::mstTask_main(Task *t) {
 		case 8: // 3 - set_monster_action_direction_imm
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				const int arg = _res->_mstUnk52[num].unk3;
+				const int arg = _res->_mstActionDirectionData[num].unk3;
 				t->codeData = p;
 				ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
 			}
@@ -3826,7 +3843,7 @@ int Game::mstTask_main(Task *t) {
 		case 4: // 4 - set_monster_action_direction_task_var
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
-				const int arg = _res->_mstUnk52[num].unk3;
+				const int arg = _res->_mstActionDirectionData[num].unk3;
 				t->codeData = p;
 				assert(arg < kMaxLocals);
 				ret = mstTaskSetActionDirection(t, num, t->localVars[arg]);
@@ -3836,7 +3853,7 @@ int Game::mstTask_main(Task *t) {
 			if (t->monster1) {
 				const int num = READ_LE_UINT16(p + 2);
 				if (mstTestActionDirection(t->monster1, num)) {
-					const int arg = _res->_mstUnk52[num].unk3;
+					const int arg = _res->_mstActionDirectionData[num].unk3;
 					t->codeData = p;
 					ret = mstTaskSetActionDirection(t, num, (arg == 0xFF) ? -1 : arg);
 				}
@@ -5349,7 +5366,7 @@ void Game::mstOp52() {
 	_m48Num = -1;
 }
 
-bool Game::mstCollidesDirection(const MstUnk48 *m48, uint8_t flag) {
+bool Game::mstHasMonsterInRange(const MstUnk48 *m48, uint8_t flag) {
 	for (int i = 0; i < 2; ++i) {
 		for (uint32_t j = 0; j < m48->count[i]; ++j) {
 			uint32_t a = (i ^ flag); // * 32; // _edx
@@ -5389,7 +5406,7 @@ l1:
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
-			debug(kDebug_MONSTER, "mstCollidesDirection (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
+			debug(kDebug_MONSTER, "mstHasMonsterInRange (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstMonsterInfos[m12u4->unk0 * kMonsterInfoDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
@@ -5448,6 +5465,7 @@ l1:
 						const uint8_t num = varC->monster1[var34]->monster1Index;
 						m12u4->monster1Index = num;
 						_op54Data[num] = 1;
+						debug(kDebug_MONSTER, "monster %d in range", num);
 						++var24;
 						continue;
 					}
@@ -5486,7 +5504,7 @@ l2:
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
-			debug(kDebug_MONSTER, "mstCollidesDirection (unk0==0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
+			debug(kDebug_MONSTER, "mstHasMonsterInRange (unk0==0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
 				uint8_t var4D = _res->_mstMonsterInfos[m12u4->unk0 * kMonsterInfoDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
@@ -5544,6 +5562,7 @@ l2:
 						const uint8_t num = varC->monster1[var34]->monster1Index;
 						m12u4->monster1Index = num;
 						_op54Data[num] = 1;
+						debug(kDebug_MONSTER, "monster %d in range", num);
 						++var24;
 						continue;
 					}
@@ -5583,20 +5602,7 @@ void Game::mstOp53(MstUnk48 *m) {
 		_mstPosYmin = -y;
 		_mstPosYmax = 191 - y;
 	}
-	if (m->unk4 == 0) {
-		if (mstCollidesDirection(m, 0)) {
-			addChasingMonster(m, 0);
-		}
-	} else {
-		int dir = _rnd.update() & 1;
-		if (mstCollidesDirection(m, dir) && addChasingMonster(m, dir)) {
-		} else {
-			dir ^= 1;
-			if (mstCollidesDirection(m, dir)) {
-				addChasingMonster(m, dir);
-			}
-		}
-	}
+	mstUpdateInRange(m);
 }
 
 void Game::mstOp54() {
@@ -5635,23 +5641,9 @@ void Game::mstOp54() {
 	}
 	mstResetCollisionTable();
 	if (m43->dataCount == 0) {
-		uint32_t indexUnk48 = m43->indexUnk48[0];
-		assert(indexUnk48 != kNone);
+		const uint32_t indexUnk48 = m43->indexUnk48[0];
 		MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
-		if (m48->unk4 == 0) {
-			if (mstCollidesDirection(m48, 0)) {
-				addChasingMonster(m48, 0);
-			}
-		} else {
-			uint8_t dir = _rnd.update() & 1;
-			if (mstCollidesDirection(m48, dir) && addChasingMonster(m48, dir)) {
-			} else {
-				dir ^= 1;
-				if (mstCollidesDirection(m48, dir)) {
-					addChasingMonster(m48, dir);
-				}
-			}
-		}
+		mstUpdateInRange(m48);
 // 41E36E
 		if (_m48Num == -1) {
 			++_mstOp54Counter;
@@ -5672,22 +5664,10 @@ void Game::mstOp54() {
 				var4 = true;
 				if (_mstOp54Table[num] == 0) {
 					_mstOp54Table[num] = 1;
-					uint32_t indexUnk48 = m43->indexUnk48[num];
-					assert(indexUnk48 != kNone);
+					const uint32_t indexUnk48 = m43->indexUnk48[num];
 					MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
-					if (m48->unk4 == 0) {
-						if (mstCollidesDirection(m48, 0) && addChasingMonster(m48, 0)) {
-							break; // goto 41E494;
-						}
-					} else {
-						int flag = _rnd.update() & 1;
-						if (mstCollidesDirection(m48, flag) && addChasingMonster(m48, flag)) {
-							break; // goto 41E494;
-						}
-						flag ^= 1;
-						if (mstCollidesDirection(m48, flag) && addChasingMonster(m48, flag)) {
-							break; // goto 41E494;
-						}
+					if (mstUpdateInRange(m48)) {
+						break; // goto 41E494;
 					}
 				}
 			}

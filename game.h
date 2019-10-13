@@ -383,6 +383,7 @@ struct Game {
 	// monsters.cpp
 	void mstMonster1ResetData(MonsterObject1 *m);
 	void mstMonster1ResetWalkPath(MonsterObject1 *m);
+	bool mstUpdateInRange(MstUnk48 *m48);
 	bool addChasingMonster(MstUnk48 *m48, uint8_t flag);
 	void mstMonster1ClearChasingMonster(MonsterObject1 *m);
 	void mstTaskSetMonster1BehaviorState(Task *t, MonsterObject1 *m, int num);
@@ -439,7 +440,7 @@ struct Game {
 	void mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int type);
 	int mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *t, int num);
 	void mstOp52();
-	bool mstCollidesDirection(const MstUnk48 *m, uint8_t flag);
+	bool mstHasMonsterInRange(const MstUnk48 *m, uint8_t flag);
 	void mstOp53(MstUnk48 *m);
 	void mstOp54();
 	int mstOp56_specialAction(Task *t, int code, int num);
