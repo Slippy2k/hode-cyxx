@@ -1888,8 +1888,8 @@ void Game::mstMonster1UpdateLevelBounds(MonsterObject1 *m) {
 			int r = mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2);
 			if (r > 0) {
 // 41AEA3
-				MstBoundingBox *b = &_mstBoundingBoxesTable[r - 1];
-				if (m->goalPos_x2 < b->x1 || m->goalPos_x1 > b->x2 || m->goalPos_y2 < b->y1 || m->goalPos_y1 > b->y2) {
+				const MstBoundingBox *b = &_mstBoundingBoxesTable[r - 1];
+				if (!rect_intersects(b->x1, b->y1, b->x2, b->y2, m->goalPos_x1, m->goalPos_y1, m->goalPos_x2, m->goalPos_y2)) {
 					break;
 				}
 			} else {
@@ -2254,7 +2254,7 @@ bool Game::lvlObjectCollidesAndy2(LvlObject *o, int type) const {
 			y2 += dy;
 		}
 	}
-	return (_andyObject->xPos + _andyObject->width - 1 >= x1 && _andyObject->xPos <= x2 && _andyObject->yPos + _andyObject->height - 1 >= y1 && _andyObject->yPos <= y2);
+	return rect_intersects(x1, y1, x2, y2, _andyObject->xPos, _andyObject->yPos, _andyObject->xPos + _andyObject->width - 1, _andyObject->yPos + _andyObject->height - 1);
 }
 
 bool Game::lvlObjectCollidesAndy3(LvlObject *o, int type) const {
@@ -2775,9 +2775,9 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				int _edi = READ_LE_UINT32(m->monsterInfos + 904);
 				int _ebx = MAX(m->unk88, walkPath->unk2C[1][1] + _edi);
 				int _eax = MIN(m->unk84, walkPath->unk2C[0][1] - _edi);
-				uint32_t indexUnk36 = walkPath->indexUnk36_32;
+				const uint32_t indexUnk36 = walkPath->indexUnk36_32;
 				assert(indexUnk36 != kNone);
-				uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
+				const uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
 				assert(indexUnk49 != kNone);
 				uint8_t _bl = _res->_mstUnk49[indexUnk49].unk14;
 				if (ABS(_eax - _ebx) <= _bl) {
@@ -2835,14 +2835,14 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		return 0;
 	}
 	if ((m->flagsA5 & 8) == 0 && (m->monsterInfos[946] & 2) == 0) {
-		uint8_t _dl = m->facingDirectionMask;
+		const uint8_t _dl = m->facingDirectionMask;
 		if ((_dl & 2) != 0) {
 			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 916) <= m->walkNode->unk2C[1][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 912) >= m->walkNode->unk2C[0][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
 				mstMonster1ResetWalkPath(m);
-				uint32_t indexWalkCode = m->walkNode->walkCodeStage1;
+				const uint32_t indexWalkCode = m->walkNode->walkCodeStage1;
 				if (indexWalkCode != kNone) {
 					m->walkCode = &_res->_mstWalkCodeData[indexWalkCode];
 				}
@@ -2855,7 +2855,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
 				mstMonster1ResetWalkPath(m);
-				uint32_t indexWalkCode = m->walkNode->walkCodeStage1;
+				const uint32_t indexWalkCode = m->walkNode->walkCodeStage1;
 				if (indexWalkCode != kNone) {
 					m->walkCode = &_res->_mstWalkCodeData[indexWalkCode];
 				}
