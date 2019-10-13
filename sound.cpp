@@ -12,6 +12,8 @@ enum {
 
 static const bool kLimitSounds = false; // limit the number of active playing sounds
 
+static const bool kCheckLinkedListForDuplicates = true; // old workaround for duplicates, corrupting lists
+
 // if x < 90, lut[x] ~= x / 2
 // if x > 90, lut[x] ~= 45 + (x - 90) * 2
 static const uint8_t _volumeRampTable[129] = {
@@ -128,7 +130,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 	so->pcm = 0;
 	if ((so->flags & kFlagPlaying) != 0) {
 
-		if (!isSssObjectInList(so, _sssObjectsList1)) {
+		if (kCheckLinkedListForDuplicates && !isSssObjectInList(so, _sssObjectsList1)) {
 			warning("removeSoundObjectFromList so %p not in _sssObjectsList1", so);
 			return;
 		}
@@ -154,7 +156,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 		}
 	} else {
 
-		if (!isSssObjectInList(so, _sssObjectsList2)) {
+		if (kCheckLinkedListForDuplicates && !isSssObjectInList(so, _sssObjectsList2)) {
 			warning("removeSoundObjectFromList so %p not in _sssObjectsList2", so);
 			return;
 		}
@@ -295,7 +297,7 @@ void Game::sssOp12_removeSounds2(int num, uint8_t source, uint8_t sampleIndex) {
 void Game::sssOp16_resumeSound(SssObject *so) {
 	debug(kDebug_SOUND, "sssOp16_resumeSound so %p flags 0x%x", so, so->flags);
 	if ((so->flags & kFlagPaused) != 0) {
-		if (!isSssObjectInList(so, _sssObjectsList2)) {
+		if (kCheckLinkedListForDuplicates && !isSssObjectInList(so, _sssObjectsList2)) {
 			warning("sssOp16_resumeSound so %p not in _sssObjectsList2, flags 0x%x pcm %p", so, so->flags, so->pcm);
 			return;
 		}
@@ -326,7 +328,7 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 		SssObject *next = so->nextPtr;
 		so->pcm = 0;
 		if ((so->flags & kFlagPlaying) != 0) {
-			if (!isSssObjectInList(so, _sssObjectsList1)) {
+			if (kCheckLinkedListForDuplicates && !isSssObjectInList(so, _sssObjectsList1)) {
 				warning("sssOp17_pauseSound so %p not in _sssObjectsList1", so);
 				return;
 			}
@@ -347,7 +349,7 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 				}
 			}
 		} else {
-			if (!isSssObjectInList(so, _sssObjectsList2)) {
+			if (kCheckLinkedListForDuplicates && !isSssObjectInList(so, _sssObjectsList2)) {
 				warning("sssOp17_pauseSound so %p not in _sssObjectsList2", so);
 				return;
 			}
@@ -715,7 +717,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 	debug(kDebug_SOUND, "prependSoundObjectToList so %p flags 0x%x", so, so->flags);
 	if (so->flags & kFlagPaused) {
 		debug(kDebug_SOUND, "Adding so %p to list2 flags 0x%x", so, so->flags);
-		if (isSssObjectInList(so, _sssObjectsList2)) {
+		if (kCheckLinkedListForDuplicates && isSssObjectInList(so, _sssObjectsList2)) {
 			warning("prependSoundObjectToList so %p already in _sssObjectsList2", so);
 			return;
 		}
@@ -727,7 +729,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 		_sssObjectsList2 = so;
 	} else {
 		debug(kDebug_SOUND, "Adding so %p to list1 flags 0x%x", so, so->flags);
-		if (isSssObjectInList(so, _sssObjectsList1)) {
+		if (kCheckLinkedListForDuplicates && isSssObjectInList(so, _sssObjectsList1)) {
 			warning("prependSoundObjectToList so %p already in _sssObjectsList1", so);
 			return;
 		}
