@@ -7,9 +7,17 @@
 #include "util.h"
 #include "video.h"
 
-struct Level_lava: Level {
-	//const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _lava_checkpointData[6] = {
+	{ 114,  54, 0x300c,   2,  0,  2 },
+	{  12, 121, 0x300c, 232,  3,  2 },
+	{  -5,  96, 0x300c,  39,  5,  2 },
+	{ 131, 112, 0x300c,  39,  7,  2 },
+	{   8, 105, 0x300c, 232, 11,  2 },
+	{  19, 112, 0x700c,  39, 13,  2 }
+};
 
+struct Level_lava: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_lava_checkpointData[num]; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

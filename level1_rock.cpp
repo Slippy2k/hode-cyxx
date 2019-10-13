@@ -11,9 +11,19 @@
 #include "util.h"
 #include "video.h"
 
-struct Level_rock: Level {
-	//const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _rock_checkpointData[8] = {
+	{  96,  34, 0x300c,  22,  0,  0 },
+	{  10, 126, 0x300c,  48,  2,  0 },
+	{   6, 128, 0x300c,  48,  4,  0 },
+	{  18, 125, 0x300c,  48,  5,  0 },
+	{  21, 124, 0x300c,  48,  7,  0 },
+	{ 105,  52, 0x3004, 232,  9,  2 },
+	{  18, 121, 0x3004, 232, 13,  2 },
+	{  43,  96, 0x3004,  39, 17,  2 }
+};
 
+struct Level_rock: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_rock_checkpointData[num]; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

@@ -6,9 +6,12 @@
 #include "paf.h"
 #include "video.h"
 
-struct Level_dark: Level {
-        //const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _dark_checkpointData[1] = {
+	{ 117, 115, 0x300c,  48,  0,  0 }
+};
 
+struct Level_dark: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_dark_checkpointData[num]; }
 	//virtual void initialize();
 	//virtual void terminate();
 	//virtual void tick();

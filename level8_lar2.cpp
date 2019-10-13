@@ -5,9 +5,23 @@
 #include "util.h"
 #include "video.h"
 
-struct Level_lar2: Level {
-        //const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _lar2_checkpointData[12] = {
+	{ 111, 123, 0x300c,  48,  0,  0 },
+	{  11, 123, 0x300c,  48,  2,  0 },
+	{  17,  51, 0x300c,  48,  4,  0 },
+	{  69,  91, 0x300c,  48,  6,  0 },
+	{ 154,  91, 0x700c,  48,  6,  0 },
+	{ 154,  91, 0x700c,  48,  6,  0 },
+	{ 137,  35, 0x300c,  48, 11,  0 },
+	{ 154,  91, 0x700c,  48,  6,  0 },
+	{  70, 139, 0x700c,  48,  5,  0 },
+	{ 106, 139, 0x700c,  48,  4,  0 },
+	{  75, 107, 0x300c,  48, 15,  0 },
+	{  75, 107, 0x300c,  48, 15,  0 }
+};
 
+struct Level_lar2: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_lar2_checkpointData[num]; }
 	//virtual void initialize();
 	//virtual void terminate();
 	virtual void tick();

@@ -4,10 +4,14 @@
 #include "paf.h"
 #include "video.h"
 
+static const CheckpointData _pwr2_checkpointData[3] = {
+	{ 127, 121, 0x300c, 232,  0,  2 },
+	{  10, 132, 0x300c, 232,  3,  2 },
+	{ 104, 129, 0x300c, 232,  7,  2 }
+};
 
 struct Level_pwr2: Level {
-        //const CheckpointData *getCheckpointData() = 0;
-
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_pwr2_checkpointData[num]; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

@@ -1257,7 +1257,7 @@ void Game::setupAndyLvlObject() {
 	_fallingAndyFlag = false;
 	_andyActionKeysFlags = 0;
 	_hideAndyObjectFlag = false;
-	const CheckpointData *dat = &_levelCheckpointData[_currentLevel][_level->_checkpoint];
+	const CheckpointData *dat = _level->getCheckpointData(_level->_checkpoint);
 	_plasmaCannonFlags = 0;
 	_actionDirectionKeyMaskIndex = 0;
 	_mstAndyCurrentScreenNum = ptr->screenNum;
@@ -1415,13 +1415,13 @@ void Game::resetScreen() {
 		_level->_screenCounterTable[i] = 0;
 	}
 	const uint8_t *dat2 = _levelScreenStartData[_currentLevel];
-	const int n = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
-	for (int i = 0; i < n; ++i) {
+	const int screenNum = _level->getCheckpointData(_level->_checkpoint)->screenNum;
+	for (int i = 0; i < screenNum; ++i) {
 		_res->_screensState[i].s0 = *dat2++;
 		_level->_screenCounterTable[i] = *dat2++;
 	}
 	resetScreenMask();
-	for (int i = n; i < _res->_lvlHdr.screensCount; ++i) {
+	for (int i = screenNum; i < _res->_lvlHdr.screensCount; ++i) {
 		_level->setupLvlObjects(i);
 	}
 	resetWormHoleSprites();
@@ -1440,12 +1440,12 @@ void Game::restartLevel() {
 	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
 	}
-	const int num = _levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum;
-	preloadLevelScreenData(num, 0xFF);
+	const int screenNum = _level->getCheckpointData(_level->_checkpoint)->screenNum;
+	preloadLevelScreenData(screenNum, 0xFF);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	memset(_video->_backgroundLayer, 0, Video::W * Video::H);
 	resetScreen();
-	if (_andyObject->screenNum != num) {
+	if (_andyObject->screenNum != screenNum) {
 		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
 	}
 	updateScreen(_andyObject->screenNum);
@@ -2078,7 +2078,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
 	initMstCode();
-	preloadLevelScreenData(_levelCheckpointData[_currentLevel][_level->_checkpoint].screenNum, 0xFF);
+	preloadLevelScreenData(_level->getCheckpointData(_level->_checkpoint)->screenNum, 0xFF);
 	memset(_level->_screenCounterTable, 0, sizeof(_level->_screenCounterTable));
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();

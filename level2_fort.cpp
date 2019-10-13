@@ -11,9 +11,16 @@
 #include "util.h"
 #include "video.h"
 
-struct Level_fort: Level {
-        //const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _fort_checkpointData[5] = {
+	{ 105,  46, 0x300c, 232,  0,  2 },
+	{   1, 103, 0x300c, 232,  2,  2 },
+	{  43,  96, 0x300c, 232,  6,  2 },
+	{  32,  97, 0x300c, 232,  9,  2 },
+	{ 105,  52, 0x300c, 232, 17,  2 }
+};
 
+struct Level_fort: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_fort_checkpointData[num]; }
 	//virtual void initialize();
 	//virtual void terminate();
 	virtual void tick();

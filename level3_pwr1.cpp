@@ -11,9 +11,21 @@
 #include "util.h"
 #include "video.h"
 
-struct Level_pwr1: Level {
-        //const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _pwr1_checkpointData[10] = {
+	{ 190,  48, 0x300c, 196,  1,  2 },
+	{ 158,  89, 0x300c, 232,  6,  2 },
+	{  71, 128, 0x300c, 196,  9,  2 },
+	{   7, 145, 0x300c, 196, 15,  2 },
+	{  50,  62, 0x300c, 196, 18,  2 },
+	{   9,  25, 0x300c, 232, 21,  2 },
+	{  19,  73, 0x300c, 232, 27,  2 },
+	{ 225,  73, 0x300c, 232, 26,  2 },
+	{ 100, 121, 0x300c, 232, 29,  2 },
+	{  80, 121, 0x700c, 232, 31,  2 }
+};
 
+struct Level_pwr1: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_pwr1_checkpointData[num]; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

@@ -4,9 +4,16 @@
 #include "paf.h"
 #include "video.h"
 
-struct Level_isld: Level {
-        //const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _isld_checkpointData[5] = {
+	{  46,  84, 0x300c, 207,  0,  2 },
+	{  99,  48, 0x300c,  39,  3,  2 },
+	{  27, 112, 0x300c,  39,  9,  2 },
+	{ 171, 144, 0x300c,  39, 14,  2 },
+	{ 195, 128, 0x300c,  39, 16,  2 }
+};
 
+struct Level_isld: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_isld_checkpointData[num]; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

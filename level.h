@@ -21,8 +21,7 @@ struct Level {
 		_video = video;
 	}
 
-	//const CheckpointData *getCheckpointData() = 0;
-
+	virtual const CheckpointData *getCheckpointData(int num) const = 0;
 	virtual void initialize() {}
 	virtual void terminate() {}
 	virtual void tick() {}

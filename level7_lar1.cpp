@@ -5,9 +5,20 @@
 #include "util.h"
 #include "video.h"
 
-struct Level_lar1: Level {
-        //const CheckpointData *getCheckpointData() = 0;
+static const CheckpointData _lar1_checkpointData[9] = {
+	{  -8, 145, 0x300c, 207,  0,  2 },
+	{  60,  49, 0x300c, 232,  2,  2 },
+	{   6,  41, 0x300c, 232,  6,  2 },
+	{  32,  37, 0x300c, 232,  8,  2 },
+	{ 172, 105, 0x300c, 232,  9,  2 },
+	{  40, 145, 0x300c, 232, 14,  2 },
+	{ 213,  25, 0x700c, 232, 16,  2 },
+	{ 123,  57, 0x300c, 232, 20,  2 },
+	{ 224,  43, 0x700c, 232,  5,  2 }
+};
 
+struct Level_lar1: Level {
+	virtual const CheckpointData *getCheckpointData(int num) const { return &_lar1_checkpointData[num]; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();
@@ -991,7 +1002,7 @@ void Level_lar1::setupLvlObjects_lar1_screen24_helper2(int num) {
 	};
 	const uint8_t *p = &data1[(num & 7) * 6];
 	num = *p++;
-	const CheckpointData *dat = &Game::_levelCheckpointData[kLvl_lar1][num];
+	const CheckpointData *dat = &_lar1_checkpointData[num];
 	_andyObject->xPos = dat->xPos;
 	_andyObject->yPos = dat->yPos;
 	_andyObject->flags2 = dat->flags2;
