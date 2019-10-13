@@ -1414,7 +1414,7 @@ void Game::resetScreen() {
 		_res->_screensState[i].s0 = 0;
 		_level->_screenCounterTable[i] = 0;
 	}
-	const uint8_t *dat2 = _levelScreenStartData[_currentLevel];
+	const uint8_t *dat2 = _level->getScreenRestartData();
 	const int screenNum = _level->getCheckpointData(_level->_checkpoint)->screenNum;
 	for (int i = 0; i < screenNum; ++i) {
 		_res->_screensState[i].s0 = *dat2++;

@@ -10,8 +10,13 @@ static const CheckpointData _dark_checkpointData[1] = {
 	{ 117, 115, 0x300c,  48,  0,  0 }
 };
 
+static const uint8_t _dark_screenStartData[2] = {
+	0x00, 0x00
+};
+
 struct Level_dark: Level {
 	virtual const CheckpointData *getCheckpointData(int num) const { return &_dark_checkpointData[num]; }
+	virtual const uint8_t *getScreenRestartData() const { return _dark_screenStartData; }
 	//virtual void initialize();
 	//virtual void terminate();
 	//virtual void tick();

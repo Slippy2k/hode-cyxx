@@ -1,5 +1,5 @@
 
-// lava_hod
+// lava_hod - "river of fire"
 
 #include "game.h"
 #include "level.h"
@@ -16,8 +16,15 @@ static const CheckpointData _lava_checkpointData[6] = {
 	{  19, 112, 0x700c,  39, 13,  2 }
 };
 
+static const uint8_t _lava_screenStartData[40] = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x01, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 struct Level_lava: Level {
 	virtual const CheckpointData *getCheckpointData(int num) const { return &_lava_checkpointData[num]; }
+	virtual const uint8_t *getScreenRestartData() const { return _lava_screenStartData; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

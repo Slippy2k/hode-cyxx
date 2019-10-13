@@ -1,4 +1,6 @@
 
+// pwr2_hod - "caverns of doom"
+
 #include "game.h"
 #include "level.h"
 #include "paf.h"
@@ -10,8 +12,14 @@ static const CheckpointData _pwr2_checkpointData[3] = {
 	{ 104, 129, 0x300c, 232,  7,  2 }
 };
 
+static const uint8_t _pwr2_screenStartData[32] = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 struct Level_pwr2: Level {
 	virtual const CheckpointData *getCheckpointData(int num) const { return &_pwr2_checkpointData[num]; }
+	virtual const uint8_t *getScreenRestartData() const { return _pwr2_screenStartData; }
 	virtual void initialize();
 	virtual void terminate();
 	virtual void tick();

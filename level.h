@@ -22,6 +22,7 @@ struct Level {
 	}
 
 	virtual const CheckpointData *getCheckpointData(int num) const = 0;
+	virtual const uint8_t *getScreenRestartData() const = 0;
 	virtual void initialize() {}
 	virtual void terminate() {}
 	virtual void tick() {}
