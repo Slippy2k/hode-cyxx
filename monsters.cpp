@@ -2950,7 +2950,7 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 			if (p->type != 2 || (_bl & 4) != 0) {
 				continue;
 			}
-			const uint32_t codeData = monster2Info->codeData;
+			const uint32_t codeData = monster2Info->codeData2;
 			if (codeData != kNone) {
 				resetTask(t, _res->_mstCodeData + codeData * 4);
 			} else {

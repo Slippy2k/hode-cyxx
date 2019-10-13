@@ -1251,7 +1251,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstInfoMonster2Data[i].shootMask = fp->readByte();
 		_mstInfoMonster2Data[i].anim = fp->readUint16();
 		_mstInfoMonster2Data[i].codeData = fp->readUint32();
-		_mstInfoMonster2Data[i].unk8 = fp->readUint32();
+		_mstInfoMonster2Data[i].codeData2 = fp->readUint32();
 		bytesRead += 12;
 	}
 

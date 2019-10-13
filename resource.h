@@ -188,8 +188,8 @@ struct MstInfoMonster2 {
 	uint8_t type; // 0x0
 	uint8_t shootMask; // 0x1
 	uint16_t anim; // 0x2
-	uint32_t codeData; // 4
-	uint32_t unk8;
+	uint32_t codeData; // 4 init
+	uint32_t codeData2; // 8 shoot
 }; // sizeof == 12
 
 struct MstBehaviorState { // u46u1
