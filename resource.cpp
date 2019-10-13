@@ -1222,8 +1222,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstWalkPathData[i].data[j].walkCodeReset[0] = READ_LE_UINT32(data + 36); // sizeof == 16
 			_mstWalkPathData[i].data[j].walkCodeReset[1] = READ_LE_UINT32(data + 40); // sizeof == 16
 			for (int k = 0; k < 4; ++k) {
-				_mstWalkPathData[i].data[j].unk2C[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
-				_mstWalkPathData[i].data[j].unk2C[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
+				_mstWalkPathData[i].data[j].coords[k][0] = READ_LE_UINT32(data + 0x2C + k * 8);
+				_mstWalkPathData[i].data[j].coords[k][1] = READ_LE_UINT32(data + 0x30 + k * 8);
 			}
 			_mstWalkPathData[i].data[j].neighborWalkNode[0] = READ_LE_UINT32(data + 76); // sizeof == 104
 			_mstWalkPathData[i].data[j].neighborWalkNode[1] = READ_LE_UINT32(data + 80); // sizeof == 104

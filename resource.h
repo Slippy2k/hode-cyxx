@@ -171,7 +171,7 @@ struct MstWalkNode { // u44u1
 	uint32_t indexUnk36_28; // 0x1C
 	uint32_t indexUnk36_32; // 0x20
 	uint32_t walkCodeReset[2]; // 0x24
-	int32_t unk2C[4][2]; // 0x2C, 0x34, 0x3C, 0x44
+	int32_t coords[4][2]; // 0x2C, 0x34, 0x3C, 0x44
 	uint32_t neighborWalkNode[4]; // per direction 0x4C
 	uint32_t nextWalkNode; // next 0x5C
 	uint8_t *unk60[2]; // 0x60

@@ -131,10 +131,10 @@ void Game::mstMonster1ResetWalkPath(MonsterObject1 *m) {
 	const uint8_t *ptr = m->monsterInfos;
 	const int num = (~m->flagsA5) & 1;
 
-	m->levelPosBounds_x2 = m->walkNode->unk2C[0][num] - (int32_t)READ_LE_UINT32(ptr + 904); // right x coordinate
-	m->levelPosBounds_x1 = m->walkNode->unk2C[1][num] + (int32_t)READ_LE_UINT32(ptr + 904); // left x coordinate
-	m->levelPosBounds_y2 = m->walkNode->unk2C[2][num] - (int32_t)READ_LE_UINT32(ptr + 908); // bottom y coordinate
-	m->levelPosBounds_y1 = m->walkNode->unk2C[3][num] + (int32_t)READ_LE_UINT32(ptr + 908); // top y coordinate
+	m->levelPosBounds_x2 = m->walkNode->coords[0][num] - (int32_t)READ_LE_UINT32(ptr + 904); // right x coordinate
+	m->levelPosBounds_x1 = m->walkNode->coords[1][num] + (int32_t)READ_LE_UINT32(ptr + 904); // left x coordinate
+	m->levelPosBounds_y2 = m->walkNode->coords[2][num] - (int32_t)READ_LE_UINT32(ptr + 908); // bottom y coordinate
+	m->levelPosBounds_y1 = m->walkNode->coords[3][num] + (int32_t)READ_LE_UINT32(ptr + 908); // top y coordinate
 
 	const uint32_t indexWalkCode = m->walkNode->walkCodeReset[num];
 	m->walkCode = (indexWalkCode == kNone) ? 0 : &_res->_mstWalkCodeData[indexWalkCode];
@@ -1182,7 +1182,7 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 }
 
 int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode, int num, int index) {
-	if (walkNode->unk2C[num][index] < 0) {
+	if (walkNode->coords[num][index] < 0) {
 		const uint32_t indexWalkBox = walkNode->walkBox;
 		assert(indexWalkBox != kNone && indexWalkBox < (uint32_t)_res->_mstHdr.walkBoxDataCount);
 		const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
@@ -1196,25 +1196,25 @@ int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode
 		if (mask) {
 			switch (num) { // ((int *)&m34)[num]
 			case 0:
-				walkNode->unk2C[num][index] = m34->right;
+				walkNode->coords[num][index] = m34->right;
 				break;
 			case 1:
-				walkNode->unk2C[num][index] = m34->left;
+				walkNode->coords[num][index] = m34->left;
 				break;
 			case 2:
-				walkNode->unk2C[num][index] = m34->bottom;
+				walkNode->coords[num][index] = m34->bottom;
 				break;
 			case 3:
-				walkNode->unk2C[num][index] = m34->top;
+				walkNode->coords[num][index] = m34->top;
 				break;
 			}
 		} else {
 			const uint32_t indexWalkNode = walkNode->neighborWalkNode[num];
 			assert(indexWalkNode != kNone && indexWalkNode < walkPath->count);
-			walkNode->unk2C[num][index] = mstWalkPathUpdateWalkNode(walkPath, &walkPath->data[indexWalkNode], num, index);
+			walkNode->coords[num][index] = mstWalkPathUpdateWalkNode(walkPath, &walkPath->data[indexWalkNode], num, index);
 		}
 	}
-	return walkNode->unk2C[num][index];
+	return walkNode->coords[num][index];
 }
 
 void Game::executeMstCodeHelper1() {
@@ -1224,10 +1224,10 @@ void Game::executeMstCodeHelper1() {
 			++_mstHelper1Count;
 			for (uint32_t j = 0; j < walkPath->count; ++j) {
 				for (int k = 0; k < 2; ++k) {
-					walkPath->data[j].unk2C[0][k] = -1;
-					walkPath->data[j].unk2C[1][k] = -1;
-					walkPath->data[j].unk2C[2][k] = -1;
-					walkPath->data[j].unk2C[3][k] = -1;
+					walkPath->data[j].coords[0][k] = -1;
+					walkPath->data[j].coords[1][k] = -1;
+					walkPath->data[j].coords[2][k] = -1;
+					walkPath->data[j].coords[3][k] = -1;
 				}
 			}
 			for (uint32_t j = 0; j < walkPath->count; ++j) {
@@ -1249,10 +1249,10 @@ void Game::executeMstCodeHelper1() {
 			}
 			MstWalkNode *walkNode = m->walkNode;
 			const int num = (~m->flagsA5) & 1;
-			m->levelPosBounds_x2 = walkNode->unk2C[0][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
-			m->levelPosBounds_x1 = walkNode->unk2C[1][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
-			m->levelPosBounds_y2 = walkNode->unk2C[2][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
-			m->levelPosBounds_y1 = walkNode->unk2C[3][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
+			m->levelPosBounds_x2 = walkNode->coords[0][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
+			m->levelPosBounds_x1 = walkNode->coords[1][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
+			m->levelPosBounds_y2 = walkNode->coords[2][num] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
+			m->levelPosBounds_y1 = walkNode->coords[3][num] + (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
 		}
 	}
 }
@@ -1664,14 +1664,14 @@ l41A879:
 			const uint8_t *p = m->monsterInfos;
 			const int w = (int32_t)READ_LE_UINT32(p + 904);
 			const int h = (int32_t)READ_LE_UINT32(p + 908);
-			while (_xMstPos1 >= walkNode->unk2C[1][_edi] + w) {
-				if (_xMstPos1 > walkNode->unk2C[0][_edi] - w) {
+			while (_xMstPos1 >= walkNode->coords[1][_edi] + w) {
+				if (_xMstPos1 > walkNode->coords[0][_edi] - w) {
 					break;
 				}
-				if (_yMstPos1 < walkNode->unk2C[3][_edi] + h) {
+				if (_yMstPos1 < walkNode->coords[3][_edi] + h) {
 					break;
 				}
-				if (_yMstPos1 > walkNode->unk2C[2][_edi] - h) {
+				if (_yMstPos1 > walkNode->coords[2][_edi] - h) {
 					break;
 				}
 				int var1C;
@@ -1705,16 +1705,16 @@ l41A879:
 	}
 // 41A9F4
 	if (m->goalDirectionMask & kDirectionKeyMaskLeft) {
-		_xMstPos2 = m->xMstPos - m->walkNode->unk2C[1][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
+		_xMstPos2 = m->xMstPos - m->walkNode->coords[1][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
 	} else if (m->goalDirectionMask & kDirectionKeyMaskRight) {
-		_xMstPos2 = m->walkNode->unk2C[0][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904) - m->xMstPos;
+		_xMstPos2 = m->walkNode->coords[0][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 904) - m->xMstPos;
 	} else {
 		_xMstPos2 = 0;
 	}
 	if (m->goalDirectionMask & kDirectionKeyMaskUp) {
-		_yMstPos2 = m->yMstPos - m->walkNode->unk2C[3][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
+		_yMstPos2 = m->yMstPos - m->walkNode->coords[3][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
 	} else if (m->goalDirectionMask & kDirectionKeyMaskDown) {
-		_yMstPos2 = m->walkNode->unk2C[2][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908) - m->yMstPos;
+		_yMstPos2 = m->walkNode->coords[2][_edi] - (int32_t)READ_LE_UINT32(m->monsterInfos + 908) - m->yMstPos;
 	} else {
 		_yMstPos2 = 0;
 	}
@@ -2750,7 +2750,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			m->flagsA6 |= 1;
 			assert(_mstCurrentMonster1 == m);
 			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0 && (m->monsterInfos[946] & 2) == 0) {
-				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->walkNode->unk2C[0][1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->walkNode->unk2C[1][1])) {
+				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->walkNode->coords[0][1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->walkNode->coords[1][1])) {
 					uint32_t indexWalkCode = m->walkNode->walkCodeStage1;
 					if (indexWalkCode != kNone) {
 						m->walkCode = &_res->_mstWalkCodeData[indexWalkCode];
@@ -2773,8 +2773,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			if ((m->monsterInfos[946] & 2) == 0) {
 				MstWalkNode *walkPath = m->walkNode;
 				int _edi = READ_LE_UINT32(m->monsterInfos + 904);
-				int _ebx = MAX(m->unk88, walkPath->unk2C[1][1] + _edi);
-				int _eax = MIN(m->unk84, walkPath->unk2C[0][1] - _edi);
+				int _ebx = MAX(m->unk88, walkPath->coords[1][1] + _edi);
+				int _eax = MIN(m->unk84, walkPath->coords[0][1] - _edi);
 				const uint32_t indexUnk36 = walkPath->indexUnk36_32;
 				assert(indexUnk36 != kNone);
 				const uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
@@ -2837,7 +2837,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	if ((m->flagsA5 & 8) == 0 && (m->monsterInfos[946] & 2) == 0) {
 		const uint8_t _dl = m->facingDirectionMask;
 		if ((_dl & 2) != 0) {
-			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 916) <= m->walkNode->unk2C[1][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 912) >= m->walkNode->unk2C[0][1]) {
+			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 916) <= m->walkNode->coords[1][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 912) >= m->walkNode->coords[0][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
@@ -2850,7 +2850,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			}
 		} else if (_dl & 8) {
 // 418A37
-			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 920) >= m->walkNode->unk2C[0][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 924) <= m->walkNode->unk2C[1][1]) {
+			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 920) >= m->walkNode->coords[0][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 924) <= m->walkNode->coords[1][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
 				m->flagsA5 = 1;
@@ -6977,8 +6977,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		}
 
 		const uint8_t *ptr = m->monsterInfos;
-		int anim = behaviorState->anim;
-		o = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], anim, o_flags1, o_flags2, 0, 0);
+		o = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], behaviorState->anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
 			mstMonster1ResetData(m);
 			return;
