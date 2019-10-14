@@ -93,6 +93,9 @@ void PafPlayer::play(int num) {
 }
 
 void PafPlayer::unload(int num) {
+	if (_videoNum < 0) {
+		return;
+	}
 	for (int i = 0; i < 4; ++i) {
 		free(_pageBuffers[i]);
 		_pageBuffers[i] = 0;
@@ -116,9 +119,9 @@ void PafPlayer::unload(int num) {
 }
 
 void PafPlayer::readPafHeader() {
-	static const char *headerSignature = "Packed Animation File V1.0\n(c) 1992-96 Amazing Studio\n";
+	static const char *kSignature = "Packed Animation File V1.0\n(c) 1992-96 Amazing Studio\n";
 	_file.read(_bufferBlock, kBufferBlockSize);
-	if (memcmp(_bufferBlock, headerSignature, strlen(headerSignature)) != 0) {
+	if (memcmp(_bufferBlock, kSignature, strlen(kSignature)) != 0) {
 		return;
 	}
 	_pafHdr.startOffset = READ_LE_UINT32(_bufferBlock + 0xA4);

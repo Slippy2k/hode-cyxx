@@ -222,7 +222,7 @@ void Level_isld::postScreenUpdate_isld_screen21() {
 				if (!_paf->_skipCutscenes) {
 					_paf->play(6);
 					_paf->unload(6);
-					_paf->unload(24);
+					_paf->unload(kPafAnimation_IslandAndyFalling);
 				}
 				_video->clearPalette();
 				_g->_endLevel = true;
@@ -401,7 +401,7 @@ void Level_isld::preScreenUpdate(int num) {
 
 void Level_isld::initialize() {
 	if (!_paf->_skipCutscenes) {
-		_paf->preload(24);
+		_paf->preload(kPafAnimation_IslandAndyFalling);
 	}
 	_g->resetWormHoleSprites();
 }
@@ -412,6 +412,7 @@ void Level_isld::tick() {
 
 void Level_isld::terminate() {
 	if (!_paf->_skipCutscenes) {
-		_paf->preload(24);
+		// original calls preload()...
+		_paf->unload(kPafAnimation_IslandAndyFalling);
 	}
 }

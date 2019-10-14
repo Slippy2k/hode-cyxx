@@ -46,8 +46,9 @@ enum {
 	kPafAnimation_lastfall = 19,
 	kPafAnimation_end = 20,
 	kPafAnimation_cinema = 21,
-	kPafAnimation_AndyFallingCannon = 22,
-	kPafAnimation_AndyFalling = 23,
+	kPafAnimation_CanyonAndyFallingCannon = 22, // kPafAnimation_ghct
+	kPafAnimation_CanyonAndyFalling = 23, // kPafAnimation_chute
+	kPafAnimation_IslandAndyFalling = 24 // kPafAnimation_chute_i
 };
 
 struct FileSystem;

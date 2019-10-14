@@ -1463,20 +1463,20 @@ void Game::playAndyFallingCutscene(int type) {
 	}
 	if (!_paf->_skipCutscenes && play) {
 		switch (_currentLevel) {
-		case 0:
+		case kLvl_rock:
 			if (_andyObject->spriteNum == 0) {
-				_paf->play(22); // Andy falls with cannon
+				_paf->play(kPafAnimation_CanyonAndyFallingCannon); // Andy falls with cannon and helmet
 			} else {
-				_paf->play(23); // Andy falls without cannon
+				_paf->play(kPafAnimation_CanyonAndyFalling); // Andy falls without cannon
 			}
 			break;
-		case 1:
+		case kLvl_fort:
 			if (_res->_currentScreenResourceNum == 0) {
-				_paf->play(23);
+				_paf->play(kPafAnimation_CanyonAndyFalling);
 			}
 			break;
-		case 3:
-			_paf->play(24);
+		case kLvl_isld:
+			_paf->play(kPafAnimation_IslandAndyFalling);
 			break;
 		}
 	}
