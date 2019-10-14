@@ -140,23 +140,23 @@ struct MstWalkCode { // u35
 	uint32_t dataCount; // C
 }; // sizeof == 16
 
-struct MstUnk36 {
+struct MstUnk36 { // MstMovingBoundsIndex
 	uint32_t indexUnk49; // indexes _mstMovingBoundsData
 	uint32_t unk4; // indexes _mstMovingBoundsData.data1
 	int32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk42 {
+struct MstUnk42 { // MstBehaviorIndex
 	uint32_t *behavior; // 0 indexes _mstBehaviorData
 	uint32_t count1; // 4
-	uint8_t *data; // 8 indexes .indexUnk46
+	uint8_t *data; // 8 lut - indexes .behavior
 	uint32_t dataCount; // C
 }; // sizeof == 16
 
-struct MstUnk43 {
+struct MstUnk43 { // MstUnk48Index
 	uint32_t *indexUnk48; // indexes _mstUnk48
 	uint32_t count1; // 4
-	uint8_t *data; // 8 indexes .indexUnk48
+	uint8_t *data; // 8 lut - indexes .indexUnk48
 	uint32_t dataCount; // C
 }; // sizeof == 16
 
@@ -217,26 +217,26 @@ struct MstAttackBox { // u47
 	uint32_t count;
 }; // sizeof == 8
 
-struct MstUnk48Unk12Unk4 { // MstInRangeMonsterAction
+struct MstUnk48Unk12Unk4 { // MstMonsterSubAreaAction
 	uint32_t unk0; // 0x0, indexes _mstMonsterInfos
 	uint32_t indexUnk51; // 0x4
 	int32_t xPos; // 0x8
 	int32_t yPos; // 0xC
 	uint32_t codeData; // 0x10
-	uint32_t codeData2; // 0x14
+	uint32_t codeData2; // 0x14 stop
 	uint8_t unk18; // 0x18
 	uint8_t direction; // 0x19
 	int8_t screenNum; // 0x1A
 	uint8_t monster1Index; // 0x1B
 }; // sizeof == 28
 
-struct MstUnk48Unk12 { // MstInRangeMonsterData
+struct MstUnk48Unk12 { // MstMonsterSubArea
 	uint8_t unk0;
 	MstUnk48Unk12Unk4 *data; // 0x4 sizeof == 28
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstUnk48 { // MstInRangeMonster
+struct MstUnk48 { // MstMonsterArea
 	uint16_t unk0;
 	uint16_t unk2;
 	uint8_t unk4;
@@ -276,7 +276,7 @@ struct MstMovingBounds { // u49
 	uint8_t unk17; // 0x17
 }; // sizeof == 24
 
-struct MstUnk50Unk1 {
+struct MstUnk50Unk1 { // MstShootAction
 	uint32_t codeData;
 	uint32_t unk4;
 	uint32_t unk8;
@@ -289,14 +289,14 @@ struct MstUnk50Unk1 {
 	int32_t unk24;
 }; // sizeof == 40
 
-struct MstUnk50 {
+struct MstUnk50 { // MstShoot
 	MstUnk50Unk1 *data;
 	uint32_t count;
 }; // sizeof == 8
 
-struct MstUnk51 {
+struct MstUnk51 { // MstShootIndex
 	uint32_t indexUnk50;
-	uint32_t *indexUnk50Unk1; // sizeof == 36
+	uint32_t *indexUnk50Unk1; // sizeof == 40
 	uint32_t count;
 }; // sizeof == 12
 
