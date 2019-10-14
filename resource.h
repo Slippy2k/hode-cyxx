@@ -280,12 +280,12 @@ struct MstShootAction { // u50u1
 	uint32_t codeData;
 	uint32_t unk4;
 	uint32_t unk8;
-	uint32_t unkC;
-	uint32_t unk10;
-	uint32_t unk14;
-	uint32_t unk18;
-	uint32_t unk1C;
-	uint32_t unk20;
+	uint32_t unkC; // xPos
+	uint32_t unk10; // yPos
+	uint32_t unk14; // width
+	uint32_t unk18; // height
+	uint32_t hSize; // 1C
+	uint32_t vSize; // 20
 	int32_t unk24;
 }; // sizeof == 40
 

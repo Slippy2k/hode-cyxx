@@ -1424,8 +1424,8 @@ void Resource::loadMstData(File *fp, const char *name) {
 			_mstShootData[i].data[j].unk10 = fp->readUint32();
 			_mstShootData[i].data[j].unk14 = fp->readUint32();
 			_mstShootData[i].data[j].unk18 = fp->readUint32();
-			_mstShootData[i].data[j].unk1C = fp->readUint32();
-			_mstShootData[i].data[j].unk20 = fp->readUint32();
+			_mstShootData[i].data[j].hSize = fp->readUint32();
+			_mstShootData[i].data[j].vSize = fp->readUint32();
 			_mstShootData[i].data[j].unk24 = fp->readUint32();
 			bytesRead += 40;
 		}

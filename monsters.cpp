@@ -804,7 +804,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 		m->unk8C = READ_LE_UINT32(ptr + 932);
 	}
 // 40F1B3
-	if (_andyShootsTable[0].type == 3 && m->unkF4 != 0 && _andyShootsTable[0].directionMask == m->shootDirection && m->directionKeyMask == _andyObject->directionKeyMask) {
+	if (_andyShootsTable[0].type == 3 && m->shootSource != 0 && _andyShootsTable[0].directionMask == m->shootDirection && m->directionKeyMask == _andyObject->directionKeyMask) {
 		m->flags48 |= 0x80;
 	} else {
 		m->shootDirection = -1;
@@ -2478,7 +2478,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if (_rnd.getNextNumber() > m->behaviorState->unk10) {
 			continue;
 		}
-		m->unkF0 = 8;
+		m->shootActionIndex = 8;
 		int var28 = 0;
 		AndyShootData *var14 = m->shootData;
 		if (t->run != &Game::mstTask_monsterWait5 && t->run != &Game::mstTask_monsterWait6 && t->run != &Game::mstTask_monsterWait7 && t->run != &Game::mstTask_monsterWait8 && t->run != &Game::mstTask_monsterWait9 && t->run != &Game::mstTask_monsterWait10) {
@@ -2513,11 +2513,11 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 					var28 = 4;
 					break;
 				}
-				_mstCurrentMonster1->unkF0 = _mstLut1[var28];
+				_mstCurrentMonster1->shootActionIndex = _mstLut1[var28];
 			}
 		} else {
 // 4184EC
-			m->unkF0 = _mstLut1[m->goalDirectionMask];
+			m->shootActionIndex = _mstLut1[m->goalDirectionMask];
 			var28 = 0;
 		}
 // 418508
@@ -2538,43 +2538,43 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		assert(indexUnk51 >= 0 && indexUnk51 < _res->_mstHdr.unk0x48);
 		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
 		for (; var24 < var18->count; ++var24) {
-			assert(m->unkF0 >= 0 && m->unkF0 < 9);
-			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->unkF0];
-			MstShootAction *m50Unk1 = &_res->_mstShootData[var18->indexUnk50].data[indexUnk50Unk1];
-			const int32_t x1 = m50Unk1->unk1C;
-			const int32_t y1 = m50Unk1->unk20;
-			if (x1 != 0 || y1 != 0) {
+			assert(m->shootActionIndex >= 0 && m->shootActionIndex < 9);
+			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->shootActionIndex];
+			const MstShootAction *m50Unk1 = &_res->_mstShootData[var18->indexUnk50].data[indexUnk50Unk1];
+			const int32_t hSize = m50Unk1->hSize;
+			const int32_t vSize = m50Unk1->vSize;
+			if (hSize != 0 || vSize != 0) {
 				int dirMask = 0;
 				int _ebp = 0;
 				if ((m50Unk1->unk4 & kDirectionKeyMaskHorizontal) != kDirectionKeyMaskHorizontal && (m->o16->flags1 & 0x10) != 0) {
-					_mstTemp_x1 = m->xMstPos - x1;
+					_mstTemp_x1 = m->xMstPos - hSize;
 				} else {
-					_mstTemp_x1 = m->xMstPos + x1;
+					_mstTemp_x1 = m->xMstPos + hSize;
 				}
 				if (_mstTemp_x1 < m->xMstPos) {
 					if (_mstTemp_x1 < m->goalPos_x1) {
-						dirMask = 8;
+						dirMask = kDirectionKeyMaskLeft;
 					}
-					_ebp = 8;
+					_ebp = kDirectionKeyMaskLeft;
 				} else if (_mstTemp_x1 > m->xMstPos) {
 					if (_mstTemp_x1 > m->goalPos_x2) {
-						dirMask = 2;
+						dirMask = kDirectionKeyMaskRight;
 					}
-					_ebp = 2;
+					_ebp = kDirectionKeyMaskRight;
 				} else {
 					_ebp = 0;
 				}
-				_mstTemp_y1 = m->yMstPos + y1;
+				_mstTemp_y1 = m->yMstPos + vSize;
 				if (_mstTemp_y1 < m->yMstPos) {
 					if (_mstTemp_y1 < m->goalPos_y1 && (m->monsterInfos[946] & 2) != 0) {
-						dirMask |= 1;
+						dirMask |= kDirectionKeyMaskUp;
 					}
-					_ebp |= 1;
+					_ebp |= kDirectionKeyMaskUp;
 				} else if (_mstTemp_y1 > m->yMstPos) {
 					if (_mstTemp_y1 > m->goalPos_y2 && (m->monsterInfos[946] & 2) != 0) {
-						dirMask |= 4;
+						dirMask |= kDirectionKeyMaskDown;
 					}
-					_ebp |= 4;
+					_ebp |= kDirectionKeyMaskDown;
 				}
 				if (var28 == dirMask) {
 					continue;
@@ -2628,11 +2628,11 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 		if (_ebx >= 0) {
 // 4187BC
-			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->unkF0];
+			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->shootActionIndex];
 			MstShootAction *m50Unk1 = &_res->_mstShootData[var18->indexUnk50].data[indexUnk50Unk1];
 			mstTaskAttack(_mstCurrentTask, m50Unk1->codeData, 0x40);
 			_mstCurrentMonster1->unkF8 = m50Unk1->unk8;
-			_mstCurrentMonster1->unkF4 = dir;
+			_mstCurrentMonster1->shootSource = dir;
 			_mstCurrentMonster1->shootDirection = var14->directionMask;
 			_mstCurrentMonster1->directionKeyMask = _andyObject->directionKeyMask;
 			return 0;
@@ -3616,7 +3616,7 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		break;
 	case 11:
 		if (t->monster1) {
-			return t->monster1->unkF4;
+			return t->monster1->shootSource;
 		}
 		break;
 	case 12:

@@ -408,8 +408,8 @@ struct MonsterObject1 {
 	uint8_t directionKeyMask;
 	uint16_t o_flags2; // 0xE8
 	int collideDistance; // 0xEC
-	int unkF0; // 0xF0
-	int unkF4; // 0xF4
+	int shootActionIndex; // 0xF0 [0..8]
+	int shootSource; // 0xF4
 	uint8_t unkF8; // 0xF8
 	int shootDirection; // 0xFC
 }; // sizeof == 256
