@@ -6940,7 +6940,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 			return;
 		}
 		if (arg1C < 0) { // _edx
-			const MstUnk42 *m42 = &_res->_mstUnk42[arg24];
+			const MstBehaviorIndex *m42 = &_res->_mstBehaviorIndexData[arg24];
 			if (m42->dataCount == 0) {
 				arg1C = m42->data[0];
 			} else {
@@ -6965,8 +6965,8 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		m->walkCode = 0;
 		m->flagsA6 = 0;
 
-		assert((uint32_t)arg1C < _res->_mstUnk42[arg24].count1);
-		const uint32_t indexBehavior = _res->_mstUnk42[arg24].behavior[arg1C];
+		assert((uint32_t)arg1C < _res->_mstBehaviorIndexData[arg24].count1);
+		const uint32_t indexBehavior = _res->_mstBehaviorIndexData[arg24].behavior[arg1C];
 		MstBehavior *m46 = &_res->_mstBehaviorData[indexBehavior];
 		m->m46 = m46;
 		assert((uint32_t)arg20 < m46->count);
@@ -7135,7 +7135,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 }
 
 void Game::mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int c, int d) {
-	const MstUnk42 *m42 = &_res->_mstUnk42[d];
+	const MstBehaviorIndex *m42 = &_res->_mstBehaviorIndexData[d];
 	struct {
 		int m42Index;
 		int m46Index;

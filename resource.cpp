@@ -1037,7 +1037,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
 	_mstHdr.screenAreaDataCount = fp->readUint32();
 	_mstHdr.unk0x1C  = fp->readUint32();
-	_mstHdr.unk0x20  = fp->readUint32();
+	_mstHdr.behaviorIndexDataCount = fp->readUint32();
 	_mstHdr.unk0x24  = fp->readUint32();
 	_mstHdr.walkPathDataCount  = fp->readUint32();
 	_mstHdr.infoMonster2Count  = fp->readUint32();
@@ -1159,22 +1159,22 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += 4;
 	}
 
-	_mstUnk42.allocate(_mstHdr.unk0x20);
-	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
+	_mstBehaviorIndexData.allocate(_mstHdr.behaviorIndexDataCount);
+	for (int i = 0; i < _mstHdr.behaviorIndexDataCount; ++i) {
 		fp->readUint32();
-		_mstUnk42[i].count1 = fp->readUint32();
-		_mstUnk42[i].behavior = (uint32_t *)malloc(_mstUnk42[i].count1 * sizeof(uint32_t));
+		_mstBehaviorIndexData[i].count1 = fp->readUint32();
+		_mstBehaviorIndexData[i].behavior = (uint32_t *)malloc(_mstBehaviorIndexData[i].count1 * sizeof(uint32_t));
 		fp->readUint32();
-		_mstUnk42[i].dataCount = fp->readUint32();
-		_mstUnk42[i].data = (uint8_t *)malloc(_mstUnk42[i].dataCount);
+		_mstBehaviorIndexData[i].dataCount = fp->readUint32();
+		_mstBehaviorIndexData[i].data = (uint8_t *)malloc(_mstBehaviorIndexData[i].dataCount);
 		bytesRead += 16;
 	}
-	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
-		for (uint32_t j = 0; j < _mstUnk42[i].count1; ++j) {
-			_mstUnk42[i].behavior[j] = fp->readUint32();
+	for (int i = 0; i < _mstHdr.behaviorIndexDataCount; ++i) {
+		for (uint32_t j = 0; j < _mstBehaviorIndexData[i].count1; ++j) {
+			_mstBehaviorIndexData[i].behavior[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		bytesRead += readBytesAlign(fp, _mstUnk42[i].data, _mstUnk42[i].dataCount);
+		bytesRead += readBytesAlign(fp, _mstBehaviorIndexData[i].data, _mstBehaviorIndexData[i].dataCount);
 	}
 
 	_mstUnk43.allocate(_mstHdr.unk0x24);
@@ -1586,11 +1586,11 @@ void Resource::unloadMstData() {
 		free(_mstWalkCodeData[i].data);
 		_mstWalkCodeData[i].data = 0;
 	}
-	for (int i = 0; i < _mstHdr.unk0x20; ++i) {
-		free(_mstUnk42[i].behavior);
-		_mstUnk42[i].behavior = 0;
-		free(_mstUnk42[i].data);
-		_mstUnk42[i].data = 0;
+	for (int i = 0; i < _mstHdr.behaviorIndexDataCount; ++i) {
+		free(_mstBehaviorIndexData[i].behavior);
+		_mstBehaviorIndexData[i].behavior = 0;
+		free(_mstBehaviorIndexData[i].data);
+		_mstBehaviorIndexData[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x24; ++i) {
 		free(_mstUnk43[i].indexUnk48);

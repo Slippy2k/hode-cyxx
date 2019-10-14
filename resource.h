@@ -79,7 +79,7 @@ struct MstHdr {
 	int levelCheckpointCodeDataCount; // 14
 	int screenAreaDataCount; // 18
 	int unk0x1C; // mstUnk39DataCount
-	int unk0x20; // mstUnk42DataCount
+	int behaviorIndexDataCount; // 20
 	int unk0x24; // mstUnk43DataCount
 	int walkPathDataCount; // 28
 	int infoMonster2Count; // 2C
@@ -146,7 +146,7 @@ struct MstUnk36 { // MstMovingBoundsIndex
 	int32_t unk8;
 }; // sizeof == 12
 
-struct MstUnk42 { // MstBehaviorIndex
+struct MstBehaviorIndex { // u42
 	uint32_t *behavior; // 0 indexes _mstBehaviorData
 	uint32_t count1; // 4
 	uint8_t *data; // 8 lut - indexes .behavior
@@ -577,7 +577,7 @@ struct Resource {
 	ResStruct<uint32_t> _mstUnk39; // indexes _mstScreenAreaData
 	ResStruct<uint32_t> _mstUnk40; // indexes _mstScreenAreaData
 	ResStruct<uint32_t> _mstUnk41;
-	ResStruct<MstUnk42> _mstUnk42;
+	ResStruct<MstBehaviorIndex> _mstBehaviorIndexData;
 	ResStruct<MstUnk43> _mstUnk43;
 	ResStruct<MstWalkPath> _mstWalkPathData;
 	ResStruct<MstInfoMonster2> _mstInfoMonster2Data;
