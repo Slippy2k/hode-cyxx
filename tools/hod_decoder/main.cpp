@@ -286,34 +286,30 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 }
 
 static void DecodeLvlSprite(const uint8_t *data, int num) {
-	if (_isPsx) {
-		return;
-	}
 
 	const int spriteNum = data[1];
 	const int framesCount = READ_LE_UINT16(data + 2);
 	const uint32_t framesDataOffset = READ_LE_UINT32(data + 0x1C);
 
-	uint32_t *framesOffsets = (uint32_t *)alloca((framesCount + 1) * sizeof(uint32_t));
-
 	int bitmapW = 0;
 	int bitmapH = 0;
-	framesOffsets[0] = 0;
 	const uint8_t *framesData = data + framesDataOffset;
+
+	uint32_t *framesOffsets = 0;
+	if (_isPsx && data[0] == 1) {
+		framesOffsets = (uint32_t *)alloca((framesCount + 1) * sizeof(uint32_t));
+		framesOffsets[0] = 0;
+	}
 
 	for (int i = 0; i < framesCount; ++i) {
 		const uint16_t size = READ_LE_UINT16(framesData);
 		const int w = READ_LE_UINT16(framesData + 2);
 		const int h = READ_LE_UINT16(framesData + 4);
-		if (_isPsx && (w > 255 || h > 191)) {
-			fprintf(stderr, "Invalid sprite dimensions %d,%d\n", w, h);
-			return;
-		}
 		bitmapW += w;
 		if (bitmapH < h) {
 			bitmapH = h;
 		}
-		if (_isPsx) {
+		if (framesOffsets) {
 			framesOffsets[i + 1] = framesOffsets[i] + size;
 			framesData += 6;
 		} else {
@@ -328,19 +324,20 @@ static void DecodeLvlSprite(const uint8_t *data, int num) {
 	}
 
 	framesData = data + framesDataOffset;
+	const uint32_t rleOffset = (framesOffsets && READ_LE_UINT16(framesData + framesCount * 6 + framesOffsets[0]) == 0) ? 2 : 0;
 	int xOffset = 0;
 	for (int i = 0; i < framesCount; ++i) {
-		if (_isPsx) {
+		if (framesOffsets) {
 			const int w = READ_LE_UINT16(framesData + i * 6 + 2);
-			DecodeRLE(framesData + framesCount * 6 + framesOffsets[i] + 2, buffer + xOffset, bitmapW);
+			DecodeRLE(framesData + framesCount * 6 + framesOffsets[i] + rleOffset, buffer + xOffset, bitmapW);
 			xOffset += w;
-			continue;
+		} else {
+			const uint16_t size = READ_LE_UINT16(framesData);
+			const int w = READ_LE_UINT16(framesData + 2);
+			DecodeRLE(framesData + 6, buffer + xOffset, bitmapW);
+			xOffset += w;
+			framesData += size;
 		}
-		const uint16_t size = READ_LE_UINT16(framesData);
-		const int w = READ_LE_UINT16(framesData + 2);
-		DecodeRLE(framesData + 6, buffer + xOffset, bitmapW);
-		xOffset += w;
-		framesData += size;
 	}
 
 	_spritePalette[0] = 255;
