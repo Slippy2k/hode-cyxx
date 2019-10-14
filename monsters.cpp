@@ -1605,42 +1605,43 @@ void Game::mstSetVerticalHorizontalBounds(MonsterObject1 *m) {
 			MstWalkNode *walkNode = &walkPath->data[_cl];
 			assert(walkNode->walkBox != kNone);
 			const MstWalkBox *m34 = &_res->_mstWalkBoxData[walkNode->walkBox];
-			if (!rect_contains(m34->left, m34->bottom, m34->right, m34->top, _xMstPos1, _yMstPos1)) {
-				_edi = -1;
+			if (rect_contains(m34->left, m34->bottom, m34->right, m34->top, _xMstPos1, _yMstPos1)) {
+				// goto 41A879
 			} else {
-				goto l41A879;
+				_edi = -1;
 			}
 		}
+		if (_edi == 0) {
 // 41A7AD
-		int _al = mstMonster1FindWalkPathRect(m, walkPath, _xMstPos1, _yMstPos1);
-		if (_al < 0) {
-			_xMstPos1 = _xMstPos3;
-			_yMstPos1 = _yMstPos3;
-			_cl = _edi - _al;
-			m->goalPos_x1 = m->goalPos_x2 = _xMstPos1;
-			m->goalPos_y1 = m->goalPos_y2 = _yMstPos1;
-			_xMstPos2 = ABS(m->xMstPos - _xMstPos1);
-			_yMstPos2 = ABS(m->yMstPos - _yMstPos1);
-			if (m->xMstPos < m->goalPos_x1) {
-				m->goalDirectionMask = kDirectionKeyMaskRight;
-			} else if (m->xMstPos > m->goalPos_x2) {
-				m->goalDirectionMask = kDirectionKeyMaskLeft;
+			const int _al = mstMonster1FindWalkPathRect(m, walkPath, _xMstPos1, _yMstPos1);
+			if (_al < 0) {
+				_xMstPos1 = _xMstPos3;
+				_yMstPos1 = _yMstPos3;
+				_cl = _edi - _al;
+				m->goalPos_x1 = m->goalPos_x2 = _xMstPos1;
+				m->goalPos_y1 = m->goalPos_y2 = _yMstPos1;
+				_xMstPos2 = ABS(m->xMstPos - _xMstPos1);
+				_yMstPos2 = ABS(m->yMstPos - _yMstPos1);
+				if (m->xMstPos < m->goalPos_x1) {
+					m->goalDirectionMask = kDirectionKeyMaskRight;
+				} else if (m->xMstPos > m->goalPos_x2) {
+					m->goalDirectionMask = kDirectionKeyMaskLeft;
+				}
+				if (m->yMstPos < m->goalPos_y1) {
+					m->goalDirectionMask |= kDirectionKeyMaskDown;
+				} else if (m->yMstPos > m->goalPos_y2) {
+					m->goalDirectionMask |= kDirectionKeyMaskUp;
+				}
+			} else {
+				_cl = _al;
 			}
-			if (m->yMstPos < m->goalPos_y1) {
-				m->goalDirectionMask |= kDirectionKeyMaskDown;
-			} else if (m->yMstPos > m->goalPos_y2) {
-				m->goalDirectionMask |= kDirectionKeyMaskUp;
-			}
-		} else {
-			_cl = _al;
-		}
 // 41A85C
-		m->flagsA8[2] = _cl;
-		m->unkBC = -1;
-		m->unkC0 = -1;
+			m->flagsA8[2] = _cl;
+			m->unkBC = -1;
+			m->unkC0 = -1;
+		}
 	}
 // 41A879
-l41A879:
 	if (_cl >= walkPath->count || m->walkNode == &walkPath->data[_cl]) {
 		m->flagsA7 = 0xFF;
 		return;
@@ -2538,7 +2539,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
 		for (; var24 < var18->count; ++var24) {
 			assert(m->unkF0 >= 0 && m->unkF0 < 9);
-			uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->unkF0];
+			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->unkF0];
 			MstUnk50Unk1 *m50Unk1 = &_res->_mstUnk50[var18->indexUnk50].data[indexUnk50Unk1];
 			const int32_t x1 = m50Unk1->unk1C;
 			const int32_t y1 = m50Unk1->unk20;
@@ -2836,7 +2837,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	}
 	if ((m->flagsA5 & 8) == 0 && (m->monsterInfos[946] & 2) == 0) {
 		const uint8_t _dl = m->facingDirectionMask;
-		if ((_dl & 2) != 0) {
+		if (_dl & 2) {
 			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 916) <= m->walkNode->coords[1][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 912) >= m->walkNode->coords[0][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
@@ -5288,9 +5289,13 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		}
 		if (_xMstPos2 < _cl && _yMstPos2 < _dl && !mstMonster1TestGoalDirection(m)) {
 // 41C2E6
-			goto l41C2E6;
+			// goto 41C2E6
+		} else {
+// 41C3FD
+			if (m->goalDirectionMask) {
+				return (this->*(t->run))(t);
+			}
 		}
-		// goto l41C3FD;
 	} else {
 // 41C355
 		if (t->run == &Game::mstTask_monsterWait6) {
@@ -5304,20 +5309,24 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		}
 // 41C399
 		mstSetHorizontalBounds(m);
+		bool flag = false;
 		while (_xMstPos2 < m->m49Unk1->unkC) {
 			if (--m->indexUnk49Unk1 >= 0) {
 				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 			} else {
-				goto l41C2E6;
+				flag = true;
+				break;
+				// goto 41C2E6
+			}
+		}
+		if (!flag) {
+// 41C3FD
+			if (m->goalDirectionMask) {
+				return (this->*(t->run))(t);
 			}
 		}
 	}
-// 41C3FD
-	if (m->goalDirectionMask) {
-		return (this->*(t->run))(t);
-	}
 // 41C2E6
-l41C2E6:
 	if (m->monsterInfos[946] & 4) {
 		mstBoundingBoxClear(m, 1);
 	}

@@ -3994,7 +3994,7 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 2:
 		o->callbackFuncPtr = &Game::lvlObjectType0Callback;
 		break;
-	case 1:
+	case 1: // plasma cannon explosion
 		o->callbackFuncPtr = &Game::lvlObjectType1Callback;
 		break;
 	case 3:
@@ -4014,12 +4014,12 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 8: // lizard
 	case 9: // spider
 	case 10: // flying spectre
-	case 11: // dog
+	case 11: // spectre
 	case 12: // spectre
-	case 13:
+	case 13: // spectre
 	case 14:
 	case 15:
-	case 16:
+	case 16: // double spectre
 	case 17:
 	case 18:
 	case 19:
@@ -4028,8 +4028,8 @@ void Game::lvlObjectTypeCallback(LvlObject *o) {
 	case 22:
 	case 23:
 	case 24: // rope
-	case 25: // swamp serpent
-	case 26: // plant
+	case 25: // swamp snake
+	case 26:
 	case 27: // green fire-fly
 	case 28:
 	case 29:
