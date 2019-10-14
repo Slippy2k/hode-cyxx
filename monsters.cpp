@@ -2778,7 +2778,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				int _eax = MIN(m->unk84, walkPath->coords[0][1] - _edi);
 				const uint32_t indexUnk36 = walkPath->indexUnk36_32;
 				assert(indexUnk36 != kNone);
-				const uint32_t indexUnk49 = _res->_mstUnk36[indexUnk36].indexUnk49;
+				const uint32_t indexUnk49 = _res->_mstMovingBoundsIndexData[indexUnk36].indexUnk49;
 				assert(indexUnk49 != kNone);
 				uint8_t _bl = _res->_mstMovingBoundsData[indexUnk49].unk14;
 				if (ABS(_eax - _ebx) <= _bl) {
@@ -6583,7 +6583,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 // 41C559
 	const uint32_t indexUnk36 = m->walkNode->indexUnk36_28;
 	assert(indexUnk36 != kNone);
-	MstUnk36 *m36 = &_res->_mstUnk36[indexUnk36];
+	MstMovingBoundsIndex *m36 = &_res->_mstMovingBoundsIndexData[indexUnk36];
 	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[m36->indexUnk49];
 	m->m49 = m49;
 	m->indexUnk49Unk1 = m36->unk4;
@@ -6729,9 +6729,8 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~1) | 6;
 	mstMonster1ResetWalkPath(m);
-	const int i = m->walkNode->indexUnk36_32;
-	assert(i >= 0 && i < _res->_mstHdr.unk0x10);
-	MstUnk36 *m36 = &_res->_mstUnk36[i];
+	const uint32_t indexUnk36 = m->walkNode->indexUnk36_32;
+	MstMovingBoundsIndex *m36 = &_res->_mstMovingBoundsIndexData[indexUnk36];
 	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[m36->indexUnk49];
 	m->m49 = m49;
 	if (flag != 0) {

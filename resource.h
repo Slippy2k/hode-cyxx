@@ -74,8 +74,8 @@ struct MstHdr {
 	int version;
 	int dataSize;
 	uint32_t walkBoxDataCount; // 8
-	int walkCodeDataCount;
-	int unk0x10; // mstUnk36DataCount
+	int walkCodeDataCount; // C
+	int movingBoundsIndexDataCount; // 10
 	int levelCheckpointCodeDataCount; // 14
 	int screenAreaDataCount; // 18
 	int unk0x1C; // mstUnk39DataCount
@@ -140,7 +140,7 @@ struct MstWalkCode { // u35
 	uint32_t dataCount; // C
 }; // sizeof == 16
 
-struct MstUnk36 { // MstMovingBoundsIndex
+struct MstMovingBoundsIndex { // u36
 	uint32_t indexUnk49; // indexes _mstMovingBoundsData
 	uint32_t unk4; // indexes _mstMovingBoundsData.data1
 	int32_t unk8;
@@ -569,7 +569,7 @@ struct Resource {
 	ResStruct<MstPointOffset> _mstPointOffsets;
 	ResStruct<MstWalkBox> _mstWalkBoxData;
 	ResStruct<MstWalkCode> _mstWalkCodeData;
-	ResStruct<MstUnk36> _mstUnk36;
+	ResStruct<MstMovingBoundsIndex> _mstMovingBoundsIndexData;
 	uint32_t _mstTickDelay;
 	uint32_t _mstTickCodeData;
 	ResStruct<uint32_t> _mstLevelCheckpointCodeData;

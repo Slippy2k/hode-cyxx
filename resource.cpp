@@ -1033,7 +1033,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.dataSize = fp->readUint32();
 	_mstHdr.walkBoxDataCount = fp->readUint32();
 	_mstHdr.walkCodeDataCount = fp->readUint32();
-	_mstHdr.unk0x10  = fp->readUint32();
+	_mstHdr.movingBoundsIndexDataCount = fp->readUint32();
 	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
 	_mstHdr.screenAreaDataCount = fp->readUint32();
 	_mstHdr.unk0x1C  = fp->readUint32();
@@ -1106,11 +1106,11 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += readBytesAlign(fp, _mstWalkCodeData[i].data, _mstWalkCodeData[i].dataCount);
 	}
 
-	_mstUnk36.allocate(_mstHdr.unk0x10);
-	for (int i = 0; i < _mstHdr.unk0x10; ++i) {
-		_mstUnk36[i].indexUnk49 = fp->readUint32();
-		_mstUnk36[i].unk4 = fp->readUint32();
-		_mstUnk36[i].unk8 = fp->readUint32();
+	_mstMovingBoundsIndexData.allocate(_mstHdr.movingBoundsIndexDataCount);
+	for (int i = 0; i < _mstHdr.movingBoundsIndexDataCount; ++i) {
+		_mstMovingBoundsIndexData[i].indexUnk49 = fp->readUint32();
+		_mstMovingBoundsIndexData[i].unk4 = fp->readUint32();
+		_mstMovingBoundsIndexData[i].unk8 = fp->readUint32();
 		bytesRead += 12;
 	}
 
