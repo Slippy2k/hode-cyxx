@@ -2540,7 +2540,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		for (; var24 < var18->count; ++var24) {
 			assert(m->unkF0 >= 0 && m->unkF0 < 9);
 			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->unkF0];
-			MstUnk50Unk1 *m50Unk1 = &_res->_mstUnk50[var18->indexUnk50].data[indexUnk50Unk1];
+			MstShootAction *m50Unk1 = &_res->_mstShootData[var18->indexUnk50].data[indexUnk50Unk1];
 			const int32_t x1 = m50Unk1->unk1C;
 			const int32_t y1 = m50Unk1->unk20;
 			if (x1 != 0 || y1 != 0) {
@@ -2629,7 +2629,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		if (_ebx >= 0) {
 // 4187BC
 			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->unkF0];
-			MstUnk50Unk1 *m50Unk1 = &_res->_mstUnk50[var18->indexUnk50].data[indexUnk50Unk1];
+			MstShootAction *m50Unk1 = &_res->_mstShootData[var18->indexUnk50].data[indexUnk50Unk1];
 			mstTaskAttack(_mstCurrentTask, m50Unk1->codeData, 0x40);
 			_mstCurrentMonster1->unkF8 = m50Unk1->unk8;
 			_mstCurrentMonster1->unkF4 = dir;

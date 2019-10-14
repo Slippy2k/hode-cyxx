@@ -73,7 +73,7 @@ struct LvlBackgroundData {
 struct MstHdr {
 	int version;
 	int dataSize;
-	uint32_t walkBoxDataCount; // 8
+	int walkBoxDataCount; // 8
 	int walkCodeDataCount; // C
 	int movingBoundsIndexDataCount; // 10
 	int levelCheckpointCodeDataCount; // 14
@@ -88,7 +88,7 @@ struct MstHdr {
 	int unk0x38; // mstUnk48DataCount
 	int infoMonster1Count; // 3C
 	int movingBoundsDataCount; // 40
-	int unk0x44; // mstUnk50DataCount
+	int shootDataCount; // 44
 	int unk0x48; // mstUnk51DataCount
 	int mstActionDirectionDataCount; // 4C
 	int op223DataCount; // 50
@@ -184,7 +184,7 @@ struct MstWalkPath { // u44
 	uint32_t count; // 0xC
 }; // sizeof == 16
 
-struct MstInfoMonster2 {
+struct MstInfoMonster2 { // u45
 	uint8_t type; // 0x0
 	uint8_t shootMask; // 0x1
 	uint16_t anim; // 0x2
@@ -251,7 +251,7 @@ struct MstUnk48 { // MstMonsterArea
 	uint32_t count[2]; // 0x24, 0x28
 }; // sizeof == 44
 
-struct MstMovingBoundsUnk1 {
+struct MstMovingBoundsUnk1 { // u49u1
 	uint32_t offsetMonsterInfo; // 0, offset _mstMonsterInfos[32]
 	uint32_t unk4;
 	uint8_t unk8;
@@ -276,7 +276,7 @@ struct MstMovingBounds { // u49
 	uint8_t unk17; // 0x17
 }; // sizeof == 24
 
-struct MstUnk50Unk1 { // MstShootAction
+struct MstShootAction { // u50u1
 	uint32_t codeData;
 	uint32_t unk4;
 	uint32_t unk8;
@@ -289,8 +289,8 @@ struct MstUnk50Unk1 { // MstShootAction
 	int32_t unk24;
 }; // sizeof == 40
 
-struct MstUnk50 { // MstShoot
-	MstUnk50Unk1 *data;
+struct MstShoot { // u50
+	MstShootAction *data;
 	uint32_t count;
 }; // sizeof == 8
 
@@ -586,7 +586,7 @@ struct Resource {
 	ResStruct<MstUnk48> _mstUnk48;
 	uint8_t *_mstMonsterInfos; // sizeof == 948
 	ResStruct<MstMovingBounds> _mstMovingBoundsData;
-	ResStruct<MstUnk50> _mstUnk50;
+	ResStruct<MstShoot> _mstShootData;
 	ResStruct<MstUnk51> _mstUnk51;
 	ResStruct<MstActionDirectionMask> _mstActionDirectionData;
 	ResStruct<MstOp223Data> _mstOp223Data;

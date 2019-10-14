@@ -1046,7 +1046,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstHdr.unk0x38  = fp->readUint32();
 	_mstHdr.infoMonster1Count  = fp->readUint32();
 	_mstHdr.movingBoundsDataCount = fp->readUint32();
-	_mstHdr.unk0x44  = fp->readUint32();
+	_mstHdr.shootDataCount = fp->readUint32();
 	_mstHdr.unk0x48  = fp->readUint32();
 	_mstHdr.mstActionDirectionDataCount = fp->readUint32();
 	_mstHdr.op223DataCount  = fp->readUint32();
@@ -1076,7 +1076,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	}
 
 	_mstWalkBoxData.allocate(_mstHdr.walkBoxDataCount);
-	for (unsigned int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
+	for (int i = 0; i < _mstHdr.walkBoxDataCount; ++i) {
 		_mstWalkBoxData[i].right  = fp->readUint32();
 		_mstWalkBoxData[i].left   = fp->readUint32();
 		_mstWalkBoxData[i].bottom = fp->readUint32();
@@ -1408,25 +1408,25 @@ void Resource::loadMstData(File *fp, const char *name) {
 		bytesRead += _mstMovingBoundsData[i].count2;
 	}
 
-	_mstUnk50.allocate(_mstHdr.unk0x44);
-	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
-		_mstUnk50[i].data  = 0; fp->readUint32();
-		_mstUnk50[i].count = fp->readUint32();
+	_mstShootData.allocate(_mstHdr.shootDataCount);
+	for (int i = 0; i < _mstHdr.shootDataCount; ++i) {
+		_mstShootData[i].data  = 0; fp->readUint32();
+		_mstShootData[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
-	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
-		_mstUnk50[i].data = (MstUnk50Unk1 *)malloc(_mstUnk50[i].count * sizeof(MstUnk50Unk1));
-		for (uint32_t j = 0; j < _mstUnk50[i].count; ++j) {
-			_mstUnk50[i].data[j].codeData = fp->readUint32();
-			_mstUnk50[i].data[j].unk4 = fp->readUint32();
-			_mstUnk50[i].data[j].unk8 = fp->readUint32();
-			_mstUnk50[i].data[j].unkC = fp->readUint32();
-			_mstUnk50[i].data[j].unk10 = fp->readUint32();
-			_mstUnk50[i].data[j].unk14 = fp->readUint32();
-			_mstUnk50[i].data[j].unk18 = fp->readUint32();
-			_mstUnk50[i].data[j].unk1C = fp->readUint32();
-			_mstUnk50[i].data[j].unk20 = fp->readUint32();
-			_mstUnk50[i].data[j].unk24 = fp->readUint32();
+	for (int i = 0; i < _mstHdr.shootDataCount; ++i) {
+		_mstShootData[i].data = (MstShootAction *)malloc(_mstShootData[i].count * sizeof(MstShootAction));
+		for (uint32_t j = 0; j < _mstShootData[i].count; ++j) {
+			_mstShootData[i].data[j].codeData = fp->readUint32();
+			_mstShootData[i].data[j].unk4 = fp->readUint32();
+			_mstShootData[i].data[j].unk8 = fp->readUint32();
+			_mstShootData[i].data[j].unkC = fp->readUint32();
+			_mstShootData[i].data[j].unk10 = fp->readUint32();
+			_mstShootData[i].data[j].unk14 = fp->readUint32();
+			_mstShootData[i].data[j].unk18 = fp->readUint32();
+			_mstShootData[i].data[j].unk1C = fp->readUint32();
+			_mstShootData[i].data[j].unk20 = fp->readUint32();
+			_mstShootData[i].data[j].unk24 = fp->readUint32();
 			bytesRead += 40;
 		}
 	}
@@ -1434,7 +1434,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 	_mstUnk51.allocate(_mstHdr.unk0x48);
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
 		_mstUnk51[i].indexUnk50 = fp->readUint32();
-		assert(_mstUnk51[i].indexUnk50 < (uint32_t)_mstHdr.unk0x44);
+		assert(_mstUnk51[i].indexUnk50 < (uint32_t)_mstHdr.shootDataCount);
 		_mstUnk51[i].indexUnk50Unk1 = 0; fp->readUint32();
 		_mstUnk51[i].count = fp->readUint32();
 		bytesRead += 12;
@@ -1443,7 +1443,7 @@ void Resource::loadMstData(File *fp, const char *name) {
 		_mstUnk51[i].indexUnk50Unk1 = (uint32_t *)malloc(_mstUnk51[i].count * 9 * sizeof(uint32_t));
 		for (uint32_t j = 0; j < _mstUnk51[i].count * 9; ++j) {
 			_mstUnk51[i].indexUnk50Unk1[j] = fp->readUint32();
-			assert(_mstUnk51[i].indexUnk50Unk1[j] < _mstUnk50[_mstUnk51[i].indexUnk50].count);
+			assert(_mstUnk51[i].indexUnk50Unk1[j] < _mstShootData[_mstUnk51[i].indexUnk50].count);
 			bytesRead += 4;
 		}
 	}
@@ -1633,9 +1633,9 @@ void Resource::unloadMstData() {
 		free(_mstMovingBoundsData[i].data2);
 		_mstMovingBoundsData[i].data2 = 0;
 	}
-	for (int i = 0; i < _mstHdr.unk0x44; ++i) {
-		free(_mstUnk50[i].data);
-		_mstUnk50[i].data = 0;
+	for (int i = 0; i < _mstHdr.shootDataCount; ++i) {
+		free(_mstShootData[i].data);
+		_mstShootData[i].data = 0;
 	}
 	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
 		free(_mstUnk51[i].indexUnk50Unk1);
