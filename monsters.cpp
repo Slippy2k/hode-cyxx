@@ -1118,7 +1118,7 @@ void Game::executeMstCode() {
 void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 	uint32_t _walkNodesTable[32];
 	int _walkNodesFirstIndex, _walkNodesLastIndex;
-	uint32_t buffer[64];
+	int32_t buffer[64];
 	for (uint32_t i = 0; i < walkPath->count; ++i) {
 		MstWalkNode *walkNode = &walkPath->data[i];
 		memset(buffer, 0xFF, sizeof(buffer));
@@ -1155,18 +1155,23 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 					continue;
 				}
 // 417525
+				int _ecx;
 				if (j == 0 || j == 1) {
-					buffer[i] = m34->right - m34->left + buffer[_edi];
+					_ecx = m34->right - m34->left + buffer[_edi];
 				} else {
-					buffer[i] = m34->bottom - m34->top + buffer[_edi];
+					_ecx = m34->bottom - m34->top + buffer[_edi];
 				}
-				if (buffer[indexWalkNode] == 0xFFFFFFFF) {
+				if (_ecx >= buffer[i]) {
+					continue;
+				}
+				if (buffer[indexWalkNode] == -1) {
 					_walkNodesTable[_walkNodesLastIndex] = indexWalkNode;
 					++_walkNodesLastIndex;
 					if (_walkNodesLastIndex >= 32) {
 						_walkNodesLastIndex = 0;
 					}
 				}
+				buffer[i] = _ecx;
 // 417585
 				uint8_t value;
 				if (_edi == i) {
