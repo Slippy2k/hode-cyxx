@@ -504,13 +504,15 @@ void Level_lar1::postScreenUpdate_lar1_screen14() {
 		case 1: {
 				BoundingBox b = { 172, 23, 222, 53 };
 				AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-				if (_g->clipBoundingBox(&b, &data->boundingBox) && (_andyObject->flags0 & 0x1F) == 0 && (_andyObject->flags0 & 0xE0) == 0xE0) {
-					_res->_screensState[14].s0 = 4;
-					if (!_paf->_skipCutscenes) {
-						_paf->preload(12);
+				if (_g->clipBoundingBox(&b, &data->boundingBox)) {
+					if ((_andyObject->flags0 & 0x1F) == 0 && (_andyObject->flags0 & 0xE0) == 0xE0) {
+						_res->_screensState[14].s0 = 4;
+						if (!_paf->_skipCutscenes) {
+							_paf->preload(12);
+						}
+					} else {
+						_g->setAndySpecialAnimation(3);
 					}
-				} else {
-					_g->setAndySpecialAnimation(3);
 				}
 			}
 			break;
