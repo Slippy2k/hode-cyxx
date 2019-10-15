@@ -10,6 +10,7 @@
 #include "3p/inih/ini.h"
 
 #include "game.h"
+#include "menu.h"
 #include "mixer.h"
 #include "paf.h"
 #include "util.h"
@@ -34,6 +35,7 @@ static bool _widescreen = false;
 static System *_system = 0;
 
 static const bool _runBenchmark = false;
+static const bool _runMenu = false;
 
 static void exitMain() {
 	if (_system) {
@@ -186,13 +188,19 @@ int main(int argc, char *argv[]) {
 		g->benchmarkCpu();
 	}
 	g->_res->loadSetupDat();
-	bool levelChanged = false;
-	do {
-		g->mainLoop(level, checkpoint, levelChanged);
-		level += 1;
-		checkpoint = 0;
-		levelChanged = true;
-	} while (!_system->inp.quit && level < kLvl_test);
+	if (_runMenu) {
+		Menu *m = new Menu(g->_paf, g->_res, _system, g->_video);
+		m->mainLoop();
+		delete m;
+	} else {
+		bool levelChanged = false;
+		do {
+			g->mainLoop(level, checkpoint, levelChanged);
+			level += 1;
+			checkpoint = 0;
+			levelChanged = true;
+		} while (!_system->inp.quit && level < kLvl_test);
+	}
 	_system->stopAudio();
 	g->_mix.fini();
 	delete g;

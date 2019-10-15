@@ -6,6 +6,7 @@
 #ifndef RESOURCE_H__
 #define RESOURCE_H__
 
+#include "defs.h"
 #include "fs.h"
 #include "intern.h"
 
@@ -617,7 +618,7 @@ struct Resource {
 	void loadLvlScreenVectorData(int num);
 	void loadLvlScreenStateData(int num);
 	void loadLvlScreenObjectData(int num);
-	void loadLvlData(File *fp, const char *name);
+	void loadLvlData(File *fp);
 	void unloadLvlData();
 	void loadLvlSpriteData(int num);
 	const uint8_t *getLvlScreenMaskDataPtr(int num) const;
@@ -632,7 +633,7 @@ struct Resource {
 	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame) const;
 	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const;
 
-	void loadSssData(File *fp, const char *name);
+	void loadSssData(File *fp, const uint32_t baseOffset = 0);
 	void unloadSssData();
 	void checkSssCode(const uint8_t *buf, int size) const;
 	void loadSssPcm(File *fp, int num);
@@ -640,7 +641,7 @@ struct Resource {
 	void clearSssGroup3();
 	void resetSssFilters();
 
-	void loadMstData(File *fp, const char *name);
+	void loadMstData(File *fp);
 	void unloadMstData();
 	const MstScreenArea *findMstCodeForPos(int num, int xPos, int yPos) const;
 	void flagMstCodeForPos(int num, uint8_t value);

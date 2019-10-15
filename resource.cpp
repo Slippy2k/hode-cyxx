@@ -208,6 +208,10 @@ void Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
 }
 
 void Resource::loadDatMenuBuffers() {
+	assert((_datHdr.sssOffset & 0x7FF) == 0);
+	_datFile->seek(_datHdr.sssOffset, SEEK_SET);
+	loadSssData(_datFile, _datHdr.sssOffset);
+
 	uint32_t baseOffset = _menuBuffersOffset;
 	_datFile->seek(baseOffset, SEEK_SET);
 	_menuBuffer1 = (uint8_t *)malloc(_datHdr.bufferSize1);
@@ -232,7 +236,7 @@ void Resource::loadLevelData(int levelNum) {
 	closeDat(_fs, _lvlFile);
 	snprintf(filename, sizeof(filename), "%s_HOD.LVL", levelName);
 	if (openDat(_fs, filename, _lvlFile)) {
-		loadLvlData(_lvlFile, filename);
+		loadLvlData(_lvlFile);
 	} else {
 		error("Unable to open '%s'", filename);
 	}
@@ -240,7 +244,7 @@ void Resource::loadLevelData(int levelNum) {
 	closeDat(_fs, _mstFile);
 	snprintf(filename, sizeof(filename), "%s_HOD.MST", levelName);
 	if (openDat(_fs, filename, _mstFile)) {
-		loadMstData(_mstFile, filename);
+		loadMstData(_mstFile);
 	} else {
 		warning("Unable to open '%s'", filename);
 		memset(&_mstHdr, 0, sizeof(_mstHdr));
@@ -249,7 +253,7 @@ void Resource::loadLevelData(int levelNum) {
 	closeDat(_fs, _sssFile);
 	snprintf(filename, sizeof(filename), "%s_HOD.SSS", levelName);
 	if (openDat(_fs, filename, _sssFile)) {
-		loadSssData(_sssFile, filename);
+		loadSssData(_sssFile);
 	} else {
 		warning("Unable to open '%s'", filename);
 		memset(&_sssHdr, 0, sizeof(_sssHdr));
@@ -450,7 +454,7 @@ void Resource::loadLvlScreenMaskData() {
 
 static const uint32_t _lvlTag = 0x484F4400; // 'HOD\x00'
 
-void Resource::loadLvlData(File *fp, const char *name) {
+void Resource::loadLvlData(File *fp) {
 
 	assert(fp == _lvlFile);
 
@@ -635,7 +639,7 @@ const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const
 	return dat->coordsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
 }
 
-void Resource::loadSssData(File *fp, const char *name) {
+void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 
 	assert(fp == _sssFile || fp == _datFile);
 
@@ -678,7 +682,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 	debug(kDebug_RESOURCE, "bufferSize %d", bufferSize);
 
 	// fp->flush();
-	fp->seek(2048, SEEK_SET); // align to the next sector
+	fp->seek(baseOffset + 2048, SEEK_SET); // align to the next sector
 
 	// _sssBuffer1
 	int bytesRead = 0;
@@ -819,6 +823,7 @@ void Resource::loadSssData(File *fp, const char *name) {
 
 	_sssPcmTable.allocate(_sssHdr.pcmCount);
 // 429AB8
+	uint32_t sssPcmOffset = baseOffset;
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 		_sssPcmTable[i].ptr = 0; fp->readUint32();
 		_sssPcmTable[i].offset = fp->readUint32();
@@ -830,6 +835,11 @@ void Resource::loadSssData(File *fp, const char *name) {
 		if (_sssPcmTable[i].totalSize != 0) {
 			assert((_sssPcmTable[i].totalSize % _sssPcmTable[i].strideSize) == 0);
 			assert(_sssPcmTable[i].totalSize == _sssPcmTable[i].strideSize * _sssPcmTable[i].strideCount);
+			if (sssPcmOffset != 0) {
+				assert(_sssPcmTable[i].offset == 0x2800); // .dat
+				_sssPcmTable[i].offset += sssPcmOffset;
+				sssPcmOffset += _sssPcmTable[i].totalSize;
+			}
 		}
 		bytesRead += 20;
 	}
@@ -1015,7 +1025,7 @@ void Resource::resetSssFilters() {
 	}
 }
 
-void Resource::loadMstData(File *fp, const char *name) {
+void Resource::loadMstData(File *fp) {
 	assert(fp == _mstFile);
 
 	if (_mstHdr.dataSize != 0) {
