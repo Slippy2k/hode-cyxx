@@ -166,8 +166,8 @@ struct Game {
 	uint16_t _mstOp68_flags1;
 	int _mstOp68_x1, _mstOp68_x2, _mstOp68_y1, _mstOp68_y2;
 	uint8_t _mstOp68_screenNum;
-	uint32_t _mstHelper1TestValue;
-	uint32_t _mstHelper1TestMask;
+	uint32_t _mstLevelSwitchesMask;
+	uint32_t _mstLevelSwitchesTestMask;
 	int _runTaskOpcodesCount;
 	int32_t _mstVars[kMaxVars];
 	uint32_t _mstFlags;

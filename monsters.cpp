@@ -877,8 +877,8 @@ void Game::resetMstCode() {
 	_mstOp68_y1 = 0;
 	_mstOp68_y2 = 0;
 	_mstOp68_screenNum = 255;
-	_mstHelper1TestValue = 0;
-	_mstHelper1TestMask = 0xFFFFFFFF;
+	_mstLevelSwitchesMask = 0;
+	_mstLevelSwitchesTestMask = 0xFFFFFFFF;
 	_mstAndyVarMask = 0;
 	_tasksList = 0;
 	_monsterObjects1TasksList = 0;
@@ -1014,10 +1014,10 @@ void Game::executeMstCode() {
 		return;
 	}
 	++_executeMstLogicCounter;
-	if ((_mstHelper1TestValue & _mstHelper1TestMask) != 0) {
+	if ((_mstLevelSwitchesMask & _mstLevelSwitchesTestMask) != 0) {
 		_mstHelper1Count = 0;
 		executeMstCodeHelper1();
-		_mstHelper1TestValue = 0;
+		_mstLevelSwitchesMask = 0;
 	}
 	for (int i = 0; i < kMaxAndyShoots; ++i) {
 		_andyShootsTable[i].shootObjectData = 0;
@@ -1219,7 +1219,7 @@ int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode
 void Game::executeMstCodeHelper1() {
 	for (int i = 0; i < _res->_mstHdr.walkPathDataCount; ++i) {
 		MstWalkPath *walkPath = &_res->_mstWalkPathData[i];
-		if (walkPath->mask & _mstHelper1TestValue) {
+		if (walkPath->mask & _mstLevelSwitchesMask) {
 			++_mstHelper1Count;
 			for (uint32_t j = 0; j < walkPath->count; ++j) {
 				for (int k = 0; k < 2; ++k) {
