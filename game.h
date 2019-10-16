@@ -414,9 +414,9 @@ struct Game {
 	void mstUpdateMonster1ObjectsPosition();
 	void mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint8_t mask1, uint8_t mask2);
 	void mstMonster1UpdateGoalPosition(MonsterObject1 *m);
-	void mstSetVerticalHorizontalBounds(MonsterObject1 *m);
+	void mstMonster1MoveTowardsGoal1(MonsterObject1 *m);
 	bool mstMonster1TestGoalDirection(MonsterObject1 *m);
-	void mstMonster1UpdateLevelBounds(MonsterObject1 *m);
+	void mstMonster1MoveTowardsGoal2(MonsterObject1 *m);
 	int mstTaskStopMonster1(Task *t, MonsterObject1 *m);
 	int mstTaskUpdatePositionActionDirection(Task *t, MonsterObject1 *m);
 	int mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, int x, int y);
@@ -448,7 +448,7 @@ struct Game {
 	void mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags);
 	void mstTaskResetMonster1WalkPath(Task *t);
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
-	void mstSetHorizontalBounds(MonsterObject1 *m);
+	void mstMonster1SetGoalHorizontal(MonsterObject1 *m);
 	void mstResetCollisionTable();
 	void mstTaskRestart(Task *t);
 	bool mstMonster1CheckLevelBounds(MonsterObject1 *m, int x, int y, uint8_t dir);
