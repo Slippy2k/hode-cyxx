@@ -359,8 +359,8 @@ struct Game {
 	void updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r);
 	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
 	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
-	int updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim);
-	void updateScreenMaskLar(uint8_t *p, bool flag);
+	int updateLevelTick_lar_helper3(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim);
+	void updateScreenMaskLar(uint8_t *p, uint8_t flag);
 	int clipAndyLvlObjectLar(BoundingBox *b, bool flag);
 	void resetWormHoleSprites();
 	void updateWormHoleSprites();

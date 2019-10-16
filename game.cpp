@@ -4300,6 +4300,7 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 			continue;
 		}
 		if (!((o->spriteNum >= 11 && o->spriteNum <= 13) || o->spriteNum == 16)) {
+			// not a spectre
 			continue;
 		}
 		BoundingBox b;
@@ -4388,11 +4389,11 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 				int _bl, i;
 				if (_al < 0) {
 					i = (-_al) * 6;
-					updateScreenMaskLar(&_lar1_unkData1[i], false);
+					updateScreenMaskLar(&_lar1_unkData1[i], 0);
 					_bl = 5;
 				} else {
 					i = _al * 6;
-					updateScreenMaskLar(&_lar1_unkData1[i], true);
+					updateScreenMaskLar(&_lar1_unkData1[i], 1);
 					_bl = 2;
 				}
 				LvlObject *o = findLvlObject2(0, _lar1_unkData1[i + 5], _lar1_unkData1[i + 4]);
@@ -4447,52 +4448,52 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 	return ret;
 }
 
-int Game::updateLevelTick_lar_helper3(bool flag, int dataNum, int screenNum, int boxNum, int anim) {
+int Game::updateLevelTick_lar_helper3(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim) {
 	uint8_t _al = (_andyObject->flags0 >> 5) & 7;
 	uint8_t _cl = (_andyObject->flags0 & 0x1F);
-	uint8_t _bl = 0;
-	if (dataNum >= 0) {
+	int ret = 0; // _bl
+	if ((dataNum & 0x80) == 0) {
 		BoundingBox *box;
 		if (_currentLevel == kLvl_lar2) {
 			box = &Game::_lar2_bboxData[boxNum];
 		} else {
 			box = &Game::_lar1_bboxData[boxNum];
 		}
-		int dy = box->y2 - box->y1;
-		int dx = box->x2 - box->x1;
+		const int dy = box->y2 - box->y1;
+		const int dx = box->x2 - box->x1;
 		if (dx >= dy) {
-			_bl = 1;
+			ret = 0;
 		} else {
-			uint8_t _dl = ((_andyObject->flags1) >> 4) & 3;
+			const uint8_t _dl = ((_andyObject->flags1) >> 4) & 3;
 			if (anim != _dl) {
 				return 0;
 			}
 			if (_cl == 3 || _cl == 5 || _cl == 2 || _al == 2 || _cl == 0 || _al == 7) {
-				_bl = 1;
+				ret = 1;
 			} else {
-				setAndySpecialAnimation(anim);
+				setAndySpecialAnimation(3);
 			}
 		}
 	} else {
 // 406736
-		_bl = 1;
+		ret = 1;
 	}
 // 406738
-	if (_bl) {
+	if (ret) {
 		if (!flag) {
-			_bl = _andyObject->anim == 224;
+			ret = (_andyObject->anim == 224) ? 1 : 0;
 		}
-		if (_bl) {
+		if (ret) {
 			LvlObject *o = findLvlObject(0, dataNum, screenNum);
 			if (o) {
 				o->objectUpdateType = 7;
 			}
 		}
 	}
-	return _bl;
+	return ret;
 }
 
-void Game::updateScreenMaskLar(uint8_t *p, bool flag) {
+void Game::updateScreenMaskLar(uint8_t *p, uint8_t flag) {
 	if (p[1] != flag) {
 		p[1] = flag;
 		const uint8_t screenNum = p[4];
@@ -4572,9 +4573,9 @@ void Game::updateWormHoleSprites() {
 				if (_al != 0 && _spritesListNextPtr != 0) {
 					const int xPos = spr->xPos + xOffset + 12;
 					const int yPos = spr->yPos + yOffset + 16;
-					if (xPos >= spr->rect1_x1 && xPos <= spr->rect1_x2 && yPos >= spr->rect1_y1 && yPos <= spr->rect1_y2) {
+					if (rect_contains(spr->rect1_x1, spr->rect1_y1, spr->rect1_x2, spr->rect1_y2, xPos, yPos)) {
 						_al += 3;
-					} else if (xPos >= spr->rect2_x1 && xPos <= spr->rect2_x2 && yPos >= spr->rect2_y1 && yPos <= spr->rect2_y2) {
+					} else if (rect_contains(spr->rect2_x1, spr->rect2_y1, spr->rect2_x2, spr->rect2_y2, xPos, yPos)) {
 						_al += 6;
 					}
 					tmp.anim = _al;
