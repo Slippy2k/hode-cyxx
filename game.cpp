@@ -4586,8 +4586,8 @@ void Game::updateWormHoleSprites() {
 					}
 					if (READ_LE_UINT16(tmp.bitmapBits) != 8) {
 						Sprite *spr = _spritesListNextPtr;
-						spr->xPos = xPos;
-						spr->yPos = yPos;
+						spr->xPos = tmp.xPos;
+						spr->yPos = tmp.yPos;
 						spr->bitmapBits = tmp.bitmapBits;
 						spr->num = tmp.flags2 & 0x3FFF;
 						const int index = spr->num & 0x1F;
