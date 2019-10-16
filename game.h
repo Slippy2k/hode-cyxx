@@ -80,8 +80,8 @@ struct Game {
 	static const uint8_t _lar1_spritesData[];
 	static const int16_t *_lar_screenMaskOffsets[];
 	static uint8_t _lar1_unkData1[];
-	static uint8_t _lar1_pinkSwitchesData[];
-	static uint8_t _lar2_unkData0[];
+	static uint8_t _lar1_switchesData[];
+	static uint8_t _lar2_switchesData[];
 	static BoundingBox _lar1_bboxData[];
 	static BoundingBox _lar2_bboxData[];
 

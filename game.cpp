@@ -4319,9 +4319,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 				continue;
 			}
 			if (_currentLevel == kLvl_lar2) {
-				_edi = &Game::_lar2_unkData0[p[3] * 4];
+				_edi = &Game::_lar2_switchesData[p[3] * 4];
 			} else {
-				_edi = &Game::_lar1_pinkSwitchesData[p[3] * 4];
+				_edi = &Game::_lar1_switchesData[p[3] * 4];
 			}
 			uint8_t _al = (p[1] >> 1) & 1;
 			uint8_t _bl = (_edi[0] >> 4);
@@ -4339,9 +4339,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 				if (_currentLevel == kLvl_lar2) {
-					_edi = &Game::_lar2_unkData0[p[3] * 4];
+					_edi = &Game::_lar2_switchesData[p[3] * 4];
 				} else {
-					_edi = &Game::_lar1_pinkSwitchesData[p[3] * 4];
+					_edi = &Game::_lar1_switchesData[p[3] * 4];
 				}
 				uint8_t _al = ((~p[1]) >> 1) & 1;
 				uint8_t _bl = (_edi[0] >> 4);
@@ -4406,9 +4406,9 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 			_al = (_al >> 1) & 1;
 			uint8_t *_esi;
 			if (_currentLevel == kLvl_lar2) {
-				_esi = &Game::_lar2_unkData0[p[3] * 4];
+				_esi = &Game::_lar2_switchesData[p[3] * 4];
 			} else {
-				_esi = &Game::_lar1_pinkSwitchesData[p[3] * 4];
+				_esi = &Game::_lar1_switchesData[p[3] * 4];
 			}
 			uint8_t _dl = _esi[0];
 			uint8_t _bl = _dl >> 4;
@@ -4427,9 +4427,9 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 // 406A0D
 	if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 		if (_currentLevel == kLvl_lar2) {
-			p = &Game::_lar2_unkData0[p[3] * 4];
+			p = &Game::_lar2_switchesData[p[3] * 4];
 		} else {
-			p = &Game::_lar1_pinkSwitchesData[p[3] * 4];
+			p = &Game::_lar1_switchesData[p[3] * 4];
 		}
 		uint8_t _al = ((~p[1]) >> 1) & 1;
 		uint8_t _cl = (p[1] >> 5) & 1;
