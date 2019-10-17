@@ -37,7 +37,7 @@ struct Level_lar2: Level {
 	virtual void postScreenUpdate(int screenNum);
 	virtual void setupLvlObjects(int screenNum);
 
-	bool postScreenUpdate_lar2_screen2_helper(BoundingBox *b);
+	bool postScreenUpdate_lar2_screen2_updateGateSwitches(BoundingBox *b);
 
 	void postScreenUpdate_lar2_screen2();
 	void postScreenUpdate_lar2_screen3();
@@ -105,13 +105,13 @@ static uint8_t _lar2_unkData3[13 * 4] = {
 	0x0D, 0x07, 0xFF, 0x09
 };
 
-bool Level_lar2::postScreenUpdate_lar2_screen2_helper(BoundingBox *b) {
+bool Level_lar2::postScreenUpdate_lar2_screen2_updateGateSwitches(BoundingBox *b) {
 	bool ret = false;
 	BoundingBox b1 = { 121, 158, 131, 162 };
 	if (_g->clipBoundingBox(&b1, b)) {
 		ret = true;
 		Game::_lar2_gatesData[0] &= 0xF;
-		LvlObject *o = _g->findLvlObject(0, 0, 2);
+		LvlObject *o = _g->findLvlObject2(0, 0, 2);
 		if (o) {
 			o->objectUpdateType = 7;
 		}
@@ -120,7 +120,7 @@ bool Level_lar2::postScreenUpdate_lar2_screen2_helper(BoundingBox *b) {
 	if (_g->clipBoundingBox(&b2, b)) {
 		ret = true;
 		Game::_lar2_gatesData[0] &= 0xF;
-		LvlObject *o = _g->findLvlObject(0, 0, 2);
+		LvlObject *o = _g->findLvlObject2(0, 1, 2);
 		if (o) {
 			o->objectUpdateType = 7;
 		}
@@ -129,7 +129,7 @@ bool Level_lar2::postScreenUpdate_lar2_screen2_helper(BoundingBox *b) {
 	if (_g->clipBoundingBox(&b3, b)) {
 		ret = true;
 		Game::_lar2_gatesData[0] &= 0xF;
-		LvlObject *o = _g->findLvlObject(0, 0, 2);
+		LvlObject *o = _g->findLvlObject2(0, 2, 2);
 		if (o) {
 			o->objectUpdateType = 7;
 		}
@@ -149,13 +149,13 @@ void Level_lar2::postScreenUpdate_lar2_screen2() {
 				b.y1 = o->yPos;
 				b.x2 = o->xPos + o->width  - 1;
 				b.y2 = o->yPos + o->height - 1;
-				if (postScreenUpdate_lar2_screen2_helper(&b)) {
+				if (postScreenUpdate_lar2_screen2_updateGateSwitches(&b)) {
 					ret = true;
 				}
 			}
 		}
 		AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-		if (postScreenUpdate_lar2_screen2_helper(&data->boundingBox) == 0) {
+		if (postScreenUpdate_lar2_screen2_updateGateSwitches(&data->boundingBox) == 0) {
 			BoundingBox b = { 107, 77, 117, 81 };
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				LvlObject *o = _g->findLvlObject2(0, 3, 2);
@@ -415,7 +415,7 @@ void Level_lar2::preScreenUpdate_lar2_screen4() {
 void Level_lar2::preScreenUpdate_lar2_screen5() {
 	if (_res->_currentScreenResourceNum == 5) {
 		if (_checkpoint == 7) {
-			Game::_lar2_gatesData[0xC] = (Game::_lar2_gatesData[4] & 0xF) | 0x10;
+			Game::_lar2_gatesData[0xC] = (Game::_lar2_gatesData[0xC] & 0xF) | 0x10;
 		} else if (_checkpoint >= 3) {
 			Game::_lar2_gatesData[0xC] &= 0xF;
 		}
