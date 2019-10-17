@@ -185,9 +185,9 @@ void Level_lar2::postScreenUpdate_lar2_screen4() {
 			_g->_currentLevelCheckpoint = _checkpoint;
 			_g->updateScreen(_andyObject->screenNum);
 		}
-		LvlObject *o = _g->findLvlObject(2, 0, 4);
-		_g->updateGatesLar(o, Game::_lar2_gatesData + 8, 2);
 	}
+	LvlObject *o = _g->findLvlObject(2, 0, 4);
+	_g->updateGatesLar(o, Game::_lar2_gatesData + 8, 2);
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen5() {
@@ -200,7 +200,7 @@ void Level_lar2::postScreenUpdate_lar2_screen5() {
 
 void Level_lar2::postScreenUpdate_lar2_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
-		if (_checkpoint != 3) {
+		if (_checkpoint == 7) {
 			if (!_paf->_skipCutscenes) {
 				if (_g->_currentLevelCheckpoint == 6) {
 					_paf->play(17);
@@ -210,7 +210,7 @@ void Level_lar2::postScreenUpdate_lar2_screen6() {
 					_g->updateScreen(_andyObject->screenNum);
 				}
 			}
-		} else {
+		} else if (_checkpoint == 3) {
 			if (!_paf->_skipCutscenes) {
 				if (_res->_screensState[6].s0 != 0) {
 					_paf->play(15);
