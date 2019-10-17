@@ -12,7 +12,7 @@ enum {
 
 static const bool kLimitSounds = false; // limit the number of active playing sounds
 
-static const bool kCheckLinkedListForDuplicates = true; // old workaround for duplicates, corrupting lists
+static const bool kCheckLinkedListForDuplicates = false; // old workaround for duplicates, corrupting lists
 
 // if x < 90, lut[x] ~= x / 2
 // if x > 90, lut[x] ~= 45 + (x - 90) * 2
