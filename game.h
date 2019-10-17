@@ -80,8 +80,8 @@ struct Game {
 	static const uint8_t _lar1_spritesData[];
 	static const int16_t *_lar_screenMaskOffsets[];
 	static uint8_t _lar1_unkData1[];
-	static uint8_t _lar1_switchesData[];
-	static uint8_t _lar2_switchesData[];
+	static uint8_t _lar1_gatesData[];
+	static uint8_t _lar2_gatesData[];
 	static BoundingBox _lar1_bboxData[];
 	static BoundingBox _lar2_bboxData[];
 
@@ -166,8 +166,7 @@ struct Game {
 	uint16_t _mstOp68_flags1;
 	int _mstOp68_x1, _mstOp68_x2, _mstOp68_y1, _mstOp68_y2;
 	uint8_t _mstOp68_screenNum;
-	uint32_t _mstLevelSwitchesMask;
-	uint32_t _mstLevelSwitchesTestMask;
+	uint32_t _mstLevelGatesMask;
 	int _runTaskOpcodesCount;
 	int32_t _mstVars[kMaxVars];
 	uint32_t _mstFlags;
@@ -356,12 +355,12 @@ struct Game {
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void setLavaAndyAnimation(int yPos);
-	void updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r);
-	void updateLevelTick_lar_helper1(int num, uint8_t *p1, BoundingBox *r);
-	int updateLevelTick_lar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
-	int updateLevelTick_lar_helper3(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim);
+	void updateSwitchesLar(int count, uint8_t *data, BoundingBox *r);
+	void updateSwitchesLar_helper1(int num, uint8_t *p1, BoundingBox *r);
+	int updateSwitchesLar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
+	int updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim);
 	void updateScreenMaskLar(uint8_t *p, uint8_t flag);
-	int clipAndyLvlObjectLar(BoundingBox *b, bool flag);
+	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
 	void resetWormHoleSprites();
 	void updateWormHoleSprites();
 	void captureScreenshot();
@@ -376,7 +375,7 @@ struct Game {
 	int objectUpdate_rock_case4(LvlObject *o);
 
 	// level7_lar1.cpp
-	void postScreenUpdate_lar1_helper(LvlObject *o, uint8_t *p, int num);
+	void updateGatesLar(LvlObject *o, uint8_t *p, int num);
 
 	// monsters.cpp
 	void mstMonster1ResetData(MonsterObject1 *m);

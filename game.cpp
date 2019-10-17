@@ -4269,31 +4269,31 @@ void Game::setLavaAndyAnimation(int yPos) {
 	}
 }
 
-void Game::updateLevelTick_lar(int count, uint8_t *p1, BoundingBox *r) {
+void Game::updateSwitchesLar(int count, uint8_t *switchesData, BoundingBox *r) {
 	for (int i = 0; i < count; ++i) {
-		p1[i * 4 + 1] &= ~0x40;
+		switchesData[i * 4 + 1] &= ~0x40;
 	}
 	for (int i = 0; i < count; ++i) {
-		if (_andyObject->screenNum == p1[i * 4]) {
-			if ((p1[i * 4 + 1] & 0x10) == 0x10) {
-				updateLevelTick_lar_helper1(i, &p1[i * 4], &r[i]);
+		if (_andyObject->screenNum == switchesData[i * 4]) {
+			if ((switchesData[i * 4 + 1] & 0x10) == 0x10) { // can be actioned by a spectre
+				updateSwitchesLar_helper1(i, &switchesData[i * 4], &r[i]);
 			}
 			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			updateLevelTick_lar_helper2(i, &p1[i * 4], &data->boundingBox, &r[i]);
+			updateSwitchesLar_helper2(i, &switchesData[i * 4], &data->boundingBox, &r[i]);
 		}
 	}
 	for (int i = 0; i < count; ++i) {
-		uint8_t _al = p1[i * 4 + 1];
-		uint8_t _dl = _al & 0x40;
+		const uint8_t _al = switchesData[i * 4 + 1];
+		const uint8_t _dl = _al & 0x40;
 		if (_dl == 0 && (_al & 0x80) == 0) {
-			p1[i * 4 + 1] |= 0x80;
+			switchesData[i * 4 + 1] |= 0x80;
 		} else if (_dl != 0 && (_al & 4) != 0) {
-			p1[i * 4 + 1] &= ~1;
+			switchesData[i * 4 + 1] &= ~1;
 		}
 	}
 }
 
-void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
+void Game::updateSwitchesLar_helper1(int num, uint8_t *p, BoundingBox *r) {
 	bool found = false;
 	for (LvlObject *o = _lvlObjectsList1; o && !found; o = o->nextPtr) {
 		if (o->screenNum != p[0]) {
@@ -4312,7 +4312,7 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 		if ((p[1] & 0x40) == 0 && clipBoundingBox(r, &b)) {
 			found = true;
 // 406B66
-			if ((p[2] & 0x80) == 0 && !updateLevelTick_lar_helper3(true, p[2], p[0], num, (p[1] >> 5) & 1)) {
+			if ((p[2] & 0x80) == 0 && !updateSwitchesLar_toggle(true, p[2], p[0], num, (p[1] >> 5) & 1)) {
 				continue;
 			}
 			p[1] |= 0x40;
@@ -4320,9 +4320,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 				continue;
 			}
 			if (_currentLevel == kLvl_lar2) {
-				_edi = &Game::_lar2_switchesData[p[3] * 4];
+				_edi = &Game::_lar2_gatesData[p[3] * 4];
 			} else {
-				_edi = &Game::_lar1_switchesData[p[3] * 4];
+				_edi = &Game::_lar1_gatesData[p[3] * 4];
 			}
 			uint8_t _al = (p[1] >> 1) & 1;
 			uint8_t _bl = (_edi[0] >> 4);
@@ -4340,9 +4340,9 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 				if (_currentLevel == kLvl_lar2) {
-					_edi = &Game::_lar2_switchesData[p[3] * 4];
+					_edi = &Game::_lar2_gatesData[p[3] * 4];
 				} else {
-					_edi = &Game::_lar1_switchesData[p[3] * 4];
+					_edi = &Game::_lar1_gatesData[p[3] * 4];
 				}
 				uint8_t _al = ((~p[1]) >> 1) & 1;
 				uint8_t _bl = (_edi[0] >> 4);
@@ -4361,19 +4361,19 @@ void Game::updateLevelTick_lar_helper1(int num, uint8_t *p, BoundingBox *r) {
 	}
 }
 
-int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, BoundingBox *b2) {
+int Game::updateSwitchesLar_helper2(int num, uint8_t *p, BoundingBox *b1, BoundingBox *b2) {
 	int ret = 0;
 	//const uint8_t flags = _andyObject->flags0 & 0x1F;
 	if ((p[1] & 0x40) == 0) {
 		ret = clipBoundingBox(b1, b2);
 		if (ret) {
-			if ((p[1] & 1) == 0) {
+			if ((p[1] & 1) == 0) { // switch already actioned
 				return ret;
 			}
 // 4068A4
 			const int flag = (p[1] >> 5) & 1;
-			uint8_t _al = clipAndyLvlObjectLar(b2, flag);
-			_al = updateLevelTick_lar_helper3(_al, p[2], p[0], num, flag);
+			uint8_t _al = clipAndyLvlObjectLar(b1, b2, flag);
+			_al = updateSwitchesLar_toggle(_al, p[2], p[0], num, flag);
 			p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
 			_al = p[1];
 			if ((_al & 0x40) == 0) {
@@ -4407,9 +4407,9 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 			_al = (_al >> 1) & 1;
 			uint8_t *_esi;
 			if (_currentLevel == kLvl_lar2) {
-				_esi = &Game::_lar2_switchesData[p[3] * 4];
+				_esi = &Game::_lar2_gatesData[p[3] * 4];
 			} else {
-				_esi = &Game::_lar1_switchesData[p[3] * 4];
+				_esi = &Game::_lar1_gatesData[p[3] * 4];
 			}
 			uint8_t _dl = _esi[0];
 			uint8_t _bl = _dl >> 4;
@@ -4417,7 +4417,7 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 				return ret;
 			}
 			_bl = (_al << 4) | (_dl & 15);
-			*_esi = _bl;
+			_esi[0] = _bl;
 			if (_cl != 1 || _al != _cl) {
 				return ret;
 			}
@@ -4428,9 +4428,9 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 // 406A0D
 	if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 		if (_currentLevel == kLvl_lar2) {
-			p = &Game::_lar2_switchesData[p[3] * 4];
+			p = &Game::_lar2_gatesData[p[3] * 4];
 		} else {
-			p = &Game::_lar1_switchesData[p[3] * 4];
+			p = &Game::_lar1_gatesData[p[3] * 4];
 		}
 		uint8_t _al = ((~p[1]) >> 1) & 1;
 		uint8_t _cl = (p[1] >> 5) & 1;
@@ -4448,7 +4448,7 @@ int Game::updateLevelTick_lar_helper2(int num, uint8_t *p, BoundingBox *b1, Boun
 	return ret;
 }
 
-int Game::updateLevelTick_lar_helper3(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim) {
+int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim) {
 	uint8_t _al = (_andyObject->flags0 >> 5) & 7;
 	uint8_t _cl = (_andyObject->flags0 & 0x1F);
 	int ret = 0; // _bl
@@ -4517,7 +4517,7 @@ void Game::updateScreenMaskLar(uint8_t *p, uint8_t flag) {
 	}
 }
 
-int Game::clipAndyLvlObjectLar(BoundingBox *b, bool flag) {
+int Game::clipAndyLvlObjectLar(BoundingBox *a /* unused */, BoundingBox *b, bool flag) {
 	int ret = 0;
 	const uint8_t flags = _andyObject->flags0 & 0x1F;
 	if (flags != 3 && flags != 5 && !flag) {
