@@ -151,3 +151,16 @@ void fioDumpData(const char *filename, const uint8_t *data, int size) {
 		fclose(fp);
 	}
 }
+
+int fioReadData(const char *filename, uint8_t *buf, int size) {
+	FILE *fp = fopen(filename, "rb");
+	if (fp) {
+		const int count = fread(buf, 1, size, fp);
+		if (count != size) {
+			warning("Failed to read %d bytes, count %d", size, count);
+		}
+		fclose(fp);
+		return count;
+	}
+	return 0;
+}

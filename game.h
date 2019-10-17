@@ -60,6 +60,9 @@ struct Game {
 		kDefaultSoundPanning = 64,
 		kDefaultSoundVolume = 128,
 
+		kSetupCfgPlayerDataSize = 52,
+		kSetupCfgSize = kSetupCfgPlayerDataSize * 4 + 4,
+
 		kFrameTimeStamp = 50 // original is 80ms (12.5hz)
 	};
 
@@ -94,8 +97,10 @@ struct Game {
 	System *_system;
 	uint32_t _cheats;
 	int _frameMs;
-
 	int _difficulty;
+
+	uint8_t _setupCfgBuffer[kSetupCfgSize];
+
 	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen
 	LvlObject *_andyObject;
 	LvlObject *_plasmaExplosionObject;
@@ -363,6 +368,8 @@ struct Game {
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
 	void resetWormHoleSprites();
 	void updateWormHoleSprites();
+	bool loadSetupCfg();
+	void saveSetupCfg();
 	void captureScreenshot();
 
 	// level1_rock.cpp

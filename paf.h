@@ -90,6 +90,7 @@ struct PafPlayer {
 	uint32_t _audioBufferOffsetWr;
 	PafAudioQueue *_audioQueue, *_audioQueueTail;
 	uint32_t _flushAudioSize;
+	uint32_t _playedMask;
 
 	PafPlayer(System *system, FileSystem *fs);
 	~PafPlayer();

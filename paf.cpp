@@ -44,6 +44,7 @@ PafPlayer::PafPlayer(System *system, FileSystem *fs)
 	_demuxAudioFrameBlocks = 0;
 	_demuxVideoFrameBlocks = 0;
 	_audioQueue = _audioQueueTail = 0;
+	_playedMask = 0;
 }
 
 PafPlayer::~PafPlayer() {
@@ -88,6 +89,7 @@ void PafPlayer::play(int num) {
 		preload(num);
 	}
 	if (_videoNum == num) {
+		_playedMask |= 1 << num;
 		mainLoop();
 	}
 }

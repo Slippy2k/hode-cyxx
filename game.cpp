@@ -13,6 +13,9 @@
 #include "util.h"
 #include "video.h"
 
+// menu settings and player progress
+static const char *_setupCfg = "setup.cfg";
+
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
@@ -4602,6 +4605,44 @@ void Game::updateWormHoleSprites() {
 		yOffset += 32;
 	}
 	_res->decLvlSpriteDataRefCounter(&tmp);
+}
+
+bool Game::loadSetupCfg() {
+	const int count = fioReadData(_setupCfg, _setupCfgBuffer, kSetupCfgSize);
+	if (count == kSetupCfgSize) {
+		uint8_t checksum = 0;
+		for (int i = 0; i < kSetupCfgSize - 2; ++i) {
+			checksum ^= _setupCfgBuffer[i];
+		}
+		if (checksum == _setupCfgBuffer[kSetupCfgSize - 1]) {
+			return true;
+		}
+		warning("Invalid checksum 0x%x for '%s'", checksum, _setupCfg);
+	}
+	memset(_setupCfgBuffer, 0, sizeof(_setupCfgBuffer));
+	return false;
+}
+
+void Game::saveSetupCfg() {
+	// save in player #0 data
+	if (_currentScreen > _setupCfgBuffer[_currentLevel]) {
+		_setupCfgBuffer[_currentLevel] = _currentScreen;
+	}
+	_setupCfgBuffer[10] = _currentLevel;
+	_setupCfgBuffer[11] = _currentScreen;
+	WRITE_LE_UINT32(_setupCfgBuffer + 12, _paf->_playedMask);
+	_setupCfgBuffer[48] = _difficulty;
+	_setupCfgBuffer[50] = _snd_masterVolume;
+	if (_currentLevel > _setupCfgBuffer[51]) {
+		_setupCfgBuffer[51] = _currentLevel;
+	}
+	uint8_t checksum = 0;
+	for (int i = 0; i < kSetupCfgSize - 2; ++i) {
+		checksum ^= _setupCfgBuffer[i];
+	}
+	_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
+
+	fioDumpData(_setupCfg, _setupCfgBuffer, kSetupCfgSize);
 }
 
 void Game::captureScreenshot() {

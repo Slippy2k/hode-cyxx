@@ -193,6 +193,7 @@ int main(int argc, char *argv[]) {
 		m->mainLoop();
 		delete m;
 	} else {
+		g->loadSetupCfg();
 		bool levelChanged = false;
 		do {
 			g->mainLoop(level, checkpoint, levelChanged);
@@ -200,6 +201,7 @@ int main(int argc, char *argv[]) {
 			checkpoint = 0;
 			levelChanged = true;
 		} while (!_system->inp.quit && level < kLvl_test);
+		g->saveSetupCfg();
 	}
 	_system->stopAudio();
 	g->_mix.fini();
