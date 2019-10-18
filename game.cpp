@@ -4625,8 +4625,8 @@ bool Game::loadSetupCfg() {
 
 void Game::saveSetupCfg() {
 	// save in player #0 data
-	if (_currentScreen > _setupCfgBuffer[_currentLevel]) {
-		_setupCfgBuffer[_currentLevel] = _currentScreen;
+	if (_currentLevelCheckpoint > _setupCfgBuffer[_currentLevel]) {
+		_setupCfgBuffer[_currentLevel] = _currentLevelCheckpoint;
 	}
 	_setupCfgBuffer[10] = _currentLevel;
 	_setupCfgBuffer[11] = _currentScreen;

@@ -123,6 +123,7 @@ int main(int argc, char *argv[]) {
 	char *dataPath = 0;
 	int level = 0;
 	int checkpoint = 0;
+	bool resume = true;
 
 	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND | kDebug_MONSTER;
 	int cheats = 0;
@@ -163,9 +164,11 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
+			resume = false;
 			break;
 		case 3:
 			checkpoint = atoi(optarg);
+			resume = false;
 			break;
 		case 4:
 			g_debugMask |= atoi(optarg);
@@ -193,7 +196,10 @@ int main(int argc, char *argv[]) {
 		m->mainLoop();
 		delete m;
 	} else {
-		g->loadSetupCfg();
+		if (g->loadSetupCfg() && resume) {
+			level = g->_setupCfgBuffer[10];
+			checkpoint = g->_setupCfgBuffer[level];
+		}
 		bool levelChanged = false;
 		do {
 			g->mainLoop(level, checkpoint, levelChanged);
