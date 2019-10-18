@@ -69,8 +69,8 @@ struct Level_lar1: Level {
 	void preScreenUpdate_lar1_screen23();
 	void preScreenUpdate_lar1_screen24();
 
-	void setupScreenCheckpoint_lar1_screen24_helper1();
-	void setupScreenCheckpoint_lar1_screen24_helper2(int num);
+	void setupScreenCheckpoint_lar1_screen24_initGates();
+	void setupScreenCheckpoint_lar1_screen24_initAndy(int num);
 	void setupScreenCheckpoint_lar1_screen24();
 };
 
@@ -112,7 +112,7 @@ BoundingBox Game::_lar1_bboxData[24] = {
 	{  32, 145,  44, 173 }
 };
 
-static uint8_t _lar1_unkData3[24 * 4] = {
+static uint8_t _lar1_switchesData[24 * 4] = {
 	0x04, 0x07, 0x01, 0x00, 0x05, 0x01, 0x01, 0x01, 0x08, 0x0F, 0x02, 0x00, 0x08, 0x07, 0x03, 0x04,
 	0x08, 0x07, 0xFF, 0x05, 0x08, 0x07, 0x04, 0x04, 0x09, 0x27, 0xFF, 0x06, 0x09, 0x29, 0x03, 0x02,
 	0x09, 0x29, 0xFF, 0x03, 0x09, 0x29, 0xFF, 0x04, 0x0A, 0x0B, 0x04, 0x02, 0x0A, 0x0B, 0xFF, 0x03,
@@ -127,7 +127,7 @@ static const uint8_t _lar1_setupScreen24Data[8 * 3] = {
 };
 
 static void setLvlObjectUpdateType3_lar1(Game *g, int screenNum) {
-	const uint8_t *p = Game::_lar1_unkData1;
+	const uint8_t *p = Game::_lar1_maskData;
 	for (int i = 0; i < 15; ++i) {
 		if (p[4] == screenNum && p[1] == 1) {
 			LvlObject *o = g->findLvlObject2(0, p[5], p[4]);
@@ -434,15 +434,15 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 0);
+							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 0);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 1);
+							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 1);
 							_bl = 2;
 						}
 // 40751B
-						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[_al + 5], Game::_lar1_unkData1[_al + 4]);
+						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_maskData[_al + 5], Game::_lar1_maskData[_al + 4]);
 						if (o) {
 							o->objectUpdateType = _bl;
 						}
@@ -452,14 +452,14 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 0);
+							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 0);
 							_bl = 5;
 						} else {
 							_al *= 6;
-							_g->updateScreenMaskLar(Game::_lar1_unkData1 + _al, 1);
+							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 1);
 							_bl = 2;
 						}
-						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[_al + 5], Game::_lar1_unkData1[_al + 4]);
+						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_maskData[_al + 5], Game::_lar1_maskData[_al + 4]);
 						if (o) {
 							o->objectUpdateType = _bl;
 						}
@@ -563,14 +563,14 @@ void Level_lar1::postScreenUpdate_lar1_screen18() {
 	_g->updateGatesLar(o1, &Game::_lar1_gatesData[11  * 4], 11);
 	LvlObject *o2 = _g->findLvlObject(2, 1, 18);
 	_g->updateGatesLar(o2, &Game::_lar1_gatesData[12 * 4], 12);
-	if ((_lar1_unkData3[0x59] & 0x40) == 0 && (_lar1_unkData3[0x59] & 0x80) != 0) {
-		if ((_lar1_unkData3[0x4D] & 1) == 0) {
-			_lar1_unkData3[0x4D] |= 1;
+	if ((_lar1_switchesData[0x59] & 0x40) == 0 && (_lar1_switchesData[0x59] & 0x80) != 0) {
+		if ((_lar1_switchesData[0x4D] & 1) == 0) {
+			_lar1_switchesData[0x4D] |= 1;
 		}
 	}
-	if ((_lar1_unkData3[0x4D] & 0x40) == 0 && (_lar1_unkData3[0x4D] & 0x80) != 0) {
-		if ((_lar1_unkData3[0x59] & 1) == 0) {
-			_lar1_unkData3[0x59] |= 1;
+	if ((_lar1_switchesData[0x4D] & 0x40) == 0 && (_lar1_switchesData[0x4D] & 0x80) != 0) {
+		if ((_lar1_switchesData[0x59] & 1) == 0) {
+			_lar1_switchesData[0x59] |= 1;
 		}
 	}
 }
@@ -588,8 +588,8 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 					_video->clearPalette();
 					++_screenCounterTable[19];
 					_g->updateScreen(_andyObject->screenNum);
-					Game::_lar1_unkData1[0x49] = 0;
-					Game::_lar1_unkData1[0x4F] = 0;
+					Game::_lar1_maskData[12 * 6 + 1] = 0;
+					Game::_lar1_maskData[13 * 6 + 1] = 0;
 				}
 				_andyObject->xPos = 204;
 				_andyObject->yPos = 25;
@@ -954,7 +954,7 @@ void Level_lar1::terminate() {
 }
 
 void Level_lar1::tick() {
-	_g->updateSwitchesLar(24, _lar1_unkData3, Game::_lar1_bboxData);
+	_g->updateSwitchesLar(24, _lar1_switchesData, Game::_lar1_bboxData);
 	_g->updateWormHoleSprites();
 	if (_screenCounterTable[19] != 0) {
 		_g->_plasmaCannonFlags |= 2;
@@ -964,15 +964,17 @@ void Level_lar1::tick() {
 	}
 }
 
-void Level_lar1::setupScreenCheckpoint_lar1_screen24_helper1() {
+void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 	const int num = _checkpoint;
 	for (int i = _lar1_setupScreen24Data[num * 3 + 2]; i < 24; ++i) {
-		_lar1_unkData3[i * 4 + 1] &= ~0x40;
-		_lar1_unkData3[i * 4 + 1] |= 1; // actioned
+		const int offset = i * 4;
+		_lar1_switchesData[offset + 1] &= ~0x40;
+		_lar1_switchesData[offset + 1] |= 1; // actioned
 	}
 	for (int i = _lar1_setupScreen24Data[num * 3 + 2]; i != 0; --i) {
-		_lar1_unkData3[(i - 1) * 4 + 1] &= ~1;
-		_lar1_unkData3[(i - 1) * 4 + 1] |= 0x40;
+		const int offset = (i - 1) * 4;
+		_lar1_switchesData[offset + 1] &= ~1;
+		_lar1_switchesData[offset + 1] |= 0x40;
 	}
 // 452630
 	static const uint8_t data[] = { 0, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -1004,7 +1006,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_helper1() {
 	Game::_lar1_gatesData[3] |= 0x30;
 }
 
-void Level_lar1::setupScreenCheckpoint_lar1_screen24_helper2(int num) {
+void Level_lar1::setupScreenCheckpoint_lar1_screen24_initAndy(int num) {
 // 45279
 	static const uint8_t data1[8 * 6] = {
 		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01,
@@ -1039,23 +1041,26 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_helper2(int num) {
 }
 
 void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
-	setupScreenCheckpoint_lar1_screen24_helper1();
+	setupScreenCheckpoint_lar1_screen24_initGates();
 	const int num = _checkpoint;
-	const int gateIndex = _lar1_setupScreen24Data[num * 3];
-	for (int b = gateIndex; b < 15; ++b) {
-		Game::_lar1_unkData1[b * 6 + 1] = 1;
-		_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 0);
-		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[b * 6 + 5], Game::_lar1_unkData1[b * 6 + 4]);
+	const int maskIndex = _lar1_setupScreen24Data[num * 3];
+	for (int b = maskIndex; b < 15; ++b) {
+		const int offset = b * 6;
+		Game::_lar1_maskData[offset + 1] = 1;
+		_g->updateScreenMaskLar(Game::_lar1_maskData + offset, 0);
+		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_maskData[offset + 5], Game::_lar1_maskData[offset + 4]);
 		if (o) {
 			o->objectUpdateType = 6;
 		}
 	}
 // 408A53
-	for (int b = gateIndex; b != 0; --b) {
+	for (int b = maskIndex; b != 0; --b) {
 // 408B28
-		_g->updateScreenMaskLar(Game::_lar1_unkData1 + (b - 1) * 6, 1);
+		const int offset = (b - 1) * 6;
+		Game::_lar1_maskData[offset + 1] = 0;
+		_g->updateScreenMaskLar(Game::_lar1_maskData + offset, 1);
 // 408BAE
-		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[(b - 1) * 6 + 5], Game::_lar1_unkData1[(b - 1) * 6 + 4]);
+		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_maskData[offset + 5], Game::_lar1_maskData[offset + 4]);
 		if (o) {
 			o->objectUpdateType = 2;
 		}
@@ -1065,7 +1070,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 		if (_screenCounterTable[26] == 0 && num == 3) {
 			_screenCounterTable[26] = 4;
 		}
-		setupScreenCheckpoint_lar1_screen24_helper2(_screenCounterTable[26]);
+		setupScreenCheckpoint_lar1_screen24_initAndy(_screenCounterTable[26]);
 	}
 }
 

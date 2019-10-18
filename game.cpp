@@ -4393,14 +4393,14 @@ int Game::updateSwitchesLar_helper2(int num, uint8_t *p, BoundingBox *b1, Boundi
 				int _bl, i;
 				if (_al < 0) {
 					i = (-_al) * 6;
-					updateScreenMaskLar(&_lar1_unkData1[i], 0);
+					updateScreenMaskLar(&_lar1_maskData[i], 0);
 					_bl = 5;
 				} else {
 					i = _al * 6;
-					updateScreenMaskLar(&_lar1_unkData1[i], 1);
+					updateScreenMaskLar(&_lar1_maskData[i], 1);
 					_bl = 2;
 				}
-				LvlObject *o = findLvlObject2(0, _lar1_unkData1[i + 5], _lar1_unkData1[i + 4]);
+				LvlObject *o = findLvlObject2(0, _lar1_maskData[i + 5], _lar1_maskData[i + 4]);
 				if (o) {
 					o->objectUpdateType = _bl;
 				}
