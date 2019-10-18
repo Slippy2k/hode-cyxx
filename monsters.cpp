@@ -2530,8 +2530,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			indexUnk51 = _esi->indexUnk51;
 		}
 		int _ebx = -1;
-		assert(indexUnk51 >= 0 && indexUnk51 < _res->_mstHdr.unk0x48);
-		MstUnk51 *var18 = &_res->_mstUnk51[indexUnk51]; // _esi
+		const MstShootIndex *var18 = &_res->_mstShootIndexData[indexUnk51]; // _esi
 		for (; var24 < var18->count; ++var24) {
 			assert(m->shootActionIndex >= 0 && m->shootActionIndex < 9);
 			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[var24 * 9 + m->shootActionIndex];

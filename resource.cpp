@@ -1057,8 +1057,8 @@ void Resource::loadMstData(File *fp) {
 	_mstHdr.infoMonster1Count  = fp->readUint32();
 	_mstHdr.movingBoundsDataCount = fp->readUint32();
 	_mstHdr.shootDataCount = fp->readUint32();
-	_mstHdr.unk0x48  = fp->readUint32();
-	_mstHdr.mstActionDirectionDataCount = fp->readUint32();
+	_mstHdr.shootIndexDataCount = fp->readUint32();
+	_mstHdr.actionDirectionDataCount = fp->readUint32();
 	_mstHdr.op223DataCount  = fp->readUint32();
 	_mstHdr.op226DataCount  = fp->readUint32();
 	_mstHdr.op227DataCount  = fp->readUint32();
@@ -1441,24 +1441,24 @@ void Resource::loadMstData(File *fp) {
 		}
 	}
 
-	_mstUnk51.allocate(_mstHdr.unk0x48);
-	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		_mstUnk51[i].indexUnk50 = fp->readUint32();
-		assert(_mstUnk51[i].indexUnk50 < (uint32_t)_mstHdr.shootDataCount);
-		_mstUnk51[i].indexUnk50Unk1 = 0; fp->readUint32();
-		_mstUnk51[i].count = fp->readUint32();
+	_mstShootIndexData.allocate(_mstHdr.shootIndexDataCount);
+	for (int i = 0; i < _mstHdr.shootIndexDataCount; ++i) {
+		_mstShootIndexData[i].indexUnk50 = fp->readUint32();
+		assert(_mstShootIndexData[i].indexUnk50 < (uint32_t)_mstHdr.shootDataCount);
+		_mstShootIndexData[i].indexUnk50Unk1 = 0; fp->readUint32();
+		_mstShootIndexData[i].count = fp->readUint32();
 		bytesRead += 12;
 	}
-	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		_mstUnk51[i].indexUnk50Unk1 = (uint32_t *)malloc(_mstUnk51[i].count * 9 * sizeof(uint32_t));
-		for (uint32_t j = 0; j < _mstUnk51[i].count * 9; ++j) {
-			_mstUnk51[i].indexUnk50Unk1[j] = fp->readUint32();
-			assert(_mstUnk51[i].indexUnk50Unk1[j] < _mstShootData[_mstUnk51[i].indexUnk50].count);
+	for (int i = 0; i < _mstHdr.shootIndexDataCount; ++i) {
+		_mstShootIndexData[i].indexUnk50Unk1 = (uint32_t *)malloc(_mstShootIndexData[i].count * 9 * sizeof(uint32_t));
+		for (uint32_t j = 0; j < _mstShootIndexData[i].count * 9; ++j) {
+			_mstShootIndexData[i].indexUnk50Unk1[j] = fp->readUint32();
+			assert(_mstShootIndexData[i].indexUnk50Unk1[j] < _mstShootData[_mstShootIndexData[i].indexUnk50].count);
 			bytesRead += 4;
 		}
 	}
-	_mstActionDirectionData.allocate(_mstHdr.mstActionDirectionDataCount);
-	for (int i = 0; i < _mstHdr.mstActionDirectionDataCount; ++i) {
+	_mstActionDirectionData.allocate(_mstHdr.actionDirectionDataCount);
+	for (int i = 0; i < _mstHdr.actionDirectionDataCount; ++i) {
 		_mstActionDirectionData[i].unk0 = fp->readByte();
 		_mstActionDirectionData[i].unk1 = fp->readByte();
 		_mstActionDirectionData[i].unk2 = fp->readByte();
@@ -1647,9 +1647,9 @@ void Resource::unloadMstData() {
 		free(_mstShootData[i].data);
 		_mstShootData[i].data = 0;
 	}
-	for (int i = 0; i < _mstHdr.unk0x48; ++i) {
-		free(_mstUnk51[i].indexUnk50Unk1);
-		_mstUnk51[i].indexUnk50Unk1 = 0;
+	for (int i = 0; i < _mstHdr.shootIndexDataCount; ++i) {
+		free(_mstShootIndexData[i].indexUnk50Unk1);
+		_mstShootIndexData[i].indexUnk50Unk1 = 0;
 	}
 
 	free(_mstCodeData);

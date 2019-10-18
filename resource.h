@@ -90,8 +90,8 @@ struct MstHdr {
 	int infoMonster1Count; // 3C
 	int movingBoundsDataCount; // 40
 	int shootDataCount; // 44
-	int unk0x48; // mstUnk51DataCount
-	int mstActionDirectionDataCount; // 4C
+	int shootIndexDataCount; // 48
+	int actionDirectionDataCount; // 4C
 	int op223DataCount; // 50
 	int op226DataCount; // 54
 	int op227DataCount; // 58
@@ -202,7 +202,7 @@ struct MstBehaviorState { // u46u1
 	uint32_t unk10; // 0x10
 	uint32_t count; // 0x14
 	uint32_t unk18; // 0x18
-	uint32_t indexUnk51; // 0x1C indexes _mstUnk51
+	uint32_t indexUnk51; // 0x1C indexes _mstShootIndexData
 	uint32_t walkPath; // 0x20 indexes _mstWalkPathData
 	uint32_t attackBox; // 0x24 indexes _mstAttackBoxData
 	uint32_t codeData; // 0x28 indexes _mstCodeData
@@ -218,7 +218,7 @@ struct MstAttackBox { // u47
 	uint32_t count;
 }; // sizeof == 8
 
-struct MstUnk48Unk12Unk4 { // MstMonsterSubAreaAction
+struct MstUnk48Unk12Unk4 { // MstMonsterAreaAction
 	uint32_t unk0; // 0x0, indexes _mstMonsterInfos
 	uint32_t indexUnk51; // 0x4
 	int32_t xPos; // 0x8
@@ -231,13 +231,13 @@ struct MstUnk48Unk12Unk4 { // MstMonsterSubAreaAction
 	uint8_t monster1Index; // 0x1B
 }; // sizeof == 28
 
-struct MstUnk48Unk12 { // MstMonsterSubArea
+struct MstUnk48Unk12 { // MstMonsterArea
 	uint8_t unk0;
 	MstUnk48Unk12Unk4 *data; // 0x4 sizeof == 28
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstUnk48 { // MstMonsterArea
+struct MstUnk48 { // MstMonsterAction
 	uint16_t unk0;
 	uint16_t unk2;
 	uint8_t unk4;
@@ -295,7 +295,7 @@ struct MstShoot { // u50
 	uint32_t count;
 }; // sizeof == 8
 
-struct MstUnk51 { // MstShootIndex
+struct MstShootIndex { // u51
 	uint32_t indexUnk50;
 	uint32_t *indexUnk50Unk1; // sizeof == 40
 	uint32_t count;
@@ -588,7 +588,7 @@ struct Resource {
 	uint8_t *_mstMonsterInfos; // sizeof == 948
 	ResStruct<MstMovingBounds> _mstMovingBoundsData;
 	ResStruct<MstShoot> _mstShootData;
-	ResStruct<MstUnk51> _mstUnk51;
+	ResStruct<MstShootIndex> _mstShootIndexData;
 	ResStruct<MstActionDirectionMask> _mstActionDirectionData;
 	ResStruct<MstOp223Data> _mstOp223Data;
 	ResStruct<MstOp227Data> _mstOp227Data;
