@@ -342,7 +342,7 @@ struct MstInfoMonster2;
 struct MstBehavior;
 struct MstBehaviorState;
 struct MstWalkNode;
-struct MstUnk48Unk12Unk4;
+struct MstMonsterAreaAction;
 struct MstMovingBounds;
 struct MstMovingBoundsUnk1;
 
@@ -353,7 +353,7 @@ struct MonsterObject1 {
 	MstWalkNode *walkNode; // 0xC
 	LvlObject *o16; // 0x10
 	LvlObject *o20; // 0x14
-	MstUnk48Unk12Unk4 *unk18; // 0x18
+	MstMonsterAreaAction *action; // 0x18
 	AndyShootData *shootData; // 0x1C
 	int monster1Index; // 0x20
 	int executeCounter; // 0x24

@@ -1355,7 +1355,7 @@ void Resource::loadMstData(File *fp) {
 			bytesRead += 12;
 		}
 		for (int j = 0; j < m->countUnk12; ++j) {
-			m12[j].data = (MstUnk48Unk12Unk4 *)malloc(m12[j].count * sizeof(MstUnk48Unk12Unk4));
+			m12[j].data = (MstMonsterAreaAction *)malloc(m12[j].count * sizeof(MstMonsterAreaAction));
 			for (uint32_t k = 0; k < m12[j].count; ++k) {
 				uint8_t data[28];
 				fp->read(data, sizeof(data));

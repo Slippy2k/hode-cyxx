@@ -207,7 +207,7 @@ struct Game {
 	int _xMstPos1, _xMstPos2, _xMstPos3;
 	int _yMstPos1, _yMstPos2, _yMstPos3;
 	int _mstHelper1Count;
-	int _m48Num;
+	int _mstActionNum;
 	uint32_t _mstAndyVarMask;
 	int _mstChasingMonstersCount;
 	int _mstPosXmin, _mstPosXmax;

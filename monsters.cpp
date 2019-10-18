@@ -168,16 +168,16 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t direction) {
 		}
 		while ((this->*(t->run))(t) == 0);
 	}
-	_m48Num = m48 - &_res->_mstUnk48[0];
+	_mstActionNum = m48 - &_res->_mstUnk48[0];
 	_mstChasingMonstersCount = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
-		MstUnk48Unk12Unk4 *unk4 = m48->unk12[i].data;
+		MstMonsterAreaAction *unk4 = m48->unk12[i].data;
 		const uint8_t num = unk4->monster1Index;
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
 			unk4->direction = direction;
 			MonsterObject1 *m = &_monsterObjects1Table[num];
-			m->unk18 = unk4;
+			m->action = unk4;
 			m->flags48 |= 0x40;
 			m->flagsA5 &= 0x8A;
 			m->flagsA5 |= 0x0A;
@@ -206,11 +206,11 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t direction) {
 
 void Game::mstMonster1ClearChasingMonster(MonsterObject1 *m) {
 	m->flags48 &= ~0x50;
-	m->unk18->monster1Index = 255;
-	m->unk18 = 0;
+	m->action->monster1Index = 255;
+	m->action = 0;
 	--_mstChasingMonstersCount;
 	if (_mstChasingMonstersCount <= 0) {
-		_m48Num = -1;
+		_mstActionNum = -1;
 	}
 }
 
@@ -237,7 +237,7 @@ void Game::mstTaskSetMonster1BehaviorState(Task *t, MonsterObject1 *m, int num) 
 }
 
 int Game::mstTaskStopMonsterObject1(Task *t) {
-	if (_m48Num == -1) {
+	if (_mstActionNum == -1) {
 		return 0;
 	}
 	MonsterObject1 *m = t->monster1;
@@ -256,7 +256,7 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	//   return 0;
 	// }
 
-	const MstUnk48Unk12Unk4 *m48 = m->unk18;
+	const MstMonsterAreaAction *m48 = m->action;
 	if (!m48) {
 		return 0;
 	}
@@ -862,7 +862,7 @@ void Game::resetMstCode() {
 	memset(_monsterObjects2Table, 0, sizeof(_monsterObjects2Table));
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
-	_m43Num3 = _m43Num1 = _m43Num2 = _m48Num = -1;
+	_m43Num3 = _m43Num1 = _m43Num2 = _mstActionNum = -1;
 	_mstOp54Counter = 0; // not reset in the original, causes uninitialized reads at the beginning of 'fort'
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// _mstUnk8 = 0;
@@ -1918,7 +1918,7 @@ int Game::mstTaskStopMonster1(Task *t, MonsterObject1 *m) {
 	if (m->monsterInfos[946] & 4) {
 		mstBoundingBoxClear(m, 1);
 	}
-	if (m->goalScreenNum != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
+	if (m->goalScreenNum != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->action) {
 		LvlObject *o = m->o16;
 		const int bx = _res->_mstPointOffsets[_currentScreen].xOffset;
 		const int by = _res->_mstPointOffsets[_currentScreen].yOffset;
@@ -2428,7 +2428,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			t->child->codeData = 0;
 			t->child = 0;
 		}
-		if ((m->flagsA5 & 8) != 0 && m->unk18 && _m48Num != -1) {
+		if ((m->flagsA5 & 8) != 0 && m->action && _mstActionNum != -1) {
 			mstTaskStopMonsterObject1(_mstCurrentTask);
 			return 0;
 		}
@@ -2524,8 +2524,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418530
 		int var20 = -1;
 		int indexUnk51;
-		if ((m->flagsA5 & 8) != 0 && m->unk18 && m->unk18->indexUnk51 != kNone && m->monsterInfos == &_res->_mstMonsterInfos[m->unk18->unk0 * 948]) {
-			indexUnk51 = m->unk18->indexUnk51;
+		if ((m->flagsA5 & 8) != 0 && m->action && m->action->indexUnk51 != kNone && m->monsterInfos == &_res->_mstMonsterInfos[m->action->unk0 * 948]) {
+			indexUnk51 = m->action->indexUnk51;
 		} else {
 			indexUnk51 = _esi->indexUnk51;
 		}
@@ -3132,8 +3132,8 @@ void Game::mstRemoveMonsterObject2(Task *t, Task **tasksList) {
 
 void Game::mstRemoveMonsterObject1(Task *t, Task **tasksList) {
 	MonsterObject1 *m = t->monster1;
-	if (_m48Num != -1) {
-		if ((m->flagsA5 & 8) != 0 && m->unk18) {
+	if (_mstActionNum != -1) {
+		if ((m->flagsA5 & 8) != 0 && m->action) {
 			mstMonster1ClearChasingMonster(m);
 		}
 	}
@@ -3599,13 +3599,13 @@ int Game::getTaskOtherVar(int index, Task *t) const {
 		}
 		return _andyShootsTable[0].directionMask & 0x7F;
 	case 9:
-		if (t->monster1 && t->monster1->unk18) {
-			return t->monster1->unk18->xPos;
+		if (t->monster1 && t->monster1->action) {
+			return t->monster1->action->xPos;
 		}
 		break;
 	case 10:
-		if (t->monster1 && t->monster1->unk18) {
-			return t->monster1->unk18->yPos;
+		if (t->monster1 && t->monster1->action) {
+			return t->monster1->action->yPos;
 		}
 		break;
 	case 11:
@@ -4344,7 +4344,7 @@ int Game::mstTask_main(Task *t) {
 			mstTaskStopMonsterObject1(t);
 			return 0;
 		case 200: // 52
-			if (t->monster1 && t->monster1->unk18) {
+			if (t->monster1 && t->monster1->action) {
 				mstOp52();
 				return 1;
 			}
@@ -4865,7 +4865,7 @@ int Game::mstTask_main(Task *t) {
 				MonsterObject1 *m = t->monster1;
 				if (m) {
 					m->flagsA5 &= ~0x70;
-					if ((m->flagsA5 & 8) != 0 && !m->unk18) {
+					if ((m->flagsA5 & 8) != 0 && !m->action) {
 						mstTaskResetMonster1Direction(t);
 						return 1;
 					}
@@ -4917,7 +4917,7 @@ int Game::mstTask_main(Task *t) {
 						}
 					} else {
 // 413FE3
-						if (m->unk18) {
+						if (m->action) {
 							mstMonster1ClearChasingMonster(m);
 						}
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
@@ -4974,7 +4974,7 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 		MonsterObject1 *m = current->monster1; // _ecx
 		Task *next = current->nextPtr; // _ebp
 		if (m && m->o16->screenNum == screenNum) {
-			if (_m48Num != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
+			if (_mstActionNum != -1 && (m->flagsA5 & 8) != 0 && m->action != 0) {
 				mstMonster1ClearChasingMonster(m);
 			}
 			const uint8_t *ptr = m->monsterInfos;
@@ -5004,7 +5004,7 @@ void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int 
 		MonsterObject1 *m = current->monster1;
 		Task *next = current->nextPtr;
 		if (m && m->o16->screenNum == screenNum && (m->monsterInfos[944] & 0x7F) == type) {
-			if (_m48Num != -1 && (m->flagsA5 & 8) != 0 && m->unk18 != 0) {
+			if (_mstActionNum != -1 && (m->flagsA5 & 8) != 0 && m->action != 0) {
 				mstMonster1ClearChasingMonster(m);
 			}
 			const uint8_t *ptr = m->monsterInfos;
@@ -5182,7 +5182,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 // 41BE12
 	uint8_t _dl = m->goalScreenNum;
-	if (_dl != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->unk18) {
+	if (_dl != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->action) {
 		if (t->run != &Game::mstTask_monsterWait6 && t->run != &Game::mstTask_monsterWait8 && t->run != &Game::mstTask_monsterWait10) {
 			if ((_dl == 0xFE && m->o16->screenNum != _currentScreen) || (_dl != 0xFE && _dl != _currentScreen)) {
 				if (m->monsterInfos[946] & 4) {
@@ -5331,10 +5331,10 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 }
 
 void Game::mstOp52() {
-	if (_m48Num == -1) {
+	if (_mstActionNum == -1) {
 		return;
 	}
-	MstUnk48 *m48 = &_res->_mstUnk48[_m48Num];
+	MstUnk48 *m48 = &_res->_mstUnk48[_mstActionNum];
 	int j = 0;
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m48unk12 = &m48->unk12[j];
@@ -5365,7 +5365,7 @@ void Game::mstOp52() {
 		}
 		++j;
 	}
-	_m48Num = -1;
+	_mstActionNum = -1;
 }
 
 bool Game::mstHasMonsterInRange(const MstUnk48 *m48, uint8_t flag) {
@@ -5389,7 +5389,7 @@ bool Game::mstHasMonsterInRange(const MstUnk48 *m48, uint8_t flag) {
 	for (int i = 0; i < m48->countUnk12; ++i) {
 		const MstUnk48Unk12 *m12 = &m48->unk12[i];
 		assert(m12->count == 1);
-		MstUnk48Unk12Unk4 *m12u4 = m12->data;
+		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
 			uint8_t var1C = m12u4->unk18;
 			if (var1C != 2) {
@@ -5490,7 +5490,7 @@ l1:
 	for (int i = _edi; i < m48->countUnk12; ++i) {
 		MstUnk48Unk12 *m12 = &m48->unk12[i]; // var20
 		assert(m12->count == 1);
-		MstUnk48Unk12Unk4 *m12u4 = m12->data;
+		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
 			uint8_t var1C = m12u4->unk18;
 			m12u4->monster1Index = 255;
@@ -5585,7 +5585,7 @@ l2:
 }
 
 void Game::mstOp53(MstUnk48 *m) {
-	if (_m48Num != -1) {
+	if (_mstActionNum != -1) {
 		return;
 	}
 	const int x = MIN(_mstAndyScreenPosX, 255);
@@ -5608,8 +5608,8 @@ void Game::mstOp53(MstUnk48 *m) {
 }
 
 void Game::mstOp54() {
-	debug(kDebug_MONSTER, "mstOp54 %d %d %d", _m48Num, _m43Num2, _m43Num3);
-	if (_m48Num != -1) {
+	debug(kDebug_MONSTER, "mstOp54 %d %d %d", _mstActionNum, _m43Num2, _m43Num3);
+	if (_mstActionNum != -1) {
 		return;
 	}
 	MstUnk43 *m43 = 0;
@@ -5647,7 +5647,7 @@ void Game::mstOp54() {
 		MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
 		mstUpdateInRange(m48);
 // 41E36E
-		if (_m48Num == -1) {
+		if (_mstActionNum == -1) {
 			++_mstOp54Counter;
 		}
 		if (_mstOp54Counter <= 16) {
@@ -5675,7 +5675,7 @@ void Game::mstOp54() {
 			}
 		}
 // 41E494
-		if (_m48Num != -1) {
+		if (_mstActionNum != -1) {
 			assert(i < m43->dataCount);
 			m43->data[i] |= 0x80;
 		} else {
