@@ -29,7 +29,7 @@ struct Level_isld: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	//virtual void setupLvlObjects(int screenNum);
+	//virtual void setupScreenCheckpoint(int screenNum);
 
 	void postScreenUpdate_isld_screen0();
 	void postScreenUpdate_isld_screen1();

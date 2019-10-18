@@ -35,7 +35,7 @@ struct Level_lar2: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	virtual void setupLvlObjects(int screenNum);
+	virtual void setupScreenCheckpoint(int screenNum);
 
 	bool postScreenUpdate_lar2_screen2_updateGateSwitches(BoundingBox *b);
 
@@ -62,7 +62,7 @@ struct Level_lar2: Level {
 	void preScreenUpdate_lar2_screen15();
 	void preScreenUpdate_lar2_screen19();
 
-	void setupLvlObjects_lar2_screen19();
+	void setupScreenCheckpoint_lar2_screen19();
 };
 
 Level *Level_lar2_create() {
@@ -529,7 +529,7 @@ void Level_lar2::tick() {
 	_g->updateSwitchesLar(13, _lar2_unkData3, Game::_lar2_bboxData);
 }
 
-void Level_lar2::setupLvlObjects_lar2_screen19() {
+void Level_lar2::setupScreenCheckpoint_lar2_screen19() {
 	int num1 = _lar2_setupScreen19Data[_checkpoint * 3 + 1];
 	for (int i = num1; i < 13; ++i) {
 		_lar2_unkData3[i * 4 + 1] = (_lar2_unkData3[i * 4 + 1] & ~0x40) | 1;
@@ -565,10 +565,10 @@ void Level_lar2::setupLvlObjects_lar2_screen19() {
 	}
 }
 
-void Level_lar2::setupLvlObjects(int num) {
+void Level_lar2::setupScreenCheckpoint(int num) {
 	switch (num) {
 	case 19:
-		setupLvlObjects_lar2_screen19();
+		setupScreenCheckpoint_lar2_screen19();
 		break;
 	}
 }

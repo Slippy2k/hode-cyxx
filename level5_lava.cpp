@@ -30,7 +30,7 @@ struct Level_lava: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	virtual void setupLvlObjects(int screenNum);
+	virtual void setupScreenCheckpoint(int screenNum);
 
 	void postScreenUpdate_lava_screen0();
 	void postScreenUpdate_lava_screen1();
@@ -59,7 +59,7 @@ struct Level_lava: Level {
 	void preScreenUpdate_lava_screen13();
 	void preScreenUpdate_lava_screen15();
 
-	void setupLvlObjects_lava_screen3();
+	void setupScreenCheckpoint_lava_screen3();
 
 	uint8_t _screen1Counter;
 	uint8_t _screen2Counter;
@@ -601,7 +601,7 @@ void Level_lava::tick() {
 	_g->updateWormHoleSprites();
 }
 
-void Level_lava::setupLvlObjects_lava_screen3() {
+void Level_lava::setupScreenCheckpoint_lava_screen3() {
 	LvlObject *ptr = _g->findLvlObject(2, 0, 3);
 	assert(ptr);
 	ptr->flags0 &= 0xFC00;
@@ -620,10 +620,10 @@ void Level_lava::setupLvlObjects_lava_screen3() {
 	ptr->yPos = 157;
 }
 
-void Level_lava::setupLvlObjects(int num) {
+void Level_lava::setupScreenCheckpoint(int num) {
 	switch (num) {
 	case 3:
-		setupLvlObjects_lava_screen3();
+		setupScreenCheckpoint_lava_screen3();
 		break;
 	}
 }

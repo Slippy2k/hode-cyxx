@@ -88,8 +88,8 @@ For each level and screen, the below callbacks can be found in the executable.
 callLevel_preScreenUpdate(int screen)
 callLevel_postScreenUpdate(int screen)
 
-// called when starting the level to setup objects
-callLevel_setupObjects(int screen)
+// called when starting the level from a checkpoint (setup objects)
+callLevel_setupScreenCheckpoint(int screen)
 
 // called at each engine tick
 callLevel_tick()
@@ -231,11 +231,11 @@ The file is 212 bytes long and contains the state for 4 different players :
 
 * each player state block is 52 bytes long and stored consecutively
 * at offset 209 is the current player index (0-3)
-* at offset 211 is a checksum : a XOR of the previous 208 bytes
+* at offset 211 is a checksum : a XOR of the previous 210 bytes
 
 Data        | Field                       | Comment
 ------------|-----------------------------|--------
-byte[10]    | Current level screen        | Used to display a thumbnail in the menu
+byte[10]    | Current level checkpoint | Used to display a thumbnail in the menu
 byte        | Current level |
 byte        | Current screen for level |
 uint32_t    | Bitmask of played cutscenes | Used to allow replay from the menu

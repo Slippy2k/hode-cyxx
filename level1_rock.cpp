@@ -37,7 +37,7 @@ struct Level_rock: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	virtual void setupLvlObjects(int screenNum);
+	virtual void setupScreenCheckpoint(int screenNum);
 
 	void postScreenUpdate_rock_screen0();
 	void postScreenUpdate_rock_screen4();
@@ -68,9 +68,9 @@ struct Level_rock: Level {
 	void preScreenUpdate_rock_screen18();
 	void preScreenUpdate_rock_screen19();
 
-	void setupLvlObjects_rock_screen2();
-	void setupLvlObjects_rock_screen3();
-	void setupLvlObjects_rock_screen18();
+	void setupScreenCheckpoint_rock_screen2();
+	void setupScreenCheckpoint_rock_screen3();
+	void setupScreenCheckpoint_rock_screen18();
 };
 
 Level *Level_rock_create() {
@@ -844,7 +844,7 @@ void Level_rock::terminate() {
 	}
 }
 
-void Level_rock::setupLvlObjects_rock_screen2() {
+void Level_rock::setupScreenCheckpoint_rock_screen2() {
 	LvlObject *ptr = _g->findLvlObject(2, 0, 2);
 	if (ptr) {
 		ptr->xPos = 146;
@@ -865,7 +865,7 @@ void Level_rock::setupLvlObjects_rock_screen2() {
 	}
 }
 
-void Level_rock::setupLvlObjects_rock_screen3() {
+void Level_rock::setupScreenCheckpoint_rock_screen3() {
 	LvlObject *ptr = _g->findLvlObject(2, 0, 3);
 	if (ptr) {
 		ptr->xPos = 198;
@@ -886,7 +886,7 @@ void Level_rock::setupLvlObjects_rock_screen3() {
 	}
 }
 
-void Level_rock::setupLvlObjects_rock_screen18() {
+void Level_rock::setupScreenCheckpoint_rock_screen18() {
 	LvlObject *ptr = _g->findLvlObject(2, 0, 18);
 	if (ptr) {
 		ptr->xPos = 16;
@@ -898,16 +898,16 @@ void Level_rock::setupLvlObjects_rock_screen18() {
 	}
 }
 
-void Level_rock::setupLvlObjects(int num) {
+void Level_rock::setupScreenCheckpoint(int num) {
 	switch (num) {
 	case 2:
-		setupLvlObjects_rock_screen2();
+		setupScreenCheckpoint_rock_screen2();
 		break;
 	case 3:
-		setupLvlObjects_rock_screen3();
+		setupScreenCheckpoint_rock_screen3();
 		break;
 	case 18:
-		setupLvlObjects_rock_screen18();
+		setupScreenCheckpoint_rock_screen18();
 		break;
 	}
 }

@@ -28,7 +28,7 @@ struct Level {
 	virtual void tick() {}
 	virtual void preScreenUpdate(int screenNum) = 0;
 	virtual void postScreenUpdate(int screenNum) = 0;
-	virtual void setupLvlObjects(int screenNum) {}
+	virtual void setupScreenCheckpoint(int screenNum) {}
 
 	Game *_g;
 	LvlObject *_andyObject;

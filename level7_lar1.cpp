@@ -32,7 +32,7 @@ struct Level_lar1: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	virtual void setupLvlObjects(int screenNum);
+	virtual void setupScreenCheckpoint(int screenNum);
 
 	void postScreenUpdate_lar1_screen0();
 	void postScreenUpdate_lar1_screen3();
@@ -69,9 +69,9 @@ struct Level_lar1: Level {
 	void preScreenUpdate_lar1_screen23();
 	void preScreenUpdate_lar1_screen24();
 
-	void setupLvlObjects_lar1_screen24_helper1();
-	void setupLvlObjects_lar1_screen24_helper2(int num);
-	void setupLvlObjects_lar1_screen24();
+	void setupScreenCheckpoint_lar1_screen24_helper1();
+	void setupScreenCheckpoint_lar1_screen24_helper2(int num);
+	void setupScreenCheckpoint_lar1_screen24();
 };
 
 Level *Level_lar1_create() {
@@ -963,7 +963,7 @@ void Level_lar1::tick() {
 	}
 }
 
-void Level_lar1::setupLvlObjects_lar1_screen24_helper1() {
+void Level_lar1::setupScreenCheckpoint_lar1_screen24_helper1() {
 	const int num = _checkpoint;
 	for (int i = _lar1_setupScreen24Data[num * 3 + 2]; i < 24; ++i) {
 		_lar1_unkData3[i * 4 + 1] &= ~0x40;
@@ -1003,7 +1003,7 @@ void Level_lar1::setupLvlObjects_lar1_screen24_helper1() {
 	Game::_lar1_gatesData[3] |= 0x30;
 }
 
-void Level_lar1::setupLvlObjects_lar1_screen24_helper2(int num) {
+void Level_lar1::setupScreenCheckpoint_lar1_screen24_helper2(int num) {
 // 45279
 	static const uint8_t data1[8 * 6] = {
 		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01,
@@ -1037,8 +1037,8 @@ void Level_lar1::setupLvlObjects_lar1_screen24_helper2(int num) {
 	}
 }
 
-void Level_lar1::setupLvlObjects_lar1_screen24() {
-	setupLvlObjects_lar1_screen24_helper1();
+void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
+	setupScreenCheckpoint_lar1_screen24_helper1();
 	const int num = _checkpoint;
 	const int gateIndex = _lar1_setupScreen24Data[num * 3];
 	for (int b = gateIndex; b < 15; ++b) {
@@ -1070,14 +1070,14 @@ void Level_lar1::setupLvlObjects_lar1_screen24() {
 		if (_screenCounterTable[26] == 0 && num == 3) {
 			_screenCounterTable[26] = 4;
 		}
-		setupLvlObjects_lar1_screen24_helper2(_screenCounterTable[26]);
+		setupScreenCheckpoint_lar1_screen24_helper2(_screenCounterTable[26]);
 	}
 }
 
-void Level_lar1::setupLvlObjects(int num) {
+void Level_lar1::setupScreenCheckpoint(int num) {
 	switch (num) {
 	case 24:
-		setupLvlObjects_lar1_screen24();
+		setupScreenCheckpoint_lar1_screen24();
 		break;
 	}
 }

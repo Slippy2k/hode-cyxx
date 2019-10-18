@@ -34,7 +34,7 @@ struct Level_fort: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	virtual void setupLvlObjects(int screenNum);
+	virtual void setupScreenCheckpoint(int screenNum);
 
 	void postScreenUpdate_fort_screen1();
 	void postScreenUpdate_fort_screen6();
@@ -53,7 +53,7 @@ struct Level_fort: Level {
 	void preScreenUpdate_fort_screen17();
 	void preScreenUpdate_fort_screen21();
 
-	void setupLvlObjects_fort_screen1();
+	void setupScreenCheckpoint_fort_screen1();
 };
 
 Level *Level_fort_create() {
@@ -326,7 +326,7 @@ void Level_fort::preScreenUpdate(int num) {
 	}
 }
 
-void Level_fort::setupLvlObjects_fort_screen1() {
+void Level_fort::setupScreenCheckpoint_fort_screen1() {
 	LvlObject *ptr = _g->findLvlObject(2, 0, 1);
 	if (ptr) {
 		ptr->xPos = 129;
@@ -338,10 +338,10 @@ void Level_fort::setupLvlObjects_fort_screen1() {
 	}
 }
 
-void Level_fort::setupLvlObjects(int num) {
+void Level_fort::setupScreenCheckpoint(int num) {
 	switch (num) {
 	case 1:
-		setupLvlObjects_fort_screen1();
+		setupScreenCheckpoint_fort_screen1();
 		break;
 	}
 }

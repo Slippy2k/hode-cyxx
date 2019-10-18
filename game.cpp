@@ -1425,7 +1425,7 @@ void Game::resetScreen() {
 	}
 	resetScreenMask();
 	for (int i = screenNum; i < _res->_lvlHdr.screensCount; ++i) {
-		_level->setupLvlObjects(i);
+		_level->setupScreenCheckpoint(i);
 	}
 	resetWormHoleSprites();
 }

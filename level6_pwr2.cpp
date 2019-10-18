@@ -25,7 +25,7 @@ struct Level_pwr2: Level {
 	virtual void tick();
 	virtual void preScreenUpdate(int screenNum);
 	virtual void postScreenUpdate(int screenNum);
-	//virtual void setupLvlObjects(int screenNum);
+	//virtual void setupScreenCheckpoint(int screenNum);
 
 	void postScreenUpdate_pwr2_screen2();
 	void postScreenUpdate_pwr2_screen3();
