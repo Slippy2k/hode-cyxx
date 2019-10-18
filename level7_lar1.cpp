@@ -409,12 +409,13 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 	if (_res->_currentScreenResourceNum == 12) {
 		const int counter = _screenCounterTable[12];
 		if (counter < 8 && (_andyObject->flags0 & 0x1F) == 3) {
-			static const uint8_t byte_4526D8[32] = {
+// 4526D8
+			static const uint8_t data[8 * 4] = {
 				0x05, 0x00, 0x00, 0x04, 0x06, 0x00, 0x00, 0x00, 0x07, 0xFB, 0x04, 0x05, 0x08, 0xFA, 0x04, 0x05,
 				0x09, 0xF9, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x04, 0xF8, 0xF7, 0x00, 0x04, 0x00, 0x00, 0x00, 0x04
 			};
 			const uint8_t num = (_andyObject->flags0 >> 5) & 7;
-			if (byte_4526D8[counter * 4 + 2] == num || byte_4526D8[counter * 4 + 3] == num) {
+			if (data[counter * 4 + 2] == num || data[counter * 4 + 3] == num) {
 				BoundingBox b[] = {
 					{ 205,   0, 227,  97 },
 					{ 200,  16, 207,  55 },
@@ -425,11 +426,11 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 					{  32, 112,  87, 167 },
 					{  32, 112,  87, 167 }
 				};
-				AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-				if (_g->clipBoundingBox(&b[counter], &data->boundingBox)) {
+				AndyLvlObjectData *andyData = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+				if (_g->clipBoundingBox(&b[counter], &andyData->boundingBox)) {
 					++_screenCounterTable[12];
 					uint8_t _bl;
-					int _al = (int8_t)byte_4526D8[counter * 4];
+					int _al = (int8_t)data[counter * 4];
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
@@ -447,7 +448,7 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 						}
 					}
 // 407536
-					_al = (int8_t)byte_4526D8[counter * 4 + 1];
+					_al = (int8_t)data[counter * 4 + 1];
 					if (_al != 0) {
 						if (_al < 0) {
 							_al = -_al * 6;
@@ -588,7 +589,7 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 					++_screenCounterTable[19];
 					_g->updateScreen(_andyObject->screenNum);
 					Game::_lar1_unkData1[0x49] = 0;
-					Game::_lar1_unkData1[0X4F] = 0;
+					Game::_lar1_unkData1[0x4F] = 0;
 				}
 				_andyObject->xPos = 204;
 				_andyObject->yPos = 25;
@@ -1042,7 +1043,8 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 	const int num = _checkpoint;
 	const int gateIndex = _lar1_setupScreen24Data[num * 3];
 	for (int b = gateIndex; b < 15; ++b) {
-		_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 1);
+		Game::_lar1_unkData1[b * 6 + 1] = 1;
+		_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 0);
 		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[b * 6 + 5], Game::_lar1_unkData1[b * 6 + 4]);
 		if (o) {
 			o->objectUpdateType = 6;
@@ -1050,19 +1052,12 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 	}
 // 408A53
 	for (int b = gateIndex; b != 0; --b) {
-		int _bl = -b;
-		if (_bl < 0) {
-			_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 0);
-			_bl = 5;
-		} else {
 // 408B28
-			_g->updateScreenMaskLar(Game::_lar1_unkData1 + b * 6, 1);
-			_bl = 2;
-		}
+		_g->updateScreenMaskLar(Game::_lar1_unkData1 + (b - 1) * 6, 1);
 // 408BAE
-		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[b * 6 + 5], Game::_lar1_unkData1[b * 6 + 4]);
+		LvlObject *o = _g->findLvlObject2(0, Game::_lar1_unkData1[(b - 1) * 6 + 5], Game::_lar1_unkData1[(b - 1) * 6 + 4]);
 		if (o) {
-			o->objectUpdateType = _bl;
+			o->objectUpdateType = 2;
 		}
 	}
 // 408BE5
