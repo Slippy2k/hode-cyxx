@@ -1227,8 +1227,8 @@ void Resource::loadMstData(File *fp) {
 			_mstWalkPathData[i].data[j].walkBox = READ_LE_UINT32(data + 16); // sizeof == 20
 			_mstWalkPathData[i].data[j].walkCodeStage1 = READ_LE_UINT32(data + 20); // sizeof == 16
 			_mstWalkPathData[i].data[j].walkCodeStage2 = READ_LE_UINT32(data + 24); // sizeof == 16
-			_mstWalkPathData[i].data[j].indexUnk36_28 = READ_LE_UINT32(data + 28); // sizeof == 12
-			_mstWalkPathData[i].data[j].indexUnk36_32 = READ_LE_UINT32(data + 32); // sizeof == 12
+			_mstWalkPathData[i].data[j].movingBoundsIndex1 = READ_LE_UINT32(data + 28); // sizeof == 12
+			_mstWalkPathData[i].data[j].movingBoundsIndex2 = READ_LE_UINT32(data + 32); // sizeof == 12
 			_mstWalkPathData[i].data[j].walkCodeReset[0] = READ_LE_UINT32(data + 36); // sizeof == 16
 			_mstWalkPathData[i].data[j].walkCodeReset[1] = READ_LE_UINT32(data + 40); // sizeof == 16
 			for (int k = 0; k < 4; ++k) {
@@ -1430,10 +1430,10 @@ void Resource::loadMstData(File *fp) {
 			_mstShootData[i].data[j].codeData = fp->readUint32();
 			_mstShootData[i].data[j].unk4 = fp->readUint32();
 			_mstShootData[i].data[j].unk8 = fp->readUint32();
-			_mstShootData[i].data[j].unkC = fp->readUint32();
-			_mstShootData[i].data[j].unk10 = fp->readUint32();
-			_mstShootData[i].data[j].unk14 = fp->readUint32();
-			_mstShootData[i].data[j].unk18 = fp->readUint32();
+			_mstShootData[i].data[j].xPos = fp->readUint32();
+			_mstShootData[i].data[j].yPos = fp->readUint32();
+			_mstShootData[i].data[j].width = fp->readUint32();
+			_mstShootData[i].data[j].height = fp->readUint32();
 			_mstShootData[i].data[j].hSize = fp->readUint32();
 			_mstShootData[i].data[j].vSize = fp->readUint32();
 			_mstShootData[i].data[j].unk24 = fp->readUint32();

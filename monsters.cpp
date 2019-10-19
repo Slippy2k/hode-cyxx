@@ -2580,14 +2580,14 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 41866A
 			_mstTemp_x1 = m->xMstPos;
 			if ((m50Unk1->unk4 & kDirectionKeyMaskHorizontal) != kDirectionKeyMaskHorizontal && (m->o16->flags1 & 0x10) != 0) {
-				_mstTemp_x1 -= m50Unk1->unk14;
-				_mstTemp_x1 -= m50Unk1->unkC;
+				_mstTemp_x1 -= m50Unk1->width;
+				_mstTemp_x1 -= m50Unk1->xPos;
 			} else {
-				_mstTemp_x1 += m50Unk1->unkC;
+				_mstTemp_x1 += m50Unk1->xPos;
 			}
-			_mstTemp_y1 = m->yMstPos + m50Unk1->unk10;
-			_mstTemp_x2 = _mstTemp_x1 + m50Unk1->unk14 - 1;
-			_mstTemp_y2 = _mstTemp_y1 + m50Unk1->unk18 - 1;
+			_mstTemp_y1 = m->yMstPos + m50Unk1->yPos;
+			_mstTemp_x2 = _mstTemp_x1 + m50Unk1->width - 1;
+			_mstTemp_y2 = _mstTemp_y1 + m50Unk1->height - 1;
 			if ((m->monsterInfos[946] & 4) != 0 && mstBoundingBoxCollides1(m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
 				continue;
 			}
@@ -2597,7 +2597,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			} else {
 				_ecx = m->yMstPos;
 			}
-			if (m50Unk1->unk14 != 0 && getMstDistance(_ecx, var14) >= 0) {
+			if (m50Unk1->width != 0 && getMstDistance(_ecx, var14) >= 0) {
 				continue;
 			}
 			if (m->collideDistance >= m50Unk1->unk24) {
@@ -2770,7 +2770,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				int _edi = READ_LE_UINT32(m->monsterInfos + 904);
 				int _ebx = MAX(m->unk88, walkPath->coords[1][1] + _edi);
 				int _eax = MIN(m->unk84, walkPath->coords[0][1] - _edi);
-				const uint32_t indexUnk36 = walkPath->indexUnk36_32;
+				const uint32_t indexUnk36 = walkPath->movingBoundsIndex2;
 				assert(indexUnk36 != kNone);
 				const uint32_t indexUnk49 = _res->_mstMovingBoundsIndexData[indexUnk36].indexUnk49;
 				assert(indexUnk49 != kNone);
@@ -6574,7 +6574,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 		return 0;
 	}
 // 41C559
-	const uint32_t indexUnk36 = m->walkNode->indexUnk36_28;
+	const uint32_t indexUnk36 = m->walkNode->movingBoundsIndex1;
 	assert(indexUnk36 != kNone);
 	MstMovingBoundsIndex *m36 = &_res->_mstMovingBoundsIndexData[indexUnk36];
 	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[m36->indexUnk49];
@@ -6722,7 +6722,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	MonsterObject1 *m = t->monster1;
 	m->flagsA5 = (m->flagsA5 & ~1) | 6;
 	mstMonster1ResetWalkPath(m);
-	const uint32_t indexUnk36 = m->walkNode->indexUnk36_32;
+	const uint32_t indexUnk36 = m->walkNode->movingBoundsIndex2;
 	MstMovingBoundsIndex *m36 = &_res->_mstMovingBoundsIndexData[indexUnk36];
 	MstMovingBounds *m49 = &_res->_mstMovingBoundsData[m36->indexUnk49];
 	m->m49 = m49;

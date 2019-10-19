@@ -6,7 +6,7 @@
 
 * release 0.1.9
 	- fixed fireballs not hitting Andy
-	- fixed fishes moving path in 'pwr1' and 'pwr2' levels
+	- fixed fishes movement in 'pwr1' and 'pwr2' levels
 	- fixed several bounding box clipping checks
 	- fixed sounds panning
 

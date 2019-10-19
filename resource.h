@@ -169,8 +169,8 @@ struct MstWalkNode { // u44u1
 	uint32_t walkBox; // 0x10
 	uint32_t walkCodeStage1; // 0x14
 	uint32_t walkCodeStage2; // 0x18
-	uint32_t indexUnk36_28; // 0x1C
-	uint32_t indexUnk36_32; // 0x20
+	uint32_t movingBoundsIndex1; // 0x1C
+	uint32_t movingBoundsIndex2; // 0x20
 	uint32_t walkCodeReset[2]; // 0x24
 	int32_t coords[4][2]; // 0x2C, 0x34, 0x3C, 0x44
 	uint32_t neighborWalkNode[4]; // per direction 0x4C
@@ -281,10 +281,10 @@ struct MstShootAction { // u50u1
 	uint32_t codeData;
 	uint32_t unk4;
 	uint32_t unk8;
-	uint32_t unkC; // xPos
-	uint32_t unk10; // yPos
-	uint32_t unk14; // width
-	uint32_t unk18; // height
+	uint32_t xPos; // C
+	uint32_t yPos; // 10
+	uint32_t width; // 14
+	uint32_t height; // 18
 	uint32_t hSize; // 1C
 	uint32_t vSize; // 20
 	int32_t unk24;
