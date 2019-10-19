@@ -187,6 +187,28 @@ void saveLZW(const char *filename, const uint8_t *bits, int len, const uint8_t *
 	}
 }
 
+#ifdef WITH_LIBBS
+#include "bs.h"
+void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
+	static bool bs_inited = false;
+	if (!bs_inited) {
+		bs_init();
+		bs_inited = true;
+	}
+	uint8_t *rgb = (uint8_t *)malloc(w * h * 3);
+	if (rgb) {
+		bs_decode_rgb24(rgb, (bs_header_t *)src, w, h, 0);
+		char filename2[MAXPATHLEN];
+		strcpy(filename2, filename);
+		char *ext = strrchr(filename2, '.');
+		if (ext) {
+			strcpy(ext + 1, "tga");
+			saveTGA(filename2, (const uint8_t *)rgb, w, h);
+		}
+		free(rgb);
+	}
+}
+#else
 #ifdef _WIN32
 void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	char filename2[MAXPATHLEN];
@@ -202,7 +224,6 @@ extern "C" {
 	#include <jpeglib.h>
 	#include <libavcodec/avcodec.h>
 }
-
 void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	static bool codec_inited = false;
 
@@ -296,3 +317,4 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	av_frame_free(&frame);
 }
 #endif // _WIN32
+#endif // WITH_LIBBS
