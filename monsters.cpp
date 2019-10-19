@@ -4343,19 +4343,19 @@ int Game::mstTask_main(Task *t) {
 		case 199: // 51 - stop_monster
 			mstTaskStopMonsterObject1(t);
 			return 0;
-		case 200: // 52
+		case 200: // 52 - stop_monster_action
 			if (t->monster1 && t->monster1->action) {
 				mstOp52();
 				return 1;
 			}
 			mstOp52();
 			break;
-		case 201: { // 53
+		case 201: { // 53 - start_monster_action
 				const int num = READ_LE_UINT16(p + 2);
 				mstOp53(&_res->_mstMonsterActionData[num]);
 			}
 			break;
-		case 202: // 54
+		case 202: // 54 - continue_monster_action
 			mstOp54();
 			break;
 		case 203: // 55 - monster_attack

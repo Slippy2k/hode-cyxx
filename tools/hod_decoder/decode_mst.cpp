@@ -225,16 +225,16 @@ static void printMstOpcode(uint32_t addr, const uint8_t *p) {
 		fprintf(_out, "stop_current_monster_object");
 		break;
 	case 200:
-		fprintf(_out, "op52");
+		fprintf(_out, "stop_monster_action");
 		break;
 	case 201:
-		fprintf(_out, "op51");
+		fprintf(_out, "start_monster_action");
 		break;
 	case 202:
-		fprintf(_out, "op54");
+		fprintf(_out, "continue_monster_action");
 		break;
 	case 203:
-		fprintf(_out, "op55");
+		fprintf(_out, "monster_attack");
 		break;
 	case 204:
 		printMstOpcode56(p[1], READ_LE_UINT16(p + 2));
