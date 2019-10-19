@@ -86,7 +86,7 @@ struct MstHdr {
 	int infoMonster2Count; // 2C
 	int behaviorDataCount; // 30
 	int attackBoxDataCount; // 34
-	int unk0x38; // mstUnk48DataCount
+	int monsterActionDataCount; // 38
 	int infoMonster1Count; // 3C
 	int movingBoundsDataCount; // 40
 	int shootDataCount; // 44
@@ -154,8 +154,8 @@ struct MstBehaviorIndex { // u42
 	uint32_t dataCount; // C
 }; // sizeof == 16
 
-struct MstUnk43 { // MstUnk48Index
-	uint32_t *indexUnk48; // indexes _mstUnk48
+struct MstUnk43 { // MstMonsterActionIndex
+	uint32_t *indexUnk48; // indexes _mstMonsterActionData
 	uint32_t count1; // 4
 	uint8_t *data; // 8 lut - indexes .indexUnk48
 	uint32_t dataCount; // C
@@ -237,7 +237,7 @@ struct MstMonsterArea {
 	uint32_t count;
 }; // sizeof == 12
 
-struct MstUnk48 { // MstMonsterAction
+struct MstMonsterAction { // u48
 	uint16_t unk0;
 	uint16_t unk2;
 	uint8_t unk4;
@@ -584,7 +584,7 @@ struct Resource {
 	ResStruct<MstInfoMonster2> _mstInfoMonster2Data;
 	ResStruct<MstBehavior> _mstBehaviorData;
 	ResStruct<MstAttackBox> _mstAttackBoxData;
-	ResStruct<MstUnk48> _mstUnk48;
+	ResStruct<MstMonsterAction> _mstMonsterActionData;
 	uint8_t *_mstMonsterInfos; // sizeof == 948
 	ResStruct<MstMovingBounds> _mstMovingBoundsData;
 	ResStruct<MstShoot> _mstShootData;

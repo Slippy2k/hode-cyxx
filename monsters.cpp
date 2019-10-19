@@ -140,7 +140,7 @@ void Game::mstMonster1ResetWalkPath(MonsterObject1 *m) {
 	m->walkCode = (indexWalkCode == kNone) ? 0 : &_res->_mstWalkCodeData[indexWalkCode];
 }
 
-bool Game::mstUpdateInRange(MstUnk48 *m) {
+bool Game::mstUpdateInRange(MstMonsterAction *m) {
 	if (m->unk4 == 0) {
 		if (mstHasMonsterInRange(m, 0) && addChasingMonster(m, 0)) {
 			return true;
@@ -158,7 +158,7 @@ bool Game::mstUpdateInRange(MstUnk48 *m) {
 	return false;
 }
 
-bool Game::addChasingMonster(MstUnk48 *m48, uint8_t direction) {
+bool Game::addChasingMonster(MstMonsterAction *m48, uint8_t direction) {
 	debug(kDebug_MONSTER, "addChasingMonster %d", direction);
 	m48->direction = direction;
 	if (m48->codeData != kNone) {
@@ -168,7 +168,7 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t direction) {
 		}
 		while ((this->*(t->run))(t) == 0);
 	}
-	_mstActionNum = m48 - &_res->_mstUnk48[0];
+	_mstActionNum = m48 - &_res->_mstMonsterActionData[0];
 	_mstChasingMonstersCount = 0;
 	for (int i = 0; i < m48->areaCount; ++i) {
 		MstMonsterAreaAction *unk4 = m48->area[i].data;
@@ -4352,7 +4352,7 @@ int Game::mstTask_main(Task *t) {
 			break;
 		case 201: { // 53
 				const int num = READ_LE_UINT16(p + 2);
-				mstOp53(&_res->_mstUnk48[num]);
+				mstOp53(&_res->_mstMonsterActionData[num]);
 			}
 			break;
 		case 202: // 54
@@ -5334,7 +5334,7 @@ void Game::mstOp52() {
 	if (_mstActionNum == -1) {
 		return;
 	}
-	MstUnk48 *m48 = &_res->_mstUnk48[_mstActionNum];
+	MstMonsterAction *m48 = &_res->_mstMonsterActionData[_mstActionNum];
 	int j = 0;
 	for (int i = 0; i < m48->areaCount; ++i) {
 		MstMonsterArea *m48Area = &m48->area[j];
@@ -5368,7 +5368,7 @@ void Game::mstOp52() {
 	_mstActionNum = -1;
 }
 
-bool Game::mstHasMonsterInRange(const MstUnk48 *m48, uint8_t flag) {
+bool Game::mstHasMonsterInRange(const MstMonsterAction *m48, uint8_t flag) {
 	for (int i = 0; i < 2; ++i) {
 		for (uint32_t j = 0; j < m48->count[i]; ++j) {
 			uint32_t a = (i ^ flag); // * 32; // _edx
@@ -5584,7 +5584,7 @@ l2:
 	return var24 != 0;
 }
 
-void Game::mstOp53(MstUnk48 *m) {
+void Game::mstOp53(MstMonsterAction *m) {
 	if (_mstActionNum != -1) {
 		return;
 	}
@@ -5644,7 +5644,7 @@ void Game::mstOp54() {
 	mstResetCollisionTable();
 	if (m43->dataCount == 0) {
 		const uint32_t indexUnk48 = m43->indexUnk48[0];
-		MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
+		MstMonsterAction *m48 = &_res->_mstMonsterActionData[indexUnk48];
 		mstUpdateInRange(m48);
 // 41E36E
 		if (_mstActionNum == -1) {
@@ -5667,7 +5667,7 @@ void Game::mstOp54() {
 				if (_mstOp54Table[num] == 0) {
 					_mstOp54Table[num] = 1;
 					const uint32_t indexUnk48 = m43->indexUnk48[num];
-					MstUnk48 *m48 = &_res->_mstUnk48[indexUnk48];
+					MstMonsterAction *m48 = &_res->_mstMonsterActionData[indexUnk48];
 					if (mstUpdateInRange(m48)) {
 						break; // goto 41E494;
 					}

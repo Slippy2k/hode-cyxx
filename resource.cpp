@@ -1046,31 +1046,31 @@ void Resource::loadMstData(File *fp) {
 	_mstHdr.movingBoundsIndexDataCount = fp->readUint32();
 	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
 	_mstHdr.screenAreaDataCount = fp->readUint32();
-	_mstHdr.unk0x1C  = fp->readUint32();
+	_mstHdr.unk0x1C = fp->readUint32();
 	_mstHdr.behaviorIndexDataCount = fp->readUint32();
-	_mstHdr.unk0x24  = fp->readUint32();
-	_mstHdr.walkPathDataCount  = fp->readUint32();
-	_mstHdr.infoMonster2Count  = fp->readUint32();
-	_mstHdr.behaviorDataCount  = fp->readUint32();
+	_mstHdr.unk0x24 = fp->readUint32();
+	_mstHdr.walkPathDataCount = fp->readUint32();
+	_mstHdr.infoMonster2Count = fp->readUint32();
+	_mstHdr.behaviorDataCount = fp->readUint32();
 	_mstHdr.attackBoxDataCount = fp->readUint32();
-	_mstHdr.unk0x38  = fp->readUint32();
-	_mstHdr.infoMonster1Count  = fp->readUint32();
+	_mstHdr.monsterActionDataCount = fp->readUint32();
+	_mstHdr.infoMonster1Count = fp->readUint32();
 	_mstHdr.movingBoundsDataCount = fp->readUint32();
 	_mstHdr.shootDataCount = fp->readUint32();
 	_mstHdr.shootIndexDataCount = fp->readUint32();
 	_mstHdr.actionDirectionDataCount = fp->readUint32();
-	_mstHdr.op223DataCount  = fp->readUint32();
-	_mstHdr.op226DataCount  = fp->readUint32();
-	_mstHdr.op227DataCount  = fp->readUint32();
-	_mstHdr.op234DataCount  = fp->readUint32();
-	_mstHdr.op2DataCount  = fp->readUint32();
-	_mstHdr.op197DataCount  = fp->readUint32();
-	_mstHdr.op211DataCount  = fp->readUint32();
-	_mstHdr.op240DataCount  = fp->readUint32();
-	_mstHdr.unk0x70  = fp->readUint32();
-	_mstHdr.unk0x74  = fp->readUint32();
+	_mstHdr.op223DataCount = fp->readUint32();
+	_mstHdr.op226DataCount = fp->readUint32();
+	_mstHdr.op227DataCount = fp->readUint32();
+	_mstHdr.op234DataCount = fp->readUint32();
+	_mstHdr.op2DataCount = fp->readUint32();
+	_mstHdr.op197DataCount = fp->readUint32();
+	_mstHdr.op211DataCount = fp->readUint32();
+	_mstHdr.op240DataCount = fp->readUint32();
+	_mstHdr.unk0x70 = fp->readUint32();
+	_mstHdr.unk0x74 = fp->readUint32();
 	_mstHdr.op204DataCount = fp->readUint32();
-	_mstHdr.codeSize    = fp->readUint32();
+	_mstHdr.codeSize = fp->readUint32();
 	_mstHdr.screensCount = fp->readUint32();
 	debug(kDebug_RESOURCE, "_mstHdr.version %d _mstHdr.codeSize %d", _mstHdr.version, _mstHdr.codeSize);
 
@@ -1304,9 +1304,9 @@ void Resource::loadMstData(File *fp) {
 		bytesRead += _mstAttackBoxData[i].count * 20;
 	}
 
-	_mstUnk48.allocate(_mstHdr.unk0x38);
-	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
-		MstUnk48 *m = &_mstUnk48[i];
+	_mstMonsterActionData.allocate(_mstHdr.monsterActionDataCount);
+	for (int i = 0; i < _mstHdr.monsterActionDataCount; ++i) {
+		MstMonsterAction *m = &_mstMonsterActionData[i];
 		m->unk0 = fp->readUint16();
 		m->unk2 = fp->readUint16();
 		m->unk4 = fp->readByte();
@@ -1324,8 +1324,8 @@ void Resource::loadMstData(File *fp) {
 		m->count[1] = fp->readUint32();
 		bytesRead += 44;
 	}
-	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
-		MstUnk48 *m = &_mstUnk48[i];
+	for (int i = 0; i < _mstHdr.monsterActionDataCount; ++i) {
+		MstMonsterAction *m = &_mstMonsterActionData[i];
 		for (int j = 0; j < 2; ++j) {
 			const int count = m->count[j];
 			if (count != 0) {
@@ -1622,8 +1622,8 @@ void Resource::unloadMstData() {
 		free(_mstAttackBoxData[i].data);
 		_mstAttackBoxData[i].data = 0;
 	}
-	for (int i = 0; i < _mstHdr.unk0x38; ++i) {
-		MstUnk48 *m = &_mstUnk48[i];
+	for (int i = 0; i < _mstHdr.monsterActionDataCount; ++i) {
+		MstMonsterAction *m = &_mstMonsterActionData[i];
 		for (int j = 0; j < 2; ++j) {
 			free(m->data1[j]);
 			m->data1[j] = 0;
