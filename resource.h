@@ -231,7 +231,7 @@ struct MstMonsterAreaAction {
 	uint8_t monster1Index; // 0x1B
 }; // sizeof == 28
 
-struct MstUnk48Unk12 { // MstMonsterArea
+struct MstMonsterArea {
 	uint8_t unk0;
 	MstMonsterAreaAction *data; // 0x4 sizeof == 28
 	uint32_t count;
@@ -245,8 +245,8 @@ struct MstUnk48 { // MstMonsterAction
 	uint8_t unk6;
 	uint8_t unk7;
 	uint32_t codeData; // 0x8 indexes _mstCodeData
-	MstUnk48Unk12 *unk12; // 0xC
-	int countUnk12; // 0x10
+	MstMonsterArea *area; // 0xC
+	int areaCount; // 0x10
 	uint32_t *data1[2]; // 0x14, 0x18
 	uint32_t *data2[2]; // 0x1C, 0x20
 	uint32_t count[2]; // 0x24, 0x28

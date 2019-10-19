@@ -1314,8 +1314,8 @@ void Resource::loadMstData(File *fp) {
 		m->unk6 = fp->readByte();
 		m->unk7 = fp->readByte();
 		m->codeData = fp->readUint32();
-		m->unk12 = 0; fp->readUint32();
-		m->countUnk12 = fp->readUint32();
+		m->area = 0; fp->readUint32();
+		m->areaCount = fp->readUint32();
 		fp->readUint32();
 		fp->readUint32();
 		fp->readUint32();
@@ -1344,8 +1344,8 @@ void Resource::loadMstData(File *fp) {
 				m->data2[j] = 0;
 			}
 		}
-		MstUnk48Unk12 *m12 = (MstUnk48Unk12 *)malloc(m->countUnk12 * sizeof(MstUnk48Unk12));
-		for (int j = 0; j < m->countUnk12; ++j) {
+		MstMonsterArea *m12 = (MstMonsterArea *)malloc(m->areaCount * sizeof(MstMonsterArea));
+		for (int j = 0; j < m->areaCount; ++j) {
 			m12[j].unk0  = fp->readByte();
 			fp->readByte();
 			fp->readByte();
@@ -1354,7 +1354,7 @@ void Resource::loadMstData(File *fp) {
 			m12[j].count = fp->readUint32();
 			bytesRead += 12;
 		}
-		for (int j = 0; j < m->countUnk12; ++j) {
+		for (int j = 0; j < m->areaCount; ++j) {
 			m12[j].data = (MstMonsterAreaAction *)malloc(m12[j].count * sizeof(MstMonsterAreaAction));
 			for (uint32_t k = 0; k < m12[j].count; ++k) {
 				uint8_t data[28];
@@ -1372,7 +1372,7 @@ void Resource::loadMstData(File *fp) {
 				bytesRead += 28;
 			}
 		}
-		m->unk12 = m12;
+		m->area = m12;
 	}
 
 	const int mapDataSize = _mstHdr.infoMonster1Count * kMonsterInfoDataSize;
@@ -1630,8 +1630,8 @@ void Resource::unloadMstData() {
 			free(m->data2[j]);
 			m->data2[j] = 0;
 		}
-		free(m->unk12);
-		m->unk12 = 0;
+		free(m->area);
+		m->area = 0;
 	}
 
 	free(_mstMonsterInfos);

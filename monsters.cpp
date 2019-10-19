@@ -170,8 +170,8 @@ bool Game::addChasingMonster(MstUnk48 *m48, uint8_t direction) {
 	}
 	_mstActionNum = m48 - &_res->_mstUnk48[0];
 	_mstChasingMonstersCount = 0;
-	for (int i = 0; i < m48->countUnk12; ++i) {
-		MstMonsterAreaAction *unk4 = m48->unk12[i].data;
+	for (int i = 0; i < m48->areaCount; ++i) {
+		MstMonsterAreaAction *unk4 = m48->area[i].data;
 		const uint8_t num = unk4->monster1Index;
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
@@ -5336,9 +5336,9 @@ void Game::mstOp52() {
 	}
 	MstUnk48 *m48 = &_res->_mstUnk48[_mstActionNum];
 	int j = 0;
-	for (int i = 0; i < m48->countUnk12; ++i) {
-		MstUnk48Unk12 *m48unk12 = &m48->unk12[j];
-		const uint8_t num = m48unk12->data->monster1Index;
+	for (int i = 0; i < m48->areaCount; ++i) {
+		MstMonsterArea *m48Area = &m48->area[j];
+		const uint8_t num = m48Area->data->monster1Index;
 		if (num != 255) {
 			assert(num < kMaxMonsterObjects1);
 			MonsterObject1 *m = &_monsterObjects1Table[num];
@@ -5386,8 +5386,8 @@ bool Game::mstHasMonsterInRange(const MstUnk48 *m48, uint8_t flag) {
 	//int var28 = 0;
 	//int var18 = 0;
 	int _edi = 0;
-	for (int i = 0; i < m48->countUnk12; ++i) {
-		const MstUnk48Unk12 *m12 = &m48->unk12[i];
+	for (int i = 0; i < m48->areaCount; ++i) {
+		const MstMonsterArea *m12 = &m48->area[i];
 		assert(m12->count == 1);
 		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
@@ -5487,8 +5487,8 @@ l1:
 	}
 	//var28 = _edi;
 	//int var20 = 0;
-	for (int i = _edi; i < m48->countUnk12; ++i) {
-		MstUnk48Unk12 *m12 = &m48->unk12[i]; // var20
+	for (int i = _edi; i < m48->areaCount; ++i) {
+		MstMonsterArea *m12 = &m48->area[i]; // var20
 		assert(m12->count == 1);
 		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
