@@ -361,8 +361,8 @@ struct Game {
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void setLavaAndyAnimation(int yPos);
 	void updateSwitchesLar(int count, uint8_t *data, BoundingBox *r);
-	void updateSwitchesLar_helper1(int num, uint8_t *p1, BoundingBox *r);
-	int updateSwitchesLar_helper2(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
+	void updateSwitchesLar_checkSpectre(int num, uint8_t *p1, BoundingBox *r);
+	int updateSwitchesLar_checkAndy(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
 	int updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim);
 	void updateScreenMaskLar(uint8_t *p, uint8_t flag);
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
