@@ -242,14 +242,7 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	}
 	MonsterObject1 *m = t->monster1;
 
-	// The condition matches the disassembly but looks like a bug
-	// It was probably meant to check bit 3 instead
-
-	//   mov  dl, [esi+MonsterObject1.flagsA5]
-	//   test dl, dl
-	//   setz al
-	//   test al, 8
-	//   jnz  short return_0
+	// original code probably meant to check bit 3 directly
 
 	// const uint8_t r = (m->flagsA5 == 0) ? 1 : 0;
 	// if ((r & 8) != 0) {
