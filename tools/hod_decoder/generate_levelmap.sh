@@ -1,6 +1,11 @@
-set -x
+#set -x
 
-DATA=~/Data/heart_of_darkness/
+EXT=bmp
+if [ $1 = "-psx" ]; then
+	EXT=jpg
+	shift
+fi
+DATA=$1
 
 do_levelmap () {
 	name=$1
@@ -25,5 +30,4 @@ do_files () {
 	do_levelmap 'dark_hod' $data $extension
 }
 
-do_files $DATA/DATA_fr bmp
-do_files $DATA/DATA_psx/parts jpg
+do_files $DATA $EXT

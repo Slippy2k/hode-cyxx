@@ -202,7 +202,7 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 extern "C" {
 	#include <jpeglib.h>
 }
-void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
+static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 	const char *filename = (const char *)userdata;
 
 	if (mdecOutput->format == kMdecOutputRgb) {
