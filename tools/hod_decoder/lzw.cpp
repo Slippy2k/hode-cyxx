@@ -1,7 +1,3 @@
-/*
- * Heart Of Darkness engine rewrite
- * Copyright (C) 2009-2011 Gregory Montoir
- */
 
 #include "intern.h"
 

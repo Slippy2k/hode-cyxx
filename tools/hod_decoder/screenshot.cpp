@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/param.h>
 #include "fileio.h"
+#include "mdec.h"
 #include "screenshot.h"
 
 static void TO_LE16(uint8_t *dst, uint16_t value) {
@@ -187,28 +188,6 @@ void saveLZW(const char *filename, const uint8_t *bits, int len, const uint8_t *
 	}
 }
 
-#ifdef WITH_LIBBS
-#include "bs.h"
-void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
-	static bool bs_inited = false;
-	if (!bs_inited) {
-		bs_init();
-		bs_inited = true;
-	}
-	uint8_t *rgb = (uint8_t *)malloc(w * h * 3);
-	if (rgb) {
-		bs_decode_rgb24(rgb, (bs_header_t *)src, w, h, 0);
-		char filename2[MAXPATHLEN];
-		strcpy(filename2, filename);
-		char *ext = strrchr(filename2, '.');
-		if (ext) {
-			strcpy(ext + 1, "tga");
-			saveTGA(filename2, (const uint8_t *)rgb, w, h);
-		}
-		free(rgb);
-	}
-}
-#else
 #ifdef _WIN32
 void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	char filename2[MAXPATHLEN];
@@ -222,35 +201,21 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 #else
 extern "C" {
 	#include <jpeglib.h>
-	#include <libavcodec/avcodec.h>
 }
-void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
-	static bool codec_inited = false;
+void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
+	const char *filename = (const char *)userdata;
 
-	if (!codec_inited) {
-		avcodec_register_all();
-		codec_inited = true;
-	}
+	if (mdecOutput->format == kMdecOutputRgb) {
 
-	// fprintf(stdout, "MDEC len %d, VLC_ID 0x%x\n", READ_LE_UINT16(src), READ_LE_UINT16(src + 2));
-	// fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
+		char filename2[MAXPATHLEN];
+		strcpy(filename2, filename);
+		char *ext = strrchr(filename2, '.');
+		if (ext) {
+			strcpy(ext + 1, "tga");
+			saveTGA(filename2, mdecOutput->planes[0].ptr, mdecOutput->w, mdecOutput->h);
+                }
 
-	const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_MDEC);
-	AVCodecContext *ctx = avcodec_alloc_context3(codec);
-	ctx->width  = w;
-	ctx->height = h;
-	avcodec_open2(ctx, codec, 0);
-
-	AVPacket pkt;
-	av_new_packet(&pkt, len);
-	memcpy(pkt.data, src, len);
-
-	AVFrame *frame = av_frame_alloc();
-	int hasFrame = 0;
-	const int ret = avcodec_decode_video2(ctx, frame, &hasFrame, &pkt);
-	if (ret < 0) {
-		fprintf(stderr, "avcodec_decode_video2 ret %d\n", ret);
-	} else {
+	} else if (mdecOutput->format == kMdecOutputYuv) {
 
 		struct jpeg_compress_struct cinfo;
 		struct jpeg_error_mgr jerr;
@@ -262,8 +227,8 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 		if (fp) {
 			jpeg_stdio_dest(&cinfo, fp);
 
-			cinfo.image_width = w;
-			cinfo.image_height = h;
+			cinfo.image_width = mdecOutput->w;
+			cinfo.image_height = mdecOutput->h;
 			cinfo.input_components = 3;
 			cinfo.in_color_space = JCS_YCbCr;
 
@@ -299,9 +264,9 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 			for (unsigned int j = 0; j < cinfo.image_height; j += 16) {
 				int offset = j;
 				for (unsigned int i = 0; i < 16; i++) {
-					y[i]       = frame->data[0] + frame->linesize[0] *  offset;
-					cr[i >> 1] = frame->data[1] + frame->linesize[1] * (offset >> 1);
-					cb[i >> 1] = frame->data[2] + frame->linesize[2] * (offset >> 1);
+					y[i]       = mdecOutput->planes[0].ptr + mdecOutput->planes[0].pitch *  offset;
+					cr[i >> 1] = mdecOutput->planes[1].ptr + mdecOutput->planes[1].pitch * (offset >> 1);
+					cb[i >> 1] = mdecOutput->planes[2].ptr + mdecOutput->planes[2].pitch * (offset >> 1);
 					++offset;
 				}
 				jpeg_write_raw_data(&cinfo, p, 16);
@@ -313,8 +278,9 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 			fclose(fp);
 		}
 	}
-	avcodec_free_context(&ctx);
-	av_frame_free(&frame);
+}
+
+void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
+	decodeMDEC(src, len, w, h, filename, outputPSX);
 }
 #endif // _WIN32
-#endif // WITH_LIBBS
