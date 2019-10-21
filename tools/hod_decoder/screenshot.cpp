@@ -188,7 +188,7 @@ void saveLZW(const char *filename, const uint8_t *bits, int len, const uint8_t *
 	}
 }
 
-#ifdef _WIN32
+#ifdef STUB_SAVEPSX
 void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	char filename2[MAXPATHLEN];
 	strcpy(filename2, filename);
@@ -281,6 +281,8 @@ static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 }
 
 void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
+	// fprintf(stdout, "MDEC len %d, VLC_ID 0x%x\n", READ_LE_UINT16(src), READ_LE_UINT16(src + 2));
+	// fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
 	decodeMDEC(src, len, w, h, filename, outputPSX);
 }
-#endif // _WIN32
+#endif // STUB_SAVEPSX
