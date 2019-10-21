@@ -254,32 +254,27 @@ void Level_lar2::postScreenUpdate_lar2_screen11() {
 	_g->updateGatesLar(o, Game::_lar2_gatesData + 0x14, 5);
 	o = _g->findLvlObject(2, 1, 11);
 	_g->updateGatesLar(o, Game::_lar2_gatesData + 0x18, 6);
-	uint8_t *p = _lar2_switchesData + 0x18;
+	int offset = 0x18;
 	if ((_lar2_switchesData[0x11] & 1) == 0 && (_lar2_switchesData[0x11] & 0x40) != 0 && (_lar2_switchesData[0x19] & 1) == 0) {
-		_lar2_switchesData[0x19] = (_lar2_switchesData[0x19] & ~0x40) | 1;
-		p = _lar2_switchesData + 0x1C;
-		_lar2_switchesData[0x1D] = (_lar2_switchesData[0x1D] & ~0x40) | 1;
+		_lar2_switchesData[0x19] = (_lar2_switchesData[0x19] | 1) & ~0x40;
+		offset = 0x1C;
+		_lar2_switchesData[0x1D] = (_lar2_switchesData[0x1D] | 1) & ~0x40;
 	}
-	if ((p[1] & 1) == 0 && (p[1] & 0x40) != 0) {
+	if ((_lar2_switchesData[offset + 1] & 1) == 0 && (_lar2_switchesData[offset + 1] & 0x40) != 0) {
 		if ((_lar2_switchesData[0x21] & 1) != 0) {
 			goto next;
 		}
-		_lar2_switchesData[0x21] |= 1;
-		_lar2_switchesData[0x21] &= ~0x40;
+		_lar2_switchesData[0x21] = (_lar2_switchesData[0x21] | 1) & ~0x40;
 	}
-	if ((_lar2_switchesData[0x21] & 1) == 0 && (_lar2_switchesData[0x21] & 0x40) != 0 && (p[1] & 1) == 0) {
-		p[1] &= ~0x40;
-		p[1] |= 1;
-		_lar2_switchesData[0x1D] |= 1;
-		_lar2_switchesData[0x1D] &= ~0x40;
-		p = _lar2_switchesData + 0x1C;
+	if ((_lar2_switchesData[0x21] & 1) == 0 && (_lar2_switchesData[0x21] & 0x40) != 0 && (_lar2_switchesData[offset + 1] & 1) == 0) {
+		_lar2_switchesData[offset + 1] = (_lar2_switchesData[offset + 1] | 1) & ~0x40;
+		_lar2_switchesData[0x1D] = (_lar2_switchesData[0x1D] | 1) & ~0x40;
+		offset = 0x1C;
 	}
 next:
-	if ((p[1] & 1) == 0 && (p[1] & 0x40) != 0 && (_lar2_switchesData[0x11] & 1) == 0) {
-		_lar2_switchesData[0x11] |= 1;
-		_lar2_switchesData[0x11] &= ~0x40;
-		_lar2_switchesData[0x15] |= 1;
-		_lar2_switchesData[0x15] &= ~0x40;
+	if ((_lar2_switchesData[offset + 1] & 1) == 0 && (_lar2_switchesData[offset + 1] & 0x40) != 0 && (_lar2_switchesData[0x11] & 1) == 0) {
+		_lar2_switchesData[0x11] = (_lar2_switchesData[0x11] | 1) & ~0x40;
+		_lar2_switchesData[0x15] = (_lar2_switchesData[0x15] | 1) & ~0X40;
 	}
 }
 
@@ -313,19 +308,15 @@ void Level_lar2::postScreenUpdate_lar2_screen12() {
 
 void Level_lar2::postScreenUpdate_lar2_screen13() {
 	if (_res->_currentScreenResourceNum == 13) {
-		const uint8_t *p = &_lar2_switchesData[0x2C];
-		if ((_lar2_switchesData[0x25] & 1) == 0 && (_lar2_switchesData[0x25] & 0x40) != 0) {
-			if ((_lar2_switchesData[0x2D] & 1) == 0) {
-				p = &_lar2_switchesData[0x30];
-				_lar2_switchesData[0x2D] &= ~0x40;
-				_lar2_switchesData[0x31] = (_lar2_switchesData[0x31] | 1) & ~0x40;
-			}
+		int offset = 0x2C;
+		if ((_lar2_switchesData[0x25] & 1) == 0 && (_lar2_switchesData[0x25] & 0x40) != 0 && (_lar2_switchesData[0x2D] & 1) == 0) {
+			offset = 0x30;
+			_lar2_switchesData[0x2D] = (_lar2_switchesData[0x2D] | 1) & ~0x40;
+			_lar2_switchesData[0x31] = (_lar2_switchesData[0x31] | 1) & ~0x40;
 		}
-		if ((p[1] & 1) == 0 && (p[1] & 0x40) != 0) {
-			if ((_lar2_switchesData[0x25] & 1) == 0) {
-				_lar2_switchesData[0x25] = (_lar2_switchesData[0x25] | 1) & ~0x40;
-				_lar2_switchesData[0x29] = (_lar2_switchesData[0x29] | 1) & ~0x40;
-			}
+		if ((_lar2_switchesData[offset + 1] & 1) == 0 && (_lar2_switchesData[offset + 1] & 0x40) != 0 && (_lar2_switchesData[0x25] & 1) == 0) {
+			_lar2_switchesData[0x25] = (_lar2_switchesData[0x25] | 1) & ~0x40;
+			_lar2_switchesData[0x29] = (_lar2_switchesData[0x29] | 1) & ~0x40;
 		}
 	}
 }
