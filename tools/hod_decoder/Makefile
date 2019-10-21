@@ -1,7 +1,7 @@
 
 CPPFLAGS += -Wall -g
 
-MDEC := ffmpeg
+MDEC := oddlib
 
 ifeq "$(MDEC)" "libbs"
 	LIBBS_DIR := libbs
@@ -13,6 +13,11 @@ endif
 ifeq "$(MDEC)" "ffmpeg"
 	MDEC_OBJS := mdec_ffmpeg.o
 	MDEC_LIBS := -lavcodec -lavutil
+endif
+
+ifeq "$(MDEC)" "oddlib"
+	MDEC_OBJS := mdec_oddlib.o PSXMDECDecoder.o
+	MDEC_LIBS :=
 endif
 
 hod_decoder: decode_sss.o decode_mst.o fileio.o lzw.o main.o screenshot.o wav.o $(MDEC_OBJS)
