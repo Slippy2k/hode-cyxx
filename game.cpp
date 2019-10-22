@@ -2100,6 +2100,9 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		_paf->preload(num);
 		_paf->play(num);
 		_paf->unload(num);
+		if (_system->inp.quit) {
+			return;
+		}
 	}
 	if (_res->_sssHdr.infosDataCount != 0) {
 		resetSound();
