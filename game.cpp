@@ -4442,7 +4442,7 @@ int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, in
 		const int dy = box->y2 - box->y1;
 		const int dx = box->x2 - box->x1;
 		if (dx >= dy) {
-			ret = 0;
+			ret = 1;
 		} else {
 			const uint8_t _dl = ((_andyObject->flags1) >> 4) & 3;
 			if (anim != _dl) {
