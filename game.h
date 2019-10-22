@@ -83,8 +83,6 @@ struct Game {
 	static const uint8_t _lar1_spritesData[];
 	static const int16_t *_lar_screenMaskOffsets[];
 	static uint8_t _lar1_maskData[];
-	static uint8_t _lar1_gatesData[];
-	static uint8_t _lar2_gatesData[];
 	static BoundingBox _lar1_bboxData[];
 	static BoundingBox _lar2_bboxData[];
 
@@ -360,9 +358,9 @@ struct Game {
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void setLavaAndyAnimation(int yPos);
-	void updateSwitchesLar(int count, uint8_t *data, BoundingBox *r);
-	void updateSwitchesLar_checkSpectre(int num, uint8_t *p1, BoundingBox *r);
-	int updateSwitchesLar_checkAndy(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r);
+	void updateSwitchesLar(int count, uint8_t *data, BoundingBox *r, uint8_t *gatesData);
+	void updateSwitchesLar_checkSpectre(int num, uint8_t *p1, BoundingBox *r, uint8_t *gatesData);
+	int updateSwitchesLar_checkAndy(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r, uint8_t *gatesData);
 	int updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim);
 	void updateScreenMaskLar(uint8_t *p, uint8_t flag);
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
