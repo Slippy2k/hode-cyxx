@@ -4329,32 +4329,28 @@ void Game::updateSwitchesLar_checkSpectre(int num, uint8_t *p, BoundingBox *r, u
 			_edi = &gatesData[p[3] * 4];
 			uint8_t _al = (p[1] >> 1) & 1;
 			uint8_t _bl = (_edi[0] >> 4);
-			if (_bl == _al) {
-				continue;
+			if (_bl != _al) {
+				_bl = (_al << 4) | (_edi[0] & 15);
+				_edi[0] = _bl;
+				const uint8_t _cl = (p[1] >> 5) & 1;
+				if (_cl == 1 && _al == _cl) {
+					_edi[3] = 4;
+				}
 			}
-			_bl = (_al << 4) | (_edi[0] & 15);
-			_edi[0] = _bl;
-			uint8_t _cl = (p[1] >> 5) & 1;
-			if (_cl != 1 || _al != _cl) {
-				continue;
-			}
-			_edi[3] = 4;
 		} else {
 // 406C3A
 			if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 				_edi = &gatesData[p[3] * 4];
 				uint8_t _al = ((~p[1]) >> 1) & 1;
 				uint8_t _bl = (_edi[0] >> 4);
-				if (_bl == _al) {
-					continue;
+				if (_bl != _al) {
+					_bl = (_al << 4) | (_edi[0] & 15);
+					_edi[0] = _bl;
+					const uint8_t _cl = (p[1] >> 5) & 1;
+					if (_cl == 1 && _al == _cl) {
+						_edi[3] = 4;
+					}
 				}
-				_bl = (_al << 4) | (_edi[0] & 15);
-				_edi[0] = _bl;
-				uint8_t _cl = (p[1] >> 5) & 1;
-				if (_cl != 1 || _al != _cl) {
-					continue;
-				}
-				_edi[3] = 4;
 			}
 		}
 	}
@@ -4363,77 +4359,71 @@ void Game::updateSwitchesLar_checkSpectre(int num, uint8_t *p, BoundingBox *r, u
 int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, BoundingBox *b2, uint8_t *gatesData) {
 	int ret = 0;
 	//const uint8_t flags = _andyObject->flags0 & 0x1F;
-	if ((p[1] & 0x40) == 0) {
-		ret = clipBoundingBox(b1, b2);
-		if (ret) {
-			if ((p[1] & 1) == 0) { // switch already actioned
-				return ret;
-			}
-// 4068A4
-			const int flag = (p[1] >> 5) & 1;
-			uint8_t _al = clipAndyLvlObjectLar(b1, b2, flag);
-			_al = updateSwitchesLar_toggle(_al, p[2], p[0], num, flag);
-			p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
-			_al = p[1];
-			if ((_al & 0x40) == 0) {
-				return ret;
-			}
-			ret = 1;
-			if ((_al & 8) != 0) {
-				if (_al & 2) {
-					_al = p[3];
-				} else {
-					_al = -p[3];
-				}
-				int _bl, i;
-				if (_al < 0) {
-					i = (-_al) * 6;
-					updateScreenMaskLar(&_lar1_maskData[i], 0);
-					_bl = 5;
-				} else {
-					i = _al * 6;
-					updateScreenMaskLar(&_lar1_maskData[i], 1);
-					_bl = 2;
-				}
-				LvlObject *o = findLvlObject2(0, _lar1_maskData[i + 5], _lar1_maskData[i + 4]);
-				if (o) {
-					o->objectUpdateType = _bl;
-				}
-				return ret;
-			}
-// 40699A
-			uint8_t _cl = (_al >> 5) & 1;
-			_al = (_al >> 1) & 1;
-			uint8_t *_esi = &gatesData[p[3] * 4];
-			uint8_t _dl = _esi[0];
-			uint8_t _bl = _dl >> 4;
-			if (_bl == _al) {
-				return ret;
-			}
-			_bl = (_al << 4) | (_dl & 15);
-			_esi[0] = _bl;
-			if (_cl != 1 || _al != _cl) {
-				return ret;
-			}
-			_esi[3] = 4;
+	if ((p[1] & 0x40) == 0 && (ret = clipBoundingBox(b1, b2)) != 0) {
+		if ((p[1] & 1) == 0) { // switch already actioned
 			return ret;
 		}
+// 4068A4
+		const int flag = (p[1] >> 5) & 1;
+		uint8_t _al = clipAndyLvlObjectLar(b1, b2, flag);
+		_al = updateSwitchesLar_toggle(_al, p[2], p[0], num, flag);
+		p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
+		_al = p[1];
+		if ((_al & 0x40) == 0) {
+			return ret;
+		}
+		ret = 1;
+		if ((_al & 8) != 0) {
+			if (_al & 2) {
+				_al = p[3];
+			} else {
+				_al = -p[3];
+			}
+			int _bl, i;
+			if (_al < 0) {
+				i = (-_al) * 6;
+				updateScreenMaskLar(&_lar1_maskData[i], 0);
+				_bl = 5;
+			} else {
+				i = _al * 6;
+				updateScreenMaskLar(&_lar1_maskData[i], 1);
+				_bl = 2;
+			}
+			LvlObject *o = findLvlObject2(0, _lar1_maskData[i + 5], _lar1_maskData[i + 4]);
+			if (o) {
+				o->objectUpdateType = _bl;
+			}
+			return ret;
+		}
+// 40699A
+		const uint8_t _cl = (_al >> 5) & 1;
+		_al = (_al >> 1) & 1;
+
+		p = &gatesData[p[3] * 4];
+		uint8_t _bl = p[0] >> 4;
+		if (_bl != _al) {
+			_bl = (_al << 4) | (p[0] & 0xF);
+			p[0] = _bl;
+			if (_cl == 1 && _al == _cl) {
+				p[3] = 4;
+			}
+		}
+		return ret;
 	}
 // 406A0D
 	if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
 		p = &gatesData[p[3] * 4];
+		const uint8_t _cl = (p[1] >> 5) & 1;
 		uint8_t _al = ((~p[1]) >> 1) & 1;
-		uint8_t _cl = (p[1] >> 5) & 1;
+
 		uint8_t _bl = p[0] >> 4;
-		if (_bl == _al) {
-			return ret;
+		if (_bl != _al) {
+			_bl = (_al << 4) | (p[0] & 0xF);
+			p[0] = _bl;
+			if (_cl == 1 && _al == _cl) {
+				p[3] = 4;
+			}
 		}
-		_bl = (_al << 4) | (p[0] & 0xF);
-		p[0] = _bl;
-		if (_cl != 1 || _al != _cl) {
-			return ret;
-		}
-		p[3] = 4;
 	}
 	return ret;
 }
