@@ -83,8 +83,6 @@ struct Game {
 	static const uint8_t _lar1_spritesData[];
 	static const int16_t *_lar_screenMaskOffsets[];
 	static uint8_t _lar1_maskData[];
-	static BoundingBox _lar1_bboxData[];
-	static BoundingBox _lar2_bboxData[];
 
 	Level *_level;
 	Mixer _mix;
@@ -361,7 +359,7 @@ struct Game {
 	void updateSwitchesLar(int count, uint8_t *data, BoundingBox *r, uint8_t *gatesData);
 	void updateSwitchesLar_checkSpectre(int num, uint8_t *p1, BoundingBox *r, uint8_t *gatesData);
 	int updateSwitchesLar_checkAndy(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r, uint8_t *gatesData);
-	int updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim);
+	int updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int switchNum, int anim, const BoundingBox *switchBoundingBox);
 	void updateScreenMaskLar(uint8_t *p, uint8_t flag);
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
 	void resetWormHoleSprites();

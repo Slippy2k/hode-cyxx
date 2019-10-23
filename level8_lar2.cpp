@@ -81,7 +81,7 @@ static const uint8_t _lar2_setupScreen19Data[13 * 3] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-BoundingBox Game::_lar2_bboxData[13] = {
+static BoundingBox _lar2_bboxData[13] = {
 	{ 210, 155, 220, 159 },
 	{ 224, 146, 234, 150 },
 	{ 193,  84, 203,  88 },
@@ -516,7 +516,7 @@ void Level_lar2::preScreenUpdate(int num) {
 }
 
 void Level_lar2::tick() {
-	_g->updateSwitchesLar(13, _lar2_switchesData, Game::_lar2_bboxData, _lar2_gatesData);
+	_g->updateSwitchesLar(13, _lar2_switchesData, _lar2_bboxData, _lar2_gatesData);
 }
 
 void Level_lar2::setupScreenCheckpoint_lar2_screen19() {

@@ -4276,17 +4276,17 @@ void Game::setLavaAndyAnimation(int yPos) {
 	}
 }
 
-void Game::updateSwitchesLar(int count, uint8_t *switchesData, BoundingBox *r, uint8_t *gatesData) {
+void Game::updateSwitchesLar(int count, uint8_t *switchesData, BoundingBox *switchesBoundingBox, uint8_t *gatesData) {
 	for (int i = 0; i < count; ++i) {
 		switchesData[i * 4 + 1] &= ~0x40;
 	}
 	for (int i = 0; i < count; ++i) {
 		if (_andyObject->screenNum == switchesData[i * 4]) {
 			if ((switchesData[i * 4 + 1] & 0x10) == 0x10) { // can be actioned by a spectre
-				updateSwitchesLar_checkSpectre(i, &switchesData[i * 4], &r[i], gatesData);
+				updateSwitchesLar_checkSpectre(i, &switchesData[i * 4], &switchesBoundingBox[i], gatesData);
 			}
 			AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			updateSwitchesLar_checkAndy(i, &switchesData[i * 4], &data->boundingBox, &r[i], gatesData);
+			updateSwitchesLar_checkAndy(i, &switchesData[i * 4], &data->boundingBox, &switchesBoundingBox[i], gatesData);
 		}
 	}
 	for (int i = 0; i < count; ++i) {
@@ -4319,7 +4319,7 @@ void Game::updateSwitchesLar_checkSpectre(int num, uint8_t *p, BoundingBox *r, u
 		if ((p[1] & 0x40) == 0 && clipBoundingBox(r, &b)) {
 			found = true;
 // 406B66
-			if ((p[2] & 0x80) == 0 && !updateSwitchesLar_toggle(true, p[2], p[0], num, (p[1] >> 5) & 1)) {
+			if ((p[2] & 0x80) == 0 && !updateSwitchesLar_toggle(true, p[2], p[0], num, (p[1] >> 5) & 1, r)) {
 				continue;
 			}
 			p[1] |= 0x40;
@@ -4366,7 +4366,7 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 // 4068A4
 		const int flag = (p[1] >> 5) & 1;
 		uint8_t _al = clipAndyLvlObjectLar(b1, b2, flag);
-		_al = updateSwitchesLar_toggle(_al, p[2], p[0], num, flag);
+		_al = updateSwitchesLar_toggle(_al, p[2], p[0], num, flag, b2);
 		p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
 		_al = p[1];
 		if ((_al & 0x40) == 0) {
@@ -4428,17 +4428,11 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 	return ret;
 }
 
-int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int boxNum, int anim) {
+int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int switchNum, int anim, const BoundingBox *box) {
 	uint8_t _al = (_andyObject->flags0 >> 5) & 7;
 	uint8_t _cl = (_andyObject->flags0 & 0x1F);
 	int ret = 0; // _bl
 	if ((dataNum & 0x80) == 0) {
-		BoundingBox *box;
-		if (_currentLevel == kLvl_lar2) {
-			box = &Game::_lar2_bboxData[boxNum];
-		} else {
-			box = &Game::_lar1_bboxData[boxNum];
-		}
 		const int dy = box->y2 - box->y1;
 		const int dx = box->x2 - box->x1;
 		if (dx >= dy) {

@@ -85,7 +85,7 @@ static uint8_t _lar1_gatesData[13 * 4] = {
         0x02, 0x00, 0x00, 0x00
 };
 
-BoundingBox Game::_lar1_bboxData[24] = {
+static BoundingBox _lar1_bboxData[24] = {
 	{ 203, 162, 213, 166 },
 	{  68,  86,  78,  90 },
 	{ 195,  58, 205,  62 },
@@ -954,7 +954,7 @@ void Level_lar1::terminate() {
 }
 
 void Level_lar1::tick() {
-	_g->updateSwitchesLar(24, _lar1_switchesData, Game::_lar1_bboxData, _lar1_gatesData);
+	_g->updateSwitchesLar(24, _lar1_switchesData, _lar1_bboxData, _lar1_gatesData);
 	_g->updateWormHoleSprites();
 	if (_screenCounterTable[19] != 0) {
 		_g->_plasmaCannonFlags |= 2;
