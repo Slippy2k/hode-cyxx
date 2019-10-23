@@ -801,7 +801,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	}
 }
 
-void Game::shuffleMstUnk43(MstUnk43 *p) {
+void Game::shuffleMstMonsterActionIndex(MstMonsterActionIndex *p) {
 	for (uint32_t i = 0; i < p->dataCount; ++i) {
 		p->data[i] &= 0x7F;
 	}
@@ -846,8 +846,8 @@ void Game::resetMstCode() {
 			shuffleArray(_res->_mstWalkCodeData[i].data, count);
 		}
 	}
-	for (int i = 0; i < _res->_mstHdr.unk0x24; ++i) {
-		shuffleMstUnk43(&_res->_mstUnk43[i]);
+	for (int i = 0; i < _res->_mstHdr.monsterActionIndexDataCount; ++i) {
+		shuffleMstMonsterActionIndex(&_res->_mstMonsterActionIndexData[i]);
 	}
 	_mstOp67_x1 = -256;
 	_mstOp67_x2 = -256;
@@ -4497,8 +4497,8 @@ int Game::mstTask_main(Task *t) {
 			break;
 		case 215: { // 62
 				if (_m43Num3 != -1) {
-					assert(_m43Num3 < _res->_mstHdr.unk0x24);
-					shuffleMstUnk43(&_res->_mstUnk43[_m43Num3]);
+					assert(_m43Num3 < _res->_mstHdr.monsterActionIndexDataCount);
+					shuffleMstMonsterActionIndex(&_res->_mstMonsterActionIndexData[_m43Num3]);
 				}
 				_mstOp54Counter = 0;
 			}
@@ -4507,8 +4507,8 @@ int Game::mstTask_main(Task *t) {
 				const int16_t num = READ_LE_UINT16(p + 2);
 				if (_m43Num3 != num) {
 					_m43Num3 = num;
-					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
-					shuffleMstUnk43(&_res->_mstUnk43[num]);
+					assert(num >= 0 && num < _res->_mstHdr.monsterActionIndexDataCount);
+					shuffleMstMonsterActionIndex(&_res->_mstMonsterActionIndexData[num]);
 					_mstOp54Counter = 0;
 				}
 			}
@@ -4518,8 +4518,8 @@ int Game::mstTask_main(Task *t) {
 				if (num != _m43Num1) {
 					_m43Num1 = num;
 					_m43Num2 = num;
-					assert(num >= 0 && num < _res->_mstHdr.unk0x24);
-					shuffleMstUnk43(&_res->_mstUnk43[num]);
+					assert(num >= 0 && num < _res->_mstHdr.monsterActionIndexDataCount);
+					shuffleMstMonsterActionIndex(&_res->_mstMonsterActionIndexData[num]);
 				}
 			}
 			break;
@@ -5605,17 +5605,17 @@ void Game::mstOp54() {
 	if (_mstActionNum != -1) {
 		return;
 	}
-	MstUnk43 *m43 = 0;
+	MstMonsterActionIndex *m43 = 0;
 	if (_mstFlags & 0x20000000) {
 		if (_m43Num2 == -1) {
 			return;
 		}
-		m43 = &_res->_mstUnk43[_m43Num2];
+		m43 = &_res->_mstMonsterActionIndexData[_m43Num2];
 	} else {
 		if (_m43Num3 == -1) {
 			return;
 		}
-		m43 = &_res->_mstUnk43[_m43Num3];
+		m43 = &_res->_mstMonsterActionIndexData[_m43Num3];
 		_m43Num2 = _m43Num1;
 	}
 	const int x = MIN(_mstAndyScreenPosX, 255);
@@ -5647,7 +5647,7 @@ void Game::mstOp54() {
 			return;
 		}
 		_mstOp54Counter = 0;
-		shuffleMstUnk43(m43);
+		shuffleMstMonsterActionIndex(m43);
 	} else {
 // 41E3CA
 		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
@@ -5681,7 +5681,7 @@ void Game::mstOp54() {
 			}
 			_mstOp54Counter = 0;
 			if (m43->dataCount != 0) {
-				shuffleMstUnk43(m43);
+				shuffleMstMonsterActionIndex(m43);
 			}
 		}
 	}

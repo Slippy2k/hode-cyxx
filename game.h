@@ -404,7 +404,7 @@ struct Game {
 	void mstTaskSetMonster2ScreenPosition(Task *t);
 	int getMstDistance(int y, const AndyShootData *p) const;
 	void mstTaskUpdateScreenPosition(Task *t);
-	void shuffleMstUnk43(MstUnk43 *p);
+	void shuffleMstMonsterActionIndex(MstMonsterActionIndex *p);
 
 	void initMstCode();
 	void resetMstCode();
