@@ -2252,7 +2252,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		break;
 	case 4:
 		++_esi->currentFrame;
-		if (_esi->currentFrame < _esi->framesCount) { // original uses '<=' (oob)
+		if (_esi->currentFrame < _esi->framesCount) { // bugfix: original uses '<=' (out of bounds)
 			_esi->currentSpriteData = _eax;
 			soundNum = READ_LE_UINT16(_eax);
 		} else {
@@ -2679,7 +2679,7 @@ void Game::levelMainLoop() {
 		}
 	}
 	if (_res->_sssHdr.infosDataCount != 0) {
-		// original code appears to have a dedicated thread for sound, that main thread/loop signals
+		// sound thread signaling
 	}
 	if (_video->_paletteNeedRefresh) {
 		_video->_paletteNeedRefresh = false;

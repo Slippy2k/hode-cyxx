@@ -242,7 +242,7 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	}
 	MonsterObject1 *m = t->monster1;
 
-	// original code probably meant to check bit 3 directly
+	// bugfix: original code meant to check bit 3 directly ?
 
 	// const uint8_t r = (m->flagsA5 == 0) ? 1 : 0;
 	// if ((r & 8) != 0) {
@@ -856,7 +856,7 @@ void Game::resetMstCode() {
 	memset(_mstVars, 0, sizeof(_mstVars));
 	memset(_tasksTable, 0, sizeof(_tasksTable));
 	_m43Num3 = _m43Num1 = _m43Num2 = _mstActionNum = -1;
-	_mstOp54Counter = 0; // not reset in the original, causes uninitialized reads at the beginning of 'fort'
+	_mstOp54Counter = 0; // bugfix: not reset in the original, causes uninitialized reads at the beginning of 'fort'
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// _mstUnk8 = 0;
 	_specialAnimFlag = false;

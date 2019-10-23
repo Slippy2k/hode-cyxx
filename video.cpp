@@ -430,8 +430,8 @@ void Video::buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst) {
 
 // returns the font index
 uint8_t Video::findStringCharacterFontIndex(uint8_t chr) const {
-	// the original code seems to ignore the last 3 entries
-	for (int i = 0; i < 36 * 2; i += 2) {
+	// bugfix: the original code seems to ignore the last 3 entries
+	for (int i = 0; i < 39 * 2; i += 2) {
 		if (_fontCharactersTable[i] == chr) {
 			return _fontCharactersTable[i + 1];
 		}
