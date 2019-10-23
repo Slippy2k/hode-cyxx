@@ -85,7 +85,7 @@ static uint8_t _lar1_gatesData[13 * 4] = {
         0x02, 0x00, 0x00, 0x00
 };
 
-static BoundingBox _lar1_bboxData[24] = {
+static BoundingBox _lar1_switchesBbox[24] = {
 	{ 203, 162, 213, 166 },
 	{  68,  86,  78,  90 },
 	{ 195,  58, 205,  62 },
@@ -112,7 +112,7 @@ static BoundingBox _lar1_bboxData[24] = {
 	{  32, 145,  44, 173 }
 };
 
-static uint8_t _lar1_switchesData[24 * 4] = {
+static uint8_t _lar1_switchesData[24 * 4] = { // screenNum,state,spriteNum,gateNum
 	0x04, 0x07, 0x01, 0x00, 0x05, 0x01, 0x01, 0x01, 0x08, 0x0F, 0x02, 0x00, 0x08, 0x07, 0x03, 0x04,
 	0x08, 0x07, 0xFF, 0x05, 0x08, 0x07, 0x04, 0x04, 0x09, 0x27, 0xFF, 0x06, 0x09, 0x29, 0x03, 0x02,
 	0x09, 0x29, 0xFF, 0x03, 0x09, 0x29, 0xFF, 0x04, 0x0A, 0x0B, 0x04, 0x02, 0x0A, 0x0B, 0xFF, 0x03,
@@ -954,7 +954,7 @@ void Level_lar1::terminate() {
 }
 
 void Level_lar1::tick() {
-	_g->updateSwitchesLar(24, _lar1_switchesData, _lar1_bboxData, _lar1_gatesData);
+	_g->updateSwitchesLar(24, _lar1_switchesData, _lar1_switchesBbox, _lar1_gatesData);
 	_g->updateWormHoleSprites();
 	if (_screenCounterTable[19] != 0) {
 		_g->_plasmaCannonFlags |= 2;
