@@ -86,7 +86,7 @@ void Game::mstMonster1ResetData(MonsterObject1 *m) {
 	}
 }
 
-void Game::initMonsterObject2_firefly(MonsterObject2 *m) {
+void Game::mstMonster2InitFirefly(MonsterObject2 *m) {
 	LvlObject *o = m->o;
 	m->x1 = _res->_mstPointOffsets[o->screenNum].xOffset;
 	m->y1 = _res->_mstPointOffsets[o->screenNum].yOffset;
@@ -7060,7 +7060,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		assert(codeData != kNone);
 		resetTask(t, _res->_mstCodeData + codeData * 4);
 		if (_currentLevel == kLvl_fort && mo->monster2Info->type == 27) {
-			initMonsterObject2_firefly(mo);
+			mstMonster2InitFirefly(mo);
 		}
 	} else {
 // 41593C

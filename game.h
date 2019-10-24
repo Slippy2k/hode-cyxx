@@ -391,7 +391,7 @@ struct Game {
 	void mstMonster1SetScreenPosition(MonsterObject1 *m);
 	bool mstMonster1SetWalkingBounds(MonsterObject1 *m);
 	bool mstMonster1UpdateWalkPath(MonsterObject1 *m);
-	void initMonsterObject2_firefly(MonsterObject2 *m);
+	void mstMonster2InitFirefly(MonsterObject2 *m);
 	void mstMonster2ResetData(MonsterObject2 *m);
 	uint32_t mstMonster1GetNextWalkCode(MonsterObject1 *m);
 	int mstTaskSetNextWalkCode(Task *t);
