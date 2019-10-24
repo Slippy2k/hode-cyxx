@@ -241,39 +241,36 @@ bool Video::clipLineCoords(int &x1, int &y1, int &x2, int &y2) {
 	int mask1 = computeLineOutCode(x2, y2);
 	while (1) {
 		const int mask2 = computeLineOutCode(x1, y1);
-		int mask = mask2;
 		if (mask2 == 0 && mask1 == 0) {
 			break;
 		}
-		if ((mask1 & mask) != 0) {
+		if ((mask1 & mask2) != 0) {
 			return true;
 		}
-		if (mask & 1) { // (x < _drawLine.x1)
+		if (mask2 & 1) { // (x < _drawLine.x1)
 			y1 += (y2 - y1) * (_drawLine.x1 - x1) / (x2 - x1);
 			x1 = _drawLine.x1;
 			continue;
 		}
-		mask >>= 8;
-		if (mask & 1) { // (y < _drawLine.y1)
+		if (mask2 & 0x100) { // (y < _drawLine.y1)
 			x1 += (x2 - x1) * (_drawLine.y1 - y1) / (y2 - y1);
 			y1 = _drawLine.y1;
 			continue;
 		}
-		mask >>= 8;
-		if (mask & 1) { // (x > _drawLine.x2)
+		if (mask2 & 0x10000) { // (x > _drawLine.x2)
 			y1 += (y2 - y1) * (_drawLine.x2 - x1) / (x2 - x1);
 			x1 = _drawLine.x2;
 			continue;
 		}
-		mask >>= 8;
-		if (mask & 1) { // (y > _drawLine.y2)
+		if (mask2 & 0x1000000) { // (y > _drawLine.y2)
 			x1 += (x2 - x1) * (_drawLine.y2 - y1) / (y2 - y1);
 			y1 = _drawLine.y2;
 			continue;
 		}
 		SWAP(x1, x2);
 		SWAP(y1, y2);
-		SWAP(mask, mask1);
+		assert(mask2 == 0);
+		mask1 = 0;
 	}
 	return false;
 }
