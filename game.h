@@ -356,6 +356,7 @@ struct Game {
 	LvlObject *findLvlObjectType2(int spriteNum, int screenNum);
 	LvlObject *findLvlObjectBoundingBox(BoundingBox *box);
 	void setLavaAndyAnimation(int yPos);
+	void updateGatesLar(LvlObject *o, uint8_t *p, int num);
 	void updateSwitchesLar(int count, uint8_t *data, BoundingBox *r, uint8_t *gatesData);
 	void updateSwitchesLar_checkSpectre(int num, uint8_t *p1, BoundingBox *r, uint8_t *gatesData);
 	int updateSwitchesLar_checkAndy(int num, uint8_t *p1, BoundingBox *b, BoundingBox *r, uint8_t *gatesData);
@@ -376,9 +377,6 @@ struct Game {
 	int objectUpdate_rock_case2(LvlObject *o);
 	int objectUpdate_rock_case3(LvlObject *o);
 	int objectUpdate_rock_case4(LvlObject *o);
-
-	// level7_lar1.cpp
-	void updateGatesLar(LvlObject *o, uint8_t *p, int num);
 
 	// monsters.cpp
 	void mstMonster1ResetData(MonsterObject1 *m);

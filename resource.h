@@ -81,7 +81,7 @@ struct MstHdr {
 	int screenAreaDataCount; // 18
 	int unk0x1C; // mstUnk39DataCount
 	int behaviorIndexDataCount; // 20
-	int monsetActionIndexDataCount; // 24
+	int monsterActionIndexDataCount; // 24
 	int walkPathDataCount; // 28
 	int infoMonster2Count; // 2C
 	int behaviorDataCount; // 30
