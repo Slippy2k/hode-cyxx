@@ -4512,8 +4512,8 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 		const int flag = (p[1] >> 5) & 1;
 		uint8_t _al = clipAndyLvlObjectLar(b1, b2, flag);
 		_al = updateSwitchesLar_toggle(_al, p[2], p[0], num, flag, b2);
-		p[1] = ((_al & 1) << 6) | (p[1] & ~0x40);
-		_al = p[1];
+		_al = ((_al & 1) << 6) | (p[1] & ~0x40);
+		p[1] = _al;
 		if ((_al & 0x40) == 0) {
 			return ret;
 		}
@@ -4543,7 +4543,6 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 // 40699A
 		const uint8_t _cl = (_al >> 5) & 1;
 		_al = (_al >> 1) & 1;
-
 		p = &gatesData[p[3] * 4];
 		uint8_t _bl = p[0] >> 4;
 		if (_bl != _al) {
@@ -4603,7 +4602,7 @@ int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, in
 			ret = (_andyObject->anim == 224) ? 1 : 0;
 		}
 		if (ret) {
-			LvlObject *o = findLvlObject(0, dataNum, screenNum);
+			LvlObject *o = findLvlObject2(0, dataNum, screenNum);
 			if (o) {
 				o->objectUpdateType = 7;
 			}
