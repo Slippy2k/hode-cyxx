@@ -38,7 +38,7 @@ Game::Game(System *system, const char *dataPath, uint32_t cheats) {
 	_plasmaExplosionObject = 0;
 	_plasmaCannonObject = 0;
 	memset(_spritesTable, 0, sizeof(_spritesTable));
-	memset(_spriteListPtrTable, 0, sizeof(_spriteListPtrTable));
+	memset(_typeSpritesList, 0, sizeof(_typeSpritesList));
 
 	_directionKeyMask = 0;
 	_actionKeyMask = 0;
@@ -64,7 +64,7 @@ Game::Game(System *system, const char *dataPath, uint32_t cheats) {
 	_mstOriginPosX = Video::W / 2;
 	_mstOriginPosY = Video::H / 2;
 	memset(_declaredLvlObjectsList, 0, sizeof(_declaredLvlObjectsList));
-	_declaredLvlObjectsListHead = 0;
+	_declaredLvlObjectsNextPtr = 0;
 	_declaredLvlObjectsListCount = 0;
 
 	memset(_animBackgroundDataTable, 0, sizeof(_animBackgroundDataTable));
@@ -90,7 +90,7 @@ Game::~Game() {
 }
 
 void Game::resetShootLvlObjectDataTable() {
-	_shootLvlObjectDataList = &_shootLvlObjectDataTable[0];
+	_shootLvlObjectDataNextPtr = &_shootLvlObjectDataTable[0];
 	for (int i = 0; i < kMaxShootLvlObjectData - 1; ++i) {
 		_shootLvlObjectDataTable[i].nextPtr = &_shootLvlObjectDataTable[i + 1];
 	}
@@ -99,8 +99,8 @@ void Game::resetShootLvlObjectDataTable() {
 
 void Game::clearShootLvlObjectData(LvlObject *ptr) {
 	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
-	dat->nextPtr = _shootLvlObjectDataList;
-	_shootLvlObjectDataList = dat;
+	dat->nextPtr = _shootLvlObjectDataNextPtr;
+	_shootLvlObjectDataNextPtr = dat;
 	ptr->dataPtr = 0;
 }
 
@@ -329,7 +329,7 @@ void Game::setupBackgroundBitmap() {
 }
 
 void Game::addToSpriteList(LvlObject *ptr) {
-	Sprite *spr = _spritesListNextPtr;
+	Sprite *spr = _spritesNextPtr;
 	if (spr) {
 		uint8_t rightScreenId  = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosRightScreen];
 		uint8_t topScreenId    = _res->_screensGrid[_res->_currentScreenResourceNum * 4 + kPosTopScreen];
@@ -368,10 +368,10 @@ void Game::addToSpriteList(LvlObject *ptr) {
 		}
 		if (READ_LE_UINT16(ptr->bitmapBits) > 8) {
 			spr->bitmapBits = ptr->bitmapBits;
-			_spritesListNextPtr = spr->nextPtr;
+			_spritesNextPtr = spr->nextPtr;
 			index = (ptr->flags2 & 31);
-			spr->nextPtr = _spriteListPtrTable[index];
-			_spriteListPtrTable[index] = spr;
+			spr->nextPtr = _typeSpritesList[index];
+			_typeSpritesList[index] = spr;
 		}
 	}
 }
@@ -744,9 +744,9 @@ void Game::destroyLvlObject(LvlObject *o) {
 	assert(o);
 	if (o->type == 8) {
 		_res->decLvlSpriteDataRefCounter(o);
-		o->nextPtr = _declaredLvlObjectsListHead;
+		o->nextPtr = _declaredLvlObjectsNextPtr;
 		--_declaredLvlObjectsListCount;
-		_declaredLvlObjectsListHead = o;
+		_declaredLvlObjectsNextPtr = o;
 		switch (o->spriteNum) {
 		case 0:
 		case 2:
@@ -962,9 +962,9 @@ void Game::clearLvlObjectsList0() {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
 			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsListHead;
+			ptr->nextPtr = _declaredLvlObjectsNextPtr;
 			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsListHead = ptr;
+			_declaredLvlObjectsNextPtr = ptr;
 			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
@@ -1003,9 +1003,9 @@ void Game::clearLvlObjectsList1() {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
 			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsListHead;
+			ptr->nextPtr = _declaredLvlObjectsNextPtr;
 			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsListHead = ptr;
+			_declaredLvlObjectsNextPtr = ptr;
 			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
@@ -1035,9 +1035,9 @@ void Game::clearLvlObjectsList2() {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
 			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsListHead;
+			ptr->nextPtr = _declaredLvlObjectsNextPtr;
 			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsListHead = ptr;
+			_declaredLvlObjectsNextPtr = ptr;
 			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
@@ -1067,9 +1067,9 @@ void Game::clearLvlObjectsList3() {
 		LvlObject *next = ptr->nextPtr;
 		if (ptr->type == 8) {
 			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsListHead;
+			ptr->nextPtr = _declaredLvlObjectsNextPtr;
 			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsListHead = ptr;
+			_declaredLvlObjectsNextPtr = ptr;
 			switch (ptr->spriteNum) {
 			case 0:
 			case 2:
@@ -1095,9 +1095,9 @@ void Game::clearLvlObjectsList3() {
 
 LvlObject *Game::addLvlObjectToList0(int num) {
 	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < kMaxLvlObjects) {
-		assert(_declaredLvlObjectsListHead);
-		LvlObject *ptr = _declaredLvlObjectsListHead;
-		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+		assert(_declaredLvlObjectsNextPtr);
+		LvlObject *ptr = _declaredLvlObjectsNextPtr;
+		_declaredLvlObjectsNextPtr = _declaredLvlObjectsNextPtr->nextPtr;
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = 8;
@@ -1116,9 +1116,9 @@ LvlObject *Game::addLvlObjectToList0(int num) {
 
 LvlObject *Game::addLvlObjectToList1(int type, int num) {
 	if ((type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) && _declaredLvlObjectsListCount < kMaxLvlObjects) {
-		assert(_declaredLvlObjectsListHead);
-		LvlObject *ptr = _declaredLvlObjectsListHead;
-		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+		assert(_declaredLvlObjectsNextPtr);
+		LvlObject *ptr = _declaredLvlObjectsNextPtr;
+		_declaredLvlObjectsNextPtr = _declaredLvlObjectsNextPtr->nextPtr;
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = type;
@@ -1139,9 +1139,9 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 
 LvlObject *Game::addLvlObjectToList2(int num) {
 	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < kMaxLvlObjects) {
-		assert(_declaredLvlObjectsListHead);
-		LvlObject *ptr = _declaredLvlObjectsListHead;
-		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+		assert(_declaredLvlObjectsNextPtr);
+		LvlObject *ptr = _declaredLvlObjectsNextPtr;
+		_declaredLvlObjectsNextPtr = _declaredLvlObjectsNextPtr->nextPtr;
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = 8;
@@ -1160,9 +1160,9 @@ LvlObject *Game::addLvlObjectToList2(int num) {
 
 LvlObject *Game::addLvlObjectToList3(int num) {
 	if (_res->_resLevelData0x2988PtrTable[num] != 0 && _declaredLvlObjectsListCount < kMaxLvlObjects) {
-		assert(_declaredLvlObjectsListHead);
-		LvlObject *ptr = _declaredLvlObjectsListHead;
-		_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+		assert(_declaredLvlObjectsNextPtr);
+		LvlObject *ptr = _declaredLvlObjectsNextPtr;
+		_declaredLvlObjectsNextPtr = _declaredLvlObjectsNextPtr->nextPtr;
 		++_declaredLvlObjectsListCount;
 		ptr->spriteNum = num;
 		ptr->type = 8;
@@ -1210,8 +1210,8 @@ void Game::removeLvlObject2(LvlObject *o) {
 	o->dataPtr = 0;
 	if (o->type == 8) {
 		_res->decLvlSpriteDataRefCounter(o);
-		o->nextPtr = _declaredLvlObjectsListHead;
-		_declaredLvlObjectsListHead = o;
+		o->nextPtr = _declaredLvlObjectsNextPtr;
+		_declaredLvlObjectsNextPtr = o;
 		--_declaredLvlObjectsListCount;
 	} else {
 		switch (o->spriteNum) {
@@ -1996,21 +1996,21 @@ void Game::drawScreen() {
 
 	// redraw background animation sprites
 	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[_res->_currentScreenResourceNum];
-	for (Sprite *spr = _spriteListPtrTable[0]; spr; spr = spr->nextPtr) {
+	for (Sprite *spr = _typeSpritesList[0]; spr; spr = spr->nextPtr) {
 		if ((spr->num & 0x1F) == 0) {
 			_video->decodeSPR(spr->bitmapBits, _video->_backgroundLayer, spr->xPos, spr->yPos, 0);
 		}
 	}
 	memset(_video->_shadowLayer, 0, Video::W * Video::H + 1);
 	for (int i = 1; i < 8; ++i) {
-		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _typeSpritesList[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x2000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_shadowLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
 		}
 	}
 	for (int i = 1; i < 4; ++i) {
-		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _typeSpritesList[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -2022,14 +2022,14 @@ void Game::drawScreen() {
 		}
 	}
 	for (int i = 4; i < 8; ++i) {
-		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _typeSpritesList[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
 		}
 	}
 	for (int i = 0; i < 24; ++i) {
-		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _typeSpritesList[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x2000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_shadowLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -2048,7 +2048,7 @@ void Game::drawScreen() {
 			_shadowScreenMasksTable[i].shadowPalettePtr);
 	}
 	for (int i = 1; i < 12; ++i) {
-		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _typeSpritesList[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -2060,7 +2060,7 @@ void Game::drawScreen() {
 		}
 	}
 	for (int i = 12; i <= 24; ++i) {
-		for (Sprite *spr = _spriteListPtrTable[i]; spr; spr = spr->nextPtr) {
+		for (Sprite *spr = _typeSpritesList[i]; spr; spr = spr->nextPtr) {
 			if ((spr->num & 0x1000) != 0) {
 				_video->decodeSPR(spr->bitmapBits, _video->_frontLayer, spr->xPos, spr->yPos, (spr->num >> 0xE) & 3);
 			}
@@ -2209,16 +2209,16 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			playSound(ptr->currentSound, ptr, 0, 3);
 			ptr->currentSound = 0xFFFF;
 		}
-		Sprite *spr = _spritesListNextPtr;
+		Sprite *spr = _spritesNextPtr;
 		if (spr && READ_LE_UINT16(_edi + 2) > 8) {
 			spr->xPos = _edi[0];
 			spr->yPos = _edi[1];
 			spr->bitmapBits = _edi + 2;
 			spr->num = ptr->flags2;
 			const int index = spr->num & 0x1F;
-			_spritesListNextPtr = spr->nextPtr;
-			spr->nextPtr = _spriteListPtrTable[index];
-			_spriteListPtrTable[index] = spr;
+			_spritesNextPtr = spr->nextPtr;
+			spr->nextPtr = _typeSpritesList[index];
+			_typeSpritesList[index] = spr;
 		}
 	}
 	int16_t soundNum = -1;
@@ -2272,16 +2272,16 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		}
 		_eax = _esi->currentSpriteData + 2; // _esi
 		if (_res->_currentScreenResourceNum == ptr->screenNum) {
-			Sprite *spr = _spritesListNextPtr;
+			Sprite *spr = _spritesNextPtr;
 			if (spr && READ_LE_UINT16(_eax + 2) > 8) {
 				spr->bitmapBits = _eax + 2;
 				spr->xPos = _eax[0];
 				spr->yPos = _eax[1];
-				_spritesListNextPtr = spr->nextPtr;
+				_spritesNextPtr = spr->nextPtr;
 				spr->num = ptr->flags2;
 				const int index = spr->num & 0x1F;
-				spr->nextPtr = _spriteListPtrTable[index];
-				_spriteListPtrTable[index] = spr;
+				spr->nextPtr = _typeSpritesList[index];
+				_typeSpritesList[index] = spr;
 			}
 		}
 		ptr->objectUpdateType = 1;
@@ -2330,16 +2330,16 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 				ptr->currentSound = 0xFFFF;
 			}
 			uint8_t *data = (uint8_t *)getLvlObjectDataPtr(ptr, kObjectDataTypeLvlBackgroundSound);
-			Sprite *spr = _spritesListNextPtr;
+			Sprite *spr = _spritesNextPtr;
 			if (spr && READ_LE_UINT16(data + 2) > 8) {
 				spr->bitmapBits = data + 2;
 				spr->xPos = data[0];
 				spr->yPos = data[1];
-				_spritesListNextPtr = spr->nextPtr;
+				_spritesNextPtr = spr->nextPtr;
 				spr->num = ptr->flags2;
 				const int index = spr->num & 0x1F;
-				spr->nextPtr = _spriteListPtrTable[index];
-				_spriteListPtrTable[index] = spr;
+				spr->nextPtr = _typeSpritesList[index];
+				_typeSpritesList[index] = spr;
 			}
 		}
 	}
@@ -2384,16 +2384,16 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		int _edx = (ptr->flags1 >> 4) & 0xFF;
 		int _ecx = (ash->flags1 >> 4) & 0xFF;
 		_ecx = (((_ecx ^ _edx) & 3) << 14) | ptr->flags2;
-		Sprite *spr = _spritesListNextPtr;
+		Sprite *spr = _spritesNextPtr;
 		if (spr && READ_LE_UINT16(_edi) > 8) {
 			spr->yPos = ptr->yPos;
 			spr->xPos = ptr->xPos;
 			spr->bitmapBits = _edi;
 			spr->num = _ecx;
 			const int index = spr->num & 0x1F;
-			_spritesListNextPtr = spr->nextPtr;
-			spr->nextPtr = _spriteListPtrTable[index];
-			_spriteListPtrTable[index] = spr;
+			_spritesNextPtr = spr->nextPtr;
+			spr->nextPtr = _typeSpritesList[index];
+			_typeSpritesList[index] = spr;
 		}
 	}
 	if (ptr->spriteNum <= 15 || ptr->dataPtr == 0) {
@@ -2631,8 +2631,8 @@ void Game::updateInput() {
 }
 
 void Game::levelMainLoop() {
-	memset(_spriteListPtrTable, 0, sizeof(_spriteListPtrTable));
-	_spritesListNextPtr = &_spritesTable[0];
+	memset(_typeSpritesList, 0, sizeof(_typeSpritesList));
+	_spritesNextPtr = &_spritesTable[0];
 	for (int i = 0; i < kMaxSprites - 1; ++i) {
 		_spritesTable[i].nextPtr = &_spritesTable[i + 1];
 	}
@@ -3232,12 +3232,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _shootLvlObjectDataList;
-					if (_shootLvlObjectDataList) {
-						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+					_edx->dataPtr = _shootLvlObjectDataNextPtr;
+					if (_shootLvlObjectDataNextPtr) {
+						_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
 						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
-						warning("Nothing free in _shootLvlObjectDataList");
+						warning("Nothing free in _shootLvlObjectDataNextPtr");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3281,12 +3281,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _shootLvlObjectDataList;
-					if (_shootLvlObjectDataList) {
-						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+					_edx->dataPtr = _shootLvlObjectDataNextPtr;
+					if (_shootLvlObjectDataNextPtr) {
+						_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
 						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
-						warning("Nothing free in _shootLvlObjectDataList");
+						warning("Nothing free in _shootLvlObjectDataNextPtr");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3322,12 +3322,12 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _shootLvlObjectDataList;
-					if (_shootLvlObjectDataList) {
-						_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+					_edx->dataPtr = _shootLvlObjectDataNextPtr;
+					if (_shootLvlObjectDataNextPtr) {
+						_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
 						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
 					} else {
-						warning("Nothing free in _shootLvlObjectDataList");
+						warning("Nothing free in _shootLvlObjectDataNextPtr");
 					}
 					_edx->xPos = ptr->xPos;
 					_edx->yPos = ptr->yPos;
@@ -3674,9 +3674,9 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 		}
 		if (o->type == 8) {
 			_res->decLvlSpriteDataRefCounter(o);
-			o->nextPtr = _declaredLvlObjectsListHead;
+			o->nextPtr = _declaredLvlObjectsNextPtr;
 			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsListHead = o;
+			_declaredLvlObjectsNextPtr = o;
 			switch (o->spriteNum) {
 			case 0:
 			case 2:
@@ -4123,9 +4123,9 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 LvlObject *Game::declareLvlObject(uint8_t type, uint8_t num) {
 	if (type != 8 || _res->_resLevelData0x2988PtrTable[num] != 0) {
 		if (_declaredLvlObjectsListCount < kMaxLvlObjects) {
-			assert(_declaredLvlObjectsListHead);
-			LvlObject *ptr = _declaredLvlObjectsListHead;
-			_declaredLvlObjectsListHead = _declaredLvlObjectsListHead->nextPtr;
+			assert(_declaredLvlObjectsNextPtr);
+			LvlObject *ptr = _declaredLvlObjectsNextPtr;
+			_declaredLvlObjectsNextPtr = _declaredLvlObjectsNextPtr->nextPtr;
 			assert(ptr);
 			++_declaredLvlObjectsListCount;
 			ptr->spriteNum = num;
@@ -4150,7 +4150,7 @@ void Game::clearDeclaredLvlObjectsList() {
 		_declaredLvlObjectsList[i].nextPtr = &_declaredLvlObjectsList[i + 1];
 	}
 	_declaredLvlObjectsList[kMaxLvlObjects - 1].nextPtr = 0;
-	_declaredLvlObjectsListHead = &_declaredLvlObjectsList[0];
+	_declaredLvlObjectsNextPtr = &_declaredLvlObjectsList[0];
 	_declaredLvlObjectsListCount = 0;
 }
 
@@ -4688,7 +4688,7 @@ void Game::updateWormHoleSprites() {
 			int xOffset = 0;
 			for (int j = 0; j < 11; ++j) {
 				uint8_t _al = (*flags >> (j * 2)) & 3;
-				if (_al != 0 && _spritesListNextPtr != 0) {
+				if (_al != 0 && _spritesNextPtr != 0) {
 					const int xPos = spr->xPos + xOffset + 12;
 					const int yPos = spr->yPos + yOffset + 16;
 					if (rect_contains(spr->rect1_x1, spr->rect1_y1, spr->rect1_x2, spr->rect1_y2, xPos, yPos)) {
@@ -4703,15 +4703,15 @@ void Game::updateWormHoleSprites() {
 						tmp.yPos -= 16;
 					}
 					if (READ_LE_UINT16(tmp.bitmapBits) != 8) {
-						Sprite *spr = _spritesListNextPtr;
+						Sprite *spr = _spritesNextPtr;
 						spr->xPos = tmp.xPos;
 						spr->yPos = tmp.yPos;
 						spr->bitmapBits = tmp.bitmapBits;
 						spr->num = tmp.flags2 & 0x3FFF;
 						const int index = spr->num & 0x1F;
-						_spritesListNextPtr = spr->nextPtr;
-						spr->nextPtr = _spriteListPtrTable[index];
-						_spriteListPtrTable[index] = spr;
+						_spritesNextPtr = spr->nextPtr;
+						spr->nextPtr = _typeSpritesList[index];
+						_typeSpritesList[index] = spr;
 					}
 				}
 				xOffset += 24;

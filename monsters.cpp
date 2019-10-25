@@ -6227,9 +6227,9 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, uint16_t flags) {
 	LvlObject *o = addLvlObjectToList0(3);
 	if (o) {
-		o->dataPtr = _shootLvlObjectDataList;
-		if (_shootLvlObjectDataList) {
-			_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+		o->dataPtr = _shootLvlObjectDataNextPtr;
+		if (_shootLvlObjectDataNextPtr) {
+			_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
 			memset(o->dataPtr, 0, sizeof(ShootLvlObjectData));
 		}
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
@@ -6257,9 +6257,9 @@ void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, 
 void Game::mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags) {
 	LvlObject *o = addLvlObjectToList2(7);
 	if (o) {
-		o->dataPtr = _shootLvlObjectDataList;
-		if (_shootLvlObjectDataList) {
-			_shootLvlObjectDataList = _shootLvlObjectDataList->nextPtr;
+		o->dataPtr = _shootLvlObjectDataNextPtr;
+		if (_shootLvlObjectDataNextPtr) {
+			_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
 			memset(o->dataPtr, 0, sizeof(ShootLvlObjectData));
 		}
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;

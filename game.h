@@ -107,8 +107,8 @@ struct Game {
 	int _currentLevelCheckpoint;
 	bool _endLevel;
 	Sprite _spritesTable[kMaxSprites];
-	Sprite *_spritesListNextPtr; // pointer to the next free entry
-	Sprite *_spriteListPtrTable[kMaxSpriteTypes];
+	Sprite *_spritesNextPtr; // pointer to the next free entry
+	Sprite *_typeSpritesList[kMaxSpriteTypes];
 	uint8_t _directionKeyMask;
 	uint8_t _actionKeyMask;
 	uint8_t _currentRightScreen;
@@ -118,7 +118,7 @@ struct Game {
 	bool _fadePalette;
 	bool _hideAndyObjectFlag;
 	ShootLvlObjectData _shootLvlObjectDataTable[kMaxShootLvlObjectData];
-	ShootLvlObjectData *_shootLvlObjectDataList; // pointer to the next free entry
+	ShootLvlObjectData *_shootLvlObjectDataNextPtr; // pointer to the next free entry
 	LvlObject *_lvlObjectsList0;
 	LvlObject *_lvlObjectsList1;
 	LvlObject *_lvlObjectsList2;
@@ -178,7 +178,7 @@ struct Game {
 	uint8_t _mstOp54Table[32];
 	bool _mstDisabled;
 	LvlObject _declaredLvlObjectsList[kMaxLvlObjects];
-	LvlObject *_declaredLvlObjectsListHead; // pointer to the next free entry
+	LvlObject *_declaredLvlObjectsNextPtr; // pointer to the next free entry
 	int _declaredLvlObjectsListCount;
 	AndyLvlObjectData _andyObjectScreenData;
 	AnimBackgroundData _animBackgroundDataTable[kMaxBackgroundAnims];
