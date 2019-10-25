@@ -834,9 +834,10 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 // 452630
 	static const uint8_t data[] = { 0, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	for (int i = _lar1_setupScreen24Data[num * 3 + 1]; i < 13; ++i) {
-		const uint8_t _al = (data[i] << 4) | 2;
-		_lar1_gatesData[i * 4] = _al;
-		const uint32_t mask = 1 << i;
+		const int j = i;
+		const uint8_t _al = (data[j] << 4) | 2;
+		_lar1_gatesData[j * 4] = _al;
+		const uint32_t mask = 1 << j;
 		if (_al & 0xF0) {
 			_g->_mstAndyVarMask &= ~mask;
 		} else {
@@ -845,9 +846,10 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 		_g->_mstLevelGatesMask |= mask;
 	}
 	for (int i = _lar1_setupScreen24Data[num * 3 + 1]; i != 0; --i) {
-		const uint8_t _al = (((data[i] == 0) ? 1 : 0) << 4) | 2;
-		_lar1_gatesData[i * 4] = _al;
-		const uint32_t mask = 1 << i;
+		const int j = i - 1;
+		const uint8_t _al = (((data[j] == 0) ? 1 : 0) << 4) | 2;
+		_lar1_gatesData[j * 4] = _al;
+		const uint32_t mask = 1 << j;
 		if (_al & 0xF0) {
 			_g->_mstAndyVarMask &= ~mask;
 		} else {

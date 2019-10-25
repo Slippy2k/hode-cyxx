@@ -1,5 +1,5 @@
 * release 0.2.1
-	- fixed switches in 'lar2' level screens 3 and 13
+	- several fixes to gates and switches in 'lar1' and 'lar2' levels
 
 * release 0.2.0
 	- added missing postScreenUpdate callbacks for 'lava' level

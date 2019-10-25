@@ -552,7 +552,7 @@ void Level_lar2::setupScreenCheckpoint_lar2_screen19() {
 	for (int i = gateIndex; i != 0; --i) {
 // 408D13
 		const int num = i - 1;
-		_lar2_gatesData[num * 4] = ((data[num] == 0) ? 16 : 0) | 2;
+		_lar2_gatesData[num * 4] = (((data[num] == 0) ? 1 : 0) << 4) | 2;
 		const uint32_t mask = 1 << num;
 		if (_lar2_gatesData[num * 4] & 0xF0) {
 			_g->_mstAndyVarMask &= ~mask;
