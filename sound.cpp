@@ -1257,6 +1257,10 @@ void Game::mixSoundObjects17640(bool flag) {
 
 void Game::queueSoundObjectsPcmStride() {
 	_mix._mixingQueueSize = 0;
+	if (_res->_isPsx) {
+		// XA ADPCM
+		return;
+	}
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		const SssPcm *pcm = so->pcm;
 		if (pcm != 0) {
