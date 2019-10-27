@@ -1366,7 +1366,7 @@ void Game::resetDisplay() {
 	_levelRestartCounter = 0;
 	_fadePalette = false;
 	memset(_video->_fadePaletteBuffer, 0, sizeof(_video->_fadePaletteBuffer));
-//	_snd_masterVolume = _plyConfigTable[_plyConfigNumber].soundVolume;
+	_snd_masterVolume = kDefaultSoundVolume; // _plyConfigTable[_plyConfigNumber].soundVolume;
 }
 
 void Game::updateScreen(uint8_t num) {
