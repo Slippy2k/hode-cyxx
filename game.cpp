@@ -318,7 +318,11 @@ void Game::setupBackgroundBitmap() {
 	if (lvl->backgroundBitmapId != 0xFFFF) {
 		playSound(lvl->backgroundBitmapId, 0, 0, 3);
 	}
-	decodeLZW(pic, _video->_backgroundLayer);
+	if (_res->_isPsx) {
+		assert(READ_LE_UINT16(pic + 4) == 0x3800);
+	} else {
+		decodeLZW(pic, _video->_backgroundLayer);
+	}
 	if (lvl->shadowCount != 0) {
 		decodeShadowScreenMask(lvl);
 	}

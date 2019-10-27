@@ -11,6 +11,7 @@
 #include "util.h"
 
 static const char *_setupDat = "SETUP.DAT";
+static const char *_setupDax = "SETUP.DAX";
 
 static const char *_prefixes[] = {
 	"rock",
@@ -56,7 +57,7 @@ static int readBytesAlign(File *f, uint8_t *buf, int len) {
 }
 
 Resource::Resource(const char *dataPath)
-	: _fs(dataPath) {
+	: _fs(dataPath), _isPsx(false) {
 
 	memset(_screensGrid, 0, sizeof(_screensGrid));
 	memset(_screensBasePos, 0, sizeof(_screensBasePos));
@@ -66,6 +67,7 @@ Resource::Resource(const char *dataPath)
 	_resLevelData0x470CTable = 0;
 	_resLevelData0x470CTablePtrHdr = 0;
 	_resLevelData0x470CTablePtrData = 0;
+	_lvlSssOffset = 0;
 
 	// sprites
 	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
@@ -113,8 +115,11 @@ Resource::~Resource() {
 bool Resource::sectorAlignedGameData() {
 	FILE *fp = _fs.openFile(_setupDat);
 	if (!fp) {
-		error("Unable to open '%s'", _setupDat);
-		return false;
+		fp = _fs.openFile(_setupDax);
+		if (!fp) {
+			error("Unable to open '%s' or '%s'", _setupDat, _setupDax);
+			return false;
+		}
 	}
 	bool ret = false;
 	uint8_t buf[2048];
@@ -126,7 +131,9 @@ bool Resource::sectorAlignedGameData() {
 }
 
 void Resource::loadSetupDat() {
-	openDat(_fs, _setupDat, _datFile);
+	if (!openDat(_fs, _setupDat, _datFile)) {
+		_isPsx = openDat(_fs, _setupDax, _datFile);
+	}
 
 	_datHdr.version = _datFile->readUint32();
 	if (_datHdr.version != 10 && _datHdr.version != 11) {
@@ -161,19 +168,21 @@ void Resource::loadSetupDat() {
 
 		uint32_t offset = 0;
 
-		// loading image
-		uint32_t size = READ_LE_UINT32(_loadingImageBuffer + offset); offset += 8;
-		offset += size + 768;
+		if (!_isPsx) {
+			// loading image
+			uint32_t size = READ_LE_UINT32(_loadingImageBuffer + offset); offset += 8;
+			offset += size + 768;
 
-		// loading animation
-		size = READ_LE_UINT32(_loadingImageBuffer + offset + 8); offset += 16;
-		offset += size;
+			// loading animation
+			size = READ_LE_UINT32(_loadingImageBuffer + offset + 8); offset += 16;
+			offset += size;
+		}
 
 		// font
 		static const int kFontSize = 16 * 16 * 64;
 		_fontBuffer = (uint8_t *)malloc(kFontSize);
 		if (_fontBuffer) {
-			size = READ_LE_UINT32(_loadingImageBuffer + offset); offset += 4;
+			/* size = READ_LE_UINT32(_loadingImageBuffer + offset); */ offset += 4;
 			if (_datHdr.version == 11) {
 				const uint32_t uncompressedSize = decodeLZW(_loadingImageBuffer + offset, _fontBuffer);
 				assert(uncompressedSize == kFontSize);
@@ -254,6 +263,10 @@ void Resource::loadLevelData(int levelNum) {
 	snprintf(filename, sizeof(filename), "%s_HOD.SSS", levelName);
 	if (openDat(_fs, filename, _sssFile)) {
 		loadSssData(_sssFile);
+	} else if (_isPsx) {
+		assert((_lvlSssOffset & 0x7FF) == 0);
+		_lvlFile->seek(_lvlSssOffset, SEEK_SET);
+		loadSssData(_lvlFile, _lvlSssOffset);
 	} else {
 		warning("Unable to open '%s'", filename);
 		memset(&_sssHdr, 0, sizeof(_sssHdr));
@@ -391,6 +404,10 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 		dat->coordsOffsetsTable = 0;
 	}
 
+	if (dat->unk0 == 1) { // fixed size offset table
+		return 0;
+	}
+
 	uint32_t framesOffset = 0;
 	for (int i = 0; i < dat->framesCount; ++i) {
 		const int size = READ_LE_UINT16(dat->framesData + framesOffset);
@@ -415,7 +432,7 @@ void Resource::loadLvlSpriteData(int num) {
 	const uint32_t size = _lvlFile->readUint32();
 	const uint32_t readSize = _lvlFile->readUint32();
 	uint8_t *ptr = (uint8_t *)calloc(size, 1);
-	_lvlFile->seek(offset, SEEK_SET);
+	_lvlFile->seek(_isPsx  ? _lvlSssOffset + offset : offset, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
 	LvlObjectData *dat = &_resLevelData0x2988Table[num];
@@ -450,6 +467,8 @@ void Resource::loadLvlScreenMaskData() {
 	_lvlFile->read(_resLevelData0x470CTable, size);
 	_resLevelData0x470CTablePtrHdr = _resLevelData0x470CTable;
 	_resLevelData0x470CTablePtrData = _resLevelData0x470CTable + (kMaxScreens * 4) * (2 * sizeof(uint32_t));
+	// .sss is embedded in .lvl on PSX
+	_lvlSssOffset = offset + fioAlignSizeTo2048(size);
 }
 
 static const uint32_t _lvlTag = 0x484F4400; // 'HOD\x00'
@@ -582,7 +601,7 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	const uint32_t size = _lvlFile->readUint32();
 	const uint32_t readSize = _lvlFile->readUint32();
 	uint8_t *ptr = (uint8_t *)calloc(size, 1);
-	_lvlFile->seek(offset, SEEK_SET);
+	_lvlFile->seek(_isPsx  ? _lvlSssOffset + offset : offset, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
 	_lvlFile->seekAlign(baseOffset + kMaxScreens * 16 + num * 160);
@@ -641,7 +660,7 @@ const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const
 
 void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 
-	assert(fp == _sssFile || fp == _datFile);
+	assert(fp == _sssFile || fp == _datFile || fp == _lvlFile);
 
 	if (_sssHdr.bufferSize != 0) {
 		const int count = MIN(_sssHdr.pcmCount, _sssHdr.preloadPcmCount);
@@ -797,7 +816,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 			bytesRead += kSizeOfPreloadInfoData_V10 * count;
 			for (int j = 0; j < count; ++j) {
 				const int len = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V10 + 0x1C) * 4;
-				bytesRead += skipBytesAlign(_sssFile, len);
+				bytesRead += skipBytesAlign(fp, len);
 			}
 			free(p);
 		}
@@ -814,7 +833,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 				static const int8_t lengths[8] = {    2,    1,    1,    2,    2,    1,    1,    1 };
 				for (int k = 0; k < 8; ++k) {
 					const int len = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V6 + offsets[k]) * lengths[k];
-					bytesRead += skipBytesAlign(_sssFile, len);
+					bytesRead += skipBytesAlign(fp, len);
 				}
 			}
 			free(p);
@@ -836,7 +855,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 			assert((_sssPcmTable[i].totalSize % _sssPcmTable[i].strideSize) == 0);
 			assert(_sssPcmTable[i].totalSize == _sssPcmTable[i].strideSize * _sssPcmTable[i].strideCount);
 			if (sssPcmOffset != 0) {
-				assert(_sssPcmTable[i].offset == 0x2800); // .dat
+				assert(fp != _datFile || _sssPcmTable[i].offset == 0x2800); // .dat
 				_sssPcmTable[i].offset += sssPcmOffset;
 				sssPcmOffset += _sssPcmTable[i].totalSize;
 			}

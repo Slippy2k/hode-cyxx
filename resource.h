@@ -529,6 +529,8 @@ struct Resource {
 	SssHdr _sssHdr;
 	File *_sssFile;
 
+	bool _isPsx;
+
 	uint8_t *_loadingImageBuffer;
 	uint8_t *_fontBuffer;
 	uint8_t *_menuBuffer0;
@@ -543,6 +545,7 @@ struct Resource {
 	uint8_t *_resLevelData0x470CTable;
 	uint8_t *_resLevelData0x470CTablePtrHdr;
 	uint8_t *_resLevelData0x470CTablePtrData;
+	uint32_t _lvlSssOffset;
 	uint32_t _resLevelData0x2B88SizeTable[kMaxScreens];
 	uint32_t _resLevelData0x2988SizeTable[kMaxSpriteTypes];
 	LvlObjectData _resLevelData0x2988Table[kMaxScreens];

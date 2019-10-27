@@ -1,4 +1,5 @@
 * release 0.2.1
+	- added initial code for PSX data files detection
 	- several fixes to gates and switches in 'lar1' and 'lar2' levels
 
 * release 0.2.0
