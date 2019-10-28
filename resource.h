@@ -617,10 +617,7 @@ struct Resource {
 
 	void loadLevelData(int levelNum);
 
-	void loadLvlScreenGridData(int num);
-	void loadLvlScreenVectorData(int num);
-	void loadLvlScreenStateData(int num);
-	void loadLvlScreenObjectData(int num);
+	void loadLvlScreenObjectData(LvlObject *dat, const uint8_t *src);
 	void loadLvlData(File *fp);
 	void unloadLvlData();
 	void loadLvlSpriteData(int num);

@@ -276,68 +276,46 @@ void Resource::loadLevelData(int levelNum) {
 	}
 }
 
-void Resource::loadLvlScreenGridData(int num) {
-	_lvlFile->seekAlign(0x8 + num * 4);
-	_lvlFile->read(&_screensGrid[num * 4], 4);
-}
-
-void Resource::loadLvlScreenVectorData(int num) {
-	_lvlFile->seekAlign(0xA8 + num * 8);
-	LvlScreenVector *dat = &_screensBasePos[num];
-	dat->u = _lvlFile->readUint32();
-	dat->v = _lvlFile->readUint32();
-}
-
-void Resource::loadLvlScreenStateData(int num) {
-	_lvlFile->seekAlign(0x1E8 + num * 4);
-	LvlScreenState *dat = &_screensState[num];
-	dat->s0 = _lvlFile->readByte();
-	dat->s1 = _lvlFile->readByte();
-	dat->s2 = _lvlFile->readByte();
-	dat->s3 = _lvlFile->readByte();
-}
-
-void Resource::loadLvlScreenObjectData(int num) {
-	_lvlFile->seekAlign(0x288 + num * 96);
-	LvlObject *dat = &_resLvlScreenObjectDataTable[num];
-
-	dat->xPos = _lvlFile->readUint32();
-	dat->yPos = _lvlFile->readUint32();
-	dat->screenNum = _lvlFile->readByte();
-	dat->screenState = _lvlFile->readByte();
-	dat->dataNum = _lvlFile->readByte();
-	dat->frame = _lvlFile->readByte();
-	dat->anim = _lvlFile->readUint16();
-	dat->type = _lvlFile->readByte();
-	dat->spriteNum = _lvlFile->readByte();
-	dat->flags0 = _lvlFile->readUint16();
-	dat->flags1 = _lvlFile->readUint16();
-	dat->flags2 = _lvlFile->readUint16();
-	dat->objectUpdateType = _lvlFile->readByte();
-	dat->hitCount = _lvlFile->readByte();
-	const uint32_t objRef = _lvlFile->readUint32();
+void Resource::loadLvlScreenObjectData(LvlObject *dat, const uint8_t *src) {
+	const uint8_t *start = src;
+	dat->xPos = READ_LE_UINT32(src); src += 4;
+	dat->yPos = READ_LE_UINT32(src); src += 4;
+	dat->screenNum = *src++;
+	dat->screenState = *src++;
+	dat->dataNum = *src++;
+	dat->frame = *src++;
+	dat->anim = READ_LE_UINT16(src); src += 2;
+	dat->type = *src++;
+	dat->spriteNum = *src++;
+	dat->flags0 = READ_LE_UINT16(src); src += 2;
+	dat->flags1 = READ_LE_UINT16(src); src += 2;
+	dat->flags2 = READ_LE_UINT16(src); src += 2;
+	dat->objectUpdateType = *src++;
+	dat->hitCount = *src++;
+	const uint32_t objRef = READ_LE_UINT32(src); src  += 4;
 	if (objRef) {
 		dat->childPtr = &_dummyObject;
-		debug(kDebug_RESOURCE, "loadLvlObj num %d linkObjRef 0x%x", num, objRef);
+		debug(kDebug_RESOURCE, "loadLvlObj dat %p linkObjRef 0x%x", dat, objRef);
 	}
-	dat->width = _lvlFile->readUint16();
-	dat->height = _lvlFile->readUint16();
-	dat->directionKeyMask = _lvlFile->readByte();
-	dat->actionKeyMask = _lvlFile->readByte();
-	dat->currentSprite = _lvlFile->readUint16();
-	dat->currentSound = _lvlFile->readUint16();
-	dat->unk26 = _lvlFile->readByte();
-	dat->unk27 = _lvlFile->readByte();
-	dat->bitmapBits = 0; _lvlFile->readUint32();
-	dat->callbackFuncPtr = 0; _lvlFile->readUint32();
-	dat->dataPtr = 0; _lvlFile->readUint32();
-	dat->sssObject = 0; _lvlFile->readUint32();
-	dat->levelData0x2988 = 0; _lvlFile->readUint32();
+	dat->width = READ_LE_UINT16(src); src += 2;
+	dat->height = READ_LE_UINT16(src); src += 2;
+	dat->directionKeyMask = *src++;
+	dat->actionKeyMask = *src++;
+	dat->currentSprite = READ_LE_UINT16(src); src += 2;
+	dat->currentSound = READ_LE_UINT16(src); src += 2;
+	dat->unk26 = *src++;
+	dat->unk27 = *src++;
+	dat->bitmapBits = 0; src += 4;
+	dat->callbackFuncPtr = 0; src += 4;
+	dat->dataPtr = 0; src += 4;
+	dat->sssObject = 0; src += 4;
+	dat->levelData0x2988 = 0; src += 4;
 	for (int i = 0; i < 8; ++i) {
-		dat->posTable[i].x = _lvlFile->readUint16();
-		dat->posTable[i].y = _lvlFile->readUint16();
+		dat->posTable[i].x = READ_LE_UINT16(src); src += 2;
+		dat->posTable[i].y = READ_LE_UINT16(src); src += 2;
 	}
-	dat->nextPtr = 0; _lvlFile->readUint32();
+	dat->nextPtr = 0; src += 4;
+	assert((src - start) == 96);
 }
 
 static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObjectData *dat, bool isPsx) {
@@ -507,17 +485,30 @@ void Resource::loadLvlData(File *fp) {
 	_lvlHdr.spritesCount = _lvlFile->readByte();
 	debug(kDebug_RESOURCE, "Resource::loadLvlData() %d %d %d %d", _lvlHdr.screensCount, _lvlHdr.staticLvlObjectsCount, _lvlHdr.otherLvlObjectsCount, _lvlHdr.spritesCount);
 
+	_lvlFile->seekAlign(0x8);
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
-		loadLvlScreenGridData(i);
+		_lvlFile->read(&_screensGrid[i * 4], 4);
 	}
+	_lvlFile->seekAlign(0xA8);
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
-		loadLvlScreenVectorData(i);
+		LvlScreenVector *dat = &_screensBasePos[i];
+		dat->u = _lvlFile->readUint32();
+		dat->v = _lvlFile->readUint32();
 	}
+	_lvlFile->seekAlign(0x1E8);
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
-		loadLvlScreenStateData(i);
+		LvlScreenState *dat = &_screensState[i];
+		dat->s0 = _lvlFile->readByte();
+		dat->s1 = _lvlFile->readByte();
+		dat->s2 = _lvlFile->readByte();
+		dat->s3 = _lvlFile->readByte();
 	}
+	_lvlFile->seekAlign(0x288);
 	for (int i = 0; i < (0x2988 - 0x288) / 96; ++i) {
-		loadLvlScreenObjectData(i);
+		LvlObject *dat = &_resLvlScreenObjectDataTable[i];
+		uint8_t buf[96];
+		_lvlFile->read(buf, sizeof(buf));
+		loadLvlScreenObjectData(dat, buf);
 	}
 
 	loadLvlScreenMaskData();
