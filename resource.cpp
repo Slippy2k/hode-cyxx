@@ -419,6 +419,7 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 			WRITE_LE_UINT32(dat->framesOffsetsTable + i * sizeof(uint32_t), framesOffset);
 			framesOffset += size;
 		}
+		dat->coordsOffsetsTable = ptr;
 		return 0;
 	}
 
@@ -667,8 +668,16 @@ void Resource::decLvlSpriteDataRefCounter(LvlObject *ptr) {
 	}
 }
 
-const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame) const {
+const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame, uint16_t *w, uint16_t *h) const {
 	assert(frame < dat->framesCount);
+	const uint8_t *p = dat->framesData;
+	if (dat->unk0 == 1) {
+		p += frame * 6;
+	} else {
+		p += READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
+	}
+	*w = READ_LE_UINT16(p + 2);
+	*h = READ_LE_UINT16(p + 4);
 	return dat->framesData + READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
 }
 

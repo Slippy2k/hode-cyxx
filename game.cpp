@@ -567,10 +567,7 @@ void Game::setupLvlObjectBitmap(LvlObject *ptr) {
 	ptr->flags1 = merge_bits(ptr->flags1, ash->flags1, 8);
 	ptr->currentSprite = ash->firstFrame;
 
-	ptr->bitmapBits = _res->getLvlSpriteFramePtr(dat, ash->firstFrame);
-
-	ptr->width = READ_LE_UINT16(ptr->bitmapBits + 2);
-	ptr->height = READ_LE_UINT16(ptr->bitmapBits + 4);
+	ptr->bitmapBits = _res->getLvlSpriteFramePtr(dat, ash->firstFrame, &ptr->width, &ptr->height);
 
 	const int w = ptr->width - 1;
 	const int h = ptr->height - 1;
