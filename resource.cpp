@@ -564,7 +564,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 	dat->dataUnk45Count = *src++;
 	dat->unkB = *src++;
 	dat->backgroundPaletteId = READ_LE_UINT16(src); src += 2;
-	dat->backgroundBitmapId  = READ_LE_UINT16(src); src += 2;
+	dat->backgroundBitmapId = READ_LE_UINT16(src); src += 2;
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundPaletteTable[i] = (offs != 0) ? ptr + offs : 0;
@@ -573,10 +573,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundBitmapTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
-	for (int i = 0; i < 4; ++i) {
-		const uint32_t offs = READ_LE_UINT32(src); src += 4;
-		dat->dataUnk0Table[i] = (offs != 0) ? ptr + offs : 0;
-	}
+	src += 4 * sizeof(uint32_t); // dataUnk0Table
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundMaskTable[i] = (offs != 0) ? ptr + offs : 0;
@@ -589,10 +586,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		dat->backgroundAnimationTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
-	for (int i = 0; i < 4; ++i) {
-		const uint32_t offs = READ_LE_UINT32(src); src += 4;
-		dat->dataUnk4Table[i] = (offs != 0) ? ptr + offs : 0;
-	}
+	src += 4 * sizeof(uint32_t); // dataUnk4Table
 	uint32_t offsetsSize = 0;
 	for (int i = 0; i < 4; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
@@ -603,10 +597,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 			dat->backgroundLvlObjectDataTable[i] = 0;
 		}
 	}
-	for (int i = 0; i < 4; ++i) {
-		const uint32_t offs = READ_LE_UINT32(src); src += 4;
-		dat->dataUnk6Table[i] = (offs != 0) ? ptr + offs : 0;
-	}
+	src += 4 * sizeof(uint32_t); // dataUnk6Table
 	assert((src - start) == 160);
 	return offsetsSize;
 }
@@ -643,6 +634,12 @@ void Resource::unloadLvlScreenBackgroundData(int num) {
 		free(_resLvlScreenBackgroundDataPtrTable[num]);
 		_resLvlScreenBackgroundDataPtrTable[num] = 0;
 		_resLevelData0x2B88SizeTable[num] = 0;
+
+		LvlBackgroundData *dat = &_resLvlScreenBackgroundDataTable[num];
+		for (int i = 0; i < 4; ++i) {
+			free(dat->backgroundLvlObjectDataTable[i]);
+		}
+		memset(dat, 0, sizeof(LvlBackgroundData));
 	}
 }
 

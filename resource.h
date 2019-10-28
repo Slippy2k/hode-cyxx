@@ -62,13 +62,13 @@ struct LvlBackgroundData {
 	uint16_t backgroundBitmapId;
 	uint8_t *backgroundPaletteTable[4];
 	uint8_t *backgroundBitmapTable[4];
-	uint8_t *dataUnk0Table[4]; // unused
+//	uint8_t *dataUnk0Table[4]; // unused
 	uint8_t *backgroundMaskTable[4];
 	uint8_t *backgroundSoundTable[4];
 	uint8_t *backgroundAnimationTable[4];
-	uint8_t *dataUnk4Table[4]; // unused
+//	uint8_t *dataUnk4Table[4]; // unused
 	LvlObjectData *backgroundLvlObjectDataTable[4];
-	uint8_t *dataUnk6Table[4]; // unused
+//	uint8_t *dataUnk6Table[4]; // unused
 };
 
 struct MstHdr {
