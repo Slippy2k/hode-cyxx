@@ -303,8 +303,7 @@ void Resource::loadLvlScreenObjectData(LvlObject *dat, const uint8_t *src) {
 	dat->actionKeyMask = *src++;
 	dat->currentSprite = READ_LE_UINT16(src); src += 2;
 	dat->currentSound = READ_LE_UINT16(src); src += 2;
-	dat->unk26 = *src++;
-	dat->unk27 = *src++;
+	src += 2; // 0x26
 	dat->bitmapBits = 0; src += 4;
 	dat->callbackFuncPtr = 0; src += 4;
 	dat->dataPtr = 0; src += 4;
@@ -330,8 +329,7 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 	dat->refCount = *src++;
 	dat->frame = *src++;
 	dat->anim = READ_LE_UINT16(src); src += 2;
-	dat->unkE = *src++;
-	dat->unkF = *src++;
+	src += 2; // 0xE
 	src += 4; // 0x10
 	uint32_t movesDataOffset = READ_LE_UINT32(src); src += 4; // 0x14
 	src += 4; // 0x18
@@ -504,10 +502,11 @@ void Resource::loadLvlData(File *fp) {
 		dat->s3 = _lvlFile->readByte();
 	}
 	_lvlFile->seekAlign(0x288);
-	for (int i = 0; i < (0x2988 - 0x288) / 96; ++i) {
+	static const int kSizeOfLvlObject = 96;
+	for (int i = 0; i < (0x2988 - 0x288) / kSizeOfLvlObject; ++i) {
 		LvlObject *dat = &_resLvlScreenObjectDataTable[i];
-		uint8_t buf[96];
-		_lvlFile->read(buf, sizeof(buf));
+		uint8_t buf[kSizeOfLvlObject];
+		_lvlFile->read(buf, kSizeOfLvlObject);
 		loadLvlScreenObjectData(dat, buf);
 	}
 
