@@ -271,7 +271,7 @@ struct Game {
 	void destroyLvlObject(LvlObject *o);
 	void setupPlasmaCannonPoints(LvlObject *ptr);
 	int testPlasmaCannonPointsDirection(int x1, int y1, int x2, int y2);
-	void preloadLevelScreenData(int num, int prev);
+	void preloadLevelScreenData(uint8_t num, uint8_t prev);
 	void loadLevelScreenSounds(int num);
 	void setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2);
 	void setLvlObjectPosRelativeToPoint(LvlObject *ptr, int num, int x, int y);

@@ -913,13 +913,27 @@ endDir:
 	return 1;
 }
 
-void Game::preloadLevelScreenData(int num, int prev) {
-	_res->loadLvlScreenBackgroundData(num);
+void Game::preloadLevelScreenData(uint8_t num, uint8_t prev) {
+	assert(num != 255);
+	if (!_res->isLvlBackgroundDataLoaded(num)) {
+		_res->loadLvlScreenBackgroundData(num);
+	}
+	const uint8_t leftScreen = _res->_screensGrid[num * 4 + kPosLeftScreen];
+	if (leftScreen != 255 && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
+		_res->loadLvlScreenBackgroundData(leftScreen);
+	}
+	const uint8_t rightScreen = _res->_screensGrid[num * 4 + kPosRightScreen];
+	if (rightScreen != 255 && !_res->isLvlBackgroundDataLoaded(rightScreen)) {
+		_res->loadLvlScreenBackgroundData(rightScreen);
+	}
+	for (unsigned int i = 0; i < kMaxScreens; ++i) {
+		if (_res->_resLevelData0x2B88SizeTable[i] != 0) {
+			if (i != num && i != leftScreen && i != rightScreen) {
+				_res->unloadLvlScreenBackgroundData(i);
+			}
+		}
+	}
 	loadLevelScreenSounds(num);
-
-	// we should also -
-	//  load the adjacent left and right screens
-	//  unload previous screens
 }
 
 void Game::loadLevelScreenSounds(int num) {
