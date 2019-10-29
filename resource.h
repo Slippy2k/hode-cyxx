@@ -79,7 +79,7 @@ struct MstHdr {
 	int movingBoundsIndexDataCount; // 10
 	int levelCheckpointCodeDataCount; // 14
 	int screenAreaDataCount; // 18
-	int unk0x1C; // mstUnk39DataCount
+	int screenAreaIndexDataCount; // 1C
 	int behaviorIndexDataCount; // 20
 	int monsterActionIndexDataCount; // 24
 	int walkPathDataCount; // 28
@@ -117,10 +117,10 @@ struct MstScreenArea {
 	int32_t x2; // 4
 	int32_t y1; // 8
 	int32_t y2; // 0xC
-	uint32_t nextByPos; // 0x10 _mstUnk40
+	uint32_t nextByPos; // 0x10 _mstScreenAreaByPosIndexData
 	uint32_t prev; // 0x14 unused
-	uint32_t nextByValue; // 0x18 indexUnk39
-	uint8_t unk0x1C; // 0x1C indexUnk39
+	uint32_t nextByValue; // 0x18 _mstScreenAreaByValueIndexData
+	uint8_t unk0x1C; // 0x1C _mstScreenAreaByValueIndexData
 	uint8_t unk0x1D; // 0x1D value
 	uint16_t unk0x1E; // 0x1E unused
 	uint32_t codeData; // 0x20, offset _mstCodeData
@@ -578,8 +578,8 @@ struct Resource {
 	uint32_t _mstTickCodeData;
 	ResStruct<uint32_t> _mstLevelCheckpointCodeData;
 	ResStruct<MstScreenArea> _mstScreenAreaData;
-	ResStruct<uint32_t> _mstUnk39; // indexes _mstScreenAreaData
-	ResStruct<uint32_t> _mstUnk40; // indexes _mstScreenAreaData
+	ResStruct<uint32_t> _mstScreenAreaByValueIndexData;
+	ResStruct<uint32_t> _mstScreenAreaByPosIndexData;
 	ResStruct<uint32_t> _mstUnk41;
 	ResStruct<MstBehaviorIndex> _mstBehaviorIndexData;
 	ResStruct<MstMonsterActionIndex> _mstMonsterActionIndexData;

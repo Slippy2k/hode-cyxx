@@ -1085,7 +1085,7 @@ void Resource::loadMstData(File *fp) {
 	_mstHdr.movingBoundsIndexDataCount = fp->readUint32();
 	_mstHdr.levelCheckpointCodeDataCount = fp->readUint32();
 	_mstHdr.screenAreaDataCount = fp->readUint32();
-	_mstHdr.unk0x1C = fp->readUint32();
+	_mstHdr.screenAreaIndexDataCount = fp->readUint32();
 	_mstHdr.behaviorIndexDataCount = fp->readUint32();
 	_mstHdr.monsterActionIndexDataCount = fp->readUint32();
 	_mstHdr.walkPathDataCount = fp->readUint32();
@@ -1190,15 +1190,15 @@ void Resource::loadMstData(File *fp) {
 		bytesRead += 36;
 	}
 
-	_mstUnk39.allocate(_mstHdr.unk0x1C);
-	for (int i = 0; i < _mstHdr.unk0x1C; ++i) {
-		_mstUnk39[i] = fp->readUint32();
+	_mstScreenAreaByValueIndexData.allocate(_mstHdr.screenAreaIndexDataCount);
+	for (int i = 0; i < _mstHdr.screenAreaIndexDataCount; ++i) {
+		_mstScreenAreaByValueIndexData[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
-	_mstUnk40.allocate(_mstHdr.screensCount);
+	_mstScreenAreaByPosIndexData.allocate(_mstHdr.screensCount);
 	for (int i = 0; i < _mstHdr.screensCount; ++i) {
-		_mstUnk40[i] = fp->readUint32();
+		_mstScreenAreaByPosIndexData[i] = fp->readUint32();
 		bytesRead += 4;
 	}
 
@@ -1696,7 +1696,7 @@ void Resource::unloadMstData() {
 }
 
 const MstScreenArea *Resource::findMstCodeForPos(int num, int xPos, int yPos) const {
-	uint32_t i = _mstUnk40[num];
+	uint32_t i = _mstScreenAreaByPosIndexData[num];
 	while (i != kNone) {
 		const MstScreenArea *msac = &_mstScreenAreaData[i];
 		if (msac->x1 <= xPos && msac->x2 >= xPos && msac->unk0x1D != 0 && msac->y1 <= yPos && msac->y2 >= yPos) {
@@ -1708,7 +1708,7 @@ const MstScreenArea *Resource::findMstCodeForPos(int num, int xPos, int yPos) co
 }
 
 void Resource::flagMstCodeForPos(int num, uint8_t value) {
-	uint32_t i = _mstUnk39[num];
+	uint32_t i = _mstScreenAreaByValueIndexData[num];
 	while (i != kNone) {
 		MstScreenArea *msac = &_mstScreenAreaData[i];
 		msac->unk0x1D = value;
