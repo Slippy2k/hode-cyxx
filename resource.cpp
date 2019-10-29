@@ -416,19 +416,23 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 }
 
 void Resource::loadLvlSpriteData(int num) {
+	assert((unsigned int)num < kMaxSpriteTypes);
+
 	static const uint32_t baseOffset = 0x2988;
 
+	uint8_t buf[4 * 3];
 	_lvlFile->seekAlign(baseOffset + num * 16);
-	const uint32_t offset = _lvlFile->readUint32();
-	const uint32_t size = _lvlFile->readUint32();
-	const uint32_t readSize = _lvlFile->readUint32();
-	uint8_t *ptr = (uint8_t *)calloc(size, 1);
-	_lvlFile->seek(_isPsx  ? _lvlSssOffset + offset : offset, SEEK_SET);
+	_lvlFile->read(buf, sizeof(buf));
+	const uint32_t offset = READ_LE_UINT32(&buf[0]);
+	const uint32_t size = READ_LE_UINT32(&buf[4]);
+	const uint32_t readSize = READ_LE_UINT32(&buf[8]);
+	assert(readSize <= size);
+	uint8_t *ptr = (uint8_t *)malloc(size);
+	_lvlFile->seek(_isPsx ? _lvlSssOffset + offset : offset, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
 	LvlObjectData *dat = &_resLevelData0x2988Table[num];
 	const uint32_t readOffsetsSize = resFixPointersLevelData0x2988(ptr, ptr + readSize, dat, _isPsx);
-	assert(readSize <= size);
 	const uint32_t allocatedOffsetsSize = size - readSize;
 	assert(allocatedOffsetsSize == readOffsetsSize);
 
@@ -597,21 +601,22 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 
 	static const uint32_t baseOffset = 0x2B88;
 
+	uint8_t buf[4 * 3];
 	_lvlFile->seekAlign(baseOffset + num * 16);
-	const uint32_t offset = _lvlFile->readUint32();
-	const uint32_t size = _lvlFile->readUint32();
-	const uint32_t readSize = _lvlFile->readUint32();
-	uint8_t *ptr = (uint8_t *)calloc(size, 1);
-	_lvlFile->seek(_isPsx  ? _lvlSssOffset + offset : offset, SEEK_SET);
+	_lvlFile->read(buf, sizeof(buf));
+	const uint32_t offset = READ_LE_UINT32(&buf[0]);
+	const uint32_t size = READ_LE_UINT32(&buf[4]);
+	const uint32_t readSize = READ_LE_UINT32(&buf[8]);
+	assert(readSize <= size);
+	uint8_t *ptr = (uint8_t *)malloc(size);
+	_lvlFile->seek(_isPsx ? _lvlSssOffset + offset : offset, SEEK_SET);
 	_lvlFile->read(ptr, readSize);
 
+	uint8_t hdr[160];
 	_lvlFile->seekAlign(baseOffset + kMaxScreens * 16 + num * 160);
-	uint8_t buf[160];
-	_lvlFile->read(buf, 160);
+	_lvlFile->read(hdr, 160);
 	LvlBackgroundData *dat = &_resLvlScreenBackgroundDataTable[num];
-	const uint32_t readOffsetsSize = resFixPointersLevelData0x2B88(buf, ptr, ptr + readSize, dat, _isPsx);
-
-	assert(size >= readSize);
+	const uint32_t readOffsetsSize = resFixPointersLevelData0x2B88(hdr, ptr, ptr + readSize, dat, _isPsx);
 	const uint32_t allocatedOffsetsSize = size - readSize;
 	assert(allocatedOffsetsSize == readOffsetsSize);
 
