@@ -261,15 +261,17 @@ void Level_pwr1::postScreenUpdate_pwr1_screen23() {
 }
 
 void Level_pwr1::postScreenUpdate_pwr1_screen27() {
-	if (_res->_screensState[27].s0 != 0) {
+	switch (_res->_screensState[27].s0) {
+	case 2:
 		++_screenCounterTable[27];
 		if (_screenCounterTable[27] == 37) {
 			_res->_resLvlScreenBackgroundDataTable[27].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = 1;
 			_g->setupScreenMask(27);
 		}
-	} else if (_res->_currentScreenResourceNum == 27) {
-		if ((_andyObject->flags0 & 0x1F) == 6) {
+		break;
+	case 0:
+		if (_res->_currentScreenResourceNum == 27 && (_andyObject->flags0 & 0x1F) == 6) {
 			BoundingBox b1;
 			b1.x1 = _andyObject->xPos + _andyObject->posTable[7].x - 3;
 			b1.x2 = _andyObject->xPos + _andyObject->posTable[7].x + 4;
@@ -283,6 +285,7 @@ void Level_pwr1::postScreenUpdate_pwr1_screen27() {
 				}
 			}
 		}
+		break;
 	}
 }
 
@@ -406,7 +409,7 @@ void Level_pwr1::preScreenUpdate_pwr1_screen23() {
 
 void Level_pwr1::preScreenUpdate_pwr1_screen24() {
 	if (_res->_currentScreenResourceNum == 24) {
-		if (_res->_screensState[27].s0 != 0) { // +0x6C
+		if (_res->_screensState[27].s0 != 0) {
 			if (_checkpoint == 6) {
 				_checkpoint = 7;
 			}

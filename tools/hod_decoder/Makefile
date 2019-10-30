@@ -1,7 +1,7 @@
 
 CPPFLAGS += -Wall -g
 
-MDEC := oddlib
+MDEC := default
 
 ifeq "$(MDEC)" "libbs"
 	LIBBS_DIR := libbs
@@ -17,6 +17,11 @@ endif
 
 ifeq "$(MDEC)" "oddlib"
 	MDEC_OBJS := mdec_oddlib.o PSXMDECDecoder.o
+	MDEC_LIBS :=
+endif
+
+ifeq "$(MDEC)" "default"
+	MDEC_OBJS := mdec.o
 	MDEC_LIBS :=
 endif
 
