@@ -380,18 +380,18 @@ void Game::addToSpriteList(LvlObject *ptr) {
 
 int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 	if (xPos < 0) {
-		xPos += 256;
+		xPos += Video::W;
 		num = _res->_screensGrid[num][kPosLeftScreen];
-	} else if (xPos >= 256) {
-		xPos -= 256;
+	} else if (xPos >= Video::W) {
+		xPos -= Video::W;
 		num = _res->_screensGrid[num][kPosRightScreen];
 	}
 	if (num != 0xFF && yPos < 0) {
-		yPos += 192;
+		yPos += Video::H;
 		num = _res->_screensGrid[num][kPosTopScreen];
-	} else if (yPos >= 192) {
+	} else if (yPos >= Video::H) {
 		assert(num != 0xFF);
-		yPos -= 192;
+		yPos -= Video::H;
 		num = _res->_screensGrid[num][kPosBottomScreen];
 	}
 	uint8_t var1 = 0xFF - (yPos & 7);
@@ -496,7 +496,7 @@ void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum
 		const int x = x1 - _res->_screensBasePos[screenNum].u;
 		const int y = y1 - _res->_screensBasePos[screenNum].v;
 
-		const int u = _res->_screensBasePos[screenNum].u + 256;
+		const int u = _res->_screensBasePos[screenNum].u + Video::W;
 		if (x2 < u) {
 			++w;
 		}
@@ -1512,18 +1512,18 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 		uint8_t num = ptr->screenNum;
 		if (xPos < 0) {
 			ptr->screenNum = _res->_screensGrid[num][kPosLeftScreen];
-			ptr->xPos = xPosPrev + 256;
-		} else if (xPos > 256) {
+			ptr->xPos = xPosPrev + Video::W;
+		} else if (xPos > Video::W) {
 			ptr->screenNum = _res->_screensGrid[num][kPosRightScreen];
-			ptr->xPos = xPosPrev - 256;
+			ptr->xPos = xPosPrev - Video::W;
 		}
 		if (yPos < 0 && ptr->screenNum != 0xFF) {
 			ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosTopScreen];
-			ptr->yPos = yPosPrev + 192;
-		} else if (yPos > 192) {
+			ptr->yPos = yPosPrev + Video::H;
+		} else if (yPos > Video::H) {
 			assert(ptr->screenNum != 0xFF);
 			ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosBottomScreen];
-			ptr->yPos = yPosPrev - 192;
+			ptr->yPos = yPosPrev - Video::H;
 		}
 		if (ptr->screenNum == 0xFF) {
 			debug(kDebug_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
@@ -3538,10 +3538,10 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 					o->anim = 12;
 				}
 				o->frame = 0;
-				if (dat->xPosShoot >= 256) {
+				if (dat->xPosShoot >= Video::W) {
 					dat->xPosShoot -= _res->_screensBasePos[ptr->screenNum].u;
 				}
-				if (dat->yPosShoot >= 192) {
+				if (dat->yPosShoot >= Video::H) {
 					dat->yPosShoot -= _res->_screensBasePos[ptr->screenNum].v;
 				}
 				setupLvlObjectBitmap(o);
@@ -3557,10 +3557,10 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 			}
 // 40D81F
 			ptr->frame = 0;
-			if (dat->xPosShoot >= 256) {
+			if (dat->xPosShoot >= Video::W) {
 				dat->xPosShoot -= _res->_screensBasePos[ptr->screenNum].u;
 			}
-			if (dat->yPosShoot >= 192) {
+			if (dat->yPosShoot >= Video::H) {
 				dat->yPosShoot -= _res->_screensBasePos[ptr->screenNum].v;
 			}
 			setupLvlObjectBitmap(ptr);
@@ -3744,26 +3744,26 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 	int var20;
 	int var24 = xPos;
 	if (xPos < 0) {
-		xPos += 256;
-		var20 = -256;
+		xPos += Video::W;
+		var20 = -Video::W;
 		var24 = xPos;
 		screenNum = _res->_screensGrid[screenNum][kPosLeftScreen];
-	} else if (xPos >= 256) {
-		xPos -= 256;
-		var20 = 256;
+	} else if (xPos >= Video::W) {
+		xPos -= Video::W;
+		var20 = Video::W;
 		var24 = xPos;
 		screenNum = _res->_screensGrid[screenNum][kPosRightScreen];
 	} else {
 		var20 = 0;
 	}
 	if (screenNum != 0xFF && yPos < 0) {
-		yPos += 192;
-		var1C = -192;
+		yPos += Video::H;
+		var1C = -Video::H;
 		screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
-	} else if (yPos >= 192) {
+	} else if (yPos >= Video::H) {
 		assert(screenNum != 0xFF);
-		yPos -= 192;
-		var1C = 192;
+		yPos -= Video::H;
+		var1C = Video::H;
 		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
 	} else {
 		var1C = 0;
@@ -3944,10 +3944,10 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 		} else {
 // 40D9FC
 			o->anim = p[0];
-			if (dat->xPosShoot >= 256) {
+			if (dat->xPosShoot >= Video::W) {
 				dat->xPosShoot -= _res->_screensBasePos[o->screenNum].u;
 			}
-			if (dat->yPosShoot >= 192) {
+			if (dat->yPosShoot >= Video::H) {
 				dat->yPosShoot -= _res->_screensBasePos[o->screenNum].v;
 			}
 // 40DA36
@@ -4106,19 +4106,19 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 		int screenNum = o->screenNum;
 		if (x < 0) {
 			o->screenNum = _res->_screensGrid[screenNum][kPosLeftScreen];
-			o->xPos = xPrev + 256;
-		} else if (x >= 256) {
+			o->xPos = xPrev + Video::W;
+		} else if (x >= Video::W) {
 			o->screenNum = _res->_screensGrid[screenNum][kPosRightScreen];
-			o->xPos = xPrev - 256;
+			o->xPos = xPrev - Video::W;
 		}
 		screenNum = o->screenNum;
 		if (y < 0 && screenNum != 0xFF) {
 			o->screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
-			o->yPos = yPrev + 192;
-		} else if (y >= 192) {
+			o->yPos = yPrev + Video::H;
+		} else if (y >= Video::H) {
 			assert(screenNum != 0xFF);
 			o->screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
-			o->yPos = yPrev - 192;
+			o->yPos = yPrev - Video::H;
 		}
 		screenNum = o->screenNum;
 		if (screenNum == 0xFF) {
