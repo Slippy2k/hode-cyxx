@@ -6,6 +6,7 @@
 #include "video.h"
 #include "system.h"
 
+static const bool kUseShadowColorLut = false;
 static const bool _findBlackColor = false;
 
 Video::Video(System *system)
@@ -24,7 +25,11 @@ Video::Video(System *system)
 	_spr.y = 0;
 	_spr.w = W;
 	_spr.h = H;
-	_shadowColorLookupTable = (uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
+	if (kUseShadowColorLut) {
+		_shadowColorLookupTable = (uint8_t *)malloc(256 * 256); // shadowLayer, frontLayer
+	} else {
+		_shadowColorLookupTable = 0;
+	}
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(256 * 192 * 2 + 256 * 4);
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
@@ -345,10 +350,7 @@ void Video::drawLine(int x1, int y1, int x2, int y2) {
 }
 
 static uint8_t lookupColor(uint8_t a, uint8_t b, const uint8_t *lut) {
-	// if (a < 144) return b;
-	// else if (b < 144) return lut[b];
-	// else return b;
-	return (a < 144) ? b : lut[b];
+	return (a >= 144 && b < 144) ? lut[b] : b;
 }
 
 void Video::applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch, int src_pitch, uint8_t *dst1, uint8_t *dst2, uint8_t *src1, uint8_t *src2) {
