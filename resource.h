@@ -636,7 +636,7 @@ struct Resource {
 	void loadSssData(File *fp, const uint32_t baseOffset = 0);
 	void unloadSssData();
 	void checkSssCode(const uint8_t *buf, int size) const;
-	void loadSssPcm(File *fp, int num);
+	void loadSssPcm(File *fp, SssPcm *pcm);
 	uint32_t getSssPcmSize(const SssPcm *pcm) const;
 	void clearSssGroup3();
 	void resetSssFilters();

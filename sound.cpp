@@ -897,7 +897,10 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 	SssSample *sample = &_res->_sssSamplesData[sampleNum];
 
 	// original loads the PCM data in a seperate thread
-	_res->loadSssPcm(_res->_sssFile, sample->pcm);
+	SssPcm *pcm = &_res->_sssPcmTable[sample->pcm];
+	if (!pcm->ptr) {
+		_res->loadSssPcm(_res->_sssFile, pcm);
+	}
 
 	if (sample->framesCount != 0) {
 // 42B64C
@@ -905,7 +908,6 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 		const int priority = CLIP(filter->priorityCurrent + sample->initPriority, 0, 7);
 		uint32_t flags1 = flags & 0xFFF0F000;
 		flags1 |= ((sampleIndex & 0xF) << 16) | (bankIndex & 0xFFF);
-		SssPcm *pcm = &_res->_sssPcmTable[sample->pcm];
 		SssObject *so = addSoundObject(pcm, priority, flags1, flags);
 		if (so) {
 			if (sample->codeOffset1 == kNone && sample->codeOffset2 == kNone && sample->codeOffset3 == kNone && sample->codeOffset4 == kNone) {
@@ -962,7 +964,7 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 	tmpObj.lvlObject = _currentSoundLvlObject;
 	tmpObj.panningPtr = 0;
 	debug(kDebug_SOUND, "startSoundObject dpcm %d", sample->pcm);
-	tmpObj.pcm = &_res->_sssPcmTable[sample->pcm];
+	tmpObj.pcm = pcm;
 	if (sample->codeOffset1 != kNone) {
 		const uint8_t *code = _res->_sssCodeData + sample->codeOffset1;
 		executeSssCode(&tmpObj, code, true);
