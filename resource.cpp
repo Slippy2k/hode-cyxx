@@ -489,7 +489,7 @@ void Resource::loadLvlData(File *fp) {
 
 	_lvlFile->seekAlign(0x8);
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {
-		_lvlFile->read(&_screensGrid[i * 4], 4);
+		_lvlFile->read(_screensGrid[i], 4);
 	}
 	_lvlFile->seekAlign(0xA8);
 	for (int i = 0; i < _lvlHdr.screensCount; ++i) {

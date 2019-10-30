@@ -539,7 +539,7 @@ struct Resource {
 
 	uint8_t _currentScreenResourceNum;
 
-	uint8_t _screensGrid[kMaxScreens * 4];
+	uint8_t _screensGrid[kMaxScreens][4];
 	LvlScreenVector _screensBasePos[kMaxScreens];
 	LvlScreenState _screensState[kMaxScreens];
 	uint8_t *_resLevelData0x470CTable;
