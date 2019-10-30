@@ -504,7 +504,7 @@ void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum
 		}
 
 		const uint8_t *src = _screenTempMaskBuffer + screenGridOffset(x, y);
-		uint8_t *dst = _screenMaskBuffer + screenMaskOffset(y1, x1);
+		uint8_t *dst = _screenMaskBuffer + screenMaskOffset(x1, y1);
 		for (int i = 0; i < h; ++i) {
 			memcpy(dst, src, w);
 			src += 32;
