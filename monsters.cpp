@@ -2915,14 +2915,13 @@ int Game::mstUpdateTaskMonsterObject2(Task *t) {
 // 4191DC
 	LvlObject *o = m->o;
 	MstInfoMonster2 *monster2Info = m->monster2Info;
-	uint8_t _bl = monster2Info->shootMask;
-	if (_bl != _dl) {
+	const uint8_t _bl = monster2Info->shootMask;
+	if ((_bl & _dl) != 0) {
 		for (int i = 0; i < _andyShootsCount; ++i) {
 			AndyShootData *p = &_andyShootsTable[i];
 			if (p->type == 2 && (_bl & 1) == 0) {
 				continue;
-			}
-			if (p->type == 1 && (_bl & 2) == 0) {
+			} else if (p->type == 1 && (_bl & 2) == 0) {
 				continue;
 			}
 			if (o->screenNum != _currentScreen || p->o->screenNum != _currentScreen) {
