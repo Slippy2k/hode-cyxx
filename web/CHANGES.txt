@@ -1,5 +1,6 @@
 * release 0.2.1
 	- added initial code for PSX data files detection
+	- fixed sprite infinite looping in 'pwr1' level screen 23
 	- several fixes to gates and switches in 'lar1' and 'lar2' levels
 
 * release 0.2.0
