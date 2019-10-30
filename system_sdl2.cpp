@@ -396,11 +396,8 @@ void System_SDL2::updateScreen(bool drawWidescreen) {
 		}
 	}
 	uint32_t *p = (_scalerMultiplier == 1) ? dst : _offscreenRgb;
-	for (int y = 0; y < h; ++y) {
-		for (int x = 0; x < w; ++x) {
-			p[x] = _pal[src[y * w + x]];
-		}
-		p += w;
+	for (int i = 0; i < w * h; ++i) {
+		p[i] = _pal[src[i]];
 	}
 	if (_scalerMultiplier != 1) {
 		_scaler->scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
