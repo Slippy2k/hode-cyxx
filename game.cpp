@@ -335,10 +335,8 @@ void Game::setupBackgroundBitmap() {
 void Game::addToSpriteList(LvlObject *ptr) {
 	Sprite *spr = _spritesNextPtr;
 	if (spr) {
-		uint8_t rightScreenId  = _res->_screensGrid[_res->_currentScreenResourceNum][kPosRightScreen];
-		uint8_t topScreenId    = _res->_screensGrid[_res->_currentScreenResourceNum][kPosTopScreen];
-		uint8_t bottomScreenId = _res->_screensGrid[_res->_currentScreenResourceNum][kPosBottomScreen];
-		uint8_t leftScreenId   = _res->_screensGrid[_res->_currentScreenResourceNum][kPosLeftScreen];
+		const uint8_t num = _res->_currentScreenResourceNum;
+		const uint8_t *grid = _res->_screensGrid[num];
 
 		LvlObjectData *dat = ptr->levelData0x2988;
 		LvlAnimHeader *ah = (LvlAnimHeader *)(dat->animsInfoData + kLvlAnimHdrOffset) + ptr->anim;
@@ -349,15 +347,15 @@ void Game::addToSpriteList(LvlObject *ptr) {
 		int index = ptr->screenNum;
 		spr->xPos = ptr->xPos;
 		spr->yPos = ptr->yPos;
-		if (index == topScreenId) {
+		if (index == grid[kPosTopScreen]) {
 			spr->yPos -= Video::H;
-		} else if (index == bottomScreenId) {
+		} else if (index == grid[kPosBottomScreen]) {
 			spr->yPos += Video::H;
-		} else if (index == rightScreenId) {
+		} else if (index == grid[kPosRightScreen]) {
 			spr->xPos += Video::W;
-		} else if (index == leftScreenId) {
+		} else if (index == grid[kPosLeftScreen]) {
 			spr->xPos -= Video::W;
-		} else if (index != _res->_currentScreenResourceNum) {
+		} else if (index != num) {
 			return;
 		}
 		if (spr->xPos >= Video::W || spr->xPos + ptr->width < 0) {
