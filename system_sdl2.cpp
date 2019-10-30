@@ -181,12 +181,19 @@ void System_SDL2::destroy() {
 	}
 }
 
-
-static void blur_h(int radius, const uint32_t *src, int srcPitch, int w, int h, const SDL_PixelFormat *fmt, uint32_t *dst, int dstPitch) {
+template<bool vertical>
+static void blur(int radius, const uint32_t *src, int srcPitch, int w, int h, const SDL_PixelFormat *fmt, uint32_t *dst, int dstPitch) {
 
 	const int count = 2 * radius + 1;
 
-	for (int y = 0; y < h; ++y) {
+	const uint32_t rmask  = fmt->Rmask;
+	const uint32_t rshift = fmt->Rshift;
+	const uint32_t gmask  = fmt->Gmask;
+	const uint32_t gshift = fmt->Gshift;
+	const uint32_t bmask  = fmt->Bmask;
+	const uint32_t bshift = fmt->Bshift;
+
+	for (int j = 0; j < (vertical ? w : h); ++j) {
 
 		uint32_t r = 0;
 		uint32_t g = 0;
@@ -194,69 +201,48 @@ static void blur_h(int radius, const uint32_t *src, int srcPitch, int w, int h, 
 
 		uint32_t color;
 
-		for (int x = -radius; x <= radius; ++x) {
-			color = src[MAX(x, 0)];
-			r += (color & fmt->Rmask) >> fmt->Rshift;
-			g += (color & fmt->Gmask) >> fmt->Gshift;
-			b += (color & fmt->Bmask) >> fmt->Bshift;
+		for (int i = -radius; i <= radius; ++i) {
+			if (vertical) {
+				color = src[MAX(i, 0) * srcPitch];
+			} else {
+				color = src[MAX(i, 0)];
+			}
+			r += (color & rmask) >> rshift;
+			g += (color & gmask) >> gshift;
+			b += (color & bmask) >> bshift;
 		}
-		dst[0] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
+		color = ((r / count) << rshift) | ((g / count) << gshift) | ((b / count) << bshift);
+		dst[0] = color;
 
-		for (int x = 1; x < w; ++x) {
-			color = src[MIN(x + radius, w - 1)];
-			r += (color & fmt->Rmask) >> fmt->Rshift;
-			g += (color & fmt->Gmask) >> fmt->Gshift;
-			b += (color & fmt->Bmask) >> fmt->Bshift;
+		for (int i = 1; i < (vertical ? h : w); ++i) {
+			if (vertical) {
+				color = src[MIN(i + radius, h - 1) * srcPitch];
+			} else {
+				color = src[MIN(i + radius, w - 1)];
+			}
+			r += (color & rmask) >> rshift;
+			g += (color & gmask) >> gshift;
+			b += (color & bmask) >> bshift;
 
-			color = src[MAX(x - radius - 1, 0)];
-			r -= (color & fmt->Rmask) >> fmt->Rshift;
-			g -= (color & fmt->Gmask) >> fmt->Gshift;
-			b -= (color & fmt->Bmask) >> fmt->Bshift;
+			if (vertical) {
+				color = src[MAX(i - radius - 1, 0) * srcPitch];
+			} else {
+				color = src[MAX(i - radius - 1, 0)];
+			}
+			r -= (color & rmask) >> rshift;
+			g -= (color & gmask) >> gshift;
+			b -= (color & bmask) >> bshift;
 
-			dst[x] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
-		}
-
-		src += srcPitch;
-		dst += dstPitch;
-	}
-}
-
-static void blur_v(int radius, const uint32_t *src, int srcPitch, int w, int h, const SDL_PixelFormat *fmt, uint32_t *dst, int dstPitch) {
-
-	const int count = 2 * radius + 1;
-
-	for (int x = 0; x < w; ++x) {
-
-		uint32_t r = 0;
-		uint32_t g = 0;
-		uint32_t b = 0;
-
-		uint32_t color;
-
-		for (int y = -radius; y <= radius; ++y) {
-			color = src[MAX(y, 0) * srcPitch];
-			r += (color & fmt->Rmask) >> fmt->Rshift;
-			g += (color & fmt->Gmask) >> fmt->Gshift;
-			b += (color & fmt->Bmask) >> fmt->Bshift;
-		}
-		dst[0] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
-
-		for (int y = 1; y < h; ++y) {
-			color = src[MIN(y + radius, h - 1) * srcPitch];
-			r += (color & fmt->Rmask) >> fmt->Rshift;
-			g += (color & fmt->Gmask) >> fmt->Gshift;
-			b += (color & fmt->Bmask) >> fmt->Bshift;
-
-			color = src[MAX(y - radius - 1, 0) * srcPitch];
-			r -= (color & fmt->Rmask) >> fmt->Rshift;
-			g -= (color & fmt->Gmask) >> fmt->Gshift;
-			b -= (color & fmt->Bmask) >> fmt->Bshift;
-
-			dst[y * dstPitch] = ((r / count) << fmt->Rshift) | ((g / count) << fmt->Gshift) | ((b / count) << fmt->Bshift);
+			color = ((r / count) << rshift) | ((g / count) << gshift) | ((b / count) << bshift);
+			if (vertical) {
+				dst[i * srcPitch] = color;
+			} else {
+				dst[i] = color;
+			}
 		}
 
-		++src;
-		++dst;
+		src += vertical ? 1 : srcPitch;
+		dst += vertical ? 1 : dstPitch;
 	}
 }
 
@@ -281,8 +267,10 @@ void System_SDL2::copyRectWidescreen(int w, int h, const uint8_t *buf, const uin
 				src[i] = SDL_MapRGB(_fmt, _gammaLut[pal[color * 3]], _gammaLut[pal[color * 3 + 1]], _gammaLut[pal[color * 3 + 2]]);
 			}
 			static const int radius = 8;
-			blur_h(radius, src, w, w, h, _fmt, tmp, w);
-			blur_v(radius, tmp, w, w, h, _fmt, dst, pitch / sizeof(uint32_t));
+			// horizontal pass
+			blur<false>(radius, src, w, w, h, _fmt, tmp, w);
+			// vertical pass
+			blur<true>(radius, tmp, w, w, h, _fmt, dst, pitch / sizeof(uint32_t));
 		}
 
 		free(src);
