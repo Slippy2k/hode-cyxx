@@ -266,6 +266,7 @@ void Level_pwr1::postScreenUpdate_pwr1_screen27() {
 	case 2:
 		++_screenCounterTable[27];
 		if (_screenCounterTable[27] == 37) {
+			_res->_screensState[27].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[27].currentMaskId = 1;
 			_res->_resLvlScreenBackgroundDataTable[27].currentBackgroundId = 1;
 			_g->setupScreenMask(27);
