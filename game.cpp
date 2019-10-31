@@ -386,16 +386,16 @@ int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 		xPos -= Video::W;
 		num = _res->_screensGrid[num][kPosRightScreen];
 	}
-	if (num != 0xFF && yPos < 0) {
+	if (num != kNoScreen && yPos < 0) {
 		yPos += Video::H;
 		num = _res->_screensGrid[num][kPosTopScreen];
 	} else if (yPos >= Video::H) {
-		assert(num != 0xFF);
+		assert(num != kNoScreen);
 		yPos -= Video::H;
 		num = _res->_screensGrid[num][kPosBottomScreen];
 	}
 	uint8_t var1 = 0xFF - (yPos & 7);
-	if (num == 0xFF) {
+	if (num == kNoScreen) {
 		return var1;
 	}
 	int _esi = screenMaskOffset(_res->_screensBasePos[num].u + xPos, _res->_screensBasePos[num].v + yPos);
@@ -431,7 +431,7 @@ int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 void Game::setupScreenPosTable(uint8_t num) {
 	const uint8_t *src = _res->_screensGrid[num];
 	for (int i = 0; i < 4; ++i) {
-		if (src[i] != 0xFF) {
+		if (src[i] != kNoScreen) {
 			int index = _res->_resLvlScreenBackgroundDataTable[src[i]].currentMaskId;
 			const uint8_t *p = _res->getLvlScreenPosDataPtr(src[i] * 4 + index);
 			if (p) {
@@ -451,7 +451,7 @@ void Game::setupScreenPosTable(uint8_t num) {
 }
 
 void Game::setupScreenMask(uint8_t num) {
-	if (num == 0xFF) {
+	if (num == kNoScreen) {
 		return;
 	}
 	int mask = _res->_resLvlScreenBackgroundDataTable[num].currentMaskId;
@@ -484,7 +484,7 @@ void Game::resetScreenMask() {
 }
 
 void Game::setScreenMaskRectHelper(int x1, int y1, int x2, int y2, int screenNum) {
-	if (screenNum != 0xFF) {
+	if (screenNum != kNoScreen) {
 
 		int index = _res->_resLvlScreenBackgroundDataTable[screenNum].currentMaskId;
 		const uint8_t *p = _res->getLvlScreenPosDataPtr(screenNum * 4 + index);
@@ -516,7 +516,7 @@ void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int screenNum) {
 	const int v = _res->_screensBasePos[screenNum].v;
 	const int topScreenNum = _res->_screensGrid[screenNum][kPosTopScreen];
 	if (x1 < u || y1 < v || y2 >= v + Video::H) {
-		if (topScreenNum != 0xFF) {
+		if (topScreenNum != kNoScreen) {
 			const int u2 = _res->_screensBasePos[topScreenNum].u;
 			const int v2 = _res->_screensBasePos[topScreenNum].v;
 			if (x1 >= u2 && y1 >= v2 && y2 < v + Video::H) {
@@ -912,16 +912,16 @@ endDir:
 }
 
 void Game::preloadLevelScreenData(uint8_t num, uint8_t prev) {
-	assert(num != 255);
+	assert(num != kNoScreen);
 	if (!_res->isLvlBackgroundDataLoaded(num)) {
 		_res->loadLvlScreenBackgroundData(num);
 	}
 	const uint8_t leftScreen = _res->_screensGrid[num][kPosLeftScreen];
-	if (leftScreen != 255 && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
+	if (leftScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
 		_res->loadLvlScreenBackgroundData(leftScreen);
 	}
 	const uint8_t rightScreen = _res->_screensGrid[num][kPosRightScreen];
-	if (rightScreen != 255 && !_res->isLvlBackgroundDataLoaded(rightScreen)) {
+	if (rightScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(rightScreen)) {
 		_res->loadLvlScreenBackgroundData(rightScreen);
 	}
 	for (unsigned int i = 0; i < kMaxScreens; ++i) {
@@ -1381,7 +1381,7 @@ void Game::resetDisplay() {
 void Game::updateScreen(uint8_t num) {
 	uint8_t i, prev;
 
-	if (num == 0xFF) {
+	if (num == kNoScreen) {
 		return;
 	}
 	prev = _res->_currentScreenResourceNum;
@@ -1393,26 +1393,26 @@ void Game::updateScreen(uint8_t num) {
 	}
 	callLevel_postScreenUpdate(num);
 	i = _res->_screensGrid[num][kPosTopScreen];
-	if (i != 0xFF && prev != i) {
+	if (i != kNoScreen && prev != i) {
 		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num][kPosRightScreen];
-	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
+	if (i != kNoScreen && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
 		updateScreenHelper(i);
 		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num][kPosBottomScreen];
-	if (i != 0xFF && prev != i) {
+	if (i != kNoScreen && prev != i) {
 		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
 	}
 	i = _res->_screensGrid[num][kPosLeftScreen];
-	if (i != 0xFF && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
+	if (i != kNoScreen && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
 		updateScreenHelper(i);
 		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
@@ -1457,12 +1457,12 @@ void Game::restartLevel() {
 		resetSound();
 	}
 	const int screenNum = _level->getCheckpointData(_level->_checkpoint)->screenNum;
-	preloadLevelScreenData(screenNum, 0xFF);
+	preloadLevelScreenData(screenNum, kNoScreen);
 	_andyObject->levelData0x2988 = _res->_resLevelData0x2988PtrTable[_andyObject->spriteNum];
 	memset(_video->_backgroundLayer, 0, Video::W * Video::H);
 	resetScreen();
 	if (_andyObject->screenNum != screenNum) {
-		preloadLevelScreenData(_andyObject->screenNum, 0xFF);
+		preloadLevelScreenData(_andyObject->screenNum, kNoScreen);
 	}
 	updateScreen(_andyObject->screenNum);
 }
@@ -1517,15 +1517,15 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 			ptr->screenNum = _res->_screensGrid[num][kPosRightScreen];
 			ptr->xPos = xPosPrev - Video::W;
 		}
-		if (yPos < 0 && ptr->screenNum != 0xFF) {
+		if (yPos < 0 && ptr->screenNum != kNoScreen) {
 			ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosTopScreen];
 			ptr->yPos = yPosPrev + Video::H;
 		} else if (yPos > Video::H) {
-			assert(ptr->screenNum != 0xFF);
+			assert(ptr->screenNum != kNoScreen);
 			ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosBottomScreen];
 			ptr->yPos = yPosPrev - Video::H;
 		}
-		if (ptr->screenNum == 0xFF) {
+		if (ptr->screenNum == kNoScreen) {
 			debug(kDebug_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
 			ptr->screenNum = num;
 			ptr->xPos = xPosPrev;
@@ -2094,7 +2094,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
 	initMstCode();
-	preloadLevelScreenData(_level->getCheckpointData(_level->_checkpoint)->screenNum, 0xFF);
+	preloadLevelScreenData(_level->getCheckpointData(_level->_checkpoint)->screenNum, kNoScreen);
 	memset(_level->_screenCounterTable, 0, sizeof(_level->_screenCounterTable));
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();

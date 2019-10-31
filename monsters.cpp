@@ -864,12 +864,12 @@ void Game::resetMstCode() {
 	_mstBoundingBoxesCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
-	_mstOp67_screenNum = 0xFF;
+	_mstOp67_screenNum = kNoScreen;
 	_mstOp68_x1 = 256;
 	_mstOp68_x2 = 256;
 	_mstOp68_y1 = 0;
 	_mstOp68_y2 = 0;
-	_mstOp68_screenNum = 255;
+	_mstOp68_screenNum = kNoScreen;
 	_mstLevelGatesMask = 0;
 	// _mstLevelGatesTestMask = 0xFFFFFFFF;
 	_mstAndyVarMask = 0;
