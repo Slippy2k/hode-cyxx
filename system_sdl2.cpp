@@ -683,25 +683,24 @@ void System_SDL2::setupDefaultKeyMappings() {
 
 	addKeyMapping(SDL_SCANCODE_RETURN,   SYS_INP_JUMP);
 	addKeyMapping(SDL_SCANCODE_LCTRL,    SYS_INP_RUN);
-//	addKeyMapping(SDL_SCANCODE_f,        SYS_INP_RUN);
+	addKeyMapping(SDL_SCANCODE_F,        SYS_INP_RUN);
 //	addKeyMapping(SDL_SCANCODE_LALT,     SYS_INP_JUMP);
-//	addKeyMapping(SDL_SCANCODE_g,        SYS_INP_JUMP);
+	addKeyMapping(SDL_SCANCODE_G,        SYS_INP_JUMP);
 	addKeyMapping(SDL_SCANCODE_LSHIFT,   SYS_INP_SHOOT);
-//	addKeyMapping(SDL_SCANCODE_h,        SYS_INP_SHOOT);
-//	addKeyMapping(SDL_SCANCODE_d,        SYS_INP_SHOOT | SYS_INP_RUN);
-//	addKeyMapping(SDL_SCANCODE_SPACE,    SYS_INP_SHOOT | SYS_INP_RUN);
+	addKeyMapping(SDL_SCANCODE_H,        SYS_INP_SHOOT);
+	addKeyMapping(SDL_SCANCODE_D,        SYS_INP_SHOOT | SYS_INP_RUN);
+	addKeyMapping(SDL_SCANCODE_SPACE,    SYS_INP_SHOOT | SYS_INP_RUN);
 	addKeyMapping(SDL_SCANCODE_ESCAPE,   SYS_INP_ESC);
 }
 
 void System_SDL2::updateKeys(PlayerInput *inp) {
 	inp->prevMask = inp->mask;
+	inp->mask = 0;
 	const uint8_t *keyState = SDL_GetKeyboardState(NULL);
 	for (int i = 0; i < _keyMappingsCount; ++i) {
-		KeyMapping *keyMap = &_keyMappings[i];
+		const KeyMapping *keyMap = &_keyMappings[i];
 		if (keyState[keyMap->keyCode]) {
 			inp->mask |= keyMap->mask;
-		} else {
-			inp->mask &= ~keyMap->mask;
 		}
 	}
 	inp->mask |= pad.mask;
