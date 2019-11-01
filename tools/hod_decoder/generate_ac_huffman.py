@@ -5,6 +5,9 @@ AC_COEFFS_COUNT = 111
 
 NODES = []
 
+ESCAPE_CODE = 0xFFFE
+END_OF_BLOCK = 0xFFFF
+
 class Tree(object):
 	def __init__(self):
 		self.left  = None
@@ -35,7 +38,7 @@ def addCode(code, value):
 def dumpNode(node):
 	if not node.left and not node.right:
 		assert node.value != 0
-		print '\t{ -1, -1, 0x%04x},' % (node.value)
+		print '\t{ -1, -1, 0x%04x },' % (node.value)
 	else:
 		assert not node.value
 		if node.left:
@@ -46,7 +49,7 @@ def dumpNode(node):
 			right = node.right.num
 		else:
 			right = -1
-		print '\t{ %d, %d, 0x0000 },' % (left, right)
+		print '\t{ %d, %d, 0 },' % (left, right)
 
 # collect variable length codes
 vlc = [] # code, non-zero values, zero values
@@ -59,19 +62,17 @@ for line in file(AC_COEFFS_TXT).readlines():
 	assert (nonzero + zero) != 0
 	vlc.append( (code, ((nonzero << 8) | zero)) )
 assert len(vlc) == AC_COEFFS_COUNT
-
-# 000001 Escape
-vlc.append( ('000001t', 0xFFFE) )
-# 10 End of block
-vlc.append( ('10t', 0xFFFF) )
+# special codes
+vlc.append( ('000001t', ESCAPE_CODE) )
+vlc.append( ('10t', END_OF_BLOCK) )
 
 # build huffman tree
 for code in vlc:
 	addCode(code[0], code[1])
 
 # output C structure
-print 'static const uint16_t kAcHuff_EscapeCode = 0xFFFE;'
-print 'static const uint16_t kAcHuff_EndOfBlock = 0xFFFF;'
+print 'static const uint16_t kAcHuff_EscapeCode = 0x%x;' % ESCAPE_CODE
+print 'static const uint16_t kAcHuff_EndOfBlock = 0x%x;' % END_OF_BLOCK
 print 'struct AcHuff {'
 print '\t int16_t left;'
 print '\t int16_t right;'
