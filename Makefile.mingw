@@ -7,7 +7,9 @@ CXX     := i686-w64-mingw32-g++
 STRIP   := i686-w64-mingw32-strip
 WINDRES := i686-w64-mingw32-windres
 
-CPPFLAGS += -O2 -Wall $(SDL_CFLAGS) # -ffunction-sections
+LTO      := -flto
+CPPFLAGS += -O2 -Wall $(SDL_CFLAGS) $(LTO) # -ffunction-sections
+LDFLAGS  += $(LTO)
 
 SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
         level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \
