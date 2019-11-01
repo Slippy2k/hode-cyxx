@@ -2,6 +2,7 @@
 #include <math.h>
 #include "intern.h"
 #include "mdec.h"
+#include "mdec_ac_coeffs.h"
 
 struct BitStream { // most significant 16 bits
 	const uint8_t *_src;
@@ -39,6 +40,9 @@ struct BitStream { // most significant 16 bits
 		int32_t value = getBits(len);
 		return (value << shift) >> shift;
 	}
+	bool getBit() {
+		return getBits(1) != 0;
+	}
 };
 
 static int readDC(BitStream *bs, int version) {
@@ -47,8 +51,40 @@ static int readDC(BitStream *bs, int version) {
 }
 
 static void readAC(BitStream *bs, int *coefficients) {
-	fprintf(stdout, "readAC unimplemented\n");
-	// while (!bs->_endOfStream)
+	int count = 0;
+	int node = 0;
+	while (!bs->_endOfStream) {
+		const uint16_t value = _acHuffTree[node].value;
+		switch (value) {
+		case kAcHuff_EscapeCode: {
+				const int zeroes = bs->getBits(6);
+				count += zeroes + 1;
+				assert(count < 63);
+				coefficients += zeroes;
+				*coefficients++ = bs->getSignedBits(10);
+			}
+			break;
+		case kAcHuff_EndOfBlock:
+			return;
+		case 0:
+			if (bs->getBit()) {
+				node = _acHuffTree[node].right;
+			} else {
+				node = _acHuffTree[node].left;
+			}
+			continue;
+		default: {
+				const int zeroes = value >> 8;
+				count += zeroes + 1;
+				assert(count < 63);
+				coefficients += zeroes;
+				const int nonZeroes = value & 255;
+				*coefficients++ = bs->getBit() ? -nonZeroes : nonZeroes;
+			}
+			break;
+		}
+		node = 0; // root
+	}
 }
 
 static const uint8_t _zigZagTable[8 * 8] = {
@@ -76,12 +112,10 @@ static const uint8_t _quantizationTable[8 * 8] = {
 static void dequantizeBlock(int *coefficients, float *block, int scale) {
 	block[0] = coefficients[0] * _quantizationTable[0]; // DC
 	for (int i = 1; i < 8 * 8; i++) {
-		block[i] = (float)coefficients[_zigZagTable[i]] * _quantizationTable[i] * scale / 8;
+		block[i] = coefficients[_zigZagTable[i]] * _quantizationTable[i] * scale / 8.f;
 	}
 }
 
-// _idct8x8[x][y] = cos(((2 * x + 1) * y) * (M_PI / 16.0)) * 0.5;
-// _idct8x8[x][y] /= sqrt(2.0) if y == 0
 static const double _idct8x8[8][8] = {
 	{ 0.353553390593274,  0.490392640201615,  0.461939766255643,  0.415734806151273,  0.353553390593274,  0.277785116509801,  0.191341716182545,  0.097545161008064 },
 	{ 0.353553390593274,  0.415734806151273,  0.191341716182545, -0.097545161008064, -0.353553390593274, -0.490392640201615, -0.461939766255643, -0.277785116509801 },
@@ -160,7 +194,7 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 	assert(vlc == 0x3800);
 	const uint16_t qscale = bs.getBits(16);
 	const uint16_t version = bs.getBits(16);
-	fprintf(stdout, "mdec qscale %d version %d\n", qscale, version);
+	// fprintf(stdout, "mdec qscale %d version %d\n", qscale, version);
 	assert(version == 2);
 
 	const int blockW = (w + 15) / 16;
@@ -177,22 +211,22 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 	mdecOut.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(blockW * 8 * blockH * 8);
 	mdecOut.planes[kOutputPlaneCr].pitch = blockW * 8;
 
-	for (int y = 0; y < blockH; ++y) {
-		for (int x = 0; x < blockW; ++x) {
+	for (int x = 0; x < blockW; ++x) {
+		for (int y = 0; y < blockH; ++y) {
 			decodeBlock(&bs, x, y, mdecOut.planes[kOutputPlaneCr].ptr, mdecOut.planes[kOutputPlaneCr].pitch, qscale, version);
 			decodeBlock(&bs, x, y, mdecOut.planes[kOutputPlaneCb].ptr, mdecOut.planes[kOutputPlaneCb].pitch, qscale, version);
-			decodeBlock(&bs, x,     y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
-			decodeBlock(&bs, x + 1, y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
-			decodeBlock(&bs, x,     y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
-			decodeBlock(&bs, x + 1, y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
+			decodeBlock(&bs, 2 * x,     2 * y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
+			decodeBlock(&bs, 2 * x + 1, 2 * y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
+			decodeBlock(&bs, 2 * x,     2 * y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
+			decodeBlock(&bs, 2 * x + 1, 2 * y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
 		}
 	}
 
 	output(&mdecOut, userdata);
 
-	free(mdecOut.planes[0].ptr);
-	free(mdecOut.planes[1].ptr);
-	free(mdecOut.planes[2].ptr);
+	free(mdecOut.planes[kOutputPlaneY].ptr);
+	free(mdecOut.planes[kOutputPlaneCb].ptr);
+	free(mdecOut.planes[kOutputPlaneCr].ptr);
 
 	return 0;
 }

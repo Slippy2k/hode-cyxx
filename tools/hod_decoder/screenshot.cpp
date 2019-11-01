@@ -256,7 +256,7 @@ static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 			jpeg_set_quality(&cinfo, 100, TRUE);
 			cinfo.optimize_coding = TRUE;
 
-			JSAMPROW y[16], cb[16], cr[16];
+			JSAMPROW y[16], cb[8], cr[8];
 			JSAMPARRAY p[3] = { y, cr, cb };
 
 			jpeg_start_compress(&cinfo, TRUE);
