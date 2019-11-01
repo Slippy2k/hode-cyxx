@@ -188,95 +188,73 @@ void saveLZW(const char *filename, const uint8_t *bits, int len, const uint8_t *
 	}
 }
 
-#ifdef STUB_SAVEPSX
-void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
-	char filename2[MAXPATHLEN];
-	strcpy(filename2, filename);
-	char *ext = strrchr(filename2, '.');
-	if (ext && strcmp(ext, ".jpg") == 0) {
-		strcpy(ext + 1, "bss");
-		fioDumpData(filename2, src, len);
-	}
-}
-#else
 extern "C" {
 	#include <jpeglib.h>
 }
 static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 	const char *filename = (const char *)userdata;
 
-	if (mdecOutput->format == kMdecOutputRgb) {
+	assert(mdecOutput->format == kMdecOutputYuv);
 
-		char filename2[MAXPATHLEN];
-		strcpy(filename2, filename);
-		char *ext = strrchr(filename2, '.');
-		if (ext) {
-			strcpy(ext + 1, "tga");
-			saveTGA(filename2, mdecOutput->planes[0].ptr, mdecOutput->w, mdecOutput->h);
-                }
+	struct jpeg_compress_struct cinfo;
+	struct jpeg_error_mgr jerr;
 
-	} else if (mdecOutput->format == kMdecOutputYuv) {
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
 
-		struct jpeg_compress_struct cinfo;
-		struct jpeg_error_mgr jerr;
+	FILE *fp = fopen(filename, "wb");
+	if (fp) {
+		jpeg_stdio_dest(&cinfo, fp);
 
-		cinfo.err = jpeg_std_error(&jerr);
-		jpeg_create_compress(&cinfo);
+		cinfo.image_width = mdecOutput->w;
+		cinfo.image_height = mdecOutput->h;
+		cinfo.input_components = 3;
+		cinfo.in_color_space = JCS_YCbCr;
 
-		FILE *fp = fopen(filename, "wb");
-		if (fp) {
-			jpeg_stdio_dest(&cinfo, fp);
+		jpeg_set_defaults(&cinfo);
+		cinfo.raw_data_in = TRUE;
 
-			cinfo.image_width = mdecOutput->w;
-			cinfo.image_height = mdecOutput->h;
-			cinfo.input_components = 3;
-			cinfo.in_color_space = JCS_YCbCr;
+		cinfo.comp_info[0].h_samp_factor = 2;
+		cinfo.comp_info[0].v_samp_factor = 2;
+		cinfo.comp_info[0].dc_tbl_no = 0;
+		cinfo.comp_info[0].ac_tbl_no = 0;
+		cinfo.comp_info[0].quant_tbl_no = 0;
 
-			jpeg_set_defaults(&cinfo);
-			cinfo.raw_data_in = TRUE;
+		cinfo.comp_info[1].h_samp_factor = 1;
+		cinfo.comp_info[1].v_samp_factor = 1;
+		cinfo.comp_info[1].dc_tbl_no = 1;
+		cinfo.comp_info[1].ac_tbl_no = 1;
+		cinfo.comp_info[1].quant_tbl_no = 1;
 
-			cinfo.comp_info[0].h_samp_factor = 2;
-			cinfo.comp_info[0].v_samp_factor = 2;
-			cinfo.comp_info[0].dc_tbl_no = 0;
-			cinfo.comp_info[0].ac_tbl_no = 0;
-			cinfo.comp_info[0].quant_tbl_no = 0;
+		cinfo.comp_info[2].h_samp_factor = 1;
+		cinfo.comp_info[2].v_samp_factor = 1;
+		cinfo.comp_info[2].dc_tbl_no = 1;
+		cinfo.comp_info[2].ac_tbl_no = 1;
+		cinfo.comp_info[2].quant_tbl_no = 1;
 
-			cinfo.comp_info[1].h_samp_factor = 1;
-			cinfo.comp_info[1].v_samp_factor = 1;
-			cinfo.comp_info[1].dc_tbl_no = 1;
-			cinfo.comp_info[1].ac_tbl_no = 1;
-			cinfo.comp_info[1].quant_tbl_no = 1;
+		jpeg_set_quality(&cinfo, 100, TRUE);
+		cinfo.optimize_coding = TRUE;
 
-			cinfo.comp_info[2].h_samp_factor = 1;
-			cinfo.comp_info[2].v_samp_factor = 1;
-			cinfo.comp_info[2].dc_tbl_no = 1;
-			cinfo.comp_info[2].ac_tbl_no = 1;
-			cinfo.comp_info[2].quant_tbl_no = 1;
+		JSAMPROW y[16], cb[8], cr[8];
+		JSAMPARRAY p[3] = { y, cr, cb };
 
-			jpeg_set_quality(&cinfo, 100, TRUE);
-			cinfo.optimize_coding = TRUE;
+		jpeg_start_compress(&cinfo, TRUE);
 
-			JSAMPROW y[16], cb[8], cr[8];
-			JSAMPARRAY p[3] = { y, cr, cb };
-
-			jpeg_start_compress(&cinfo, TRUE);
-
-			for (unsigned int j = 0; j < cinfo.image_height; j += 16) {
-				int offset = j;
-				for (unsigned int i = 0; i < 16; i++) {
-					y[i]       = mdecOutput->planes[0].ptr + mdecOutput->planes[0].pitch *  offset;
-					cr[i >> 1] = mdecOutput->planes[1].ptr + mdecOutput->planes[1].pitch * (offset >> 1);
-					cb[i >> 1] = mdecOutput->planes[2].ptr + mdecOutput->planes[2].pitch * (offset >> 1);
-					++offset;
-				}
-				jpeg_write_raw_data(&cinfo, p, 16);
+		for (unsigned int j = 0; j < cinfo.image_height; j += 16) {
+			int offset = j;
+			for (unsigned int i = 0; i < 16; i++) {
+				y[i]       = mdecOutput->planes[0].ptr + mdecOutput->planes[0].pitch *  offset;
+				cr[i >> 1] = mdecOutput->planes[1].ptr + mdecOutput->planes[1].pitch * (offset >> 1);
+				cb[i >> 1] = mdecOutput->planes[2].ptr + mdecOutput->planes[2].pitch * (offset >> 1);
+				++offset;
 			}
-
-			jpeg_finish_compress(&cinfo);
-			jpeg_destroy_compress(&cinfo);
-
-			fclose(fp);
+			jpeg_write_raw_data(&cinfo, p, 16);
 		}
+
+		jpeg_finish_compress(&cinfo);
+		jpeg_destroy_compress(&cinfo);
+
+		fclose(fp);
 	}
 }
 
@@ -285,4 +263,3 @@ void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
 	// fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
 	decodeMDEC(src, len, w, h, filename, outputPSX);
 }
-#endif // STUB_SAVEPSX
