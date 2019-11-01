@@ -2481,7 +2481,7 @@ void Game::updateAnimatedLvlObjectsLeftRightCurrentScreens() {
 		}
 	}
 	int index = _res->_screensGrid[_res->_currentScreenResourceNum][kPosRightScreen];
-	if (index != 0xFF && _res->_screensState[index].s2 != 0) {
+	if (index != kNoScreen && _res->_screensState[index].s2 != 0) {
 		ptr = _screenLvlObjectsList[index];
 		while (ptr) {
 			if (ptr->screenState == 0xFF || ptr->screenState == _res->_screensState[index].s0) {
@@ -2492,7 +2492,7 @@ void Game::updateAnimatedLvlObjectsLeftRightCurrentScreens() {
 		}
 	}
 	index = _res->_screensGrid[_res->_currentScreenResourceNum][kPosLeftScreen];
-	if (index != 0xFF && _res->_screensState[index].s2 != 0) {
+	if (index != kNoScreen && _res->_screensState[index].s2 != 0) {
 		ptr = _screenLvlObjectsList[index];
 		while (ptr) {
 			if (ptr->screenState == 0xFF || ptr->screenState == _res->_screensState[index].s0) {
@@ -2663,10 +2663,10 @@ void Game::levelMainLoop() {
 		restartLevel();
 	} else {
 		callLevel_postScreenUpdate(_res->_currentScreenResourceNum);
-		if (_currentLeftScreen != 0xFF) {
+		if (_currentLeftScreen != kNoScreen) {
 			callLevel_postScreenUpdate(_currentLeftScreen);
 		}
-		if (_currentRightScreen != 0xFF) {
+		if (_currentRightScreen != kNoScreen) {
 			callLevel_postScreenUpdate(_currentRightScreen);
 		}
 	}
@@ -3743,7 +3743,7 @@ void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
 		yPos += Video::H;
 		screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
 	} else if (yPos >= Video::H) {
-		assert(screenNum != 0xFF);
+		assert(screenNum != kNoScreen);
 		yPos -= Video::H;
 		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
 	}
@@ -3833,12 +3833,12 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 	} else {
 		var20 = 0;
 	}
-	if (screenNum != 0xFF && yPos < 0) {
+	if (screenNum != kNoScreen && yPos < 0) {
 		yPos += Video::H;
 		var1C = -Video::H;
 		screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
 	} else if (yPos >= Video::H) {
-		assert(screenNum != 0xFF);
+		assert(screenNum != kNoScreen);
 		yPos -= Video::H;
 		var1C = Video::H;
 		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
@@ -3846,7 +3846,7 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 		var1C = 0;
 	}
 // 40D0CA
-	if (screenNum == 0xFF) {
+	if (screenNum == kNoScreen) {
 		return 0;
 	}
 	uint8_t var2C, _bl;
@@ -4189,16 +4189,16 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 			o->xPos = xPrev - Video::W;
 		}
 		screenNum = o->screenNum;
-		if (y < 0 && screenNum != 0xFF) {
+		if (y < 0 && screenNum != kNoScreen) {
 			o->screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
 			o->yPos = yPrev + Video::H;
 		} else if (y >= Video::H) {
-			assert(screenNum != 0xFF);
+			assert(screenNum != kNoScreen);
 			o->screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
 			o->yPos = yPrev - Video::H;
 		}
 		screenNum = o->screenNum;
-		if (screenNum == 0xFF) {
+		if (screenNum == kNoScreen) {
 			o->xPos = xPrev;
 			o->yPos = yPrev;
 			o->screenNum = numPrev;
