@@ -3723,8 +3723,85 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 }
 
 void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
-	warning("lvlObjectSpecialPowersCallbackHelper1 unimplemented");
-	// TODO
+	int xPos = o->xPos + o->posTable[3].x;
+	int yPos = o->yPos + o->posTable[3].y;
+	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
+	const uint8_t val = dat->unk3;
+	if (val == 0x80) {
+		dat->xPosShoot = xPos;
+		dat->yPosShoot = yPos;
+	}
+	uint8_t screenNum = o->screenNum;
+	if (xPos < 0) {
+		xPos += Video::W;
+		screenNum = _res->_screensGrid[screenNum][kPosLeftScreen];
+	} else if (xPos >= Video::W) {
+		xPos -= Video::W;
+		screenNum = _res->_screensGrid[screenNum][kPosRightScreen];
+	}
+	if (screenNum != kNoScreen && yPos < 0) {
+		yPos += Video::H;
+		screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
+	} else if (yPos >= Video::H) {
+		assert(screenNum != 0xFF);
+		yPos -= Video::H;
+		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
+	}
+	int8_t dy = 255 - (yPos & 7);
+	if (screenNum == kNoScreen) {
+		const int xLevelPos = _res->_screensBasePos[screenNum].u + xPos;
+		const int yLevelPos = _res->_screensBasePos[screenNum].v + yPos + 8;
+		int offset = screenMaskOffset(xLevelPos, yLevelPos);
+		if (_screenMaskBuffer[offset] & 1) {
+			dy = -8;
+// 40D4FB
+			goto set_dat03;
+		} else if (_screenMaskBuffer[offset + 512] & 1) {
+// 40D514
+			const int _esi = screenGridOffset(xPos, yPos);
+			int i = 0;
+			while (screenNum != _res->_screensGrid[_res->_currentScreenResourceNum][i]) {
+				++i;
+				if (i >= 4) {
+					if (screenNum != _res->_currentScreenResourceNum) {
+						goto set_dat03;
+					}
+					break;
+				}
+			}
+// 40D585
+			const uint8_t *p = _res->_resLevelData0x470CTablePtrData + (xPos & 7);
+			dy += (int8_t)p[_screenPosTable[i][_esi] * 8];
+		} else if (_screenMaskBuffer[offset - 1024] & 1) {
+// 40D5BC
+			dy -= 16;
+			goto set_dat03;
+		} else {
+// 40D5D0
+			dy = val;
+			if (val < 0x18) {
+				dat->unk3 = val + 4;
+			}
+			goto set_dxpos;
+		}
+	}
+// 40D4FB
+set_dat03:
+	if (val == 0x18) {
+		dat->unk0 = 6;
+	} else {
+		dat->unk3 = 8;
+	}
+// 40D5E1
+set_dxpos:
+	if (dat->unk0 != 6 && dat->unk3 == 0x80) {
+		dat->yPosShoot += dy;
+		setLvlObjectPosRelativeToPoint(o, 3, dat->xPosShoot, dat->yPosShoot);
+	} else {
+		dat->unk3 = 0x80;
+		dat->dxPos = 0;
+		dat->dyPos = 0;
+	}
 }
 
 uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
