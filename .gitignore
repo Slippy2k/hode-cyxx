@@ -1,0 +1,17 @@
+*.o
+*.d
+*.cfg
+*.idb
+*.bmp
+*.jpg
+*.tga
+*.png
+*.wav
+*.bin
+*.bss
+*.zip
+*.tar.bz2
+*.pdf
+*.gif
+*.mp4
+*.exe
