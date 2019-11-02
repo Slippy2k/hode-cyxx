@@ -414,15 +414,9 @@ int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 	} else {
 		return 0;
 	}
-	int _dl = 1; // screen
-	while (_res->_screensGrid[_res->_currentScreenResourceNum][_dl - 1] != num) {
-		++_dl;
-		if (_dl >= 4) {
-			if (num == _res->_currentScreenResourceNum) {
-				break;
-			}
-			return (int8_t)(var1 + 4);
-		}
+	int _dl = _res->findScreenGridIndex(num);
+	if (_dl < 0) {
+		return (int8_t)(var1 + 4);
 	}
 	const uint8_t *p = _res->_resLevelData0x470CTablePtrData + (xPos & 7);
 	return (int8_t)(var1 + p[_screenPosTable[_dl][_edi] * 8]);
@@ -3748,7 +3742,7 @@ void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
 		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
 	}
 	int8_t dy = 255 - (yPos & 7);
-	if (screenNum == kNoScreen) {
+	if (screenNum != kNoScreen) {
 		const int xLevelPos = _res->_screensBasePos[screenNum].u + xPos;
 		const int yLevelPos = _res->_screensBasePos[screenNum].v + yPos + 8;
 		int offset = screenMaskOffset(xLevelPos, yLevelPos);
@@ -3759,19 +3753,14 @@ void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
 		} else if (_screenMaskBuffer[offset + 512] & 1) {
 // 40D514
 			const int _esi = screenGridOffset(xPos, yPos);
-			int i = 0;
-			while (screenNum != _res->_screensGrid[_res->_currentScreenResourceNum][i]) {
-				++i;
-				if (i >= 4) {
-					if (screenNum != _res->_currentScreenResourceNum) {
-						goto set_dat03;
-					}
-					break;
-				}
+			int i = _res->findScreenGridIndex(screenNum);
+			if (i < 0) {
+				goto set_dat03;
 			}
 // 40D585
 			const uint8_t *p = _res->_resLevelData0x470CTablePtrData + (xPos & 7);
 			dy += (int8_t)p[_screenPosTable[i][_esi] * 8];
+			goto set_dat03;
 		} else if (_screenMaskBuffer[offset - 1024] & 1) {
 // 40D5BC
 			dy -= 16;
@@ -3946,17 +3935,11 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 	if (_bl != 2 && _bl != 4 && _bl != 7) {
 		return var30;
 	}
-	var2C = 0;
-	while (_res->_screensGrid[_res->_currentScreenResourceNum][var2C] != screenNum) {
-		++var2C;
-		if (var2C >= 4) {
+	var2C = _res->findScreenGridIndex(screenNum);
+	if (var2C < 0) {
 // 40D35D
-			if (o->screenNum != _res->_currentScreenResourceNum) {
-				dat->yPosShoot += 4;
-				return var30;
-			}
-			break;
-		}
+		dat->yPosShoot += 4;
+		return var30;
 	}
 // 40D384
 	const int _ecx = (o->posTable[3].x + o->xPos) & 7;

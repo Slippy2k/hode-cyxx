@@ -678,6 +678,18 @@ const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const
 	return dat->coordsData + READ_LE_UINT32(dat->coordsOffsetsTable + num * sizeof(uint32_t));
 }
 
+int Resource::findScreenGridIndex(int screenNum) const {
+	for (int i = 0; i < 4; ++i) {
+		if (_screensGrid[_currentScreenResourceNum][i] == screenNum) {
+			return i;
+		}
+	}
+	if (_currentScreenResourceNum == screenNum) {
+		return 4;
+	}
+	return -1;
+}
+
 void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 
 	assert(fp == _sssFile || fp == _datFile || fp == _lvlFile);

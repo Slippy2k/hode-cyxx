@@ -632,6 +632,7 @@ struct Resource {
 	void decLvlSpriteDataRefCounter(LvlObject *ptr);
 	const uint8_t *getLvlSpriteFramePtr(LvlObjectData *dat, int frame, uint16_t *w, uint16_t *h) const;
 	const uint8_t *getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const;
+	int findScreenGridIndex(int screenNum) const;
 
 	void loadSssData(File *fp, const uint32_t baseOffset = 0);
 	void unloadSssData();
