@@ -15,16 +15,21 @@ struct BitStream { // most significant 16 bits
 		: _src(src), _len(0), _end(src + size), _endOfStream(false) {
 	}
 
+	void refill() {
+		assert(_len == 0);
+		assert(_src < _end);
+		_bits = READ_LE_UINT16(_src); _src += 2;
+		if (_src >= _end) {
+			_endOfStream = true;
+		}
+		_len = 16;
+	}
+
 	int getBits(int len) {
 		int value = 0;
 		while (len != 0) {
 			if (_len == 0) {
-				assert(_src < _end);
-				_bits = READ_LE_UINT16(_src); _src += 2;
-				if (_src >= _end) {
-					_endOfStream = true;
-				}
-				_len = 16;
+				refill();
 			}
 			const int count = (len < _len) ? len : _len;
 			value <<= count;
@@ -41,7 +46,13 @@ struct BitStream { // most significant 16 bits
 		return (value << shift) >> shift;
 	}
 	bool getBit() {
-		return getBits(1) != 0;
+		if (_len == 0) {
+			refill();
+		}
+		const bool bit = (_bits & 0x8000) != 0;
+		_bits <<= 1;
+		--_len;
+		return bit;
 	}
 };
 
