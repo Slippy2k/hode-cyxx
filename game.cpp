@@ -910,18 +910,20 @@ void Game::preloadLevelScreenData(uint8_t num, uint8_t prev) {
 	if (!_res->isLvlBackgroundDataLoaded(num)) {
 		_res->loadLvlScreenBackgroundData(num);
 	}
-	const uint8_t leftScreen = _res->_screensGrid[num][kPosLeftScreen];
-	if (leftScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
-		_res->loadLvlScreenBackgroundData(leftScreen);
-	}
-	const uint8_t rightScreen = _res->_screensGrid[num][kPosRightScreen];
-	if (rightScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(rightScreen)) {
-		_res->loadLvlScreenBackgroundData(rightScreen);
-	}
-	for (unsigned int i = 0; i < kMaxScreens; ++i) {
-		if (_res->_resLevelData0x2B88SizeTable[i] != 0) {
-			if (i != num && i != leftScreen && i != rightScreen) {
-				_res->unloadLvlScreenBackgroundData(i);
+	if (0) {
+		const uint8_t leftScreen = _res->_screensGrid[num][kPosLeftScreen];
+		if (leftScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
+			_res->loadLvlScreenBackgroundData(leftScreen);
+		}
+		const uint8_t rightScreen = _res->_screensGrid[num][kPosRightScreen];
+		if (rightScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(rightScreen)) {
+			_res->loadLvlScreenBackgroundData(rightScreen);
+		}
+		for (unsigned int i = 0; i < kMaxScreens; ++i) {
+			if (_res->_resLevelData0x2B88SizeTable[i] != 0) {
+				if (i != num && i != leftScreen && i != rightScreen) {
+					_res->unloadLvlScreenBackgroundData(i);
+				}
 			}
 		}
 	}
@@ -1304,7 +1306,10 @@ void Game::updateScreenHelper(int num) {
 		case 0: {
 				AnimBackgroundData *p = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
 				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->dataNum];
-				assert(data);
+				if (!data) {
+					warning("No AnimBackgroundData num %d screen %d", ptr->dataNum, num);
+					break;
+				}
 				p->framesCount = READ_LE_UINT16(data); data += 2;
 				ptr->currentSound = READ_LE_UINT16(data); data += 2;
 				p->currentSpriteData = p->otherSpriteData = data;
@@ -1314,6 +1319,10 @@ void Game::updateScreenHelper(int num) {
 			break;
 		case 1: {
 				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->dataNum];
+				if (!data) {
+					warning("No SoundBackgroundData num %d screen %d", ptr->dataNum, num);
+					break;
+				}
 				ptr->currentSound = READ_LE_UINT16(data); data += 2;
 				ptr->dataPtr = data;
 			}
