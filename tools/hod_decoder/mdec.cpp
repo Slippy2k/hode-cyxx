@@ -9,19 +9,19 @@ struct BitStream { // most significant 16 bits
 	uint16_t _bits;
 	int _len;
 	const uint8_t *_end;
-	bool _endOfStream;
 
 	BitStream(const uint8_t *src, int size)
-		: _src(src), _len(0), _end(src + size), _endOfStream(false) {
+		: _src(src), _len(0), _end(src + size) {
+	}
+
+	bool endOfStream() {
+		return _src >= _end && _len == 0;
 	}
 
 	void refill() {
 		assert(_len == 0);
 		assert(_src < _end);
 		_bits = READ_LE_UINT16(_src); _src += 2;
-		if (_src >= _end) {
-			_endOfStream = true;
-		}
 		_len = 16;
 	}
 
@@ -64,7 +64,7 @@ static int readDC(BitStream *bs, int version) {
 static void readAC(BitStream *bs, int *coefficients) {
 	int count = 0;
 	int node = 0;
-	while (!bs->_endOfStream) {
+	while (!bs->endOfStream()) {
 		const uint16_t value = _acHuffTree[node].value;
 		switch (value) {
 		case kAcHuff_EscapeCode: {
