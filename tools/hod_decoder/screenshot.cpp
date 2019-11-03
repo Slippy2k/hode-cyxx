@@ -194,8 +194,6 @@ extern "C" {
 static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 	const char *filename = (const char *)userdata;
 
-	assert(mdecOutput->format == kMdecOutputYuv);
-
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;
 

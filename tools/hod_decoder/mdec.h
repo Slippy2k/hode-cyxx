@@ -4,13 +4,7 @@
 
 #include <stdint.h>
 
-enum {
-	kMdecOutputRgb,
-	kMdecOutputYuv
-};
-
 struct MdecOutput {
-	int format;
 	int w, h;
 	struct {
 		uint8_t *ptr;

@@ -212,7 +212,6 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 	const int blockH = (h + 15) / 16;
 
 	MdecOutput mdecOut;
-	mdecOut.format = kMdecOutputYuv;
 	mdecOut.w = blockW * 16;
 	mdecOut.h = blockH * 16;
 	mdecOut.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(blockW * 16 * blockH * 16);

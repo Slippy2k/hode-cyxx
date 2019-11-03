@@ -13,7 +13,6 @@ do_levelmap () {
 	extension=$3
 	./hod_decoder $data/$name.lvl > levelmap_$name.txt
 	python generate_levelmap.py levelmap_$name.txt $extension
-	optipng -o9 -strip all levelmap_$type_$name.png
 }
 
 do_files () {

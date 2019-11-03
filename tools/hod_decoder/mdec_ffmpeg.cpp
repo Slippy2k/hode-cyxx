@@ -29,7 +29,6 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 		fprintf(stderr, "avcodec_decode_video2 ret %d\n", ret);
 	} else {
 		MdecOutput mdecOutput;
-		mdecOutput.format = kMdecOutputYuv;
 		mdecOutput.w = frame->width;
 		mdecOutput.h = frame->height;
 		for (int i = 0; i < 3; ++i) {

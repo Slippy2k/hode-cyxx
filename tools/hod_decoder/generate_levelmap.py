@@ -31,5 +31,5 @@ for line in f.readlines():
 	if count == h:
 		break
 
-fname = os.path.splitext(sys.argv[1])[0] + '.png'
+fname = os.path.splitext(sys.argv[1])[0] + '.' + ext
 im.save(fname)
