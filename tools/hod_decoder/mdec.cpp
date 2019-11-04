@@ -2,7 +2,7 @@
 #include <math.h>
 #include "intern.h"
 #include "mdec.h"
-#include "mdec_ac_coeffs.h"
+#include "mdec_coeffs.h"
 
 struct BitStream { // most significant 16 bits
 	const uint8_t *_src;
@@ -14,7 +14,7 @@ struct BitStream { // most significant 16 bits
 		: _src(src), _len(0), _end(src + size) {
 	}
 
-	bool endOfStream() {
+	bool endOfStream() const {
 		return _src >= _end && _len == 0;
 	}
 
@@ -180,13 +180,7 @@ static void decodeBlock(BitStream *bs, int x8, int y8, uint8_t *dst, int dstPitc
 	for (int y = 0; y < 8; y++) {
 		for (int x = 0; x < 8; x++) {
 			const int val = (int)round(idctData[y * 8 + x]); // (-128,127) range
-			if (val < -128) {
-				dst[x] = 0;
-			} else if (val > 127) {
-				dst[x] = 255;
-			} else {
-				dst[x] = 128 + val;
-			}
+			dst[x] = (val < -128) ? 0 : ((val > 127) ? 255 : (128 + val));
 		}
 		dst += dstPitch;
 	}

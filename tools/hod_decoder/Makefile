@@ -16,8 +16,8 @@ endif
 hod_decoder: decode_sss.o decode_mst.o fileio.o lzw.o main.o screenshot.o wav.o $(MDEC_OBJS)
 	$(CXX) -o $@ $^ -lz -ljpeg $(MDEC_LIBS)
 
-mdec_ac_coeffs.h: generate_ac_huffman.py
-	python generate_ac_huffman.py > $@
+mdec_coeffs.h: generate_mdec_coeffs.py
+	python generate_mdec_coeffs.py > $@
 
 clean:
 	rm -f *.o hod_decoder
