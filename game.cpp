@@ -518,7 +518,7 @@ void Game::setScreenMaskRect(int x1, int y1, int x2, int y2, int screenNum) {
 			}
 		}
 	}
-	setScreenMaskRectHelper(u, v, x2, y2, screenNum);
+	setScreenMaskRectHelper(x1, v, x2, y2, screenNum);
 }
 
 void Game::updateScreenMaskBuffer(int x, int y, int type) {
