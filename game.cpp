@@ -386,13 +386,14 @@ int16_t Game::calcScreenMaskDy(int16_t xPos, int16_t yPos, int num) {
 		xPos -= Video::W;
 		num = _res->_screensGrid[num][kPosRightScreen];
 	}
-	if (num != kNoScreen && yPos < 0) {
-		yPos += Video::H;
-		num = _res->_screensGrid[num][kPosTopScreen];
-	} else if (yPos >= Video::H) {
-		assert(num != kNoScreen);
-		yPos -= Video::H;
-		num = _res->_screensGrid[num][kPosBottomScreen];
+	if (num != kNoScreen) {
+		if (yPos < 0) {
+			yPos += Video::H;
+			num = _res->_screensGrid[num][kPosTopScreen];
+		} else if (yPos >= Video::H) {
+			yPos -= Video::H;
+			num = _res->_screensGrid[num][kPosBottomScreen];
+		}
 	}
 	uint8_t var1 = 0xFF - (yPos & 7);
 	if (num == kNoScreen) {
@@ -1520,13 +1521,14 @@ int8_t Game::updateLvlObjectScreen(LvlObject *ptr) {
 			ptr->screenNum = _res->_screensGrid[num][kPosRightScreen];
 			ptr->xPos = xPosPrev - Video::W;
 		}
-		if (yPos < 0 && ptr->screenNum != kNoScreen) {
-			ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosTopScreen];
-			ptr->yPos = yPosPrev + Video::H;
-		} else if (yPos > Video::H) {
-			assert(ptr->screenNum != kNoScreen);
-			ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosBottomScreen];
-			ptr->yPos = yPosPrev - Video::H;
+		if (ptr->screenNum != kNoScreen) {
+			if (yPos < 0) {
+				ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosTopScreen];
+				ptr->yPos = yPosPrev + Video::H;
+			} else if (yPos > Video::H) {
+				ptr->screenNum = _res->_screensGrid[ptr->screenNum][kPosBottomScreen];
+				ptr->yPos = yPosPrev - Video::H;
+			}
 		}
 		if (ptr->screenNum == kNoScreen) {
 			debug(kDebug_GAME, "Changing screen from -1 to %d, pos=%d,%d (%d,%d)", num, xPos, yPos, xPosPrev, yPosPrev);
@@ -3742,13 +3744,14 @@ void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
 		xPos -= Video::W;
 		screenNum = _res->_screensGrid[screenNum][kPosRightScreen];
 	}
-	if (screenNum != kNoScreen && yPos < 0) {
-		yPos += Video::H;
-		screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
-	} else if (yPos >= Video::H) {
-		assert(screenNum != kNoScreen);
-		yPos -= Video::H;
-		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
+	if (screenNum != kNoScreen) {
+		if (yPos < 0) {
+			yPos += Video::H;
+			screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
+		} else if (yPos >= Video::H) {
+			yPos -= Video::H;
+			screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
+		}
 	}
 	int8_t dy = 255 - (yPos & 7);
 	if (screenNum != kNoScreen) {
@@ -3815,8 +3818,8 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 	}
 	int xPos = o->xPos + o->posTable[3].x; // _ecx
 
-	int var1C;
-	int var20;
+	int var1C = 0;
+	int var20 = 0;
 	int var24 = xPos;
 	if (xPos < 0) {
 		xPos += Video::W;
@@ -3828,20 +3831,17 @@ uint8_t Game::lvlObjectSpecialPowersCallbackScreen(LvlObject *o) {
 		var20 = Video::W;
 		var24 = xPos;
 		screenNum = _res->_screensGrid[screenNum][kPosRightScreen];
-	} else {
-		var20 = 0;
 	}
-	if (screenNum != kNoScreen && yPos < 0) {
-		yPos += Video::H;
-		var1C = -Video::H;
-		screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
-	} else if (yPos >= Video::H) {
-		assert(screenNum != kNoScreen);
-		yPos -= Video::H;
-		var1C = Video::H;
-		screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
-	} else {
-		var1C = 0;
+	if (screenNum != kNoScreen) {
+		if (yPos < 0) {
+			yPos += Video::H;
+			var1C = -Video::H;
+			screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
+		} else if (yPos >= Video::H) {
+			yPos -= Video::H;
+			var1C = Video::H;
+			screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
+		}
 	}
 // 40D0CA
 	if (screenNum == kNoScreen) {
@@ -4181,13 +4181,14 @@ int Game::setLvlObjectPosInScreenGrid(LvlObject *o, int pos) {
 			o->xPos = xPrev - Video::W;
 		}
 		screenNum = o->screenNum;
-		if (y < 0 && screenNum != kNoScreen) {
-			o->screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
-			o->yPos = yPrev + Video::H;
-		} else if (y >= Video::H) {
-			assert(screenNum != kNoScreen);
-			o->screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
-			o->yPos = yPrev - Video::H;
+		if (screenNum != kNoScreen) {
+			if (y < 0) {
+				o->screenNum = _res->_screensGrid[screenNum][kPosTopScreen];
+				o->yPos = yPrev + Video::H;
+			} else if (y >= Video::H) {
+				o->screenNum = _res->_screensGrid[screenNum][kPosBottomScreen];
+				o->yPos = yPrev - Video::H;
+			}
 		}
 		screenNum = o->screenNum;
 		if (screenNum == kNoScreen) {
