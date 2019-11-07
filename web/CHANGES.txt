@@ -1,4 +1,5 @@
 * release 0.2.2
+	- fixed lever in 'lava' level screen 2
 	- fixed masking with plants in 'pwr1' level
 
 * release 0.2.1

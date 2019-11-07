@@ -272,7 +272,7 @@ void Level_lava::postScreenUpdate_lava_screen2() {
 		}
 	}
 // 4093F2
-	if (_res->_currentScreenResourceNum == 2 && _g->clipLvlObjectsBoundingBox(_andyObject, o, 0x44)) {
+	if (_res->_currentScreenResourceNum == 2 && (o->flags0 & 0x1F) != 0 && _g->clipLvlObjectsBoundingBox(_andyObject, o, 0x44)) {
 		const int x = o->xPos + o->width / 2;
 		if (_andyObject->xPos > x) {
 			_andyObject->xPos += 10;
