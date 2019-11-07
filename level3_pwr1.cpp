@@ -423,11 +423,7 @@ void Level_pwr1::preScreenUpdate_pwr1_screen26() {
 	if (_checkpoint >= 7) {
 		_res->_screensState[23].s0 = 1;
 	}
-	if (_res->_currentScreenResourceNum == 23 || _res->_currentScreenResourceNum == 26) {
-		const uint8_t num = _res->_screensState[23].s0 != 0 ? 1 : 0;
-		_res->_resLvlScreenBackgroundDataTable[23].currentBackgroundId = num;
-		_res->_resLvlScreenBackgroundDataTable[23].currentMaskId = num;
-	}
+	preScreenUpdate_pwr1_screen23();
 }
 
 void Level_pwr1::preScreenUpdate_pwr1_screen27() {
