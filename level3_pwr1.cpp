@@ -462,7 +462,7 @@ void Level_pwr1::preScreenUpdate_pwr1_screen31() {
 
 void Level_pwr1::preScreenUpdate_pwr1_screen35() {
 	if (_res->_currentScreenResourceNum == 35) {
-		_screenCounterTable[25] = 0;
+		_screenCounterTable[35] = 0;
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(5);
 		}
