@@ -490,13 +490,7 @@ static void DecodeSssAdpcmNibble(uint8_t nibble, int *pred) {
 	const int delta = nibble & 7;
 	const int diff  = ((2 * delta + 1) * 511) >> 3;
 	const int npred = *pred + (sign ? -diff : diff);
-	if (npred < -32768) {
-		*pred = -32768;
-	} else if (npred > 32767) {
-		*pred = 32767;
-	} else {
-		*pred = npred;
-	}
+	*pred = (npred < SHRT_MIN ? SHRT_MIN : (npred > SHRT_MAX ? SHRT_MAX : npred));
 }
 
 static void DecodeSssAdpcm(const uint8_t *src, int size, int16_t *data) {
@@ -507,6 +501,50 @@ static void DecodeSssAdpcm(const uint8_t *src, int size, int16_t *data) {
 		*data++ = pred;
 		DecodeSssAdpcmNibble(src[i] & 15, &pred);
 		*data++ = pred;
+	}
+}
+
+static int8_t sext8(uint8_t x, int bits) {
+	const int shift = 8 - bits;
+	return ((int8_t)(x << shift)) >> shift;
+}
+
+static int _pcmL1, _pcmL0;
+
+static void DecodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16bytes, dst: 56bytes
+	static const int16_t K0_1024[] = { 0, 960, 1840, 1568, 1952 };
+	static const int16_t K1_1024[] = { 0,   0, -832, -880, -960 };
+	const uint8_t param = *src++;
+	const int shift = 12 - (param & 15);
+	assert(shift >= 0);
+	const int filter = param >> 4;
+	assert(filter < 5);
+	const int flag = *src++;
+	if (flag < 7) {
+		for (int i = 0; i < 14; ++i) {
+			const uint8_t b = *src++;
+			const int t1 = sext8(b & 15, 4);
+			const int s1 = (t1 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
+			_pcmL1 = _pcmL0;
+			_pcmL0 = s1;
+			*dst++ = (_pcmL0 < SHRT_MIN ? SHRT_MIN : (_pcmL0 > SHRT_MAX ? SHRT_MAX : _pcmL0));
+			const int t2 = sext8(b >> 4, 4);
+			const int s2 = (t2 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
+			_pcmL1 = _pcmL0;
+			_pcmL0 = s2;
+			*dst++ = (_pcmL0 < SHRT_MIN ? SHRT_MIN : (_pcmL0 > SHRT_MAX ? SHRT_MAX : _pcmL0));
+		}
+	} else {
+		memset(dst, 0, 2 * 14 * sizeof(int16_t));
+		_pcmL1 = _pcmL0 = 0;
+	}
+}
+
+static void DecodeSssSpuAdpcm(const uint8_t *src, int size, int16_t *data) {
+	_pcmL1 = _pcmL0 = 0;
+	assert((size & 15) == 0);
+	for (int i = 0; i < size / 16; ++i) {
+		DecodeSssSpuAdpcmUnit(src + i * 16, data + i * 28);
 	}
 }
 
@@ -628,10 +666,13 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		const uint16_t count  = READ_LE_UINT16(header + i * kSizeOfPcm + 16);
 		const uint16_t flags  = READ_LE_UINT16(header + i * kSizeOfPcm + 18);
 
+		// fprintf(stdout, "pcm %d offset 0x%x size %d stride %d count %d flags 0x%x\n", i, offset, size, stride, count, flags);
+
 		if (baseOffset != 0) {
 			// offsets are all equal to '0x2800' in setup.dat .sss data
 			// seek on first entry and read PCM data sequentially
 			if (i == 0) {
+				assert(offset != 0);
 				fp->seek(baseOffset + offset, SEEK_SET);
 			}
 		}
@@ -652,6 +693,12 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 			if (_isPsx) {
 				assert(stride == 512);
 
+				if (offset == 0) {
+					// only PCM in .dax appear to have 'correct' size value
+					// PCM in .lvl appear shorter than 'size'
+					continue;
+				}
+
 				uint8_t *samples = (uint8_t *)malloc(size);
 				if (samples) {
 					fp->read(samples, size);
@@ -660,6 +707,19 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 
 					snprintf(filename, sizeof(filename), "hod_%03d.pcm", i);
 					fioDumpData(filename, samples, size);
+
+					assert((size & 15) == 0);
+					const uint32_t decompressedSize = (size / 16) * 28 * sizeof(int16_t);
+					uint8_t *pcm = (uint8_t *)calloc(1, decompressedSize);
+					if (pcm) {
+
+						DecodeSssSpuAdpcm(samples, size, (int16_t *)pcm);
+
+						snprintf(filename, sizeof(filename), "hod_%03d.wav", i);
+						saveWAV(filename, 11025, 16, channels, pcm, decompressedSize);
+
+						free(pcm);
+					}
 
 					free(samples);
 				}
