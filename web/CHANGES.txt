@@ -1,6 +1,7 @@
 * release 0.2.2
 	- fixed lever in 'lava' level screen 2
 	- fixed masking with plants in 'pwr1' level
+	- fixed missing explosion animation with fireballs
 
 * release 0.2.1
 	- added initial code for PSX data files detection
@@ -39,7 +40,7 @@
 * release 0.1.5
 	- added 'firefly' object in 'fort' level
 	- added collision with monsters
-	- added missing explosion sprites
+	- added missing explosion sprites with plasma cannon
 	- added postScreenUpdate callbacks for 'isld' level
 	- fixed monsters hug
 
