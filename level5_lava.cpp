@@ -531,8 +531,8 @@ void Level_lava::preScreenUpdate_lava_screen10() {
 	if (_res->_screensState[10].s0 != 0 && _res->_screensState[10].s0 != 1) {
 		_res->_screensState[10].s0 = 1;
 	}
+	_res->_resLvlScreenBackgroundDataTable[10].currentMaskId = num;
 	if (_res->_currentScreenResourceNum == 10) {
-		_res->_resLvlScreenBackgroundDataTable[10].currentMaskId = num;
 		if (!_paf->_skipCutscenes) {
 			_paf->preload(7);
 		}
