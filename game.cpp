@@ -4800,16 +4800,22 @@ void Game::updateWormHoleSprites() {
 }
 
 bool Game::loadSetupCfg() {
-	const int count = fioReadData(_setupCfg, _setupCfgBuffer, kSetupCfgSize);
-	if (count == kSetupCfgSize) {
-		uint8_t checksum = 0;
-		for (int i = 0; i < kSetupCfgSize - 2; ++i) {
-			checksum ^= _setupCfgBuffer[i];
+	FILE *fp = _res->_fs.openSaveFile(_setupCfg, false);
+	if (fp) {
+		const int count = fread(_setupCfgBuffer, 1, kSetupCfgSize, fp);
+		_res->_fs.closeFile(fp);
+		if (count != kSetupCfgSize) {
+			warning("Failed to read %d bytes from '%s', ret %d", kSetupCfgSize, _setupCfg, count);
+		} else {
+			uint8_t checksum = 0;
+			for (int i = 0; i < kSetupCfgSize - 2; ++i) {
+				checksum ^= _setupCfgBuffer[i];
+			}
+			if (checksum == _setupCfgBuffer[kSetupCfgSize - 1]) {
+				return true;
+			}
+			warning("Invalid checksum 0x%x for '%s'", checksum, _setupCfg);
 		}
-		if (checksum == _setupCfgBuffer[kSetupCfgSize - 1]) {
-			return true;
-		}
-		warning("Invalid checksum 0x%x for '%s'", checksum, _setupCfg);
 	}
 	memset(_setupCfgBuffer, 0, sizeof(_setupCfgBuffer));
 	return false;
@@ -4833,8 +4839,14 @@ void Game::saveSetupCfg() {
 		checksum ^= _setupCfgBuffer[i];
 	}
 	_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
-
-	fioDumpData(_setupCfg, _setupCfgBuffer, kSetupCfgSize);
+	FILE *fp = _res->_fs.openSaveFile(_setupCfg, true);
+	if (fp) {
+		const int count = fwrite(_setupCfgBuffer, 1, kSetupCfgSize, fp);
+		_res->_fs.closeFile(fp);
+		if (count != kSetupCfgSize) {
+			warning("Failed to write %d bytes to '%s', ret %d", kSetupCfgSize, _setupCfg, count);
+		}
+	}
 }
 
 void Game::captureScreenshot() {

@@ -27,8 +27,8 @@ static bool matchGameData(const char *path) {
 	return false;
 }
 
-FileSystem::FileSystem(const char *dataPath)
-	: _dataPath(dataPath), _filesCount(0), _filesList(0) {
+FileSystem::FileSystem(const char *dataPath, const char *savePath)
+	: _dataPath(dataPath), _savePath(savePath), _filesCount(0), _filesList(0) {
 	listFiles(dataPath);
 }
 
@@ -50,6 +50,12 @@ FILE *FileSystem::openFile(const char *name) {
 		}
 	}
 	return fp;
+}
+
+FILE *FileSystem::openSaveFile(const char *filename, bool write) {
+	char path[MAXPATHLEN];
+	snprintf(path, sizeof(path), "%s/%s", _savePath, filename);
+	return fopen(path, write ? "wb" : "rb");
 }
 
 void FileSystem::closeFile(FILE *fp) {

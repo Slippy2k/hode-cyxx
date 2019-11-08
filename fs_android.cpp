@@ -66,7 +66,7 @@ FILE *android_fopen(const char *fname, const char *mode) {
 // FileSystem
 //
 
-FileSystem::FileSystem(const char *dataPath) {
+FileSystem::FileSystem(const char *dataPath, const char *savePath) {
 	JNIEnv *env = (JNIEnv *)SDL_AndroidGetJNIEnv();
 	jobject activity = (jobject)SDL_AndroidGetActivity();
 
@@ -81,6 +81,7 @@ FileSystem::FileSystem(const char *dataPath) {
 
 	_assetManager = AAssetManager_fromJava(env, globalAssetManager);
 	_dataPath = dataPath;
+	_savePath = savePath;
 	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "dataPath %s _assetManager %p", _dataPath, _assetManager);
 }
 
@@ -98,6 +99,18 @@ FILE *FileSystem::openFile(const char *filename) {
 	}
 	FILE *fp = android_fopen(name, "rb");
 	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "android_fopen %s %p", name, fp);
+	return fp;
+}
+
+FILE *FileSystem::openSaveFile(const char *filename, bool write) {
+	FILE *fp = 0;
+	char *prefPath = SDL_GetPrefPath(ANDROID_PACKAGE_NAME, "hode");
+	if (prefPath) {
+		char path[MAXPATHLEN];
+		snprintf(path, sizeof(path), "%s/%s", prefPath, filename);
+		fp = fopen(path, write ? "wb" : "rb");
+		SDL_free(prefPath);
+	}
 	return fp;
 }
 
