@@ -520,23 +520,19 @@ static void DecodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16
 	const int filter = param >> 4;
 	assert(filter < 5);
 	const int flag = *src++;
-	if (flag < 7) {
-		for (int i = 0; i < 14; ++i) {
-			const uint8_t b = *src++;
-			const int t1 = sext8(b & 15, 4);
-			const int s1 = (t1 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
-			_pcmL1 = _pcmL0;
-			_pcmL0 = s1;
-			*dst++ = (_pcmL0 < SHRT_MIN ? SHRT_MIN : (_pcmL0 > SHRT_MAX ? SHRT_MAX : _pcmL0));
-			const int t2 = sext8(b >> 4, 4);
-			const int s2 = (t2 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
-			_pcmL1 = _pcmL0;
-			_pcmL0 = s2;
-			*dst++ = (_pcmL0 < SHRT_MIN ? SHRT_MIN : (_pcmL0 > SHRT_MAX ? SHRT_MAX : _pcmL0));
-		}
-	} else {
-		memset(dst, 0, 2 * 14 * sizeof(int16_t));
-		_pcmL1 = _pcmL0 = 0;
+	assert(flag < 7);
+	for (int i = 0; i < 14; ++i) {
+		const uint8_t b = *src++;
+		const int t1 = sext8(b & 15, 4);
+		const int s1 = (t1 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
+		_pcmL1 = _pcmL0;
+		_pcmL0 = s1;
+		*dst++ = (_pcmL0 < SHRT_MIN ? SHRT_MIN : (_pcmL0 > SHRT_MAX ? SHRT_MAX : _pcmL0));
+		const int t2 = sext8(b >> 4, 4);
+		const int s2 = (t2 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
+		_pcmL1 = _pcmL0;
+		_pcmL0 = s2;
+		*dst++ = (_pcmL0 < SHRT_MIN ? SHRT_MIN : (_pcmL0 > SHRT_MAX ? SHRT_MAX : _pcmL0));
 	}
 }
 
@@ -544,6 +540,9 @@ static void DecodeSssSpuAdpcm(const uint8_t *src, int size, int16_t *data) {
 	_pcmL1 = _pcmL0 = 0;
 	assert((size & 15) == 0);
 	for (int i = 0; i < size / 16; ++i) {
+		if (((i * 16) & 511) == 0) {
+			assert(src[i * 16 + 1] == 6);
+		}
 		DecodeSssSpuAdpcmUnit(src + i * 16, data + i * 28);
 	}
 }
@@ -790,7 +789,7 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d.jpg", spriteGroup, spriteNum);
 			savePSX(filename, ptr + 16, size - 4, w, h);
 		} else {
-			assert(READ_LE_UINT32(ptr + 16) == 0x3020100 && size == 1144);
+			assert(READ_LE_UINT32(ptr + 16) == 0x3020100 && (size == 1144 || size == 848));
 		}
 
 		return compressedSize + 2;
