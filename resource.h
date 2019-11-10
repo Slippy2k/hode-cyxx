@@ -7,7 +7,6 @@
 #define RESOURCE_H__
 
 #include "defs.h"
-#include "fs.h"
 #include "intern.h"
 
 struct DatHdr {
@@ -515,9 +514,11 @@ struct ResStruct {
 	}
 };
 
+struct FileSystem;
+
 struct Resource {
 
-	FileSystem _fs;
+	FileSystem *_fs;
 
 	DatHdr _datHdr;
 	File *_datFile;
@@ -604,7 +605,7 @@ struct Resource {
 	uint8_t *_mstCodeData;
 	ResStruct<MstOp226Data> _mstOp226Data;
 
-	Resource(const char *dataPath);
+	Resource(FileSystem *fs);
 	~Resource();
 
 	bool sectorAlignedGameData();

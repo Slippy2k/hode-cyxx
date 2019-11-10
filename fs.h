@@ -11,7 +11,7 @@ struct FileSystem {
 	int _filesCount;
 	char **_filesList;
 
-	FileSystem(const char *dataPath, const char *savePath = ".");
+	FileSystem(const char *dataPath, const char *savePath);
 	~FileSystem();
 
 	FILE *openFile(const char *filename);

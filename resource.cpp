@@ -26,8 +26,8 @@ static const char *_prefixes[] = {
 	"test"
 };
 
-static bool openDat(FileSystem &fs, const char *name, File *f) {
-	FILE *fp = fs.openFile(name);
+static bool openDat(FileSystem *fs, const char *name, File *f) {
+	FILE *fp = fs->openFile(name);
 	if (fp) {
 		f->setFp(fp);
 		return true;
@@ -35,9 +35,9 @@ static bool openDat(FileSystem &fs, const char *name, File *f) {
 	return false;
 }
 
-static void closeDat(FileSystem &fs, File *f) {
+static void closeDat(FileSystem *fs, File *f) {
 	if (f->_fp) {
-		fs.closeFile(f->_fp);
+		fs->closeFile(f->_fp);
 		f->setFp(0);
 	}
 }
@@ -56,8 +56,8 @@ static int readBytesAlign(File *f, uint8_t *buf, int len) {
 	return (len + 3) & ~3;
 }
 
-Resource::Resource(const char *dataPath)
-	: _fs(dataPath), _isPsx(false) {
+Resource::Resource(FileSystem *fs)
+	: _fs(fs), _isPsx(false) {
 
 	memset(_screensGrid, 0, sizeof(_screensGrid));
 	memset(_screensBasePos, 0, sizeof(_screensBasePos));
@@ -113,9 +113,9 @@ Resource::~Resource() {
 }
 
 bool Resource::sectorAlignedGameData() {
-	FILE *fp = _fs.openFile(_setupDat);
+	FILE *fp = _fs->openFile(_setupDat);
 	if (!fp) {
-		fp = _fs.openFile(_setupDax);
+		fp = _fs->openFile(_setupDax);
 		if (!fp) {
 			error("Unable to open '%s' or '%s'", _setupDat, _setupDax);
 			return false;
@@ -126,7 +126,7 @@ bool Resource::sectorAlignedGameData() {
 	if (fread(buf, 1, sizeof(buf), fp) == sizeof(buf)) {
 		ret = fioUpdateCRC(0, buf, sizeof(buf)) == 0;
 	}
-	fclose(fp);
+	_fs->closeFile(fp);
 	return ret;
 }
 

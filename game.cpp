@@ -19,11 +19,12 @@ static const char *_setupCfg = "setup.cfg";
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
-Game::Game(System *system, const char *dataPath, uint32_t cheats) {
+Game::Game(System *system, const char *dataPath, const char *savePath, uint32_t cheats)
+	: _fs(dataPath, savePath) {
 
 	_level = 0;
-	_res = new Resource(dataPath);
-	_paf = new PafPlayer(system, &_res->_fs);
+	_res = new Resource(&_fs);
+	_paf = new PafPlayer(system, &_fs);
 	_rnd.setSeed();
 	_video = new Video(system);
 	_system = system;
@@ -4800,10 +4801,10 @@ void Game::updateWormHoleSprites() {
 }
 
 bool Game::loadSetupCfg() {
-	FILE *fp = _res->_fs.openSaveFile(_setupCfg, false);
+	FILE *fp = _fs.openSaveFile(_setupCfg, false);
 	if (fp) {
 		const int count = fread(_setupCfgBuffer, 1, kSetupCfgSize, fp);
-		_res->_fs.closeFile(fp);
+		_fs.closeFile(fp);
 		if (count != kSetupCfgSize) {
 			warning("Failed to read %d bytes from '%s', ret %d", kSetupCfgSize, _setupCfg, count);
 		} else {
@@ -4839,10 +4840,10 @@ void Game::saveSetupCfg() {
 		checksum ^= _setupCfgBuffer[i];
 	}
 	_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
-	FILE *fp = _res->_fs.openSaveFile(_setupCfg, true);
+	FILE *fp = _fs.openSaveFile(_setupCfg, true);
 	if (fp) {
 		const int count = fwrite(_setupCfgBuffer, 1, kSetupCfgSize, fp);
-		_res->_fs.closeFile(fp);
+		_fs.closeFile(fp);
 		if (count != kSetupCfgSize) {
 			warning("Failed to write %d bytes to '%s', ret %d", kSetupCfgSize, _setupCfg, count);
 		}
