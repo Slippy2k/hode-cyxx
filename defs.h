@@ -213,6 +213,7 @@ struct Sprite {
 	Sprite *nextPtr;
 	uint16_t num;
 	uint16_t flags;
+	uint16_t w, h;
 };
 
 struct BoundingBox {

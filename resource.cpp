@@ -670,12 +670,22 @@ const uint8_t *Resource::getLvlSpriteFramePtr(LvlObjectData *dat, int frame, uin
 	const uint8_t *p = dat->framesData;
 	if (dat->unk0 == 1) {
 		p += frame * 6;
+		const uint16_t size = READ_LE_UINT16(p);
+		*w = READ_LE_UINT16(p + 2);
+		*h = READ_LE_UINT16(p + 4);
+		if (size > 8) {
+			return dat->framesData + READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
+		}
 	} else {
 		p += READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
+		const uint16_t size = READ_LE_UINT16(p);
+		*w = READ_LE_UINT16(p + 2);
+		*h = READ_LE_UINT16(p + 4);
+		if (size > 8) {
+			return p + 6;
+		}
 	}
-	*w = READ_LE_UINT16(p + 2);
-	*h = READ_LE_UINT16(p + 4);
-	return dat->framesData + READ_LE_UINT32(dat->framesOffsetsTable + frame * sizeof(uint32_t));
+	return 0;
 }
 
 const uint8_t *Resource::getLvlSpriteCoordPtr(LvlObjectData *dat, int num) const {

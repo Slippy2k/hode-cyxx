@@ -49,7 +49,7 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num) {
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		if (num == i) {
-			_video->decodeSPR(ptr + 2, _video->_frontLayer, ptr[0], ptr[1], 0);
+			_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0], ptr[1], 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
 			break;
 		}
 		ptr += size + 2;
