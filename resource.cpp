@@ -27,7 +27,7 @@ static const char *_prefixes[] = {
 };
 
 static bool openDat(FileSystem *fs, const char *name, File *f) {
-	FILE *fp = fs->openFile(name);
+	FILE *fp = fs->openAssetFile(name);
 	if (fp) {
 		f->setFp(fp);
 		return true;
@@ -113,9 +113,9 @@ Resource::~Resource() {
 }
 
 bool Resource::sectorAlignedGameData() {
-	FILE *fp = _fs->openFile(_setupDat);
+	FILE *fp = _fs->openAssetFile(_setupDat);
 	if (!fp) {
-		fp = _fs->openFile(_setupDax);
+		fp = _fs->openAssetFile(_setupDax);
 		if (!fp) {
 			error("Unable to open '%s' or '%s'", _setupDat, _setupDax);
 			return false;

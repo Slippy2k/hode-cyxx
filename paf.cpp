@@ -17,7 +17,7 @@ static const char *_filenames[] = {
 
 static bool openPaf(FileSystem *fs, File *f) {
 	for (int i = 0; _filenames[i]; ++i) {
-		FILE *fp = fs->openFile(_filenames[i]);
+		FILE *fp = fs->openAssetFile(_filenames[i]);
 		if (fp) {
 			f->setFp(fp);
 			return true;

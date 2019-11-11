@@ -39,7 +39,7 @@ FileSystem::~FileSystem() {
 	free(_filesList);
 }
 
-FILE *FileSystem::openFile(const char *name) {
+FILE *FileSystem::openAssetFile(const char *name) {
 	FILE *fp = 0;
 	for (int i = 0; i < _filesCount; ++i) {
 		const char *p = strrchr(_filesList[i], '/');

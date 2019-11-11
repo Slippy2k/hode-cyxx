@@ -88,7 +88,7 @@ FileSystem::FileSystem(const char *dataPath, const char *savePath) {
 FileSystem::~FileSystem() {
 }
 
-FILE *FileSystem::openFile(const char *filename) {
+FILE *FileSystem::openAssetFile(const char *filename) {
 	char *name = (char *)alloca(strlen(filename) + 1);
 	for (int i = 0; i < strlen(filename) + 1; ++i) {
 		if (filename[i] >= 'A' && filename[i] <= 'Z') {

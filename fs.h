@@ -14,7 +14,7 @@ struct FileSystem {
 	FileSystem(const char *dataPath, const char *savePath);
 	~FileSystem();
 
-	FILE *openFile(const char *filename);
+	FILE *openAssetFile(const char *filename);
 	FILE *openSaveFile(const char *filename, bool write);
 	void closeFile(FILE *);
 
