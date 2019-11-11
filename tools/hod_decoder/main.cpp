@@ -552,10 +552,10 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 	const int version = fp->readUint32();
 	assert(version == 6 || version == 10 || version == 12);
 
-	fp->readUint32(); // 0x4
-	fp->readUint32(); // 0x8
+	fp->readUint32();
+	const int pcmPreloadCount = fp->readUint32();
 
-	const int data4Count = fp->readUint32(); // 0xC
+	const int data4Count = fp->readUint32();
 	const int data1Count = fp->readUint32();
 	const int data2Count = fp->readUint32();
 	const int data3Count = fp->readUint32();
@@ -581,14 +581,21 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		free(codeData);
 	}
 
+	uint16_t *preloadPcm[preload1Count];
+
 	if (version == 10 || version == 12) {
 
 		fp->seek(preload1Count * 4, SEEK_CUR);
 		fp->seek(preload2Count * 4, SEEK_CUR);
 		fp->seek(preload3Count * 4, SEEK_CUR);
 		for (int i = 0; i < preload1Count; ++i) {
-			const int len = (version == 12) ? fp->readUint16() * 2 : fp->readByte();
-			fp->seek(len, SEEK_CUR);
+			const int len = (version == 12) ? fp->readUint16() : fp->readByte();
+			uint16_t *p = (uint16_t *)alloca((len + 1) * sizeof(uint16_t));
+			preloadPcm[i] = p;
+			*p++ = len;
+			for (int j = 0; j < len; ++j) {
+				*p++ = (version == 12) ? fp->readUint16() : fp->readByte();
+			}
 		}
 		for (int i = 0; i < preload2Count; ++i) {
 			const uint8_t len = fp->readByte();
@@ -658,6 +665,56 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 	uint8_t *header = (uint8_t *)alloca(pcmCount * kSizeOfPcm);
 	fp->read(header, pcmCount * kSizeOfPcm);
 
+	// pcm in .LVL are stored following preload table
+	if (_isPsx && pcmPreloadCount == -1) {
+
+		const uint32_t pcmOffset = READ_LE_UINT32(header + 4);
+		fp->seek(pcmOffset + baseOffset, SEEK_SET);
+
+		for (int j = 0; j < preload1Count; ++j) {
+
+			const uint16_t *p = preloadPcm[j];
+			const int len = *p++;
+			int totalPcmSize = 0;
+			for (int i = 0; i < len; ++i) {
+				const int num   = *p++;
+				const int count = READ_LE_UINT16(header + num * kSizeOfPcm + 16);
+				const int size  = count << 9;
+				assert(size != 0);
+				totalPcmSize += size;
+
+				if (j != 0) {
+					// need to seek to next data offset
+					continue;
+				}
+
+				uint8_t *samples = (uint8_t *)malloc(size);
+				if (samples) {
+					fp->read(samples, size);
+
+					// ffplay -acodec adpcm_psx -f s16le -ar 11025 -ac 1 -i $fn.pcm
+					char filename[64];
+					snprintf(filename, sizeof(filename), "hod_%03d.pcm", num);
+					fioDumpData(filename, samples, size);
+
+					assert((size & 15) == 0);
+					const uint32_t decompressedSize = (size / 16) * 28 * sizeof(int16_t);
+					uint8_t *pcm = (uint8_t *)malloc(decompressedSize);
+					if (pcm) {
+						DecodeSssSpuAdpcm(samples, size, (int16_t *)pcm);
+
+						snprintf(filename, sizeof(filename), "hod_%03d.wav", num);
+						saveWAV(filename, 11025, 16, 1, pcm, decompressedSize);
+
+						free(pcm);
+					}
+					free(samples);
+				}
+			}
+		}
+		return;
+	}
+
 	for (int i = 0; i < pcmCount; ++i) {
 		const uint32_t offset = READ_LE_UINT32(header + i * kSizeOfPcm + 4);
 		const uint32_t size   = READ_LE_UINT32(header + i * kSizeOfPcm + 8);
@@ -678,8 +735,6 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 
 		if (size != 0) {
 
-			const int channels = ((flags & 1) != 0) ? 2 : 1;
-
 			assert(stride * count == size);
 			assert(size % stride == 0);
 
@@ -692,18 +747,14 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 			if (_isPsx) {
 				assert(stride == 512);
 
-				if (offset == 0) {
-					// only PCM in .dax appear to have 'correct' size value
-					// PCM in .lvl appear shorter than 'size'
-					continue;
-				}
+				// pcm in .DAX are stored sequentially
+				assert(offset != 0);
 
 				uint8_t *samples = (uint8_t *)malloc(size);
 				if (samples) {
 					fp->read(samples, size);
 
 					// ffplay -acodec adpcm_psx -f s16le -ar 11025 -ac 1 -i $fn.pcm
-
 					snprintf(filename, sizeof(filename), "hod_%03d.pcm", i);
 					fioDumpData(filename, samples, size);
 
@@ -715,7 +766,7 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 						DecodeSssSpuAdpcm(samples, size, (int16_t *)pcm);
 
 						snprintf(filename, sizeof(filename), "hod_%03d.wav", i);
-						saveWAV(filename, 11025, 16, channels, pcm, decompressedSize);
+						saveWAV(filename, 11025, 16, 1, pcm, decompressedSize);
 
 						free(pcm);
 					}
@@ -724,6 +775,8 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 				}
 				continue;
 			}
+
+			const int channels = ((flags & 1) != 0) ? 2 : 1;
 
 			assert(stride == 2276 || stride == 4040);
 			const uint32_t decompressedSize = (stride - 256 * sizeof(int16_t)) * count * sizeof(int16_t);
@@ -1335,7 +1388,6 @@ static void DecodeSaturn0003(FILE *fp) { // .sss
 				fread(samples, 1, size, fp);
 
 				// ffplay -acodec adpcm_ct -f u8 -ar 11025 -ac 1 -i $fn.pcm
-
 				char name[64];
 				snprintf(name, sizeof(name), "hod_%03d.pcm", i);
 				fioDumpData(name, samples, size);
