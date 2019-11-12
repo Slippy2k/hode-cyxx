@@ -62,7 +62,7 @@ struct Point16_t {
 
 struct AnimBackgroundData {
 	const uint8_t *currentSpriteData; // 0
-	uint8_t *firstSpriteData; // 4
+	uint8_t *nextSpriteData; // 4
 	uint8_t *otherSpriteData; // 8
 	uint16_t framesCount; // 12
 	uint16_t currentFrame; // 14

@@ -263,8 +263,11 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 		memcpy(_spritePalette, paletteData[0] + 2, 256 * 3);
 	}
 
-	header += 4 * sizeof(uint32_t) * 2;
-	for (int i = 0; i < 4; ++i) {
+	header += 4 * sizeof(uint32_t); // dataUnk0
+
+	header += 4 * sizeof(uint32_t); // backgroundMaskTable
+
+	for (int i = 0; i < 4; ++i) { // backgroundSoundTable
 		const uint32_t offset = READ_LE_UINT32(header); header += 4;
 		if (offset != 0) {
 			const uint8_t *p = data + offset;
@@ -280,6 +283,54 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 
 				snprintf(filename, sizeof(filename), "lvl_screen_%02d_static_%d_x_%03d_y_%03d.bmp", num, i, x, y);
 				saveBMP(filename, _bitmapBuffer, paletteData[0] + 2, w, h);
+			}
+		}
+	}
+
+	for (int i = 0; i < 4; ++i) { // backgroundAnimationTable
+		const uint32_t offset = READ_LE_UINT32(header); header += 4;
+		if (offset != 0) {
+			const uint8_t *p = data + offset;
+			if (_isPsx) {
+				const int framesCount = READ_LE_UINT32(p); p += 4;
+				p += 4; // sound
+				for (int j = 0; j < framesCount; ++j) {
+					p += 4; // sound
+					const uint16_t size = READ_LE_UINT16(p + 2);
+					if (size > 6) {
+						const int type = READ_LE_UINT32(p + 4);
+						if (type == 1) {
+							assert(READ_LE_UINT16(p + 10) + 6 == size);
+							const int x = 0;
+							const int y = 0;
+							const int w = p[12] * 16;
+							const int h = p[13] * 16;
+							if (isMdecData(p + 16)) {
+								snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.jpg", num, i, j, x, y);
+								savePSX(filename, p + 16, size - 12, w, h);
+							}
+						}
+					}
+					p += size + 2;
+				}
+				continue;
+			}
+			const int framesCount = READ_LE_UINT16(p); p += 2;
+			p += 2; // sound
+			for (int j = 0; j < framesCount; ++j) {
+				const uint16_t size = READ_LE_UINT16(p + 4);
+				if (size > 8) {
+					const int x = p[2];
+					const int y = p[3];
+					const int w = READ_LE_UINT16(p + 6);
+					const int h = READ_LE_UINT16(p + 8);
+					memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
+					DecodeRLE(p + 10, _bitmapBuffer, w);
+
+					snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.bmp", num, i, j, x, y);
+					saveBMP(filename, _bitmapBuffer, paletteData[0] + 2, w, h);
+				}
+				p += size + 4;
 			}
 		}
 	}

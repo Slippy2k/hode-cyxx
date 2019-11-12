@@ -1323,7 +1323,7 @@ void Game::updateScreenHelper(int num) {
 				}
 				p->currentSpriteData = p->otherSpriteData = data;
 				p->currentFrame = 0;
-				p->firstSpriteData = READ_LE_UINT16(data + 4) + data + 4;
+				p->nextSpriteData = READ_LE_UINT16(data + 4) + data + 4;
 			}
 			break;
 		case 1: {
@@ -2251,13 +2251,13 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	}
 	int16_t soundNum = -1;
 	const int len = READ_LE_UINT16(_edi + 2);
-	const uint8_t *_eax = len + _edi + 2; // nextSpriteData
+	const uint8_t *nextSpriteData = len + _edi + 2;
 	switch (ptr->objectUpdateType - 1) {
 	case 6:
-		_esi->currentSpriteData = _esi->firstSpriteData;
+		_esi->currentSpriteData = _esi->nextSpriteData;
 		if (_esi->currentFrame == 0) {
 			_esi->currentFrame = 1;
-			soundNum = READ_LE_UINT16(_esi->firstSpriteData);
+			soundNum = READ_LE_UINT16(_esi->nextSpriteData);
 		}
 		ptr->objectUpdateType = 4;
 		break;
@@ -2269,8 +2269,8 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	case 3:
 		++_esi->currentFrame;
 		if (_esi->currentFrame < _esi->framesCount) {
-			_esi->currentSpriteData = _eax;
-			soundNum = READ_LE_UINT16(_eax);
+			_esi->currentSpriteData = nextSpriteData;
+			soundNum = READ_LE_UINT16(nextSpriteData);
 		} else {
 			_esi->currentFrame = 0;
 			_esi->currentSpriteData = _esi->otherSpriteData;
@@ -2281,8 +2281,8 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	case 4:
 		++_esi->currentFrame;
 		if (_esi->currentFrame < _esi->framesCount) { // bugfix: original uses '<=' (out of bounds)
-			_esi->currentSpriteData = _eax;
-			soundNum = READ_LE_UINT16(_eax);
+			_esi->currentSpriteData = nextSpriteData;
+			soundNum = READ_LE_UINT16(nextSpriteData);
 		} else {
 			_esi->currentFrame = 0;
 			_esi->currentSpriteData = _esi->otherSpriteData;
@@ -2293,20 +2293,20 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	case 2:
 		while (_esi->currentFrame < _esi->framesCount - 2) {
 			++_esi->currentFrame;
-			_esi->currentSpriteData = _eax;
-			_eax += 2;
-			const int len = READ_LE_UINT16(_eax + 2);
-			_eax += len + 2;
+			_esi->currentSpriteData = nextSpriteData;
+			nextSpriteData += 2;
+			const int len = READ_LE_UINT16(nextSpriteData + 2);
+			nextSpriteData += len + 2;
 		}
-		_eax = _esi->currentSpriteData + 2; // _esi
+		nextSpriteData = _esi->currentSpriteData + 2;
 		if (_res->_currentScreenResourceNum == ptr->screenNum) {
 			Sprite *spr = _spritesNextPtr;
-			if (spr && READ_LE_UINT16(_eax + 2) > 8) {
-				spr->w = READ_LE_UINT16(_eax + 4);
-				spr->h = READ_LE_UINT16(_eax + 6);
-				spr->bitmapBits = _eax + 8;
-				spr->xPos = _eax[0];
-				spr->yPos = _eax[1];
+			if (spr && READ_LE_UINT16(nextSpriteData + 2) > 8) {
+				spr->w = READ_LE_UINT16(nextSpriteData + 4);
+				spr->h = READ_LE_UINT16(nextSpriteData + 6);
+				spr->bitmapBits = nextSpriteData + 8;
+				spr->xPos = nextSpriteData[0];
+				spr->yPos = nextSpriteData[1];
 				_spritesNextPtr = spr->nextPtr;
 				spr->num = ptr->flags2;
 				const int index = spr->num & 0x1F;
@@ -2319,7 +2319,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 	case 1:
 		++_esi->currentFrame;
 		if (_esi->currentFrame < _esi->framesCount - 1) {
-			_esi->currentSpriteData = _eax;
+			_esi->currentSpriteData = nextSpriteData;
 			soundNum = READ_LE_UINT16(_esi->currentSpriteData);
 		} else {
 			if (_esi->currentFrame > _esi->framesCount) {
@@ -2336,10 +2336,10 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		if (ptr->hitCount == 0) {
 			++_esi->currentFrame;
 			if (_esi->currentFrame >= _esi->framesCount) {
-				_esi->currentSpriteData = _esi->firstSpriteData;
+				_esi->currentSpriteData = _esi->nextSpriteData;
 				_esi->currentFrame = 1;
 			} else {
-				_esi->currentSpriteData = _eax;
+				_esi->currentSpriteData = nextSpriteData;
 			}
 		} else {
 			--ptr->hitCount;
