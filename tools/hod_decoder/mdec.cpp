@@ -232,5 +232,5 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 	free(mdecOut.planes[kOutputPlaneCb].ptr);
 	free(mdecOut.planes[kOutputPlaneCr].ptr);
 
-	return 0;
+	return bs._src - src;
 }

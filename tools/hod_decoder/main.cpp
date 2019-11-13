@@ -298,18 +298,30 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 					p += 4; // sound
 					const uint16_t size = READ_LE_UINT16(p + 2);
 					if (size > 6) {
-						const int type = READ_LE_UINT32(p + 4);
-						if (type == 1) {
-							assert(READ_LE_UINT16(p + 10) + 6 == size);
-							const int x = p[8];
-							const int y = p[9];
-							const int w = p[12] * 16;
-							const int h = p[13] * 16;
-							if (isMdecData(p + 16)) {
+						const int count = READ_LE_UINT32(p + 4);
+						assert(count >= 1 && count <= 3);
+						int offset = 8;
+						for (int k = 0; k < count && offset < size; ++k) {
+							const int x = p[offset];
+							const int y = p[offset + 1];
+							const int len = READ_LE_UINT16(p + offset + 2);
+							const int w = p[offset + 4] * 16;
+							const int h = p[offset + 5] * 16;
+							// const int unk6 = p[offset + 6];
+							const int mat = p[offset + 7];
+							const uint8_t *data = p + offset + 8 + mat;
+							assert(isMdecData(data));
+							if (mat == 0) {
 								snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.jpg", num, i, j, x, y);
-								savePSX(filename, p + 16, size - 12, w, h);
+								savePSX(filename, data, len - 8 - mat, w, h);
+							} else {
+								// ptr[8 + ...] contains target (x,y) for each decoded 16x16 block
+								// x == b >> 4
+								// y == b & 15
 							}
+							offset += len;
 						}
+						assert(offset == size + 2);
 					}
 					p += size + 2;
 				}
@@ -879,24 +891,24 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 	const int compressedSize = READ_LE_UINT16(ptr + 2);
 
 	if (_isPsx) {
-		const int type = READ_LE_UINT32(ptr + 4);
-		assert(type == 1);
-		assert(ptr[0] == ptr[8] && ptr[1] == ptr[9]);
-		const int x = ptr[8];
-		const int y = ptr[9];
-		const int size = READ_LE_UINT16(ptr + 10);
+		const int count = READ_LE_UINT32(ptr + 4);
+		assert(count == 1);
+		const int offset = 8;
+		const int x = ptr[offset];
+		const int y = ptr[offset + 1];
+		assert(ptr[0] == x && ptr[1] == y);
+		const int size = READ_LE_UINT16(ptr + offset + 2);
 		assert(size + 6 == compressedSize);
-		const int w = ptr[12] * 16;
-		const int h = ptr[13] * 16;
-
-		char filename[64];
-		if (isMdecData(ptr + 16)) {
+		const int w = ptr[offset + 4] * 16;
+		const int h = ptr[offset + 5] * 16;
+		// const int unk6 = ptr[offset + 6];
+		const int mat = ptr[offset + 7];
+		const uint8_t *data = ptr + offset + 8 + mat;
+		assert(isMdecData(data));
+		if (mat == 0) {
+			char filename[64];
 			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d_x_%03d_y_%03d.jpg", spriteGroup, spriteNum, x, y);
-			savePSX(filename, ptr + 16, size - 4, w, h);
-		} else {
-			assert(READ_LE_UINT32(ptr + 16) == 0x03020100 && READ_LE_UINT32(ptr + 20) == 0x08070605 && (size == 1144 || size == 848));
-			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d_x_%03d_y_%03d.bin", spriteGroup, spriteNum, x, y);
-			fioDumpData(filename, ptr, compressedSize);
+			savePSX(filename, ptr + offset + 8, size - 8, w, h);
 		}
 
 		return compressedSize + 2;
