@@ -3545,10 +3545,6 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 				if (_rnd._rndSeed & 1) {
 					++o->anim;
 				}
-				if (o->anim > 12) {
-					warning("Invalid frame number %d for fireball type %d", o->anim, dat->unk0);
-					o->anim = 12;
-				}
 				o->frame = 0;
 				if (dat->xPosShoot >= Video::W) {
 					dat->xPosShoot -= _res->_screensBasePos[ptr->screenNum].u;

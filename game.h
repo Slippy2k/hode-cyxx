@@ -447,7 +447,7 @@ struct Game {
 	void mstOp57_addWormHoleSprite(int x, int y, int screenNum);
 	void mstOp58_addLvlObject(Task *t, int num);
 	void mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, uint16_t flags);
-	void mstOp59_addShootFireball(int x, int y, int screenNum, int pos, int type, uint16_t flags);
+	void mstOp59_addShootFireball(int x, int y, int screenNum, int type, int state, uint16_t flags);
 	void mstTaskResetMonster1WalkPath(Task *t);
 	bool mstSetCurrentPos(MonsterObject1 *m, int x, int y);
 	void mstMonster1SetGoalHorizontal(MonsterObject1 *m);
