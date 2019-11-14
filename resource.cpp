@@ -151,9 +151,9 @@ void Resource::loadSetupDat() {
 	for (int i = 0; i < kLvl_dark; ++i) { // last level has a single checkpoint
 		_datHdr.levelCheckpointsCount[i] = _datFile->readUint32();
 	}
-	_datHdr.yesNoQuitImage         = _datFile->readUint32();
+	_datHdr.yesNoQuitImage   = _datFile->readUint32();
 	_datFile->readUint32(); // 0x44
-	_datHdr.loadingImageSize       = _datFile->readUint32();
+	_datHdr.loadingImageSize = _datFile->readUint32();
 	const int hintsCount = (_datHdr.version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
 		_datHdr.hintsImageOffsetTable[i] = _datFile->readUint32();
@@ -880,7 +880,6 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		}
 	} else if (_sssHdr.version == 6) {
 // 42E8DF
-		_sssPreloadInfosData.deallocate();
 		static const int kSizeOfPreloadInfoData_V6 = 68;
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int count = _sssPreloadInfosData[i].count;
@@ -897,6 +896,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 			}
 			free(p);
 		}
+		_sssPreloadInfosData.deallocate();
 	}
 
 	_sssPcmTable.allocate(_sssHdr.pcmCount);
@@ -950,7 +950,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		bytesRead += lutSize * 3;
 	}
 // 429B4B
-	// _sssPreloadedPcmTotalSize 0;
+	// _sssPreloadedPcmTotalSize = 0;
 
 // 429B9F
 	checkSssCode(_sssCodeData, _sssHdr.codeSize);
@@ -963,32 +963,13 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		}
 	}
 // 429C00
-	for (int i = 0; i < _sssHdr.samplesDataCount; ++i) {
-		if (_sssSamplesData[i].codeOffset1 != kNone) {
-		}
-		if (_sssSamplesData[i].codeOffset2 != kNone) {
-		}
-		if (_sssSamplesData[i].codeOffset3 != kNone) {
-		}
-		if (_sssSamplesData[i].codeOffset4 != kNone) {
-		}
-	}
+	// fixup _sssSamplesData[i].codeOffset
 	debug(kDebug_RESOURCE, "bufferSize %d bytesRead %d", bufferSize, bytesRead);
 	if (bufferSize != bytesRead) {
 		error("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
 	}
-
 // 429C96
-	if (0 && _sssHdr.filtersDataCount != 0) {
-		fp->flush();
-		uint8_t buf[256];
-		assert(_sssHdr.filtersDataCount <= (int)sizeof(buf));
-		fp->read(buf, _sssHdr.filtersDataCount);
-		for (int i = 0; i < _sssHdr.filtersDataCount; i += 4) {
-			uint32_t j = READ_LE_UINT32(buf + i);
-			debug(kDebug_RESOURCE, "unk14 offset 0x%x data 0x%x", i, j);
-		}
-	}
+	// preload PCM (_sssHdr.preloadPcmCount)
 // 429D32
 	for (int i = 0; i < _sssHdr.banksDataCount; ++i) {
 		uint32_t mask = 1;
