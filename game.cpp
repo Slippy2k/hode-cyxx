@@ -914,6 +914,16 @@ void Game::preloadLevelScreenData(uint8_t num, uint8_t prev) {
 	if (!_res->isLvlBackgroundDataLoaded(num)) {
 		_res->loadLvlScreenBackgroundData(num);
 	}
+	if (num < _res->_sssPreloadInfosData.count) {
+		const SssPreloadInfo *preloadInfo = &_res->_sssPreloadInfosData[num];
+		for (unsigned int i = 0; i < preloadInfo->count; ++i) {
+			const SssPreloadInfoData *preloadData = &preloadInfo->data[i];
+			if (preloadData->screenNum == prev) {
+				_res->preloadSssPcmList(preloadData);
+				break;
+			}
+		}
+	}
 	if (0) {
 		const uint8_t leftScreen = _res->_screensGrid[num][kPosLeftScreen];
 		if (leftScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
