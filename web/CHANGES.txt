@@ -2,7 +2,7 @@
 	- fixed lever in 'lava' level screen 2
 	- fixed masking with plants in 'pwr1' level
 	- fixed missing explosion animation with fireballs
-	- fixed screen mask in 'lar2' screen 7
+	- fixed screen mask in 'lar2' level screen 7
 
 * release 0.2.1
 	- added initial code for PSX data files detection
