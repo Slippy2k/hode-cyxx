@@ -53,7 +53,7 @@ void File::flush() {
 
 SectorFile::SectorFile() {
 	memset(_buf, 0, sizeof(_buf));
-	_bufPos = _bufLen = 0;
+	_bufPos = 2044;
 }
 
 int fioAlignSizeTo2048(int size) {
@@ -70,14 +70,11 @@ uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size) {
 }
 
 void SectorFile::refillBuffer() {
-	int size = fread(_buf, 1, 2048, _fp);
-	if (size == 2048) {
-		uint32_t crc = fioUpdateCRC(0, _buf, 2048);
-		assert(crc == 0);
-		size -= 4;
-	}
+	const int size = fread(_buf, 1, 2048, _fp);
+	assert(size == 2048);
+	const uint32_t crc = fioUpdateCRC(0, _buf, 2048);
+	assert(crc == 0);
 	_bufPos = 0;
-	_bufLen = size;
 }
 
 void SectorFile::seekAlign(int pos) {
@@ -87,49 +84,51 @@ void SectorFile::seekAlign(int pos) {
 	refillBuffer();
 	const int skipCount = pos - alignPos;
 	_bufPos += skipCount;
-	_bufLen -= skipCount;
 }
 
 void SectorFile::seek(int pos, int whence) {
 	if (whence == SEEK_SET) {
 		assert((pos & 2047) == 0);
-		_bufLen = _bufPos = 0;
+		_bufPos = 2044;
 		File::seek(pos, SEEK_SET);
 	} else {
 		assert(whence == SEEK_CUR && pos >= 0);
-		if (pos < _bufLen) {
-			_bufLen -= pos;
+		const int bufLen = 2044 - _bufPos;
+		if (pos < bufLen) {
 			_bufPos += pos;
 		} else {
-			pos -= _bufLen;
-			const int count = fioAlignSizeTo2048(pos) / 2048;
-			if (count > 1) {
-				const int alignPos = (count - 1) * 2048;
+			pos -= bufLen;
+			const int count = (fioAlignSizeTo2048(pos) / 2048) - 1;
+			if (count > 0) {
+				const int alignPos = count * 2048;
 				fseek(_fp, alignPos, SEEK_CUR);
 			}
 			refillBuffer();
 			_bufPos = pos % 2044;
-			_bufLen = 2044 - _bufPos;
 		}
 	}
 }
 
 int SectorFile::read(uint8_t *ptr, int size) {
-	if (size >= _bufLen) {
-		const int count = fioAlignSizeTo2048(size) / 2048;
-		for (int i = 0; i < count; ++i) {
-			memcpy(ptr, _buf + _bufPos, _bufLen);
-			ptr += _bufLen;
-			size -= _bufLen;
-			refillBuffer();
-			if (_bufLen == 0 || size < _bufLen) {
-				break;
-			}
+	const int bufLen = 2044 - _bufPos;
+	if (size >= bufLen) {
+		if (bufLen) {
+			memcpy(ptr, _buf + _bufPos, bufLen);
+			ptr += bufLen;
+			size -= bufLen;
 		}
+		const int count = (fioAlignSizeTo2048(size) / 2048) - 1;
+		for (int i = 0; i < count; ++i) {
+			refillBuffer();
+			memcpy(ptr, _buf, 2044);
+			ptr += 2044;
+			size -= 2044;
+		}
+		refillBuffer();
 	}
-	if (_bufLen != 0 && size != 0) {
+	if (size != 0) {
+		assert(size <= 2044 - _bufPos);
 		memcpy(ptr, _buf + _bufPos, size);
-		_bufLen -= size;
 		_bufPos += size;
 	}
 	return 0;
@@ -138,5 +137,5 @@ int SectorFile::read(uint8_t *ptr, int size) {
 void SectorFile::flush() {
 	const int currentPos = ftell(_fp);
 	assert((currentPos & 2047) == 0);
-	_bufLen = _bufPos = 0;
+	_bufPos = 2044;
 }

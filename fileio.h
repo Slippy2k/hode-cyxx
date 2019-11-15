@@ -34,7 +34,6 @@ struct SectorFile : File {
 
 	uint8_t _buf[kFioBufferSize];
 	int _bufPos;
-	int _bufLen;
 
 	SectorFile();
 
