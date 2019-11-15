@@ -238,7 +238,7 @@ struct AndyLvlObjectData {
 };
 
 struct ShootLvlObjectData {
-	uint8_t unk0; // 0x0 type
+	uint8_t type; // 0x0
 	uint8_t state; // 0x1
 	uint8_t counter; // 0x2
 	uint8_t unk3; // 0x3 value

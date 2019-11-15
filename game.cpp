@@ -3017,7 +3017,7 @@ void Game::lvlObjectType0CallbackHelper1() {
 		LvlObject *o = data->shootLvlObject;
 		if (o) {
 			ShootLvlObjectData *dataUnk1 = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
-			if (dataUnk1->unk0 < 4) {
+			if (dataUnk1->type < 4) {
 				_bl |= 0xC0;
 			}
 		}
@@ -3155,7 +3155,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 		ShootLvlObjectData *_eax = (ShootLvlObjectData *)getLvlObjectDataPtr(_esi, kObjectDataTypeShoot);
 		_esi->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
 		uint8_t _cl = (ptr->flags1 >> 4) & 3;
-		if (_eax->unk0 == 4) {
+		if (_eax->type == 4) {
 			_eax->counter = 33;
 			switch (var1) {
 			case 0:
@@ -3283,7 +3283,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 						break;
 					}
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
-					_edx->unk0 = 0;
+					_edx->type = 0;
 				}
 			} else {
 // 40DE08
@@ -3292,7 +3292,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					break;
 				}
 				ShootLvlObjectData *_eax = (ShootLvlObjectData *)getLvlObjectDataPtr(_esi, kObjectDataTypeShoot);
-				_esi->anim = (_eax->unk0 == 4) ? 14 : 15;
+				_esi->anim = (_eax->type == 4) ? 14 : 15;
 				updateAndyObject(_esi);
 				setLvlObjectPosRelativeToObject(_esi, 0, ptr, 6);
 				if (_currentLevel == kLvl_isld) {
@@ -3333,7 +3333,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 						break;
 					}
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
-					_edx->unk0 = 0;
+					_edx->type = 0;
 				}
 			}
 			break;
@@ -3373,7 +3373,7 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 						break;
 					}
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
-					_edx->unk0 = 4; // large power
+					_edx->type = 4; // large power
 				}
 			}
 			break;
@@ -3513,13 +3513,13 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 		}
 // 40D6E0
 		if (dat->unk3 != 0x80 && dat->counter != 0) {
-			if (dat->unk0 == 7) {
+			if (dat->type == 7) {
 				ptr->yPos += calcScreenMaskDy(ptr->xPos + ptr->posTable[7].x, ptr->yPos + ptr->posTable[7].y + 4, ptr->screenNum);
 
 			}
 // 40D711
 			const uint8_t ret = lvlObjectCallbackCollideScreen(ptr);
-			if (ret != 0 && (dat->unk0 != 7 || (ret & 1) == 0)) {
+			if (ret != 0 && (dat->type != 7 || (ret & 1) == 0)) {
 				dat->unk3 = 0x80;
 			}
 		}
@@ -3533,7 +3533,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 		static const uint8_t animData2[16] = {
 			0x06, 0x0E, 0x05, 0x0E, 0x05, 0x0E, 0x05, 0x0E, 0x05, 0x0E, 0x06, 0x0E, 0x04, 0x0E, 0x04, 0x0E
 		};
-		const uint8_t *anim = (dat->unk0 >= 7) ? &animData2[dat->state * 2] : &animData1[dat->state * 2];
+		const uint8_t *anim = (dat->type >= 7) ? &animData2[dat->state * 2] : &animData1[dat->state * 2];
 		if (dat->counter != 0 && dat->unk3 != 0x80) {
 			if (addLvlObjectToList3(ptr->spriteNum)) {
 				LvlObject *o = _lvlObjectsList3;
@@ -3557,7 +3557,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 			}
 		} else {
 // 40D7F5
-			dat->unk0 = (dat->unk0 < 7) ? 3 : 9;
+			dat->type = (dat->type < 7) ? 3 : 9;
 			if (dat->counter != 0 && _actionDirectionKeyMaskIndex != 0xA3) {
 				ptr->anim = anim[0];
 			} else {
@@ -3792,13 +3792,13 @@ void Game::lvlObjectSpecialPowersCallbackHelper1(LvlObject *o) {
 // 40D4FB
 set_dat03:
 	if (val == 0x18) {
-		dat->unk0 = 6;
+		dat->type = 6;
 	} else {
 		dat->unk3 = 8;
 	}
 // 40D5E1
 set_dxpos:
-	if (dat->unk0 != 6 && dat->unk3 == 0x80) {
+	if (dat->type != 6 && dat->unk3 == 0x80) {
 		dat->yPosShoot += dy;
 		setLvlObjectPosRelativeToPoint(o, 3, dat->xPosShoot, dat->yPosShoot);
 	} else {
@@ -3868,7 +3868,7 @@ uint8_t Game::lvlObjectCallbackCollideScreen(LvlObject *o) {
 	static const int offsets2[] = {
 		0, 1, 512, -1, 0, -1, 512, 1, 0, 1, -512, -1, 0, -1, -512, 1
 	};
-	uint8_t _bl, _cl = dat->unk0;
+	uint8_t _bl, _cl = dat->type;
 	const uint8_t *var10;
 	const int *_esi;
 	if (_cl == 4) {
@@ -3986,8 +3986,8 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 		if (dat->unk3 != 0x80 && dat->counter != 0) {
 			uint8_t _al = lvlObjectCallbackCollideScreen(o);
 			if (_al != 0) {
-				if (dat->unk0 == 4 && (_al & 1) != 0 && (dat->state == 4 || dat->state == 2)) {
-					dat->unk0 = 5;
+				if (dat->type == 4 && (_al & 1) != 0 && (dat->state == 4 || dat->state == 2)) {
+					dat->type = 5;
 					_al -= 4;
 					dat->state = (_al != 0) ? 5 : 0;
 				} else {
@@ -3996,7 +3996,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 			}
 		}
 // 40D947
-		if (dat->unk0 == 5) {
+		if (dat->type == 5) {
 			dat->dyPos = 0;
 			if (dat->unk3 != 0x80) {
 				lvlObjectSpecialPowersCallbackHelper1(o);
@@ -4010,7 +4010,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 		static const uint8_t animData2[] = {
 			0x04, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x03, 0x08, 0x04, 0x08, 0x02, 0x08, 0x02, 0x08
 		};
-		const uint8_t *p = (dat->unk0 >= 4) ? &animData2[dat->state * 2] : &animData1[dat->state * 2];
+		const uint8_t *p = (dat->type >= 4) ? &animData2[dat->state * 2] : &animData1[dat->state * 2];
 // 40D97C
 		if (dat->unk3 != 0x80 && dat->counter != 0) {
 			if (addLvlObjectToList3(o->spriteNum)) {
@@ -4051,8 +4051,8 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 				}
 			}
 // 40DA6B
-			if (dat->unk0 >= 4) {
-				dat->unk0 = 6;
+			if (dat->type >= 4) {
+				dat->type = 6;
 				if (dat->dxPos <= 0) {
 					dat->xPosShoot += 8;
 				}
@@ -4060,7 +4060,7 @@ int Game::lvlObjectSpecialPowersCallback(LvlObject *o) {
 					dat->yPosShoot += 8;
 				}
 			} else {
-				dat->unk0 = 1;
+				dat->type = 1;
 			}
 			dat->dxPos = 0;
 			dat->dyPos = 0;

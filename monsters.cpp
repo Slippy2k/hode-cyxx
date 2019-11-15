@@ -3040,7 +3040,7 @@ void Game::mstUpdateRefPos() {
 			p->width  = ptr->dxPos;
 			p->height = ptr->dyPos;
 			p->directionMask = ptr->state;
-			switch (ptr->unk0) {
+			switch (ptr->type) {
 			case 0:
 				p->type = 1;
 				p->xPos = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset + o->posTable[7].x;
@@ -3538,7 +3538,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 				if (o) {
 					ShootLvlObjectData *data = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 					if (data) {
-						return (data->unk0 == 4) ? 1 : 0;
+						return (data->type == 4) ? 1 : 0;
 					}
 				}
 			}
@@ -3552,7 +3552,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 				if (o) {
 					ShootLvlObjectData *data = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 					if (data) {
-						return (data->unk0 == 0) ? 1 : 0;
+						return (data->type == 0) ? 1 : 0;
 					}
 				}
 			}
@@ -6223,7 +6223,7 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 	}
 }
 
-void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, uint16_t flags) {
+void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int state, uint16_t flags) {
 	LvlObject *o = addLvlObjectToList0(3);
 	if (o) {
 		o->dataPtr = _shootLvlObjectDataNextPtr;
@@ -6234,17 +6234,18 @@ void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int type, 
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
 		assert(s);
 		o->callbackFuncPtr = &Game::lvlObjectSpecialPowersCallback;
-		s->state = type;
-		s->unk0 = 0;
+		s->state = state;
+		s->type = 0;
 		s->counter = 17;
-		s->dxPos = (int8_t)_specialPowersDxDyTable[type * 2];
-		s->dyPos = (int8_t)_specialPowersDxDyTable[type * 2 + 1];
+		s->dxPos = (int8_t)_specialPowersDxDyTable[state * 2];
+		s->dyPos = (int8_t)_specialPowersDxDyTable[state * 2 + 1];
 // 43E730
 		static const uint8_t data[16] = {
 			0x0D, 0x00, 0x0C, 0x01, 0x0C, 0x03, 0x0C, 0x00, 0x0C, 0x02, 0x0D, 0x01, 0x0B, 0x00, 0x0B, 0x02,
 		};
-		o->anim = data[type * 2];
-		o->flags1 = ((data[type * 2 + 1] & 3) << 4) | (o->flags1 & ~0x0030);
+		assert(state < 8);
+		o->anim = data[state* 2];
+		o->flags1 = ((data[state * 2 + 1] & 3) << 4) | (o->flags1 & ~0x0030);
 		o->frame = 0;
 		o->flags2 = o->flags1;
 		o->screenNum = screenNum;
@@ -6264,11 +6265,12 @@ void Game::mstOp59_addShootFireball(int x, int y, int screenNum, int type, int s
 		ShootLvlObjectData *s = (ShootLvlObjectData *)o->dataPtr;
 		assert(s);
 		s->state = state;
-// dx, dy
-		static const uint8_t _byte_43E6E0[16] = {
+// 43E6E0
+		static const uint8_t fireballDxDy1[16] = {
 			0x0A, 0x00, 0xF7, 0xFA, 0xF7, 0x06, 0x09, 0xFA, 0x09, 0x06, 0xF6, 0x00, 0x00, 0xF6, 0x00, 0x0A
 		};
-		static const uint8_t _byte_43E6F0[16] = {
+// 43E6F0
+		static const uint8_t fireballDxDy2[16] = {
 			0x0D, 0x00, 0xF5, 0xF9, 0xF5, 0x07, 0x0B, 0xF9, 0x0B, 0x07, 0xF3, 0x00, 0x00, 0xF3, 0x00, 0x0D
 		};
 // 43E740
@@ -6279,22 +6281,23 @@ void Game::mstOp59_addShootFireball(int x, int y, int screenNum, int type, int s
 		static const uint8_t data2[16] = {
 			0x0D, 0x00, 0xF5, 0xF9, 0xF5, 0x07, 0x0B, 0xF9, 0x0B, 0x07, 0xF3, 0x00, 0x00, 0xF3, 0x00, 0x0D
 		};
-		const uint8_t *_ecx;
+		assert(state < 8);
+		const uint8_t *anim;
 		if (type >= 7) {
-			s->dxPos = (int8_t)_byte_43E6F0[state * 2];
-			s->dyPos = (int8_t)_byte_43E6F0[state * 2 + 1];
+			s->dxPos = (int8_t)fireballDxDy2[state * 2];
+			s->dyPos = (int8_t)fireballDxDy2[state * 2 + 1];
 			s->counter = 33;
-			_ecx = &data2[state * 2];
+			anim = &data2[state * 2];
 		} else {
-			s->dxPos = (int8_t)_byte_43E6E0[state * 2];
-			s->dyPos = (int8_t)_byte_43E6E0[state * 2 + 1];
+			s->dxPos = (int8_t)fireballDxDy1[state * 2];
+			s->dyPos = (int8_t)fireballDxDy1[state * 2 + 1];
 			s->counter = 39;
-			_ecx = &data1[state * 2];
+			anim = &data1[state * 2];
 		}
-		s->unk0 = type;
-		o->anim = _ecx[0];
+		s->type = type;
+		o->anim = anim[0];
 		o->screenNum = screenNum;
-		o->flags1 = ((_ecx[1] & 3) << 4) | (o->flags1 & ~0x0030);
+		o->flags1 = ((anim[1] & 3) << 4) | (o->flags1 & ~0x0030);
 		o->flags2 = flags;
 		o->frame = 0;
 		setupLvlObjectBitmap(o);
