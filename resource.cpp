@@ -757,7 +757,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		_sssInfosData[i].targetPriority = fp->readByte();
 		_sssInfosData[i].targetPanning = fp->readByte();
 		_sssInfosData[i].concurrencyMask = fp->readByte();
-		fp->readByte(); // padding to 8 bytes
+		fp->skipByte(); // padding to 8 bytes
 		bytesRead += 8;
 	}
 	_sssDefaultsData.allocate(_sssHdr.filtersDataCount);
@@ -765,7 +765,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		_sssDefaultsData[i].defaultVolume   = fp->readByte();
 		_sssDefaultsData[i].defaultPriority = fp->readByte();
 		_sssDefaultsData[i].defaultPanning  = fp->readByte();
-		fp->readByte(); // padding to 4 bytes
+		fp->skipByte(); // padding to 4 bytes
 		bytesRead += 4;
 	}
 	_sssBanksData.allocate(_sssHdr.banksDataCount);
@@ -899,7 +899,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 // 429AB8
 	uint32_t sssPcmOffset = baseOffset;
 	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
-		_sssPcmTable[i].ptr = 0; fp->readUint32();
+		_sssPcmTable[i].ptr = 0; fp->skipUint32();
 		_sssPcmTable[i].offset = fp->readUint32();
 		_sssPcmTable[i].totalSize = fp->readUint32();
 		_sssPcmTable[i].strideSize = fp->readUint32();
@@ -1170,10 +1170,10 @@ void Resource::loadMstData(File *fp) {
 
 	_mstWalkCodeData.allocate(_mstHdr.walkCodeDataCount);
 	for (int i = 0; i < _mstHdr.walkCodeDataCount; ++i) {
-		fp->readUint32();
+		fp->skipUint32();
 		_mstWalkCodeData[i].codeDataCount = fp->readUint32();
 		_mstWalkCodeData[i].codeData = (uint32_t *)malloc(_mstWalkCodeData[i].codeDataCount * sizeof(uint32_t));
-		fp->readUint32();
+		fp->skipUint32();
 		_mstWalkCodeData[i].dataCount = fp->readUint32();
 		_mstWalkCodeData[i].data = (uint8_t *)malloc(_mstWalkCodeData[i].dataCount);
 		bytesRead += 16;
@@ -1241,10 +1241,10 @@ void Resource::loadMstData(File *fp) {
 
 	_mstBehaviorIndexData.allocate(_mstHdr.behaviorIndexDataCount);
 	for (int i = 0; i < _mstHdr.behaviorIndexDataCount; ++i) {
-		fp->readUint32();
+		fp->skipUint32();
 		_mstBehaviorIndexData[i].count1 = fp->readUint32();
 		_mstBehaviorIndexData[i].behavior = (uint32_t *)malloc(_mstBehaviorIndexData[i].count1 * sizeof(uint32_t));
-		fp->readUint32();
+		fp->skipUint32();
 		_mstBehaviorIndexData[i].dataCount = fp->readUint32();
 		_mstBehaviorIndexData[i].data = (uint8_t *)malloc(_mstBehaviorIndexData[i].dataCount);
 		bytesRead += 16;
@@ -1259,10 +1259,10 @@ void Resource::loadMstData(File *fp) {
 
 	_mstMonsterActionIndexData.allocate(_mstHdr.monsterActionIndexDataCount);
 	for (int i = 0; i < _mstHdr.monsterActionIndexDataCount; ++i) {
-		fp->readUint32();
+		fp->skipUint32();
 		_mstMonsterActionIndexData[i].count1 = fp->readUint32();
 		_mstMonsterActionIndexData[i].indexUnk48 = (uint32_t *)malloc(_mstMonsterActionIndexData[i].count1 * sizeof(uint32_t));
-		fp->readUint32();
+		fp->skipUint32();
 		_mstMonsterActionIndexData[i].dataCount = fp->readUint32();
 		_mstMonsterActionIndexData[i].data = (uint8_t *)malloc(_mstMonsterActionIndexData[i].dataCount);
 		bytesRead += 16;
@@ -1277,8 +1277,8 @@ void Resource::loadMstData(File *fp) {
 
 	_mstWalkPathData.allocate(_mstHdr.walkPathDataCount);
 	for (int i = 0; i < _mstHdr.walkPathDataCount; ++i) {
-		fp->readUint32();
-		fp->readUint32();
+		fp->skipUint32();
+		fp->skipUint32();
 		_mstWalkPathData[i].mask  = fp->readUint32();
 		_mstWalkPathData[i].count = fp->readUint32();
 		bytesRead += 16;
@@ -1337,7 +1337,7 @@ void Resource::loadMstData(File *fp) {
 
 	_mstBehaviorData.allocate(_mstHdr.behaviorDataCount);
 	for (int i = 0; i < _mstHdr.behaviorDataCount; ++i) {
-		fp->readUint32();
+		fp->skipUint32();
 		_mstBehaviorData[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
@@ -1364,7 +1364,7 @@ void Resource::loadMstData(File *fp) {
 
 	_mstAttackBoxData.allocate(_mstHdr.attackBoxDataCount);
 	for (int i = 0; i < _mstHdr.attackBoxDataCount; ++i) {
-		fp->readUint32();
+		fp->skipUint32();
 		_mstAttackBoxData[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
@@ -1384,12 +1384,9 @@ void Resource::loadMstData(File *fp) {
 		m->unk6 = fp->readByte();
 		m->unk7 = fp->readByte();
 		m->codeData = fp->readUint32();
-		m->area = 0; fp->readUint32();
+		m->area = 0; fp->skipUint32();
 		m->areaCount = fp->readUint32();
-		fp->readUint32();
-		fp->readUint32();
-		fp->readUint32();
-		fp->readUint32();
+		fp->seek(16, SEEK_CUR);
 		m->count[0] = fp->readUint32();
 		m->count[1] = fp->readUint32();
 		bytesRead += 44;
@@ -1417,10 +1414,10 @@ void Resource::loadMstData(File *fp) {
 		MstMonsterArea *m12 = (MstMonsterArea *)malloc(m->areaCount * sizeof(MstMonsterArea));
 		for (int j = 0; j < m->areaCount; ++j) {
 			m12[j].unk0  = fp->readByte();
-			fp->readByte();
-			fp->readByte();
-			fp->readByte();
-			m12[j].data  = 0; fp->readUint32();
+			fp->skipByte();
+			fp->skipByte();
+			fp->skipByte();
+			m12[j].data  = 0; fp->skipUint32();
 			m12[j].count = fp->readUint32();
 			bytesRead += 12;
 		}
@@ -1453,9 +1450,9 @@ void Resource::loadMstData(File *fp) {
 	_mstMovingBoundsData.allocate(_mstHdr.movingBoundsDataCount);
 	for (int i = 0; i < _mstHdr.movingBoundsDataCount; ++i) {
 		_mstMovingBoundsData[i].indexMonsterInfo = fp->readUint32();
-		fp->readUint32();
+		fp->skipUint32();
 		_mstMovingBoundsData[i].count1  = fp->readUint32();
-		fp->readUint32();
+		fp->skipUint32();
 		_mstMovingBoundsData[i].count2  = fp->readUint32();
 		_mstMovingBoundsData[i].unk14   = fp->readByte();
 		_mstMovingBoundsData[i].unk15   = fp->readByte();
@@ -1468,7 +1465,7 @@ void Resource::loadMstData(File *fp) {
 		const int start = _mstMovingBoundsData[i].indexMonsterInfo;
 		assert(start < _mstHdr.infoMonster1Count);
 		for (uint32_t j = 0; j < _mstMovingBoundsData[i].count1; ++j) {
-			fp->readUint32();
+			fp->skipUint32();
 			_mstMovingBoundsData[i].data1[j].unk4 = fp->readUint32();
 			_mstMovingBoundsData[i].data1[j].unk8 = fp->readByte();
 			_mstMovingBoundsData[i].data1[j].unk9 = fp->readByte();
@@ -1490,7 +1487,7 @@ void Resource::loadMstData(File *fp) {
 
 	_mstShootData.allocate(_mstHdr.shootDataCount);
 	for (int i = 0; i < _mstHdr.shootDataCount; ++i) {
-		_mstShootData[i].data  = 0; fp->readUint32();
+		_mstShootData[i].data  = 0; fp->skipUint32();
 		_mstShootData[i].count = fp->readUint32();
 		bytesRead += 8;
 	}
@@ -1515,7 +1512,7 @@ void Resource::loadMstData(File *fp) {
 	for (int i = 0; i < _mstHdr.shootIndexDataCount; ++i) {
 		_mstShootIndexData[i].indexUnk50 = fp->readUint32();
 		assert(_mstShootIndexData[i].indexUnk50 < (uint32_t)_mstHdr.shootDataCount);
-		_mstShootIndexData[i].indexUnk50Unk1 = 0; fp->readUint32();
+		_mstShootIndexData[i].indexUnk50Unk1 = 0; fp->skipUint32();
 		_mstShootIndexData[i].count = fp->readUint32();
 		bytesRead += 12;
 	}

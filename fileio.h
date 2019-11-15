@@ -24,6 +24,10 @@ struct File {
 	uint16_t readUint16();
 	uint32_t readUint32();
 	virtual void flush();
+
+	void skipByte()   { seek(1, SEEK_CUR); }
+	void skipUint16() { seek(2, SEEK_CUR); }
+	void skipUint32() { seek(4, SEEK_CUR); }
 };
 
 struct SectorFile : File {
