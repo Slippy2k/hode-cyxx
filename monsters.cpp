@@ -678,16 +678,16 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	m->xDelta = _mstAndyLevelPosX - m->xMstPos;
 	if (m->xDelta < 0) {
 		m->xDelta = -m->xDelta;
-		m->facingDirectionMask = 8;
+		m->facingDirectionMask = kDirectionKeyMaskLeft;
 	} else {
-		m->facingDirectionMask = 2;
+		m->facingDirectionMask = kDirectionKeyMaskRight;
 	}
 	m->yDelta = _mstAndyLevelPosY - m->yMstPos;
 	if (m->yDelta < 0) {
 		m->yDelta = -m->yDelta;
-		m->facingDirectionMask |= 1;
+		m->facingDirectionMask |= kDirectionKeyMaskUp;
 	} else {
-		m->facingDirectionMask |= 4;
+		m->facingDirectionMask |= kDirectionKeyMaskDown;
 	}
 	m->collideDistance = -1;
 	m->shootData = 0;
@@ -778,14 +778,14 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 		}
 	}
 // 40F151
-	if (m->facingDirectionMask & 8) {
+	if (m->facingDirectionMask & kDirectionKeyMaskLeft) {
 		m->unk88 = READ_LE_UINT32(ptr + 920);
 		m->unk84 = READ_LE_UINT32(ptr + 924);
 	} else {
 		m->unk88 = READ_LE_UINT32(ptr + 912);
 		m->unk84 = READ_LE_UINT32(ptr + 916);
 	}
-	if (m->facingDirectionMask & 1) {
+	if (m->facingDirectionMask & kDirectionKeyMaskUp) {
 		m->unk90 = READ_LE_UINT32(ptr + 936);
 		m->unk8C = READ_LE_UINT32(ptr + 940);
 	} else {
@@ -1272,7 +1272,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 				o->directionKeyMask |= (m->facingDirectionMask & ~kDirectionKeyMaskVertical);
 			} else {
 				o->directionKeyMask |= m->facingDirectionMask;
-				if ((m->monsterInfos[946] & 2) != 0) {
+				if (m->monsterInfos[946] & 2) {
 					if (_edi == 160 && (_mstLut1[o->directionKeyMask] & 1) != 0) {
 						if (m->xDelta >= m->yDelta) {
 							o->directionKeyMask &= ~kDirectionKeyMaskVertical;
@@ -1319,7 +1319,7 @@ void Game::mstMonster1UpdateGoalPosition(MonsterObject1 *m) {
 	int var18 = 0;
 	int _ebp, _edi, _esi, _eax;
 	if (m->goalScreenNum == 0xFD) {
-		MstMovingBounds *m49 = m->m49;
+		const MstMovingBounds *m49 = m->m49;
 		if (m->levelPosBounds_x2 > _mstAndyLevelPosX + m49->unk14 - m->goalDistance_x2 && m->levelPosBounds_x1 < _mstAndyLevelPosX + m->goalDistance_x2 - m49->unk14 && m->levelPosBounds_y2 > _mstAndyLevelPosY + m49->unk15 - m->goalDistance_y2 && m->levelPosBounds_y1 < _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y2) {
 			var18 = _mstAndyLevelPosX + m49->unk14 + m->goalDistance_x1;
 			if (m->levelPosBounds_x2 < var18) {
@@ -2584,13 +2584,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			if ((m->monsterInfos[946] & 4) != 0 && mstBoundingBoxCollides1(m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
 				continue;
 			}
-			int _ecx;
-			if (m->monsterInfos[946] & 2) {
-				_ecx = var14->boundingBox.y2;
-			} else {
-				_ecx = m->yMstPos;
-			}
-			if (m50Unk1->width != 0 && getMstDistance(_ecx, var14) >= 0) {
+			if (m50Unk1->width != 0 && getMstDistance((m->monsterInfos[946] & 2) != 0 ? var14->boundingBox.y2 : m->yMstPos, var14) >= 0) {
 				continue;
 			}
 			if (m->collideDistance >= m50Unk1->unk24) {
@@ -2824,7 +2818,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	}
 	if ((m->flagsA5 & 8) == 0 && (m->monsterInfos[946] & 2) == 0) {
 		const uint8_t _dl = m->facingDirectionMask;
-		if (_dl & 2) {
+		if (_dl & kDirectionKeyMaskRight) {
 			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 916) <= m->walkNode->coords[1][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 912) >= m->walkNode->coords[0][1]) {
 				m->flagsA6 |= 1;
 				assert(m == _mstCurrentMonster1);
@@ -2836,7 +2830,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 				}
 				return 0;
 			}
-		} else if (_dl & 8) {
+		} else if (_dl & kDirectionKeyMaskLeft) {
 // 418A37
 			if ((int32_t)READ_LE_UINT32(m->monsterInfos + 920) >= m->walkNode->coords[0][1] || (int32_t)READ_LE_UINT32(m->monsterInfos + 924) <= m->walkNode->coords[1][1]) {
 				m->flagsA6 |= 1;
@@ -6022,40 +6016,37 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			if (screenNum >= _res->_mstHdr.screensCount) {
 				screenNum = _res->_mstHdr.screensCount - 1;
 			}
-			int _ebp = _res->_mstPointOffsets[screenNum].xOffset;
-			int _edx = _res->_mstPointOffsets[screenNum].yOffset;
-			int _eax = op204Data->arg3 * 256;
-			int _edi = _ebp + 256;
-			_ebp -= _eax;
-			_edi += _eax;
+			const int x = _res->_mstPointOffsets[screenNum].xOffset;
+			const int y = _res->_mstPointOffsets[screenNum].yOffset; // _edx
+			const int xOffset = op204Data->arg3 * 256; // _eax
+			const int x1 = x - xOffset; // _ebp
+			const int x2 = x + xOffset; // _edi
 			int count = 0;
 			for (int i = 0; i < kMaxMonsterObjects1; ++i) {
-				MonsterObject1 *m = &_monsterObjects1Table[i];
+				const MonsterObject1 *m = &_monsterObjects1Table[i];
 				if (!m->m46) {
 					continue;
 				}
-				if (m->xMstPos < _ebp || m->xMstPos > _edi) {
+				if (m->xMstPos < x1 || m->xMstPos > x2) {
 					continue;
 				}
-				if (m->yMstPos < _edx || m->yMstPos > _edx + 192) {
+				if (m->yMstPos < y || m->yMstPos > y + 192) {
 					continue;
 				}
+				const int num = op204Data->arg1;
 				switch (op204Data->arg0) {
 				case 0:
-					_eax = op204Data->arg1;
-					if (m->m46 == &_res->_mstBehaviorData[_eax]) {
+					if (m->m46 == &_res->_mstBehaviorData[num]) {
 						++count;
 					}
 					break;
 				case 1:
-					_eax = op204Data->arg1;
-					if (m->monsterInfos == &_res->_mstMonsterInfos[_eax * kMonsterInfoDataSize]) {
+					if (m->monsterInfos == &_res->_mstMonsterInfos[num * kMonsterInfoDataSize]) {
 						++count;
 					}
 					break;
 				case 2:
-					_eax = op204Data->arg1;
-					if (m->monsterInfos[944] == _eax) {
+					if (m->monsterInfos[944] == num) {
 						++count;
 					}
 					break;
