@@ -584,7 +584,7 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 		dat->backgroundAnimationTable[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	uint32_t offsetsSize = 0;
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 8; ++i) {
 		const uint32_t offs = READ_LE_UINT32(src); src += 4;
 		if (offs != 0) {
 			dat->backgroundLvlObjectDataTable[i] = (LvlObjectData *)malloc(sizeof(LvlObjectData));
@@ -592,10 +592,6 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 		} else {
 			dat->backgroundLvlObjectDataTable[i] = 0;
 		}
-	}
-	for (int i = 0; i < 4; ++i) {
-		const uint32_t offs = READ_LE_UINT32(src); src += 4;
-		dat->dataUnk6Table[i] = (offs != 0) ? ptr + offs : 0;
 	}
 	assert((src - start) == 160);
 	return offsetsSize;

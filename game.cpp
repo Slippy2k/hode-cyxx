@@ -1321,7 +1321,7 @@ void Game::updateScreenHelper(int num) {
 				AnimBackgroundData *p = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
 				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->dataNum];
 				if (!data) {
-					warning("No AnimBackgroundData num %d screen %d", ptr->dataNum, num);
+					warning("No backgroundAnimationData num %d screen %d", ptr->dataNum, num);
 					break;
 				}
 				if (_res->_isPsx) {
@@ -1339,7 +1339,7 @@ void Game::updateScreenHelper(int num) {
 		case 1: {
 				uint8_t *data =  _res->_resLvlScreenBackgroundDataTable[num].backgroundSoundTable[ptr->dataNum];
 				if (!data) {
-					warning("No SoundBackgroundData num %d screen %d", ptr->dataNum, num);
+					warning("No backgroundSoundData num %d screen %d", ptr->dataNum, num);
 					break;
 				}
 				ptr->currentSound = READ_LE_UINT16(data); data += 2;
@@ -1348,6 +1348,10 @@ void Game::updateScreenHelper(int num) {
 			break;
 		case 2:
 			ptr->levelData0x2988 = _res->_resLvlScreenBackgroundDataTable[num].backgroundLvlObjectDataTable[ptr->dataNum];
+			if (!ptr->levelData0x2988) {
+				warning("No backgroundLvlObjectData num %d screen %d", ptr->dataNum, num);
+				break;
+			}
 			if (_currentLevel == kLvl_rock) {
 				switch (ptr->objectUpdateType) {
 				case 0:

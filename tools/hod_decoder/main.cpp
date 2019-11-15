@@ -287,7 +287,7 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 		}
 	}
 
-	for (int i = 0; i < 4; ++i) { // backgroundAnimationTable
+	for (int i = 0; i < 8; ++i) { // backgroundAnimationTable
 		const uint32_t offset = READ_LE_UINT32(header); header += 4;
 		if (offset != 0) {
 			const uint8_t *p = data + offset;
