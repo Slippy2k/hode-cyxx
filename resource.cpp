@@ -993,15 +993,15 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 }
 
 void Resource::unloadSssData() {
-	for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
+	for (unsigned int i = 0; i < _sssPreload1Table.count; ++i) {
 		free(_sssPreload1Table[i].ptr);
 		_sssPreload1Table[i].ptr = 0;
 	}
-	for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
+	for (unsigned int i = 0; i < _sssPreloadInfosData.count; ++i) {
 		free(_sssPreloadInfosData[i].data);
 		_sssPreloadInfosData[i].data = 0;
 	}
-	for (int i = 0; i < _sssHdr.pcmCount; ++i) {
+	for (unsigned int i = 0; i < _sssPcmTable.count; ++i) {
 		free(_sssPcmTable[i].ptr);
 		_sssPcmTable[i].ptr = 0;
 	}
