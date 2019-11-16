@@ -453,7 +453,7 @@ static void DecodeLvl(File *fp) {
 	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
 	// screen masks (shadows, grids)
-	static const uint32_t kMaskOffsets = 0x4708;
+	static const uint32_t kMaskOffsets = kBackgroundsOffset + kMaxScreens * (16 + 160);
 	fp->seekAlign(kMaskOffsets);
 	const uint32_t masksOffset = fp->readUint32();
 	const uint32_t masksSize = fp->readUint32();
@@ -644,7 +644,12 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		free(codeData);
 	}
 
-	uint16_t *preloadPcm[preload1Count];
+	struct {
+		int count;
+		uint16_t *num;
+		uint32_t offset;
+		uint32_t size;
+	} preloadPcm[preload1Count];
 
 	if (version == 10 || version == 12) {
 
@@ -653,11 +658,12 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 		fp->seek(preload3Count * 4, SEEK_CUR);
 		for (int i = 0; i < preload1Count; ++i) {
 			const int len = (version == 12) ? fp->readUint16() : fp->readByte();
-			uint16_t *p = (uint16_t *)alloca((len + 1) * sizeof(uint16_t));
-			preloadPcm[i] = p;
-			*p++ = len;
+			preloadPcm[i].count = len;
+			preloadPcm[i].num = (uint16_t *)alloca(len * sizeof(uint16_t));
+			preloadPcm[i].offset = 0;
+			preloadPcm[i].size = 0;
 			for (int j = 0; j < len; ++j) {
-				*p++ = (version == 12) ? fp->readUint16() : fp->readByte();
+				preloadPcm[i].num[j] = (version == 12) ? fp->readUint16() : fp->readByte();
 			}
 		}
 		for (int i = 0; i < preload2Count; ++i) {
@@ -687,6 +693,13 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 
 			int total = 0;
 			for (int j = 0; j < count; ++j) {
+				uint16_t sector       = READ_LE_UINT16(buffer + j * kSizeOfData4);
+				uint16_t size         = READ_LE_UINT16(buffer + j * kSizeOfData4 + 2);
+				uint8_t preload1Index = buffer[j * kSizeOfData4 + 0x12];
+				if (sector != 0xFFFF) {
+					preloadPcm[preload1Index].offset = sector * 2048;
+					preloadPcm[preload1Index].size   = size * 2048;
+				}
 				const int len = READ_LE_UINT32(buffer + j * kSizeOfData4 + 0x1C) * 4;
 				total += len;
 			}
@@ -728,28 +741,23 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 	uint8_t *header = (uint8_t *)alloca(pcmCount * kSizeOfPcm);
 	fp->read(header, pcmCount * kSizeOfPcm);
 
-	// pcm in .LVL are stored following preload table
+	// pcm in .LVL are stored by 'preload blocks'
+	// this reduces seeking but increases data files size as pcm are duplicated
 	if (_isPsx && pcmPreloadCount == -1) {
-
-		const uint32_t pcmOffset = READ_LE_UINT32(header + 4);
-		fp->seek(pcmOffset + baseOffset, SEEK_SET);
-
 		for (int j = 0; j < preload1Count; ++j) {
+			if (preloadPcm[j].size == 0) {
+				continue;
+			}
+			fp->seek(preloadPcm[j].offset, SEEK_SET);
 
-			const uint16_t *p = preloadPcm[j];
-			const int len = *p++;
-			int totalPcmSize = 0;
-			for (int i = 0; i < len; ++i) {
+			const uint16_t *p = preloadPcm[j].num;
+			uint32_t totalPcmSize = 0;
+			for (int i = 0; i < preloadPcm[j].count; ++i) {
 				const int num   = *p++;
 				const int count = READ_LE_UINT16(header + num * kSizeOfPcm + 16);
 				const int size  = count << 9;
 				assert(size != 0);
 				totalPcmSize += size;
-
-				if (j != 0) {
-					// need to seek to next data offset
-					continue;
-				}
 
 				uint8_t *samples = (uint8_t *)malloc(size);
 				if (samples) {
@@ -774,6 +782,8 @@ static void DecodeSss(File *fp, uint32_t baseOffset) {
 					free(samples);
 				}
 			}
+			totalPcmSize = fioAlignSizeTo2048(totalPcmSize);
+			assert(preloadPcm[j].size == totalPcmSize);
 		}
 		return;
 	}
