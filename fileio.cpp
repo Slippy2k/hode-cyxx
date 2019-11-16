@@ -7,6 +7,8 @@
 #include "fileio.h"
 #include "util.h"
 
+static const bool kCheckSectorFileCrc = true;
+
 File::File()
 	: _fp(0) {
 }
@@ -62,19 +64,33 @@ int fioAlignSizeTo2048(int size) {
 
 uint32_t fioUpdateCRC(uint32_t sum, const uint8_t *buf, uint32_t size) {
 	assert((size & 3) == 0);
-	size >>= 2;
-	while (size--) {
-		sum ^= READ_LE_UINT32(buf); buf += 4;
+	for (uint32_t offset = 0; offset < size; offset += 4) {
+		sum ^= READ_LE_UINT32(buf + offset);
 	}
 	return sum;
 }
 
-void SectorFile::refillBuffer() {
-	const int size = fread(_buf, 1, 2048, _fp);
-	assert(size == 2048);
-	const uint32_t crc = fioUpdateCRC(0, _buf, 2048);
-	assert(crc == 0);
-	_bufPos = 0;
+void SectorFile::refillBuffer(uint8_t *ptr) {
+	if (ptr) {
+		static const int kPayloadSize = kFioBufferSize - 4;
+		const int size = fread(ptr, 1, kPayloadSize, _fp);
+		assert(size == kPayloadSize);
+		uint8_t buf[4];
+		const int count = fread(buf, 1, 4, _fp);
+		assert(count == 4);
+		if (kCheckSectorFileCrc) {
+			const uint32_t crc = fioUpdateCRC(0, ptr, kPayloadSize);
+			assert(crc == READ_LE_UINT32(buf));
+		}
+	} else {
+		const int size = fread(_buf, 1, kFioBufferSize, _fp);
+		assert(size == kFioBufferSize);
+		if (kCheckSectorFileCrc) {
+			const uint32_t crc = fioUpdateCRC(0, _buf, kFioBufferSize);
+			assert(crc == 0);
+		}
+		_bufPos = 0;
+	}
 }
 
 void SectorFile::seekAlign(int pos) {
@@ -119,8 +135,7 @@ int SectorFile::read(uint8_t *ptr, int size) {
 		}
 		const int count = (fioAlignSizeTo2048(size) / 2048) - 1;
 		for (int i = 0; i < count; ++i) {
-			refillBuffer();
-			memcpy(ptr, _buf, 2044);
+			refillBuffer(ptr);
 			ptr += 2044;
 			size -= 2044;
 		}

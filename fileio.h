@@ -41,7 +41,7 @@ struct SectorFile : File {
 
 	SectorFile();
 
-	void refillBuffer();
+	void refillBuffer(uint8_t *ptr = 0);
 	virtual void seekAlign(int pos);
 	virtual void seek(int pos, int whence);
 	virtual int read(uint8_t *ptr, int size);
