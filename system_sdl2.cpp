@@ -425,7 +425,7 @@ void System_SDL2::processEvents() {
 			break;
 		case SDL_JOYHATMOTION:
 			if (_joystick) {
-				pad.mask = 0;
+				pad.mask &= ~(SYS_INP_UP | SYS_INP_DOWN | SYS_INP_LEFT | SYS_INP_RIGHT);
 				if (ev.jhat.value & SDL_HAT_UP) {
 					pad.mask |= SYS_INP_UP;
 				}
