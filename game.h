@@ -96,6 +96,7 @@ struct Game {
 	uint32_t _cheats;
 	int _frameMs;
 	int _difficulty;
+	bool _loadingScreenEnabled;
 
 	uint8_t _setupCfgBuffer[kSetupCfgSize];
 
@@ -327,6 +328,7 @@ struct Game {
 	void callLevel_initialize();
 	void callLevel_tick();
 	void callLevel_terminate();
+	void displayLoadingScreen();
 	int displayHintScreen(int num, int pause);
 	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
 	void removeLvlObjectFromList(LvlObject **list, LvlObject *ptr);

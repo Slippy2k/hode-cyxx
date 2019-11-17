@@ -196,27 +196,30 @@ void Resource::loadSetupDat() {
 }
 
 
-void Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
-	if (_isPsx) {
-		return;
+bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
+	if (!_isPsx) {
+		const int offset = _datHdr.hintsImageOffsetTable[num];
+		const int size = _datHdr.hintsImageSizeTable[num];
+		assert(size == 256 * 192);
+		_datFile->seek(offset, SEEK_SET);
+		_datFile->read(dst, size);
+		_datFile->flush();
+		_datFile->read(pal, 768);
+		return true;
 	}
-	const int offset = _datHdr.hintsImageOffsetTable[num];
-	const int size = _datHdr.hintsImageSizeTable[num];
-	assert(size == 256 * 192);
-	_datFile->seek(offset, SEEK_SET);
-	_datFile->read(dst, size);
-	_datFile->flush();
-	_datFile->read(pal, 768);
+	return true;
 }
 
-void Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
+bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
 	if (_loadingImageBuffer) {
 		const uint32_t bufferSize = READ_LE_UINT32(_loadingImageBuffer);
 		const int size = decodeLZW(_loadingImageBuffer + 8, dst);
 		assert(size == 256 * 192);
-		// palette follows compressed bitmap (and uses 8 bits per color)
+		// palette follows compressed bitmap
 		memcpy(pal, _loadingImageBuffer + 8 + bufferSize, 256 * 3);
+		return true;
 	}
+	return false;
 }
 
 void Resource::loadDatMenuBuffers() {

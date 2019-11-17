@@ -31,8 +31,8 @@ Game::Game(System *system, const char *dataPath, const char *savePath, uint32_t 
 	_cheats = cheats;
 
 	_frameMs = kFrameTimeStamp;
-
 	_difficulty = 1;
+	_loadingScreenEnabled = true;
 
 	memset(_screenLvlObjectsList, 0, sizeof(_screenLvlObjectsList));
 	_andyObject = 0;
@@ -2109,6 +2109,9 @@ void Game::drawScreen() {
 }
 
 void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
+	if (_loadingScreenEnabled) {
+		displayLoadingScreen();
+	}
 	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
 	_currentLevel = level;
@@ -2826,6 +2829,14 @@ void Game::callLevel_terminate() {
 	_level = 0;
 }
 
+void Game::displayLoadingScreen() {
+	if (_res->loadDatLoadingImage(_video->_frontLayer, _video->_palette)) {
+		_system->setPalette(_video->_palette, 256, 6);
+		_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+		_system->updateScreen(false);
+	}
+}
+
 int Game::displayHintScreen(int num, int pause) {
 	static const int kQuitYes = 0;
 	static const int kQuitNo = 1;
@@ -2841,10 +2852,11 @@ int Game::displayHintScreen(int num, int pause) {
 		_res->loadDatHintImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
 		confirmQuit = true;
 	}
-	_res->loadDatHintImage(num, _video->_frontLayer, _video->_palette);
-	_system->setPalette(_video->_palette, 256, 6);
-	_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
-	_system->updateScreen(false);
+	if (_res->loadDatHintImage(num, _video->_frontLayer, _video->_palette)) {
+		_system->setPalette(_video->_palette, 256, 6);
+		_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+		_system->updateScreen(false);
+	}
 	do {
 		_system->processEvents();
 		if (confirmQuit) {
