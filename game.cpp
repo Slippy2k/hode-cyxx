@@ -941,31 +941,6 @@ void Game::preloadLevelScreenData(uint8_t num, uint8_t prev) {
 			}
 		}
 	}
-	loadLevelScreenSounds(num);
-}
-
-void Game::loadLevelScreenSounds(int num) {
-	MixerLock ml(&_mix);
-#if 0
-	if (_res->_sssHdr.pcmCount > 0 && _res->_sssPreloadData1) {
-		for (size_t i = 0; i < _res->_sssPreloadData1[num].count; ++i) {
-			const int j = _res->_sssPreloadData1[num].ptr[i];
-			debug(kDebug_GAME, "levelScreen preloadData1 #%d res %d", i, j);
-		}
-	}
-	if (_res->_lvlHdr.spritesCount > 0 && _res->_sssPreloadData2) {
-		for (size_t i = 0; i < _res->_sssPreloadData2[num].count; ++i) {
-			const int j = _res->_sssPreloadData2[num].ptr[i];
-			debug(kDebug_GAME, "levelScreen preloadData2 #%d res %d", i, j);
-		}
-	}
-	if (_res->_sssHdr.preloadInfoCount > 0 && _res->_sssPreloadData3) {
-		for (size_t i = 0; i < _res->_sssPreloadData3[num].count; ++i) {
-			const int j = _res->_sssPreloadData3[num].ptr[i];
-			debug(kDebug_GAME, "levelScreen preloadData3 #%d res %d", i, j);
-		}
-	}
-#endif
 }
 
 void Game::setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2) {

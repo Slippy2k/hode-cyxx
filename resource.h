@@ -449,10 +449,12 @@ struct SssPreloadList {
 };
 
 struct SssPreloadInfoData {
+	uint16_t pcmBlockOffset;
+	uint16_t pcmBlockSize;
 	uint8_t screenNum;
+	uint8_t preload3Index;
 	uint8_t preload1Index;
 	uint8_t preload2Index;
-	uint8_t preload3Index;
 	uint32_t unk1C;
 }; // sizeof == 32 (v10,v12) 68 (v6)
 

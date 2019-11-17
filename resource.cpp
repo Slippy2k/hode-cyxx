@@ -211,7 +211,7 @@ bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
 }
 
 bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
-	if (_loadingImageBuffer) {
+	if (!_isPsx && _loadingImageBuffer) {
 		const uint32_t bufferSize = READ_LE_UINT32(_loadingImageBuffer);
 		const int size = decodeLZW(_loadingImageBuffer + 8, dst);
 		assert(size == 256 * 192);
@@ -857,19 +857,22 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 			const int count = _sssPreloadInfosData[i].count;
 			_sssPreloadInfosData[i].data = (SssPreloadInfoData *)malloc(count * sizeof(SssPreloadInfoData));
 			for (int j = 0; j < count; ++j) {
-				fp->seek(16, SEEK_CUR);
-				_sssPreloadInfosData[i].data[j].screenNum = fp->readByte();
+				SssPreloadInfoData *preloadInfoData = &_sssPreloadInfosData[i].data[j];
+				preloadInfoData->pcmBlockOffset = fp->readUint16();
+				preloadInfoData->pcmBlockSize = fp->readUint16();
+				fp->seek(12, SEEK_CUR);
+				preloadInfoData->screenNum = fp->readByte();
 				const int preload3Index = fp->readByte(); // mst
 				assert(preload3Index < _sssHdr.preloadData3Count);
-				_sssPreloadInfosData[i].data[j].preload3Index = preload3Index;
+				preloadInfoData->preload3Index = preload3Index;
 				const int preload1Index = fp->readByte(); // pcm
 				assert(preload1Index < _sssHdr.preloadData1Count);
-				_sssPreloadInfosData[i].data[j].preload1Index = preload1Index;
+				preloadInfoData->preload1Index = preload1Index;
 				const int preload2Index = fp->readByte(); // lvl
 				assert(preload2Index < _sssHdr.preloadData2Count);
-				_sssPreloadInfosData[i].data[j].preload2Index = preload2Index;
+				preloadInfoData->preload2Index = preload2Index;
 				fp->seek(8, SEEK_CUR);
-				_sssPreloadInfosData[i].data[j].unk1C = fp->readUint32();
+				preloadInfoData->unk1C = fp->readUint32();
 				bytesRead += kSizeOfPreloadInfoData_V10;
 			}
 			for (int j = 0; j < count; ++j) {
