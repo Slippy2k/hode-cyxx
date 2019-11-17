@@ -896,6 +896,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 			free(p);
 		}
 		_sssPreloadInfosData.deallocate();
+		_sssHdr.preloadInfoCount = 0;
 	}
 
 	_sssPcmTable.allocate(_sssHdr.pcmCount);
