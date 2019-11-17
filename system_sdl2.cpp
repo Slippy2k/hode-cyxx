@@ -12,8 +12,6 @@
 
 static const char *kIconBmp = "icon.bmp";
 
-static const int kJoystickCommitValue = 3200;
-
 static int _scalerMultiplier = 3;
 static const Scaler *_scaler = &scaler_xbr;
 static const float _gamma = 1.f;
@@ -36,7 +34,7 @@ struct KeyMapping {
 
 struct System_SDL2 : System {
 	enum {
-		kCopyRectsSize = 200,
+		kJoystickCommitValue = 3200,
 		kKeyMappingsSize = 20,
 		kAudioHz = 22050,
 	};
