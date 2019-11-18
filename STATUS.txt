@@ -1,0 +1,21 @@
+level 1 'rock' - completable
+	infinite wave of monsters screen 6 ?
+
+level 2 'fort' - completable
+
+level 3 'pwr1' - completable
+	glitch in the last screen ? 2 Andy
+
+level 4 'isld' - to check
+	screen 4 - spectre do not hit the bridge (no large explosion sprite)
+	--checkpoint 3 - cannot shoot worm when up (vertical)
+
+level 5 'lava' - completable
+
+level 6 'pwr2' - completable
+
+level 7 'pwr1' - to check
+
+level 8 'pwr2' - to check (--checkpoint 4)
+
+level 9 'dark' - completable
