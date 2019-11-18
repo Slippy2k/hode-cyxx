@@ -20,11 +20,11 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x02:
-		fprintf(_out, "add_sound %d num:%d", READ_LE_UINT16(p + offset + 2), (int8_t)p[offset + 1]);
+		fprintf(_out, "add_sound %d num:%d", (int16_t)READ_LE_UINT16(p + offset + 2), (int8_t)p[offset + 1]);
 		offset += 4;
 		break;
 	case 0x04:
-		fprintf(_out, "remove_sound %d num:%d", READ_LE_UINT16(p + offset + 2), p[offset + 1]);
+		fprintf(_out, "remove_sound %d num:%d", (int16_t)READ_LE_UINT16(p + offset + 2), p[offset + 1]);
 		offset += 4;
 		break;
 	case 0x05:
@@ -56,11 +56,11 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x0D:
-		fprintf(_out, "init_volume_modulation value:%d steps:%d", READ_LE_UINT16(p + offset + 2), READ_LE_UINT32(p + offset + 4));
+		fprintf(_out, "init_volume_modulation value:%d steps:%d", (int16_t)READ_LE_UINT16(p + offset + 2), READ_LE_UINT32(p + offset + 4));
 		offset += 8;
 		break;
 	case 0x0E:
-		fprintf(_out, "init_panning_modulation value:%d steps:%d", READ_LE_UINT16(p + offset + 2), READ_LE_UINT32(p + offset + 8));
+		fprintf(_out, "init_panning_modulation value:%d steps:%d", (int16_t)READ_LE_UINT16(p + offset + 2), READ_LE_UINT32(p + offset + 8));
 		offset += 12;
 		break;
 	case 0x10:
@@ -80,7 +80,7 @@ static uint32_t printSssOpcode(uint32_t offset, const uint8_t *p) {
 		offset += 4;
 		break;
 	case 0x14:
-		fprintf(_out, "set_pause_counter %d", READ_LE_UINT16(p + offset + 2));
+		fprintf(_out, "set_pause_counter %d", (int16_t)READ_LE_UINT16(p + offset + 2));
 		offset += 4;
 		break;
 	case 0x15:
