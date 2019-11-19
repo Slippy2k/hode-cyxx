@@ -7189,7 +7189,7 @@ int Game::mstTask_wait2(Task *t) {
 }
 
 int Game::mstTask_wait3(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_wait3 t %p", t);
+	debug(kDebug_MONSTER, "mstTask_wait3 t %p type:%d bit:%d", t, t->arg1, t->arg2);
 	if (getTaskFlag(t, t->arg2, t->arg1) == 0) {
 		return 1;
 	}
