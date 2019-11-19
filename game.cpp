@@ -4617,24 +4617,24 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 		}
 		ret = 1;
 		if ((_al & 8) != 0) {
+			int mask, type, offset;
 			if (_al & 2) {
-				_al = p[3];
+				mask = p[3];
 			} else {
-				_al = -p[3];
+				mask = -p[3];
 			}
-			int _bl, i;
-			if (_al < 0) {
-				i = (-_al) * 6;
-				updateScreenMaskLar(&_lar1_maskData[i], 0);
-				_bl = 5;
+			if (mask < 0) {
+				offset = (-mask) * 6;
+				updateScreenMaskLar(&_lar1_maskData[offset], 0);
+				type = 5;
 			} else {
-				i = _al * 6;
-				updateScreenMaskLar(&_lar1_maskData[i], 1);
-				_bl = 2;
+				offset = mask * 6;
+				updateScreenMaskLar(&_lar1_maskData[offset], 1);
+				type = 2;
 			}
-			LvlObject *o = findLvlObject2(0, _lar1_maskData[i + 5], _lar1_maskData[i + 4]);
+			LvlObject *o = findLvlObject2(0, _lar1_maskData[offset + 5], _lar1_maskData[offset + 4]);
 			if (o) {
-				o->objectUpdateType = _bl;
+				o->objectUpdateType = type;
 			}
 			return ret;
 		}
@@ -4715,6 +4715,7 @@ void Game::updateScreenMaskLar(uint8_t *p, uint8_t flag) {
 		const uint8_t screenNum = p[4];
 		uint32_t maskOffset = screenMaskOffset(_res->_screensBasePos[screenNum].u + p[2], _res->_screensBasePos[screenNum].v + p[3]);
 		uint8_t *dst = _screenMaskBuffer + maskOffset;
+		assert(p[0] < 6);
 		const int16_t *src = _lar_screenMaskOffsets[p[0]];
 		const int count = *src++;
 		if (!flag) {
