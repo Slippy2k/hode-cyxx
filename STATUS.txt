@@ -13,7 +13,8 @@ level 5 'lava' - completable
 
 level 6 'pwr2' - completable
 
-level 7 'pwr1' - to check (--checkpoint 2)
+level 7 'pwr1' - to check (--checkpoint 3)
+	screen 9 - gate not open
 
 level 8 'pwr2' - to check (--checkpoint 4)
 	need to start checkpoint 1 so checkpoint 4 is triggered in screen 6 ?

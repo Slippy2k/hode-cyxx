@@ -831,7 +831,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 		_lar1_switchesData[offset + 1] |= 0x40;
 	}
 // 452630
-	static const uint8_t data[] = { 0, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	static const uint8_t data[] = { 0, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	for (int i = _lar1_setupScreen24Data[num * 3 + 1]; i < 13; ++i) {
 		const int j = i;
 		const uint8_t _al = (data[j] << 4) | 2;
@@ -856,10 +856,8 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 		}
 		_g->_mstLevelGatesMask |= mask;
 	}
-	_lar1_gatesData[2] &= 0xF;
-	_lar1_gatesData[2] |= 0x30;
-	_lar1_gatesData[3] &= 0xF;
-	_lar1_gatesData[3] |= 0x30;
+	_lar1_gatesData[0x8] = (_lar1_gatesData[0x8] & 0xF) | 0x30;
+	_lar1_gatesData[0xC] = (_lar1_gatesData[0xC] & 0xF) | 0x30;
 }
 
 void Level_lar1::setupScreenCheckpoint_lar1_screen24_initAndy(int num) {
@@ -878,6 +876,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initAndy(int num) {
 	_andyObject->anim = dat->anim;
 	_andyObject->flags1 &= 0xFFCF;
 	_andyObject->flags1 |= (dat->flags2 >> 10) & 0x30;
+	_andyObject->screenNum = dat->screenNum;
 // 452990
 	static const uint8_t data2[5] = { 7, 6, 0, 4, 5 };
 	for (int i = 0; i < 5; ++i) {
