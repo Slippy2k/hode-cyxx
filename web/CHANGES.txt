@@ -1,4 +1,5 @@
 * release 0.2.3
+	- fixed double spectre fireball animations in 'lar1' and 'lar2'
 	- fixed level transition from 'pwr1' to 'isld'
 	- fixed screen state for 'lava' screen 15
 
