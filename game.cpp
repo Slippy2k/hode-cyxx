@@ -2098,7 +2098,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	_mix._lock(0);
 	_mstAndyCurrentScreenNum = -1;
 	_rnd.initTable();
-	const int screenNum = _level->getCheckpointData(_level->_checkpoint)->screenNum;
+	const int screenNum = _level->getCheckpointData(checkpoint)->screenNum;
 	if (_mstDisabled) {
 		_specialAnimMask = 0;
 		_mstCurrentAnim = 0;
@@ -2108,7 +2108,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		_currentScreen = screenNum; // bugfix: clear previous level screen number
 		initMstCode();
 	}
-	preloadLevelScreenData(screenNum, kNoScreen);
 	memset(_level->_screenCounterTable, 0, sizeof(_level->_screenCounterTable));
 	clearDeclaredLvlObjectsList();
 	initLvlObjects();
@@ -2130,9 +2129,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		if (_system->inp.quit) {
 			return;
 		}
-	}
-	if (_res->_sssHdr.infosDataCount != 0) {
-		resetSound();
 	}
 	_endLevel = false;
 	resetShootLvlObjectDataTable();

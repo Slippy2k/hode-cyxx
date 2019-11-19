@@ -1,3 +1,6 @@
+* release 0.2.3
+	- fixed level transition from 'pwr1' to 'isld'
+
 * release 0.2.2
 	- fixed lever in 'lava' level screen 2
 	- fixed masking with plants in 'pwr1' level

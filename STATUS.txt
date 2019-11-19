@@ -4,7 +4,6 @@ level 1 'rock' - completable
 level 2 'fort' - completable
 
 level 3 'pwr1' - completable
-	glitch in the last screen ? 2 Andy
 
 level 4 'isld' - to check (--checkpoint 3)
 	screen 4 - spectre do not hit the bridge (no large explosion sprite)
