@@ -1,5 +1,6 @@
 * release 0.2.3
 	- fixed level transition from 'pwr1' to 'isld'
+	- fixed screen state for 'lava' screen 15
 
 * release 0.2.2
 	- fixed lever in 'lava' level screen 2

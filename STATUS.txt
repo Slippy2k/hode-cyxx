@@ -1,14 +1,15 @@
 level 1 'rock' - completable
-	infinite wave of monsters screen 6 ?
+	screen 6 - infinite wave of monsters
 
 level 2 'fort' - completable
 
 level 3 'pwr1' - completable
 
-level 4 'isld' - to check (--checkpoint 3)
-	screen 4 - spectre do not hit the bridge (no large explosion sprite)
+level 4 'isld' - completable
+	screen 4 - spectres do not hit the bridge (no large explosion sprite)
 
 level 5 'lava' - completable
+	screen 7 - spiders do not move close to Andy
 
 level 6 'pwr2' - completable
 
