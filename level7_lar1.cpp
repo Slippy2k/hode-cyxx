@@ -227,7 +227,7 @@ void Level_lar1::postScreenUpdate_lar1_screen5() {
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox) && (_lar1_gatesData[0x18] & 0xF0) == 0x10) {
 				_checkpoint = 2;
-				_screenCounterTable[26] = (_lar1_gatesData[0x1C] < 16) ? 1 : 3;
+				_screenCounterTable[26] = (_lar1_gatesData[0x1C] & 0xF0) != 0 ? 3 : 1;
 			}
 		}
 	}
@@ -244,10 +244,9 @@ void Level_lar1::postScreenUpdate_lar1_screen8() {
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				_checkpoint = 3;
-				const int a = (_lar1_gatesData[0x18] & 0xF0) != 0 ? 5 : 4;
-				_screenCounterTable[26] = a;
+				_screenCounterTable[26] = (_lar1_gatesData[0x18] & 0xF0) != 0 ? 5 : 4;
 				if ((_lar1_gatesData[0x1C] & 0xF0) == 0x10) {
-					_screenCounterTable[26] = a + 2;
+					_screenCounterTable[26] += 2;
 				}
 			}
 		}
@@ -861,27 +860,34 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 }
 
 void Level_lar1::setupScreenCheckpoint_lar1_screen24_initAndy(int num) {
-// 45279
-	static const uint8_t data1[8 * 6] = {
-		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x01,
-		0x01, 0x01, 0x08, 0x01, 0x01, 0x01, 0x01, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
-		0x01, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x01, 0x01, 0x03, 0x01, 0x01, 0x00, 0x01, 0x01
+// 452798
+	static const uint8_t data[8 * 6] = {
+		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, // checkpoint, gate states
+		0x08, 0x00, 0x01, 0x00, 0x00, 0x00,
+		0x02, 0x01, 0x00, 0x01, 0x01, 0x01,
+		0x08, 0x01, 0x01, 0x01, 0x01, 0x01,
+		0x03, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x03, 0x00, 0x01, 0x00, 0x00, 0x00,
+		0x03, 0x01, 0x00, 0x00, 0x01, 0x01,
+		0x03, 0x01, 0x01, 0x00, 0x01, 0x01
 	};
-	const uint8_t *p = &data1[(num & 7) * 6];
+	const uint8_t *p = &data[(num & 7) * 6];
 	num = *p++;
 	const CheckpointData *dat = &_lar1_checkpointData[num];
 	_andyObject->xPos = dat->xPos;
 	_andyObject->yPos = dat->yPos;
 	_andyObject->flags2 = dat->flags2;
 	_andyObject->anim = dat->anim;
-	_andyObject->flags1 &= 0xFFCF;
+	_andyObject->flags1 &= ~0x30;
 	_andyObject->flags1 |= (dat->flags2 >> 10) & 0x30;
 	_andyObject->screenNum = dat->screenNum;
+	_andyObject->frame = 0;
+	_g->setupLvlObjectBitmap(_andyObject);
 // 452990
-	static const uint8_t data2[5] = { 7, 6, 0, 4, 5 };
+	static const uint8_t gatesNum[5] = { 7, 6, 0, 4, 5 };
 	for (int i = 0; i < 5; ++i) {
 		uint8_t _al = *p++;
-		num = data2[i];
+		num = gatesNum[i];
 		_al <<= 4;
 		_al |= _lar1_gatesData[num * 4] & 15;
 		_lar1_gatesData[num * 4] = _al;
@@ -898,8 +904,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initAndy(int num) {
 void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 	setupScreenCheckpoint_lar1_screen24_initGates();
 	const int num = _checkpoint;
-	const int maskIndex = _lar1_setupScreen24Data[num * 3];
-	for (int b = maskIndex; b < 15; ++b) {
+	for (int b = _lar1_setupScreen24Data[num * 3]; b < 15; ++b) {
 		const int offset = b * 6;
 		Game::_lar1_maskData[offset + 1] = 1;
 		_g->updateScreenMaskLar(Game::_lar1_maskData + offset, 0);
@@ -909,7 +914,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 		}
 	}
 // 408A53
-	for (int b = maskIndex; b != 0; --b) {
+	for (int b = _lar1_setupScreen24Data[num * 3]; b != 0; --b) {
 // 408B28
 		const int offset = (b - 1) * 6;
 		Game::_lar1_maskData[offset + 1] = 0;

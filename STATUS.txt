@@ -15,6 +15,8 @@ level 6 'pwr2' - completable
 
 level 7 'pwr1' - to check (--checkpoint 3)
 	screen 9 - gate not open
+		setupScreenCheckpoint_lar1_screen24
+			_screenCounterTable should be set to 5 ?
 
 level 8 'pwr2' - to check (--checkpoint 4)
 	need to start checkpoint 1 so checkpoint 4 is triggered in screen 6 ?
