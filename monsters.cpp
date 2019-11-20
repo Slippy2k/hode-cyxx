@@ -1055,7 +1055,9 @@ void Game::executeMstCode() {
 		if (dat) {
 			if (energy > 0) {
 // 419C30
-				if (p->type == 2) {
+				if (_cheats & kCheatOneHitSpecialPowers) {
+					m->localVars[7] = 0;
+				} else if (p->type == 2) {
 					m->localVars[7] -= 4;
 					if (m->localVars[7] < 0) {
 						m->localVars[7] = 0;

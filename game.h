@@ -41,8 +41,9 @@ enum {
 enum {
 	kCheatSpectreFireballNoHit = 1 << 0,
 	kCheatOneHitPlasmaCannon = 1 << 1,
-	kCheatWalkOnLava = 1 << 2,
-	kCheatGateNoCrush = 1 << 3,
+	kCheatOneHitSpecialPowers = 1 << 2,
+	kCheatWalkOnLava = 1 << 3,
+	kCheatGateNoCrush = 1 << 4,
 };
 
 struct Game {
