@@ -406,8 +406,7 @@ void Level_lar1::postScreenUpdate_lar1_screen18() {
 }
 
 void Level_lar1::postScreenUpdate_lar1_screen19() {
-	switch (_screenCounterTable[19]) {
-	case 0:
+	if (_screenCounterTable[19] == 0) {
 		if (_res->_currentScreenResourceNum == 19) {
 			BoundingBox b = { 160, 0, 209, 71 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
@@ -434,8 +433,7 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 				_g->clearLvlObjectsList0();
 			}
 		}
-		break;
-	case 2:
+	} else if (_res->_screensState[19].s0 == 2) {
 		++_screenCounterTable[19];
 		if (_screenCounterTable[19] == 2) {
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
@@ -444,7 +442,6 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 			_res->_screensState[19].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
 		}
-		break;
 	}
 }
 
