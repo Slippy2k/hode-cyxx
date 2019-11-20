@@ -4709,6 +4709,19 @@ int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, in
 	return ret;
 }
 
+void Game::dumpSwitchesLar(int switchesCount, const uint8_t *switchesData, const BoundingBox *switchesBoundingBox, int gatesCount, const uint8_t *gatesData) {
+	fprintf(stdout, "_mstAndyVarMask 0x%x _mstLevelGatesMask 0x%x\n", _mstAndyVarMask, _mstLevelGatesMask);
+	for (int i = 0; i < gatesCount; ++i) {
+		const uint8_t *p = gatesData + i * 4;
+		fprintf(stdout, "gate %2d: state 0x%02x\n", i, p[0]);
+	}
+	for (int i = 0; i < switchesCount; ++i) {
+		const uint8_t *p = switchesData + i * 4;
+		const BoundingBox *b = &switchesBoundingBox[i];
+		fprintf(stdout, "switch %2d: screen %2d (%3d,%3d,%3d,%3d) flags 0x%02x sprite %2d gate %2d\n", i, p[0], b->x1, b->y1, b->x2, b->y2, p[1], (int8_t)p[2], p[3]);
+	}
+}
+
 void Game::updateScreenMaskLar(uint8_t *p, uint8_t flag) {
 	if (p[1] != flag) {
 		p[1] = flag;

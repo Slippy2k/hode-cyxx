@@ -79,10 +79,19 @@ Level *Level_lar1_create() {
 }
 
 static uint8_t _lar1_gatesData[13 * 4] = {
-        0x02, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x32, 0x09, 0x02, 0x00, 0x32, 0x0E, 0x02, 0x00,
-        0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-        0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-        0x02, 0x00, 0x00, 0x00
+	0x02, 0x00, 0x00, 0x00, // screen 4
+	0x12, 0x00, 0x00, 0x00, // screen 5
+	0x32, 0x09, 0x02, 0x00, // screen 5
+	0x32, 0x0E, 0x02, 0x00, // screen 5
+	0x02, 0x00, 0x00, 0x00, // screen 8
+	0x02, 0x00, 0x00, 0x00, // screen 8
+	0x02, 0x00, 0x00, 0x00, // screen 9
+	0x02, 0x00, 0x00, 0x00, // screen 13
+	0x02, 0x00, 0x00, 0x00, // screen 14
+	0x02, 0x00, 0x00, 0x00, // screen 15
+	0x02, 0x00, 0x00, 0x00, // screen 16
+	0x02, 0x00, 0x00, 0x00, // screen 18
+	0x02, 0x00, 0x00, 0x00  // screen 18
 };
 
 static BoundingBox _lar1_switchesBbox[24] = {
@@ -225,9 +234,9 @@ void Level_lar1::postScreenUpdate_lar1_screen5() {
 		if (_checkpoint >= 1 && _checkpoint <= 3) {
 			BoundingBox b = { 194, 0, 255, 88 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (_g->clipBoundingBox(&b, &data->boundingBox) && (_lar1_gatesData[0x18] & 0xF0) == 0x10) {
+			if (_g->clipBoundingBox(&b, &data->boundingBox) && (_lar1_gatesData[6 * 4] & 0xF0) == 0x10) {
 				_checkpoint = 2;
-				_screenCounterTable[26] = (_lar1_gatesData[0x1C] & 0xF0) != 0 ? 3 : 1;
+				_screenCounterTable[26] = (_lar1_gatesData[7 * 4] & 0xF0) != 0 ? 3 : 1;
 			}
 		}
 	}
@@ -244,8 +253,8 @@ void Level_lar1::postScreenUpdate_lar1_screen8() {
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (_g->clipBoundingBox(&b, &data->boundingBox)) {
 				_checkpoint = 3;
-				_screenCounterTable[26] = (_lar1_gatesData[0x18] & 0xF0) != 0 ? 5 : 4;
-				if ((_lar1_gatesData[0x1C] & 0xF0) == 0x10) {
+				_screenCounterTable[26] = (_lar1_gatesData[6 * 4] & 0xF0) != 0 ? 5 : 4;
+				if ((_lar1_gatesData[7 * 4] & 0xF0) == 0x10) {
 					_screenCounterTable[26] += 2;
 				}
 			}
@@ -413,7 +422,7 @@ void Level_lar1::postScreenUpdate_lar1_screen16() {
 
 void Level_lar1::postScreenUpdate_lar1_screen18() {
 	LvlObject *o1 = _g->findLvlObject(2, 0, 18);
-	_g->updateGatesLar(o1, &_lar1_gatesData[11  * 4], 11);
+	_g->updateGatesLar(o1, &_lar1_gatesData[11 * 4], 11);
 	LvlObject *o2 = _g->findLvlObject(2, 1, 18);
 	_g->updateGatesLar(o2, &_lar1_gatesData[12 * 4], 12);
 	if ((_lar1_switchesData[0x59] & 0x40) == 0 && (_lar1_switchesData[0x59] & 0x80) != 0) {
@@ -429,7 +438,8 @@ void Level_lar1::postScreenUpdate_lar1_screen18() {
 }
 
 void Level_lar1::postScreenUpdate_lar1_screen19() {
-	if (_screenCounterTable[19] == 0) {
+	switch (_screenCounterTable[19]) {
+	case 0:
 		if (_res->_currentScreenResourceNum == 19) {
 			BoundingBox b = { 160, 0, 209, 71 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
@@ -439,16 +449,16 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 					_paf->play(13);
 					_paf->unload(13);
 					_video->clearPalette();
-					++_screenCounterTable[19];
-					_g->updateScreen(_andyObject->screenNum);
-					Game::_lar1_maskData[12 * 6 + 1] = 0;
-					Game::_lar1_maskData[13 * 6 + 1] = 0;
 				}
+				++_screenCounterTable[19]; // bugfix: conditioned with _pafSkipCutscenes
+				_g->updateScreen(_andyObject->screenNum);
+				Game::_lar1_maskData[12 * 6 + 1] = 0;
+				Game::_lar1_maskData[13 * 6 + 1] = 0;
 				_andyObject->xPos = 204;
 				_andyObject->yPos = 25;
 				_andyObject->anim = 232;
 				_andyObject->frame = 0;
-				_andyObject->flags1 = (_andyObject->flags1 & 0xFFDF) | 0x10;
+				_andyObject->flags1 = (_andyObject->flags1 & ~0x20) | 0x10;
 				_andyObject->directionKeyMask = 0;
 				_andyObject->actionKeyMask = 0;
 				_g->setupLvlObjectBitmap(_andyObject);
@@ -456,7 +466,8 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 				_g->clearLvlObjectsList0();
 			}
 		}
-	} else if (_res->_screensState[19].s0 == 2) {
+		break;
+	case 2:
 		++_screenCounterTable[19];
 		if (_screenCounterTable[19] == 2) {
 			_res->_resLvlScreenBackgroundDataTable[19].currentMaskId = 1;
@@ -465,6 +476,7 @@ void Level_lar1::postScreenUpdate_lar1_screen19() {
 			_res->_screensState[19].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[19].currentBackgroundId = 1;
 		}
+		break;
 	}
 }
 
@@ -587,9 +599,9 @@ void Level_lar1::preScreenUpdate_lar1_screen2() {
 void Level_lar1::preScreenUpdate_lar1_screen6() {
 	if (_res->_currentScreenResourceNum == 6) {
 		if (_checkpoint >= 1 && _checkpoint <= 3) {
-			if ((_lar1_gatesData[0x18] & 0xF0) == 0) {
+			if ((_lar1_gatesData[6 * 4] & 0xF0) == 0) {
 				_checkpoint = 2;
-				_screenCounterTable[26] = ((_lar1_gatesData[0x1C] & 0xF0) != 0) ? 2 : 0;
+				_screenCounterTable[26] = ((_lar1_gatesData[7 * 4] & 0xF0) != 0) ? 2 : 0;
 			}
 		}
 	}
@@ -610,7 +622,7 @@ void Level_lar1::preScreenUpdate_lar1_screen10() {
 void Level_lar1::preScreenUpdate_lar1_screen11() {
 	if (_res->_currentScreenResourceNum == 11) {
 		if (_checkpoint >= 2 && _checkpoint <= 3) {
-			if ((_lar1_gatesData[0x1C] & 0xF) == 1 && (_lar1_gatesData[0x18] & 0xF) == 1) {
+			if ((_lar1_gatesData[7 * 4] & 0xF) == 1 && (_lar1_gatesData[6 * 4] & 0xF) == 1) {
 				_checkpoint = 4;
 			}
 		}
@@ -680,8 +692,7 @@ void Level_lar1::preScreenUpdate_lar1_screen17() {
 
 void Level_lar1::preScreenUpdate_lar1_screen18() {
 	if (_checkpoint >= 7) {
-		_lar1_gatesData[0x30] &= 0xF;
-		_lar1_gatesData[0x30] |= 0x10;
+		_lar1_gatesData[12 * 4] = (_lar1_gatesData[12 * 4] & 0xF) | 0x10;
 	}
 	if (_res->_currentScreenResourceNum == 18) {
 		setLvlObjectUpdateType3_lar1(_g, 18);
@@ -727,8 +738,7 @@ void Level_lar1::preScreenUpdate_lar1_screen23() {
 	if (_res->_currentScreenResourceNum == 23) {
 		setLvlObjectUpdateType3_lar1(_g, 23);
 		if (_g->_plasmaCannonFlags & 2) {
-			_lar1_gatesData[0x28] &= 0xF;
-			_lar1_gatesData[0x28] |= 0x10;
+			_lar1_gatesData[10 * 4] = (_lar1_gatesData[10 * 4] & 0xF) | 0x10;
 		}
 	}
 }
@@ -855,8 +865,8 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24_initGates() {
 		}
 		_g->_mstLevelGatesMask |= mask;
 	}
-	_lar1_gatesData[0x8] = (_lar1_gatesData[0x8] & 0xF) | 0x30;
-	_lar1_gatesData[0xC] = (_lar1_gatesData[0xC] & 0xF) | 0x30;
+	_lar1_gatesData[2 * 4] = (_lar1_gatesData[2 * 4] & 0xF) | 0x30;
+	_lar1_gatesData[3 * 4] = (_lar1_gatesData[3 * 4] & 0xF) | 0x30;
 }
 
 void Level_lar1::setupScreenCheckpoint_lar1_screen24_initAndy(int num) {
@@ -931,6 +941,9 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 			_screenCounterTable[26] = 4;
 		}
 		setupScreenCheckpoint_lar1_screen24_initAndy(_screenCounterTable[26]);
+	}
+	if (g_debugMask & kDebug_SWITCHES) {
+		_g->dumpSwitchesLar(24, _lar1_switchesData, _lar1_switchesBbox, 13, _lar1_gatesData);
 	}
 }
 
