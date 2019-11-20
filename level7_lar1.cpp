@@ -277,7 +277,8 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 				0x09, 0xF9, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x04, 0xF8, 0xF7, 0x00, 0x04, 0x00, 0x00, 0x00, 0x04
 			};
 			const uint8_t num = (_andyObject->flags0 >> 5) & 7;
-			if (data[counter * 4 + 2] == num || data[counter * 4 + 3] == num) {
+			const int offset = counter * 4;
+			if (data[offset + 2] == num || data[offset + 3] == num) {
 				BoundingBox b[] = {
 					{ 205,   0, 227,  97 },
 					{ 200,  16, 207,  55 },
@@ -291,41 +292,8 @@ void Level_lar1::postScreenUpdate_lar1_screen12() {
 				AndyLvlObjectData *andyData = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 				if (_g->clipBoundingBox(&b[counter], &andyData->boundingBox)) {
 					++_screenCounterTable[12];
-					uint8_t _bl;
-					int _al = (int8_t)data[counter * 4];
-					if (_al != 0) {
-						if (_al < 0) {
-							_al = -_al * 6;
-							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 0);
-							_bl = 5;
-						} else {
-							_al *= 6;
-							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 1);
-							_bl = 2;
-						}
-// 40751B
-						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_maskData[_al + 5], Game::_lar1_maskData[_al + 4]);
-						if (o) {
-							o->objectUpdateType = _bl;
-						}
-					}
-// 407536
-					_al = (int8_t)data[counter * 4 + 1];
-					if (_al != 0) {
-						if (_al < 0) {
-							_al = -_al * 6;
-							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 0);
-							_bl = 5;
-						} else {
-							_al *= 6;
-							_g->updateScreenMaskLar(Game::_lar1_maskData + _al, 1);
-							_bl = 2;
-						}
-						LvlObject *o = _g->findLvlObject2(0, Game::_lar1_maskData[_al + 5], Game::_lar1_maskData[_al + 4]);
-						if (o) {
-							o->objectUpdateType = _bl;
-						}
-					}
+					_g->updateGateMaskLar((int8_t)data[offset]);
+					_g->updateGateMaskLar((int8_t)data[offset + 1]);
 				}
 			}
 		}

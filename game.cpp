@@ -4617,25 +4617,8 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 		}
 		ret = 1;
 		if ((_al & 8) != 0) {
-			int mask, type, offset;
-			if (_al & 2) {
-				mask = p[3];
-			} else {
-				mask = -p[3];
-			}
-			if (mask < 0) {
-				offset = (-mask) * 6;
-				updateScreenMaskLar(&_lar1_maskData[offset], 0);
-				type = 5;
-			} else {
-				offset = mask * 6;
-				updateScreenMaskLar(&_lar1_maskData[offset], 1);
-				type = 2;
-			}
-			LvlObject *o = findLvlObject2(0, _lar1_maskData[offset + 5], _lar1_maskData[offset + 4]);
-			if (o) {
-				o->objectUpdateType = type;
-			}
+			const int mask = (_al & 2) != 0 ? p[3] : -p[3];
+			updateGateMaskLar(mask);
 			return ret;
 		}
 // 40699A
@@ -4743,6 +4726,25 @@ void Game::updateScreenMaskLar(uint8_t *p, uint8_t flag) {
 				dst += offset;
 				*dst |= 8;
 			}
+		}
+	}
+}
+
+void Game::updateGateMaskLar(int num) {
+	if (num != 0) {
+		int offset, type;
+		if (num < 0) {
+			offset = -num * 6;
+			updateScreenMaskLar(_lar1_maskData + offset, 0);
+			type = 5;
+		} else {
+			offset = num * 6;
+			updateScreenMaskLar(_lar1_maskData + offset, 1);
+			type = 2;
+		}
+		LvlObject *o = findLvlObject2(0, _lar1_maskData[offset + 5], _lar1_maskData[offset + 4]);
+		if (o) {
+			o->objectUpdateType = type;
 		}
 	}
 }

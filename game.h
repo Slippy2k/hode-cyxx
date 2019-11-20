@@ -368,6 +368,7 @@ struct Game {
 	int updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int switchNum, int anim, const BoundingBox *switchBoundingBox);
 	void dumpSwitchesLar(int switchesCount, const uint8_t *switchesData, const BoundingBox *switchesBoundingBox, int gatesCount, const uint8_t *gatesData);
 	void updateScreenMaskLar(uint8_t *p, uint8_t flag);
+	void updateGateMaskLar(int num);
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
 	void resetWormHoleSprites();
 	void updateWormHoleSprites();
