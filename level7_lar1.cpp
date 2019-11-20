@@ -317,7 +317,7 @@ void Level_lar1::postScreenUpdate_lar1_screen14() {
 					_g->_currentLevelCheckpoint = _checkpoint;
 					if (!_paf->_skipCutscenes) {
 						_paf->play(11);
-						_paf->unload();
+						_paf->unload(11);
 						_video->clearPalette();
 					}
 					_g->restartLevel();
@@ -903,7 +903,7 @@ void Level_lar1::setupScreenCheckpoint_lar1_screen24() {
 // 408BE5
 	if (num == 2 || num == 3) {
 		if (_screenCounterTable[26] == 0 && num == 3) {
-			_screenCounterTable[26] = 4;
+			_screenCounterTable[26] = 5; // bugfix: original is 4, but gate 6 (screen 8) will be closed
 		}
 		setupScreenCheckpoint_lar1_screen24_initAndy(_screenCounterTable[26]);
 	}
