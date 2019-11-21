@@ -169,10 +169,10 @@ struct Game {
 	uint8_t _mstOp67_flags1;
 	uint16_t _mstOp67_unk;
 	int _mstOp67_x1, _mstOp67_x2, _mstOp67_y1, _mstOp67_y2;
-	uint8_t _mstOp67_screenNum;
+	int8_t _mstOp67_screenNum;
 	uint16_t _mstOp68_flags1;
 	int _mstOp68_x1, _mstOp68_x2, _mstOp68_y1, _mstOp68_y2;
-	uint8_t _mstOp68_screenNum;
+	int8_t _mstOp68_screenNum;
 	uint32_t _mstLevelGatesMask;
 	int _runTaskOpcodesCount;
 	int32_t _mstVars[kMaxVars];
@@ -403,9 +403,9 @@ struct Game {
 	int mstTaskSetNextWalkCode(Task *t);
 
 	void mstBoundingBoxClear(MonsterObject1 *m, int dir);
-	int mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2);
+	int mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) const;
 	int mstBoundingBoxUpdate(int num, int monster1Index, int x1, int y1, int x2, int y2);
-	int mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2);
+	int mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) const;
 
 	void mstTaskSetMonster2ScreenPosition(Task *t);
 	int getMstDistance(int y, const AndyShootData *p) const;

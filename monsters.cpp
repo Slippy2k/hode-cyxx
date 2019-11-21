@@ -459,7 +459,7 @@ void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
 	m->bboxNum[dir] = 0xFF;
 }
 
-int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) {
+int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) const {
 	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
 		const MstBoundingBox *p = &_mstBoundingBoxesTable[i];
 		if (p->monster1Index != 0xFF && num != p->monster1Index) {
@@ -500,9 +500,9 @@ int Game::mstBoundingBoxUpdate(int num, int monster1Index, int x1, int y1, int x
 	return num;
 }
 
-int Game::mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) {
+int Game::mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) const {
 	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
-		MstBoundingBox *p = &_mstBoundingBoxesTable[i];
+		const MstBoundingBox *p = &_mstBoundingBoxesTable[i];
 		if (p->monster1Index == 0xFF || p->monster1Index == num) {
 			continue;
 		}
@@ -864,12 +864,12 @@ void Game::resetMstCode() {
 	_mstBoundingBoxesCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
-	_mstOp67_screenNum = kNoScreen;
+	_mstOp67_screenNum = -1;
 	_mstOp68_x1 = 256;
 	_mstOp68_x2 = 256;
 	_mstOp68_y1 = 0;
 	_mstOp68_y2 = 0;
-	_mstOp68_screenNum = kNoScreen;
+	_mstOp68_screenNum = -1;
 	_mstLevelGatesMask = 0;
 	// _mstLevelGatesTestMask = 0xFFFFFFFF;
 	_mstAndyVarMask = 0;
@@ -2583,7 +2583,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			_mstTemp_y1 = m->yMstPos + m50Unk1->yPos;
 			_mstTemp_x2 = _mstTemp_x1 + m50Unk1->width - 1;
 			_mstTemp_y2 = _mstTemp_y1 + m50Unk1->height - 1;
-			if ((m->monsterInfos[946] & 4) != 0 && mstBoundingBoxCollides1(m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
+			if ((m->monsterInfos[946] & 4) != 0 && mstBoundingBoxCollides1(m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2) != 0) {
 				continue;
 			}
 			if (m50Unk1->width != 0 && getMstDistance((m->monsterInfos[946] & 2) != 0 ? var14->boundingBox.y2 : m->yMstPos, var14) >= 0) {
@@ -4613,10 +4613,10 @@ int Game::mstTask_main(Task *t) {
 		case 226: { // 68 - add_monster_group
 				const int num = READ_LE_UINT16(p + 2);
 				const MstOp226Data *m226Data = &_res->_mstOp226Data[num];
-				int _edi  = _res->_mstPointOffsets[_currentScreen].xOffset; // xOffset
-				int var14 = _res->_mstPointOffsets[_currentScreen].yOffset; // yOffset
-				int var1C = 0;
-				int var8  = 0;
+				int _edi = _res->_mstPointOffsets[_currentScreen].xOffset;
+				int yPos = _res->_mstPointOffsets[_currentScreen].yOffset;
+				int countRight = 0; // var1C
+				int countLeft  = 0; // var8
 				int _ecx  = m226Data->unk4 * 256;
 				int _edx  = _edi + 256;
 				_edi -= _ecx;
@@ -4633,56 +4633,54 @@ int Game::mstTask_main(Task *t) {
 					if (m->xMstPos < _edi || m->xMstPos > var20) {
 						continue;
 					}
-					if (m->yMstPos < var14 || m->yMstPos > var14 + 192) {
+					if (m->yMstPos < yPos || m->yMstPos > yPos + 192) {
 						continue;
 					}
 					if (_mstAndyLevelPosX > m->xMstPos) {
-						++var8;
+						++countLeft;
 					} else {
-						++var1C;
+						++countRight;
 					}
 				}
 				t->flags |= 0x80;
-				_edi = var1C;
-				_edx = var8;
-				int _ebx = var1C + var8;
-				if (_ebx >= m226Data->unk3) {
+				const int total = countRight + countLeft; // _ebx
+				if (total >= m226Data->unk3) {
 					break;
 				}
-				_edi += var8;
-				_ecx = m226Data->unk3 - _edi;
-				_edi = m226Data->unk1;
-				if (var8 >= _edi) {
-					_edi = 0;
+				_ecx = m226Data->unk3 - total;
+
+				int countType1 = m226Data->unk1; // _edi
+				if (countLeft >= countType1) {
+					countType1 = 0;
 				} else {
-					_edi -= var8;
+					countType1 -= countLeft;
 				}
-				int _esi = m226Data->unk2;
-				if (var1C >= _esi) {
-					_esi = 0;
+				int countType2 = m226Data->unk2; // _esi
+				if (countRight >= countType2) {
+					countType2 = 0;
 				} else {
-					_esi -= var1C;
+					countType2 -= countRight;
 				}
-				if (_edi != 0) {
+				if (countType1 != 0) {
 					if (_mstOp67_screenNum < 0) {
 						if (_mstOp67_x2 >= -_mstAndyScreenPosX && _mstOp67_x1 <= -_mstAndyScreenPosX * 2) {
-							_edi = 0;
+							countType1 = 0;
 						}
 					} else if (_mstOp67_screenNum == _currentScreen) {
-						_edi = 0;
+						countType1 = 0;
 					}
 				}
-				if (_esi != 0) {
+				if (countType2 != 0) {
 					if (_mstOp68_screenNum < 0) {
 						if (_mstOp68_x2 >= -_mstAndyScreenPosX && _mstOp68_x1 <= -_mstAndyScreenPosX * 2) {
-							_esi = 0;
+							countType2 = 0;
 						}
 					} else if (_mstOp68_screenNum == _currentScreen) {
-						_esi = 0;
+						countType2 = 0;
 					}
 				}
-				if (_edi != 0 || _esi != 0) {
-					mstOp68_addMonsterGroup(t, _res->_mstMonsterInfos + m226Data->unk0 * kMonsterInfoDataSize, _edi, _esi, _ecx, m226Data->unk6);
+				if (countType1 != 0 || countType2 != 0) {
+					mstOp68_addMonsterGroup(t, _res->_mstMonsterInfos + m226Data->unk0 * kMonsterInfoDataSize, countType1, countType2, _ecx, m226Data->unk6);
 				}
 			}
 			break;
@@ -5229,7 +5227,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		const int x2 = x1 + p[0xE] - 1;
 		const int y1 = m->yMstPos + (int8_t)p[0xD];
 		const int y2 = y1 + p[0xF] - 1;
-		if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
+		if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 // 41C1BB
 			m->indexUnk49Unk1 = 0;
 			m->m49Unk1 = &m->m49->data1[0];
@@ -6657,7 +6655,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 			const int x2 = x1 + p[0xE] - 1;
 			const int y1 = m->yMstPos + (int8_t)p[0xD];
 			const int y2 = y1 + p[0xF] - 1;
-			if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
+			if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 // 41CA54
 				m->indexUnk49Unk1 = 0;
 				m->m49Unk1 = &m->m49->data1[0];
@@ -6834,7 +6832,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 				const int x2 = x1 + p[0xE] - 1;
 				const int y1 = m->yMstPos + (int8_t)p[0xD];
 				const int y2 = y1 + p[0xF] - 1;
-				if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) > 1) {
+				if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 // 41D1F5
 					m->indexUnk49Unk1 = 0;
 					m->m49Unk1 = &m->m49->data1[0];
@@ -7161,7 +7159,7 @@ void Game::mstOp68_addMonsterGroup(Task *t, const uint8_t *p, int a, int b, int 
 }
 
 int Game::mstTask_wait1(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_wait1 t %p", t);
+	debug(kDebug_MONSTER, "mstTask_wait1 t %p count %d", t, t->arg1);
 	--t->arg1;
 	if (t->arg1 == 0) {
 		t->run = &Game::mstTask_main;
@@ -7171,7 +7169,7 @@ int Game::mstTask_wait1(Task *t) {
 }
 
 int Game::mstTask_wait2(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_wait2 t %p", t);
+	debug(kDebug_MONSTER, "mstTask_wait2 t %p count %d", t, t->arg1);
 	--t->arg1;
 	if (t->arg1 == 0) {
 		t->run = &Game::mstTask_main;
@@ -7191,7 +7189,7 @@ int Game::mstTask_wait2(Task *t) {
 }
 
 int Game::mstTask_wait3(Task *t) {
-	debug(kDebug_MONSTER, "mstTask_wait3 t %p type:%d bit:%d", t, t->arg1, t->arg2);
+	debug(kDebug_MONSTER, "mstTask_wait3 t %p type %d flag %d", t, t->arg1, t->arg2);
 	if (getTaskFlag(t, t->arg2, t->arg1) == 0) {
 		return 1;
 	}
