@@ -443,7 +443,7 @@ int Game::mstTaskSetNextWalkCode(Task *t) {
 
 void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
 	assert(dir == 0 || dir == 1);
-	uint8_t r = m->flagsA8[dir];
+	uint8_t r = m->bboxNum[dir];
 	if (r < _mstBoundingBoxesCount && _mstBoundingBoxesTable[r].monster1Index == m->monster1Index) {
 		_mstBoundingBoxesTable[r].monster1Index = 255;
 		int i = r;
@@ -456,7 +456,7 @@ void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
 			_mstBoundingBoxesCount = r;
 		}
 	}
-	m->flagsA8[dir] = 255;
+	m->bboxNum[dir] = 0xFF;
 }
 
 int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) {
@@ -669,7 +669,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[13];
 			_mstTemp_x2 = _mstTemp_x1 + ptr1[14];
 			_mstTemp_y2 = _mstTemp_y1 + ptr1[15];
-			m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
+			m->bboxNum[0] = mstBoundingBoxUpdate(m->bboxNum[0], m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
 		} else {
 			mstBoundingBoxClear(m, 0);
 		}
@@ -1592,7 +1592,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 	MstBehaviorState *behaviorState = m->behaviorState;
 	assert(behaviorState->walkPath != kNone);
 	MstWalkPath *walkPath = &_res->_mstWalkPathData[behaviorState->walkPath];
-	uint8_t _cl = m->flagsA8[2];
+	uint8_t _cl = m->bboxNum[2];
 	if (m->unkBC != _xMstPos1 || m->unkC0 != _yMstPos1) {
 		if (_cl < walkPath->count) {
 			MstWalkNode *walkNode = &walkPath->data[_cl];
@@ -1628,7 +1628,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 				_cl = _al;
 			}
 // 41A85C
-			m->flagsA8[2] = _cl;
+			m->bboxNum[2] = _cl;
 			m->unkBC = -1;
 			m->unkC0 = -1;
 		}
@@ -1809,7 +1809,7 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 // 41ACAB
 		int num = var20 + var8 * 5;
 		int var4 = _mstLut3[num];
-		if (_mstLut1[var4] == m->flagsA8[3]) {
+		if (_mstLut1[var4] == m->bboxNum[3]) {
 			continue;
 		}
 		int _ecx, _eax;
@@ -1886,7 +1886,7 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 				}
 			} else {
 // 41AF09
-				m->flagsA8[1] = mstBoundingBoxUpdate(m->flagsA8[1], m->monster1Index, x1, y1, x2, y2);
+				m->bboxNum[1] = mstBoundingBoxUpdate(m->bboxNum[1], m->monster1Index, x1, y1, x2, y2);
 			}
 // 41AFB3
 		}
@@ -1894,12 +1894,12 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 // 41B00C
 		m->goalDirectionMask = var4;
 		if (var20 == 0) {
-			m->flagsA8[3] = 255;
+			m->bboxNum[3] = 0xFF;
 			uint8_t n = _mstLut1[var4];
 			if (n >= 4) {
 				n -= 4;
 			}
-			m->flagsA8[3] = n;
+			m->bboxNum[3] = n;
 		}
 	}
 // 41B030
@@ -3261,7 +3261,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			return 0;
 		}
 // 40EAA0
-		m->flagsA8[0] = mstBoundingBoxUpdate(m->flagsA8[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+		m->bboxNum[0] = mstBoundingBoxUpdate(m->bboxNum[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
 	}
 // 40EAD0
 	m->o_flags0 = var4;
@@ -5143,7 +5143,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->goalPos_x1 = m->goalDistance_x1;
 	m->goalPos_x2 = m->goalDistance_x2;
 	m->goalPos_y1 = m->goalDistance_y1;
-	m->flagsA8[2] = 255;
+	m->bboxNum[2] = 0xFF;
 	m->unkC0 = -1;
 	m->unkBC = -1;
 	m->flagsA7 = 255;
@@ -5163,7 +5163,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	}
 // 41BDA9
 	if (m->monsterInfos[946] & 4) {
-		m->flagsA8[3] = 255;
+		m->bboxNum[3] = 0xFF;
 		m->targetLevelPos_x = -1;
 		m->targetLevelPos_y = -1;
 		mstBoundingBoxClear(m, 1);
@@ -5233,7 +5233,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 // 41C1BB
 			m->indexUnk49Unk1 = 0;
 			m->m49Unk1 = &m->m49->data1[0];
-			m->flagsA8[3] = 255;
+			m->bboxNum[3] = 0xFF;
 			m->targetLevelPos_x = -1;
 			m->targetLevelPos_y = -1;
 			mstBoundingBoxClear(m, 1);
@@ -5243,7 +5243,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 				return 0;
 			}
 		} else {
-			m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
+			m->bboxNum[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 		}
 	}
 // 41C17B
@@ -6540,7 +6540,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	if (m->monsterInfos[946] & 2) {
 		m->unkC0 = -1;
 		m->unkBC = -1;
-		m->flagsA8[2] = 255;
+		m->bboxNum[2] = 0xFF;
 		m->flagsA7 = 255;
 		y = m34->top;
 		if (m->yMstPos < m34->top || m->yMstPos > m34->bottom) {
@@ -6551,7 +6551,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	x = m34->left;
 	if (m->monsterInfos[946] & 4) {
 // 41C4C9
-		m->flagsA8[3] = 255;
+		m->bboxNum[3] = 0xFF;
 		m->targetLevelPos_x = -1;
 		m->targetLevelPos_y = -1;
 		mstBoundingBoxClear(m, 1);
@@ -6652,7 +6652,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	if (_edi != 0 && ((_xMstPos2 >= m->m49->unk14 || ((m->monsterInfos[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)))) {
 // 41C833
 		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-		if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 255) {
+		if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 			const int x1 = m->xMstPos + (int8_t)p[0xC];
 			const int x2 = x1 + p[0xE] - 1;
 			const int y1 = m->yMstPos + (int8_t)p[0xD];
@@ -6661,7 +6661,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 // 41CA54
 				m->indexUnk49Unk1 = 0;
 				m->m49Unk1 = &m->m49->data1[0];
-				m->flagsA8[3] = 255;
+				m->bboxNum[3] = 0xFF;
 				m->targetLevelPos_x = -1;
 				m->targetLevelPos_y = -1;
 				mstBoundingBoxClear(m, 1);
@@ -6671,7 +6671,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 					return 0;
 				}
 			} else {
-				m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
+				m->bboxNum[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 			}
 		}
 // 41C976
@@ -6679,7 +6679,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 			m->indexUnk49Unk1 = m->m49->count1 - 1;
 			m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 			if (m->monsterInfos[946] & 4) {
-				m->flagsA8[3] = 255;
+				m->bboxNum[3] = 0xFF;
 				m->targetLevelPos_x = -1;
 				m->targetLevelPos_y = -1;
 				mstBoundingBoxClear(m, 1);
@@ -6732,7 +6732,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	m->goalScreenNum = 0xFD;
 	m->unkC0 = -1;
 	m->unkBC = -1;
-	m->flagsA8[2] = 255;
+	m->bboxNum[2] = 0xFF;
 	m->flagsA7 = 255;
 	if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos)) {
 		mstTaskResetMonster1WalkPath(t);
@@ -6744,7 +6744,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	if (p[946] & 2) {
 		m->unkE4 = 255;
 		if (p[946] & 4) {
-			m->flagsA8[3] = 255;
+			m->bboxNum[3] = 0xFF;
 			m->targetLevelPos_x = -1;
 			m->targetLevelPos_y = -1;
 			mstBoundingBoxClear(m, 1);
@@ -6829,7 +6829,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	if (_edi) {
 		if (_xMstPos2 >= m->m49->unk14 || ((m->monsterInfos[946] & 2) != 0 && _yMstPos2 >= m->m49->unk15)) {
 			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-			if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->flagsA8[0] == 0xFF) {
+			if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 				const int x1 = m->xMstPos + (int8_t)p[0xC];
 				const int x2 = x1 + p[0xE] - 1;
 				const int y1 = m->yMstPos + (int8_t)p[0xD];
@@ -6838,7 +6838,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 // 41D1F5
 					m->indexUnk49Unk1 = 0;
 					m->m49Unk1 = &m->m49->data1[0];
-					m->flagsA8[3] = 255;
+					m->bboxNum[3] = 0xFF;
 					m->targetLevelPos_x = -1;
 					m->targetLevelPos_y = -1;
 					mstBoundingBoxClear(m, 1);
@@ -6848,7 +6848,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 						return 0;
 					}
 				} else {
-					m->flagsA8[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
+					m->bboxNum[0] = mstBoundingBoxUpdate(0xFF, m->monster1Index, x1, y1, x2, y2);
 				}
 			}
 // 41D115
@@ -6856,7 +6856,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 				m->indexUnk49Unk1 = m->m49->count1 - 1;
 				m->m49Unk1 = &m->m49->data1[m->indexUnk49Unk1];
 				if (m->monsterInfos[946] & 4) {
-					m->flagsA8[3] = 0xFF;
+					m->bboxNum[3] = 0xFF;
 					m->targetLevelPos_x = -1;
 					m->targetLevelPos_y = -1;
 					mstBoundingBoxClear(m, 1);
@@ -7084,8 +7084,8 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		m->walkNode = _res->_mstWalkPathData[behaviorState->walkPath].data;
 
 		if (m->monsterInfos[946] & 4) {
-			m->flagsA8[0] = 0xFF;
-			m->flagsA8[1] = 0xFF;
+			m->bboxNum[0] = 0xFF;
+			m->bboxNum[1] = 0xFF;
 		}
 // 415A89
 		mstTaskUpdateScreenPosition(t);
