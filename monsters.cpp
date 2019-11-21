@@ -2016,7 +2016,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 	_xMstPos3 = x;
 	_yMstPos3 = y;
 	const int num = (~m->flagsA5) & 1;
-	int _esi = 0x40000000;
+	int minDistance = 0x40000000; // _esi
 	int var20 = -1;
 	int var24 = -1;
 	int _ebp = 0;
@@ -2042,8 +2042,8 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			}
 			_edi = y - _ebx;
 			_edi *= _edi;
-			if (_esi >= _edi) {
-				_esi = _edi;
+			if (minDistance >= _edi) {
+				minDistance = _edi;
 				_xMstPos3 = x;
 				_yMstPos3 = _ebx;
 				var20 = var24;
@@ -2059,13 +2059,12 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			}
 			_ebp = x - _ecx;
 			_ebp *= _ebp;
-			if (_esi >= _ebp) {
+			if (minDistance >= _ebp) {
 				_xMstPos3 = _ecx;
 				_yMstPos3 = y;
 				var20 = var24;
-				_esi = _ebp;
+				minDistance = _ebp;
 			}
-
 		} else {
 // 41A49C
 			int _edx = (x - m34->left);
@@ -2073,17 +2072,18 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			int _eax = (y - m34->top);
 			_eax *= _eax;
 			_edx += _eax;
-			if (_esi >= _edx) {
+			if (minDistance >= _edx) {
 				_xMstPos3 = m34->left;
 				_yMstPos3 = m34->top;
 				var20 = var24;
-				_esi = _edx;
+				minDistance = _edx;
 			}
 // 41A4C6
 			_edx = x - m34->right;
 			_edx *= _edx;
 			_eax += _edx;
-			if (_esi >= _edx) {
+			if (minDistance >= _edx) {
+				minDistance = _edx;
 				_xMstPos3 = m34->right;
 				_yMstPos3 = m34->top;
 				var20 = var24;
@@ -2092,7 +2092,8 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			_edi = y - m34->bottom;
 			_edi *= _edi;
 			_edx += _edi;
-			if (_esi >= _edi) {
+			if (minDistance >= _edi) {
+				minDistance = _edx;
 				_xMstPos3 = m34->right;
 				_yMstPos3 = m34->bottom;
 				var20 = var24;
@@ -2101,7 +2102,8 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			_ebp = x - m34->left;
 			_ebp *= _ebp;
 			_eax = _edi + _ebp;
-			if (_esi >= _eax) {
+			if (minDistance >= _eax) {
+				minDistance = _edx;
 				_xMstPos3 = m34->left;
 				_yMstPos3 = m34->bottom;
 				var20 = var24;
@@ -2112,6 +2114,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 		// This matches disassembly but looks like a copy-paste from the above condition
 /*
 		if (_esi >= _edi + _ebp) {
+			minDistance = _edx;
 			_xMstPos3 = x;
 			_yMstPos3 = _ebx;
 			var20 = var24;
