@@ -59,6 +59,7 @@ struct Game {
 		kMaxBackgroundAnims = 64,
 		kMaxSprites = 128,
 		kMaxLvlObjects = 160,
+		kMaxBoundingBoxes = 64,
 
 		kDefaultSoundPanning = 64,
 		kDefaultSoundVolume = 128,
@@ -220,7 +221,7 @@ struct Game {
 	uint8_t _mstCurrentActionKeyMask;
 	int _mstCurrentPosX, _mstCurrentPosY;
 	int _mstBoundingBoxesCount;
-	MstBoundingBox _mstBoundingBoxesTable[64];
+	MstBoundingBox _mstBoundingBoxesTable[kMaxBoundingBoxes];
 	Task *_mstCurrentTask;
 	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
 	int _wormHoleSpritesCount;
@@ -403,7 +404,7 @@ struct Game {
 
 	void mstBoundingBoxClear(MonsterObject1 *m, int dir);
 	int mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2);
-	int mstBoundingBoxUpdate(int num, int a, int x1, int y1, int x2, int y2);
+	int mstBoundingBoxUpdate(int num, int monster1Index, int x1, int y1, int x2, int y2);
 	int mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2);
 
 	void mstTaskSetMonster2ScreenPosition(Task *t);

@@ -471,26 +471,26 @@ int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-int Game::mstBoundingBoxUpdate(int num, int a, int x1, int y1, int x2, int y2) {
+int Game::mstBoundingBoxUpdate(int num, int monster1Index, int x1, int y1, int x2, int y2) {
 	if (num == 0xFF) {
-		MstBoundingBox *p = &_mstBoundingBoxesTable[0];
-		for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
-			if (p->monster1Index == 0xFF) {
-				num = i;
+		for (num = 0; num < _mstBoundingBoxesCount; ++num) {
+			if (_mstBoundingBoxesTable[num].monster1Index == 0xFF) {
 				break;
 			}
 		}
+		assert(num < kMaxBoundingBoxes);
+		MstBoundingBox *p = &_mstBoundingBoxesTable[num];
 		p->x1 = x1;
 		p->y1 = y1;
 		p->x2 = x2;
 		p->y2 = y2;
-		p->monster1Index = a;
-		if (num != _mstBoundingBoxesCount) {
+		p->monster1Index = monster1Index;
+		if (num == _mstBoundingBoxesCount) {
 			++_mstBoundingBoxesCount;
 		}
 	} else if (num < _mstBoundingBoxesCount) {
 		MstBoundingBox *p = &_mstBoundingBoxesTable[num];
-		if (p->monster1Index == a) {
+		if (p->monster1Index == monster1Index) {
 			p->x1 = x1;
 			p->y1 = y1;
 			p->x2 = x2;
