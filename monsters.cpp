@@ -33,7 +33,7 @@ static const uint8_t _mstLut1[] = {
 };
 
 // indexes _mstLut1
-static const uint8_t _mstLut3[] = {
+static const uint8_t _mstLut3[8 * 5] = {
 	0x01, 0x03, 0x09, 0x02, 0x08, 0x03, 0x02, 0x01, 0x06, 0x09, 0x02, 0x06, 0x03, 0x04, 0x01, 0x06,
 	0x04, 0x02, 0x0C, 0x03, 0x04, 0x0C, 0x06, 0x08, 0x02, 0x0C, 0x08, 0x04, 0x09, 0x06, 0x08, 0x09,
 	0x0C, 0x01, 0x04, 0x09, 0x01, 0x08, 0x03, 0x0C
@@ -1789,12 +1789,12 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 	int var10 = (~m->flagsA5) & 1;
 	const uint32_t indexWalkBox = m->walkNode->walkBox;
 	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
-	int varC = 0;
+	int bboxIndex = 0;
 	int var8 = _mstLut1[m->goalDirectionMask];
 	for (int var20 = 0; var20 < 5; ++var20) {
 		if (var20 != 0) {
 			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-			if (p[0xE] == 0 || varC == 0) {
+			if (p[0xE] == 0 || bboxIndex == 0) {
 				break;
 			}
 		}
@@ -1814,44 +1814,44 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			_eax = (int8_t)p[0x9];
 		}
 // 41ACF5
-		int _edi = m->xMstPos;
+		int xPos = m->xMstPos; // _edi
 		if (dirMask & kDirectionKeyMaskLeft) {
-			_edi -= _ecx;
-			if (_edi < m->levelPosBounds_x1) {
+			xPos -= _ecx;
+			if (xPos < m->levelPosBounds_x1) {
 				continue;
 			}
 		} else if (dirMask & kDirectionKeyMaskRight) {
-			_edi += _ecx;
-			if (_edi > m->levelPosBounds_x2) {
+			xPos += _ecx;
+			if (xPos > m->levelPosBounds_x2) {
 				continue;
 			}
 		}
 // 41AD27
-		int _ebp = m->yMstPos;
+		int yPos = m->yMstPos; // _ebp
 		if (dirMask & kDirectionKeyMaskUp) {
-			_ebp -= _eax;
-			if (_ebp < m->levelPosBounds_y1) {
+			yPos -= _eax;
+			if (yPos < m->levelPosBounds_y1) {
 				continue;
 			}
 		} else if (dirMask & kDirectionKeyMaskDown) {
-			_ebp += _eax;
-			if (_ebp > m->levelPosBounds_y2) {
+			yPos += _eax;
+			if (yPos > m->levelPosBounds_y2) {
 				continue;
 			}
 		}
 // 41AD53
 		if (var10 == 1 && (m->flagsA5 & 4) == 0 && (m->flags48 & 8) != 0) {
-			if (!mstSetCurrentPos(m, _edi, _ebp)) {
+			if (!mstSetCurrentPos(m, xPos, yPos)) {
 				continue;
 			}
 		}
 // 41AD7B
 		const int w = READ_LE_UINT32(m->monsterInfos + 904);
 		const int h = READ_LE_UINT32(m->monsterInfos + 908);
-		if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, _edi, _ebp)) {
+		if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, xPos, yPos)) {
 			const uint32_t indexWalkPath = m->behaviorState->walkPath;
 			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
-			const int num = mstMonster1FindWalkPathRect(m, walkPath, _edi, _ebp);
+			const int num = mstMonster1FindWalkPathRect(m, walkPath, xPos, yPos);
 			if (num < 0) {
 				continue;
 			}
@@ -1860,21 +1860,23 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			}
 		}
 // 41ADDF
-		m->targetLevelPos_x = _edi;
-		m->targetLevelPos_y = _ebp;
+		m->targetLevelPos_x = xPos;
+		m->targetLevelPos_y = yPos;
 		p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (p[0xE] != 0) {
 			const int x1 = m->xMstPos + (int8_t)p[0xC];
 			const int x2 = x1 + p[0xE] - 1;
 			const int y1 = m->yMstPos + (int8_t)p[0xD];
 			const int y2 = y1 + p[0xF] - 1;
-			int r = mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2);
-			if (r > 0) {
+			const int r = mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2);
+			if (r != 0) {
 // 41AEA3
-				const MstBoundingBox *b = &_mstBoundingBoxesTable[r - 1];
+				bboxIndex = r - 1;
+				const MstBoundingBox *b = &_mstBoundingBoxesTable[bboxIndex];
 				if (!rect_intersects(b->x1, b->y1, b->x2, b->y2, m->goalPos_x1, m->goalPos_y1, m->goalPos_x2, m->goalPos_y2)) {
 					break;
 				}
+				continue;
 			} else {
 // 41AF09
 				m->bboxNum[1] = mstBoundingBoxUpdate(m->bboxNum[1], m->monster1Index, x1, y1, x2, y2);
