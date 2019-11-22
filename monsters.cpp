@@ -1796,10 +1796,9 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 	int var10 = (~m->flagsA5) & 1;
 	const uint32_t indexWalkBox = m->walkNode->walkBox;
 	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
-	int var20 = 0;
 	int varC = 0;
 	int var8 = _mstLut1[m->goalDirectionMask];
-	for (; var20 < 5; ++var20) {
+	for (int var20 = 0; var20 < 5; ++var20) {
 		if (var20 != 0) {
 			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 			if (p[0xE] == 0 || varC == 0) {
@@ -1807,14 +1806,14 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			}
 		}
 // 41ACAB
-		int num = var20 + var8 * 5;
-		int var4 = _mstLut3[num];
-		if (_mstLut1[var4] == m->bboxNum[3]) {
+		const int num = var20 + var8 * 5;
+		const int dirMask = _mstLut3[num];
+		if (_mstLut1[dirMask] == m->bboxNum[3]) {
 			continue;
 		}
 		int _ecx, _eax;
 		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
-		if (_mstLut1[var4] & 1) {
+		if (_mstLut1[dirMask] & 1) {
 			_ecx = (int8_t)p[0xA];
 			_eax = (int8_t)p[0xB];
 		} else {
@@ -1823,12 +1822,12 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 		}
 // 41ACF5
 		int _edi = m->xMstPos;
-		if (var4 & 8) {
+		if (dirMask & kDirectionKeyMaskLeft) {
 			_edi -= _ecx;
 			if (_edi < m->levelPosBounds_x1) {
 				continue;
 			}
-		} else if (var4 & 2) {
+		} else if (dirMask & kDirectionKeyMaskRight) {
 			_edi += _ecx;
 			if (_edi > m->levelPosBounds_x2) {
 				continue;
@@ -1836,12 +1835,12 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 		}
 // 41AD27
 		int _ebp = m->yMstPos;
-		if (var4 & 1) {
+		if (dirMask & kDirectionKeyMaskUp) {
 			_ebp -= _eax;
 			if (_ebp < m->levelPosBounds_y1) {
 				continue;
 			}
-		} else if (var4 & 4) {
+		} else if (dirMask & kDirectionKeyMaskDown) {
 			_ebp += _eax;
 			if (_ebp > m->levelPosBounds_y2) {
 				continue;
@@ -1854,11 +1853,10 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			}
 		}
 // 41AD7B
-		int w = READ_LE_UINT32(m->monsterInfos + 904);
-		int h = READ_LE_UINT32(m->monsterInfos + 908);
+		const int w = READ_LE_UINT32(m->monsterInfos + 904);
+		const int h = READ_LE_UINT32(m->monsterInfos + 908);
 		if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, _edi, _ebp)) {
 			const uint32_t indexWalkPath = m->behaviorState->walkPath;
-			assert(indexWalkPath != kNone);
 			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
 			const int num = mstMonster1FindWalkPathRect(m, walkPath, _edi, _ebp);
 			if (num < 0) {
@@ -1867,8 +1865,8 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			if (m->walkNode->unk60[var10][num] == 0) {
 				continue;
 			}
-// 41ADDF
 		}
+// 41ADDF
 		m->targetLevelPos_x = _edi;
 		m->targetLevelPos_y = _ebp;
 		p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
@@ -1892,15 +1890,20 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 		}
 		mstBoundingBoxClear(m, 1);
 // 41B00C
-		m->goalDirectionMask = var4;
+		m->goalDirectionMask = dirMask;
 		if (var20 == 0) {
+// 41B05B
 			m->bboxNum[3] = 0xFF;
-			uint8_t n = _mstLut1[var4];
-			if (n >= 4) {
+		} else {
+			uint8_t n = _mstLut1[dirMask];
+			if (n < 4) {
+				n += 4;
+			} else {
 				n -= 4;
 			}
 			m->bboxNum[3] = n;
 		}
+		return;
 	}
 // 41B030
 	m->task->flags |= 0x80;
@@ -3231,14 +3234,14 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			_eax = (int8_t)ptr[9];
 		}
 // 40EA1A
-		if (o->directionKeyMask & 8) {
+		if (o->directionKeyMask & kDirectionKeyMaskLeft) {
 			_ebp = -_ebp;
-		} else if ((o->directionKeyMask & 2) == 0) {
+		} else if ((o->directionKeyMask & kDirectionKeyMaskRight) == 0) {
 			_ebp = 0;
 		}
-		if (o->directionKeyMask & 1) {
+		if (o->directionKeyMask & kDirectionKeyMaskUp) {
 			_eax = -_eax;
-		} else if ((o->directionKeyMask & 4) == 0) {
+		} else if ((o->directionKeyMask & kDirectionKeyMaskDown) == 0) {
 			_eax = 0;
 		}
 // 40EA40
@@ -6492,16 +6495,16 @@ bool Game::mstMonster1CheckLevelBounds(MonsterObject1 *m, int x, int y, uint8_t 
 	if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && !mstSetCurrentPos(m, x, y)) {
 		return true;
 	}
-	if ((dir & 8) != 0 && x < m->levelPosBounds_x1) {
+	if ((dir & kDirectionKeyMaskLeft) != 0 && x < m->levelPosBounds_x1) {
 		return true;
 	}
-	if ((dir & 2) != 0 && x > m->levelPosBounds_x2) {
+	if ((dir & kDirectionKeyMaskRight) != 0 && x > m->levelPosBounds_x2) {
 		return true;
 	}
-	if ((dir & 1) != 0 && y < m->levelPosBounds_y1) {
+	if ((dir & kDirectionKeyMaskUp) != 0 && y < m->levelPosBounds_y1) {
 		return true;
 	}
-	if ((dir & 4) != 0 && y > m->levelPosBounds_y2) {
+	if ((dir & kDirectionKeyMaskDown) != 0 && y > m->levelPosBounds_y2) {
 		return true;
 	}
 	return false;
