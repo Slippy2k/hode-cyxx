@@ -467,6 +467,15 @@ void Game::setupScreenMask(uint8_t num) {
 			memcpy(p, _screenTempMaskBuffer + i * 32, 32);
 			p += 512;
 		}
+		if (0) {
+			fprintf(stdout, "screen %d mask %d\n", num, mask);
+			for (int y = 0; y < 24; ++y) {
+				for (int x = 0; x < 32; ++x) {
+					fprintf(stdout, "%02d ", _screenTempMaskBuffer[y * 32 + x]);
+				}
+				fputc('\n', stdout);
+			}
+		}
 	}
 	if (_res->_currentScreenResourceNum == num) {
 		setupScreenPosTable(num);

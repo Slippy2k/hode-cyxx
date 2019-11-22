@@ -698,7 +698,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 			_mstTemp_y1 = o->yPos;
 			_mstTemp_x2 = o->xPos + o->width - 1;
 			_mstTemp_y2 = o->yPos + o->height - 1;
-			uint8_t _al = p->type;
+			const uint8_t _al = p->type;
 			if (_al == 1 || _al == 2) {
 // 40EED8
 				if (p->monsterDistance >= m->xDelta + m->yDelta) {
@@ -713,7 +713,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 // 40EF72
 					if (rect_intersects(0, 0, 255, 191, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2)) {
 						const uint8_t type = m->monsterInfos[944];
-						if (((type & 9) == 0 && clipLvlObjectsSmall(p->o, o, 132)) || ((type & 9) != 0 && clipLvlObjectsSmall(p->o, o, 20))) {
+						if ((type == 9 && clipLvlObjectsSmall(p->o, o, 132)) || (type != 9 && clipLvlObjectsSmall(p->o, o, 20))) {
 							p->m = m;
 							p->monsterDistance = m->xDelta + m->yDelta;
 							p->clipX = _clipBoxOffsetX;
