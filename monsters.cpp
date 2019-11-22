@@ -3155,7 +3155,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	LvlObject *o = m->o16;
 	uint8_t var4 = _res->_mstActionDirectionData[num].unk0;
 	uint8_t var8 = _res->_mstActionDirectionData[num].unk2;
-	const uint8_t *ptr = m->monsterInfos + var4 * 28;
+	const uint8_t *p = m->monsterInfos + var4 * 28;
 	uint8_t _al = (o->flags1 >> 4) & 3;
 	uint8_t _cl = ((_al & 1) != 0) ? 8 : 2;
 	if (_al & 2) {
@@ -3163,19 +3163,19 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	} else {
 		_cl |= 1;
 	}
-	mstLvlObjectSetActionDirection(o, ptr, var8, _cl);
+	mstLvlObjectSetActionDirection(o, p, var8, _cl);
 	const uint8_t am = _res->_mstActionDirectionData[num].unk1;
 	o->actionKeyMask |= am;
 
 	t->flags &= ~0x80;
-	int _edi = (int8_t)ptr[4];
-	int _ebp = (int8_t)ptr[5];
+	int _edi = (int8_t)p[4];
+	int _ebp = (int8_t)p[5];
 	debug(kDebug_MONSTER, "mstTaskSetActionDirection m %p action 0x%x direction 0x%x (%d,%d)", m, o->actionKeyMask, o->directionKeyMask, _edi, _ebp);
 	int _eax = 0;
 	int var10 = 0;
 	if (_edi != 0 || _ebp != 0) {
 // 40E8E2
-		uint8_t var11 = ptr[2];
+		uint8_t var11 = p[2];
 		if (((var11 & kDirectionKeyMaskHorizontal) == kDirectionKeyMaskHorizontal && (o->directionKeyMask & 8) != 0) || ((var11 & kDirectionKeyMaskHorizontal) != kDirectionKeyMaskHorizontal && (o->flags1 & 0x10) != 0)) {
 			_edi = m->xMstPos - _edi;
 		} else {
@@ -3209,17 +3209,17 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 		_eax = var10;
 // 40E9BC
 	}
-	if ((m->monsterInfos[946] & 4) != 0 && ptr[14] != 0) {
+	if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0) {
 		if (_eax == 0) {
 			_ebp = 0;
 		} else if (_mstLut1[_eax] & 1) {
 // 40E9FF
-			_ebp = (int8_t)ptr[10];
-			_eax = (int8_t)ptr[11];
+			_ebp = (int8_t)p[0xA];
+			_eax = (int8_t)p[0xB];
 		} else {
 // 40EA12
-			_ebp = (int8_t)ptr[8];
-			_eax = (int8_t)ptr[9];
+			_ebp = (int8_t)p[0x8];
+			_eax = (int8_t)p[0x9];
 		}
 // 40EA1A
 		if (o->directionKeyMask & kDirectionKeyMaskLeft) {
@@ -3233,14 +3233,16 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			_eax = 0;
 		}
 // 40EA40
-		_edi = m->xMstPos + (int8_t)ptr[12] + _ebp;
-		_ebp = m->yMstPos + (int8_t)ptr[13] + _eax;
-		if ((var8 & 0xE0) != 0x60 && mstBoundingBoxCollides2(m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1) != 0) {
+		const int x1 = m->xMstPos + (int8_t)p[0xC]; // _edi
+		const int x2 = x1 + p[0xE] - 1;
+		const int y1 = m->yMstPos + (int8_t)p[0xD]; // _ebp
+		const int y2 = y1 + p[0xF] - 1;
+		if ((var8 & 0xE0) != 0x60 && mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 			t->flags |= 0x80;
 			return 0;
 		}
 // 40EAA0
-		m->bboxNum[0] = mstBoundingBoxUpdate(m->bboxNum[0], m->monster1Index, _edi, _ebp, ptr[14] + _edi - 1, ptr[15] + _ebp - 1);
+		m->bboxNum[0] = mstBoundingBoxUpdate(m->bboxNum[0], m->monster1Index, x1, y1, x2, y2);
 	}
 // 40EAD0
 	m->o_flags0 = var4;
