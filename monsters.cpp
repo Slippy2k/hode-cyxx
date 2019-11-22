@@ -2017,11 +2017,9 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 	_yMstPos3 = y;
 	const int num = (~m->flagsA5) & 1;
 	int minDistance = 0x40000000; // _esi
-	int var20 = -1;
-	int var24 = -1;
-	int _ebp = 0;
-	for (uint32_t i = 0; i < walkPath->count; ++i, --var24) {
-		int _edi;
+	int ret = -1;
+	int currentIndex = -1;
+	for (uint32_t i = 0; i < walkPath->count; ++i, --currentIndex) {
 		MstWalkNode *walkNode = &walkPath->data[i];
 		if (walkNode->unk60[num][i] == 0 && m->walkNode != walkNode) {
 			continue;
@@ -2032,97 +2030,84 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			return i;
 		}
 // 41A3CE
+		int dist, xDist, yDist;
+
 		if (x >= m34->left && x <= m34->right) {
-			int var4 = m34->bottom;
-			int var8 = ABS(y - m34->bottom);
-			int _ebx = m34->top;
-			int _eax = ABS(y - m34->top);
-			if (_eax >= var8) {
-				_ebx = var4;
-			}
-			_edi = y - _ebx;
-			_edi *= _edi;
-			if (minDistance >= _edi) {
-				minDistance = _edi;
+			const int dy1 = ABS(y - m34->bottom);
+			const int dy2 = ABS(y - m34->top);
+			const int top = (dy2 >= dy1) ? m34->bottom : m34->top; // _ebx
+			yDist = y - top;
+			yDist *= yDist;
+			dist = yDist;
+			if (minDistance >= dist) {
+				minDistance = dist;
 				_xMstPos3 = x;
-				_yMstPos3 = _ebx;
-				var20 = var24;
+				_yMstPos3 = top;
+				ret = currentIndex;
 			}
 		} else if (y >= m34->top && y <= m34->bottom) {
 // 41A435
-			int var8 = m34->right;
-			int var4 = ABS(x - m34->right);
-			int _ecx = m34->left;
-			int _eax = ABS(x - m34->left);
-			if (_eax >= var4) {
-				_ecx = var8;
-			}
-			_ebp = x - _ecx;
-			_ebp *= _ebp;
-			if (minDistance >= _ebp) {
-				_xMstPos3 = _ecx;
+			const int dy1 = ABS(x - m34->right);
+			const int dy2 = ABS(x - m34->left);
+			const int left = (dy2 >= dy1) ? m34->right : m34->left; // _ecx
+			xDist = x - left;
+			xDist *= xDist;
+			dist = xDist;
+			if (minDistance >= dist) {
+				minDistance = dist;
+				_xMstPos3 = left;
 				_yMstPos3 = y;
-				var20 = var24;
-				minDistance = _ebp;
+				ret = currentIndex;
 			}
 		} else {
 // 41A49C
-			int _edx = (x - m34->left);
-			_edx *= _edx;
-			int _eax = (y - m34->top);
-			_eax *= _eax;
-			_edx += _eax;
-			if (minDistance >= _edx) {
+			xDist = (x - m34->left); // _edx
+			xDist *= xDist;
+			yDist = (y - m34->top); // _eax
+			yDist *= yDist;
+
+			dist = xDist + yDist;
+			if (minDistance >= dist) {
+				minDistance = dist;
 				_xMstPos3 = m34->left;
 				_yMstPos3 = m34->top;
-				var20 = var24;
-				minDistance = _edx;
+				ret = currentIndex;
 			}
 // 41A4C6
-			_edx = x - m34->right;
-			_edx *= _edx;
-			_eax += _edx;
-			if (minDistance >= _edx) {
-				minDistance = _edx;
+			xDist = x - m34->right; // _edx
+			xDist *= xDist;
+			dist = xDist + yDist;
+			if (minDistance >= dist) {
+				minDistance = dist;
 				_xMstPos3 = m34->right;
 				_yMstPos3 = m34->top;
-				var20 = var24;
+				ret = currentIndex;
 			}
 // 41A4FB
-			_edi = y - m34->bottom;
-			_edi *= _edi;
-			_edx += _edi;
-			if (minDistance >= _edi) {
-				minDistance = _edx;
+			yDist = y - m34->bottom; // _edi
+			yDist *= yDist;
+			dist = xDist + yDist;
+			if (minDistance >= dist) {
+				minDistance = dist;
 				_xMstPos3 = m34->right;
 				_yMstPos3 = m34->bottom;
-				var20 = var24;
+				ret = currentIndex;
 			}
 // 41A529
-			_ebp = x - m34->left;
-			_ebp *= _ebp;
-			_eax = _edi + _ebp;
-			if (minDistance >= _eax) {
-				minDistance = _edx;
+			xDist = x - m34->left; // _ebp
+			xDist *= xDist;
+			dist = xDist + yDist;
+			if (minDistance >= dist) {
+				minDistance = dist;
 				_xMstPos3 = m34->left;
 				_yMstPos3 = m34->bottom;
-				var20 = var24;
+				ret = currentIndex;
 			}
-
 		}
 // 41A560
-		// This matches disassembly but looks like a copy-paste from the above condition
-/*
-		if (_esi >= _edi + _ebp) {
-			minDistance = _edx;
-			_xMstPos3 = x;
-			_yMstPos3 = _ebx;
-			var20 = var24;
-
-		}
-*/
+		// if (minDistance >= xDist + yDist)
 	}
-	return var20;
+	return ret;
 }
 
 bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
