@@ -18,6 +18,7 @@ BINS = (
 	'hode.ini',
 	'icon.bmp',
 	'README.txt',
+	'CHANGES.txt',
 )
 
 def getVersion():
@@ -75,4 +76,6 @@ for name in BINS:
 	for filename in src_dir:
 		if re.match(name, filename):
 			zf.write(os.path.join(SRC_DIR, filename), filename)
+	if os.path.exists(name):
+		zf.write(name, name)
 zf.close()
