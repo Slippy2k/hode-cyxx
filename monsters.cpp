@@ -660,11 +660,11 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	const uint8_t *ptr = m->monsterInfos;
 	if (ptr[946] & 4) {
 		const uint8_t *ptr1 = ptr + (o->flags0 & 255) * 28; // _eax
-		if (ptr1[14] != 0) {
-			_mstTemp_x1 = m->xMstPos + (int8_t)ptr1[12];
-			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[13];
-			_mstTemp_x2 = _mstTemp_x1 + ptr1[14];
-			_mstTemp_y2 = _mstTemp_y1 + ptr1[15];
+		if (ptr1[0xE] != 0) {
+			_mstTemp_x1 = m->xMstPos + (int8_t)ptr1[0xC];
+			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[0xD];
+			_mstTemp_x2 = _mstTemp_x1 + ptr1[0xE] - 1;
+			_mstTemp_y2 = _mstTemp_y1 + ptr1[0xF] - 1;
 			m->bboxNum[0] = mstBoundingBoxUpdate(m->bboxNum[0], m->monster1Index, _mstTemp_x1, _mstTemp_y1, _mstTemp_x2, _mstTemp_y2);
 		} else {
 			mstBoundingBoxClear(m, 0);
@@ -1873,17 +1873,17 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 // 41AEA3
 				bboxIndex = r - 1;
 				const MstBoundingBox *b = &_mstBoundingBoxesTable[bboxIndex];
-				if (!rect_intersects(b->x1, b->y1, b->x2, b->y2, m->goalPos_x1, m->goalPos_y1, m->goalPos_x2, m->goalPos_y2)) {
+				if (rect_intersects(b->x1, b->y1, b->x2, b->y2, m->goalPos_x1, m->goalPos_y1, m->goalPos_x2, m->goalPos_y2)) {
 					break;
 				}
 				continue;
-			} else {
 // 41AF09
-				m->bboxNum[1] = mstBoundingBoxUpdate(m->bboxNum[1], m->monster1Index, x1, y1, x2, y2);
 			}
+			m->bboxNum[1] = mstBoundingBoxUpdate(m->bboxNum[1], m->monster1Index, x1, y1, x2, y2);
 // 41AFB3
+		} else { // (p[0xE] == 0)
+			mstBoundingBoxClear(m, 1);
 		}
-		mstBoundingBoxClear(m, 1);
 // 41B00C
 		m->goalDirectionMask = dirMask;
 		if (var20 == 0) {
@@ -3496,6 +3496,7 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 				return ((t->monster2->o->flags1 & 0x20) != 0) ? 1 : 0;
 			}
 		}
+		break;
 	case 4: {
 			MonsterObject1 *m = t->monster1;
 			if (m) {
