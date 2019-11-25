@@ -4290,10 +4290,8 @@ int Game::mstTask_main(Task *t) {
 				int c = getTaskVar(t, op197Data->unk4, (mask >>  8) & 15); // var14
 				int d = getTaskVar(t, op197Data->unk6, (mask >>  4) & 15); // _esi
 				int e = getTaskVar(t, op197Data->unkE,  mask        & 15); // _eax
-				if (e >= _res->_mstHdr.screensCount) {
-					e = _res->_mstHdr.screensCount - 1;
-				}
-				ret = mstOp49_setMovingBounds(a, b, c, d, e, t, num);
+				const int screenNum = CLIP(e, -4, _res->_mstHdr.screensCount - 1);
+				ret = mstOp49_setMovingBounds(a, b, c, d, screenNum, t, num);
 			}
 			break;
 		case 198: { // 50 - call_task
@@ -5041,14 +5039,14 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 				t->run = &Game::mstTask_monsterWait6;
 			}
 			if (m->goalDistance_x2 <= 0) {
-				m->goalScreenNum = 255;
+				m->goalScreenNum = kNoScreen;
 				if (m->xMstPos < _mstAndyLevelPosX) {
-					m->goalDistance_x1 = -m->goalDistance_x1;
-					m->goalDistance_x2 = -m->goalDistance_x2;
+					m->goalDistance_x1 = -m->goalDistance_x2;
+					m->goalDistance_x2 = -m->goalDistance_x1;
 				}
 			}
 			if ((_al & 2) != 0 && m->goalDistance_y2 <= 0) {
-				m->goalScreenNum = 255;
+				m->goalScreenNum = kNoScreen;
 				if (m->yMstPos < _mstAndyLevelPosY) {
 					m->goalDistance_y1 = -m->goalDistance_y2;
 					m->goalDistance_y2 = -m->goalDistance_y1;
@@ -5132,16 +5130,10 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->goalPos_y2 = m->goalDistance_y2;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
-		m->goalDistance_y1 = m->yMstPos;
-		m->goalPos_y1 = m->yMstPos;
-		m->goalDistance_y2 = m->yMstPos;
-		m->goalPos_y2 = m->yMstPos;
+		m->goalDistance_y1 = m->goalPos_y1 = m->goalDistance_y2 = m->goalPos_y2 = m->yMstPos;
 	}
 	if ((ptr[2] & kDirectionKeyMaskHorizontal) == 0) {
-		m->goalDistance_x1 = m->xMstPos;
-		m->goalPos_x1 = m->xMstPos;
-		m->goalDistance_x2 = m->xMstPos;
-		m->goalPos_x2 = m->xMstPos;
+		m->goalDistance_x1 = m->goalPos_x1 = m->goalDistance_x2 = m->goalPos_x2 = m->xMstPos;
 	}
 // 41BDA9
 	if (m->monsterInfos[946] & 4) {
@@ -6161,10 +6153,10 @@ void Game::mstOp57_addWormHoleSprite(int x, int y, int screenNum) {
 
 void Game::mstOp58_addLvlObject(Task *t, int num) {
 	const MstOp211Data *dat = &_res->_mstOp211Data[num];
-	const int mask = dat->unkE;
+	const int mask = dat->maskVars;
 	int xPos = getTaskVar(t, dat->indexVar1, (mask >> 8) & 15); // _ebx
 	int yPos = getTaskVar(t, dat->indexVar2, (mask >> 4) & 15); // _ebp
-	const int type = getTaskVar(t, dat->unkC, mask & 15) & 255; // _eax
+	const uint8_t type = getTaskVar(t, dat->indexVar3, mask & 15); // _eax
 	LvlObject *o = 0;
 	if (t->monster2) {
 		o = t->monster2->o;
@@ -6191,7 +6183,7 @@ void Game::mstOp58_addLvlObject(Task *t, int num) {
 		yPos += _mstAndyScreenPosY; // _ebp
 		screen = _currentScreen;
 	}
-	uint16_t flags = (dat->unk6 == -1 && o) ? o->flags2 : 0x3001;
+	const uint16_t flags = (dat->unk6 == -1 && o) ? o->flags2 : 0x3001;
 	o = addLvlObject(2, xPos, yPos, screen, dat->unk8, dat->unk4, dat->unkB, flags, dat->unk9, dat->unkA);
 	if (o) {
 		o->dataPtr = 0;
