@@ -24,7 +24,7 @@ level 7 'pwr1' - completable (issue on screen 11)
 					_screenCounterTable[26] = (_lar1_gatesData[6 * 4] & 0xF0) != 0 ? 5 : 4;
 	screen 11 (--checkpoint 4)
 		worms do not go down, seek for double spectre eggs ?
-			check mstMonster1MoveTowardsGoal2
+			check mstMonster1UpdateGoalPosition
 			worm hole sprites are on top of the stairs
 		not possible to walk on the left (can jump)
 level 8 'pwr2' - to check (--checkpoint 4)

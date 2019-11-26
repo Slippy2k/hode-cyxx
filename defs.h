@@ -389,8 +389,8 @@ struct MonsterObject1 {
 	uint8_t bboxNum[4]; // 0xA8, 0xA9, 0xAA, 0xAB
 	int32_t targetLevelPos_x; // 0xAC
 	int32_t targetLevelPos_y; // 0xBC
-	int32_t unkB4; // _xMstPos2
-	int32_t unkB8; // _yMstPos2
+	int32_t previousLevelPos_x; // _xMstPos2
+	int32_t previousLevelPos_y; // _yMstPos2
 	int32_t unkBC; // 0xBC x
 	int32_t unkC0; // 0xC0 y
 	Task *task; // 0xC4
