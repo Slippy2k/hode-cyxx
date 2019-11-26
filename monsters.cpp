@@ -3265,6 +3265,7 @@ Task *Game::findFreeTask() {
 			return t;
 		}
 	}
+	warning("findFreeTask() no free task");
 	return 0;
 }
 
@@ -4940,8 +4941,7 @@ void Game::mstOp26_removeMstTaskScreen(Task **tasksList, int screenNum) {
 			if (_mstActionNum != -1 && (m->flagsA5 & 8) != 0 && m->action != 0) {
 				mstMonster1ClearChasingMonster(m);
 			}
-			const uint8_t *ptr = m->monsterInfos;
-			if (ptr[946] & 4) {
+			if (m->monsterInfos[946] & 4) {
 				mstBoundingBoxClear(m, 0);
 				mstBoundingBoxClear(m, 1);
 			}
@@ -4970,8 +4970,7 @@ void Game::mstOp27_removeMstTaskScreenType(Task **tasksList, int screenNum, int 
 			if (_mstActionNum != -1 && (m->flagsA5 & 8) != 0 && m->action != 0) {
 				mstMonster1ClearChasingMonster(m);
 			}
-			const uint8_t *ptr = m->monsterInfos;
-			if (ptr[946] & 4) {
+			if (m->monsterInfos[946] & 4) {
 				mstBoundingBoxClear(m, 0);
 				mstBoundingBoxClear(m, 1);
 			}
@@ -6934,7 +6933,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 		}
 // 41562C
 		m->o16 = o;
-		if (_currentLevel == kLvl_lar2 && m->monsterInfos[944] == 26) {
+		if (_currentLevel == kLvl_lar2 && m->monsterInfos[944] == 26) { // Master of Darkness
 			m->o20 = addLvlObject(ptr[945], x1, y1, objScreen, ptr[944], behaviorState->anim + 1, o_flags1, 0x3001, 0, 0);
 			if (!m->o20) {
 				warning("mstOp67 failed to addLvlObject in kLvl_lar2");
@@ -6999,7 +6998,6 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 	if (mo) {
 		Task *t = findFreeTask();
 		if (!t) {
-			warning("mstOp67 mo %p no free task", mo);
 			mo->monster2Info = 0;
 			if (mo->o) {
 				mo->o->dataPtr = 0;
@@ -7027,7 +7025,6 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 // 41593C
 		Task *t = findFreeTask();
 		if (!t) {
-			warning("mstOp67_addMonster no free task found");
 			mstMonster1ResetData(m);
 			removeLvlObject2(o);
 			return;
