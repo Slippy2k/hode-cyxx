@@ -1635,7 +1635,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 	}
 	_edi = (~m->flagsA5) & 1;
 	if (m->unkBC == _xMstPos1 && m->unkC0 == _yMstPos1) {
-		if (m->flagsA7 == 255) {
+		if (m->flagsA7 == 0xFF) {
 			return;
 		}
 		m->goalDirectionMask = m->flagsA7;
@@ -1768,7 +1768,7 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 		if (_xMstPos2 < _yMstPos2) {
 			if (_xMstPos2 < m->m49Unk1->unkA) {
 				m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
-				if (m->flagsA7 != 255) {
+				if (m->flagsA7 != 0xFF) {
 					_xMstPos2 = 0;
 				}
 			}
@@ -1776,7 +1776,7 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 // 41AC2B
 			if (_yMstPos2 < m->m49Unk1->unkB) {
 				m->goalDirectionMask &= ~kDirectionKeyMaskVertical;
-				if (m->flagsA7 != 255) {
+				if (m->flagsA7 != 0xFF) {
 					_yMstPos2 = 0;
 				}
 			}
@@ -1982,7 +1982,7 @@ int Game::mstTaskUpdatePositionActionDirection(Task *t, MonsterObject1 *m) {
 		if (_xMstPos2 < _yMstPos2) {
 			if (_xMstPos2 < m->m49Unk1->unkA) {
 				m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
-				if (m->flagsA7 != m->goalDirectionMask) {
+				if (m->flagsA7 != 0xFF) {
 					_xMstPos2 = 0;
 				}
 
@@ -1991,7 +1991,7 @@ int Game::mstTaskUpdatePositionActionDirection(Task *t, MonsterObject1 *m) {
 // 41B7E9
 			if (_yMstPos2 < m->m49Unk1->unkB) {
 				m->goalDirectionMask &= ~kDirectionKeyMaskVertical;
-				if (m->flagsA7 != m->goalDirectionMask) {
+				if (m->flagsA7 != 0xFF) {
 					_yMstPos2 = 0;
 				}
 			}
@@ -5120,7 +5120,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->bboxNum[2] = 0xFF;
 	m->unkC0 = -1;
 	m->unkBC = -1;
-	m->flagsA7 = 255;
+	m->flagsA7 = 0xFF;
 	m->goalPos_y2 = m->goalDistance_y2;
 	const uint8_t *ptr = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((ptr[2] & kDirectionKeyMaskVertical) == 0) {
@@ -6509,7 +6509,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 		m->unkC0 = -1;
 		m->unkBC = -1;
 		m->bboxNum[2] = 0xFF;
-		m->flagsA7 = 255;
+		m->flagsA7 = 0xFF;
 		y = m34->top;
 		if (m->yMstPos < m34->top || m->yMstPos > m34->bottom) {
 			flag = true;
@@ -6698,7 +6698,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 	m->unkC0 = -1;
 	m->unkBC = -1;
 	m->bboxNum[2] = 0xFF;
-	m->flagsA7 = 255;
+	m->flagsA7 = 0xFF;
 	if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos)) {
 		mstTaskResetMonster1WalkPath(t);
 		return 0;
