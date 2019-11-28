@@ -775,11 +775,11 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 	}
 // 40F151
 	if (m->facingDirectionMask & kDirectionKeyMaskLeft) {
-		m->unk88 = READ_LE_UINT32(ptr + 920);
-		m->unk84 = READ_LE_UINT32(ptr + 924);
+		m->goalPosBounds_x1 = READ_LE_UINT32(ptr + 920);
+		m->goalPosBounds_x2 = READ_LE_UINT32(ptr + 924);
 	} else {
-		m->unk88 = READ_LE_UINT32(ptr + 912);
-		m->unk84 = READ_LE_UINT32(ptr + 916);
+		m->goalPosBounds_x1 = READ_LE_UINT32(ptr + 912);
+		m->goalPosBounds_x2 = READ_LE_UINT32(ptr + 916);
 	}
 	// m->unk90 =
 	// m->unk8C =
@@ -2732,8 +2732,8 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			if ((m->monsterInfos[946] & 2) == 0) {
 				MstWalkNode *walkPath = m->walkNode;
 				int _edi = READ_LE_UINT32(m->monsterInfos + 904);
-				int _ebx = MAX(m->unk88, walkPath->coords[1][1] + _edi);
-				int _eax = MIN(m->unk84, walkPath->coords[0][1] - _edi);
+				int _ebx = MAX(m->goalPosBounds_x1, walkPath->coords[1][1] + _edi);
+				int _eax = MIN(m->goalPosBounds_x2, walkPath->coords[0][1] - _edi);
 				const uint32_t indexUnk36 = walkPath->movingBoundsIndex2;
 				const uint32_t indexUnk49 = _res->_mstMovingBoundsIndexData[indexUnk36].indexUnk49;
 				uint8_t _bl = _res->_mstMovingBoundsData[indexUnk49].unk14;
@@ -6378,9 +6378,9 @@ void Game::mstMonster1SetGoalHorizontal(MonsterObject1 *m) {
 	int x = m->xMstPos;
 	if (x < m->goalPos_x1) {
 		_xMstPos1 = x = m->goalPos_x2;
-		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x > m->unk84) {
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x > m->goalPosBounds_x2) {
 			t->flags |= 0x80;
-			x = m->unk84;
+			x = m->goalPosBounds_x2;
 		}
 		if (x > m->levelPosBounds_x2) {
 			t->flags |= 0x80;
@@ -6391,9 +6391,9 @@ void Game::mstMonster1SetGoalHorizontal(MonsterObject1 *m) {
 	} else if (x > m->goalPos_x2) {
 // 41A2AA
 		_xMstPos1 = x = m->goalPos_x1;
-		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x < m->unk88) {
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && x < m->goalPosBounds_x1) {
 			t->flags |= 0x80;
-			x = m->unk88;
+			x = m->goalPosBounds_x1;
 		}
 		if (x < m->levelPosBounds_x1) {
 			t->flags |= 0x80;
