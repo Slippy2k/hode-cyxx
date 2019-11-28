@@ -206,8 +206,9 @@ struct Game {
 	int _m43Num1;
 	int _m43Num2;
 	int _m43Num3;
-	int _xMstPos1, _xMstPos2, _xMstPos3;
-	int _yMstPos1, _yMstPos2, _yMstPos3;
+	int _xMstPos1, _yMstPos1;
+	int _xMstPos2, _yMstPos2; // xMstDist1, yMstDist1
+	int _xMstPos3, _yMstPos3;
 	int _mstHelper1Count;
 	int _mstActionNum;
 	uint32_t _mstAndyVarMask;
