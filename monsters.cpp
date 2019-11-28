@@ -781,13 +781,8 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 		m->unk88 = READ_LE_UINT32(ptr + 912);
 		m->unk84 = READ_LE_UINT32(ptr + 916);
 	}
-	if (m->facingDirectionMask & kDirectionKeyMaskUp) {
-		m->unk90 = READ_LE_UINT32(ptr + 936);
-		m->unk8C = READ_LE_UINT32(ptr + 940);
-	} else {
-		m->unk90 = READ_LE_UINT32(ptr + 928);
-		m->unk8C = READ_LE_UINT32(ptr + 932);
-	}
+	// m->unk90 =
+	// m->unk8C =
 // 40F1B3
 	if (_andyShootsTable[0].type == 3 && m->shootSource != 0 && _andyShootsTable[0].directionMask == m->shootDirection && m->directionKeyMask == _andyObject->directionKeyMask) {
 		m->flags48 |= 0x80;
@@ -1736,8 +1731,8 @@ bool Game::mstMonster1TestGoalDirection(MonsterObject1 *m) {
 void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 	if (m->targetLevelPos_x != -1) {
 		if (m->xMstPos != m->targetLevelPos_x || m->yMstPos != m->targetLevelPos_y) {
-			_xMstPos2 = m->previousLevelPos_x;
-			_yMstPos2 = m->previousLevelPos_y;
+			_xMstPos2 = m->previousDxPos;
+			_yMstPos2 = m->previousDyPos;
 			return;
 		}
 		mstBoundingBoxClear(m, 1);
@@ -1747,8 +1742,8 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 	if (m->goalDirectionMask == 0) {
 		return;
 	}
-	m->previousLevelPos_x = _xMstPos2;
-	m->previousLevelPos_y = _yMstPos2;
+	m->previousDxPos = _xMstPos2;
+	m->previousDyPos = _yMstPos2;
 	const MstMovingBoundsUnk1 *m49Unk1 = m->m49Unk1;
 	uint8_t xDist, yDist;
 	if (_mstLut1[m->goalDirectionMask] & 1) {

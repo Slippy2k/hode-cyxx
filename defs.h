@@ -376,8 +376,8 @@ struct MonsterObject1 {
 	int goalPos_y2; // 0x80
 	int unk84; // 0x84 x
 	int unk88; // 0x88 y
-	int unk8C; // 0x8C unused
-	int unk90; // 0x90 unused
+	// int unk8C; // 0x8C unused
+	// int unk90; // 0x90 unused
 	int levelPosBounds_x2; // 0x94
 	int levelPosBounds_x1; // 0x98
 	int levelPosBounds_y2; // 0x9C
@@ -388,11 +388,11 @@ struct MonsterObject1 {
 	uint8_t targetDirectionMask; // 0xA7
 	uint8_t bboxNum[4]; // 0xA8, 0xA9, 0xAA, 0xAB
 	int32_t targetLevelPos_x; // 0xAC
-	int32_t targetLevelPos_y; // 0xBC
-	int32_t previousLevelPos_x; // _xMstPos2
-	int32_t previousLevelPos_y; // _yMstPos2
-	int32_t unkBC; // 0xBC x
-	int32_t unkC0; // 0xC0 y
+	int32_t targetLevelPos_y; // 0xB0
+	int32_t previousDxPos; // 0xB4 _xMstPos2
+	int32_t previousDyPos; // 0xB8 _yMstPos2
+	int32_t unkBC; // 0xBC _xMstPos1
+	int32_t unkC0; // 0xC0 _yMstPos1
 	Task *task; // 0xC4
 	uint8_t rnd_m49[4]; // 0xC8
 	uint8_t rnd_m35[4]; // 0xCC
