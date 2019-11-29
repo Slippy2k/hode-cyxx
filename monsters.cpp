@@ -131,10 +131,10 @@ void Game::mstMonster1ResetWalkPath(MonsterObject1 *m) {
 	const uint8_t *ptr = m->monsterInfos;
 	const int num = (~m->flagsA5) & 1;
 
-	m->levelPosBounds_x2 = m->walkNode->coords[0][num] - (int32_t)READ_LE_UINT32(ptr + 904); // right x coordinate
-	m->levelPosBounds_x1 = m->walkNode->coords[1][num] + (int32_t)READ_LE_UINT32(ptr + 904); // left x coordinate
-	m->levelPosBounds_y2 = m->walkNode->coords[2][num] - (int32_t)READ_LE_UINT32(ptr + 908); // bottom y coordinate
-	m->levelPosBounds_y1 = m->walkNode->coords[3][num] + (int32_t)READ_LE_UINT32(ptr + 908); // top y coordinate
+	m->levelPosBounds_x2 = m->walkNode->coords[0][num] - (int32_t)READ_LE_UINT32(ptr + 904);
+	m->levelPosBounds_x1 = m->walkNode->coords[1][num] + (int32_t)READ_LE_UINT32(ptr + 904);
+	m->levelPosBounds_y2 = m->walkNode->coords[2][num] - (int32_t)READ_LE_UINT32(ptr + 908);
+	m->levelPosBounds_y1 = m->walkNode->coords[3][num] + (int32_t)READ_LE_UINT32(ptr + 908);
 
 	const uint32_t indexWalkCode = m->walkNode->walkCodeReset[num];
 	m->walkCode = (indexWalkCode == kNone) ? 0 : &_res->_mstWalkCodeData[indexWalkCode];
@@ -179,8 +179,7 @@ bool Game::addChasingMonster(MstMonsterAction *m48, uint8_t direction) {
 			MonsterObject1 *m = &_monsterObjects1Table[num];
 			m->action = unk4;
 			m->flags48 |= 0x40;
-			m->flagsA5 &= 0x8A;
-			m->flagsA5 |= 0x0A;
+			m->flagsA5 = (m->flagsA5 & ~0x75) | 0xA;
 			mstMonster1ResetWalkPath(m);
 			Task *current = _monsterObjects1TasksList;
 			Task *t = m->task;
@@ -1903,11 +1902,12 @@ int Game::mstTaskStopMonster1(Task *t, MonsterObject1 *m) {
 	}
 	if (m->goalScreenNum != 0xFC && (m->flagsA5 & 8) != 0 && (t->flags & 0x20) != 0 && m->action) {
 		LvlObject *o = m->o16;
-		const int bx = _res->_mstPointOffsets[_currentScreen].xOffset;
-		const int by = _res->_mstPointOffsets[_currentScreen].yOffset;
-		const int ox = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
-		const int oy = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
-		if (ox < bx || ox + o->width - 1 > bx + 255 || oy < by || oy + o->height - 1 > by + 191) {
+		const int xPosScreen = _res->_mstPointOffsets[_currentScreen].xOffset;
+		const int yPosScreen = _res->_mstPointOffsets[_currentScreen].yOffset;
+		const int xPosObj = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
+		const int yPosObj = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
+		// this matches the original code but rect_intersects() could probably be used
+		if (xPosObj < xPosScreen || xPosObj + o->width - 1 > xPosScreen + 255 || yPosObj < yPosScreen || yPosObj + o->height - 1 > yPosScreen + 191) {
 			return mstTaskStopMonsterObject1(t);
 		}
 	}
@@ -5365,9 +5365,9 @@ l1:
 // 41DC19
 					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
 					_ebx += _mstAndyLevelPosX;
-					int var44 =  _ebx;
+					const int xLevelPos = _ebx;
 					_esi += _mstAndyLevelPosY;
-					int var38 = _esi;
+					const int yLevelPos = _esi;
 					int minDistY = 0x1000000;
 					int minDistX = 0x1000000;
 					int var34 = -1;
@@ -5376,30 +5376,30 @@ l1:
 					for (int j = 0; j < var10; ++j) {
 						MonsterObject1 *m = varC->monster1[j];
 						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
-							int _ebp = var38 - m->yMstPos;
+							int _ebp = yLevelPos - m->yMstPos;
 							int _eax = ABS(_ebp);
-							int _esi = var44 - m->xMstPos;
+							int _esi = xLevelPos - m->xMstPos;
 							int _ecx = ABS(_esi);
 							if (_ecx > m48->unk0 || _eax > m48->unk2) {
 								continue;
 							}
 							if ((var8 || var4) && m->monsterInfos[944] != 10 && m->monsterInfos[944] != 16 && m->monsterInfos[944] != 9) {
 								if (_esi <= 0) {
-									if (m->levelPosBounds_x1 > _ebx) { // var44
+									if (m->levelPosBounds_x1 > xLevelPos) {
 										continue;
 									}
 								} else {
-									if (m->levelPosBounds_x2 < _ebx) { // var44
+									if (m->levelPosBounds_x2 < xLevelPos) {
 										continue;
 									}
 								}
 								if (var4D != 0) { // vertical move
 									if (_ebp <= 0) {
-										if (m->levelPosBounds_y1 > var38) {
+										if (m->levelPosBounds_y1 > yLevelPos) {
 											continue;
 										}
 									} else {
-										if (m->levelPosBounds_y2 < var38) {
+										if (m->levelPosBounds_y2 < yLevelPos) {
 											continue;
 										}
 									}
@@ -5463,9 +5463,9 @@ l2:
 // 41DF10
 					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
 					_ebx += _mstAndyLevelPosX;
-					int var44 =  _ebx;
+					const int xLevelPos = _ebx;
 					_esi += _mstAndyLevelPosY;
-					int var38 = _esi;
+					const int yLevelPos = _esi;
 					int minDistY = 0x1000000;
 					int minDistX = 0x1000000;
 					int var34 = -1;
@@ -5473,30 +5473,30 @@ l2:
 					for (int j = 0; j < var10; ++j) {
 						MonsterObject1 *m = varC->monster1[j];
 						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
-							int _ebp = var38 - m->yMstPos;
+							int _ebp = yLevelPos - m->yMstPos;
 							int _eax = ABS(_ebp);
-							int _esi = var44 - m->xMstPos;
+							int _esi = xLevelPos - m->xMstPos;
 							int _ecx = ABS(_esi);
 							if (_ecx > m48->unk0 || _eax > m48->unk2) {
 								continue;
 							}
 							if ((var8 || var4) && m->monsterInfos[944] != 10 && m->monsterInfos[944] != 16 && m->monsterInfos[944] != 9) {
 								if (_esi <= 0) {
-									if (m->levelPosBounds_x1 > _ebx) { // var44
+									if (m->levelPosBounds_x1 > xLevelPos) {
 										continue;
 									}
 								} else {
-									if (m->levelPosBounds_x2 < _ebx) { // var44
+									if (m->levelPosBounds_x2 < xLevelPos) {
 										continue;
 									}
 								}
 								if (var4D != 0) { // vertical move
 									if (_ebp <= 0) {
-										if (m->levelPosBounds_y1 > var38) {
+										if (m->levelPosBounds_y1 > yLevelPos) {
 											continue;
 										}
 									} else {
-										if (m->levelPosBounds_y2 < var38) {
+										if (m->levelPosBounds_y2 < yLevelPos) {
 											continue;
 										}
 									}
