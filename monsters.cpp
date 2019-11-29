@@ -1579,27 +1579,26 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 		return;
 	}
 // 41A759
-	int _edi = 0;
 	MstBehaviorState *behaviorState = m->behaviorState;
 	MstWalkPath *walkPath = &_res->_mstWalkPathData[behaviorState->walkPath];
 	uint8_t _cl = m->bboxNum[2];
 	if (m->unkBC != _xMstPos1 || m->unkC0 != _yMstPos1) {
+		bool inWalkBox = false;
 		if (_cl < walkPath->count) {
 			MstWalkNode *walkNode = &walkPath->data[_cl];
 			const MstWalkBox *m34 = &_res->_mstWalkBoxData[walkNode->walkBox];
-			if (rect_contains(m34->left, m34->bottom, m34->right, m34->top, _xMstPos1, _yMstPos1)) {
+			if (rect_contains(m34->left, m34->top, m34->right, m34->bottom, _xMstPos1, _yMstPos1)) {
+				inWalkBox = true;
 				// goto 41A879
-			} else {
-				_edi = -1;
 			}
 		}
-		if (_edi == 0) {
+		if (!inWalkBox) {
 // 41A7AD
 			const int _al = mstMonster1FindWalkPathRect(m, walkPath, _xMstPos1, _yMstPos1);
 			if (_al < 0) {
 				_xMstPos1 = _xMstPos3;
 				_yMstPos1 = _yMstPos3;
-				_cl = _edi - _al;
+				_cl = -1 - _al;
 				m->goalPos_x1 = m->goalPos_x2 = _xMstPos1;
 				m->goalPos_y1 = m->goalPos_y2 = _yMstPos1;
 				_xMstPos2 = ABS(m->xMstPos - _xMstPos1);
@@ -1628,7 +1627,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 		m->targetDirectionMask = 0xFF;
 		return;
 	}
-	_edi = (~m->flagsA5) & 1;
+	const int _edi = (~m->flagsA5) & 1;
 	if (m->unkBC == _xMstPos1 && m->unkC0 == _yMstPos1) {
 		if (m->targetDirectionMask == 0xFF) {
 			return;
@@ -1784,8 +1783,8 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 	int bboxIndex = 0;
 	int var8 = _mstLut1[m->goalDirectionMask];
 	for (int var20 = 0; var20 < 5; ++var20) {
+		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (var20 != 0) {
-			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 			if (p[0xE] == 0 || bboxIndex == 0) {
 				break;
 			}
@@ -1797,7 +1796,6 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			continue;
 		}
 		int _ecx, _eax;
-		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (_mstLut1[dirMask] & 1) {
 			_ecx = (int8_t)p[0xA];
 			_eax = (int8_t)p[0xB];
