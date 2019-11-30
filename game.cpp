@@ -19,15 +19,14 @@ static const char *_setupCfg = "setup.cfg";
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
-Game::Game(System *system, const char *dataPath, const char *savePath, uint32_t cheats)
+Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	: _fs(dataPath, savePath) {
 
 	_level = 0;
 	_res = new Resource(&_fs);
-	_paf = new PafPlayer(system, &_fs);
+	_paf = new PafPlayer(&_fs);
 	_rnd.setSeed();
-	_video = new Video(system);
-	_system = system;
+	_video = new Video();
 	_cheats = cheats;
 
 	_frameMs = kFrameTimeStamp;
@@ -169,7 +168,7 @@ void Game::shakeScreen() {
 			if (_shakeScreenDuration & 1) {
 				dy = -dy;
 			}
-			_system->shakeScreen(dx, dy);
+			g_system->shakeScreen(dx, dy);
 		}
 	}
 	if (_levelRestartCounter != 0) {
@@ -2135,7 +2134,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		_paf->preload(num);
 		_paf->play(num);
 		_paf->unload(num);
-		if (_system->inp.quit) {
+		if (g_system->inp.quit) {
 			return;
 		}
 	}
@@ -2144,14 +2143,14 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	callLevel_initialize();
 	restartLevel();
 	do {
-		const int frameTimeStamp = _system->getTimeStamp() + _frameMs;
+		const int frameTimeStamp = g_system->getTimeStamp() + _frameMs;
 		levelMainLoop();
-		int diff = frameTimeStamp - _system->getTimeStamp();
+		int diff = frameTimeStamp - g_system->getTimeStamp();
 		if (diff < 10) {
 			diff = 10;
 		}
-		_system->sleep(diff);
-	} while (!_system->inp.quit && !_endLevel);
+		g_system->sleep(diff);
+	} while (!g_system->inp.quit && !_endLevel);
 	_animBackgroundDataCount = 0;
 	callLevel_terminate();
 }
@@ -2651,7 +2650,7 @@ void Game::updateAndyMonsterObjects() {
 }
 
 void Game::updateInput() {
-	const uint8_t inputMask = _system->inp.mask;
+	const uint8_t inputMask = g_system->inp.mask;
 	if (inputMask & SYS_INP_RUN) {
 		_actionKeyMask |= kActionKeyMaskRun;
 	}
@@ -2727,11 +2726,11 @@ void Game::levelMainLoop() {
 	if (_video->_paletteNeedRefresh) {
 		_video->_paletteNeedRefresh = false;
 		_video->refreshGamePalette(_video->_displayPaletteBuffer);
-		_system->copyRectWidescreen(Video::W, Video::H, _video->_backgroundLayer, _video->_palette);
+		g_system->copyRectWidescreen(Video::W, Video::H, _video->_backgroundLayer, _video->_palette);
 	}
 	drawScreen();
-	if (_system->inp.screenshot) {
-		_system->inp.screenshot = false;
+	if (g_system->inp.screenshot) {
+		g_system->inp.screenshot = false;
 		captureScreenshot();
 	}
 	if (_cheats != 0) {
@@ -2750,10 +2749,10 @@ void Game::levelMainLoop() {
 		_video->updateGameDisplay(_video->_frontLayer);
 	}
 	_rnd.update();
-	_system->processEvents();
-	if (_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
+	g_system->processEvents();
+	if (g_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
 		if (displayHintScreen(-1, 0)) {
-			_system->inp.quit = true;
+			g_system->inp.quit = true;
 			return;
 		}
 	} else {
@@ -2820,9 +2819,9 @@ void Game::callLevel_terminate() {
 
 void Game::displayLoadingScreen() {
 	if (_res->loadDatLoadingImage(_video->_frontLayer, _video->_palette)) {
-		_system->setPalette(_video->_palette, 256, 6);
-		_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
-		_system->updateScreen(false);
+		g_system->setPalette(_video->_palette, 256, 6);
+		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+		g_system->updateScreen(false);
 	}
 }
 
@@ -2842,27 +2841,27 @@ int Game::displayHintScreen(int num, int pause) {
 		confirmQuit = true;
 	}
 	if (_res->loadDatHintImage(num, _video->_frontLayer, _video->_palette)) {
-		_system->setPalette(_video->_palette, 256, 6);
-		_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
-		_system->updateScreen(false);
+		g_system->setPalette(_video->_palette, 256, 6);
+		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+		g_system->updateScreen(false);
 	}
 	do {
-		_system->processEvents();
+		g_system->processEvents();
 		if (confirmQuit) {
 			const int currentQuit = quit;
-			if (_system->inp.keyReleased(SYS_INP_LEFT)) {
+			if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
 				quit = kQuitNo;
 			}
-			if (_system->inp.keyReleased(SYS_INP_RIGHT)) {
+			if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
 				quit = kQuitYes;
 			}
 			if (currentQuit != quit) {
-				_system->copyRect(0, 0, Video::W, Video::H, quitBuffers[quit], 256);
-				_system->updateScreen(false);
+				g_system->copyRect(0, 0, Video::W, Video::H, quitBuffers[quit], 256);
+				g_system->updateScreen(false);
 			}
 		}
-		_system->sleep(30);
-	} while (!_system->inp.quit && !_system->inp.keyReleased(SYS_INP_JUMP));
+		g_system->sleep(30);
+	} while (!g_system->inp.quit && !g_system->inp.keyReleased(SYS_INP_JUMP));
 	unmuteSound();
 	_video->_paletteNeedRefresh = true;
 	return confirmQuit && quit == kQuitYes;

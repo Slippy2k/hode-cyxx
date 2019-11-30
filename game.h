@@ -18,7 +18,6 @@ struct Game;
 struct Level;
 struct PafPlayer;
 struct Video;
-struct System;
 
 struct CheckpointData {
 	int16_t xPos;
@@ -95,7 +94,6 @@ struct Game {
 	Random _rnd;
 	Resource *_res;
 	Video *_video;
-	System *_system;
 	uint32_t _cheats;
 	int _frameMs;
 	int _difficulty;
@@ -228,7 +226,7 @@ struct Game {
 	int _wormHoleSpritesCount;
 	WormHoleSprite _wormHoleSpritesTable[6];
 
-	Game(System *system, const char *dataPath, const char *savePath, uint32_t cheats);
+	Game(const char *dataPath, const char *savePath, uint32_t cheats);
 	~Game();
 
 	// 32*24 pitch=512
