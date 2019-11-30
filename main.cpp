@@ -26,6 +26,7 @@ static const char *_usage =
 	"hode - Heart of Darkness Interpreter\n"
 	"Usage: %s [OPTIONS]...\n"
 	"  --datapath=PATH   Path to data files (default '.')\n"
+	"  --savepath=PATH   Path to save files (default '.')\n"
 	"  --level=NUM       Start at level NUM\n"
 	"  --checkpoint=NUM  Start at checkpoint NUM\n"
 ;
