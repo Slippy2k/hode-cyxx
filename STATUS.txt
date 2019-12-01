@@ -11,9 +11,12 @@ level 4 'isld' - completable
 level 5 'lava' - completable
 	screen 7 - spiders do not move close to Andy
 
-level 6 'pwr2' - completable
+level 6 'pwr2' - issue on screen 7
+	screen 7 (--checkpoint 2)
+		2 Andy - monster object added in screen 10
+		amigo do not grab Andy when Spectre are all dead
 
-level 7 'lar1' - completable (issue on screen 11)
+level 7 'lar1' - issue on screen 11
 	--checkpoint 3
 		switch on the right does not trigger the walls
 	screen 9 - gate not open
