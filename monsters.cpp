@@ -173,7 +173,7 @@ bool Game::addChasingMonster(MstMonsterAction *m48, uint8_t direction) {
 	for (int i = 0; i < m48->areaCount; ++i) {
 		MstMonsterAreaAction *unk4 = m48->area[i].data;
 		const uint8_t num = unk4->monster1Index;
-		if (num != 255) {
+		if (num != 0xFF) {
 			assert(num < kMaxMonsterObjects1);
 			unk4->direction = direction;
 			MonsterObject1 *m = &_monsterObjects1Table[num];
@@ -205,7 +205,7 @@ bool Game::addChasingMonster(MstMonsterAction *m48, uint8_t direction) {
 
 void Game::mstMonster1ClearChasingMonster(MonsterObject1 *m) {
 	m->flags48 &= ~0x50;
-	m->action->monster1Index = 255;
+	m->action->monster1Index = 0xFF;
 	m->action = 0;
 	--_mstChasingMonstersCount;
 	if (_mstChasingMonstersCount <= 0) {
@@ -438,17 +438,17 @@ int Game::mstTaskSetNextWalkCode(Task *t) {
 
 void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
 	assert(dir == 0 || dir == 1);
-	uint8_t r = m->bboxNum[dir];
-	if (r < _mstBoundingBoxesCount && _mstBoundingBoxesTable[r].monster1Index == m->monster1Index) {
-		_mstBoundingBoxesTable[r].monster1Index = 255;
-		int i = r;
+	uint8_t num = m->bboxNum[dir];
+	if (num < _mstBoundingBoxesCount && _mstBoundingBoxesTable[num].monster1Index == m->monster1Index) {
+		_mstBoundingBoxesTable[num].monster1Index = 0xFF;
+		int i = num + 1;
 		for (; i < _mstBoundingBoxesCount; ++i) {
-			if (_mstBoundingBoxesTable[i].monster1Index != 255) {
+			if (_mstBoundingBoxesTable[i].monster1Index != 0xFF) {
 				break;
 			}
 		}
 		if (i == _mstBoundingBoxesCount) {
-			_mstBoundingBoxesCount = r;
+			_mstBoundingBoxesCount = num;
 		}
 	}
 	m->bboxNum[dir] = 0xFF;
@@ -457,10 +457,11 @@ void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
 int Game::mstBoundingBoxCollides1(int num, int x1, int y1, int x2, int y2) const {
 	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
 		const MstBoundingBox *p = &_mstBoundingBoxesTable[i];
-		if (p->monster1Index != 0xFF && num != p->monster1Index) {
-			if (rect_intersects(x1, y1, x2, y2, p->x1, p->y1, p->x2, p->y2)) {
-				return i + 1;
-			}
+		if (p->monster1Index == 0xFF || num == p->monster1Index) {
+			continue;
+		}
+		if (rect_intersects(x1, y1, x2, y2, p->x1, p->y1, p->x2, p->y2)) {
+			return i + 1;
 		}
 	}
 	return 0;
@@ -850,7 +851,7 @@ void Game::resetMstCode() {
 	_executeMstLogicPrevCounter = _executeMstLogicCounter = 0;
 	// _mstUnk8 = 0;
 	_specialAnimFlag = false;
-	_mstAndyRectNum = 255;
+	_mstAndyRectNum = 0xFF;
 	_mstBoundingBoxesCount = 0;
 	_mstOp67_y1 = 0;
 	_mstOp67_y2 = 0;
@@ -5184,8 +5185,9 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		}
 	}
 // 41C038
-	if (m->monsterInfos[946] & 4) {
-		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
+
+	const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
+	if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 		const int x1 = m->xMstPos + (int8_t)p[0xC];
 		const int x2 = x1 + p[0xE] - 1;
 		const int y1 = m->yMstPos + (int8_t)p[0xD];
@@ -5289,7 +5291,7 @@ void Game::mstOp52() {
 	for (int i = 0; i < m48->areaCount; ++i) {
 		MstMonsterArea *m48Area = &m48->area[j];
 		const uint8_t num = m48Area->data->monster1Index;
-		if (num != 255) {
+		if (num != 0xFF) {
 			assert(num < kMaxMonsterObjects1);
 			MonsterObject1 *m = &_monsterObjects1Table[num];
 			mstMonster1ClearChasingMonster(m);
@@ -5443,7 +5445,7 @@ l1:
 		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
 			uint8_t var1C = m12u4->unk18;
-			m12u4->monster1Index = 255;
+			m12u4->monster1Index = 0xFF;
 			int var4C = (var1C == 2) ? 0 : var1C;
 			int _edx = var4C;
 // 41DE98
@@ -5703,8 +5705,8 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			_specialAnimFlag = true;
 		}
 // 411BBA
-		if (_mstAndyRectNum != 255) {
-			_mstBoundingBoxesTable[_mstAndyRectNum].monster1Index = 255;
+		if (_mstAndyRectNum != 0xFF) {
+			_mstBoundingBoxesTable[_mstAndyRectNum].monster1Index = 0xFF;
 		}
 		break;
 	case 1:
@@ -5743,7 +5745,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			_specialAnimFlag = false;
 		}
 // 4119F5
-		_mstAndyRectNum = mstBoundingBoxUpdate(_mstAndyRectNum, 0xFE, _mstAndyLevelPosX, _mstAndyLevelPosY, _mstAndyLevelPosX + _andyObject->width - 1, _mstAndyLevelPosY + _andyObject->height - 1);
+		_mstAndyRectNum = mstBoundingBoxUpdate(_mstAndyRectNum, 0xFE, _mstAndyLevelPosX, _mstAndyLevelPosY, _mstAndyLevelPosX + _andyObject->width - 1, _mstAndyLevelPosY + _andyObject->height - 1) & 0xFF;
 		break;
 	case 2: {
 			LvlObject *o = t->monster1->o16;

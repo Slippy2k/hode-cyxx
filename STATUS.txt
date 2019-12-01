@@ -13,7 +13,7 @@ level 5 'lava' - completable
 
 level 6 'pwr2' - completable
 
-level 7 'pwr1' - completable (issue on screen 11)
+level 7 'lar1' - completable (issue on screen 11)
 	--checkpoint 3
 		switch on the right does not trigger the walls
 	screen 9 - gate not open
@@ -27,7 +27,7 @@ level 7 'pwr1' - completable (issue on screen 11)
 			check mstMonster1UpdateGoalPosition
 			worm hole sprites are on top of the stairs
 		not possible to walk on the left (can jump)
-level 8 'pwr2' - to check (--checkpoint 4)
+level 8 'lar2' - to check (--checkpoint 4)
 	need to start checkpoint 1 so checkpoint 4 is triggered in screen 6 ?
 	checkpoint 5 not triggered when bringing the second meteorite piece
 
