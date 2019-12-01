@@ -6,6 +6,8 @@ import zipfile
 
 SRC_DIR = '..'
 
+EXTRA_DIRS = [ '.', '../tools/' ]
+
 SRCS = (
 	'Makefile$',
 	'.*\.h$',
@@ -19,7 +21,7 @@ BINS = (
 	'icon.bmp',
 	'README.txt',
 	'CHANGES.txt',
-	'VERSIONS.txt',
+	'VERSIONS.yaml',
 )
 
 def getVersion():
@@ -77,6 +79,8 @@ for name in BINS:
 	for filename in src_dir:
 		if re.match(name, filename):
 			zf.write(os.path.join(SRC_DIR, filename), filename)
-	if os.path.exists(name):
-		zf.write(name, name)
+	for dirname in EXTRA_DIRS:
+		path = os.path.join(dirname, name)
+		if os.path.exists(path):
+			zf.write(path, name)
 zf.close()
