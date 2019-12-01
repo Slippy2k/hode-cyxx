@@ -21,7 +21,7 @@ BINS = (
 	'icon.bmp',
 	'README.txt',
 	'CHANGES.txt',
-	'VERSIONS.yaml',
+	'RELEASES.yaml',
 )
 
 def getVersion():

@@ -22,7 +22,7 @@ The original datafiles from the Windows releases (Demo or CD) are required.
 - *_hod.sss
 - *_hod.mst
 
-See also the 'VERSIONS.yaml' file for a list of game versions this program
+See also the 'RELEASES.yaml' file for a list of game versions this program
 has been tested with.
 
 
