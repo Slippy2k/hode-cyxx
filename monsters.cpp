@@ -2707,7 +2707,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418C73
 			m->flagsA6 |= 1;
 			assert(_mstCurrentMonster1 == m);
-			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0 && (m->monsterInfos[946] & 2) == 0) {
+			if (!mstSetCurrentPos(m, m->xMstPos, m->yMstPos) && (m->monsterInfos[946] & 2) == 0) {
 				if ((_mstCurrentPosX > m->xMstPos && _mstCurrentPosX > m->walkNode->coords[0][1]) || (_mstCurrentPosX < m->xMstPos && _mstCurrentPosX < m->walkNode->coords[1][1])) {
 					uint32_t indexWalkCode = m->walkNode->walkCodeStage1;
 					if (indexWalkCode != kNone) {
@@ -2818,7 +2818,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		}
 	}
 // 418A9A
-	if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0) {
+	if (!mstSetCurrentPos(m, m->xMstPos, m->yMstPos)) {
 		mstTaskInitMonster1Type2(t, 1);
 	}
 	return 0;
@@ -3189,7 +3189,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			var10 |= 4;
 		}
 // 40E96D
-		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && mstSetCurrentPos(m, _edi, _ebp) == 0) {
+		if ((m->flagsA5 & 2) != 0 && (m->flags48 & 8) != 0 && !mstSetCurrentPos(m, _edi, _ebp)) {
 			t->flags |= 0x80;
 			return 0;
 		}
@@ -6201,10 +6201,10 @@ void Game::mstOp59_addShootSpecialPowers(int x, int y, int screenNum, int state,
 			0x0D, 0x00, 0x0C, 0x01, 0x0C, 0x03, 0x0C, 0x00, 0x0C, 0x02, 0x0D, 0x01, 0x0B, 0x00, 0x0B, 0x02,
 		};
 		assert(state < 8);
-		o->anim = data[state* 2];
+		o->anim = data[state * 2];
 		o->flags1 = ((data[state * 2 + 1] & 3) << 4) | (o->flags1 & ~0x0030);
 		o->frame = 0;
-		o->flags2 = o->flags1;
+		o->flags2 = flags;
 		o->screenNum = screenNum;
 		setupLvlObjectBitmap(o);
 		setLvlObjectPosRelativeToPoint(o, 6, x, y);
@@ -6278,7 +6278,7 @@ void Game::mstTaskResetMonster1WalkPath(Task *t) {
 			break;
 		case 6:
 			m->flagsA5 &= ~7;
-			if (mstSetCurrentPos(m, m->xMstPos, m->yMstPos) == 0) {
+			if (!mstSetCurrentPos(m, m->xMstPos, m->yMstPos)) {
 				m->flagsA5 |= 1;
 				if (!mstMonster1UpdateWalkPath(m)) {
 					mstMonster1ResetWalkPath(m);

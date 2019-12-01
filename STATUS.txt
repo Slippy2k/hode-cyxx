@@ -36,6 +36,26 @@ level 8 'lar2' - to check (--checkpoint 4)
 
 level 9 'dark' - completable
 
+-- level 6 issue
+
+; Amigo #1 (with Andy)
+executeMstCode task 0 0x7f5a2cf3af98 code 239 offset 0x0070
+resetTask t 0x7f5a2cf3b000 offset 0x221c
+executeMstCode task 0 0x7f5a2cf3af98 code 223 offset 0x0074
+mstOp67_addMonster pos 130,100,130,100 10 2 0x0 0x300b 0 0 10
+resetTask t 0x7f5a2cf3b068 offset 0xf8ac1560
+mstTaskInitMonster1Type2 t 0x7f5a2cf3b068 flag 0
+mstMonster1UpdateWalkPath m 0x7f5a2cf3e420
+resetTask t 0x7f5a2cf3b068 offset 0x2a04
+
+; Amigo #2
+executeMstCode task 0 0x7f5a2cf3af98 code 223 offset 0x0078
+mstOp67_addMonster pos 100,150,100,150 8 2 0x1 0x300b 1 0 10
+resetTask t 0x7f5a2cf3b0d0 offset 0xf8ac1560
+mstTaskInitMonster1Type2 t 0x7f5a2cf3b0d0 flag 0
+mstMonster1UpdateWalkPath m 0x7f5a2cf3e548
+resetTask t 0x7f5a2cf3b0d0 offset 0x2a58
+
 
 -- level 7 issue
 
