@@ -39,6 +39,10 @@ level 9 'dark' - completable
 
 -- level 6 issue
 
+levelMap 2 2
+ 0a  0b
+ 07  08
+
 ; Amigo #1 (with Andy)
 executeMstCode task 0 0x7f5a2cf3af98 code 239 offset 0x0070
 resetTask t 0x7f5a2cf3b000 offset 0x221c

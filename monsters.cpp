@@ -1707,6 +1707,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 	} else {
 		_yMstPos2 = 0;
 	}
+	debug(kDebug_MONSTER, "mstMonster1MoveTowardsGoal1 m %p dist %d,%d", m, _xMstPos2, _yMstPos2);
 }
 
 bool Game::mstMonster1TestGoalDirection(MonsterObject1 *m) {
@@ -2015,6 +2016,8 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 	int minDistance = 0x40000000; // _esi
 	int ret = -1;
 	int currentIndex = -1;
+	int xDist = 0;
+	int yDist = 0;
 	for (uint32_t i = 0; i < walkPath->count; ++i, --currentIndex) {
 		MstWalkNode *walkNode = &walkPath->data[i];
 		if (walkNode->unk60[num][i] == 0 && m->walkNode != walkNode) {
@@ -2026,82 +2029,97 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 			return i;
 		}
 // 41A3CE
-		int dist, xDist, yDist;
+		int dist, curX = x, curY = y;
 
 		if (x >= m34->left && x <= m34->right) {
 			const int dy1 = ABS(y - m34->bottom);
 			const int dy2 = ABS(y - m34->top);
-			const int top = (dy2 >= dy1) ? m34->bottom : m34->top; // _ebx
-			yDist = y - top;
+			curY = (dy2 >= dy1) ? m34->bottom : m34->top;
+
+			yDist = y - curY;
 			yDist *= yDist;
+
 			dist = yDist;
 			if (minDistance >= dist) {
 				minDistance = dist;
-				_xMstPos3 = x;
-				_yMstPos3 = top;
+				_xMstPos3 = curX;
+				_yMstPos3 = curY;
 				ret = currentIndex;
 			}
 		} else if (y >= m34->top && y <= m34->bottom) {
 // 41A435
-			const int dy1 = ABS(x - m34->right);
-			const int dy2 = ABS(x - m34->left);
-			const int left = (dy2 >= dy1) ? m34->right : m34->left; // _ecx
-			xDist = x - left;
+			const int dx1 = ABS(x - m34->right);
+			const int dx2 = ABS(x - m34->left);
+			curX = (dx2 >= dx1) ? m34->right : m34->left;
+
+			xDist = x - curX;
 			xDist *= xDist;
+
 			dist = xDist;
 			if (minDistance >= dist) {
 				minDistance = dist;
-				_xMstPos3 = left;
-				_yMstPos3 = y;
+				_xMstPos3 = curX;
+				_yMstPos3 = curY;
 				ret = currentIndex;
 			}
 		} else {
 // 41A49C
-			xDist = (x - m34->left); // _edx
+			curX = m34->left;
+			xDist = x - curX;
 			xDist *= xDist;
-			yDist = (y - m34->top); // _eax
+			curY = m34->top;
+			yDist = y - curY;
 			yDist *= yDist;
 
 			dist = xDist + yDist;
 			if (minDistance >= dist) {
 				minDistance = dist;
-				_xMstPos3 = m34->left;
-				_yMstPos3 = m34->top;
+				_xMstPos3 = curX;
+				_yMstPos3 = curY;
 				ret = currentIndex;
 			}
 // 41A4C6
-			xDist = x - m34->right; // _edx
+			curX = m34->right;
+			xDist = x - curX;
 			xDist *= xDist;
 			dist = xDist + yDist;
 			if (minDistance >= dist) {
 				minDistance = dist;
-				_xMstPos3 = m34->right;
-				_yMstPos3 = m34->top;
+				_xMstPos3 = curX;
+				_yMstPos3 = curY;
 				ret = currentIndex;
 			}
 // 41A4FB
-			yDist = y - m34->bottom; // _edi
+			curY = m34->bottom;
+			yDist = y - curY;
 			yDist *= yDist;
 			dist = xDist + yDist;
 			if (minDistance >= dist) {
 				minDistance = dist;
-				_xMstPos3 = m34->right;
-				_yMstPos3 = m34->bottom;
+				_xMstPos3 = curX;
+				_yMstPos3 = curY;
 				ret = currentIndex;
 			}
 // 41A529
-			xDist = x - m34->left; // _ebp
+			curX = m34->left;
+			xDist = x - curX;
 			xDist *= xDist;
 			dist = xDist + yDist;
 			if (minDistance >= dist) {
 				minDistance = dist;
-				_xMstPos3 = m34->left;
-				_yMstPos3 = m34->bottom;
+				_xMstPos3 = curX;
+				_yMstPos3 = curY;
 				ret = currentIndex;
 			}
 		}
 // 41A560
-		// if (minDistance >= xDist + yDist)
+		dist = xDist + yDist;
+		if (minDistance >= dist) {
+			minDistance = dist;
+			_xMstPos3 = curX;
+			_yMstPos3 = curY;
+			ret = currentIndex;
+		}
 	}
 	return ret;
 }
@@ -2662,8 +2680,11 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 		return 0;
 	}
 	uint8_t _al = _mstCurrentMonster1->flagsA6;
+	if (_al & 2) {
+		return 0;
+	}
 	uint8_t _dl = _mstCurrentMonster1->flagsA5;
-	if ((_al & 2) != 0 || (_dl & 0x30) != 0) {
+	if (_dl & 0x30) {
 		return 0;
 	}
 	dir = _dl & 3;
