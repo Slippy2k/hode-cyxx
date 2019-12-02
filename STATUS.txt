@@ -9,7 +9,8 @@ level 4 'isld' - completable
 	screen 4 - spectres do not hit the bridge (no large explosion sprite)
 
 level 5 'lava' - completable
-	screen 7 - spiders do not move close to Andy
+	--checkpoint 3
+		screen 7 - spiders do not move close to Andy
 
 level 6 'pwr2' - issue on screen 7
 	screen 7 (--checkpoint 2)
