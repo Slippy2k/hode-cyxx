@@ -1311,20 +1311,27 @@ void Game::mstMonster1UpdateGoalPosition(MonsterObject1 *m) {
 	int var1C = 0;
 	int var18 = 0;
 	int _ebp, _edi, _esi, _eax;
+	debug(kDebug_MONSTER, "mstMonster1UpdateGoalPosition m %p goalScreen %d levelBounds [%d,%d,%d,%d]", m, m->goalScreenNum, m->levelPosBounds_x1, m->levelPosBounds_y1, m->levelPosBounds_x2, m->levelPosBounds_y2);
 	if (m->goalScreenNum == 0xFD) {
 		const MstMovingBounds *m49 = m->m49;
-		if (m->levelPosBounds_x2 > _mstAndyLevelPosX + m49->unk14 - m->goalDistance_x2 && m->levelPosBounds_x1 < _mstAndyLevelPosX + m->goalDistance_x2 - m49->unk14 && m->levelPosBounds_y2 > _mstAndyLevelPosY + m49->unk15 - m->goalDistance_y2 && m->levelPosBounds_y1 < _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y2) {
-			var18 = _mstAndyLevelPosX + m49->unk14 + m->goalDistance_x1;
-			if (m->levelPosBounds_x2 < var18) {
-				if (m->levelPosBounds_x1 > _mstAndyLevelPosX - m->goalDistance_x1 - m49->unk14 && m->levelPosBounds_y2 < _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y1 && m->levelPosBounds_y1 > _mstAndyLevelPosY - m->goalDistance_y1 - m49->unk15) {
+		const int xPos_1 = _mstAndyLevelPosX + m49->unk14 - m->goalDistance_x2;
+		const int xPos_2 = _mstAndyLevelPosX - m49->unk14 + m->goalDistance_x2;
+		const int yPos_1 = _mstAndyLevelPosY + m49->unk15 - m->goalDistance_y2;
+		const int yPos_2 = _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y2;
+		if (m->levelPosBounds_x2 > xPos_1 && m->levelPosBounds_x1 < xPos_2 && m->levelPosBounds_y2 > yPos_1 && m->levelPosBounds_y1 < yPos_2) {
+			const int xPos_3 = _mstAndyLevelPosX + m49->unk14 + m->goalDistance_x1;
+			const int xPos_4 = _mstAndyLevelPosX - m49->unk14 - m->goalDistance_x1;
+			const int yPos_3 = _mstAndyLevelPosY + m49->unk15 + m->goalDistance_y1;
+			const int yPos_4 = _mstAndyLevelPosY - m49->unk15 - m->goalDistance_y1;
+			if (m->levelPosBounds_x2 < xPos_3) {
+				if (m->levelPosBounds_x1 > xPos_4 && m->levelPosBounds_y2 < yPos_3 && m->levelPosBounds_y1 > yPos_4) {
 					goto l41B2DC;
 				}
 			}
 // 41B170
-			int tmp = var18;
 			var18 = 0;
 			_ebp = 0x40000000;
-			if (m->levelPosBounds_x2 >= tmp) {
+			if (m->levelPosBounds_x2 >= _mstAndyLevelPosX + m->goalDistance_x1 + m49->unk14) {
 				if (m->xMstPos > _mstAndyLevelPosX + m->goalDistance_x2) {
 					_ebp = m->xMstPos - m->goalDistance_x1 - _mstAndyLevelPosX;
 // 41B191
@@ -1350,7 +1357,7 @@ void Game::mstMonster1UpdateGoalPosition(MonsterObject1 *m) {
 			_edi = 0x40000000;
 			if (m->levelPosBounds_x1 <= _mstAndyLevelPosX - m->goalDistance_x1 - m49->unk14) {
 				if (m->xMstPos > _mstAndyLevelPosX - m->goalDistance_x1) {
-					_edi = m->xMstPos - _mstAndyLevelPosX  + m->goalDistance_x2;
+					_edi = m->xMstPos - _mstAndyLevelPosX + m->goalDistance_x2;
 					if (_edi >= 0 && _edi < m49->unk14) {
 						_edi = 0x40000000;
 					} else {
@@ -1384,7 +1391,7 @@ void Game::mstMonster1UpdateGoalPosition(MonsterObject1 *m) {
 					_esi = -1;
 					var18 |= 4;
 				} else {
-					_esi = m->goalDistance_y2 - m->yMstPos - _mstAndyLevelPosY;
+					_esi = m->goalDistance_y2 - m->yMstPos + _mstAndyLevelPosY;
 					if (_esi >= 0 && _esi < m49->unk15) {
 						_esi = 0x40000000;
 					} else {
@@ -1498,8 +1505,8 @@ l41B2DC:
 		m->goalPos_y2 = -m->goalDistance_y1;
 		break;
 	case 2:
-		m->goalPos_y2 =  m->goalDistance_y2;
 		m->goalPos_y1 = -m->goalDistance_y2;
+		m->goalPos_y2 =  m->goalDistance_y2;
 		break;
 	}
 // 41B442
@@ -1514,6 +1521,7 @@ l41B2DC:
 	if ((ptr[2] & kDirectionKeyMaskHorizontal) == 0) {
 		m->goalDistance_x1 = m->goalPos_x1 = m->goalDistance_x2 = m->goalPos_x2 = m->xMstPos;
 	}
+	debug(kDebug_MONSTER, "mstMonster1UpdateGoalPosition m %p mask 0x%x goal [%d,%d,%d,%d]", m, var1C, m->goalPos_x1, m->goalPos_y1, m->goalPos_x2, m->goalPos_y2);
 }
 
 void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
@@ -1523,7 +1531,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
 	const int w = READ_LE_UINT32(p + 904);
 	const int h = READ_LE_UINT32(p + 908);
-	debug(kDebug_MONSTER, "mstMonster1MoveTowardsGoal1 m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left,  m34->right, m34->top, m34->bottom);
+	debug(kDebug_MONSTER, "mstMonster1MoveTowardsGoal1 m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left, m34->top, m34->right, m34->bottom);
 	if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, m->xMstPos, m->yMstPos)) {
 		mstMonster1UpdateWalkPath(m);
 		m->unkC0 = -1;
