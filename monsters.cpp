@@ -1136,13 +1136,13 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 					continue;
 				}
 // 417525
-				int _ecx;
+				int delta;
 				if (j == 0 || j == 1) {
-					_ecx = m34->right - m34->left + buffer[_edi];
+					delta = m34->right - m34->left + buffer[_edi];
 				} else {
-					_ecx = m34->bottom - m34->top + buffer[_edi];
+					delta = m34->bottom - m34->top + buffer[_edi];
 				}
-				if (_ecx >= buffer[i]) {
+				if (delta >= buffer[i]) {
 					continue;
 				}
 				if (buffer[indexWalkNode] == -1) {
@@ -1152,12 +1152,12 @@ void Game::mstWalkPathUpdateIndex(MstWalkPath *walkPath, int index) {
 						_walkNodesLastIndex = 0;
 					}
 				}
-				buffer[i] = _ecx;
+				buffer[i] = delta;
 // 417585
 				uint8_t value;
 				if (_edi == i) {
-					static const uint8_t data[] = { 2, 8, 4, 1 };
-					value = data[j];
+					static const uint8_t directions[] = { 2, 8, 4, 1 };
+					value = directions[j];
 				} else {
 					value = walkNode->unk60[index][_edi];
 				}
@@ -1648,9 +1648,9 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 		m->unkC0 = _yMstPos1;
 		const uint32_t indexWalkPath = m->behaviorState->walkPath;
 		MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
-		uint8_t var1D = m->walkNode->unk60[_edi][_cl];
-		if (var1D != 0) {
-			MstWalkNode *walkNode = m->walkNode;
+		const MstWalkNode *walkNode = m->walkNode;
+		const uint8_t dirMask = walkNode->unk60[_edi][_cl];
+		if (dirMask != 0) {
 			const uint8_t *p = m->monsterInfos;
 			const int w = (int32_t)READ_LE_UINT32(p + 904);
 			const int h = (int32_t)READ_LE_UINT32(p + 908);
@@ -1675,7 +1675,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 				case 8:
 					var1C = 1;
 					break;
-				default:
+				default: // 1
 					var1C = 3;
 					break;
 				}
@@ -1687,7 +1687,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 				}
 			}
 // 41A9E4
-			m->goalDirectionMask = var1D;
+			m->goalDirectionMask = dirMask;
 		}
 // 41A9EB
 		m->targetDirectionMask = m->goalDirectionMask;
@@ -1898,7 +1898,7 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			}
 			m->bboxNum[3] = n;
 		}
-		// return; TODO: re-enable when m->levelBounds_x1/x2/y1/y2 are corrected
+		// return; // TODO: re-enable when m->levelBounds_x1/x2/y1/y2 are corrected
 	}
 // 41B030
 	m->task->flags |= 0x80;
@@ -2020,7 +2020,7 @@ int Game::mstMonster1FindWalkPathRect(MonsterObject1 *m, MstWalkPath *walkPath, 
 	int yDist = 0;
 	for (uint32_t i = 0; i < walkPath->count; ++i, --currentIndex) {
 		MstWalkNode *walkNode = &walkPath->data[i];
-		if (walkNode->unk60[num][i] == 0 && m->walkNode != walkNode) {
+		if (m->walkNode->unk60[num][i] == 0 && m->walkNode != walkNode) {
 			continue;
 		}
 		const uint32_t indexWalkBox = walkNode->walkBox;
