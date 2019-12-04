@@ -417,9 +417,9 @@ bool Game::mstMonster1UpdateWalkPath(MonsterObject1 *m) {
 uint32_t Game::mstMonster1GetNextWalkCode(MonsterObject1 *m) {
 	MstWalkCode *walkCode = m->walkCode;
 	int num = 0;
-	if (walkCode->dataCount != 0) {
+	if (walkCode->indexDataCount != 0) {
 		num = _rnd.getMstNextNumber(m->rnd_m35);
-		num = walkCode->data[num];
+		num = walkCode->indexData[num];
 	}
 	const uint32_t codeData = walkCode->codeData[num];
 	return codeData;
@@ -832,9 +832,9 @@ void Game::resetMstCode() {
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.walkCodeDataCount; ++i) {
-		const int count = _res->_mstWalkCodeData[i].dataCount;
+		const int count = _res->_mstWalkCodeData[i].indexDataCount;
 		if (count != 0) {
-			shuffleArray(_res->_mstWalkCodeData[i].data, count);
+			shuffleArray(_res->_mstWalkCodeData[i].indexData, count);
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.monsterActionIndexDataCount; ++i) {
@@ -5547,7 +5547,7 @@ l2:
 			}
 // 41E09E
 			if (var1C == 2 && var4C != 1) {
-				// _edx = 1;
+				_edx = 1;
 				var4C = 1;
 				goto l2; // goto 41DE98;
 			}
@@ -5579,6 +5579,7 @@ void Game::mstOp53(MstMonsterAction *m) {
 		_mstPosYmin = -y;
 		_mstPosYmax = 191 - y;
 	}
+	mstResetCollisionTable();
 	mstUpdateInRange(m);
 }
 
@@ -6310,14 +6311,13 @@ void Game::mstTaskResetMonster1WalkPath(Task *t) {
 				if (indexWalkCode != kNone) {
 					m->walkCode = &_res->_mstWalkCodeData[indexWalkCode];
 				}
-				mstTaskSetNextWalkCode(t);
 			} else {
 				m->flagsA5 |= 2;
 				if (!mstMonster1UpdateWalkPath(m)) {
 					mstMonster1ResetWalkPath(m);
 				}
-				mstTaskSetNextWalkCode(t);
 			}
+			mstTaskSetNextWalkCode(t);
 			break;
 		}
 	} else {
@@ -6461,12 +6461,12 @@ void Game::mstResetCollisionTable() {
 			if ((_al & 8) == 0 || m->monsterInfos[945] != 0) {
 				const uint32_t offset = m->monsterInfos - _res->_mstMonsterInfos;
 				assert(offset % kMonsterInfoDataSize == 0);
-				const uint32_t _ecx = offset / kMonsterInfoDataSize;
-				assert(_ecx < 32);
-				_al = m->xMstPos < _mstAndyLevelPosX;
-				const int count = _mstCollisionTable[_al][_ecx].count;
-				_mstCollisionTable[_al][_ecx].monster1[count] = m;
-				++_mstCollisionTable[_al][_ecx].count;
+				const uint32_t num = offset / kMonsterInfoDataSize;
+				assert(num < 32);
+				const int dir = (m->xMstPos < _mstAndyLevelPosX) ? 1 : 0;
+				const int count = _mstCollisionTable[dir][num].count;
+				_mstCollisionTable[dir][num].monster1[count] = m;
+				++_mstCollisionTable[dir][num].count;
 			}
 		}
 	}

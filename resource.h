@@ -134,8 +134,8 @@ struct MstWalkBox { // u34
 struct MstWalkCode { // u35
 	uint32_t *codeData; // 0, offset _mstCodeData
 	uint32_t codeDataCount; // 4
-	uint8_t *data; // 8
-	uint32_t dataCount; // C
+	uint8_t *indexData; // 8
+	uint32_t indexDataCount; // C
 }; // sizeof == 16
 
 struct MstMovingBoundsIndex { // u36

@@ -1181,8 +1181,12 @@ void Resource::loadMstData(File *fp) {
 		_mstWalkCodeData[i].codeDataCount = fp->readUint32();
 		_mstWalkCodeData[i].codeData = (uint32_t *)malloc(_mstWalkCodeData[i].codeDataCount * sizeof(uint32_t));
 		fp->skipUint32();
-		_mstWalkCodeData[i].dataCount = fp->readUint32();
-		_mstWalkCodeData[i].data = (uint8_t *)malloc(_mstWalkCodeData[i].dataCount);
+		_mstWalkCodeData[i].indexDataCount = fp->readUint32();
+		if (_mstWalkCodeData[i].indexDataCount != 0) {
+			_mstWalkCodeData[i].indexData = (uint8_t *)malloc(_mstWalkCodeData[i].indexDataCount);
+		} else {
+			_mstWalkCodeData[i].indexData = 0;
+		}
 		bytesRead += 16;
 	}
 	for (int i = 0; i < _mstHdr.walkCodeDataCount; ++i) {
@@ -1190,7 +1194,9 @@ void Resource::loadMstData(File *fp) {
 			_mstWalkCodeData[i].codeData[j] = fp->readUint32();
 			bytesRead += 4;
 		}
-		bytesRead += readBytesAlign(fp, _mstWalkCodeData[i].data, _mstWalkCodeData[i].dataCount);
+		if (_mstWalkCodeData[i].indexDataCount != 0) {
+			bytesRead += readBytesAlign(fp, _mstWalkCodeData[i].indexData, _mstWalkCodeData[i].indexDataCount);
+		}
 	}
 
 	_mstMovingBoundsIndexData.allocate(_mstHdr.movingBoundsIndexDataCount);
@@ -1667,8 +1673,8 @@ void Resource::unloadMstData() {
 	for (int i = 0; i < _mstHdr.walkCodeDataCount; ++i) {
 		free(_mstWalkCodeData[i].codeData);
 		_mstWalkCodeData[i].codeData = 0;
-		free(_mstWalkCodeData[i].data);
-		_mstWalkCodeData[i].data = 0;
+		free(_mstWalkCodeData[i].indexData);
+		_mstWalkCodeData[i].indexData = 0;
 	}
 	for (int i = 0; i < _mstHdr.behaviorIndexDataCount; ++i) {
 		free(_mstBehaviorIndexData[i].behavior);
