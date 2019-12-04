@@ -826,9 +826,9 @@ void Game::resetMstCode() {
 	_rnd.initMstTable();
 	_rnd.initTable();
 	for (int i = 0; i < _res->_mstHdr.movingBoundsDataCount; ++i) {
-		const int count = _res->_mstMovingBoundsData[i].count2;
+		const int count = _res->_mstMovingBoundsData[i].indexDataCount;
 		if (count != 0) {
-			shuffleArray(_res->_mstMovingBoundsData[i].data2, count);
+			shuffleArray(_res->_mstMovingBoundsData[i].indexData, count);
 		}
 	}
 	for (int i = 0; i < _res->_mstHdr.walkCodeDataCount; ++i) {
@@ -5018,10 +5018,10 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	m->m49 = m49;
 	m->indexUnk49Unk1 = op197Data->unkF;
 	if (m->indexUnk49Unk1 < 0) {
-		if (m49->count2 == 0) {
+		if (m49->indexDataCount == 0) {
 			m->indexUnk49Unk1 = 0;
 		} else {
-			m->indexUnk49Unk1 = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
+			m->indexUnk49Unk1 = m49->indexData[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 	assert((uint32_t)m->indexUnk49Unk1 < m49->count1);
@@ -6552,10 +6552,10 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 	m->m49 = m49;
 	m->indexUnk49Unk1 = m36->unk4;
 	if (m->indexUnk49Unk1 < 0) {
-		if (m49->count2 == 0) {
+		if (m49->indexDataCount == 0) {
 			m->indexUnk49Unk1 = 0;
 		} else {
-			m->indexUnk49Unk1 = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
+			m->indexUnk49Unk1 = m49->indexData[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 // 41C5B1
@@ -6702,10 +6702,10 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 		m->indexUnk49Unk1 = m36->unk4;
 	}
 	if (m->indexUnk49Unk1 < 0) {
-		if (m49->count2 == 0) {
+		if (m49->indexDataCount == 0) {
 			m->indexUnk49Unk1 = 0;
 		} else {
-			m->indexUnk49Unk1 = m49->data2[_rnd.getMstNextNumber(m->rnd_m49)];
+			m->indexUnk49Unk1 = m49->indexData[_rnd.getMstNextNumber(m->rnd_m49)];
 		}
 	}
 // 41CC44

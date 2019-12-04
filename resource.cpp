@@ -1466,7 +1466,7 @@ void Resource::loadMstData(File *fp) {
 		fp->skipUint32();
 		_mstMovingBoundsData[i].count1  = fp->readUint32();
 		fp->skipUint32();
-		_mstMovingBoundsData[i].count2  = fp->readUint32();
+		_mstMovingBoundsData[i].indexDataCount = fp->readUint32();
 		_mstMovingBoundsData[i].unk14   = fp->readByte();
 		_mstMovingBoundsData[i].unk15   = fp->readByte();
 		_mstMovingBoundsData[i].unk16   = fp->readByte();
@@ -1493,9 +1493,11 @@ void Resource::loadMstData(File *fp) {
 			_mstMovingBoundsData[i].data1[j].offsetMonsterInfo = start * kMonsterInfoDataSize + num * 28;
 			bytesRead += 16;
 		}
-		_mstMovingBoundsData[i].data2 = (uint8_t *)malloc(_mstMovingBoundsData[i].count2);
-		fp->read(_mstMovingBoundsData[i].data2, _mstMovingBoundsData[i].count2);
-		bytesRead += _mstMovingBoundsData[i].count2;
+		if (_mstMovingBoundsData[i].indexDataCount != 0) {
+			_mstMovingBoundsData[i].indexData = (uint8_t *)malloc(_mstMovingBoundsData[i].indexDataCount);
+			fp->read(_mstMovingBoundsData[i].indexData, _mstMovingBoundsData[i].indexDataCount);
+			bytesRead += _mstMovingBoundsData[i].indexDataCount;
+		}
 	}
 
 	_mstShootData.allocate(_mstHdr.shootDataCount);
@@ -1720,8 +1722,8 @@ void Resource::unloadMstData() {
 	for (int i = 0; i < _mstHdr.movingBoundsDataCount; ++i) {
 		free(_mstMovingBoundsData[i].data1);
 		_mstMovingBoundsData[i].data1 = 0;
-		free(_mstMovingBoundsData[i].data2);
-		_mstMovingBoundsData[i].data2 = 0;
+		free(_mstMovingBoundsData[i].indexData);
+		_mstMovingBoundsData[i].indexData = 0;
 	}
 	for (int i = 0; i < _mstHdr.shootDataCount; ++i) {
 		free(_mstShootData[i].data);

@@ -266,8 +266,8 @@ struct MstMovingBounds { // u49
 	uint32_t indexMonsterInfo; // 0, indexes _mstMonsterInfos
 	MstMovingBoundsUnk1 *data1; // 0x4, sizeof == 16
 	uint32_t count1; // 0x8
-	uint8_t *data2; // 0xC
-	uint32_t count2; // 0x10
+	uint8_t *indexData; // 0xC
+	uint32_t indexDataCount; // 0x10
 	uint8_t unk14; // 0x14
 	uint8_t unk15; // 0x15
 	uint8_t unk16; // 0x16
