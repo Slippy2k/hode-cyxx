@@ -4661,7 +4661,7 @@ int Game::mstTask_main(Task *t) {
 				}
 				if (countType1 != 0) {
 					if (_mstOp67_screenNum < 0) {
-						if (_mstOp67_x2 >= -_mstAndyScreenPosX && _mstOp67_x1 <= -_mstAndyScreenPosX * 2) {
+						if (_mstOp67_x2 >= -_mstAndyScreenPosX && _mstOp67_x1 <= 255 - _mstAndyScreenPosX) {
 							countType1 = 0;
 						}
 					} else if (_mstOp67_screenNum == _currentScreen) {
@@ -4670,7 +4670,7 @@ int Game::mstTask_main(Task *t) {
 				}
 				if (countType2 != 0) {
 					if (_mstOp68_screenNum < 0) {
-						if (_mstOp68_x2 >= -_mstAndyScreenPosX && _mstOp68_x1 <= -_mstAndyScreenPosX * 2) {
+						if (_mstOp68_x2 >= -_mstAndyScreenPosX && _mstOp68_x1 <= 255 -_mstAndyScreenPosX) {
 							countType2 = 0;
 						}
 					} else if (_mstOp68_screenNum == _currentScreen) {
