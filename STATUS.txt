@@ -17,46 +17,16 @@ level 6 'pwr2' - completable
 level 7 'lar1' - issue on screen 11
 	--checkpoint 3
 		switch on the right does not trigger the walls
-	screen 9 - gate not open
-		setupScreenCheckpoint_lar1_screen24
-			_screenCounterTable should be set to 5 ?
-				maybe the same in the original
-				see gates 6/7 in screen8 code
-					_screenCounterTable[26] = (_lar1_gatesData[6 * 4] & 0xF0) != 0 ? 5 : 4;
-	screen 11 (--checkpoint 4)
-		worms do not go down, seek for double spectre eggs ?
-			check mstMonster1UpdateGoalPosition
-			worm hole sprites are on top of the stairs
-		not possible to walk on the left (can jump)
+		screen 9 - gate not open
+			setupScreenCheckpoint_lar1_screen24
+				_screenCounterTable should be set to 5 ?
+					maybe the same in the original
+					see gates 6/7 in screen8 code
+						_screenCounterTable[26] = (_lar1_gatesData[6 * 4] & 0xF0) != 0 ? 5 : 4;
+	--checkpoint 4
+		screen 11
+			worms do not go down, seek for double spectre eggs ?
+			not possible to walk on the left (can jump)
 level 8 'lar2' - to check (--checkpoint 5)
 
 level 9 'dark' - completable
-
--- level 7 issue
-
-; trigger cutscene when meeting servant the first time
-mstTask_monsterWait1 t 0x7fccdaeb30d8
-mstMonster1UpdateWalkPath m 0x7fccdaeb6428
-executeMstCode task 3 0x7fccdaeb30d8 code 33 offset 0x0a90
-executeMstCode task 3 0x7fccdaeb30d8 code 227 offset 0x0a84
-executeMstCode task 3 0x7fccdaeb30d8 code 204 offset 0x0a98
-mstOp56_specialAction code 29
-setScreenState screen 6 state 1
-executeMstCode task 3 0x7fccdaeb30d8 code 242 offset 0x0a9c
-child (nil) monster1 0x7fccdaeb6428 monster2 (nil)
-
-mstUpdateTaskMonsterObject1 t 0x7fccdaeb30d8
-mstMonster1Collide mask 0x0 flagsA6 0x1
-mstTask_monsterWait2 t 0x7fccdaeb30d8
-mstMonster1UpdateWalkPath m 0x7fccdaeb6428
-executeMstCode task 3 0x7fccdaeb30d8 code 30 offset 0x0abc
-opcode30 set wait3 bit:0
-
-; when bringing the first piece of meteorite
-mstUpdateTaskMonsterObject1 t 0x7fccdaeb30d8
-mstMonster1Collide mask 0x0 flagsA6 0x1
-mstTask_wait3 t 0x7fccdaeb30d8 type:3 bit:0
-executeMstCode task 3 0x7fccdaeb30d8 code 204 offset 0x0ac0
-mstOp56_specialAction code 30
-setNextCheckpoint
-executeMstCode task 3 0x7fccdaeb30d8 code 3 offset 0x0ac4
