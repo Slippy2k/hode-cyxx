@@ -1,8 +1,9 @@
 
 import hashlib
 import os
-import sys
+import subprocess
 import struct
+import sys
 
 SUFFIXES = [
 	'setup.dat',
@@ -19,17 +20,20 @@ class ReleaseInfo(object):
 	def __init__(self, name):
 		self.name = name
 		self.files = []
-		self.version_strings = []
+		self.win32_version_info = []
+		self.win32_securom = 'false'
 	def toYaml(self):
 		print '- name: %s' % self.name
 		if len(self.files) != 0:
 			print '  files:'
 			for filename, checksum in self.files:
 				print '  - %s: %s' % (filename, checksum)
-		if len(self.version_strings) != 0:
-			print '  version_strings:'
-			for key, value in self.version_strings:
-				print '  - %s: %s' % (key, value)
+				if filename == "hodwin32.exe":
+					print '    securom: ' + self.win32_securom
+					if len(self.win32_version_info) != 0:
+						print '    version_info:'
+						for key, value in self.win32_version_info:
+							print '    - %s: %s' % (key, value)
 
 def readPeSections(f):
 	assert f.read(2) == 'MZ'
@@ -53,49 +57,24 @@ def readPeSections(f):
 		sections[section_name] = (section_size, section_offset, section_addr)
 	return sections
 
-def parsePeVersionStrings(f, section, start_offset):
-	f.seek(start_offset + 12)
-	entries_count = struct.unpack('<H', f.read(2))[0]
-	entries_count += struct.unpack('<H', f.read(2))[0]
-	assert entries_count == 1
-	for i in range(entries_count):
-		value = struct.unpack('<I', f.read(4))[0]
-		offset = struct.unpack('<I', f.read(4))[0]
-		f.seek(section[1] + offset)
-		resource_offset = section[1] + struct.unpack('<I', f.read(4))[0] - section[2]
-		resource_size = struct.unpack('<I', f.read(4))[0]
-
-def parsePeVersion(f, section, start_offset):
-	f.seek(start_offset + 12)
-	entries_count = struct.unpack('<H', f.read(2))[0]
-	entries_count += struct.unpack('<H', f.read(2))[0]
-	assert entries_count == 1
-	for i in range(entries_count):
-		value = struct.unpack('<I', f.read(4))[0]
-		offset = struct.unpack('<I', f.read(4))[0]
-		assert value == 1
-		parsePeVersionStrings(f, section, section[1] + (offset & 0x7FFFFFFF))
-
-RESTYPE_ICON = 0x03
-RESTYPE_STRING = 0x06
-RESTYPE_VERSION = 0x10
-
 def dumpPeVersionStringSection(filepath, info):
 	f = file(filepath)
 	sections = readPeSections(f)
 	for name in sections.keys():
-		if name.startswith('.rsrc'):
-			section_offset = sections[name][1]
-			f.seek(section_offset + 12)
-			entries_count = struct.unpack('<H', f.read(2))[0]
-			entries_count += struct.unpack('<H', f.read(2))[0]
-			for i in range(entries_count):
-				value = struct.unpack('<I', f.read(4))[0]
-				offset = struct.unpack('<I', f.read(4))[0]
-				if value == RESTYPE_VERSION:
-					return parsePeVersion(f, sections[name], section_offset + (offset & 0x7FFFFFFF))
-			break
-	return None
+		if name.startswith('.cms_'):
+			info.win32_securom = 'true'
+		elif name.startswith('.rsrc'):
+			args = [ 'wine', 'decode_pe', filepath ]
+			p = subprocess.Popen(args, stdout=subprocess.PIPE)
+			for line in p.stdout.readlines():
+				s = line.strip()
+				sep = s.index(':')
+				if sep != -1:
+					name = s[:sep].strip()
+					value = s[sep + 1:].strip()
+					if name == 'LegalCopyright' and ord(value[0]) == 0xA9:
+						value = '(c)' + value[1:]
+					info.win32_version_info.append((name, value))
 
 def calculateSha1(filepath):
 	h = hashlib.new('sha1')
