@@ -13,6 +13,8 @@ SRCS = (
 	'.*\.h$',
 	'.*\.cpp$',
 	'README.txt',
+	'CHANGES.txt',
+	'RELEASES.yaml',
 )
 
 BINS = (
@@ -61,16 +63,21 @@ def tidyCpp(fname):
 src_dir = os.listdir(SRC_DIR)
 
 filename = 'hode-%s.tar.bz2' % version
+prefix = 'hode-%s/' % version
 tf = tarfile.open(filename, 'w:bz2')
 for name in SRCS:
 	for filename in src_dir:
 		if re.match(name, filename):
-			entryname = 'hode-' + version + '/' + filename
+			entryname = prefix + filename
 			entrypath = os.path.join(SRC_DIR, filename)
 			fileobj = tidyCpp(entrypath)
 			tarinfo = tf.gettarinfo(name=filename, arcname=entryname, fileobj=fileobj)
 			fileobj.seek(0)
 			tf.addfile(tarinfo, fileobj)
+	for dirname in EXTRA_DIRS:
+		path = os.path.join(dirname, name)
+		if os.path.exists(path):
+			tf.add(path, prefix + name)
 tf.close()
 
 filename = 'hode-%s-win32.zip' % version
