@@ -16,8 +16,6 @@ level 5 'lava' - completable
 level 6 'pwr2' - completable
 
 level 7 'lar1' - issue on screen 11
-	--checkpoint 3
-		switch on the top right does not trigger the wall
 	--checkpoint 4
 		screen 11
 			worms do not go down, seek for double spectre eggs ?

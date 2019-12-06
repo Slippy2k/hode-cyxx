@@ -1,6 +1,7 @@
 * release 0.2.4
 	- fixed Amigo walk path in 'pwr2' screen 7
 	- fixed glowing stone puzzle in 'lar2'
+	- fixed missing trigger for switch #0 in 'lar1'
 
 * release 0.2.3
 	- fixed double spectre fireball animations in 'lar1' and 'lar2'
