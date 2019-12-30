@@ -441,7 +441,7 @@ void Game::mstBoundingBoxClear(MonsterObject1 *m, int dir) {
 	uint8_t num = m->bboxNum[dir];
 	if (num < _mstBoundingBoxesCount && _mstBoundingBoxesTable[num].monster1Index == m->monster1Index) {
 		_mstBoundingBoxesTable[num].monster1Index = 0xFF;
-		int i = num + 1;
+		int i = num;
 		for (; i < _mstBoundingBoxesCount; ++i) {
 			if (_mstBoundingBoxesTable[i].monster1Index != 0xFF) {
 				break;
@@ -1989,7 +1989,6 @@ int Game::mstTaskUpdatePositionActionDirection(Task *t, MonsterObject1 *m) {
 				if (m->targetDirectionMask != 0xFF) {
 					_xMstPos2 = 0;
 				}
-
 			}
 		} else {
 // 41B7E9
@@ -5208,7 +5207,6 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		}
 	}
 // 41C038
-
 	const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 		const int x1 = m->xMstPos + (int8_t)p[0xC];
@@ -5224,7 +5222,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			m->targetLevelPos_y = -1;
 			mstBoundingBoxClear(m, 1);
 			if (p[0xE] != 0) {
-				t->flags &= ~0x80;
+				t->flags |= 0x80;
 				mstTaskResetMonster1WalkPath(t);
 				return 0;
 			}
@@ -5243,7 +5241,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			mstMonster1MoveTowardsGoal1(m);
 		} else if (t->run == &Game::mstTask_monsterWait9) {
 			mstMonster1MoveTowardsGoal2(m);
-		} else {
+		} else { // &Game::mstTask_monsterWait7
 			mstMonster1MoveTowardsGoal1(m);
 		}
 // 41C281
@@ -6648,7 +6646,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 				m->targetLevelPos_y = -1;
 				mstBoundingBoxClear(m, 1);
 				if (p[0xE] != 0) {
-					t->flags &= ~0x80;
+					t->flags |= 0x80;
 					mstTaskResetMonster1WalkPath(t);
 					return 0;
 				}
@@ -6826,7 +6824,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 					m->targetLevelPos_y = -1;
 					mstBoundingBoxClear(m, 1);
 					if (p[0xE] != 0) {
-						t->flags &= ~0x80;
+						t->flags |= 0x80;
 						mstTaskResetMonster1WalkPath(t);
 						return 0;
 					}

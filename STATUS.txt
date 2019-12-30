@@ -10,8 +10,9 @@ level 4 'isld' - completable
 
 level 5 'lava' - completable
 	--checkpoint 3
-		screen 7 - spiders do not move
+		screen 8 - spiders do not move
 			due to mstMonster1MoveTowardsGoal2 'return;' commented
+			related to mstBoundingBoxCollides2, objects colliding ?
 
 level 6 'pwr2' - completable
 
