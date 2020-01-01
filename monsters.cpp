@@ -1864,9 +1864,10 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 		m->targetLevelPos_y = yPos;
 		p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (p[0xE] != 0) {
+			bboxIndex = m->monster1Index;
 			const int x1 = m->xMstPos + (int8_t)p[0xC];
-			const int x2 = x1 + p[0xE] - 1;
 			const int y1 = m->yMstPos + (int8_t)p[0xD];
+			const int x2 = x1 + p[0xE] - 1;
 			const int y2 = y1 + p[0xF] - 1;
 			const int r = mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2);
 			if (r != 0) {
@@ -3249,9 +3250,9 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 			_eax = 0;
 		}
 // 40EA40
-		const int x1 = m->xMstPos + (int8_t)p[0xC]; // _edi
+		const int x1 = m->xMstPos + (int8_t)p[0xC];
+		const int y1 = m->yMstPos + (int8_t)p[0xD];
 		const int x2 = x1 + p[0xE] - 1;
-		const int y1 = m->yMstPos + (int8_t)p[0xD]; // _ebp
 		const int y2 = y1 + p[0xF] - 1;
 		if ((var8 & 0xE0) != 0x60 && mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 			t->flags |= 0x80;
@@ -5210,8 +5211,8 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 	const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 	if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 		const int x1 = m->xMstPos + (int8_t)p[0xC];
-		const int x2 = x1 + p[0xE] - 1;
 		const int y1 = m->yMstPos + (int8_t)p[0xD];
+		const int x2 = x1 + p[0xE] - 1;
 		const int y2 = y1 + p[0xF] - 1;
 		if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 // 41C1BB
@@ -6634,8 +6635,8 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 		const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 			const int x1 = m->xMstPos + (int8_t)p[0xC];
-			const int x2 = x1 + p[0xE] - 1;
 			const int y1 = m->yMstPos + (int8_t)p[0xD];
+			const int x2 = x1 + p[0xE] - 1;
 			const int y2 = y1 + p[0xF] - 1;
 			if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 // 41CA54
@@ -6812,8 +6813,8 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 			const uint8_t *p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 			if ((m->monsterInfos[946] & 4) != 0 && p[0xE] != 0 && m->bboxNum[0] == 0xFF) {
 				const int x1 = m->xMstPos + (int8_t)p[0xC];
-				const int x2 = x1 + p[0xE] - 1;
 				const int y1 = m->yMstPos + (int8_t)p[0xD];
+				const int x2 = x1 + p[0xE] - 1;
 				const int y2 = y1 + p[0xF] - 1;
 				if (mstBoundingBoxCollides2(m->monster1Index, x1, y1, x2, y2) != 0) {
 // 41D1F5
