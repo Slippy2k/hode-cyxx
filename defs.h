@@ -103,7 +103,7 @@ struct LvlSprMoveData {
 	uint8_t op2;
 	uint16_t op3;
 	uint16_t op4;
-	uint16_t unk0x6;
+	uint16_t unk0x6; // padding to 8 bytes
 } PACKED; // sizeof == 8
 
 struct LvlSprHotspotData {

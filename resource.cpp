@@ -347,37 +347,44 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 
 	assert(src == base + kLvlAnimHdrOffset);
 	dat->animsInfoData = base;
-#ifdef __BYTE_ORDER
-	if (__BYTE_ORDER == __BIG_ENDIAN) {
-		for (int i = 0; i < dat->hotspotsCount; ++i) {
-			LvlAnimHeader *ah = ((LvlAnimHeader *)(base + kLvlAnimHdrOffset)) + i;
-			ah->unk0 = le16toh(ah->unk0);
-			ah->seqOffset = le32toh(ah->seqOffset);
-			if (ah->seqOffset != 0) {
-				for (int seq = 0; seq < ah->seqCount; ++seq) {
-					LvlAnimSeqHeader *ash = ((LvlAnimSeqHeader *)(base + ah->seqOffset)) + seq;
-					ash->firstFrame = le16toh(ash->firstFrame);
-					ash->unk2 = le16toh(ash->unk2);
-					ash->sound = le16toh(ash->sound);
-					ash->flags0 = le16toh(ash->flags0);
-					ash->flags1 = le16toh(ash->flags1);
-					ash->unkE = le16toh(ash->unkE);
-					ash->offset = le32toh(ash->offset);
-					if (ash->offset != 0) {
-						LvlAnimSeqFrameHeader *asfh = (LvlAnimSeqFrameHeader *)(base + ash->offset);
-						asfh->move = le16toh(asfh->move);
-						asfh->anim = le16toh(asfh->anim);
-					}
-				}
-			}
-		}
-	}
-#endif
 	dat->refCount = 0xFF;
 	dat->framesData = (framesDataOffset == 0) ? 0 : base + framesDataOffset;
 	dat->hotspotsData = (hotspotsDataOffset == 0) ? 0 : base + hotspotsDataOffset;
 	dat->movesData = (movesDataOffset == 0) ? 0 : base + movesDataOffset;
 	dat->coordsData = (coordsDataOffset == 0) ? 0 : base + coordsDataOffset;
+	if (kByteSwapData) {
+		for (int i = 0; i < dat->hotspotsCount; ++i) {
+			LvlAnimHeader *ah = ((LvlAnimHeader *)(base + kLvlAnimHdrOffset)) + i;
+			ah->unk0 = le16toh(ah->unk0);
+			ah->seqOffset = le32toh(ah->seqOffset);
+			if (ah->seqOffset == 0) {
+				continue;
+			}
+			for (int j = 0; j < ah->seqCount; ++j) {
+				LvlAnimSeqHeader *ash = ((LvlAnimSeqHeader *)(base + ah->seqOffset)) + j;
+				ash->firstFrame = le16toh(ash->firstFrame);
+				ash->unk2 = le16toh(ash->unk2);
+				ash->sound = le16toh(ash->sound);
+				ash->flags0 = le16toh(ash->flags0);
+				ash->flags1 = le16toh(ash->flags1);
+				ash->unkE = le16toh(ash->unkE);
+				ash->offset = le32toh(ash->offset);
+				if (ash->offset == 0) {
+					continue;
+				}
+				for (int k = 0; k < ash->count; ++k) {
+					LvlAnimSeqFrameHeader *asfh = ((LvlAnimSeqFrameHeader *)(base + ash->offset)) + k;
+					asfh->move = le16toh(asfh->move);
+					asfh->anim = le16toh(asfh->anim);
+				}
+			}
+		}
+		for (int i = 0; i < dat->movesCount; ++i) {
+			LvlSprMoveData *smd = ((LvlSprMoveData *)dat->movesData) + i;
+			smd->op3 = le16toh(smd->op3);
+			smd->op4 = le16toh(smd->op4);
+		}
+	}
 
 	dat->framesOffsetsTable = ptr;
 	if (dat->coordsData) {
