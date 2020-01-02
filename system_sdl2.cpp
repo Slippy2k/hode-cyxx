@@ -14,7 +14,6 @@ static const char *kIconBmp = "icon.bmp";
 
 static int _scalerMultiplier = 3;
 static const Scaler *_scaler = &scaler_xbr;
-static const float _gamma = 1.f;
 
 static const int _pixelFormat = SDL_PIXELFORMAT_RGB888;
 
