@@ -35,7 +35,7 @@ struct System_SDL2 : System {
 	enum {
 		kJoystickCommitValue = 3200,
 		kKeyMappingsSize = 20,
-		kAudioHz = 22050,
+		kAudioHz = 22050
 	};
 
 	uint8_t *_offscreenLut;

@@ -4689,7 +4689,7 @@ int Game::mstTask_main(Task *t) {
 				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
-					assert(m->codeData != kNone);
+					assert(m->codeData < _res->_mstHdr.codeSize);
 					p = _res->_mstCodeData + m->codeData * 4 - 4;
 				}
 			}
@@ -4701,7 +4701,7 @@ int Game::mstTask_main(Task *t) {
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 				const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 				if (compareOp(m->compare, a, b)) {
-					assert(m->codeData != kNone);
+					assert(m->codeData < _res->_mstHdr.codeSize);
 					p = _res->_mstCodeData + m->codeData * 4 - 4;
 				}
 			}
