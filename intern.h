@@ -17,7 +17,7 @@
 #define le32toh(x) x
 #define htole16(x) x
 #define htole32(x) x
-static const bool kByteSwapData = false;
+static const bool kByteSwapData = false; // no byteswap needed on little endian
 #else
 #include <endian.h>
 static const bool kByteSwapData = (__BYTE_ORDER == __BIG_ENDIAN);
