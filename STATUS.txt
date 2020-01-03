@@ -21,6 +21,7 @@ level 7 'lar1' - issue on screen 11
 		screen 11
 			worms do not go down, seek for double spectre eggs ?
 			not possible to walk on the left (can jump)
+
 level 8 'lar2' - to check (--checkpoint 5)
 
 level 9 'dark' - completable

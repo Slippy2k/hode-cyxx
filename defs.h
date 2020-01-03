@@ -386,7 +386,9 @@ struct MonsterObject1 {
 	uint8_t flagsA5; // 0xA5
 	uint8_t flagsA6; // 0xA6
 	uint8_t targetDirectionMask; // 0xA7
-	uint8_t bboxNum[4]; // 0xA8, 0xA9, 0xAA, 0xAB
+	uint8_t bboxNum[2]; // 0xA8, 0xA9
+	uint8_t walkBoxNum; // 0xAA
+	uint8_t unkAB; // 0xAB
 	int32_t targetLevelPos_x; // 0xAC
 	int32_t targetLevelPos_y; // 0xB0
 	int32_t previousDxPos; // 0xB4 _xMstPos2
