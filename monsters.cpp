@@ -1529,8 +1529,8 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 	const uint8_t *p = m->monsterInfos;
 	const uint32_t indexWalkBox = walkNode->walkBox;
 	const MstWalkBox *m34 = &_res->_mstWalkBoxData[indexWalkBox];
-	const int w = READ_LE_UINT32(p + 904);
-	const int h = READ_LE_UINT32(p + 908);
+	const int w = (int32_t)READ_LE_UINT32(p + 904);
+	const int h = (int32_t)READ_LE_UINT32(p + 908);
 	debug(kDebug_MONSTER, "mstMonster1MoveTowardsGoal1 m %p pos %d,%d [%d,%d,%d,%d]", m, m->xMstPos, m->yMstPos, m34->left, m34->top, m34->right, m34->bottom);
 	if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, m->xMstPos, m->yMstPos)) {
 		mstMonster1UpdateWalkPath(m);
@@ -1654,16 +1654,11 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 			const uint8_t *p = m->monsterInfos;
 			const int w = (int32_t)READ_LE_UINT32(p + 904);
 			const int h = (int32_t)READ_LE_UINT32(p + 908);
-			while (_xMstPos1 >= walkNode->coords[1][_edi] + w) {
-				if (_xMstPos1 > walkNode->coords[0][_edi] - w) {
-					break;
-				}
-				if (_yMstPos1 < walkNode->coords[3][_edi] + h) {
-					break;
-				}
-				if (_yMstPos1 > walkNode->coords[2][_edi] - h) {
-					break;
-				}
+			const int x1 = walkNode->coords[1][_edi] + w; // left
+			const int x2 = walkNode->coords[0][_edi] - w; // right
+			const int y1 = walkNode->coords[3][_edi] + h; // top
+			const int y2 = walkNode->coords[2][_edi] - h; // bottom
+			while (rect_contains(x1, y1, x2, y2, _xMstPos1, _yMstPos1)) {
 				int var1C;
 				switch (walkNode->unk60[_edi][_cl]) {
 				case 2:
@@ -1680,6 +1675,7 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 					break;
 				}
 				const uint32_t indexWalkNode = walkNode->neighborWalkNode[var1C];
+				assert(indexWalkNode != kNone && indexWalkNode < walkPath->count);
 				walkNode = &walkPath->data[indexWalkNode];
 				if (walkNode == &walkPath->data[_cl]) {
 					m->targetDirectionMask = 0xFF;
@@ -1846,8 +1842,8 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			}
 		}
 // 41AD7B
-		const int w = READ_LE_UINT32(m->monsterInfos + 904);
-		const int h = READ_LE_UINT32(m->monsterInfos + 908);
+		const int w = (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
+		const int h = (int32_t)READ_LE_UINT32(m->monsterInfos + 908);
 		if (!rect_contains(m34->left - w, m34->top - h, m34->right + w, m34->bottom + h, xPos, yPos)) {
 			const uint32_t indexWalkPath = m->behaviorState->walkPath;
 			MstWalkPath *walkPath = &_res->_mstWalkPathData[indexWalkPath];
@@ -2755,7 +2751,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418D41
 			if ((m->monsterInfos[946] & 2) == 0) {
 				MstWalkNode *walkPath = m->walkNode;
-				int _edi = READ_LE_UINT32(m->monsterInfos + 904);
+				int _edi = (int32_t)READ_LE_UINT32(m->monsterInfos + 904);
 				int _ebx = MAX(m->goalPosBounds_x1, walkPath->coords[1][1] + _edi);
 				int _eax = MIN(m->goalPosBounds_x2, walkPath->coords[0][1] - _edi);
 				const uint32_t indexUnk36 = walkPath->movingBoundsIndex2;
@@ -2810,6 +2806,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	} else if (dir != 2) {
 		return 0;
 	}
+// 41897E
 	if ((m->flagsA5 & 4) != 0 || (m->flags48 & 8) == 0) {
 		return 0;
 	}
@@ -4940,7 +4937,11 @@ int Game::mstTask_main(Task *t) {
 			p = t->codeData;
 		}
 		++_runTaskOpcodesCount;
-	} while (_runTaskOpcodesCount <= 128 && ret == 0);
+		if (_runTaskOpcodesCount >= 128) { // prevent infinite loop
+			warning("Stopping task %p, counter %d", t, _runTaskOpcodesCount);
+			break;
+		}
+	} while (ret == 0);
 	if (t->codeData) {
 		t->codeData = p;
 	}
@@ -5304,9 +5305,8 @@ void Game::mstOp52() {
 		return;
 	}
 	MstMonsterAction *m48 = &_res->_mstMonsterActionData[_mstActionNum];
-	int j = 0;
 	for (int i = 0; i < m48->areaCount; ++i) {
-		MstMonsterArea *m48Area = &m48->area[j];
+		MstMonsterArea *m48Area = &m48->area[i];
 		const uint8_t num = m48Area->data->monster1Index;
 		if (num != 0xFF) {
 			assert(num < kMaxMonsterObjects1);
@@ -5332,7 +5332,6 @@ void Game::mstOp52() {
 				}
 			}
 		}
-		++j;
 	}
 	_mstActionNum = -1;
 }
