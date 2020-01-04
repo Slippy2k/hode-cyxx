@@ -4891,6 +4891,8 @@ void Game::saveSetupCfg() {
 		if (count != kSetupCfgSize) {
 			warning("Failed to write %d bytes to '%s', ret %d", kSetupCfgSize, _setupCfg, count);
 		}
+	} else {
+		warning("Failed to save '%s'", kSetupCfgSize);
 	}
 }
 
