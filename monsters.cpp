@@ -496,14 +496,14 @@ int Game::mstBoundingBoxUpdate(int num, int monster1Index, int x1, int y1, int x
 	return num;
 }
 
-int Game::mstBoundingBoxCollides2(int num, int x1, int y1, int x2, int y2) const {
+int Game::mstBoundingBoxCollides2(int monster1Index, int x1, int y1, int x2, int y2) const {
 	for (int i = 0; i < _mstBoundingBoxesCount; ++i) {
 		const MstBoundingBox *p = &_mstBoundingBoxesTable[i];
-		if (p->monster1Index == 0xFF || p->monster1Index == num) {
+		if (p->monster1Index == 0xFF || p->monster1Index == monster1Index) {
 			continue;
 		}
 		if (p->monster1Index == 0xFE) { // Andy
-			if (_monsterObjects1Table[num].monsterInfos[944] != 15) {
+			if (_monsterObjects1Table[monster1Index].monsterInfos[944] != 15) {
 				continue;
 			}
 		}
@@ -1654,11 +1654,14 @@ void Game::mstMonster1MoveTowardsGoal1(MonsterObject1 *m) {
 			const uint8_t *p = m->monsterInfos;
 			const int w = (int32_t)READ_LE_UINT32(p + 904);
 			const int h = (int32_t)READ_LE_UINT32(p + 908);
-			const int x1 = walkNode->coords[1][_edi] + w; // left
-			const int x2 = walkNode->coords[0][_edi] - w; // right
-			const int y1 = walkNode->coords[3][_edi] + h; // top
-			const int y2 = walkNode->coords[2][_edi] - h; // bottom
-			while (rect_contains(x1, y1, x2, y2, _xMstPos1, _yMstPos1)) {
+			while (1) {
+				const int x1 = walkNode->coords[1][_edi] + w; // left
+				const int x2 = walkNode->coords[0][_edi] - w; // right
+				const int y1 = walkNode->coords[3][_edi] + h; // top
+				const int y2 = walkNode->coords[2][_edi] - h; // bottom
+				if (!rect_contains(x1, y1, x2, y2, _xMstPos1, _yMstPos1)) {
+					break;
+				}
 				int var1C;
 				switch (walkNode->unk60[_edi][_cl]) {
 				case 2:
