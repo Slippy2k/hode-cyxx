@@ -10,17 +10,18 @@ level 4 'isld' - completable
 
 level 5 'lava' - completable
 	--checkpoint 3
-		screen 8 - spiders do not move
-			due to mstMonster1MoveTowardsGoal2 'return;' commented
-			related to mstBoundingBoxCollides2, objects colliding ?
+		screen 8
+			spiders do not move
+				due to mstMonster1MoveTowardsGoal2 'return;' commented
+			spiders locked
+				when mstBoundingBoxCollides2 return true and objects collides
 
 level 6 'pwr2' - completable
 
 level 7 'lar1' - issue on screen 11
 	--checkpoint 4
 		screen 11
-			worms do not go down, seek for double spectre eggs ?
-			not possible to walk on the left (can jump)
+			worms do not go down and do not attack the double spectre
 
 level 8 'lar2' - to check (--checkpoint 5)
 
