@@ -1,4 +1,5 @@
 * release 0.2.5
+	- fixed spiders and worms movement
 	- several fixes for big endian platforms
 
 * release 0.2.4

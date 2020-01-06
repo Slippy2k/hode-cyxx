@@ -11,8 +11,6 @@ level 4 'isld' - completable
 level 5 'lava' - completable
 	--checkpoint 3
 		screen 8
-			spiders do not move
-				due to mstMonster1MoveTowardsGoal2 'return;' commented
 			spiders locked
 				when mstBoundingBoxCollides2 return true and objects collides
 

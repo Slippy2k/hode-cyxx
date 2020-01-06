@@ -1893,7 +1893,7 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 			const uint8_t n = _mstLut1[dirMask];
 			m->unkAB = (n < 4) ? n + 4 : n - 4;
 		}
-		// return; // TODO: re-enable when m->goalPos_x1/x2/y1/y2 are corrected
+		return;
 	}
 // 41B030
 	m->task->flags |= 0x80;
@@ -1922,7 +1922,7 @@ int Game::mstTaskStopMonster1(Task *t, MonsterObject1 *m) {
 }
 
 int Game::mstTaskUpdatePositionActionDirection(Task *t, MonsterObject1 *m) {
-	if ((m->monsterInfos[946] & 4) == 0 || (_mstLut1[m->goalDirectionMask] & 1) != 0) {
+	if ((m->monsterInfos[946] & 4) == 0 && (_mstLut1[m->goalDirectionMask] & 1) != 0) {
 		if (_xMstPos2 < m->m49->unk14) {
 			m->goalDirectionMask &= ~kDirectionKeyMaskHorizontal;
 		}
