@@ -4702,7 +4702,7 @@ int Game::mstTask_main(Task *t) {
 			}
 			break;
 		case 231:
-		case 232: { // 71
+		case 232: { // 71 - compare_flags_monster
 				const int num = READ_LE_UINT16(p + 2);
 				const MstOp234Data *m = &_res->_mstOp234Data[num];
 				const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
@@ -4710,10 +4710,9 @@ int Game::mstTask_main(Task *t) {
 				if (compareOp(m->compare, a, b)) {
 					if (p[0] == 231) {
 						LvlObject *o = 0;
-						MonsterObject1 *m = t->monster1;
-						if (m) {
-							if ((m->flagsA6 & 2) == 0) {
-								o = m->o16;
+						if (t->monster1) {
+							if ((t->monster1->flagsA6 & 2) == 0) {
+								o = t->monster1->o16;
 							}
 						} else if (t->monster2) {
 							o = t->monster2->o;
@@ -4729,10 +4728,9 @@ int Game::mstTask_main(Task *t) {
 				} else {
 					if (p[0] == 232) {
 						LvlObject *o = 0;
-						MonsterObject1 *m = t->monster1;
-						if (m) {
-							if ((m->flagsA6 & 2) == 0) {
-								o = m->o16;
+						if (t->monster1) {
+							if ((t->monster1->flagsA6 & 2) == 0) {
+								o = t->monster1->o16;
 							}
 						} else if (t->monster2) {
 							o = t->monster2->o;
@@ -4749,7 +4747,7 @@ int Game::mstTask_main(Task *t) {
 			}
 			break;
 		case 233:
-		case 234: { // 72
+		case 234: { // 72 - compare_vars_monster
 				const int num = READ_LE_UINT16(p + 2);
 				const MstOp234Data *m = &_res->_mstOp234Data[num];
 				const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
@@ -6468,6 +6466,7 @@ void Game::mstResetCollisionTable() {
 	}
 }
 
+// resume bytecode execution
 void Game::mstTaskRestart(Task *t) {
 	t->run = &Game::mstTask_main;
 	LvlObject *o = 0;
@@ -7151,17 +7150,7 @@ int Game::mstTask_wait2(Task *t) {
 	debug(kDebug_MONSTER, "mstTask_wait2 t %p count %d", t, t->arg1);
 	--t->arg1;
 	if (t->arg1 == 0) {
-		t->run = &Game::mstTask_main;
-		LvlObject *o = 0;
-		if (t->monster1) {
-			o = t->monster1->o16;
-		} else if (t->monster2) {
-			o = t->monster2->o;
-		}
-		if (o) {
-			o->actionKeyMask = 0;
-			o->directionKeyMask = 0;
-		}
+		mstTaskRestart(t);
 		return 0;
 	}
 	return 1;
@@ -7172,17 +7161,7 @@ int Game::mstTask_wait3(Task *t) {
 	if (getTaskFlag(t, t->arg2, t->arg1) == 0) {
 		return 1;
 	}
-	t->run = &Game::mstTask_main;
-	LvlObject *o = 0;
-	if (t->monster1) {
-		o = t->monster1->o16;
-	} else if (t->monster2) {
-		o = t->monster2->o;
-	}
-	if (o) {
-		o->actionKeyMask = 0;
-		o->directionKeyMask = 0;
-	}
+	mstTaskRestart(t);
 	return 0;
 }
 
@@ -7192,24 +7171,12 @@ int Game::mstTask_idle(Task *t) {
 }
 
 int Game::mstTask_mstOp231(Task *t) {
+	debug(kDebug_MONSTER, "mstTask_mstOp231 t %p", t);
 	const MstOp234Data *m = &_res->_mstOp234Data[t->arg2];
 	const int a = getTaskFlag(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskFlag(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
-		LvlObject *o = 0;
-		MonsterObject1 *m = t->monster1;
-		if (m) {
-			if ((m->flagsA6 & 2) == 0) {
-				o = m->o16;
-			}
-		} else if (t->monster2) {
-			o = t->monster2->o;
-		}
-		if (o) {
-			o->actionKeyMask = 0;
-			o->directionKeyMask = 0;
-		}
-		t->run = &Game::mstTask_main;
+		mstTaskRestart(t);
 		return 0;
 	}
 	return 1;
@@ -7227,17 +7194,7 @@ int Game::mstTask_mstOp233(Task *t) {
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (!compareOp(m->compare, a, b)) {
-		t->run = &Game::mstTask_main;
-		LvlObject *o = 0;
-		if (t->monster1) {
-			o = t->monster1->o16;
-		} else if (t->monster2) {
-			o = t->monster2->o;
-		}
-		if (o) {
-			o->actionKeyMask = 0;
-			o->directionKeyMask = 0;
-		}
+		mstTaskRestart(t);
 		return 0;
 	}
 	return 1;
@@ -7249,17 +7206,7 @@ int Game::mstTask_mstOp234(Task *t) {
 	const int a = getTaskVar(t, m->indexVar1, m->maskVars & 15);
 	const int b = getTaskVar(t, m->indexVar2, m->maskVars >> 4);
 	if (compareOp(m->compare, a, b)) {
-		t->run = &Game::mstTask_main;
-		LvlObject *o = 0;
-		if (t->monster1) {
-			o = t->monster1->o16;
-		} else if (t->monster2) {
-			o = t->monster2->o;
-		}
-		if (o) {
-			o->actionKeyMask = 0;
-			o->directionKeyMask = 0;
-		}
+		mstTaskRestart(t);
 		return 0;
 	}
 	return 1;

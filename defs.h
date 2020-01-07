@@ -384,7 +384,7 @@ struct MonsterObject1 {
 	int levelPosBounds_y1; // 0xA0
 	uint8_t o_flags0; // 0xA4
 	uint8_t flagsA5; // 0xA5
-	uint8_t flagsA6; // 0xA6
+	uint8_t flagsA6; // 0xA6 |1:turning |2:idle |4:colliding
 	uint8_t targetDirectionMask; // 0xA7
 	uint8_t bboxNum[2]; // 0xA8, 0xA9
 	uint8_t walkBoxNum; // 0xAA
