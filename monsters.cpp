@@ -659,7 +659,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 
 	const uint8_t *ptr = m->monsterInfos;
 	if (ptr[946] & 4) {
-		const uint8_t *ptr1 = ptr + (o->flags0 & 255) * 28; // _eax
+		const uint8_t *ptr1 = ptr + (o->flags0 & 0xFF) * 28; // _eax
 		if (ptr1[0xE] != 0) {
 			_mstTemp_x1 = m->xMstPos + (int8_t)ptr1[0xC];
 			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[0xD];
@@ -2382,7 +2382,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	MonsterObject1 *m = t->monster1;
 	MonsterObject1 *_mstCurrentMonster1 = m;
 	LvlObject *o = m->o16;
-	const int num = o->flags0 & 255;
+	const int num = o->flags0 & 0xFF;
 	const uint8_t *ptr = m->monsterInfos + num * 28; // _ebx
 	int8_t a = ptr[6];
 	if (a != 0) {
@@ -5316,8 +5316,8 @@ void Game::mstOp52() {
 			if ((m->flagsA5 & 0x70) == 0) {
 				assert(m->task->monster1 == m);
 				Task *t = m->task;
-				const int a = (m->o16->flags0 & 255) * 28;
-				if (m->monsterInfos[a] != 0) {
+				const int num = m->o16->flags0 & 0xFF;
+				if (m->monsterInfos[num * 28] != 0) {
 					if (t->run != &Game::mstTask_monsterWait1 && t->run != &Game::mstTask_monsterWait4 && t->run != &Game::mstTask_monsterWait2 && t->run != &Game::mstTask_monsterWait3 && t->run != &Game::mstTask_monsterWait5 && t->run != &Game::mstTask_monsterWait6 && t->run != &Game::mstTask_monsterWait7 && t->run != &Game::mstTask_monsterWait8 && t->run != &Game::mstTask_monsterWait9 && t->run != &Game::mstTask_monsterWait10) {
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
 						mstTaskInitMonster1Type2(m->task, 1);
@@ -5353,7 +5353,6 @@ bool Game::mstHasMonsterInRange(const MstMonsterAction *m48, uint8_t flag) {
 
 	int var24 = 0;
 	//int var28 = 0;
-	//int var18 = 0;
 	int _edi = 0;
 	for (int i = 0; i < m48->areaCount; ++i) {
 		const MstMonsterArea *m12 = &m48->area[i];
@@ -5451,13 +5450,11 @@ l1:
 			goto l1; // goto 41DB85
 		}
 // 41DE1E
-		//var18 += 12;
 		//++var28;
 	}
 	//var28 = _edi;
-	//int var20 = 0;
 	for (int i = _edi; i < m48->areaCount; ++i) {
-		MstMonsterArea *m12 = &m48->area[i]; // var20
+		MstMonsterArea *m12 = &m48->area[i];
 		assert(m12->count == 1);
 		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
@@ -5547,7 +5544,6 @@ l2:
 			}
 // 41E0E4
 		}
-		//var20 += 12;
 		//++var28;
 	}
 	return var24 != 0;
@@ -6440,8 +6436,8 @@ void Game::mstResetCollisionTable() {
 			if ((_bl & 0xB0) != 0) {
 				continue;
 			}
-			const uint8_t *p = m->monsterInfos + (m->o16->flags0 & 255) * 28;
-			if (p[0] != 0) {
+			const int num = m->o16->flags0 & 0xFF;
+			if (m->monsterInfos[num * 28] != 0) {
 				continue;
 			}
 			if (m->task->run == &Game::mstTask_monsterWait4) {
