@@ -4606,15 +4606,11 @@ int Game::mstTask_main(Task *t) {
 		case 226: { // 68 - add_monster_group
 				const int num = READ_LE_UINT16(p + 2);
 				const MstOp226Data *m226Data = &_res->_mstOp226Data[num];
-				int _edi = _res->_mstPointOffsets[_currentScreen].xOffset;
+				int xPos = _res->_mstPointOffsets[_currentScreen].xOffset;
 				int yPos = _res->_mstPointOffsets[_currentScreen].yOffset;
 				int countRight = 0; // var1C
 				int countLeft  = 0; // var8
-				int _ecx  = m226Data->unk4 * 256;
-				int _edx  = _edi + 256;
-				_edi -= _ecx;
-				_edx += _ecx;
-				int var20 = _edx;
+				int xOffset  = m226Data->unk4 * 256;
 				for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 					MonsterObject1 *m = &_monsterObjects1Table[i];
 					if (!m->m46) {
@@ -4623,10 +4619,7 @@ int Game::mstTask_main(Task *t) {
 					if (m->monsterInfos[944] != _res->_mstMonsterInfos[m226Data->unk0 * kMonsterInfoDataSize + 944]) {
 						continue;
 					}
-					if (m->xMstPos < _edi || m->xMstPos > var20) {
-						continue;
-					}
-					if (m->yMstPos < yPos || m->yMstPos > yPos + 192) {
+					if (!rect_contains(xPos - xOffset, yPos, xPos + xOffset + 256, yPos + 192, m->xMstPos, m->yMstPos)) {
 						continue;
 					}
 					if (_mstAndyLevelPosX > m->xMstPos) {
@@ -4640,7 +4633,7 @@ int Game::mstTask_main(Task *t) {
 				if (total >= m226Data->unk3) {
 					break;
 				}
-				_ecx = m226Data->unk3 - total;
+				int _ecx = m226Data->unk3 - total;
 
 				int countType1 = m226Data->unk1; // _edi
 				if (countLeft >= countType1) {
@@ -5997,20 +5990,15 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 				screenNum = _res->_mstHdr.screensCount - 1;
 			}
 			const int x = _res->_mstPointOffsets[screenNum].xOffset;
-			const int y = _res->_mstPointOffsets[screenNum].yOffset; // _edx
-			const int xOffset = op204Data->arg3 * 256; // _eax
-			const int x1 = x - xOffset; // _ebp
-			const int x2 = x + xOffset; // _edi
+			const int y = _res->_mstPointOffsets[screenNum].yOffset;
+			const int xOffset = op204Data->arg3 * 256;
 			int count = 0;
 			for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 				const MonsterObject1 *m = &_monsterObjects1Table[i];
 				if (!m->m46) {
 					continue;
 				}
-				if (m->xMstPos < x1 || m->xMstPos > x2) {
-					continue;
-				}
-				if (m->yMstPos < y || m->yMstPos > y + 192) {
+				if (!rect_contains(x - xOffset, y, x + xOffset + 256, y + 192, m->xMstPos, m->yMstPos)) {
 					continue;
 				}
 				const int num = op204Data->arg1;

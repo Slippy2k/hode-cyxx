@@ -16,10 +16,7 @@ level 5 'lava' - completable
 
 level 6 'pwr2' - completable
 
-level 7 'lar1' - issue on screen 11
-	--checkpoint 4
-		screen 11
-			worms do not go down and do not attack the double spectre
+level 7 'lar1' - to check (--checkpoint 4)
 
 level 8 'lar2' - to check (--checkpoint 5)
 
