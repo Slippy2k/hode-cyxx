@@ -38,7 +38,7 @@ struct Menu {
 	void loadData();
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
-	void drawBitmap(const DatBitmap *bitmap);
+	void drawBitmap(const DatBitmap *bitmap, const DatSpritesGroup *spritesGroup);
 
 	void mainLoop();
 };
