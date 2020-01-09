@@ -175,6 +175,7 @@ void System_SDL2::destroy() {
 		SDL_JoystickClose(_joystick);
 		_joystick = 0;
 	}
+	SDL_Quit();
 }
 
 template<bool vertical>
