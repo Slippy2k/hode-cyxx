@@ -29,8 +29,10 @@ struct Menu {
 
 	DatSpritesGroup *_titleSprites;
 	DatSpritesGroup *_playerSprites;
-	DatBitmap *_titleBitmap;
-	DatBitmap *_playerBitmap;
+	const uint8_t *_titleBitmapData;
+	uint32_t _titleBitmapSize;
+	const uint8_t *_playerBitmapData;
+	uint32_t _playerBitmapSize;
 	int _currentOption;
 
 	Menu(PafPlayer *paf, Resource *res, Video *video);
@@ -38,7 +40,7 @@ struct Menu {
 	void loadData();
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
-	void drawBitmap(const DatBitmap *bitmap, const DatSpritesGroup *spritesGroup);
+	void drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup);
 
 	void mainLoop();
 };

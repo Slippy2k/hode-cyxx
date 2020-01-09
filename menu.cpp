@@ -11,15 +11,20 @@ Menu::Menu(PafPlayer *paf, Resource *res, Video *video)
 	: _paf(paf), _res(res), _video(video) {
 	_titleSprites = 0;
 	_playerSprites = 0;
-	_titleBitmap = 0;
-	_playerBitmap = 0;
+	_titleBitmapData = 0;
+	_titleBitmapSize = 0;
+	_playerBitmapData = 0;
+	_titleBitmapSize = 0;
 	_currentOption = 0;
 }
 
 void Menu::loadData() {
 	_res->loadDatMenuBuffers();
 
-	if (_res->_datHdr.version == 10) {
+	const int version = _res->_datHdr.version;
+	const int options = 19;
+
+	if (version == 10) {
 
 		const uint8_t *ptr = _res->_menuBuffer1;
 		uint32_t ptrOffset = 0;
@@ -32,13 +37,36 @@ void Menu::loadData() {
 		_playerSprites->size = le32toh(_playerSprites->size);
 		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
 
-		_titleBitmap = (DatBitmap *)(ptr + ptrOffset);
-		_titleBitmap->size = le32toh(_titleBitmap->size);
-		ptrOffset += sizeof(DatBitmap) + _titleBitmap->size + 768;
+		_titleBitmapSize = READ_LE_UINT32(ptr + ptrOffset);
+		_titleBitmapData = ptr + ptrOffset + 8;
+		ptrOffset += 8 + _titleBitmapSize + 768;
 
-		_playerBitmap = (DatBitmap *)(ptr + ptrOffset);
-		_playerBitmap->size = le32toh(_playerBitmap->size);
-		ptrOffset += sizeof(DatBitmap) + _playerBitmap->size + 768;
+		_playerBitmapSize = READ_LE_UINT32(ptr + ptrOffset);
+		_playerBitmapData = ptr + ptrOffset + 8;
+		ptrOffset += 8 + _playerBitmapSize + 768;
+
+	} else if (version == 11) {
+
+		const uint8_t *ptr = _res->_menuBuffer1;
+		uint32_t hdrOffset = 4;
+
+		uint32_t ptrOffset = 4 + (2 + options) * 8; // pointers to bitmaps
+		ptrOffset += _res->_datHdr.cutscenesCount * 12;
+		for (int i = 0; i < 8; ++i) {
+			ptrOffset += _res->_datHdr.levelCheckpointsCount[i] * 12;
+		}
+		ptrOffset += _res->_datHdr.levelsCount * 12;
+
+		_titleBitmapSize = READ_LE_UINT32(ptr + hdrOffset);
+		hdrOffset += 8;
+		_titleBitmapData = ptr + ptrOffset;
+		ptrOffset += _titleBitmapSize + 768;
+
+		_playerBitmapSize = READ_LE_UINT32(ptr + hdrOffset);
+		hdrOffset += 8;
+		_playerBitmapData = ptr + ptrOffset;
+		ptrOffset += _playerBitmapSize + 768;
+
 	} else {
 		warning("Unhandled .dat version %d", _res->_datHdr.version);
 	}
@@ -56,13 +84,14 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num) {
 	}
 }
 
-void Menu::drawBitmap(const DatBitmap *bitmap, const DatSpritesGroup *spritesGroup) {
-	const uint8_t *data = (const uint8_t *)&bitmap[1];
-	const uint32_t uncompressedSize = decodeLZW(data, _video->_frontLayer);
+void Menu::drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup) {
+	const uint32_t uncompressedSize = decodeLZW(bitmapData, _video->_frontLayer);
 	assert(uncompressedSize == Video::W * Video::H);
-	const uint8_t *palette = data + bitmap->size;
+	const uint8_t *palette = bitmapData + bitmapSize;
 	g_system->setPalette(palette, 256, 6);
-	drawSprite(spritesGroup, _currentOption);
+	if (spritesGroup) {
+		drawSprite(spritesGroup, _currentOption);
+	}
 	g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
 	g_system->updateScreen(false);
 }
@@ -80,7 +109,7 @@ void Menu::mainLoop() {
 				++_currentOption;
 			}
 		}
-		drawBitmap(_titleBitmap, _titleSprites);
+		drawBitmap(_titleBitmapData, _titleBitmapSize, _titleSprites);
 		g_system->processEvents();
 		g_system->sleep(15);
 	}
