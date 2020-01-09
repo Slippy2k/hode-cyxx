@@ -24,10 +24,10 @@ void Menu::loadData() {
 	const int version = _res->_datHdr.version;
 	const int options = 19;
 
-	if (version == 10) {
+	const uint8_t *ptr = _res->_menuBuffer1;
+	uint32_t ptrOffset = 0;
 
-		const uint8_t *ptr = _res->_menuBuffer1;
-		uint32_t ptrOffset = 0;
+	if (version == 10) {
 
 		_titleSprites = (DatSpritesGroup *)(ptr + ptrOffset);
 		_titleSprites->size = le32toh(_titleSprites->size);
@@ -47,10 +47,10 @@ void Menu::loadData() {
 
 	} else if (version == 11) {
 
-		const uint8_t *ptr = _res->_menuBuffer1;
+		ptr = _res->_menuBuffer1;
 		uint32_t hdrOffset = 4;
 
-		uint32_t ptrOffset = 4 + (2 + options) * 8; // pointers to bitmaps
+		ptrOffset = 4 + (2 + options) * 8; // pointers to bitmaps
 		ptrOffset += _res->_datHdr.cutscenesCount * 12;
 		for (int i = 0; i < 8; ++i) {
 			ptrOffset += _res->_datHdr.levelCheckpointsCount[i] * 12;
@@ -66,9 +66,20 @@ void Menu::loadData() {
 		hdrOffset += 8;
 		_playerBitmapData = ptr + ptrOffset;
 		ptrOffset += _playerBitmapSize + 768;
+	}
 
-	} else {
-		warning("Unhandled .dat version %d", _res->_datHdr.version);
+	ptr = _res->_menuBuffer0;
+	ptrOffset = 0;
+
+	if (version == 11) {
+
+		_titleSprites = (DatSpritesGroup *)(ptr + ptrOffset);
+		_titleSprites->size = le32toh(_titleSprites->size);
+		ptrOffset += sizeof(DatSpritesGroup) + _titleSprites->size;
+
+		_playerSprites = (DatSpritesGroup *)(ptr + ptrOffset);
+		_playerSprites->size = le32toh(_playerSprites->size);
+		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
 	}
 }
 
@@ -89,9 +100,7 @@ void Menu::drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatS
 	assert(uncompressedSize == Video::W * Video::H);
 	const uint8_t *palette = bitmapData + bitmapSize;
 	g_system->setPalette(palette, 256, 6);
-	if (spritesGroup) {
-		drawSprite(spritesGroup, _currentOption);
-	}
+	drawSprite(spritesGroup, _currentOption);
 	g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
 	g_system->updateScreen(false);
 }
@@ -107,6 +116,11 @@ void Menu::mainLoop() {
 		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
 			if (_currentOption < 3) {
 				++_currentOption;
+			}
+		}
+		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
+			if (_currentOption == 3) {
+				break;
 			}
 		}
 		drawBitmap(_titleBitmapData, _titleBitmapSize, _titleSprites);
