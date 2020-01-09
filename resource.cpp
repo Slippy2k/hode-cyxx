@@ -1521,6 +1521,8 @@ void Resource::loadMstData(File *fp) {
 			_mstMovingBoundsData[i].indexData = (uint8_t *)malloc(_mstMovingBoundsData[i].indexDataCount);
 			fp->read(_mstMovingBoundsData[i].indexData, _mstMovingBoundsData[i].indexDataCount);
 			bytesRead += _mstMovingBoundsData[i].indexDataCount;
+		} else {
+			_mstMovingBoundsData[i].indexData = 0;
 		}
 	}
 
