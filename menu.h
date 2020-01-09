@@ -43,6 +43,7 @@ struct Menu {
 	void drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup);
 
 	void mainLoop();
+	void handleTitleScreen();
 };
 
 #endif // MENU_H__

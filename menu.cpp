@@ -14,7 +14,7 @@ Menu::Menu(PafPlayer *paf, Resource *res, Video *video)
 	_titleBitmapData = 0;
 	_titleBitmapSize = 0;
 	_playerBitmapData = 0;
-	_titleBitmapSize = 0;
+	_playerBitmapSize = 0;
 	_currentOption = 0;
 }
 
@@ -107,21 +107,34 @@ void Menu::drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatS
 
 void Menu::mainLoop() {
 	loadData();
+	handleTitleScreen();
+}
+
+void Menu::handleTitleScreen() {
 	while (!g_system->inp.quit) {
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
 			if (_currentOption > 0) {
 				--_currentOption;
 			}
+			// playSound(0, soundData[0x70], 0, 5);
 		}
 		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
 			if (_currentOption < 3) {
 				++_currentOption;
 			}
+			// playSound(0, soundData[0x70], 0, 5);
 		}
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
-			if (_currentOption == 3) {
+			if (_currentOption == 0) {
+				// assign player
+			} else if (_currentOption == 1) {
+				// play
+			} else if (_currentOption == 2) {
+				// options
+			} else if (_currentOption == 3) {
 				break;
 			}
+			// playSound(0, soundData[0x78], 0, 5);
 		}
 		drawBitmap(_titleBitmapData, _titleBitmapSize, _titleSprites);
 		g_system->processEvents();

@@ -195,7 +195,6 @@ void Resource::loadSetupDat() {
 	_menuBuffersOffset = _datHdr.hintsImageOffsetTable[_datHdr.yesNoQuitImage + 2];
 }
 
-
 bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
 	if (!_isPsx) {
 		const int offset = _datHdr.hintsImageOffsetTable[num];
