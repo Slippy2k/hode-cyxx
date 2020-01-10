@@ -152,7 +152,7 @@ void Resource::loadSetupDat() {
 		_datHdr.levelCheckpointsCount[i] = _datFile->readUint32();
 	}
 	_datHdr.yesNoQuitImage   = _datFile->readUint32();
-	_datFile->readUint32(); // 0x44
+	_datHdr.soundDataSize    = _datFile->readUint32();
 	_datHdr.loadingImageSize = _datFile->readUint32();
 	const int hintsCount = (_datHdr.version == 11) ? 46 : 20;
 	for (int i = 0; i < hintsCount; ++i) {
@@ -978,7 +978,12 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		error("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
 	}
 // 429C96
-	// preload PCM (_sssHdr.preloadPcmCount)
+	// preload PCM (_sssHdr.preloadPcmCount or setup.dat)
+	if (fp == _datFile) {
+		for (int i = 0; i < _sssHdr.pcmCount; ++i) {
+			loadSssPcm(fp, &_sssPcmTable[i]);
+		}
+	}
 // 429D32
 	for (int i = 0; i < _sssHdr.banksDataCount; ++i) {
 		uint32_t mask = 1;
@@ -1061,7 +1066,9 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 			return;
 		}
 		pcm->ptr = p;
-		fp->seek(pcm->offset, SEEK_SET);
+		if (fp != _datFile || pcm == &_sssPcmTable[0]) {
+			fp->seek(pcm->offset, SEEK_SET);
+		}
 		for (int i = 0; i < pcm->strideCount; ++i) {
 			uint8_t samples[256 * sizeof(int16_t)];
 			fp->read(samples, sizeof(samples));

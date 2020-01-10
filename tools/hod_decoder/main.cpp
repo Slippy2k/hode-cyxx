@@ -1058,7 +1058,7 @@ static void DecodeSetupDat(File *fp) {
 	const int levels       = READ_LE_UINT32(buffer + 0x1C);
 	// checkpoints
 	const int yesNoQuit    = READ_LE_UINT32(buffer + 0x40);
-	const int unk0x44      = READ_LE_UINT32(buffer + 0x44);
+	const int soundSize    = READ_LE_UINT32(buffer + 0x44);
 	const int bufferSize2  = READ_LE_UINT32(buffer + 0x48);
 
 	// hint screens
@@ -1246,7 +1246,7 @@ static void DecodeSetupDat(File *fp) {
 			assert((size % (16 * 10)) == 0);
 			ptrOffset += size;
 
-			ptrOffset += unk0x44;
+			ptrOffset += soundSize; // sound data
 		}
 
 		if (_isPsx) {

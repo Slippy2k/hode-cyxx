@@ -1,4 +1,5 @@
 
+#include "game.h"
 #include "menu.h"
 #include "lzw.h"
 #include "paf.h"
@@ -7,14 +8,15 @@
 #include "util.h"
 #include "video.h"
 
-Menu::Menu(PafPlayer *paf, Resource *res, Video *video)
-	: _paf(paf), _res(res), _video(video) {
+Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
+	: _g(g), _paf(paf), _res(res), _video(video) {
 	_titleSprites = 0;
 	_playerSprites = 0;
 	_titleBitmapData = 0;
 	_titleBitmapSize = 0;
 	_playerBitmapData = 0;
 	_playerBitmapSize = 0;
+	_soundData = 0;
 	_currentOption = 0;
 }
 
@@ -80,6 +82,41 @@ void Menu::loadData() {
 		_playerSprites = (DatSpritesGroup *)(ptr + ptrOffset);
 		_playerSprites->size = le32toh(_playerSprites->size);
 		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
+
+		ptrOffset += _res->_datHdr.menusCount * 8;
+
+		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+		assert((size % (16 * 10)) == 0);
+		ptrOffset += size;
+
+		_soundData = ptr + ptrOffset;
+		ptrOffset += _res->_datHdr.soundDataSize;
+	}
+}
+
+int Menu::getSoundNum(int num) const {
+	assert((num & 7) == 0);
+	num /= 8;
+	if (_soundData) {
+		const int count = READ_LE_UINT32(_soundData + 4);
+		const uint8_t *p = _soundData + 8 + count * 8;
+		for (int i = 0; i < count; ++i) {
+			const int count2 = READ_LE_UINT32(_soundData + 8 + i * 8 + 4);
+			if (i == num) {
+				assert(count2 != 0);
+				return (int16_t)READ_LE_UINT16(p);
+			}
+			p += count2 * 2;
+		}
+		assert((p - _soundData) == _res->_datHdr.soundDataSize);
+	}
+	return -1;
+}
+
+void Menu::playSound(int num) {
+	num = getSoundNum(num);
+	if (num != -1) {
+		_g->playSound(num, 0, 0, 5);
 	}
 }
 
@@ -116,13 +153,13 @@ void Menu::handleTitleScreen() {
 			if (_currentOption > 0) {
 				--_currentOption;
 			}
-			// playSound(0, soundData[0x70], 0, 5);
+			playSound(0x70);
 		}
 		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
 			if (_currentOption < 3) {
 				++_currentOption;
 			}
-			// playSound(0, soundData[0x70], 0, 5);
+			playSound(0x70);
 		}
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
 			if (_currentOption == 0) {
@@ -134,7 +171,7 @@ void Menu::handleTitleScreen() {
 			} else if (_currentOption == 3) {
 				break;
 			}
-			// playSound(0, soundData[0x78], 0, 5);
+			playSound(0x78);
 		}
 		drawBitmap(_titleBitmapData, _titleBitmapSize, _titleSprites);
 		g_system->processEvents();
