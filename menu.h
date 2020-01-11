@@ -57,8 +57,8 @@ struct Menu {
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
 	void drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup);
 
-	void mainLoop();
-	void handleTitleScreen();
+	bool mainLoop();
+	bool handleTitleScreen();
 };
 
 #endif // MENU_H__

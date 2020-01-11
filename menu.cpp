@@ -169,12 +169,12 @@ void Menu::drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatS
 	g_system->updateScreen(false);
 }
 
-void Menu::mainLoop() {
+bool Menu::mainLoop() {
 	loadData();
-	handleTitleScreen();
+	return handleTitleScreen();
 }
 
-void Menu::handleTitleScreen() {
+bool Menu::handleTitleScreen() {
 	while (!g_system->inp.quit) {
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
 			if (_currentOption > 0) {
@@ -191,12 +191,12 @@ void Menu::handleTitleScreen() {
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
 			if (_currentOption == 0) {
 				// assign player
-			} else if (_currentOption == 1) {
-				// play
+			} else if (_currentOption == 1) { // play
+				break;
 			} else if (_currentOption == 2) {
 				// options
-			} else if (_currentOption == 3) {
-				break;
+			} else if (_currentOption == 3) { // quit
+				return false;
 			}
 			playSound(0x78);
 		}
@@ -204,4 +204,5 @@ void Menu::handleTitleScreen() {
 		g_system->processEvents();
 		g_system->sleep(15);
 	}
+	return true;
 }

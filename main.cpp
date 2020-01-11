@@ -35,7 +35,7 @@ static bool _fullscreen = false;
 static bool _widescreen = false;
 
 static const bool _runBenchmark = false;
-static const bool _runMenu = false;
+static bool _runMenu = false;
 
 static void lockAudio(int flag) {
 	if (flag) {
@@ -91,6 +91,8 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 			g->_mstDisabled = configBool(value);
 		} else if (strcmp(name, "disable_sss") == 0) {
 			g->_sssDisabled = configBool(value);
+		} else if (strcmp(name, "disable_menu") == 0) {
+			_runMenu = !configBool(value);
 		} else if (strcmp(name, "max_active_sounds") == 0) {
 			g->_playingSssObjectsMax = atoi(value);
 		} else if (strcmp(name, "difficulty") == 0) {
@@ -192,11 +194,13 @@ int main(int argc, char *argv[]) {
 		g->benchmarkCpu();
 	}
 	g->_res->loadSetupDat();
-	if (_runMenu) {
+	bool runGame = true;
+	if (_runMenu && resume) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
-		m->mainLoop();
+		runGame = m->mainLoop();
 		delete m;
-	} else {
+	}
+	if (runGame) {
 		if (g->loadSetupCfg() && resume) {
 			level = g->_setupCfgBuffer[10];
 			checkpoint = g->_setupCfgBuffer[level];
