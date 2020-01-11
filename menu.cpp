@@ -24,7 +24,7 @@ void Menu::loadData() {
 	_res->loadDatMenuBuffers();
 
 	const int version = _res->_datHdr.version;
-	const int options = 19;
+	const int optionsCount = 19;
 
 	const uint8_t *ptr = _res->_menuBuffer1;
 	uint32_t ptrOffset = 0;
@@ -47,25 +47,52 @@ void Menu::loadData() {
 		_playerBitmapData = ptr + ptrOffset + 8;
 		ptrOffset += 8 + _playerBitmapSize + 768;
 
+		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+		assert((size % (16 * 10)) == 0);
+		ptrOffset += size;
+
+		const int cutscenesCount = _res->_datHdr.cutscenesCount;
+		uint32_t hdrOffset = ptrOffset;
+		ptrOffset += cutscenesCount * sizeof(DatBitmapsGroup);
+		for (int i = 0; i < cutscenesCount; ++i) {
+			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+			hdrOffset += sizeof(DatBitmapsGroup);
+			ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
+		}
+
+		for (int i = 0; i < 8; ++i) {
+			const int count = _res->_datHdr.levelCheckpointsCount[i];
+			hdrOffset = ptrOffset;
+			ptrOffset += count * sizeof(DatBitmapsGroup);
+			for (int j = 0; j < count; ++j) {
+				DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+				hdrOffset += sizeof(DatBitmapsGroup);
+				ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
+			}
+		}
+
+		_soundData = ptr + ptrOffset;
+		ptrOffset += _res->_datHdr.soundDataSize;
+
 	} else if (version == 11) {
 
 		ptr = _res->_menuBuffer1;
 		uint32_t hdrOffset = 4;
 
-		ptrOffset = 4 + (2 + options) * 8; // pointers to bitmaps
-		ptrOffset += _res->_datHdr.cutscenesCount * 12;
+		ptrOffset = 4 + (2 + optionsCount) * sizeof(DatBitmap);
+		ptrOffset += _res->_datHdr.cutscenesCount * sizeof(DatBitmapsGroup);
 		for (int i = 0; i < 8; ++i) {
-			ptrOffset += _res->_datHdr.levelCheckpointsCount[i] * 12;
+			ptrOffset += _res->_datHdr.levelCheckpointsCount[i] * sizeof(DatBitmapsGroup);
 		}
-		ptrOffset += _res->_datHdr.levelsCount * 12;
+		ptrOffset += _res->_datHdr.levelsCount * sizeof(DatBitmapsGroup);
 
 		_titleBitmapSize = READ_LE_UINT32(ptr + hdrOffset);
-		hdrOffset += 8;
+		hdrOffset += sizeof(DatBitmap);
 		_titleBitmapData = ptr + ptrOffset;
 		ptrOffset += _titleBitmapSize + 768;
 
 		_playerBitmapSize = READ_LE_UINT32(ptr + hdrOffset);
-		hdrOffset += 8;
+		hdrOffset += sizeof(DatBitmap);
 		_playerBitmapData = ptr + ptrOffset;
 		ptrOffset += _playerBitmapSize + 768;
 	}

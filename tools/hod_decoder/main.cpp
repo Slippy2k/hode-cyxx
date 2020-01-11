@@ -1182,6 +1182,8 @@ static void DecodeSetupDat(File *fp) {
 				ptrOffset += DecodeSetupDatBitmapGroup(checkpoints[i], count, ptr + hdrOffset, ptr + ptrOffset);
 			}
 
+			// sound data
+
 		} else if (version == 11) {
 
 			ptrOffset = 4 + (2 + options) * 8;

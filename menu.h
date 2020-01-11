@@ -22,6 +22,15 @@ struct DatBitmap {
 	// 8 lzw + 768 palette
 } PACKED; // sizeof == 8
 
+struct DatBitmapsGroup {
+	uint8_t w;
+	uint8_t h;
+	uint8_t colors;
+	uint8_t unk3; // padding to 4 bytes
+	uint32_t unk4; // 4
+	uint32_t unk8; // 8
+} PACKED; // sizeof == 12
+
 struct Menu {
 
 	Game *_g;
