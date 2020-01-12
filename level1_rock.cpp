@@ -282,26 +282,23 @@ void Level_rock::postScreenUpdate_rock_screen18() {
 			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 1;
 			_g->setupScreenMask(18);
-		} else if (_screenCounterTable[18] == 51) {
+		} else if (_screenCounterTable[18] >= 51) {
 			_res->_screensState[18].s0 = 1;
 			_res->_resLvlScreenBackgroundDataTable[18].currentBackgroundId = 1;
 		} else {
-			o = _g->findLvlObject(2, 0, 18);
-			assert(o);
-			if ((o->flags0 & 0x1F) == 11 || (o->flags0 & 0x1F) == 1) {
+			if ((o->flags0 & 0x1F) != 11 || (_andyObject->flags0 & 0x1F) == 11) {
 				break;
 			}
 			BoundingBox box = { 24, 98, 108, 165 };
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-			if (!_g->clipBoundingBox(&box, &data->boundingBox)) {
-				return;
+			if (_g->clipBoundingBox(&box, &data->boundingBox)) {
+				_andyObject->anim = 155;
+				_andyObject->xPos = 59;
+				_andyObject->yPos = 150;
+				_andyObject->frame = 0;
+				_andyObject->flags2 = 0x300C;
+				_g->setupLvlObjectBitmap(_andyObject);
 			}
-			_andyObject->anim = 155;
-			_andyObject->xPos = 59;
-			_andyObject->yPos = 150;
-			_andyObject->frame = 0;
-			_andyObject->flags2 = 0x300C;
-			_g->setupLvlObjectBitmap(_andyObject);
 		}
 		break;
 	}

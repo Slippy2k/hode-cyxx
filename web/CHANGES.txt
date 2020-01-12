@@ -1,3 +1,6 @@
+* release 0.2.6
+	- fixed skull animation in 'rock' screen 18
+
 * release 0.2.5
 	- fixed spiders and worms movement
 	- several fixes for big endian platforms
