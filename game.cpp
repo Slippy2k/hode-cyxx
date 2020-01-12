@@ -2389,7 +2389,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	o = next = ptr->nextPtr;
 	if ((ptr->spriteNum > 15 && ptr->dataPtr == 0) || ptr->levelData0x2988 == 0) {
 		if (ptr->childPtr) {
-			o = ptr->nextPtr;
+			o = ptr->childPtr->nextPtr;
 		}
 		return o;
 	}
