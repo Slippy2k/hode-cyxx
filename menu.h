@@ -44,7 +44,11 @@ struct Menu {
 	uint32_t _titleBitmapSize;
 	const uint8_t *_playerBitmapData;
 	uint32_t _playerBitmapSize;
+	const uint8_t *_digitTiles;
 	const uint8_t *_soundData;
+
+	uint8_t _paletteBuffer[256 * 3];
+
 	int _currentOption;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
@@ -55,10 +59,15 @@ struct Menu {
 	void playSound(int num);
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
+	void drawSpriteList(const DatSpritesGroup *spriteGroup, int num, int y, int x);
 	void drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup);
+	void refreshScreen(bool updatePalette);
 
 	bool mainLoop();
 	bool handleTitleScreen();
+	void drawDigit(int x, int y, int num);
+	void drawPlayerProgress(int num, int b);
+	void handleAssignPlayer();
 };
 
 #endif // MENU_H__

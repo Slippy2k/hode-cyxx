@@ -10,14 +10,17 @@
 
 Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	: _g(g), _paf(paf), _res(res), _video(video) {
+
 	_titleSprites = 0;
 	_playerSprites = 0;
 	_titleBitmapData = 0;
 	_titleBitmapSize = 0;
 	_playerBitmapData = 0;
 	_playerBitmapSize = 0;
+	_digitTiles = 0;
 	_soundData = 0;
-	_currentOption = 0;
+
+	_currentOption = 1;
 }
 
 void Menu::loadData() {
@@ -112,6 +115,7 @@ void Menu::loadData() {
 
 		ptrOffset += _res->_datHdr.menusCount * 8;
 
+		_digitTiles = ptr + ptrOffset;
 		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
 		assert((size % (16 * 10)) == 0);
 		ptrOffset += size;
@@ -159,12 +163,22 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num) {
 	}
 }
 
+void Menu::drawSpriteList(const DatSpritesGroup *spriteGroup, int num, int y, int x) {
+}
+
 void Menu::drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup) {
 	const uint32_t uncompressedSize = decodeLZW(bitmapData, _video->_frontLayer);
 	assert(uncompressedSize == Video::W * Video::H);
 	const uint8_t *palette = bitmapData + bitmapSize;
 	g_system->setPalette(palette, 256, 6);
 	drawSprite(spritesGroup, _currentOption);
+	refreshScreen(false);
+}
+
+void Menu::refreshScreen(bool updatePalette) {
+	if (updatePalette) {
+		g_system->setPalette(_paletteBuffer, 256, 6);
+	}
 	g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
 	g_system->updateScreen(false);
 }
@@ -178,31 +192,101 @@ bool Menu::handleTitleScreen() {
 	while (!g_system->inp.quit) {
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
 			if (_currentOption > 0) {
+				playSound(0x70);
 				--_currentOption;
 			}
-			playSound(0x70);
 		}
 		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
 			if (_currentOption < 3) {
+				playSound(0x70);
 				++_currentOption;
 			}
-			playSound(0x70);
 		}
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
-			if (_currentOption == 0) {
-				// assign player
-			} else if (_currentOption == 1) { // play
+			playSound(0x78);
+			switch (_currentOption) {
+			case 0:
+				handleAssignPlayer();
 				break;
-			} else if (_currentOption == 2) {
-				// options
-			} else if (_currentOption == 3) { // quit
+			case 1: // play
+				return true;
+			case 2: // options
+				break;
+			case 3: // quit
 				return false;
 			}
-			playSound(0x78);
 		}
 		drawBitmap(_titleBitmapData, _titleBitmapSize, _titleSprites);
 		g_system->processEvents();
 		g_system->sleep(15);
 	}
-	return true;
+	return false;
+}
+
+void Menu::drawDigit(int x, int y, int num) {
+	if (x < 0 || x + 16 > Video::W || y < 0 || y + 10 > Video::H) {
+		return;
+	}
+	if (num >= 16) {
+		return;
+	}
+	uint8_t *dst = _video->_frontLayer + y * 256 + x;
+	const uint8_t *src = _digitTiles + num * 16;
+
+	for (int j = 0; j < 10; ++j) {
+		for (int i = 0; i < 16; ++i) {
+			if (*src != 0) {
+				*dst = *src;
+			}
+			++dst;
+			++src;
+		}
+		dst += Video::W - 16;
+		src += Video::W - 16;
+	}
+}
+
+void Menu::drawPlayerProgress(int num, int b) {
+	const uint32_t uncompressedSize = decodeLZW(_playerBitmapData, _video->_frontLayer);
+	assert(uncompressedSize == Video::W * Video::H);
+	int offset = 0xA;
+	for (int y = 96; y < 164; y += 17) {
+		if (_g->_setupCfgBuffer[offset + 2] == 0 && 0) {
+			drawSpriteList(_playerSprites, 0x52, y - 3, 3);
+		} else {
+			int levelNum = _g->_setupCfgBuffer[offset];
+			int screenNum;
+			if (levelNum == 8) { // 'dark'
+				levelNum = 7;
+				screenNum = 11;
+			} else {
+				screenNum = _g->_setupCfgBuffer[offset + 1];
+			}
+			drawDigit(145, y, levelNum + 1);
+			drawDigit(234, y, screenNum + 1);
+		}
+		offset += 0x34;
+	}
+// 422DD7
+	// TODO
+// 422EFE
+	if (b > 0) {
+		if (b <= 4) {
+			drawSpriteList(_playerSprites, 2, b * 17 + 74, 8);
+			drawSpriteList(_playerSprites, 0, 0, 6);
+		} else if (b == 5) {
+			drawSpriteList(_playerSprites, 0, 0, 7);
+		}
+	}
+// 422F49
+	drawSpriteList(_playerSprites, 0, 0, num);
+	if (num > 2) {
+		drawSpriteList(_playerSprites, 0, 0, 2);
+	}
+	refreshScreen(false);
+}
+
+void Menu::handleAssignPlayer() {
+	memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
+	drawPlayerProgress(_g->_setupCfgBuffer[209], 0);
 }

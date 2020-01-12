@@ -194,6 +194,7 @@ int main(int argc, char *argv[]) {
 		g->benchmarkCpu();
 	}
 	g->_res->loadSetupDat();
+	g->loadSetupCfg();
 	bool runGame = true;
 	if (_runMenu && resume) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
@@ -201,7 +202,7 @@ int main(int argc, char *argv[]) {
 		delete m;
 	}
 	if (runGame) {
-		if (g->loadSetupCfg() && resume) {
+		if (resume) {
 			level = g->_setupCfgBuffer[10];
 			checkpoint = g->_setupCfgBuffer[level];
 		}
