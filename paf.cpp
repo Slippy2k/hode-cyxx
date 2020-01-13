@@ -457,10 +457,13 @@ void PafPlayer::mainLoop() {
 	_currentPageBuffer = 0;
 	int currentFrameBlock = 0;
 
-	AudioCallback audioCb;
-	audioCb.proc = mixAudio;
-	audioCb.userdata = this;
-	AudioCallback prevAudioCb = g_system->setAudioCallback(audioCb);
+	AudioCallback prevAudioCb;
+	if (_demuxAudioFrameBlocks) {
+		AudioCallback audioCb;
+		audioCb.proc = mixAudio;
+		audioCb.userdata = this;
+		prevAudioCb = g_system->setAudioCallback(audioCb);
+	}
 
 	uint32_t frameTime = g_system->getTimeStamp() + 1000 / kFramesPerSec;
 
@@ -499,7 +502,11 @@ void PafPlayer::mainLoop() {
 		++_currentPageBuffer;
 		_currentPageBuffer &= 3;
 	}
-	unload();
+
 	// restore audio callback
-	g_system->setAudioCallback(prevAudioCb);
+	if (_demuxAudioFrameBlocks) {
+		g_system->setAudioCallback(prevAudioCb);
+	}
+
+	unload();
 }

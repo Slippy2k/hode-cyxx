@@ -11,6 +11,9 @@
 Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	: _g(g), _paf(paf), _res(res), _video(video) {
 
+	assert(sizeof(SetupConfig) == Game::kSetupCfgSize);
+	_config = (SetupConfig *)_g->_setupCfgBuffer;
+
 	_titleSprites = 0;
 	_playerSprites = 0;
 	_titleBitmapData = 0;
@@ -18,16 +21,17 @@ Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	_playerBitmapData = 0;
 	_playerBitmapSize = 0;
 	_digitTiles = 0;
+	_optionData = 0;
 	_soundData = 0;
 
 	_currentOption = 1;
+	_palNum = 0;
 }
 
 void Menu::loadData() {
 	_res->loadDatMenuBuffers();
 
 	const int version = _res->_datHdr.version;
-	const int optionsCount = 19;
 
 	const uint8_t *ptr = _res->_menuBuffer1;
 	uint32_t ptrOffset = 0;
@@ -52,6 +56,7 @@ void Menu::loadData() {
 
 		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
 		assert((size % (16 * 10)) == 0);
+		_digitTiles = ptr + ptrOffset;
 		ptrOffset += size;
 
 		const int cutscenesCount = _res->_datHdr.cutscenesCount;
@@ -82,7 +87,7 @@ void Menu::loadData() {
 		ptr = _res->_menuBuffer1;
 		uint32_t hdrOffset = 4;
 
-		ptrOffset = 4 + (2 + optionsCount) * sizeof(DatBitmap);
+		ptrOffset = 4 + (2 + kOptionsCount) * sizeof(DatBitmap);
 		ptrOffset += _res->_datHdr.cutscenesCount * sizeof(DatBitmapsGroup);
 		for (int i = 0; i < 8; ++i) {
 			ptrOffset += _res->_datHdr.levelCheckpointsCount[i] * sizeof(DatBitmapsGroup);
@@ -98,6 +103,36 @@ void Menu::loadData() {
 		hdrOffset += sizeof(DatBitmap);
 		_playerBitmapData = ptr + ptrOffset;
 		ptrOffset += _playerBitmapSize + 768;
+
+		for (int i = 0; i < kOptionsCount; ++i) {
+			_optionsBitmapSize[i] = READ_LE_UINT32(ptr + hdrOffset);
+			hdrOffset += sizeof(DatBitmap);
+			_optionsBitmapData[i] = ptr + ptrOffset;
+			ptrOffset += _optionsBitmapSize[i] + 768;
+		}
+
+		const int cutscenesCount = _res->_datHdr.cutscenesCount;
+		for (int i = 0; i < cutscenesCount; ++i) {
+			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+			hdrOffset += sizeof(DatBitmapsGroup);
+			ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
+		}
+
+		for (int i = 0; i < 8; ++i) {
+			const int count = _res->_datHdr.levelCheckpointsCount[i];
+			for (int j = 0; j < count; ++j) {
+				DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+				hdrOffset += sizeof(DatBitmapsGroup);
+				ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
+			}
+		}
+
+		const int levelsCount = _res->_datHdr.levelsCount;
+		for (int i = 0; i < levelsCount; ++i) {
+			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+			hdrOffset += sizeof(DatBitmapsGroup);
+			ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
+		}
 	}
 
 	ptr = _res->_menuBuffer0;
@@ -113,15 +148,60 @@ void Menu::loadData() {
 		_playerSprites->size = le32toh(_playerSprites->size);
 		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
 
+		_optionData = ptr + ptrOffset;
 		ptrOffset += _res->_datHdr.menusCount * 8;
 
-		_digitTiles = ptr + ptrOffset;
 		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
 		assert((size % (16 * 10)) == 0);
+		_digitTiles = ptr + ptrOffset;
 		ptrOffset += size;
 
 		_soundData = ptr + ptrOffset;
 		ptrOffset += _res->_datHdr.soundDataSize;
+	}
+
+	uint32_t hdrOffset = ptrOffset;
+	const int iconsCount = _res->_datHdr.iconsCount;
+	ptrOffset += iconsCount * sizeof(DatSpritesGroup);
+	for (int i = 0; i < iconsCount; ++i) {
+		DatSpritesGroup *spritesGroup = (DatSpritesGroup *)(ptr + hdrOffset);
+		hdrOffset += sizeof(DatSpritesGroup);
+		ptrOffset += le32toh(spritesGroup->size);
+	}
+
+	const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+	if (size != 0) {
+		hdrOffset = ptrOffset;
+		ptrOffset += size * 20;
+		for (int i = 0; i < size; ++i) {
+			DatSpritesGroup *spritesGroup = (DatSpritesGroup *)(ptr + hdrOffset + 4);
+			hdrOffset += 20;
+			ptrOffset += le32toh(spritesGroup->size);
+		}
+	}
+
+	if (version == 10) {
+
+		_optionData = ptr + ptrOffset;
+		ptrOffset += _res->_datHdr.menusCount * 8;
+
+		hdrOffset = ptrOffset;
+		ptrOffset += kOptionsCount * sizeof(DatBitmap);
+		for (int i = 0; i < kOptionsCount; ++i) {
+			_optionsBitmapSize[i] = READ_LE_UINT32(ptr + hdrOffset);
+			hdrOffset += sizeof(DatBitmap);
+			_optionsBitmapData[i] = ptr + ptrOffset;
+			ptrOffset += _optionsBitmapSize[i] + 768;
+		}
+
+		const int levelsCount = _res->_datHdr.levelsCount;
+		hdrOffset = ptrOffset;
+		ptrOffset += levelsCount * sizeof(DatBitmapsGroup);
+		for (int i = 0; i < levelsCount; ++i) {
+			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+			hdrOffset += sizeof(DatBitmapsGroup);
+			ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
+		}
 	}
 }
 
@@ -224,6 +304,7 @@ bool Menu::handleTitleScreen() {
 			case 1: // play
 				return true;
 			case 2: // options
+				handleOptions(0);
 				break;
 			case 3: // quit
 				return false;
@@ -245,40 +326,37 @@ void Menu::drawDigit(int x, int y, int num) {
 	}
 	uint8_t *dst = _video->_frontLayer + y * 256 + x;
 	const uint8_t *src = _digitTiles + num * 16;
-
 	for (int j = 0; j < 10; ++j) {
 		for (int i = 0; i < 16; ++i) {
-			if (*src != 0) {
-				*dst = *src;
+			if (src[i] != 0) {
+				dst[i] = src[i];
 			}
-			++dst;
-			++src;
 		}
-		dst += Video::W - 16;
-		src += Video::W - 16;
+		dst += Video::W;
+		src += Video::W;
 	}
 }
 
 void Menu::drawPlayerProgress(int num, int b) {
 	const uint32_t uncompressedSize = decodeLZW(_playerBitmapData, _video->_frontLayer);
 	assert(uncompressedSize == Video::W * Video::H);
-	int offset = 0xA;
+	int player = 0;
 	for (int y = 96; y < 164; y += 17) {
-		if (_g->_setupCfgBuffer[offset + 2] == 0 && 0) {
+		if (_config->players[player].cutscenesMask == 0) {
 			drawSpritePos(_playerSprites, 0x52, y - 3, 3);
 		} else {
-			int levelNum = _g->_setupCfgBuffer[offset];
+			int levelNum = _config->players[player].levelNum;
 			int screenNum;
 			if (levelNum == 8) { // 'dark'
 				levelNum = 7;
 				screenNum = 11;
 			} else {
-				screenNum = _g->_setupCfgBuffer[offset + 1];
+				screenNum = _config->players[player].screenNum;
 			}
 			drawDigit(145, y, levelNum + 1);
 			drawDigit(234, y, screenNum + 1);
 		}
-		offset += 0x34;
+		++player;
 	}
 // 422DD7
 	// TODO
@@ -301,5 +379,74 @@ void Menu::drawPlayerProgress(int num, int b) {
 
 void Menu::handleAssignPlayer() {
 	memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
+	int _ebp = 1;
+	int _ebx = 0; // currentPlayer
+//	int _edx = 0;
+	int _edi = 5;
 	drawPlayerProgress(_g->_setupCfgBuffer[209], 0);
+	while (!g_system->inp.quit) {
+		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
+			if (_ebp != 0 && _ebx == _edi) {
+				playSound(0x80);
+			} else {
+				playSound(0x78);
+			}
+// 42301D
+			if (_ebp == 0) {
+				return;
+			}
+			if (_ebx == 0) {
+				// _ebx = _plyConfig->currentPlayer + 1;
+			} else {
+				if (_ebx != _edi) {
+					if (_ebp == 1) {
+						--_ebx;
+						// _plyConfig->currentPlayer = _ebx;
+						// _snd_masterVolume
+					} else if (_ebp == 2) {
+						_ebp = _edi;
+					} else if (_ebp == 4) {
+					}
+				}
+// 423123
+				_ebx = 0;
+			}
+// 423125
+		}
+		if (g_system->inp.keyReleased(SYS_INP_UP)) {
+		}
+		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
+		}
+		g_system->processEvents();
+		g_system->sleep(15);
+	}
+}
+
+void Menu::handleOptions(int num) {
+	const uint8_t *data = &_optionData[num * 8];
+	if (data[6] != 0xFF) {
+// 428004
+	} else {
+// 428045
+	}
+// 428053
+	_paf->play(data[5]);
+	if (_palNum == 1) {
+		_config->players[_config->currentPlayer].levelNum = 0;
+		_config->players[_config->currentPlayer].screenNum = 0;
+	} else if (_palNum == 3) {
+//		_config->players[_config->currentPlayer].levelNum = _currentLevel;
+//		_config->players[_config->currentPlayer].screenNum = _levelCheckpoint;
+	} else if (_palNum == 5) {
+// 4281C3
+	} else if (_palNum == 6) {
+// 42816B
+	} else if (_palNum == 9) {
+// 428118
+	} else if (_palNum == 18) {
+// 4280EA
+	} else {
+		const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_palNum], _video->_frontLayer);
+		assert(uncompressedSize == Video::W * Video::H);
+	}
 }

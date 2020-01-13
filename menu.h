@@ -31,12 +31,35 @@ struct DatBitmapsGroup {
 	uint32_t unk8; // 8
 } PACKED; // sizeof == 12
 
+struct SetupConfig {
+	struct {
+		uint8_t progress[10];
+		uint8_t levelNum;
+		uint8_t screenNum;
+		uint32_t cutscenesMask;
+		uint8_t controls[32];
+		uint8_t difficulty;
+		uint8_t stereo;
+		uint8_t volume;
+		uint8_t currentLevel;
+	} players[4]; // sizeof == 52
+	uint8_t unkD0;
+	uint8_t currentPlayer; // 0xD1
+	uint8_t unkD2;
+	uint8_t checksum;
+} PACKED; // sizeof == 212
+
 struct Menu {
+	enum {
+		kOptionsCount = 19
+	};
 
 	Game *_g;
 	PafPlayer *_paf;
 	Resource *_res;
 	Video *_video;
+
+	SetupConfig *_config;
 
 	DatSpritesGroup *_titleSprites;
 	DatSpritesGroup *_playerSprites;
@@ -44,12 +67,16 @@ struct Menu {
 	uint32_t _titleBitmapSize;
 	const uint8_t *_playerBitmapData;
 	uint32_t _playerBitmapSize;
+	uint32_t _optionsBitmapSize[19];
+	const uint8_t *_optionsBitmapData[19];
 	const uint8_t *_digitTiles;
+	const uint8_t *_optionData;
 	const uint8_t *_soundData;
 
 	uint8_t _paletteBuffer[256 * 3];
 
 	int _currentOption;
+	uint8_t _palNum;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
@@ -68,6 +95,7 @@ struct Menu {
 	void drawDigit(int x, int y, int num);
 	void drawPlayerProgress(int num, int b);
 	void handleAssignPlayer();
+	void handleOptions(int num);
 };
 
 #endif // MENU_H__
