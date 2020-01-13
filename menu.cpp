@@ -163,7 +163,20 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num) {
 	}
 }
 
-void Menu::drawSpriteList(const DatSpritesGroup *spriteGroup, int num, int y, int x) {
+void Menu::drawSpritePos(const DatSpritesGroup *spriteGroup, int x, int y, uint32_t num) {
+	const uint8_t *ptr = (const uint8_t *)&spriteGroup[1];
+	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
+		const uint16_t size = READ_LE_UINT16(ptr + 2);
+		if (num == i) {
+			if (x == 0 && y == 0) {
+				x = ptr[0];
+				y = ptr[1];
+			}
+			_video->decodeSPR(ptr + 8, _video->_frontLayer, x, y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+			break;
+		}
+		ptr += size + 2;
+	}
 }
 
 void Menu::drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup) {
@@ -252,7 +265,7 @@ void Menu::drawPlayerProgress(int num, int b) {
 	int offset = 0xA;
 	for (int y = 96; y < 164; y += 17) {
 		if (_g->_setupCfgBuffer[offset + 2] == 0 && 0) {
-			drawSpriteList(_playerSprites, 0x52, y - 3, 3);
+			drawSpritePos(_playerSprites, 0x52, y - 3, 3);
 		} else {
 			int levelNum = _g->_setupCfgBuffer[offset];
 			int screenNum;
@@ -272,16 +285,16 @@ void Menu::drawPlayerProgress(int num, int b) {
 // 422EFE
 	if (b > 0) {
 		if (b <= 4) {
-			drawSpriteList(_playerSprites, 2, b * 17 + 74, 8);
-			drawSpriteList(_playerSprites, 0, 0, 6);
+			drawSpritePos(_playerSprites, 2, b * 17 + 74, 8);
+			drawSpritePos(_playerSprites, 0, 0, 6);
 		} else if (b == 5) {
-			drawSpriteList(_playerSprites, 0, 0, 7);
+			drawSpritePos(_playerSprites, 0, 0, 7);
 		}
 	}
 // 422F49
-	drawSpriteList(_playerSprites, 0, 0, num);
+	drawSpritePos(_playerSprites, 0, 0, num);
 	if (num > 2) {
-		drawSpriteList(_playerSprites, 0, 0, 2);
+		drawSpritePos(_playerSprites, 0, 0, 2);
 	}
 	refreshScreen(false);
 }

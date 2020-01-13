@@ -59,7 +59,7 @@ struct Menu {
 	void playSound(int num);
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
-	void drawSpriteList(const DatSpritesGroup *spriteGroup, int num, int y, int x);
+	void drawSpritePos(const DatSpritesGroup *spriteGroup, int x, int y, uint32_t num);
 	void drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup);
 	void refreshScreen(bool updatePalette);
 
