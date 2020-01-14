@@ -89,7 +89,7 @@ struct Menu {
 	void drawDigit(int x, int y, int num);
 	void drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int x, int y, int w, int h, uint8_t baseColor = 0);
 	void setCurrentPlayer(int num);
-	void drawPlayerProgress(int num, int currentSlot);
+	void drawPlayerProgress(int state, int cursor);
 	void handleAssignPlayer();
 	void handleOptions(int num);
 };

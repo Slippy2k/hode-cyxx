@@ -8,6 +8,23 @@
 #include "util.h"
 #include "video.h"
 
+static void setDefaultsSetupCfg(SetupConfig *config, int num) {
+	assert(num >= 0 && num < 4);
+	memset(config->players[num].progress, 0, 10);
+	config->players[num].levelNum = 0;
+	config->players[num].checkpointNum = 0;
+	config->players[num].cutscenesMask = 0;
+	memset(config->players[num].controls, 0, 32);
+	config->players[num].controls[0x0] = 0x11;
+	config->players[num].controls[0x4] = 0x22;
+	config->players[num].controls[0x8] = 0x84;
+	config->players[num].controls[0xC] = 0x48;
+	config->players[num].difficulty = 1;
+	config->players[num].stereo = 1;
+	config->players[num].volume = 128;
+	config->players[num].currentLevel = 0;
+}
+
 Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	: _g(g), _paf(paf), _res(res), _video(video) {
 
@@ -251,14 +268,11 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num) {
 }
 
 void Menu::drawSpritePos(const DatSpritesGroup *spriteGroup, int x, int y, uint32_t num) {
+	assert(x != 0 || y != 0);
 	const uint8_t *ptr = (const uint8_t *)&spriteGroup[1];
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		if (num == i) {
-			if (x == 0 && y == 0) {
-				x = ptr[0];
-				y = ptr[1];
-			}
 			_video->decodeSPR(ptr + 8, _video->_frontLayer, x, y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
 			break;
 		}
@@ -366,7 +380,6 @@ void Menu::setCurrentPlayer(int num) {
 		}
 	}
 // 422CE0
-	// color remapping to 205 done in drawBitmap
 	const DatBitmapsGroup *bitmapsGroup = &_checkpointsBitmaps[_levelNum][_checkpointNum];
 	uint8_t *dst = _paletteBuffer + 205 * 3;
 	const uint8_t *src = getCheckpointBitmap(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum) + bitmapsGroup->w * bitmapsGroup->h;
@@ -375,7 +388,7 @@ void Menu::setCurrentPlayer(int num) {
 	g_system->setPalette(_paletteBuffer, 256, 6);
 }
 
-void Menu::drawPlayerProgress(int num, int currentSlot) {
+void Menu::drawPlayerProgress(int state, int cursor) {
 	const uint32_t uncompressedSize = decodeLZW(_playerBitmapData, _video->_frontLayer);
 	assert(uncompressedSize == Video::W * Video::H);
 	int player = 0;
@@ -397,7 +410,7 @@ void Menu::drawPlayerProgress(int num, int currentSlot) {
 		++player;
 	}
 // 422DD7
-	player = (currentSlot == 0 || currentSlot == 5) ? _config->currentPlayer : (currentSlot - 1);
+	player = (cursor == 0 || cursor == 5) ? _config->currentPlayer : (cursor - 1);
 	uint8_t *p = _video->_frontLayer;
 	const int offset = (player * 17) + 92;
 	for (int i = 0; i < 16; ++i) { // player
@@ -418,18 +431,18 @@ void Menu::drawPlayerProgress(int num, int currentSlot) {
 		drawBitmap(bitmapsGroup, src, 132, 0, bitmapsGroup->w, bitmapsGroup->h, 205);
 	}
 // 422EFE
-	if (currentSlot > 0) {
-		if (currentSlot <= 4) {
-			drawSpritePos(_playerSprites, 2, currentSlot * 17 + 74, 8);
-			drawSpritePos(_playerSprites, 0, 0, 6);
-		} else if (currentSlot == 5) {
-			drawSpritePos(_playerSprites, 0, 0, 7);
+	if (cursor > 0) {
+		if (cursor <= 4) {
+			drawSpritePos(_playerSprites, 2, cursor * 17 + 74, 8);
+			drawSprite(_playerSprites, 6);
+		} else if (cursor == 5) {
+			drawSprite(_playerSprites, 7);
 		}
 	}
 // 422F49
-	drawSpritePos(_playerSprites, 0, 0, num); // Yes/No
-	if (num > 2) {
-		drawSpritePos(_playerSprites, 0, 0, 2);
+	drawSprite(_playerSprites, state); // Yes/No
+	if (state > 2) {
+		drawSprite(_playerSprites, 2);
 	}
 	refreshScreen(false);
 }
@@ -437,7 +450,7 @@ void Menu::drawPlayerProgress(int num, int currentSlot) {
 void Menu::handleAssignPlayer() {
 	memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
 	int _ebp = 1; // state
-	int _ebx = 0; // currentPlayer
+	int _ebx = 0; // cursor
 	setCurrentPlayer(_config->currentPlayer);
 	drawPlayerProgress(_config->currentPlayer, 0);
 	while (!g_system->inp.quit) {
@@ -467,7 +480,7 @@ void Menu::handleAssignPlayer() {
 				} else {
 					if (_ebp == 4) {
 						--_ebx;
-						// plySetDefaultValues(_ebx)
+						setDefaultsSetupCfg(_config, _ebx);
 						// _snd_masterVolume
 					}
 					setCurrentPlayer(_config->currentPlayer);
@@ -526,7 +539,7 @@ void Menu::handleOptions(int num) { // handleOptionTransition
 		_config->players[_config->currentPlayer].checkpointNum = 0;
 	} else if (_palNum == 3) {
 		_config->players[_config->currentPlayer].levelNum = _g->_currentLevel;
-//		_config->players[_config->currentPlayer].checkpointNum = _levelCheckpoint;
+		_config->players[_config->currentPlayer].checkpointNum = _g->_currentLevelCheckpoint;
 	} else if (_palNum == 5) {
 // 4281C3
 	} else if (_palNum == 6) {

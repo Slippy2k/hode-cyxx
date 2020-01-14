@@ -1864,7 +1864,3 @@ void Resource::writeSetupCfg(FILE *fp, SetupConfig *config) {
 void Resource::readSetupCfg(FILE *fp, SetupConfig *config) {
 	persistSetupCfg<kModeLoad>(fp, config);
 }
-
-void Resource::setDefaultsSetupCfg(SetupConfig *config) {
-	memset(config, 0, sizeof(SetupConfig));
-}

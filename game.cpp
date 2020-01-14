@@ -4853,7 +4853,7 @@ bool Game::loadSetupCfg() {
 		_paf->_playedMask = _setupConfig.players[0].cutscenesMask;
 		return true;
 	}
-	_res->setDefaultsSetupCfg(&_setupConfig);
+	memset(&_setupConfig, 0, sizeof(_setupConfig));
 	return false;
 }
 
@@ -4864,7 +4864,7 @@ void Game::saveSetupCfg() {
 	}
 	_setupConfig.players[0].levelNum = _currentLevel;
 	_setupConfig.players[0].checkpointNum = _level->_checkpoint;
-	_setupConfig.players[0].cutscenesMask = htole32(_paf->_playedMask);
+	_setupConfig.players[0].cutscenesMask = _paf->_playedMask;
 	_setupConfig.players[0].difficulty = _difficulty;
 	_setupConfig.players[0].volume = _snd_masterVolume;
 	if (_currentLevel > _setupConfig.players[0].currentLevel) {
