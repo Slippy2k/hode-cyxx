@@ -203,8 +203,8 @@ int main(int argc, char *argv[]) {
 	}
 	if (runGame) {
 		if (resume) {
-			level = g->_setupCfgBuffer[10];
-			checkpoint = g->_setupCfgBuffer[level];
+			level = g->_setupConfig.players[0].levelNum;
+			checkpoint = g->_setupConfig.players[0].progress[level];
 		}
 		bool levelChanged = false;
 		do {

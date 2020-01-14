@@ -4848,58 +4848,34 @@ void Game::updateWormHoleSprites() {
 bool Game::loadSetupCfg() {
 	FILE *fp = _fs.openSaveFile(_setupCfg, false);
 	if (fp) {
-		const int count = fread(_setupCfgBuffer, 1, kSetupCfgSize, fp);
+		_res->readSetupCfg(fp, &_setupConfig);
 		_fs.closeFile(fp);
-		if (count != kSetupCfgSize) {
-			warning("Failed to read %d bytes from '%s', ret %d", kSetupCfgSize, _setupCfg, count);
-		} else {
-			uint8_t checksum = 0;
-			for (int i = 0; i < kSetupCfgSize - 2; ++i) {
-				checksum ^= _setupCfgBuffer[i];
-			}
-			if (checksum != _setupCfgBuffer[kSetupCfgSize - 1]) {
-				warning("Fixing checksum 0x%x for '%s'", checksum, _setupCfg);
-				_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
-			}
-			_paf->_playedMask = READ_LE_UINT32(_setupCfgBuffer + 12);
-			return true;
-		}
+		_paf->_playedMask = _setupConfig.players[0].cutscenesMask;
+		return true;
 	}
-	memset(_setupCfgBuffer, 0, sizeof(_setupCfgBuffer));
+	_res->setDefaultsSetupCfg(&_setupConfig);
 	return false;
 }
 
 void Game::saveSetupCfg() {
-	assert(sizeof(SetupConfig) == kSetupCfgSize);
-	SetupConfig *config = (SetupConfig *)_setupCfgBuffer;
-
 	// save in player #0 data
-	if (_currentLevelCheckpoint > config->players[0].progress[_currentLevel]) {
-		config->players[0].progress[_currentLevel] = _currentLevelCheckpoint;
+	if (_currentLevelCheckpoint > _setupConfig.players[0].progress[_currentLevel]) {
+		_setupConfig.players[0].progress[_currentLevel] = _currentLevelCheckpoint;
 	}
-	config->players[0].levelNum = _currentLevel;
-	config->players[0].checkpointNum = _level->_checkpoint;
-	config->players[0].cutscenesMask = htole32(_paf->_playedMask);
-	config->players[0].difficulty = _difficulty;
-	config->players[0].volume = _snd_masterVolume;
-	if (_currentLevel > config->players[0].currentLevel) {
-		config->players[0].currentLevel = _currentLevel;
+	_setupConfig.players[0].levelNum = _currentLevel;
+	_setupConfig.players[0].checkpointNum = _level->_checkpoint;
+	_setupConfig.players[0].cutscenesMask = htole32(_paf->_playedMask);
+	_setupConfig.players[0].difficulty = _difficulty;
+	_setupConfig.players[0].volume = _snd_masterVolume;
+	if (_currentLevel > _setupConfig.players[0].currentLevel) {
+		_setupConfig.players[0].currentLevel = _currentLevel;
 	}
-
-	uint8_t checksum = 0;
-	for (int i = 0; i < kSetupCfgSize - 2; ++i) {
-		checksum ^= _setupCfgBuffer[i];
-	}
-	_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
 	FILE *fp = _fs.openSaveFile(_setupCfg, true);
 	if (fp) {
-		const int count = fwrite(_setupCfgBuffer, 1, kSetupCfgSize, fp);
+		_res->writeSetupCfg(fp, &_setupConfig);
 		_fs.closeFile(fp);
-		if (count != kSetupCfgSize) {
-			warning("Failed to write %d bytes to '%s', ret %d", kSetupCfgSize, _setupCfg, count);
-		}
 	} else {
-		warning("Failed to save '%s'", kSetupCfgSize);
+		warning("Failed to save '%s'", _setupCfg);
 	}
 }
 

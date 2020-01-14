@@ -63,9 +63,6 @@ struct Game {
 		kDefaultSoundPanning = 64,
 		kDefaultSoundVolume = 128,
 
-		kSetupCfgPlayerDataSize = 52,
-		kSetupCfgSize = kSetupCfgPlayerDataSize * 4 + 4,
-
 		kFrameTimeStamp = 50 // original is 80ms (12.5hz)
 	};
 
@@ -99,7 +96,7 @@ struct Game {
 	int _difficulty;
 	bool _loadingScreenEnabled;
 
-	uint8_t _setupCfgBuffer[kSetupCfgSize];
+	SetupConfig _setupConfig;
 
 	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen
 	LvlObject *_andyObject;
