@@ -398,8 +398,20 @@ void Menu::drawPlayerProgress(int num, int currentSlot) {
 		++player;
 	}
 // 422DD7
-	// TODO
-	player = _config->currentPlayer;
+	player = (currentSlot == 0 || currentSlot == 5) ? _config->currentPlayer : (currentSlot - 1);
+	uint8_t *p = _video->_frontLayer;
+	const int offset = (player * 17) + 92;
+	for (int i = 0; i < 16; ++i) { // player
+		memcpy(p + i * Video::W +  6935, p + i * Video::W + (offset + 1) * 256 +   8, 72);
+	}
+// 422E47
+	for (int i = 0; i < 16; ++i) { // level
+		memcpy(p + i * Video::W + 11287, p + i * Video::W + (offset + 1) * 256 +  83, 76);
+	}
+// 422E87
+	for (int i = 0; i < 16; ++i) { // checkpoint
+		memcpy(p + i * Video::W + 15639, p + i * Video::W + (offset + 1) * 256 + 172, 76);
+	}
 // 422EC3
 	if (_config->players[player].cutscenesMask != 0) {
 		DatBitmapsGroup *bitmapsGroup = &_checkpointsBitmaps[_levelNum][_checkpointNum];
@@ -416,7 +428,7 @@ void Menu::drawPlayerProgress(int num, int currentSlot) {
 		}
 	}
 // 422F49
-	drawSpritePos(_playerSprites, 0, 0, num);
+	drawSpritePos(_playerSprites, 0, 0, num); // Yes/No
 	if (num > 2) {
 		drawSpritePos(_playerSprites, 0, 0, 2);
 	}
@@ -425,16 +437,13 @@ void Menu::drawPlayerProgress(int num, int currentSlot) {
 
 void Menu::handleAssignPlayer() {
 	memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
-	int _ebp = 1; // option
+	int _ebp = 1; // state
 	int _ebx = 0; // currentPlayer
-//	int _edx = 0;
-	int _edi = 5;
-	int _ecx;
 	setCurrentPlayer(_config->currentPlayer);
 	drawPlayerProgress(_config->currentPlayer, 0);
 	while (!g_system->inp.quit) {
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
-			if (_ebp != 0 && _ebx == _edi) {
+			if (_ebp != 0 && _ebx == 5) {
 				playSound(0x80);
 			} else {
 				playSound(0x78);
@@ -447,18 +456,25 @@ void Menu::handleAssignPlayer() {
 			if (_ebx == 0) {
 				_ebx = _config->currentPlayer + 1;
 			} else {
-				if (_ebx != _edi) {
-					if (_ebp == 1) {
+				if (_ebx == 5) {
+					_ebx = 0;
+				} else if (_ebp == 1) {
+					--_ebx;
+					_config->currentPlayer = _ebx;
+					// _snd_masterVolume
+					_ebx = 0;
+				} else if (_ebp == 2) {
+					_ebp = 5;
+				} else {
+					if (_ebp == 4) {
 						--_ebx;
-						_config->currentPlayer = _ebx;
+						// plySetDefaultValues(_ebx)
 						// _snd_masterVolume
-					} else if (_ebp == 2) {
-						_ebp = _edi;
-					} else if (_ebp == 4) {
 					}
+					setCurrentPlayer(_config->currentPlayer);
+					_ebp = 2;
+					_ebx = 0;
 				}
-// 423123
-				_ebx = 0;
 			}
 // 423125
 		}
@@ -467,25 +483,19 @@ void Menu::handleAssignPlayer() {
 				if (_ebx > 1) {
 					playSound(0x70);
 					--_ebx;
-					_ecx = _ebx - 1;
-					setCurrentPlayer(_ecx);
+					setCurrentPlayer(_ebx - 1);
 				}
 			}
 			if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
-				if (_ebx < _edi) {
+				if (_ebx < 5) {
 					playSound(0x70);
 					++_ebx;
-					if (_ebx == _edi) {
-						_ecx = _config->currentPlayer;
-					} else {
-						_ecx = _ebx - 1;
-					}
-					setCurrentPlayer(_ecx);
+					setCurrentPlayer((_ebx == 5) ? _config->currentPlayer : (_ebx - 1));
 				}
 			}
 		}
 		if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
-			if (_ebp == 1 || _ebp == 2 || _ebp == _edi) {
+			if (_ebp == 1 || _ebp == 2 || _ebp == 5) {
 				playSound(0x70);
 				--_ebp;
 			}
