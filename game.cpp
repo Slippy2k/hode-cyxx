@@ -2152,6 +2152,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		g_system->sleep(diff);
 	} while (!g_system->inp.quit && !_endLevel);
 	_animBackgroundDataCount = 0;
+	saveSetupCfg();
 	callLevel_terminate();
 }
 
