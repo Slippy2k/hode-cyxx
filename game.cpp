@@ -4868,18 +4868,22 @@ bool Game::loadSetupCfg() {
 }
 
 void Game::saveSetupCfg() {
+	assert(sizeof(SetupConfig) == kSetupCfgSize);
+	SetupConfig *config = (SetupConfig *)_setupCfgBuffer;
+
 	// save in player #0 data
-	if (_currentLevelCheckpoint > _setupCfgBuffer[_currentLevel]) {
-		_setupCfgBuffer[_currentLevel] = _currentLevelCheckpoint;
+	if (_currentLevelCheckpoint > config->players[0].progress[_currentLevel]) {
+		config->players[0].progress[_currentLevel] = _currentLevelCheckpoint;
 	}
-	_setupCfgBuffer[10] = _currentLevel;
-	_setupCfgBuffer[11] = _currentScreen;
-	WRITE_LE_UINT32(_setupCfgBuffer + 12, _paf->_playedMask);
-	_setupCfgBuffer[48] = _difficulty;
-	_setupCfgBuffer[50] = _snd_masterVolume;
-	if (_currentLevel > _setupCfgBuffer[51]) {
-		_setupCfgBuffer[51] = _currentLevel;
+	config->players[0].levelNum = _currentLevel;
+	config->players[0].screenNum = _currentScreen;
+	config->players[0].cutscenesMask = htole32(_paf->_playedMask);
+	config->players[0].difficulty = _difficulty;
+	config->players[0].volume = _snd_masterVolume;
+	if (_currentLevel > config->players[0].currentLevel) {
+		config->players[0].currentLevel = _currentLevel;
 	}
+
 	uint8_t checksum = 0;
 	for (int i = 0; i < kSetupCfgSize - 2; ++i) {
 		checksum ^= _setupCfgBuffer[i];
