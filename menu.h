@@ -49,8 +49,8 @@ struct Menu {
 	Video *_video;
 
 	SetupConfig *_config;
-	int _checkpointNum;
-	int _levelNum;
+	uint8_t _checkpointNum;
+	uint8_t _levelNum;
 
 	DatSpritesGroup *_titleSprites;
 	DatSpritesGroup *_playerSprites;

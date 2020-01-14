@@ -46,12 +46,12 @@ void Menu::loadData() {
 		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
 
 		_titleBitmapSize = READ_LE_UINT32(ptr + ptrOffset);
-		_titleBitmapData = ptr + ptrOffset + 8;
-		ptrOffset += 8 + _titleBitmapSize + 768;
+		_titleBitmapData = ptr + ptrOffset + sizeof(DatBitmap);
+		ptrOffset += sizeof(DatBitmap) + _titleBitmapSize + 768;
 
 		_playerBitmapSize = READ_LE_UINT32(ptr + ptrOffset);
-		_playerBitmapData = ptr + ptrOffset + 8;
-		ptrOffset += 8 + _playerBitmapSize + 768;
+		_playerBitmapData = ptr + ptrOffset + sizeof(DatBitmap);
+		ptrOffset += sizeof(DatBitmap) + _playerBitmapSize + 768;
 
 		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
 		assert((size % (16 * 10)) == 0);
@@ -88,7 +88,7 @@ void Menu::loadData() {
 
 		ptrOffset = 4 + (2 + kOptionsCount) * sizeof(DatBitmap);
 		ptrOffset += _res->_datHdr.cutscenesCount * sizeof(DatBitmapsGroup);
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 0; i < kCheckpointLevelsCount; ++i) {
 			ptrOffset += _res->_datHdr.levelCheckpointsCount[i] * sizeof(DatBitmapsGroup);
 		}
 		ptrOffset += _res->_datHdr.levelsCount * sizeof(DatBitmapsGroup);
@@ -355,10 +355,16 @@ void Menu::drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmap
 
 void Menu::setCurrentPlayer(int num) {
 	_levelNum = _config->players[num].levelNum;
+	if (_levelNum > kLvl_dark) {
+		_levelNum = kLvl_dark;
+	}
 	if (_levelNum == 8) {
 		_checkpointNum = 11;
 	} else {
 		_checkpointNum = _config->players[num].checkpointNum;
+		if (_checkpointNum >= _res->_datHdr.levelCheckpointsCount[_levelNum]) {
+			_checkpointNum = _res->_datHdr.levelCheckpointsCount[_levelNum] - 1;
+		}
 	}
 // 422CE0
 	// color remapping to 205 done in drawBitmap
