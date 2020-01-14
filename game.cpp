@@ -4856,10 +4856,11 @@ bool Game::loadSetupCfg() {
 			for (int i = 0; i < kSetupCfgSize - 2; ++i) {
 				checksum ^= _setupCfgBuffer[i];
 			}
-			if (checksum == _setupCfgBuffer[kSetupCfgSize - 1]) {
-				return true;
+			if (checksum != _setupCfgBuffer[kSetupCfgSize - 1]) {
+				warning("Fixing checksum 0x%x for '%s'", checksum, _setupCfg);
+				_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
 			}
-			warning("Invalid checksum 0x%x for '%s'", checksum, _setupCfg);
+			return true;
 		}
 	}
 	memset(_setupCfgBuffer, 0, sizeof(_setupCfgBuffer));
