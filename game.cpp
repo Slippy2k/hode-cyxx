@@ -4860,6 +4860,7 @@ bool Game::loadSetupCfg() {
 				warning("Fixing checksum 0x%x for '%s'", checksum, _setupCfg);
 				_setupCfgBuffer[kSetupCfgSize - 1] = checksum;
 			}
+			_paf->_playedMask = READ_LE_UINT32(_setupCfgBuffer + 12);
 			return true;
 		}
 	}
@@ -4876,7 +4877,7 @@ void Game::saveSetupCfg() {
 		config->players[0].progress[_currentLevel] = _currentLevelCheckpoint;
 	}
 	config->players[0].levelNum = _currentLevel;
-	config->players[0].screenNum = _currentScreen;
+	config->players[0].checkpointNum = _level->_checkpoint;
 	config->players[0].cutscenesMask = htole32(_paf->_playedMask);
 	config->players[0].difficulty = _difficulty;
 	config->players[0].volume = _snd_masterVolume;

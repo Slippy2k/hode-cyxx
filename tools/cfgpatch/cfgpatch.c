@@ -26,10 +26,10 @@ static void PlyPrintConfigData(const uint8_t *p) {
 	int i;
 	
 	for (i = 0; i < 10; ++i) {
-		printf("Level %d Screen %d\n", i, PlyReadNextByte(p)); p++;
+		printf("Level %d Checkpoint %d\n", i, PlyReadNextByte(p)); p++;
 	}
 	printf("Current Level %d\n", PlyReadNextByte(p)); p++;
-	printf("Current Screen %d\n", PlyReadNextByte(p)); p++;
+	printf("Current Checkpoint %d\n", PlyReadNextByte(p)); p++;
 	printf("Played Cutscenes Mask 0x%X\n", PlyReadNextInt(p)); p += 4;
 	for (i = 0; i < 4; ++i) {
 		printf("Joystick Keyboard Action %d 0x%X\n", i, PlyReadNextInt(p)); p += 4;

@@ -33,7 +33,14 @@ struct DatBitmapsGroup {
 
 struct Menu {
 	enum {
+		kCheckpointLevelsCount = 8,
 		kOptionsCount = 19
+	};
+	enum {
+		kTitleScreen_AssignPlayer,
+		kTitleScreen_Play,
+		kTitleScreen_Options,
+		kTitleScreen_Quit
 	};
 
 	Game *_g;
@@ -42,6 +49,8 @@ struct Menu {
 	Video *_video;
 
 	SetupConfig *_config;
+	int _checkpointNum;
+	int _levelNum;
 
 	DatSpritesGroup *_titleSprites;
 	DatSpritesGroup *_playerSprites;
@@ -49,15 +58,17 @@ struct Menu {
 	uint32_t _titleBitmapSize;
 	const uint8_t *_playerBitmapData;
 	uint32_t _playerBitmapSize;
-	uint32_t _optionsBitmapSize[19];
-	const uint8_t *_optionsBitmapData[19];
+	uint32_t _optionsBitmapSize[kOptionsCount];
+	const uint8_t *_optionsBitmapData[kOptionsCount];
 	const uint8_t *_digitTiles;
+	DatBitmapsGroup *_checkpointsBitmaps[kCheckpointLevelsCount];
+	const uint8_t *_checkpointsBitmapsData[kCheckpointLevelsCount];
+
 	const uint8_t *_optionData;
 	const uint8_t *_soundData;
 
 	uint8_t _paletteBuffer[256 * 3];
 
-	int _currentOption;
 	uint8_t _palNum;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
@@ -69,13 +80,16 @@ struct Menu {
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
 	void drawSpritePos(const DatSpritesGroup *spriteGroup, int x, int y, uint32_t num);
-	void drawBitmap(const uint8_t *bitmapData, uint32_t bitmapSize, const DatSpritesGroup *spritesGroup);
 	void refreshScreen(bool updatePalette);
 
 	bool mainLoop();
+
+	void drawTitleScreen(int option);
 	bool handleTitleScreen();
 	void drawDigit(int x, int y, int num);
-	void drawPlayerProgress(int num, int b);
+	void drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int x, int y, int w, int h, uint8_t baseColor = 0);
+	void setCurrentPlayer(int num);
+	void drawPlayerProgress(int num, int currentSlot);
 	void handleAssignPlayer();
 	void handleOptions(int num);
 };

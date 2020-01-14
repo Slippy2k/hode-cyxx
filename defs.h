@@ -54,7 +54,7 @@ struct SetupConfig {
 	struct {
 		uint8_t progress[10];
 		uint8_t levelNum;
-		uint8_t screenNum;
+		uint8_t checkpointNum;
 		uint32_t cutscenesMask;
 		uint8_t controls[32];
 		uint8_t difficulty;
