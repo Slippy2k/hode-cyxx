@@ -290,7 +290,22 @@ void Menu::refreshScreen(bool updatePalette) {
 
 bool Menu::mainLoop() {
 	loadData();
-	return handleTitleScreen();
+	while (true) {
+		int option = handleTitleScreen();
+		g_system->inp.flush();
+		if (option == kTitleScreen_AssignPlayer) {
+			handleAssignPlayer();
+			g_system->inp.flush();
+			continue;
+		} else if (option == kTitleScreen_Play) {
+			return true;
+		} else if (option == kTitleScreen_Options) {
+			handleOptions(0);
+		} else { // kTitleScreen_Quit
+			break;
+		}
+	}
+	return false;
 }
 
 void Menu::drawTitleScreen(int option) {
@@ -302,7 +317,7 @@ void Menu::drawTitleScreen(int option) {
 	refreshScreen(false);
 }
 
-bool Menu::handleTitleScreen() {
+int Menu::handleTitleScreen() {
 	int currentOption = kTitleScreen_Play;
 	while (!g_system->inp.quit) {
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
@@ -319,21 +334,13 @@ bool Menu::handleTitleScreen() {
 		}
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
 			playSound(0x78);
-			if (currentOption == kTitleScreen_AssignPlayer) {
-				handleAssignPlayer();
-			} else if (currentOption == kTitleScreen_Play) {
-				return true;
-			} else if (currentOption == kTitleScreen_Options) {
-				handleOptions(0);
-			} else if (currentOption == kTitleScreen_Quit) {
-				return false;
-			}
+			break;
 		}
 		drawTitleScreen(currentOption);
 		g_system->processEvents();
 		g_system->sleep(15);
 	}
-	return false;
+	return currentOption;
 }
 
 void Menu::drawDigit(int x, int y, int num) {
@@ -432,10 +439,10 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 	}
 // 422EFE
 	if (cursor > 0) {
-		if (cursor <= 4) {
+		if (cursor <= 4) { // highlight one player
 			drawSpritePos(_playerSprites, 2, cursor * 17 + 74, 8);
 			drawSprite(_playerSprites, 6);
-		} else if (cursor == 5) {
+		} else if (cursor == 5) { // cancel
 			drawSprite(_playerSprites, 7);
 		}
 	}
@@ -452,7 +459,7 @@ void Menu::handleAssignPlayer() {
 	int _ebp = 1; // state
 	int _ebx = 0; // cursor
 	setCurrentPlayer(_config->currentPlayer);
-	drawPlayerProgress(_config->currentPlayer, 0);
+	drawPlayerProgress(_ebp, _ebx);
 	while (!g_system->inp.quit) {
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
 			if (_ebp != 0 && _ebx == 5) {
@@ -505,17 +512,18 @@ void Menu::handleAssignPlayer() {
 					setCurrentPlayer((_ebx == 5) ? _config->currentPlayer : (_ebx - 1));
 				}
 			}
-		}
-		if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
-			if (_ebp == 1 || _ebp == 2 || _ebp == 5) {
-				playSound(0x70);
-				--_ebp;
+		} else {
+			if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
+				if (_ebp == 1 || _ebp == 2 || _ebp == 5) {
+					playSound(0x70);
+					--_ebp;
+				}
 			}
-		}
-		if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
-			if (_ebp < 2 || _ebp == 4) {
-				playSound(0x70);
-				++_ebp;
+			if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
+				if (_ebp == 0 || _ebp == 1 || _ebp == 4) {
+					playSound(0x70);
+					++_ebp;
+				}
 			}
 		}
 // 4231FF

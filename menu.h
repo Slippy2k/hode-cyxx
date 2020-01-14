@@ -85,7 +85,7 @@ struct Menu {
 	bool mainLoop();
 
 	void drawTitleScreen(int option);
-	bool handleTitleScreen();
+	int handleTitleScreen();
 	void drawDigit(int x, int y, int num);
 	void drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int x, int y, int w, int h, uint8_t baseColor = 0);
 	void setCurrentPlayer(int num);
