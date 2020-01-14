@@ -63,11 +63,7 @@ void PafPlayer::preload(int num) {
 	_videoOffset = _file.readUint32();
 	_file.seek(_videoOffset, SEEK_SET);
 	memset(&_pafHdr, 0, sizeof(_pafHdr));
-	readPafHeader();
-	if (_pafHdr.framesCount == 0) {
-		return;
-	}
-	if (!_pafHdr.frameBlocksCountTable || !_pafHdr.framesOffsetTable || !_pafHdr.frameBlocksOffsetTable) {
+	if (!readPafHeader()) {
 		unload();
 		return;
 	}
@@ -124,23 +120,33 @@ void PafPlayer::unload(int num) {
 	_audioQueueTail = 0;
 }
 
-void PafPlayer::readPafHeader() {
+bool PafPlayer::readPafHeader() {
 	static const char *kSignature = "Packed Animation File V1.0\n(c) 1992-96 Amazing Studio\n";
 	_file.read(_bufferBlock, kBufferBlockSize);
 	if (memcmp(_bufferBlock, kSignature, strlen(kSignature)) != 0) {
-		return;
+		warning("readPafHeader() Unexpected signature");
+		return false;
 	}
 	_pafHdr.startOffset = READ_LE_UINT32(_bufferBlock + 0xA4);
 	_pafHdr.preloadFrameBlocksCount = READ_LE_UINT32(_bufferBlock + 0x9C);
 	_pafHdr.readBufferSize = READ_LE_UINT32(_bufferBlock + 0x98);
 	assert(_pafHdr.readBufferSize == kBufferBlockSize);
 	_pafHdr.framesCount = READ_LE_UINT32(_bufferBlock + 0x84);
+	if (_pafHdr.framesCount <= 0) {
+		warning("readPafHeader() Invalid number of frames %d", _pafHdr.framesCount);
+		return false;
+	}
 	_pafHdr.maxVideoFrameBlocksCount = READ_LE_UINT32(_bufferBlock + 0xA8);
 	_pafHdr.maxAudioFrameBlocksCount = READ_LE_UINT32(_bufferBlock + 0xAC);
 	_pafHdr.frameBlocksCount = READ_LE_UINT32(_bufferBlock + 0xA0);
+	if (_pafHdr.frameBlocksCount <= 0) {
+		warning("readPafHeader() Invalid number of blocks %d", _pafHdr.frameBlocksCount);
+		return false;
+	}
 	_pafHdr.frameBlocksCountTable = readPafHeaderTable(_pafHdr.framesCount);
 	_pafHdr.framesOffsetTable = readPafHeaderTable(_pafHdr.framesCount);
 	_pafHdr.frameBlocksOffsetTable = readPafHeaderTable(_pafHdr.frameBlocksCount);
+	return _pafHdr.frameBlocksCountTable != 0 && _pafHdr.framesOffsetTable != 0 && _pafHdr.frameBlocksOffsetTable != 0;
 }
 
 uint32_t *PafPlayer::readPafHeaderTable(int count) {
@@ -344,7 +350,7 @@ void PafPlayer::decodeVideoFrameOp1(const uint8_t *src) {
 }
 
 void PafPlayer::decodeVideoFrameOp2(const uint8_t *src) {
-	int page = *src++;
+	const int page = *src++;
 	if (page != _currentPageBuffer) {
 		memcpy(_pageBuffers[_currentPageBuffer], _pageBuffers[page], kVideoWidth * kVideoHeight);
 	}
@@ -372,12 +378,9 @@ void PafPlayer::decodeVideoFrameOp4(const uint8_t *src) {
 }
 
 static void decodeAudioFrame2205(const uint8_t *src, int len, int16_t *dst) {
-
-	int offset = 256 * sizeof(int16_t);
-
-	for (int i = 0; i < len; ++i) {
-		*dst++ = READ_LE_UINT16(src + src[offset++] * sizeof(int16_t));
-		*dst++ = READ_LE_UINT16(src + src[offset++] * sizeof(int16_t));
+	const int offset = 256 * sizeof(int16_t);
+	for (int i = 0; i < len * 2; ++i) { // stereo
+		dst[i] = READ_LE_UINT16(src + src[offset + i] * sizeof(int16_t));
 	}
 }
 
@@ -448,7 +451,6 @@ static void mixAudio(void *userdata, int16_t *buf, int len) {
 }
 
 void PafPlayer::mainLoop() {
-	assert(_pafHdr.readBufferSize == 2048);
 	_file.seek(_videoOffset + _pafHdr.startOffset, SEEK_SET);
 	for (int i = 0; i < 4; ++i) {
 		memset(_pageBuffers[i], 0, kVideoWidth * kVideoHeight);
