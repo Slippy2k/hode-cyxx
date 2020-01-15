@@ -14,14 +14,14 @@ struct DatHdr {
 	uint32_t bufferSize0; // 0x4
 	uint32_t bufferSize1; // 0x8
 	uint32_t sssOffset; // 0xC
-	uint32_t iconsCount; // 0x10
-	uint32_t menusCount; // 0x14
-	uint32_t cutscenesCount; // 0x18
-	uint32_t levelsCount; // 0x1C
-	uint32_t levelCheckpointsCount[8]; // 0x20..0x3C
-	int yesNoQuitImage; // 0x40
-	int soundDataSize; // 0x44
-	int loadingImageSize; // 0x48
+	int32_t iconsCount; // 0x10
+	int32_t menusCount; // 0x14
+	int32_t cutscenesCount; // 0x18
+	int32_t levelsCount; // 0x1C
+	int32_t levelCheckpointsCount[8]; // 0x20..0x3C
+	int32_t yesNoQuitImage; // 0x40
+	uint32_t soundDataSize; // 0x44
+	uint32_t loadingImageSize; // 0x48
 	uint32_t hintsImageOffsetTable[46];
 	uint32_t hintsImageSizeTable[46];
 };

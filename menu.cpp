@@ -320,6 +320,7 @@ void Menu::drawTitleScreen(int option) {
 int Menu::handleTitleScreen() {
 	int currentOption = kTitleScreen_Play;
 	while (!g_system->inp.quit) {
+		g_system->processEvents();
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
 			if (currentOption > kTitleScreen_AssignPlayer) {
 				playSound(0x70);

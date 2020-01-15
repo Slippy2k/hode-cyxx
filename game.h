@@ -97,6 +97,7 @@ struct Game {
 	bool _loadingScreenEnabled;
 
 	SetupConfig _setupConfig;
+	bool _resumeGame;
 
 	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen
 	LvlObject *_andyObject;
@@ -369,7 +370,7 @@ struct Game {
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
 	void resetWormHoleSprites();
 	void updateWormHoleSprites();
-	bool loadSetupCfg();
+	bool loadSetupCfg(bool resume);
 	void saveSetupCfg();
 	void captureScreenshot();
 

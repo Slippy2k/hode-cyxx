@@ -2095,6 +2095,18 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	if (_loadingScreenEnabled) {
 		displayLoadingScreen();
 	}
+	if (_resumeGame) {
+		const int num = _setupConfig.currentPlayer;
+		level = _setupConfig.players[num].levelNum;
+		if (level > kLvl_dark) {
+			level = kLvl_dark;
+		}
+		checkpoint = _setupConfig.players[num].progress[level];
+		if (checkpoint >= _res->_datHdr.levelCheckpointsCount[level]) {
+			checkpoint = _res->_datHdr.levelCheckpointsCount[level] - 1;
+		}
+		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;
+	}
 	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
 	_currentLevel = level;
@@ -4845,12 +4857,12 @@ void Game::updateWormHoleSprites() {
 	_res->decLvlSpriteDataRefCounter(&tmp);
 }
 
-bool Game::loadSetupCfg() {
+bool Game::loadSetupCfg(bool resume) {
+	_resumeGame = resume;
 	FILE *fp = _fs.openSaveFile(_setupCfg, false);
 	if (fp) {
 		_res->readSetupCfg(fp, &_setupConfig);
 		_fs.closeFile(fp);
-		_paf->_playedMask = _setupConfig.players[0].cutscenesMask;
 		return true;
 	}
 	memset(&_setupConfig, 0, sizeof(_setupConfig));
@@ -4858,17 +4870,21 @@ bool Game::loadSetupCfg() {
 }
 
 void Game::saveSetupCfg() {
-	// save in player #0 data
-	if (_currentLevelCheckpoint > _setupConfig.players[0].progress[_currentLevel]) {
-		_setupConfig.players[0].progress[_currentLevel] = _currentLevelCheckpoint;
+	if (!_resumeGame) {
+		// do not save progress when game is started from a specific level/checkpoint
+		return;
 	}
-	_setupConfig.players[0].levelNum = _currentLevel;
-	_setupConfig.players[0].checkpointNum = _level->_checkpoint;
-	_setupConfig.players[0].cutscenesMask = _paf->_playedMask;
-	_setupConfig.players[0].difficulty = _difficulty;
-	_setupConfig.players[0].volume = _snd_masterVolume;
-	if (_currentLevel > _setupConfig.players[0].currentLevel) {
-		_setupConfig.players[0].currentLevel = _currentLevel;
+	const int num = _setupConfig.currentPlayer;
+	if (_currentLevelCheckpoint > _setupConfig.players[num].progress[_currentLevel]) {
+		_setupConfig.players[num].progress[_currentLevel] = _currentLevelCheckpoint;
+	}
+	_setupConfig.players[num].levelNum = _currentLevel;
+	_setupConfig.players[num].checkpointNum = _level->_checkpoint;
+	_setupConfig.players[num].cutscenesMask = _paf->_playedMask;
+	_setupConfig.players[num].difficulty = _difficulty;
+	_setupConfig.players[num].volume = _snd_masterVolume;
+	if (_currentLevel > _setupConfig.players[num].currentLevel) {
+		_setupConfig.players[num].currentLevel = _currentLevel;
 	}
 	FILE *fp = _fs.openSaveFile(_setupCfg, true);
 	if (fp) {

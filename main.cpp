@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 	char *savePath = 0;
 	int level = 0;
 	int checkpoint = 0;
-	bool resume = true;
+	bool resume = true; // resume game from 'setup.cfg'
 
 	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND | kDebug_MONSTER;
 	int cheats = 0;
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 		g->benchmarkCpu();
 	}
 	g->_res->loadSetupDat();
-	g->loadSetupCfg();
+	g->loadSetupCfg(resume);
 	bool runGame = true;
 	if (_runMenu && resume) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
@@ -202,10 +202,6 @@ int main(int argc, char *argv[]) {
 		delete m;
 	}
 	if (runGame) {
-		if (resume) {
-			level = g->_setupConfig.players[0].levelNum;
-			checkpoint = g->_setupConfig.players[0].progress[level];
-		}
 		bool levelChanged = false;
 		do {
 			g->mainLoop(level, checkpoint, levelChanged);
