@@ -8,6 +8,15 @@
 #include "util.h"
 #include "video.h"
 
+enum {
+	kMenu_NewGame = 0,
+	kMenu_CurrentGame = 2,
+	kMenu_Save = 4,
+	kMenu_Options = 8,
+	kMenu_Quit = 15,
+	kMenu_Cutscenes = 17
+};
+
 static void setDefaultsSetupCfg(SetupConfig *config, int num) {
 	assert(num >= 0 && num < 4);
 	memset(config->players[num].progress, 0, 10);
@@ -30,17 +39,7 @@ Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 
 	_config = &_g->_setupConfig;
 
-	_titleSprites = 0;
-	_playerSprites = 0;
-	_titleBitmapData = 0;
-	_titleBitmapSize = 0;
-	_playerBitmapData = 0;
-	_playerBitmapSize = 0;
-	_digitTiles = 0;
-	_optionData = 0;
-	_soundData = 0;
-
-	_palNum = 0;
+	_optionNum = 0;
 }
 
 void Menu::loadData() {
@@ -122,8 +121,12 @@ void Menu::loadData() {
 		for (int i = 0; i < kOptionsCount; ++i) {
 			_optionsBitmapSize[i] = READ_LE_UINT32(ptr + hdrOffset);
 			hdrOffset += sizeof(DatBitmap);
-			_optionsBitmapData[i] = ptr + ptrOffset;
-			ptrOffset += _optionsBitmapSize[i] + 768;
+			if (_optionsBitmapSize[i] != 0) {
+				_optionsBitmapData[i] = ptr + ptrOffset;
+				ptrOffset += _optionsBitmapSize[i] + 768;
+			} else {
+				_optionsBitmapData[i] = 0;
+			}
 		}
 
 		const int cutscenesCount = _res->_datHdr.cutscenesCount;
@@ -207,8 +210,12 @@ void Menu::loadData() {
 		for (int i = 0; i < kOptionsCount; ++i) {
 			_optionsBitmapSize[i] = READ_LE_UINT32(ptr + hdrOffset);
 			hdrOffset += sizeof(DatBitmap);
-			_optionsBitmapData[i] = ptr + ptrOffset;
-			ptrOffset += _optionsBitmapSize[i] + 768;
+			if (_optionsBitmapSize[i] != 0) {
+				_optionsBitmapData[i] = ptr + ptrOffset;
+				ptrOffset += _optionsBitmapSize[i] + 768;
+			} else {
+				_optionsBitmapData[i] = 0;
+			}
 		}
 
 		const int levelsCount = _res->_datHdr.levelsCount;
@@ -292,15 +299,15 @@ bool Menu::mainLoop() {
 	loadData();
 	while (true) {
 		int option = handleTitleScreen();
-		g_system->inp.flush();
 		if (option == kTitleScreen_AssignPlayer) {
 			handleAssignPlayer();
-			g_system->inp.flush();
 			continue;
 		} else if (option == kTitleScreen_Play) {
 			return true;
 		} else if (option == kTitleScreen_Options) {
-			handleOptions(0);
+			handleOptions();
+			if (_optionNum == kMenu_Quit + 1) {
+			}
 		} else { // kTitleScreen_Quit
 			break;
 		}
@@ -338,7 +345,6 @@ int Menu::handleTitleScreen() {
 			break;
 		}
 		drawTitleScreen(currentOption);
-		g_system->processEvents();
 		g_system->sleep(15);
 	}
 	return currentOption;
@@ -450,91 +456,91 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 // 422F49
 	drawSprite(_playerSprites, state); // Yes/No
 	if (state > 2) {
-		drawSprite(_playerSprites, 2);
+		drawSprite(_playerSprites, 2); // MessageBox
 	}
 	refreshScreen(false);
 }
 
 void Menu::handleAssignPlayer() {
 	memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
-	int _ebp = 1; // state
-	int _ebx = 0; // cursor
+	int state = 1;
+	int cursor = 0;
 	setCurrentPlayer(_config->currentPlayer);
-	drawPlayerProgress(_ebp, _ebx);
+	drawPlayerProgress(state, cursor);
 	while (!g_system->inp.quit) {
+		g_system->processEvents();
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
-			if (_ebp != 0 && _ebx == 5) {
+			if (state != 0 && cursor == 5) {
 				playSound(0x80);
 			} else {
 				playSound(0x78);
 			}
 // 42301D
-			if (_ebp == 0) {
+			if (state == 0) {
 				// return to title screen
 				return;
 			}
-			if (_ebx == 0) {
-				_ebx = _config->currentPlayer + 1;
+			if (cursor == 0) {
+				cursor = _config->currentPlayer + 1;
 			} else {
-				if (_ebx == 5) {
-					_ebx = 0;
-				} else if (_ebp == 1) {
-					--_ebx;
-					_config->currentPlayer = _ebx;
+				if (cursor == 5) {
+					cursor = 0;
+				} else if (state == 1) {
+					--cursor;
+					_config->currentPlayer = cursor;
 					// _snd_masterVolume
-					_ebx = 0;
-				} else if (_ebp == 2) {
-					_ebp = 5;
+					cursor = 0;
+				} else if (state == 2) {
+					state = 5;
 				} else {
-					if (_ebp == 4) {
-						--_ebx;
-						setDefaultsSetupCfg(_config, _ebx);
+					if (state == 4) {
+						--cursor;
+						setDefaultsSetupCfg(_config, cursor);
 						// _snd_masterVolume
 					}
 					setCurrentPlayer(_config->currentPlayer);
-					_ebp = 2;
-					_ebx = 0;
+					state = 2;
+					cursor = 0;
 				}
 			}
 // 423125
 		}
-		if (_ebx != 0 && _ebp < 3) {
+		if (cursor != 0 && state < 3) {
 			if (g_system->inp.keyReleased(SYS_INP_UP)) {
-				if (_ebx > 1) {
+				if (cursor > 1) {
 					playSound(0x70);
-					--_ebx;
-					setCurrentPlayer(_ebx - 1);
+					--cursor;
+					setCurrentPlayer(cursor - 1);
 				}
 			}
 			if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
-				if (_ebx < 5) {
+				if (cursor < 5) {
 					playSound(0x70);
-					++_ebx;
-					setCurrentPlayer((_ebx == 5) ? _config->currentPlayer : (_ebx - 1));
+					++cursor;
+					setCurrentPlayer((cursor == 5) ? _config->currentPlayer : (cursor - 1));
 				}
 			}
 		} else {
 			if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
-				if (_ebp == 1 || _ebp == 2 || _ebp == 5) {
+				if (state == 1 || state == 2 || state == 5) {
 					playSound(0x70);
-					--_ebp;
+					--state;
 				}
 			}
 			if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
-				if (_ebp == 0 || _ebp == 1 || _ebp == 4) {
+				if (state == 0 || state == 1 || state == 4) {
 					playSound(0x70);
-					++_ebp;
+					++state;
 				}
 			}
 		}
 // 4231FF
-		drawPlayerProgress(_ebp, _ebx);
-		g_system->processEvents();
+		drawPlayerProgress(state, cursor);
 		g_system->sleep(15);
 	}
 }
 
-void Menu::handleOptions(int num) { // handleOptionTransition
+void Menu::changeToOption(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	if (data[6] != 0xFF) {
 // 428004
@@ -543,22 +549,98 @@ void Menu::handleOptions(int num) { // handleOptionTransition
 	}
 // 428053
 	_paf->play(data[5]);
-	if (_palNum == 1) {
+	if (_optionNum == 1) {
 		_config->players[_config->currentPlayer].levelNum = 0;
 		_config->players[_config->currentPlayer].checkpointNum = 0;
-	} else if (_palNum == 3) {
+	} else if (_optionNum == 3) {
 		_config->players[_config->currentPlayer].levelNum = _g->_currentLevel;
 		_config->players[_config->currentPlayer].checkpointNum = _g->_currentLevelCheckpoint;
-	} else if (_palNum == 5) {
+	} else if (_optionNum == 5) {
 // 4281C3
-	} else if (_palNum == 6) {
+	} else if (_optionNum == 6) {
 // 42816B
-	} else if (_palNum == 9) {
+	} else if (_optionNum == 9) {
 // 428118
-	} else if (_palNum == 18) {
+	} else if (_optionNum == 18) {
 // 4280EA
-	} else {
-		const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_palNum], _video->_frontLayer);
+	} else if (_optionsBitmapSize[_optionNum] != 0) {
+		const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 		assert(uncompressedSize == Video::W * Video::H);
+		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+		refreshScreen(true);
+	}
+}
+
+static bool matchInput(uint8_t type, uint8_t mask, const uint8_t keys) {
+	if (type != 0) {
+		if ((mask & 1) != 0 && (keys & SYS_INP_RUN) != 0) {
+			return true;
+		}
+		if ((mask & 2) != 0 && (keys & SYS_INP_JUMP) != 0) {
+			return true;
+		}
+		if ((mask & 4) != 0 && (keys & SYS_INP_SHOOT) != 0) {
+			return true;
+		}
+	} else {
+		if ((mask & 1) != 0 && (keys & SYS_INP_UP) != 0) {
+			return true;
+		}
+		if ((mask & 2) != 0 && (keys & SYS_INP_RIGHT) != 0) {
+			return true;
+		}
+		if ((mask & 4) != 0 && (keys & SYS_INP_DOWN) != 0) {
+			return true;
+		}
+		if ((mask & 8) != 0 && (keys & SYS_INP_LEFT) != 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void Menu::handleOptions() {
+// 428529
+	_optionNum = kMenu_Options;
+	changeToOption(0);
+	while (!g_system->inp.quit) {
+// 428752
+		g_system->processEvents();
+		int num = -1;
+		for (int i = 0; i < _res->_datHdr.menusCount; ++i) {
+			const uint8_t *data = _optionData + i * 8;
+			if (data[0] == _optionNum && matchInput(data[1] & 1, data[2], g_system->inp.mask)) {
+				num = i;
+				break;
+			}
+		}
+		if (num == -1) {
+			g_system->sleep(15);
+			continue;
+		}
+		const uint8_t *data = &_optionData[num * 8];
+		_optionNum = data[3];
+		switch (data[4]) {
+		case 6:
+			playSound(0x70);
+			changeToOption(num);
+			break;
+		case 7:
+			playSound(0x78);
+			changeToOption(num);
+			break;
+		case 8:
+			changeToOption(num);
+			break;
+		default:
+			warning("Unhandled option %d %d", _optionNum, data[4]);
+			break;
+		}
+// 428D41
+		if (_optionNum == 16 || _optionNum == 1 || _optionNum == 3 || _optionNum == 7) {
+// 428E74
+			// _g->saveSetupCfg();
+			break;
+		}
 	}
 }

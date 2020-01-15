@@ -69,7 +69,7 @@ struct Menu {
 
 	uint8_t _paletteBuffer[256 * 3];
 
-	uint8_t _palNum;
+	uint8_t _optionNum;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
@@ -91,7 +91,8 @@ struct Menu {
 	void setCurrentPlayer(int num);
 	void drawPlayerProgress(int state, int cursor);
 	void handleAssignPlayer();
-	void handleOptions(int num);
+	void changeToOption(int num);
+	void handleOptions();
 };
 
 #endif // MENU_H__
