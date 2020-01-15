@@ -4882,7 +4882,7 @@ void Game::saveSetupCfg() {
 		_setupConfig.players[num].progress[_currentLevel] = _currentLevelCheckpoint;
 	}
 	_setupConfig.players[num].levelNum = _currentLevel;
-	_setupConfig.players[num].checkpointNum = _level->_checkpoint;
+	_setupConfig.players[num].checkpointNum = _currentLevelCheckpoint;
 	_setupConfig.players[num].cutscenesMask = _paf->_playedMask;
 	_setupConfig.players[num].difficulty = _difficulty;
 	_setupConfig.players[num].volume = _snd_masterVolume;

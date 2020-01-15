@@ -11,10 +11,10 @@
 enum {
 	kMenu_NewGame = 0,
 	kMenu_CurrentGame = 2,
-	kMenu_Save = 4,
+	kMenu_Load = 4,
 	kMenu_Options = 8,
 	kMenu_Quit = 15,
-	kMenu_Cutscenes = 17
+	kMenu_Cinematics = 17
 };
 
 static void setDefaultsSetupCfg(SetupConfig *config, int num) {
@@ -38,8 +38,6 @@ Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	: _g(g), _paf(paf), _res(res), _video(video) {
 
 	_config = &_g->_setupConfig;
-
-	_optionNum = 0;
 }
 
 void Menu::loadData() {
@@ -297,18 +295,22 @@ void Menu::refreshScreen(bool updatePalette) {
 
 bool Menu::mainLoop() {
 	loadData();
-	while (true) {
-		int option = handleTitleScreen();
+	while (!g_system->inp.quit) {
+		const int option = handleTitleScreen();
 		if (option == kTitleScreen_AssignPlayer) {
 			handleAssignPlayer();
-			continue;
+			debug(kDebug_MENU, "currentPlayer %d", _config->currentPlayer);
 		} else if (option == kTitleScreen_Play) {
 			return true;
 		} else if (option == kTitleScreen_Options) {
 			handleOptions();
-			if (_optionNum == kMenu_Quit + 1) {
+			debug(kDebug_MENU, "_optionNum %d", _optionNum);
+			if (_optionNum == kMenu_CurrentGame + 1) {
+				return true;
+			} else if (_optionNum == kMenu_Quit + 1) {
+				break;
 			}
-		} else { // kTitleScreen_Quit
+		} else if (option == kTitleScreen_Quit) {
 			break;
 		}
 	}
@@ -381,11 +383,13 @@ void Menu::drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmap
 }
 
 void Menu::setCurrentPlayer(int num) {
+	debug(kDebug_MENU, "setCurrentPlayer %d", num);
 	_levelNum = _config->players[num].levelNum;
 	if (_levelNum > kLvl_dark) {
 		_levelNum = kLvl_dark;
 	}
-	if (_levelNum == 8) {
+	if (_levelNum == kLvl_dark) {
+		_levelNum = 7;
 		_checkpointNum = 11;
 	} else {
 		_checkpointNum = _config->players[num].checkpointNum;
@@ -412,7 +416,7 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 		} else {
 			int levelNum = _config->players[player].levelNum;
 			int checkpointNum;
-			if (levelNum == 8) { // 'dark'
+			if (levelNum == kLvl_dark) {
 				levelNum = 7;
 				checkpointNum = 11;
 			} else {
@@ -485,15 +489,15 @@ void Menu::handleAssignPlayer() {
 			} else {
 				if (cursor == 5) {
 					cursor = 0;
-				} else if (state == 1) {
+				} else if (state == 1) { // select
 					--cursor;
 					_config->currentPlayer = cursor;
 					// _snd_masterVolume
 					cursor = 0;
-				} else if (state == 2) {
-					state = 5;
+				} else if (state == 2) { // clear
+					state = 5; // 'No'
 				} else {
-					if (state == 4) {
+					if (state == 4) { // 'Yes', clear confirmation
 						--cursor;
 						setDefaultsSetupCfg(_config, cursor);
 						// _snd_masterVolume
@@ -549,10 +553,10 @@ void Menu::changeToOption(int num) {
 	}
 // 428053
 	_paf->play(data[5]);
-	if (_optionNum == 1) {
+	if (_optionNum == kMenu_NewGame + 1) {
 		_config->players[_config->currentPlayer].levelNum = 0;
 		_config->players[_config->currentPlayer].checkpointNum = 0;
-	} else if (_optionNum == 3) {
+	} else if (_optionNum == kMenu_CurrentGame + 1) {
 		_config->players[_config->currentPlayer].levelNum = _g->_currentLevel;
 		_config->players[_config->currentPlayer].checkpointNum = _g->_currentLevelCheckpoint;
 	} else if (_optionNum == 5) {
