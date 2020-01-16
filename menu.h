@@ -28,8 +28,8 @@ struct DatBitmapsGroup {
 	uint8_t h;
 	uint8_t colors;
 	uint8_t unk3; // padding to 4 bytes
-	uint32_t unk4; // 4
-	uint32_t unk8; // 8
+	uint32_t offset; // 4
+	uint32_t palette; // 8
 } PACKED; // sizeof == 12
 
 struct Menu {

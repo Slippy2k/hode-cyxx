@@ -40,13 +40,24 @@ Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	_config = &_g->_setupConfig;
 }
 
+static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint32_t ptrOffset) {
+	const uint32_t baseOffset = ptrOffset;
+	for (int i = 0; i < count; ++i) {
+		bitmapsGroup[i].offset = ptrOffset - baseOffset;
+		const int size = bitmapsGroup[i].w * bitmapsGroup[i].h;
+		bitmapsGroup[i].palette = bitmapsGroup[i].offset + size;
+		ptrOffset += size + 768;
+	}
+	return ptrOffset - baseOffset;
+}
+
 void Menu::loadData() {
 	_res->loadDatMenuBuffers();
 
 	const int version = _res->_datHdr.version;
 
 	const uint8_t *ptr = _res->_menuBuffer1;
-	uint32_t ptrOffset = 0;
+	uint32_t hdrOffset, ptrOffset = 0;
 
 	if (version == 10) {
 
@@ -85,9 +96,7 @@ void Menu::loadData() {
 			const int count = _res->_datHdr.levelCheckpointsCount[i];
 			ptrOffset += count * sizeof(DatBitmapsGroup);
 			_checkpointsBitmapsData[i] = ptr + ptrOffset;
-			for (int j = 0; j < count; ++j) {
-				ptrOffset += bitmapsGroup[j].w * bitmapsGroup[j].h + 768;
-			}
+			ptrOffset += readBitmapsGroup(count, bitmapsGroup, ptrOffset);
 		}
 
 		_soundData = ptr + ptrOffset;
@@ -96,7 +105,7 @@ void Menu::loadData() {
 	} else if (version == 11) {
 
 		ptr = _res->_menuBuffer1;
-		uint32_t hdrOffset = 4;
+		hdrOffset = 4;
 
 		ptrOffset = 4 + (2 + kOptionsCount) * sizeof(DatBitmap);
 		ptrOffset += _res->_datHdr.cutscenesCount * sizeof(DatBitmapsGroup);
@@ -135,22 +144,17 @@ void Menu::loadData() {
 		}
 
 		for (int i = 0; i < kCheckpointLevelsCount; ++i) {
-			const int count = _res->_datHdr.levelCheckpointsCount[i];
-			_checkpointsBitmaps[i] = (DatBitmapsGroup *)(ptr + hdrOffset);
+			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
+			_checkpointsBitmaps[i] = bitmapsGroup;
 			_checkpointsBitmapsData[i] = ptr + ptrOffset;
-			for (int j = 0; j < count; ++j) {
-				DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
-				hdrOffset += sizeof(DatBitmapsGroup);
-				ptrOffset += bitmapsGroup->w * bitmapsGroup->h + 768;
-			}
+			const int count = _res->_datHdr.levelCheckpointsCount[i];
+			ptrOffset += readBitmapsGroup(count, bitmapsGroup, ptrOffset);
 		}
 
 		const int levelsCount = _res->_datHdr.levelsCount;
 		_levelsBitmaps = (DatBitmapsGroup *)(ptr + hdrOffset);
 		_levelsBitmapsData = ptr + ptrOffset;
-		for (int i = 0; i < levelsCount; ++i) {
-			ptrOffset += _levelsBitmaps[i].w * _levelsBitmaps[i].h + 768;
-		}
+		ptrOffset += readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset);
 	}
 
 	ptr = _res->_menuBuffer0;
@@ -178,7 +182,7 @@ void Menu::loadData() {
 		ptrOffset += _res->_datHdr.soundDataSize;
 	}
 
-	uint32_t hdrOffset = ptrOffset;
+	hdrOffset = ptrOffset;
 	_iconsSprites = (DatSpritesGroup *)(ptr + ptrOffset);
 	const int iconsCount = _res->_datHdr.iconsCount;
 	ptrOffset += iconsCount * sizeof(DatSpritesGroup);
@@ -221,17 +225,8 @@ void Menu::loadData() {
 		ptrOffset += levelsCount * sizeof(DatBitmapsGroup);
 		_levelsBitmaps = (DatBitmapsGroup *)(ptr + hdrOffset);
 		_levelsBitmapsData = ptr + ptrOffset;
-		for (int i = 0; i < levelsCount; ++i) {
-			ptrOffset += _levelsBitmaps[i].w * _levelsBitmaps[i].h + 768;
-		}
+		readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset);
 	}
-}
-
-static const uint8_t *getCheckpointBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *data, int num) {
-	for (int i = 0; i < num; ++i) {
-		data += bitmapsGroup[i].w * bitmapsGroup[i].h + 768;
-	}
-	return data;
 }
 
 int Menu::getSoundNum(int num) const {
@@ -414,9 +409,9 @@ void Menu::setCurrentPlayer(int num) {
 		}
 	}
 // 422CE0
-	const DatBitmapsGroup *bitmapsGroup = &_checkpointsBitmaps[_levelNum][_checkpointNum];
+	const DatBitmapsGroup *bitmap = &_checkpointsBitmaps[_levelNum][_checkpointNum];
 	uint8_t *dst = _paletteBuffer + 205 * 3;
-	const uint8_t *src = getCheckpointBitmap(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum) + bitmapsGroup->w * bitmapsGroup->h;
+	const uint8_t *src = _checkpointsBitmapsData[_levelNum] + bitmap->palette;
 	memcpy(dst, src, 50 * 3);
 	g_system->setPalette(_paletteBuffer, 256, 6);
 }
@@ -459,9 +454,9 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 	}
 // 422EC3
 	if (_config->players[player].cutscenesMask != 0) {
-		DatBitmapsGroup *bitmapsGroup = &_checkpointsBitmaps[_levelNum][_checkpointNum];
-		const uint8_t *src = getCheckpointBitmap(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum);
-		drawBitmap(bitmapsGroup, src, 132, 0, bitmapsGroup->w, bitmapsGroup->h, 205);
+		DatBitmapsGroup *bitmap = &_checkpointsBitmaps[_levelNum][_checkpointNum];
+		const uint8_t *src = _checkpointsBitmapsData[_levelNum] + bitmap->offset;
+		drawBitmap(bitmap, src, 132, 0, bitmap->w, bitmap->h, 205);
 	}
 // 422EFE
 	if (cursor > 0) {
@@ -563,10 +558,10 @@ void Menu::drawLevelScreen() {
 	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	assert(uncompressedSize == Video::W * Video::H);
 	drawSprite(&_iconsSprites[1], _levelNum);
-//	const uint8_t *p = _dataPtr10 + _levelNum * 12;
-//	drawBitmap(p, 23, 10, p[0], p[1]);
+	DatBitmapsGroup *bitmap = &_levelsBitmaps[_levelNum];
+	drawBitmap(bitmap, _levelsBitmapsData + bitmap->offset, 23, 10, bitmap->w, bitmap->h, 205);
 	drawSpriteNextFrame(&_iconsSprites[4], 0, 0);
-//	drawSpriteNextFrame((flag != 0) ? &_iconsSprites[3] : &_iconsSprites[2]), 0, 0);
+//	drawSpriteNextFrame(_openingOption ? &_iconsSprites[3] : &_iconsSprites[2]), 0, 0);
 	refreshScreen(false);
 }
 
