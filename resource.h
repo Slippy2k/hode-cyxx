@@ -662,7 +662,6 @@ struct Resource {
 
 	void writeSetupCfg(FILE *fp, SetupConfig *config);
 	void readSetupCfg(FILE *fp, SetupConfig *config);
-	void setDefaultsSetupCfg(SetupConfig *config);
 };
 
 #endif // RESOURCE_H__

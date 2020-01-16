@@ -10,10 +10,11 @@ struct Resource;
 struct Video;
 
 struct DatSpritesGroup {
-	uint32_t unk0; // 0
-	uint32_t unk4; // 4
+	uint32_t currentFrame; // 0
+	uint32_t firstFrame; // 4
 	uint32_t size; // 8 following this header
-	uint32_t count; // 12
+	uint16_t count; // 12
+	uint16_t num; // 14
 } PACKED; // sizeof == 16
 
 struct DatBitmap {
@@ -60,10 +61,15 @@ struct Menu {
 	uint32_t _playerBitmapSize;
 	uint32_t _optionsBitmapSize[kOptionsCount];
 	const uint8_t *_optionsBitmapData[kOptionsCount];
-	const uint8_t *_digitTiles;
+	DatBitmapsGroup *_cutscenesBitmaps;
+	const uint8_t *_cutscenesBitmapsData;
 	DatBitmapsGroup *_checkpointsBitmaps[kCheckpointLevelsCount];
 	const uint8_t *_checkpointsBitmapsData[kCheckpointLevelsCount];
+	DatBitmapsGroup *_levelsBitmaps;
+	const uint8_t *_levelsBitmapsData;
+	DatSpritesGroup *_iconsSprites;
 
+	const uint8_t *_digitsData;
 	const uint8_t *_optionData;
 	const uint8_t *_soundData;
 
@@ -80,6 +86,7 @@ struct Menu {
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
 	void drawSpritePos(const DatSpritesGroup *spriteGroup, int x, int y, uint32_t num);
+	void drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int x, int y);
 	void refreshScreen(bool updatePalette);
 
 	bool mainLoop();
@@ -91,6 +98,7 @@ struct Menu {
 	void setCurrentPlayer(int num);
 	void drawPlayerProgress(int state, int cursor);
 	void handleAssignPlayer();
+	void drawLevelScreen();
 	void changeToOption(int num);
 	void handleOptions();
 };
