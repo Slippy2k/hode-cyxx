@@ -626,6 +626,7 @@ struct Resource {
 	bool loadDatHintImage(int num, uint8_t *dst, uint8_t *pal);
 	bool loadDatLoadingImage(uint8_t *dst, uint8_t *pal);
 	void loadDatMenuBuffers();
+	void unloadDatMenuBuffers();
 
 	void loadLevelData(int levelNum);
 

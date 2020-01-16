@@ -242,6 +242,13 @@ void Resource::loadDatMenuBuffers() {
 	}
 }
 
+void Resource::unloadDatMenuBuffers() {
+	free(_menuBuffer1);
+	_menuBuffer1 = 0;
+	free(_menuBuffer0);
+	_menuBuffer0 = 0;
+}
+
 void Resource::loadLevelData(int levelNum) {
 
 	char filename[32];

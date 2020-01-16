@@ -305,6 +305,7 @@ void Menu::refreshScreen(bool updatePalette) {
 }
 
 bool Menu::mainLoop() {
+	bool ret = false;
 	loadData();
 	while (!g_system->inp.quit) {
 		const int option = handleTitleScreen();
@@ -316,10 +317,9 @@ bool Menu::mainLoop() {
 		} else if (option == kTitleScreen_Options) {
 			handleOptions();
 			debug(kDebug_MENU, "optionNum %d", _optionNum);
-			if (_optionNum == kMenu_NewGame + 1) {
-				return true;
-			} else if (_optionNum == kMenu_CurrentGame + 1) {
-				return true;
+			if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1) {
+				ret = true;
+				break;
 			} else if (_optionNum == kMenu_Quit + 1) {
 				break;
 			}
@@ -327,7 +327,8 @@ bool Menu::mainLoop() {
 			break;
 		}
 	}
-	return false;
+	_res->unloadDatMenuBuffers();
+	return ret;
 }
 
 void Menu::drawTitleScreen(int option) {
