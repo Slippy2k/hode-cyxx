@@ -48,7 +48,7 @@ Game progress is saved in 'setup.cfg', similar to the original engine.
 Status:
 -------
 
-Menus are currently missing.
+Settings menu is not implemented.
 
 PSX datafiles can be used but sound (SPU ADPCM) and background screens (MDEC)
 are not handled yet.
