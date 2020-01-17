@@ -10,8 +10,8 @@ struct Resource;
 struct Video;
 
 struct DatSpritesGroup {
-	uint32_t currentFrame; // 0
-	uint32_t firstFrame; // 4
+	uint32_t currentFrameOffset; // 0
+	uint32_t firstFrameOffset; // 4
 	uint32_t size; // 8 following this header
 	uint16_t count; // 12
 	uint16_t num; // 14
@@ -50,8 +50,8 @@ struct Menu {
 	Video *_video;
 
 	SetupConfig *_config;
-	uint8_t _checkpointNum;
-	uint8_t _levelNum;
+	int _checkpointNum;
+	int _levelNum;
 
 	DatSpritesGroup *_titleSprites;
 	DatSpritesGroup *_playerSprites;
@@ -68,14 +68,20 @@ struct Menu {
 	DatBitmapsGroup *_levelsBitmaps;
 	const uint8_t *_levelsBitmapsData;
 	DatSpritesGroup *_iconsSprites;
+	const uint8_t *_iconsSpritesData;
+	int _optionsButtonSpritesCount;
+	const uint8_t *_optionsButtonSpritesData;
+	const uint8_t *_currentOptionButton;
 
 	const uint8_t *_digitsData;
 	const uint8_t *_optionData;
 	const uint8_t *_soundData;
 
 	uint8_t _paletteBuffer[256 * 3];
-
+	bool _highlightCancel;
 	uint8_t _optionNum;
+	int _lastLevelNum;
+	uint8_t _unk1;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
@@ -84,9 +90,9 @@ struct Menu {
 	int getSoundNum(int num) const;
 	void playSound(int num);
 
-	void drawSprite(const DatSpritesGroup *spriteGroup, uint32_t num);
-	void drawSpritePos(const DatSpritesGroup *spriteGroup, int x, int y, uint32_t num);
-	void drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int x, int y);
+	void drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num);
+	void drawSpritePos(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, int x, int y, uint32_t num);
+	void drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int num, int x, int y);
 	void refreshScreen(bool updatePalette);
 
 	bool mainLoop();
@@ -98,8 +104,11 @@ struct Menu {
 	void setCurrentPlayer(int num);
 	void drawPlayerProgress(int state, int cursor);
 	void handleAssignPlayer();
+	void drawCheckpointScreen();
 	void drawLevelScreen();
+	void drawSettingsScreen(int num);
 	void changeToOption(int num);
+	void handleLoadLevel(int num);
 	void handleOptions();
 };
 
