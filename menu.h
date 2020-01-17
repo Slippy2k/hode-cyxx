@@ -85,6 +85,8 @@ struct Menu {
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
+	void setVolume();
+
 	void loadData();
 
 	int getSoundNum(int num) const;

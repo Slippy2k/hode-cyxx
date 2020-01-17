@@ -40,6 +40,18 @@ Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
 	_config = &_g->_setupConfig;
 }
 
+void Menu::setVolume() {
+	const int volume = _config->players[_config->currentPlayer].volume;
+	if (volume != _g->_snd_masterVolume) {
+		_g->_snd_masterVolume = volume;
+		if (volume == 0) {
+			_g->muteSound();
+		} else {
+			_g->unmuteSound();
+		}
+	}
+}
+
 static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint32_t ptrOffset) {
 	const uint32_t baseOffset = ptrOffset;
 	for (int i = 0; i < count; ++i) {
@@ -519,7 +531,7 @@ void Menu::handleAssignPlayer() {
 				} else if (state == 1) { // select
 					--cursor;
 					_config->currentPlayer = cursor;
-					// _snd_masterVolume
+					// setVolume();
 					cursor = 0;
 				} else if (state == 2) { // clear
 					state = 5; // 'No'
@@ -527,7 +539,7 @@ void Menu::handleAssignPlayer() {
 					if (state == 4) { // 'Yes', clear confirmation
 						--cursor;
 						setDefaultsSetupCfg(_config, cursor);
-						// _snd_masterVolume
+						// setVolume();
 					}
 					setCurrentPlayer(_config->currentPlayer);
 					state = 2;
@@ -572,6 +584,20 @@ void Menu::handleAssignPlayer() {
 }
 
 void Menu::drawCheckpointScreen() {
+	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	assert(uncompressedSize == Video::W * Video::H);
+	// drawBitmaps(_currentCheckpointData, _checkpointNum, 0);
+	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
+	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
+	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) / 10);
+	int num = 0;
+	if (num > 1 && num < 7) {
+		drawSpritePos(&_iconsSprites[9], _iconsSpritesData, 0, 0, num - 2);
+	} else {
+		drawSpriteNextFrame(_iconsSprites, (num != 0) ? 8 : 7, 0, 0);
+	}
+	drawSpriteNextFrame(_iconsSprites, 6, 0, 0);
+	refreshScreen(false);
 }
 
 void Menu::drawLevelScreen() {
