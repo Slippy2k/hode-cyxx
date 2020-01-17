@@ -81,7 +81,8 @@ struct Menu {
 	bool _highlightCancel;
 	uint8_t _optionNum;
 	int _lastLevelNum;
-	uint8_t _unk1;
+	uint8_t _condMask;
+	uint8_t _checkpointIndex;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
@@ -111,6 +112,7 @@ struct Menu {
 	void drawSettingsScreen(int num);
 	void changeToOption(int num);
 	void handleLoadLevel(int num);
+	void handleLoadCheckpoint(int num);
 	void handleOptions();
 };
 
