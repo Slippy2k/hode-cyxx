@@ -2101,11 +2101,12 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		if (level > kLvl_dark) {
 			level = kLvl_dark;
 		}
-		checkpoint = _setupConfig.players[num].progress[level];
-		if (checkpoint >= _res->_datHdr.levelCheckpointsCount[level]) {
-			checkpoint = _res->_datHdr.levelCheckpointsCount[level] - 1;
+		checkpoint = _setupConfig.players[num].checkpointNum;
+		if (checkpoint != 0) {
+			checkpoint = _setupConfig.players[num].progress[level];
 		}
 		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;
+		debug(kDebug_GAME, "Restart at level %d checkpoint %d cutscenes 0x%x", level, checkpoint, _paf->_playedMask);
 	}
 	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
