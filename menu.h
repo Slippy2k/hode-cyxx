@@ -78,11 +78,13 @@ struct Menu {
 	const uint8_t *_soundData;
 
 	uint8_t _paletteBuffer[256 * 3];
-	bool _highlightCancel;
+	bool _loadLevelButtonState;
 	uint8_t _optionNum;
 	int _lastLevelNum;
+	int _lastLevelCheckpointNum[kCheckpointLevelsCount];
 	uint8_t _condMask;
-	uint8_t _checkpointIndex;
+	uint8_t _loadCheckpointButtonState;
+	int _bitmapCircularListIndex[3];
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
@@ -105,11 +107,15 @@ struct Menu {
 	void drawDigit(int x, int y, int num);
 	void drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int x, int y, int w, int h, uint8_t baseColor = 0);
 	void setCurrentPlayer(int num);
+	void setLevelCheckpoint(int num);
 	void drawPlayerProgress(int state, int cursor);
 	void handleAssignPlayer();
+	void updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count);
+	void drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count, bool updatePalette);
+	void scrollBitmapsCheckpoints(int dir);
 	void drawCheckpointScreen();
 	void drawLevelScreen();
-	void drawSettingsScreen(int num);
+	void handleSettingsScreen(int num);
 	void changeToOption(int num);
 	void handleLoadLevel(int num);
 	void handleLoadCheckpoint(int num);

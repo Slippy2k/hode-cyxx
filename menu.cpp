@@ -12,6 +12,7 @@ enum {
 	kMenu_NewGame = 0,
 	kMenu_CurrentGame = 2,
 	kMenu_Load = 4,
+	kMenu_ResumeGame = 7,
 	kMenu_Settings = 8,
 	kMenu_Quit = 15,
 	kMenu_Cutscenes = 17
@@ -345,7 +346,7 @@ bool Menu::mainLoop() {
 		} else if (option == kTitleScreen_Options) {
 			handleOptions();
 			debug(kDebug_MENU, "optionNum %d", _optionNum);
-			if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1) {
+			if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
 				ret = true;
 				break;
 			} else if (_optionNum == kMenu_Quit + 1) {
@@ -411,19 +412,36 @@ void Menu::drawDigit(int x, int y, int num) {
 }
 
 void Menu::drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int x, int y, int w, int h, uint8_t baseColor) {
-	assert(x >= 0 && x + w < Video::W && y >= 0 && y + h < Video::H);
+	const int srcPitch = w;
+	if (x < 0) {
+		bitmapData -= x;
+		w += x;
+		x = 0;
+	}
+	if (x + w > Video::W) {
+		w = Video::W - x;
+	}
+	if (y < 0) {
+		bitmapData -= y * srcPitch;
+		h += y;
+		y = 0;
+	}
+	if (y + h > Video::H) {
+		h = Video::H - y;
+	}
 	uint8_t *dst = _video->_frontLayer + y * Video::W + x;
 	for (int j = 0; j < h; ++j) {
 		for (int i = 0; i < w; ++i) {
 			dst[i] = baseColor - bitmapsGroup->colors + bitmapData[i];
 		}
 		dst += Video::W;
-		bitmapData += w;
+		bitmapData += srcPitch;
 	}
 }
 
 void Menu::setCurrentPlayer(int num) {
 	debug(kDebug_MENU, "setCurrentPlayer %d", num);
+	setLevelCheckpoint(num);
 	_levelNum = _config->players[num].levelNum;
 	if (_levelNum > kLvl_dark) {
 		_levelNum = kLvl_dark;
@@ -439,10 +457,18 @@ void Menu::setCurrentPlayer(int num) {
 	}
 // 422CE0
 	const DatBitmapsGroup *bitmap = &_checkpointsBitmaps[_levelNum][_checkpointNum];
-	uint8_t *dst = _paletteBuffer + 205 * 3;
-	const uint8_t *src = _checkpointsBitmapsData[_levelNum] + bitmap->palette;
-	memcpy(dst, src, 50 * 3);
+	memcpy(_paletteBuffer + 205 * 3, _checkpointsBitmapsData[_levelNum] + bitmap->palette, 50 * 3);
 	g_system->setPalette(_paletteBuffer, 256, 6);
+}
+
+void Menu::setLevelCheckpoint(int num) {
+	for (int i = 0; i < kCheckpointLevelsCount; ++i) {
+		uint8_t checkpoint = _config->players[num].progress[i] + 1;
+		if (checkpoint >= _res->_datHdr.levelCheckpointsCount[i]) {
+			checkpoint = _res->_datHdr.levelCheckpointsCount[i];
+		}
+		_lastLevelCheckpointNum[i] = checkpoint;
+	}
 }
 
 void Menu::drawPlayerProgress(int state, int cursor) {
@@ -583,14 +609,82 @@ void Menu::handleAssignPlayer() {
 	}
 }
 
-void Menu::drawCheckpointScreen() {
+void Menu::updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count) {
+	if (num == 0) {
+		if (count < 3) {
+			_bitmapCircularListIndex[0] = -1;
+		} else {
+			_bitmapCircularListIndex[0] = count - 1;
+		}
+		_bitmapCircularListIndex[1] = 0;
+		_bitmapCircularListIndex[2] = 1;
+	} else if (num == 1) {
+		_bitmapCircularListIndex[0] = 0;
+		_bitmapCircularListIndex[1] = 1;
+		_bitmapCircularListIndex[2] = 2;
+	} else {
+		_bitmapCircularListIndex[0] = num - 1;
+		_bitmapCircularListIndex[1] = num;
+		if (num == count - 1) {
+			_bitmapCircularListIndex[2] = 0;
+		} else {
+			_bitmapCircularListIndex[2] = num + 1;
+		}
+	}
+// 423F05
+	for (int i = 0; i < 3; ++i) {
+		if (_bitmapCircularListIndex[i] != -1) {
+			const DatBitmapsGroup *bitmap = &bitmapsGroup[_bitmapCircularListIndex[i]];
+			memcpy(_paletteBuffer + (105 + 50 * i) * 3, bitmapData + bitmap->palette, 50 * 3);
+		}
+	}
+	g_system->setPalette(_paletteBuffer, 256, 6);
+}
+
+void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count, bool updatePalette) {
+	memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
+	if (updatePalette) {
+		g_system->setPalette(_paletteBuffer, 256, 6);
+	}
+	updateBitmapsCircularList(bitmapsGroup, bitmapData, num, count);
+	static const int xPos[] = { -60, 68, 196 };
+	for (int i = 0; i < 3; ++i) {
+		if (_bitmapCircularListIndex[i] != -1) {
+			const DatBitmapsGroup *bitmap = &bitmapsGroup[_bitmapCircularListIndex[i]];
+			drawBitmap(bitmap, bitmapData + bitmap->offset, xPos[i], 14, bitmap->w, bitmap->h, 105 + 50 * i);
+		}
+	}
+}
+
+void Menu::scrollBitmapsCheckpoints(int dir) {
 	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	assert(uncompressedSize == Video::W * Video::H);
-	// drawBitmapsCircularList(_currentCheckpointData, _checkpointNum, 0);
 	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) / 10);
-	const int num = _checkpointIndex;
+	drawSpriteNextFrame(_iconsSprites, (_loadCheckpointButtonState != 0) ? 8 : 7, 0, 0);
+	//
+	if (dir) {
+		++_checkpointNum;
+		if (_checkpointNum >= _lastLevelCheckpointNum[_levelNum]) {
+			_checkpointNum = 0;
+		}
+	} else {
+		--_checkpointNum;
+		if (_checkpointNum < 0) {
+			_checkpointNum = _lastLevelCheckpointNum[_levelNum] - 1;
+		}
+	}
+}
+
+void Menu::drawCheckpointScreen() {
+	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	assert(uncompressedSize == Video::W * Video::H);
+	drawBitmapsCircularList(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum, _lastLevelCheckpointNum[_levelNum], false);
+	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
+	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
+	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) % 10);
+	const int num = _loadCheckpointButtonState;
 	if (num > 1 && num < 7) {
 		drawSprite(&_iconsSprites[9], _iconsSpritesData, num - 2);
 	} else {
@@ -607,11 +701,11 @@ void Menu::drawLevelScreen() {
 	DatBitmapsGroup *bitmap = &_levelsBitmaps[_levelNum];
 	drawBitmap(bitmap, _levelsBitmapsData + bitmap->offset, 23, 10, bitmap->w, bitmap->h, 192);
 	drawSpriteNextFrame(_iconsSprites, 4, 0, 0);
-	drawSpriteNextFrame(_iconsSprites, _highlightCancel ? 3 : 2, 0, 0);
+	drawSpriteNextFrame(_iconsSprites, _loadLevelButtonState ? 3 : 2, 0, 0);
 	refreshScreen(false);
 }
 
-void Menu::drawSettingsScreen(int num) {
+void Menu::handleSettingsScreen(int num) {
 }
 
 void Menu::changeToOption(int num) {
@@ -633,20 +727,23 @@ void Menu::changeToOption(int num) {
 		_config->players[_config->currentPlayer].checkpointNum = _g->_currentLevelCheckpoint;
 	} else if (_optionNum == kMenu_Load + 1) {
 // 4281C3
-		_highlightCancel = false;
+		_loadLevelButtonState = false;
 		memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 768);
-		memcpy(_paletteBuffer + _levelsBitmaps[_levelNum].colors * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
+		memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
 		g_system->setPalette(_paletteBuffer, 256, 6);
 		drawLevelScreen();
 	} else if (_optionNum == kMenu_Load + 2) {
 // 42816B
 		memcpy(_paletteBuffer, _optionsBitmapData[6] + _optionsBitmapSize[6], 768);
 		g_system->setPalette(_paletteBuffer, 256, 6);
+		_loadCheckpointButtonState = 0;
+		_checkpointNum = 0;
+		setLevelCheckpoint(_config->currentPlayer);
 		drawCheckpointScreen();
 	} else if (_optionNum == kMenu_Settings + 1) {
 // 428118
 		memcpy(_paletteBuffer, _optionsBitmapData[0] + _optionsBitmapSize[0], 768);
-		drawSettingsScreen(5);
+		handleSettingsScreen(5);
 	} else if (_optionNum == kMenu_Cutscenes + 1) {
 // 4280EA
 	} else if (_optionsBitmapSize[_optionNum] != 0) {
@@ -661,17 +758,17 @@ void Menu::handleLoadLevel(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == 16) {
-		if (_highlightCancel) {
+		if (_loadLevelButtonState) {
 			playSound(0x70);
 		}
-		_highlightCancel = false;
+		_loadLevelButtonState = false;
 	} else if (num == 17) {
-		if (!_highlightCancel) {
+		if (!_loadLevelButtonState) {
 			playSound(0x70);
 		}
-		_highlightCancel = true;
+		_loadLevelButtonState = true;
 	} else if (num == 18) {
-		if (_highlightCancel) {
+		if (_loadLevelButtonState) {
 			playSound(0x80);
 			_condMask = 0x80;
 		} else {
@@ -686,7 +783,7 @@ void Menu::handleLoadLevel(int num) {
 			if (_levelNum >= _lastLevelNum) {
 				_levelNum = 0;
 			}
-			memcpy(_paletteBuffer + _levelsBitmaps[_levelNum].colors * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
+			memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
 			g_system->setPalette(_paletteBuffer, 256, 6);
 			_condMask = 0x20;
 		}
@@ -698,7 +795,7 @@ void Menu::handleLoadLevel(int num) {
 			if (_levelNum < 0) {
 				_levelNum = _lastLevelNum - 1;
 			}
-			memcpy(_paletteBuffer + _levelsBitmaps[_levelNum].colors * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
+			memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
 			g_system->setPalette(_paletteBuffer, 256, 6);
 			_condMask = 0x40;
 		}
@@ -710,45 +807,52 @@ void Menu::handleLoadCheckpoint(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == 11) {
-		if (_checkpointIndex != 0) {
+		if (_loadCheckpointButtonState != 0) {
 			playSound(0x70);
-			_checkpointIndex = 0;
+			_loadCheckpointButtonState = 0;
 		}
 	} else if (num == 12) {
-		if (_checkpointIndex == 0) {
+		if (_loadCheckpointButtonState == 0) {
 			playSound(0x70);
-			_checkpointIndex = 1;
+			_loadCheckpointButtonState = 1;
 		}
 	} else if (num == 13) {
-		if (_checkpointIndex != 0) {
+		if (_loadCheckpointButtonState != 0) {
 			playSound(0x80);
 			_condMask = 0x80;
 		} else {
 			playSound(0x78);
-			_checkpointIndex = 2;
+			_loadCheckpointButtonState = 2;
 			do {
 				drawCheckpointScreen();
-				++_checkpointIndex;
-			} while (_checkpointIndex <= 7);
+				++_loadCheckpointButtonState;
+			} while (_loadCheckpointButtonState <= 7);
 			_condMask = 0x08;
 			_config->players[_config->currentPlayer].checkpointNum = _checkpointNum;
 			_config->players[_config->currentPlayer].levelNum = _levelNum;
+			debug(kDebug_MENU, "Restart game at level %d checkpoint %d", _levelNum, _checkpointNum);
 			return;
 		}
 	} else if (num == 14) {
-		if (_checkpointIndex == 0) {
+		if (_lastLevelCheckpointNum[_levelNum] > 2 || _loadCheckpointButtonState == 0) {
 			playSound(0x70);
+			scrollBitmapsCheckpoints(1);
 		}
 	} else if (num == 15) {
-		if (_checkpointIndex == 1) {
+		if (_lastLevelCheckpointNum[_levelNum] > 2 || _loadCheckpointButtonState == 1) {
 			playSound(0x70);
+			scrollBitmapsCheckpoints(0);
 		}
 	}
 	drawCheckpointScreen();
 }
 
-static bool matchInput(uint8_t type, uint8_t mask, const PlayerInput &inp, uint8_t optionMask) {
+static bool matchInput(uint8_t menu, uint8_t type, uint8_t mask, const PlayerInput &inp, uint8_t optionMask) {
 	if (type != 0) {
+		if (menu == kMenu_Cutscenes || menu == kMenu_Settings) {
+			// not implemented yet
+			return false;
+		}
 		if ((mask & 1) != 0 && inp.keyReleased(SYS_INP_RUN)) {
 			return true;
 		}
@@ -797,7 +901,7 @@ void Menu::handleOptions() {
 		int num = -1;
 		for (int i = 0; i < _res->_datHdr.menusCount; ++i) {
 			const uint8_t *data = _optionData + i * 8;
-			if (data[0] == _optionNum && matchInput(data[1] & 1, data[2], g_system->inp, _condMask)) {
+			if (data[0] == _optionNum && matchInput(data[0], data[1] & 1, data[2], g_system->inp, _condMask)) {
 				num = i;
 				break;
 			}
@@ -813,7 +917,7 @@ void Menu::handleOptions() {
 		debug(kDebug_MENU, "handleOptions option %d code %d", _optionNum, data[4]);
 		switch (data[4]) {
 		case 0:
-			drawSettingsScreen(num);
+			handleSettingsScreen(num);
 			break;
 		case 6:
 			playSound(0x70);
@@ -832,6 +936,7 @@ void Menu::handleOptions() {
 		case 11:
 			break;
 		case 12:
+			setLevelCheckpoint(_config->currentPlayer);
 			handleLoadCheckpoint(num);
 			break;
 		default:
@@ -839,7 +944,7 @@ void Menu::handleOptions() {
 			break;
 		}
 // 428D41
-		if (_optionNum == 16 || _optionNum == 1 || _optionNum == 3 || _optionNum == 7) {
+		if (_optionNum == 16 || _optionNum == 1 || _optionNum == 3 || _optionNum == kMenu_ResumeGame) {
 // 428E74
 			// _g->saveSetupCfg();
 			break;
