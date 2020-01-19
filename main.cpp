@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
 	g->_res->loadSetupDat();
 	g->loadSetupCfg(resume);
 	bool runGame = true;
-	if (_runMenu && resume) {
+	if (_runMenu && resume && !g->_res->_isPsx) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
 		runGame = m->mainLoop();
 		delete m;

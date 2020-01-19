@@ -332,6 +332,7 @@ void Menu::drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int num, int x, int
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		spriteGroup[num].currentFrameOffset += size + 2;
 	} else {
+		spriteGroup[num].num = 0;
 		spriteGroup[num].currentFrameOffset = spriteGroup[num].firstFrameOffset;
 	}
 }
