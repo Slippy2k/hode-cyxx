@@ -2102,7 +2102,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 			level = kLvl_dark;
 		}
 		checkpoint = _setupConfig.players[num].checkpointNum;
-		if (checkpoint != 0) {
+		if (checkpoint != 0 && checkpoint >= _res->_datHdr.levelCheckpointsCount[level]) {
 			checkpoint = _setupConfig.players[num].progress[level];
 		}
 		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;

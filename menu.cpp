@@ -9,6 +9,13 @@
 #include "video.h"
 
 enum {
+	kTitleScreen_AssignPlayer,
+	kTitleScreen_Play,
+	kTitleScreen_Options,
+	kTitleScreen_Quit
+};
+
+enum {
 	kMenu_NewGame = 0,
 	kMenu_CurrentGame = 2,
 	kMenu_Load = 4,
@@ -33,6 +40,10 @@ static void setDefaultsSetupCfg(SetupConfig *config, int num) {
 	config->players[num].stereo = 1;
 	config->players[num].volume = 128;
 	config->players[num].currentLevel = 0;
+}
+
+static bool isEmptySetupCfg(SetupConfig *config, int num) {
+	return config->players[num].levelNum == 0 && config->players[num].checkpointNum == 0 && config->players[num].cutscenesMask == 0;
 }
 
 Menu::Menu(Game *g, PafPlayer *paf, Resource *res, Video *video)
@@ -476,7 +487,7 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 	assert(uncompressedSize == Video::W * Video::H);
 	int player = 0;
 	for (int y = 96; y < 164; y += 17) {
-		if (_config->players[player].cutscenesMask == 0) {
+		if (isEmptySetupCfg(_config, player)) {
 			drawSpritePos(_playerSprites, (const uint8_t *)&_playerSprites[1], 82, y - 3, 3); // empty
 		} else {
 			int levelNum = _config->players[player].levelNum;
@@ -508,7 +519,7 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 		memcpy(p + i * Video::W + 15639, p + i * Video::W + (offset + 1) * 256 + 172, 76);
 	}
 // 422EC3
-	if (_config->players[player].cutscenesMask != 0) {
+	if (!isEmptySetupCfg(_config, player)) {
 		DatBitmapsGroup *bitmap = &_checkpointsBitmaps[_levelNum][_checkpointNum];
 		const uint8_t *src = _checkpointsBitmapsData[_levelNum] + bitmap->offset;
 		drawBitmap(bitmap, src, 132, 0, bitmap->w, bitmap->h, 205);
@@ -633,7 +644,7 @@ void Menu::updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const 
 	}
 // 423F05
 	for (int i = 0; i < 3; ++i) {
-		if (_bitmapCircularListIndex[i] != -1) {
+		if (_bitmapCircularListIndex[i] != -1 && _bitmapCircularListIndex[i] < count) {
 			const DatBitmapsGroup *bitmap = &bitmapsGroup[_bitmapCircularListIndex[i]];
 			memcpy(_paletteBuffer + (105 + 50 * i) * 3, bitmapData + bitmap->palette, 50 * 3);
 		}
@@ -649,7 +660,7 @@ void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const ui
 	updateBitmapsCircularList(bitmapsGroup, bitmapData, num, count);
 	static const int xPos[] = { -60, 68, 196 };
 	for (int i = 0; i < 3; ++i) {
-		if (_bitmapCircularListIndex[i] != -1) {
+		if (_bitmapCircularListIndex[i] != -1 && _bitmapCircularListIndex[i] < count) {
 			const DatBitmapsGroup *bitmap = &bitmapsGroup[_bitmapCircularListIndex[i]];
 			drawBitmap(bitmap, bitmapData + bitmap->offset, xPos[i], 14, bitmap->w, bitmap->h, 105 + 50 * i);
 		}
@@ -661,9 +672,8 @@ void Menu::scrollBitmapsCheckpoints(int dir) {
 	assert(uncompressedSize == Video::W * Video::H);
 	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
-	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) / 10);
+	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) % 10);
 	drawSpriteNextFrame(_iconsSprites, (_loadCheckpointButtonState != 0) ? 8 : 7, 0, 0);
-	//
 	if (dir) {
 		++_checkpointNum;
 		if (_checkpointNum >= _lastLevelCheckpointNum[_levelNum]) {
@@ -701,7 +711,7 @@ void Menu::drawLevelScreen() {
 	DatBitmapsGroup *bitmap = &_levelsBitmaps[_levelNum];
 	drawBitmap(bitmap, _levelsBitmapsData + bitmap->offset, 23, 10, bitmap->w, bitmap->h, 192);
 	drawSpriteNextFrame(_iconsSprites, 4, 0, 0);
-	drawSpriteNextFrame(_iconsSprites, _loadLevelButtonState ? 3 : 2, 0, 0);
+	drawSpriteNextFrame(_iconsSprites, (_loadLevelButtonState != 0) ? 3 : 2, 0, 0);
 	refreshScreen(false);
 }
 
@@ -723,22 +733,23 @@ void Menu::changeToOption(int num) {
 		_config->players[_config->currentPlayer].levelNum = 0;
 		_config->players[_config->currentPlayer].checkpointNum = 0;
 	} else if (_optionNum == kMenu_CurrentGame + 1) {
-		_config->players[_config->currentPlayer].levelNum = _g->_currentLevel;
-		_config->players[_config->currentPlayer].checkpointNum = _g->_currentLevelCheckpoint;
+		// _config->players[_config->currentPlayer].levelNum = _g->_currentLevel;
+		// _config->players[_config->currentPlayer].checkpointNum = _g->_currentLevelCheckpoint;
 	} else if (_optionNum == kMenu_Load + 1) {
 // 4281C3
-		_loadLevelButtonState = false;
+		_loadLevelButtonState = 0;
+		_levelNum = 0;
 		memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 768);
 		memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
 		g_system->setPalette(_paletteBuffer, 256, 6);
 		drawLevelScreen();
 	} else if (_optionNum == kMenu_Load + 2) {
 // 42816B
-		memcpy(_paletteBuffer, _optionsBitmapData[6] + _optionsBitmapSize[6], 768);
-		g_system->setPalette(_paletteBuffer, 256, 6);
 		_loadCheckpointButtonState = 0;
 		_checkpointNum = 0;
 		setLevelCheckpoint(_config->currentPlayer);
+		memcpy(_paletteBuffer, _optionsBitmapData[6] + _optionsBitmapSize[6], 768);
+		g_system->setPalette(_paletteBuffer, 256, 6);
 		drawCheckpointScreen();
 	} else if (_optionNum == kMenu_Settings + 1) {
 // 428118
@@ -758,17 +769,17 @@ void Menu::handleLoadLevel(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == 16) {
-		if (_loadLevelButtonState) {
+		if (_loadLevelButtonState != 0) {
 			playSound(0x70);
 		}
-		_loadLevelButtonState = false;
+		_loadLevelButtonState = 0;
 	} else if (num == 17) {
-		if (!_loadLevelButtonState) {
+		if (_loadLevelButtonState == 0) {
 			playSound(0x70);
 		}
-		_loadLevelButtonState = true;
+		_loadLevelButtonState = 1;
 	} else if (num == 18) {
-		if (_loadLevelButtonState) {
+		if (_loadLevelButtonState != 0) {
 			playSound(0x80);
 			_condMask = 0x80;
 		} else {
@@ -823,13 +834,14 @@ void Menu::handleLoadCheckpoint(int num) {
 		} else {
 			playSound(0x78);
 			_loadCheckpointButtonState = 2;
-			do {
-				drawCheckpointScreen();
-				++_loadCheckpointButtonState;
-			} while (_loadCheckpointButtonState <= 7);
 			_condMask = 0x08;
-			_config->players[_config->currentPlayer].checkpointNum = _checkpointNum;
-			_config->players[_config->currentPlayer].levelNum = _levelNum;
+			if (_levelNum == 7 && _checkpointNum == 11) {
+				_config->players[_config->currentPlayer].levelNum = kLvl_dark;
+				_config->players[_config->currentPlayer].checkpointNum = 0;
+			} else {
+				_config->players[_config->currentPlayer].levelNum = _levelNum;
+				_config->players[_config->currentPlayer].checkpointNum = _checkpointNum;
+			}
 			debug(kDebug_MENU, "Restart game at level %d checkpoint %d", _levelNum, _checkpointNum);
 			return;
 		}

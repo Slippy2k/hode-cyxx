@@ -37,12 +37,6 @@ struct Menu {
 		kCheckpointLevelsCount = 8,
 		kOptionsCount = 19
 	};
-	enum {
-		kTitleScreen_AssignPlayer,
-		kTitleScreen_Play,
-		kTitleScreen_Options,
-		kTitleScreen_Quit
-	};
 
 	Game *_g;
 	PafPlayer *_paf;
@@ -78,7 +72,7 @@ struct Menu {
 	const uint8_t *_soundData;
 
 	uint8_t _paletteBuffer[256 * 3];
-	bool _loadLevelButtonState;
+	uint8_t _loadLevelButtonState;
 	uint8_t _optionNum;
 	int _lastLevelNum;
 	int _lastLevelCheckpointNum[kCheckpointLevelsCount];
