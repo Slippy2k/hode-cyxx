@@ -50,8 +50,8 @@ Status:
 
 Settings and projection menus are not implemented.
 
-PSX datafiles can be used but sound (SPU ADPCM) and background screens (MDEC)
-are not handled yet.
+PSX version datafiles can be used but background screens and overlays (MDEC)
+are not decoded yet.
 
 
 Credits:

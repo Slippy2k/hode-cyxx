@@ -287,7 +287,7 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 // a: type/source (0, 1, 2) b: num/index (3, monster1Index, monster2.monster1Index)
 void Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	MixerLock ml(&_mix);
-	if (!_res->_isPsx && num < _res->_sssHdr.infosDataCount) {
+	if (num < _res->_sssHdr.infosDataCount) {
 		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.infosDataCount, a, b);
 		_currentSoundLvlObject = ptr;
 		playSoundObject(&_res->_sssInfosData[num], a, b);
@@ -2179,11 +2179,11 @@ void Game::mixAudio(int16_t *buf, int len) {
 		return;
 	}
 
-	static const int kStereoSamples = 3528; // stereo
+	const int kStereoSamples = _res->_isPsx ? 896 * 2 : 1764 * 2; // stereo
 
 	static int count = 0;
 
-	static int16_t buffer[kStereoSamples];
+	static int16_t buffer[4096];
 	static int bufferOffset = 0;
 	static int bufferSize = 0;
 

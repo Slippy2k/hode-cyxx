@@ -1228,7 +1228,8 @@ void Game::queueSoundObjectsPcmStride() {
 			if (so->currentPcmPtr < ptr) {
 				continue;
 			}
-			const int16_t *end = ptr + _res->getSssPcmSize(pcm) / sizeof(int16_t);
+			const uint32_t pcmSize = _res->getSssPcmSize(pcm) / sizeof(int16_t);
+			const int16_t *end = ptr + pcmSize;
 			if (so->currentPcmPtr >= end) {
 				continue;
 			}
@@ -1236,8 +1237,8 @@ void Game::queueSoundObjectsPcmStride() {
 				continue;
 			}
 			_mix.queue(so->currentPcmPtr, end, so->panType, so->panL, so->panR, so->stereo);
-			const int strideSize = (pcm->strideSize - 256 * sizeof(int16_t));
-			assert(strideSize == 1764 || strideSize == 3528); // words
+			const int strideSize = pcmSize / pcm->strideCount;
+			assert(strideSize == 1764 || strideSize == 3528 || strideSize == 896); // words
 			so->currentPcmPtr += strideSize;
 		}
 	}
