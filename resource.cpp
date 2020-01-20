@@ -206,7 +206,7 @@ bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
 		_datFile->read(pal, 768);
 		return true;
 	}
-	return true;
+	return false;
 }
 
 bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
@@ -1065,7 +1065,7 @@ static int8_t sext8(uint8_t x, int bits) {
 
 static int _pcmL1, _pcmL0;
 
-static void decodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16bytes, dst: 56bytes
+static void decodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16bytes, dst: 112bytes
 	static const int16_t K0_1024[] = { 0, 960, 1840, 1568, 1952 };
 	static const int16_t K1_1024[] = { 0,   0, -832, -880, -960 };
 	const uint8_t param = *src++;
@@ -1081,12 +1081,14 @@ static void decodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16
 		const int s1 = (t1 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
 		_pcmL1 = _pcmL0;
 		_pcmL0 = s1;
-		*dst++ = CLIP(_pcmL0, -32768, 32767);
+		dst[0] = dst[1] = CLIP(_pcmL0, -32768, 32767);
+		dst += 2;
 		const int t2 = sext8(b >> 4, 4);
 		const int s2 = (t2 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
 		_pcmL1 = _pcmL0;
 		_pcmL0 = s2;
-		*dst++ = CLIP(_pcmL0, -32768, 32767);
+		dst[0] = dst[1] = CLIP(_pcmL0, -32768, 32767);
+		dst += 2;
 	}
 }
 
@@ -1094,7 +1096,7 @@ uint32_t Resource::getSssPcmSize(const SssPcm *pcm) const {
 	if (_isPsx) {
 		assert(pcm->strideSize == 512);
 		const uint32_t size = pcm->strideCount * 512;
-		return (size / 16) * 28 * sizeof(int16_t);
+		return (size / 16) * 56 * sizeof(int16_t);
 	}
 	return (pcm->strideSize - 256 * sizeof(int16_t)) * pcm->strideCount * sizeof(int16_t);
 }
@@ -1110,14 +1112,14 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 			return;
 		}
 		pcm->ptr = p;
-		if (_isPsx) { // 11025 hz
+		if (_isPsx) {
 			for (int i = 0; i < pcm->strideCount; ++i) {
 				uint8_t buf[512];
 				fp->read(buf, sizeof(buf));
 				_pcmL1 = _pcmL0 = 0;
 				for (int j = 0; j < 512; j += 16) {
 					decodeSssSpuAdpcmUnit(buf + j, p);
-					p += 28;
+					p += 56;
 				}
 			}
 			return;

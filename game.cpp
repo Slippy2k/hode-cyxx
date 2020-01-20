@@ -2179,7 +2179,7 @@ void Game::mixAudio(int16_t *buf, int len) {
 		return;
 	}
 
-	const int kStereoSamples = _res->_isPsx ? 896 * 2 : 1764 * 2; // stereo
+	const int kStereoSamples = _res->_isPsx ? 1792 * 2 : 1764 * 2; // stereo
 
 	static int count = 0;
 
@@ -2862,26 +2862,26 @@ int Game::displayHintScreen(int num, int pause) {
 		g_system->setPalette(_video->_palette, 256, 6);
 		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
 		g_system->updateScreen(false);
+		do {
+			g_system->processEvents();
+			if (confirmQuit) {
+				const int currentQuit = quit;
+				if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
+					quit = kQuitNo;
+				}
+				if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
+					quit = kQuitYes;
+				}
+				if (currentQuit != quit) {
+					g_system->copyRect(0, 0, Video::W, Video::H, quitBuffers[quit], 256);
+					g_system->updateScreen(false);
+				}
+			}
+			g_system->sleep(30);
+		} while (!g_system->inp.quit && !g_system->inp.keyReleased(SYS_INP_JUMP));
+		_video->_paletteNeedRefresh = true;
 	}
-	do {
-		g_system->processEvents();
-		if (confirmQuit) {
-			const int currentQuit = quit;
-			if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
-				quit = kQuitNo;
-			}
-			if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
-				quit = kQuitYes;
-			}
-			if (currentQuit != quit) {
-				g_system->copyRect(0, 0, Video::W, Video::H, quitBuffers[quit], 256);
-				g_system->updateScreen(false);
-			}
-		}
-		g_system->sleep(30);
-	} while (!g_system->inp.quit && !g_system->inp.keyReleased(SYS_INP_JUMP));
 	unmuteSound();
-	_video->_paletteNeedRefresh = true;
 	return confirmQuit && quit == kQuitYes;
 }
 
