@@ -133,12 +133,14 @@ void PafDecoder::Decode() {
 	m_currentVideoPage = 0;
 
 	m_imageWriter = createBmpImageWriter();
-	m_soundWriter = createWavSoundWriter();
 
 	if (m_demuxAudioFrameBlocks) {
+		m_soundWriter = createWavSoundWriter();
 		char buf[512];
 		snprintf(buf, sizeof(buf), "%02d_%s", m_videoNum, m_videoName);
 		m_soundWriter->Open(buf, 22050, 16, 2, true);
+	} else {
+		m_soundWriter = 0;
 	}
 
 	int currentFrameBlock = 0;
