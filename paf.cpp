@@ -471,7 +471,8 @@ void PafPlayer::mainLoop() {
 		prevAudioCb = g_system->setAudioCallback(audioCb);
 	}
 
-	uint32_t frameTime = g_system->getTimeStamp() + 1000 / kFramesPerSec;
+	const uint32_t framesPerSec = (_demuxAudioFrameBlocks != 0) ? kFramesPerSec : 15;
+	uint32_t frameTime = g_system->getTimeStamp() + 1000 / framesPerSec;
 
 	for (int i = 0; i < (int)_pafHdr.framesCount; ++i) {
 		// read buffering blocks
@@ -502,7 +503,7 @@ void PafPlayer::mainLoop() {
 
 		const int delay = MAX(10, int(frameTime - g_system->getTimeStamp()));
 		g_system->sleep(delay);
-		frameTime = g_system->getTimeStamp() + 1000 / kFramesPerSec;
+		frameTime = g_system->getTimeStamp() + 1000 / framesPerSec;
 
 		// set next decoding video page
 		++_currentPageBuffer;
