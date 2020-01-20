@@ -373,8 +373,7 @@ bool Menu::mainLoop() {
 }
 
 void Menu::drawTitleScreen(int option) {
-	const uint32_t uncompressedSize = decodeLZW(_titleBitmapData, _video->_frontLayer);
-	assert(uncompressedSize == Video::W * Video::H);
+	decodeLZW(_titleBitmapData, _video->_frontLayer);
 	const uint8_t *palette = _titleBitmapData + _titleBitmapSize;
 	g_system->setPalette(palette, 256, 6);
 	drawSprite(_titleSprites, (const uint8_t *)&_titleSprites[1], option);
@@ -484,8 +483,7 @@ void Menu::setLevelCheckpoint(int num) {
 }
 
 void Menu::drawPlayerProgress(int state, int cursor) {
-	const uint32_t uncompressedSize = decodeLZW(_playerBitmapData, _video->_frontLayer);
-	assert(uncompressedSize == Video::W * Video::H);
+	decodeLZW(_playerBitmapData, _video->_frontLayer);
 	int player = 0;
 	for (int y = 96; y < 164; y += 17) {
 		if (isEmptySetupCfg(_config, player)) {
@@ -669,8 +667,7 @@ void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const ui
 }
 
 void Menu::scrollBitmapsCheckpoints(int dir) {
-	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-	assert(uncompressedSize == Video::W * Video::H);
+	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) % 10);
@@ -689,8 +686,7 @@ void Menu::scrollBitmapsCheckpoints(int dir) {
 }
 
 void Menu::drawCheckpointScreen() {
-	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-	assert(uncompressedSize == Video::W * Video::H);
+	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawBitmapsCircularList(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum, _lastLevelCheckpointNum[_levelNum], false);
 	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
@@ -706,8 +702,7 @@ void Menu::drawCheckpointScreen() {
 }
 
 void Menu::drawLevelScreen() {
-	const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-	assert(uncompressedSize == Video::W * Video::H);
+	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawSprite(&_iconsSprites[1], _iconsSpritesData, _levelNum);
 	DatBitmapsGroup *bitmap = &_levelsBitmaps[_levelNum];
 	drawBitmap(bitmap, _levelsBitmapsData + bitmap->offset, 23, 10, bitmap->w, bitmap->h, 192);
@@ -759,8 +754,7 @@ void Menu::changeToOption(int num) {
 	} else if (_optionNum == kMenu_Cutscenes + 1) {
 // 4280EA
 	} else if (_optionsBitmapSize[_optionNum] != 0) {
-		const uint32_t uncompressedSize = decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-		assert(uncompressedSize == Video::W * Video::H);
+		decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
 		refreshScreen(true);
 	}
