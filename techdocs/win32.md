@@ -18,17 +18,17 @@ Most of the information presented here was found by studying the binary code and
 
 ## Assets
 
-SETUP.DAT contains several files for the options, menus and the hint screens.
-
-![Hint 3](img/hint03.png) ![Hint 6](img/hint06.png)
-
-HOD.PAF contains the cinematics. PAF stands for Packed Animation File.
-
 There are three files for each level :
 
 * .LVL : contains the palettes, bitmaps, sprites and pre-calculated tables for shadows
 * .MST : contains the bytecode and triggers for the monster logic
 * .SSS : contains the sound and triggers
+
+SETUP.DAT contains data for the options, menus and the hint screens.
+
+![Hint 3](img/hint03.png) ![Hint 6](img/hint06.png)
+
+HOD.PAF ('Packed Animation File') contains the cinematics and the menu transitions.
 
 
 ## Compression
@@ -235,9 +235,9 @@ The file is 212 bytes long and contains the state for 4 different players :
 
 Data        | Field                       | Comment
 ------------|-----------------------------|--------
-byte[10]    | Current level checkpoint | Used to display a thumbnail in the menu
+byte[10]    | Last level checkpoint reached | Used to display a thumbnail in the menu
 byte        | Current level |
-byte        | Current screen for level |
+byte        | Current checkpoint for level |
 uint32_t    | Bitmask of played cutscenes | Used to allow replay from the menu
 uint32_t[4] | Joystick mapping |
 byte[8]     | Keyboard mapping |
