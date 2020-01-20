@@ -501,7 +501,7 @@ void PafPlayer::mainLoop() {
 			break;
 		}
 
-		const int delay = MAX(10, int(frameTime - g_system->getTimeStamp()));
+		const int delay = MAX<int>(10, frameTime - g_system->getTimeStamp());
 		g_system->sleep(delay);
 		frameTime = g_system->getTimeStamp() + 1000 / framesPerSec;
 

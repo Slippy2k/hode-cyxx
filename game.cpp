@@ -2162,11 +2162,8 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		if (g_system->inp.quit) {
 			break;
 		}
-		int diff = frameTimeStamp - g_system->getTimeStamp();
-		if (diff < 10) {
-			diff = 10;
-		}
-		g_system->sleep(diff);
+		const int delay = MAX<int>(10, frameTimeStamp - g_system->getTimeStamp());
+		g_system->sleep(delay);
 	} while (!_endLevel);
 	_animBackgroundDataCount = 0;
 	saveSetupCfg();
