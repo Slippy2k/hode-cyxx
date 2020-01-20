@@ -67,8 +67,14 @@ void PafPlayer::preload(int num) {
 		unload();
 		return;
 	}
+	uint8_t *buffer = (uint8_t *)calloc(kPageBufferSize * 4 + 256 * 4, 1);
+	if (!buffer) {
+		warning("preloadPaf() Unable to allocate page buffers");
+		unload();
+		return;
+	}
 	for (int i = 0; i < 4; ++i) {
-		_pageBuffers[i] = (uint8_t *)calloc(kPageBufferSize, 1);
+		_pageBuffers[i] = buffer + i * kPageBufferSize;
 	}
 	_demuxVideoFrameBlocks = (uint8_t *)calloc(_pafHdr.maxVideoFrameBlocksCount, _pafHdr.readBufferSize);
 	if (_pafHdr.maxAudioFrameBlocksCount != 0) {
@@ -98,10 +104,8 @@ void PafPlayer::unload(int num) {
 	if (_videoNum < 0) {
 		return;
 	}
-	for (int i = 0; i < 4; ++i) {
-		free(_pageBuffers[i]);
-		_pageBuffers[i] = 0;
-	}
+	free(_pageBuffers[0]);
+	memset(_pageBuffers, 0, sizeof(_pageBuffers));
 	free(_demuxVideoFrameBlocks);
 	_demuxVideoFrameBlocks = 0;
 	free(_demuxAudioFrameBlocks);
