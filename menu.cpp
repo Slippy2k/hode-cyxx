@@ -661,25 +661,6 @@ void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const ui
 	}
 }
 
-void Menu::scrollBitmapsCheckpoints(int dir) {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
-	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
-	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) % 10);
-	drawSpriteNextFrame(_iconsSprites, (_loadCheckpointButtonState != 0) ? 8 : 7, 0, 0);
-	if (dir) {
-		++_checkpointNum;
-		if (_checkpointNum >= _lastLevelCheckpointNum[_levelNum]) {
-			_checkpointNum = 0;
-		}
-	} else {
-		--_checkpointNum;
-		if (_checkpointNum < 0) {
-			_checkpointNum = _lastLevelCheckpointNum[_levelNum] - 1;
-		}
-	}
-}
-
 void Menu::drawCheckpointScreen() {
 	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawBitmapsCircularList(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum, _lastLevelCheckpointNum[_levelNum], false);
@@ -704,26 +685,6 @@ void Menu::drawLevelScreen() {
 	drawSpriteNextFrame(_iconsSprites, 4, 0, 0);
 	drawSpriteNextFrame(_iconsSprites, (_loadLevelButtonState != 0) ? 3 : 2, 0, 0);
 	refreshScreen(false);
-}
-
-void Menu::scrollBitmapsCutscenes(int dir) {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-	drawSpriteNextFrame(_iconsSprites, 10, 0, 0);
-	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_cutsceneNum + 1) / 10);
-	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_cutsceneNum + 1) % 10);
-	drawSpriteNextFrame(_iconsSprites, 11, 0, 0);
-	drawSpriteNextFrame(_iconsSprites, (_loadCutsceneButtonState != 0) ? 13 : 12, 0, 0);
-	if (dir) {
-		++_cutsceneNum;
-		if (_cutsceneNum >= _cutsceneIndexesCount) {
-			_cutsceneNum = 0;
-		}
-	} else {
-		--_cutsceneNum;
-		if (_cutsceneNum < 0) {
-			_cutsceneNum = _cutsceneIndexesCount - 1;
-		}
-	}
 }
 
 void Menu::drawCutsceneScreen() {
@@ -877,12 +838,18 @@ void Menu::handleLoadCheckpoint(int num) {
 	} else if (num == 14) {
 		if (_lastLevelCheckpointNum[_levelNum] > 2 || _loadCheckpointButtonState == 0) {
 			playSound(0x70);
-			scrollBitmapsCheckpoints(1);
+			++_checkpointNum;
+			if (_checkpointNum >= _lastLevelCheckpointNum[_levelNum]) {
+				_checkpointNum = 0;
+			}
 		}
 	} else if (num == 15) {
 		if (_lastLevelCheckpointNum[_levelNum] > 2 || _loadCheckpointButtonState == 1) {
 			playSound(0x70);
-			scrollBitmapsCheckpoints(0);
+			--_checkpointNum;
+			if (_checkpointNum < 0) {
+				_checkpointNum = _lastLevelCheckpointNum[_levelNum] - 1;
+			}
 		}
 	}
 	drawCheckpointScreen();
@@ -920,12 +887,18 @@ void Menu::handleLoadCutscene(int num) {
 	} else if (num == 9) {
 		if (_cutsceneIndexesCount > 2 || _loadCutsceneButtonState == 0) {
 			playSound(0x70);
-			scrollBitmapsCutscenes(1);
+			++_cutsceneNum;
+			if (_cutsceneNum >= _cutsceneIndexesCount) {
+				_cutsceneNum = 0;
+			}
 		}
 	} else if (num == 10) {
 		if (_cutsceneIndexesCount > 2 || _loadCutsceneButtonState == 1) {
 			playSound(0x70);
-			scrollBitmapsCutscenes(0);
+			--_cutsceneNum;
+			if (_cutsceneNum < 0) {
+				_cutsceneNum = _cutsceneIndexesCount - 1;
+			}
 		}
 	}
 	drawCutsceneScreen();

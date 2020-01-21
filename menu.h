@@ -111,10 +111,8 @@ struct Menu {
 	void handleAssignPlayer();
 	void updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count);
 	void drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count, bool updatePalette);
-	void scrollBitmapsCheckpoints(int dir);
 	void drawCheckpointScreen();
 	void drawLevelScreen();
-	void scrollBitmapsCutscenes(int dir);
 	void drawCutsceneScreen();
 	void handleSettingsScreen(int num);
 	void changeToOption(int num);
