@@ -9,7 +9,7 @@
 #include "video.h"
 
 enum {
-	kTitleScreen_AssignPlayer,
+	kTitleScreen_AssignPlayer = 0,
 	kTitleScreen_Play,
 	kTitleScreen_Options,
 	kTitleScreen_Quit
@@ -279,7 +279,8 @@ int Menu::getSoundNum(int num) const {
 			}
 			p += count2 * 2;
 		}
-		assert((p - _soundData) == _res->_datHdr.soundDataSize);
+		// sound not found
+		assert((uint32_t)(p - _soundData) == _res->_datHdr.soundDataSize);
 	}
 	return -1;
 }
@@ -992,6 +993,7 @@ void Menu::handleOptions() {
 			_optionNum = -1;
 			break;
 		}
+		// get transition from inputs and menu return code (_condMask)
 		int num = -1;
 		for (int i = 0; i < _res->_datHdr.menusCount; ++i) {
 			const uint8_t *data = _optionData + i * 8;
@@ -1041,9 +1043,9 @@ void Menu::handleOptions() {
 			break;
 		}
 // 428D41
-		if (_optionNum == 16 || _optionNum == 1 || _optionNum == 3 || _optionNum == kMenu_ResumeGame) {
+		if (_optionNum == kMenu_Quit + 1 || _optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
 // 428E74
-			// _g->saveSetupCfg();
+			// 'setup.cfg' is saved when exiting the main loop
 			break;
 		}
 	}
