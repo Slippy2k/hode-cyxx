@@ -35,7 +35,7 @@ static bool _fullscreen = false;
 static bool _widescreen = false;
 
 static const bool _runBenchmark = false;
-static bool _runMenu = false;
+static bool _runMenu = true;
 
 static void lockAudio(int flag) {
 	if (flag) {
