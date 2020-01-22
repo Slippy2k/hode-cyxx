@@ -89,12 +89,14 @@ void Menu::loadData() {
 	if (version == 10) {
 
 		_titleSprites = (DatSpritesGroup *)(ptr + ptrOffset);
-		_titleSprites->size = le16toh(_titleSprites->size);
+		_titleSprites->size = le32toh(_titleSprites->size);
+		_titleSprites->count = le16toh(_titleSprites->count);
 		ptrOffset += sizeof(DatSpritesGroup) + _titleSprites->size;
 		_titleSprites->firstFrameOffset = 0;
 
 		_playerSprites = (DatSpritesGroup *)(ptr + ptrOffset);
-		_playerSprites->size = le16toh(_playerSprites->size);
+		_playerSprites->size = le32toh(_playerSprites->size);
+		_playerSprites->count = le16toh(_playerSprites->count);
 		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
 		_playerSprites->firstFrameOffset = 0;
 
@@ -189,13 +191,15 @@ void Menu::loadData() {
 	if (version == 11) {
 
 		_titleSprites = (DatSpritesGroup *)(ptr + ptrOffset);
-		_titleSprites->size = le16toh(_titleSprites->size);
+		_titleSprites->size = le32toh(_titleSprites->size);
 		ptrOffset += sizeof(DatSpritesGroup) + _titleSprites->size;
+		_titleSprites->count = le16toh(_titleSprites->count);
 		_titleSprites->firstFrameOffset = 0;
 
 		_playerSprites = (DatSpritesGroup *)(ptr + ptrOffset);
-		_playerSprites->size = le16toh(_playerSprites->size);
+		_playerSprites->size = le32toh(_playerSprites->size);
 		ptrOffset += sizeof(DatSpritesGroup) + _playerSprites->size;
+		_playerSprites->count = le16toh(_playerSprites->count);
 		_playerSprites->firstFrameOffset = 0;
 
 		_optionData = ptr + ptrOffset;
@@ -217,7 +221,8 @@ void Menu::loadData() {
 	_iconsSpritesData = ptr + ptrOffset;
 	const uint32_t baseOffset = ptrOffset;
 	for (int i = 0; i < iconsCount; ++i) {
-		_iconsSprites[i].size = le16toh(_iconsSprites[i].size);
+		_iconsSprites[i].size = le32toh(_iconsSprites[i].size);
+		_iconsSprites[i].count = le16toh(_iconsSprites[i].count);
 		_iconsSprites[i].firstFrameOffset = ptrOffset - baseOffset;
 		ptrOffset += _iconsSprites[i].size;
 	}
@@ -231,8 +236,10 @@ void Menu::loadData() {
 		for (int i = 0; i < _optionsButtonSpritesCount; ++i) {
 			WRITE_LE_UINT32(_res->_menuBuffer0 + hdrOffset, ptrOffset - baseOffset);
 			DatSpritesGroup *spritesGroup = (DatSpritesGroup *)(ptr + hdrOffset + 4);
+			spritesGroup->size = le32toh(spritesGroup->size);
+			spritesGroup->count = le16toh(spritesGroup->count);
 			hdrOffset += 20;
-			ptrOffset += le16toh(spritesGroup->size);
+			ptrOffset += spritesGroup->size;
 		}
 	} else {
 		_optionsButtonSpritesData = 0;

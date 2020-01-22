@@ -1,5 +1,6 @@
 * release 0.2.7
 	- added 'projection' submenu
+	- fixed menu on big endian platforms
 
 * release 0.2.6
 	- added initial code for menu
