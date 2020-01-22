@@ -10,15 +10,16 @@ enum {
 	kClearCode = 1 << (kCodeWidth - 1),
 	kEndCode = kClearCode + 1,
 	kNewCodes = kEndCode + 1,
+	kStackSize = 8192,
 	kMaxBits = 12
 };
 
 struct LzwDecoder {
 
-	uint16_t _prefix[4096];
-	uint8_t _stack[8192];
+	uint16_t _prefix[1 << kMaxBits];
+	uint8_t _stack[kStackSize];
 	const uint8_t *_buf;
-	uint8_t _currentBits;
+	uint32_t _currentBits;
 	uint8_t _codeSize;
 	uint8_t _bitsLeft;
 
@@ -29,17 +30,14 @@ struct LzwDecoder {
 static struct LzwDecoder _lzw;
 
 uint32_t LzwDecoder::nextCode() {
-	if (_bitsLeft == 0) {
-		_currentBits = *_buf++;
-		_bitsLeft = 8;
-	}
-	uint32_t code = _currentBits >> (8 - _bitsLeft);
-	while (_bitsLeft < _codeSize) {
-		_currentBits = *_buf++;
-		code |= _currentBits << _bitsLeft;
+	_currentBits |= (*_buf++) << _bitsLeft;
+	_bitsLeft += 8;
+	if (_bitsLeft < _codeSize) {
+		_currentBits |= (*_buf++) << _bitsLeft;
 		_bitsLeft += 8;
 	}
-	code &= (1 << _codeSize) - 1;
+	const uint32_t code = _currentBits & ((1 << _codeSize) - 1);
+	_currentBits >>= _codeSize;
 	_bitsLeft -= _codeSize;
 	return code;
 }
@@ -47,7 +45,7 @@ uint32_t LzwDecoder::nextCode() {
 int LzwDecoder::decode(uint8_t *dst) {
 	uint8_t *p = dst;
 	uint32_t topSlot = 1 << kCodeWidth;
-	uint8_t *stackPtr = &_stack[8191];
+	uint8_t *stackPtr = &_stack[kStackSize - 1];
 	uint32_t currentSlot = kNewCodes;
 	uint32_t previousCode = 0;
 	uint32_t lastCode = 0;
@@ -73,8 +71,8 @@ int LzwDecoder::decode(uint8_t *dst) {
 			uint32_t code = currentCode;
 			if (currentCode >= slot) {
 				code = lastCode;
-				currentStackPtr = &_stack[8190];
-				_stack[8190] = (uint8_t)previousCode;
+				currentStackPtr = &_stack[kStackSize - 2];
+				*currentStackPtr = (uint8_t)previousCode;
 			}
 			while (code >= kNewCodes) {
 				--currentStackPtr;
