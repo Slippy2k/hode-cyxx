@@ -4899,28 +4899,14 @@ void Game::saveSetupCfg() {
 
 void Game::captureScreenshot() {
 	static int screenshot = 1;
+
 	char name[64];
-
-	snprintf(name, sizeof(name), "screenshot-%03d-front.bmp", screenshot);
-	saveBMP(name, _video->_frontLayer, _video->_palette, Video::W, Video::H);
-
-	snprintf(name, sizeof(name), "screenshot-%03d-background.bmp", screenshot);
-	saveBMP(name, _video->_backgroundLayer, _video->_palette, Video::W, Video::H);
-
-	snprintf(name, sizeof(name), "screenshot-%03d-shadow.bmp", screenshot);
-	saveBMP(name, _video->_shadowLayer, _video->_palette, Video::W, Video::H);
-
-	static const int kPaletteRectSize = 8;
-	uint8_t paletteBuffer[8 * 256 * 8];
-	for (int x = 0; x < 256; ++x) {
-		const int xOffset = x * kPaletteRectSize;
-		for (int y = 0; y < kPaletteRectSize; ++y) {
-			memset(paletteBuffer + xOffset + y * 256 * kPaletteRectSize, x, kPaletteRectSize);
-		}
+	snprintf(name, sizeof(name), "screenshot-%03d.bmp", screenshot);
+	FILE *fp = _fs.openSaveFile(name, true);
+	if (fp) {
+		saveBMP(fp, _video->_frontLayer, _video->_palette, Video::W, Video::H);
+		fclose(fp);
 	}
-
-	snprintf(name, sizeof(name), "screenshot-%03d-palette.bmp", screenshot);
-	saveBMP(name, paletteBuffer, _video->_palette, 256 * kPaletteRectSize, kPaletteRectSize);
 
 	++screenshot;
 }
