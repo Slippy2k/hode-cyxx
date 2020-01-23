@@ -13,9 +13,6 @@
 #include "util.h"
 #include "video.h"
 
-// menu settings and player progress
-static const char *_setupCfg = "setup.cfg";
-
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
@@ -4861,10 +4858,7 @@ void Game::updateWormHoleSprites() {
 
 bool Game::loadSetupCfg(bool resume) {
 	_resumeGame = resume;
-	FILE *fp = _fs.openSaveFile(_setupCfg, false);
-	if (fp) {
-		_res->readSetupCfg(fp, &_setupConfig);
-		_fs.closeFile(fp);
+	if (_res->readSetupCfg(&_setupConfig)) {
 		return true;
 	}
 	memset(&_setupConfig, 0, sizeof(_setupConfig));
@@ -4888,13 +4882,7 @@ void Game::saveSetupCfg() {
 	if (_currentLevel > _setupConfig.players[num].currentLevel) {
 		_setupConfig.players[num].currentLevel = _currentLevel;
 	}
-	FILE *fp = _fs.openSaveFile(_setupCfg, true);
-	if (fp) {
-		_res->writeSetupCfg(fp, &_setupConfig);
-		_fs.closeFile(fp);
-	} else {
-		warning("Failed to save '%s'", _setupCfg);
-	}
+	_res->writeSetupCfg(&_setupConfig);
 }
 
 void Game::captureScreenshot() {
