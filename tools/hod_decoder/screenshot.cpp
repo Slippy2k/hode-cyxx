@@ -257,7 +257,5 @@ static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 }
 
 void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
-	// fprintf(stdout, "MDEC len %d, VLC_ID 0x%x\n", READ_LE_UINT16(src), READ_LE_UINT16(src + 2));
-	// fprintf(stdout, "qscale %d version %d\n", READ_LE_UINT16(src + 4), READ_LE_UINT16(src + 6));
 	decodeMDEC(src, len, w, h, filename, outputPSX);
 }
