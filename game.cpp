@@ -316,7 +316,7 @@ void Game::setupBackgroundBitmap() {
 		playSound(lvl->backgroundBitmapId, 0, 0, 3);
 	}
 	if (_res->_isPsx) {
-		assert(READ_LE_UINT16(pic + 4) == 0x3800);
+		_video->decodeBackgroundPsx(pic + 2);
 	} else {
 		decodeLZW(pic, _video->_backgroundLayer);
 	}

@@ -188,15 +188,17 @@ int main(int argc, char *argv[]) {
 	}
 	Game *g = new Game(dataPath ? dataPath : _defaultDataPath, savePath ? savePath : _defaultSavePath, cheats);
 	ini_parse(_configIni, handleConfigIni, g);
-	setupAudio(g);
-	g_system->init(_title, Video::W, Video::H, _fullscreen, _widescreen);
 	if (_runBenchmark) {
 		g->benchmarkCpu();
 	}
+	// load setup.dat and detects if these are PC or PSX datafiles
 	g->_res->loadSetupDat();
+	const bool isPsx = g->_res->_isPsx;
+	setupAudio(g);
+	g_system->init(_title, Video::W, Video::H, _fullscreen, _widescreen, isPsx);
 	g->loadSetupCfg(resume);
 	bool runGame = true;
-	if (_runMenu && resume && !g->_res->_isPsx) {
+	if (_runMenu && resume && !isPsx) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
 		runGame = m->mainLoop();
 		delete m;

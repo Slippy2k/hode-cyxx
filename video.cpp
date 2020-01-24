@@ -4,6 +4,7 @@
  */
 
 #include "video.h"
+#include "mdec.h"
 #include "system.h"
 
 static const bool kUseShadowColorLut = false;
@@ -478,4 +479,13 @@ uint8_t Video::findWhiteColor() const {
 		}
 	}
 	return color;
+}
+
+static void outputPsxCb(const MdecOutput *out, const void *userdata) {
+	g_system->copyYuv(Video::W, Video::H, out->planes[0].ptr, out->planes[0].pitch, out->planes[1].ptr, out->planes[1].pitch, out->planes[2].ptr, out->planes[2].pitch);
+}
+
+void Video::decodeBackgroundPsx(const uint8_t *src) {
+	const int len = W * H * sizeof(uint16_t);
+	decodeMDEC(src, len, W, H, this, outputPsxCb);
 }
