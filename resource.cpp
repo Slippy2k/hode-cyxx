@@ -1167,7 +1167,11 @@ void Resource::resetSssFilters() {
 void Resource::preloadSssPcmList(const SssPreloadInfoData *preloadInfoData) {
 	File *fp = _sssFile;
 	if (_isPsx) {
-		_lvlFile->seek(preloadInfoData->pcmBlockOffset * 2048, SEEK_SET);
+		const uint16_t offset = preloadInfoData->pcmBlockOffset;
+		if (offset == 0xFFFF) {
+			return;
+		}
+		_lvlFile->seek(offset * 2048, SEEK_SET);
 		fp = _lvlFile;
 	}
 	const uint8_t num = preloadInfoData->preload1Index;
