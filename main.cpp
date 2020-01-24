@@ -60,7 +60,7 @@ static void setupAudio(Game *g) {
 
 static const char *_defaultDataPath = ".";
 
-static const char* _defaultSavePath = ".";
+static const char *_defaultSavePath = ".";
 
 static const char *_levelNames[] = {
 	"rock",
@@ -194,8 +194,8 @@ int main(int argc, char *argv[]) {
 	// load setup.dat and detects if these are PC or PSX datafiles
 	g->_res->loadSetupDat();
 	const bool isPsx = g->_res->_isPsx;
-	setupAudio(g);
 	g_system->init(_title, Video::W, Video::H, _fullscreen, _widescreen, isPsx);
+	setupAudio(g);
 	g->loadSetupCfg(resume);
 	bool runGame = true;
 	if (_runMenu && resume && !isPsx) {
