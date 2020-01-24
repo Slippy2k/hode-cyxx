@@ -115,9 +115,7 @@ FILE *FileSystem::openSaveFile(const char *filename, bool write) {
 }
 
 int FileSystem::closeFile(FILE *fp) {
-	if (fp) {
-		fclose(fp);
-		return 0;
-	}
-	return -1;
+	const int err = ferror(fp);
+	fclose(fp);
+	return err;
 }
