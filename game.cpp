@@ -2104,6 +2104,8 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		}
 		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;
 		debug(kDebug_GAME, "Restart at level %d checkpoint %d cutscenes 0x%x", level, checkpoint, _paf->_playedMask);
+		// resume once, on the starting level
+		_resumeGame = false;
 	}
 	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
