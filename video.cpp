@@ -481,11 +481,34 @@ uint8_t Video::findWhiteColor() const {
 	return color;
 }
 
-static void outputPsxCb(const MdecOutput *out, const void *userdata) {
+static void outputBackgroundPsxCb(const MdecOutput *out, const void *userdata) {
 	g_system->copyYuv(Video::W, Video::H, out->planes[0].ptr, out->planes[0].pitch, out->planes[1].ptr, out->planes[1].pitch, out->planes[2].ptr, out->planes[2].pitch);
 }
 
 void Video::decodeBackgroundPsx(const uint8_t *src) {
 	const int len = W * H * sizeof(uint16_t);
-	decodeMDEC(src, len, W, H, this, outputPsxCb);
+	decodeMDEC(src, len, W, H, this, outputBackgroundPsxCb);
+}
+
+void Video::decodeTilePsx(const uint8_t *src) {
+	const uint16_t size = READ_LE_UINT16(src + 2);
+	if (size > 6) {
+		const int count = READ_LE_UINT32(src + 4);
+		assert(count >= 1 && count <= 3);
+		int offset = 8;
+		for (int i = 0; i < count && offset < size; ++i) {
+			// const int x = src[offset];
+			// const int y = src[offset + 1];
+			const int len = READ_LE_UINT16(src + offset + 2);
+			const int w = src[offset + 4] * 16;
+			const int h = src[offset + 5] * 16;
+			const int tiles = src[offset + 7];
+			if (tiles == 0 && 0) {
+				const uint8_t *data = &src[offset + 8];
+				decodeMDEC(data, len - 8, w, h, this, outputBackgroundPsxCb);
+			}
+			offset += len;
+		}
+		assert(offset == size + 2);
+	}
 }

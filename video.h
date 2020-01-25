@@ -77,6 +77,7 @@ struct Video {
 	uint8_t findWhiteColor() const;
 
 	void decodeBackgroundPsx(const uint8_t *src);
+	void decodeTilePsx(const uint8_t *src);
 };
 
 #endif // VIDEO_H__
