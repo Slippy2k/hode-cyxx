@@ -35,6 +35,7 @@ Video::Video() {
 	_transformShadowLayerDelta = 0;
 	_fillColor = 0xC4;
 	_blackColor = 255;
+	memset(&_mdec, 0, sizeof(_mdec));
 }
 
 Video::~Video() {
@@ -43,6 +44,9 @@ Video::~Video() {
 	free(_backgroundLayer);
 	free(_shadowColorLookupTable);
 	free(_shadowScreenMaskBuffer);
+	free(_mdec.planes[kOutputPlaneY].ptr);
+	free(_mdec.planes[kOutputPlaneCb].ptr);
+	free(_mdec.planes[kOutputPlaneCr].ptr);
 }
 
 static int colorBrightness(int r, int g, int b) {
@@ -80,6 +84,9 @@ void Video::updateGameDisplay(uint8_t *buf) {
 		}
 	}
 	g_system->copyRect(0, 0, W, H, buf, 256);
+	if (_mdec.planes[0].ptr) {
+		g_system->copyYuv(Video::W, Video::H, _mdec.planes[0].ptr, _mdec.planes[0].pitch, _mdec.planes[1].ptr, _mdec.planes[1].pitch, _mdec.planes[2].ptr, _mdec.planes[2].pitch);
+	}
 }
 
 void Video::updateScreen() {
@@ -481,13 +488,26 @@ uint8_t Video::findWhiteColor() const {
 	return color;
 }
 
-static void outputBackgroundPsxCb(const MdecOutput *out, const void *userdata) {
-	g_system->copyYuv(Video::W, Video::H, out->planes[0].ptr, out->planes[0].pitch, out->planes[1].ptr, out->planes[1].pitch, out->planes[2].ptr, out->planes[2].pitch);
+void Video::initPsx() {
+	const int w = (W + 15) & ~15;
+	const int h = (H + 15) & ~15;
+	_mdec.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
+	_mdec.planes[kOutputPlaneY].pitch = w;
+	const int w2 = w / 2;
+	const int h2 = h / 2;
+	_mdec.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
+	_mdec.planes[kOutputPlaneCb].pitch = w2;
+	_mdec.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
+	_mdec.planes[kOutputPlaneCr].pitch = w2;
 }
 
 void Video::decodeBackgroundPsx(const uint8_t *src) {
 	const int len = W * H * sizeof(uint16_t);
-	decodeMDEC(src, len, W, H, this, outputBackgroundPsxCb);
+	_mdec.x = 0;
+	_mdec.y = 0;
+	_mdec.w = W;
+	_mdec.h = H;
+	decodeMDEC(src, len, W, H, &_mdec);
 }
 
 void Video::decodeTilePsx(const uint8_t *src) {
@@ -497,15 +517,19 @@ void Video::decodeTilePsx(const uint8_t *src) {
 		assert(count >= 1 && count <= 3);
 		int offset = 8;
 		for (int i = 0; i < count && offset < size; ++i) {
-			// const int x = src[offset];
-			// const int y = src[offset + 1];
+			const int x = src[offset];
+			const int y = src[offset + 1];
 			const int len = READ_LE_UINT16(src + offset + 2);
 			const int w = src[offset + 4] * 16;
 			const int h = src[offset + 5] * 16;
 			const int tiles = src[offset + 7];
-			if (tiles == 0 && 0) {
+			if (tiles == 0) {
+				_mdec.x = x;
+				_mdec.y = y;
+				_mdec.w = w;
+				_mdec.h = h;
 				const uint8_t *data = &src[offset + 8];
-				decodeMDEC(data, len - 8, w, h, this, outputBackgroundPsxCb);
+				decodeMDEC(data, len - 8, w, h, &_mdec);
 			}
 			offset += len;
 		}

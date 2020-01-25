@@ -176,13 +176,7 @@ static void decodeBlock(BitStream *bs, int x8, int y8, uint8_t *dst, int dstPitc
 	}
 }
 
-enum {
-	kOutputPlaneY = 0,
-	kOutputPlaneCb = 1,
-	kOutputPlaneCr = 2
-};
-
-int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, void (*output)(const MdecOutput *, const void *)) {
+int decodeMDEC(const uint8_t *src, int len, int w, int h, MdecOutput *out) {
 	BitStream bs(src, len);
 	bs.getBits(16);
 	const uint16_t vlc = bs.getBits(16);
@@ -195,35 +189,28 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 	const int blockW = (w + 15) / 16;
 	const int blockH = (h + 15) / 16;
 
-	MdecOutput mdecOut;
-	mdecOut.w = blockW * 16;
-	mdecOut.h = blockH * 16;
-	mdecOut.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(blockW * 16 * blockH * 16);
-	mdecOut.planes[kOutputPlaneY].pitch = blockW * 16;
-	mdecOut.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(blockW * 8 * blockH * 8);
-	mdecOut.planes[kOutputPlaneCb].pitch = blockW * 8;
-	mdecOut.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(blockW * 8 * blockH * 8);
-	mdecOut.planes[kOutputPlaneCr].pitch = blockW * 8;
+	// 16x16
+	const int yPitch = out->planes[kOutputPlaneY].pitch;
+	uint8_t *yPtr = out->planes[kOutputPlaneY].ptr + out->y * yPitch + out->x;
+	const int cbPitch = out->planes[kOutputPlaneCb].pitch;
+	// 8x8
+	uint8_t *cbPtr = out->planes[kOutputPlaneCb].ptr + out->y / 2 * cbPitch + out->x / 2;
+	const int crPitch = out->planes[kOutputPlaneCr].pitch;
+	uint8_t *crPtr = out->planes[kOutputPlaneCr].ptr + out->y / 2 * crPitch + out->x / 2;
 
 	for (int x = 0; x < blockW; ++x) {
 		for (int y = 0; y < blockH; ++y) {
-			decodeBlock(&bs, x, y, mdecOut.planes[kOutputPlaneCr].ptr, mdecOut.planes[kOutputPlaneCr].pitch, qscale, version);
-			decodeBlock(&bs, x, y, mdecOut.planes[kOutputPlaneCb].ptr, mdecOut.planes[kOutputPlaneCb].pitch, qscale, version);
-			decodeBlock(&bs, 2 * x,     2 * y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
-			decodeBlock(&bs, 2 * x + 1, 2 * y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
-			decodeBlock(&bs, 2 * x,     2 * y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
-			decodeBlock(&bs, 2 * x + 1, 2 * y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
+			decodeBlock(&bs, x, y, crPtr, crPitch, qscale, version);
+			decodeBlock(&bs, x, y, cbPtr, cbPitch, qscale, version);
+			decodeBlock(&bs, 2 * x,     2 * y,     yPtr, yPitch, qscale, version);
+			decodeBlock(&bs, 2 * x + 1, 2 * y,     yPtr, yPitch, qscale, version);
+			decodeBlock(&bs, 2 * x,     2 * y + 1, yPtr, yPitch, qscale, version);
+			decodeBlock(&bs, 2 * x + 1, 2 * y + 1, yPtr, yPitch, qscale, version);
 		}
 	}
 
 	const int eof = bs.getBits(11);
 	assert(eof == 0x3FE); // v2 frame
-
-	output(&mdecOut, userdata);
-
-	free(mdecOut.planes[kOutputPlaneY].ptr);
-	free(mdecOut.planes[kOutputPlaneCb].ptr);
-	free(mdecOut.planes[kOutputPlaneCr].ptr);
 
 	return bs._src - src;
 }

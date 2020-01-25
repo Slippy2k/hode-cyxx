@@ -4,7 +4,14 @@
 
 #include <stdint.h>
 
+enum {
+	kOutputPlaneY = 0,
+	kOutputPlaneCb = 1,
+	kOutputPlaneCr = 2
+};
+
 struct MdecOutput {
+	int x, y;
 	int w, h;
 	struct {
 		uint8_t *ptr;
@@ -12,6 +19,6 @@ struct MdecOutput {
 	} planes[3];
 };
 
-int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, void (*output)(const MdecOutput *, const void *));
+int decodeMDEC(const uint8_t *src, int len, int w, int h, MdecOutput *out);
 
 #endif // MDEC_H__

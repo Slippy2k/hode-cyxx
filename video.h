@@ -7,6 +7,7 @@
 #define VIDEO_H__
 
 #include "intern.h"
+#include "mdec.h"
 
 enum {
 	kSprHorizFlip  = 1 << 0, // left-right
@@ -55,6 +56,8 @@ struct Video {
 		int x, y, w, h;
 	} _spr;
 
+	MdecOutput _mdec;
+
 	Video();
 	~Video();
 
@@ -76,6 +79,7 @@ struct Video {
 	void drawString(const char *s, int x, int y, uint8_t color, uint8_t *dst);
 	uint8_t findWhiteColor() const;
 
+	void initPsx();
 	void decodeBackgroundPsx(const uint8_t *src);
 	void decodeTilePsx(const uint8_t *src);
 };

@@ -204,6 +204,9 @@ int main(int argc, char *argv[]) {
 		delete m;
 	}
 	if (runGame) {
+		if (isPsx) {
+			g->_video->initPsx();
+		}
 		bool levelChanged = false;
 		do {
 			g->mainLoop(level, checkpoint, levelChanged);
