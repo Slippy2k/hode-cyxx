@@ -2165,7 +2165,6 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		g_system->sleep(delay);
 	} while (!_endLevel);
 	_animBackgroundDataCount = 0;
-	saveSetupCfg();
 	callLevel_terminate();
 }
 
@@ -4868,10 +4867,6 @@ bool Game::loadSetupCfg(bool resume) {
 }
 
 void Game::saveSetupCfg() {
-	if (!_resumeGame) {
-		// do not save progress when game is started from a specific level/checkpoint
-		return;
-	}
 	const int num = _setupConfig.currentPlayer;
 	if (_currentLevelCheckpoint > _setupConfig.players[num].progress[_currentLevel]) {
 		_setupConfig.players[num].progress[_currentLevel] = _currentLevelCheckpoint;
