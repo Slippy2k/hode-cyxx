@@ -510,7 +510,7 @@ void Video::decodeBackgroundPsx(const uint8_t *src) {
 	decodeMDEC(src, len, 0, W, H, &_mdec);
 }
 
-void Video::decodeTilePsx(const uint8_t *src) {
+void Video::decodeOverlayPsx(const uint8_t *src) {
 	const uint16_t size = READ_LE_UINT16(src + 2);
 	if (size > 6) {
 		const int count = READ_LE_UINT32(src + 4);
@@ -522,12 +522,12 @@ void Video::decodeTilePsx(const uint8_t *src) {
 			const int len = READ_LE_UINT16(src + offset + 2);
 			_mdec.w = src[offset + 4] * 16;
 			_mdec.h = src[offset + 5] * 16;
-			const int tiles = src[offset + 7];
+			const int mborder = src[offset + 7];
 			const uint8_t *data = &src[offset + 8];
-			if (tiles == 0) {
+			if (mborder == 0) {
 				decodeMDEC(data, len - 8, 0, _mdec.w, _mdec.h, &_mdec);
 			} else if (0) {
-				decodeMDEC(data + tiles, len - 8, data, _mdec.w, _mdec.h, &_mdec);
+				decodeMDEC(data + mborder, len - 8 - mborder, data, _mdec.w, _mdec.h, &_mdec);
 			}
 			offset += len;
 		}

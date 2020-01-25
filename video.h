@@ -81,7 +81,7 @@ struct Video {
 
 	void initPsx();
 	void decodeBackgroundPsx(const uint8_t *src);
-	void decodeTilePsx(const uint8_t *src);
+	void decodeOverlayPsx(const uint8_t *src);
 };
 
 #endif // VIDEO_H__

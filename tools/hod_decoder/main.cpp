@@ -308,16 +308,16 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 							const int w = p[offset + 4] * 16;
 							const int h = p[offset + 5] * 16;
 							// const int unk6 = p[offset + 6];
-							const int mat = p[offset + 7];
-							const uint8_t *data = p + offset + 8 + mat;
+							const int mborder = p[offset + 7];
+							const uint8_t *data = p + offset + 8 + mborder;
 							assert(isMdecData(data));
-							if (mat == 0) {
+							if (mborder == 0) {
 								snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.jpg", num, i, j, x, y);
-								savePSX(filename, data, len - 8 - mat, w, h);
+								savePSX(filename, data, len - 8 - mborder, w, h);
 							} else {
-								// ptr[8 + ...] contains target (x,y) for each decoded 16x16 block
-								// x == b >> 4
-								// y == b & 15
+								// p[offset + 8...] contains target (x,y) for each decoded 16x16 block
+								// y == b >> 4
+								// x == b & 15
 							}
 							offset += len;
 						}

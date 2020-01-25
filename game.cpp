@@ -2257,7 +2257,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			ptr->currentSound = 0xFFFF;
 		}
 		if (isPsx) {
-			_video->decodeTilePsx(data);
+			_video->decodeOverlayPsx(data);
 		} else {
 			Sprite *spr = _spritesNextPtr;
 			if (spr && READ_LE_UINT16(data + 2) > 8) {
@@ -2324,7 +2324,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		data = _esi->currentSpriteData + soundDataLen;
 		if (_res->_currentScreenResourceNum == ptr->screenNum) {
 			if (isPsx) {
-				_video->decodeTilePsx(data);
+				_video->decodeOverlayPsx(data);
 			} else {
 				Sprite *spr = _spritesNextPtr;
 				if (spr && READ_LE_UINT16(data + 2) > 8) {
