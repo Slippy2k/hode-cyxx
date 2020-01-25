@@ -507,7 +507,7 @@ void Video::decodeBackgroundPsx(const uint8_t *src) {
 	_mdec.y = 0;
 	_mdec.w = W;
 	_mdec.h = H;
-	decodeMDEC(src, len, W, H, &_mdec);
+	decodeMDEC(src, len, 0, W, H, &_mdec);
 }
 
 void Video::decodeTilePsx(const uint8_t *src) {
@@ -517,19 +517,17 @@ void Video::decodeTilePsx(const uint8_t *src) {
 		assert(count >= 1 && count <= 3);
 		int offset = 8;
 		for (int i = 0; i < count && offset < size; ++i) {
-			const int x = src[offset];
-			const int y = src[offset + 1];
+			_mdec.x = src[offset];
+			_mdec.y = src[offset + 1];
 			const int len = READ_LE_UINT16(src + offset + 2);
-			const int w = src[offset + 4] * 16;
-			const int h = src[offset + 5] * 16;
+			_mdec.w = src[offset + 4] * 16;
+			_mdec.h = src[offset + 5] * 16;
 			const int tiles = src[offset + 7];
+			const uint8_t *data = &src[offset + 8];
 			if (tiles == 0) {
-				_mdec.x = x;
-				_mdec.y = y;
-				_mdec.w = w;
-				_mdec.h = h;
-				const uint8_t *data = &src[offset + 8];
-				decodeMDEC(data, len - 8, w, h, &_mdec);
+				decodeMDEC(data, len - 8, 0, _mdec.w, _mdec.h, &_mdec);
+			} else if (0) {
+				decodeMDEC(data + tiles, len - 8, data, _mdec.w, _mdec.h, &_mdec);
 			}
 			offset += len;
 		}

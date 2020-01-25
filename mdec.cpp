@@ -176,7 +176,7 @@ static void decodeBlock(BitStream *bs, int x8, int y8, uint8_t *dst, int dstPitc
 	}
 }
 
-int decodeMDEC(const uint8_t *src, int len, int w, int h, MdecOutput *out) {
+int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int w, int h, MdecOutput *out) {
 	BitStream bs(src, len);
 	bs.getBits(16);
 	const uint16_t vlc = bs.getBits(16);
@@ -189,17 +189,21 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, MdecOutput *out) {
 	const int blockW = (w + 15) / 16;
 	const int blockH = (h + 15) / 16;
 
-	// 16x16
 	const int yPitch = out->planes[kOutputPlaneY].pitch;
 	uint8_t *yPtr = out->planes[kOutputPlaneY].ptr + out->y * yPitch + out->x;
 	const int cbPitch = out->planes[kOutputPlaneCb].pitch;
-	// 8x8
 	uint8_t *cbPtr = out->planes[kOutputPlaneCb].ptr + out->y / 2 * cbPitch + out->x / 2;
 	const int crPitch = out->planes[kOutputPlaneCr].pitch;
 	uint8_t *crPtr = out->planes[kOutputPlaneCr].ptr + out->y / 2 * crPitch + out->x / 2;
 
 	for (int x = 0; x < blockW; ++x) {
 		for (int y = 0; y < blockH; ++y) {
+			if (mborder) {
+				const uint8_t xy = *mborder++;
+				if ((xy & 15) != x || (xy >> 4) != y) {
+					continue;
+				}
+			}
 			decodeBlock(&bs, x, y, crPtr, crPitch, qscale, version);
 			decodeBlock(&bs, x, y, cbPtr, cbPitch, qscale, version);
 			decodeBlock(&bs, 2 * x,     2 * y,     yPtr, yPitch, qscale, version);
@@ -209,8 +213,10 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, MdecOutput *out) {
 		}
 	}
 
-	const int eof = bs.getBits(11);
-	assert(eof == 0x3FE); // v2 frame
+	if (!mborder) {
+		const int eof = bs.getBits(11);
+		assert(eof == 0x3FE); // v2 frame
+	}
 
 	return bs._src - src;
 }
