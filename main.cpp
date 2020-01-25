@@ -210,14 +210,14 @@ int main(int argc, char *argv[]) {
 		bool levelChanged = false;
 		do {
 			g->mainLoop(level, checkpoint, levelChanged);
+			// do not save progress when game is started from a specific level/checkpoint
+			if (resume) {
+				g->saveSetupCfg();
+			}
 			level += 1;
 			checkpoint = 0;
 			levelChanged = true;
 		} while (!g_system->inp.quit && level < kLvl_test);
-		// do not save progress when game is started from a specific level/checkpoint
-		if (resume) {
-			g->saveSetupCfg();
-		}
 	}
 	g_system->stopAudio();
 	g->_mix.fini();
