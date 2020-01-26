@@ -256,6 +256,6 @@ static void outputPSX(const MdecOutput *mdecOutput, const void *userdata) {
 	}
 }
 
-void savePSX(const char *filename, const uint8_t *src, int len, int w, int h) {
-	decodeMDEC(src, len, w, h, filename, outputPSX);
+void savePSX(const char *filename, const uint8_t *src, int len, int w, int h, const uint8_t *mborder, int mblen) {
+	decodeMDEC(src, len, w, h, mborder, mblen, filename, outputPSX);
 }

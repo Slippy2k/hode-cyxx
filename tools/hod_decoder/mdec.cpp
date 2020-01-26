@@ -182,7 +182,7 @@ enum {
 	kOutputPlaneCr = 2
 };
 
-int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, void (*output)(const MdecOutput *, const void *)) {
+int decodeMDEC(const uint8_t *src, int len, int w, int h, const uint8_t *mborder, int mblen, const void *userdata, void (*output)(const MdecOutput *, const void *)) {
 	BitStream bs(src, len);
 	bs.getBits(16);
 	const uint16_t vlc = bs.getBits(16);
@@ -198,26 +198,39 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const void *userdata, 
 	MdecOutput mdecOut;
 	mdecOut.w = blockW * 16;
 	mdecOut.h = blockH * 16;
-	mdecOut.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(blockW * 16 * blockH * 16);
+	mdecOut.planes[kOutputPlaneY].ptr = (uint8_t *)calloc(blockW * 16 * blockH * 16, 1);
 	mdecOut.planes[kOutputPlaneY].pitch = blockW * 16;
-	mdecOut.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(blockW * 8 * blockH * 8);
+	mdecOut.planes[kOutputPlaneCb].ptr = (uint8_t *)calloc(blockW * 8 * blockH * 8, 1);
 	mdecOut.planes[kOutputPlaneCb].pitch = blockW * 8;
-	mdecOut.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(blockW * 8 * blockH * 8);
+	mdecOut.planes[kOutputPlaneCr].ptr = (uint8_t *)calloc(blockW * 8 * blockH * 8, 1);
 	mdecOut.planes[kOutputPlaneCr].pitch = blockW * 8;
 
+	int z = 0;
 	for (int x = 0; x < blockW; ++x) {
 		for (int y = 0; y < blockH; ++y) {
+			if (z < mblen) {
+				const uint8_t xy = mborder[z];
+				if ((xy & 15) != x || (xy >> 4) != y) {
+					continue;
+				}
+				++z;
+			}
 			decodeBlock(&bs, x, y, mdecOut.planes[kOutputPlaneCr].ptr, mdecOut.planes[kOutputPlaneCr].pitch, qscale, version);
 			decodeBlock(&bs, x, y, mdecOut.planes[kOutputPlaneCb].ptr, mdecOut.planes[kOutputPlaneCb].pitch, qscale, version);
 			decodeBlock(&bs, 2 * x,     2 * y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
 			decodeBlock(&bs, 2 * x + 1, 2 * y,     mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
 			decodeBlock(&bs, 2 * x,     2 * y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
 			decodeBlock(&bs, 2 * x + 1, 2 * y + 1, mdecOut.planes[kOutputPlaneY].ptr, mdecOut.planes[kOutputPlaneY].pitch, qscale, version);
+			if (mborder && z == mblen) {
+				goto end;
+			}
 		}
 	}
-
-	const int eof = bs.getBits(11);
-	assert(eof == 0x3FE); // v2 frame
+end:
+	if (!mborder) {
+		const int eof = bs.getBits(11);
+		assert(eof == 0x3FE); // v2 frame
+	}
 
 	output(&mdecOut, userdata);
 

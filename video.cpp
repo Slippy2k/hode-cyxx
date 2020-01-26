@@ -507,7 +507,7 @@ void Video::decodeBackgroundPsx(const uint8_t *src) {
 	_mdec.y = 0;
 	_mdec.w = W;
 	_mdec.h = H;
-	decodeMDEC(src, len, 0, W, H, &_mdec);
+	decodeMDEC(src, len, 0, 0, W, H, &_mdec);
 }
 
 void Video::decodeOverlayPsx(const uint8_t *src) {
@@ -522,12 +522,14 @@ void Video::decodeOverlayPsx(const uint8_t *src) {
 			const int len = READ_LE_UINT16(src + offset + 2);
 			_mdec.w = src[offset + 4] * 16;
 			_mdec.h = src[offset + 5] * 16;
-			const int mborder = src[offset + 7];
+			const int mborderlen = src[offset + 6];
+			const int mborderalign = src[offset + 7];
 			const uint8_t *data = &src[offset + 8];
-			if (mborder == 0) {
-				decodeMDEC(data, len - 8, 0, _mdec.w, _mdec.h, &_mdec);
-			} else if (0) {
-				decodeMDEC(data + mborder, len - 8 - mborder, data, _mdec.w, _mdec.h, &_mdec);
+			if (mborderalign == 0) {
+				decodeMDEC(data, len - 8, 0, 0, _mdec.w, _mdec.h, &_mdec);
+			} else {
+				// different macroblocks order
+				decodeMDEC(data + mborderalign, len - 8 - mborderalign, data, mborderlen, _mdec.w, _mdec.h, &_mdec);
 			}
 			offset += len;
 		}
