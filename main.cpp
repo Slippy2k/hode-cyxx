@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
 		runGame = m->mainLoop();
 		delete m;
 	}
-	if (runGame) {
+	if (runGame && !g_system->inp.quit) {
 		if (isPsx) {
 			g->_video->initPsx();
 		}
