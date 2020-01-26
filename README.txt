@@ -50,8 +50,7 @@ Status:
 
 Settings submenu is not implemented.
 
-PSX version datafiles can be used but background overlays (MDEC) are not
-decoded and menu is unavailable.
+PSX datafiles can be used, but menu and videos are missing.
 
 
 Credits:
