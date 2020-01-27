@@ -54,6 +54,21 @@
   - fort_hod.mst: ce55095902ade9f1d8a198f271d0946d6228b90d
   - fort_hod.sss: 6ff572b553d93040c9cad74891db05b2cc8267c6
   - hod.paf: 0644a8114392b8e9449f691315dd8cb5a8616ac1
+  - hodwin32.exe: 9c61df98e15a265bd5719b7e5e2e2af13644b80e
+    securom: true
+    version_info:
+    - Comments: Release Candidate 0
+    - CompanyName: Amazing Studio - 9 rue d' Enhgien - 75010 Paris FRANCE - Email: hod@amazingstudio.com
+    - FileDescription: Heart Of Darkness
+    - FileVersion: 1, 1, 0, 0
+    - InternalName: Heart Of Darkness
+    - LegalCopyright: (c) 1998 by Amazing Studio & Infogrames
+    - LegalTrademarks: by Amazing Studio - All rights reserved
+    - OriginalFilename: Heart Of Darkness
+    - PrivateBuild: HEARTMM5511
+    - ProductName: Heart Of Darkness  - Windows 95 / 98 & NT - DirectX 3.x or greater
+    - ProductVersion: 1, 1, 0, 0
+    - SpecialBuild: VC5.0 Sp3
   - isld_hod.lvl: f78e9316f2187c0ca9e42abe8a2242b3d3e6feaf
   - isld_hod.mst: 448e5dd5bbe59621279562d8695c9a864cb4c286
   - isld_hod.sss: 61c5da6dfcf80684c56baebddb04125ca0c1f209
