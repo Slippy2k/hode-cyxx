@@ -510,7 +510,7 @@ void Video::decodeBackgroundPsx(const uint8_t *src) {
 	decodeMDEC(src, len, 0, 0, W, H, &_mdec);
 }
 
-void Video::decodeOverlayPsx(const uint8_t *src) {
+void Video::decodeBackgroundOverlayPsx(const uint8_t *src) {
 	const uint16_t size = READ_LE_UINT16(src + 2);
 	if (size > 6) {
 		const int count = READ_LE_UINT32(src + 4);

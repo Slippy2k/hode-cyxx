@@ -1,6 +1,6 @@
 * release 0.2.8
 	- added PSX background overlays (MDEC)
-	- fixed crash with paf animation #3 with Italian PC data files
+	- fixed crash playing paf animation #3 with Italian PC data files
 
 * release 0.2.7
 	- added 'projection' submenu
