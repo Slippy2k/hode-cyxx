@@ -32,7 +32,7 @@ struct BitStream { // most significant 16 bits
 	}
 	int getSignedBits(int len) {
 		const int shift = 32 - len;
-		int32_t value = getBits(len);
+		const int32_t value = getBits(len);
 		return (value << shift) >> shift;
 	}
 	bool getBit() {

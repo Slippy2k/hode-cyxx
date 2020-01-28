@@ -226,6 +226,37 @@ static void DecodeRLE(const uint8_t *src, uint8_t *dst, int dstPitch) {
 	}
 }
 
+static void DecodeLvlOverlayPsx(int screen, int anim, int frame, const uint8_t *p, int size) {
+	const int count = READ_LE_UINT32(p + 4);
+	assert(count >= 1 && count <= 3);
+	int offset = 8;
+	for (int k = 0; k < count && offset < size; ++k) {
+		const int x = p[offset];
+		const int y = p[offset + 1];
+		const int len = READ_LE_UINT16(p + offset + 2);
+		const int w = p[offset + 4] * 16;
+		const int h = p[offset + 5] * 16;
+		const int mborderlen = p[offset + 6];
+		const int mborderalign = p[offset + 7];
+		const uint8_t *data = p + offset + 8 + mborderalign;
+		assert(isMdecData(data));
+
+		char filename[128];
+		if (screen < 0) {
+			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d_x_%03d_y_%03d.jpg", anim, frame, x, y);
+		} else {
+			snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.jpg", screen, anim, frame, x, y);
+		}
+		if (mborderalign == 0) {
+			savePSX(filename, data, len - 8, w, h);
+		} else {
+			savePSX(filename, data, len - 8 - mborderalign, w, h, data + offset + 8, mborderlen);
+		}
+		offset += len;
+	}
+	assert(offset == size + 2);
+}
+
 static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data, uint32_t dataSize, int num) {
 	header += 16;
 	const uint8_t *paletteData[4];
@@ -239,7 +270,7 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 		bitmapData[i] = (offset != 0) ? data + offset : 0;
 	}
 
-	char filename[64];
+	char filename[128];
 
 	for (int i = 0; i < 4; ++i) {
 		if (bitmapData[i]) {
@@ -298,28 +329,7 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 					p += 4; // sound
 					const uint16_t size = READ_LE_UINT16(p + 2);
 					if (size > 6) {
-						const int count = READ_LE_UINT32(p + 4);
-						assert(count >= 1 && count <= 3);
-						int offset = 8;
-						for (int k = 0; k < count && offset < size; ++k) {
-							const int x = p[offset];
-							const int y = p[offset + 1];
-							const int len = READ_LE_UINT16(p + offset + 2);
-							const int w = p[offset + 4] * 16;
-							const int h = p[offset + 5] * 16;
-							const int mborderlen = p[offset + 6];
-							const int mborderalign = p[offset + 7];
-							const uint8_t *data = p + offset + 8 + mborderalign;
-							assert(isMdecData(data));
-							snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.jpg", num, i, j, x, y);
-							if (mborderalign == 0) {
-								savePSX(filename, data, len - 8, w, h);
-							} else {
-								savePSX(filename, data, len - 8 - mborderalign, w, h, data + offset + 8, mborderlen);
-							}
-							offset += len;
-						}
-						assert(offset == size + 2);
+						DecodeLvlOverlayPsx(num, i, j, p, size);
 					}
 					p += size + 2;
 				}
@@ -900,26 +910,7 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 	const int compressedSize = READ_LE_UINT16(ptr + 2);
 
 	if (_isPsx) {
-		const int count = READ_LE_UINT32(ptr + 4);
-		assert(count == 1);
-		const int offset = 8;
-		const int x = ptr[offset];
-		const int y = ptr[offset + 1];
-		assert(ptr[0] == x && ptr[1] == y);
-		const int size = READ_LE_UINT16(ptr + offset + 2);
-		assert(size + 6 == compressedSize);
-		const int w = ptr[offset + 4] * 16;
-		const int h = ptr[offset + 5] * 16;
-		// const int unk6 = ptr[offset + 6];
-		const int mat = ptr[offset + 7];
-		const uint8_t *data = ptr + offset + 8 + mat;
-		assert(isMdecData(data));
-		if (mat == 0) {
-			char filename[64];
-			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d_x_%03d_y_%03d.jpg", spriteGroup, spriteNum, x, y);
-			savePSX(filename, ptr + offset + 8, size - 8, w, h);
-		}
-
+		DecodeLvlOverlayPsx(-1, spriteGroup, spriteNum, ptr, compressedSize);
 		return compressedSize + 2;
 	}
 
@@ -936,9 +927,9 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 
 		const uint8_t *palette = (spriteGroup == kSprControls) ? _controlsPalette : _spritePalette;
 
-		char name[64];
-		snprintf(name, sizeof(name), "setup_spr_%02d_%02d_x_%03d_y_%03d.bmp", spriteGroup, spriteNum, x, y);
-		saveBMP(name, _bitmapBuffer, palette, w, h);
+		char filename[128];
+		snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d_x_%03d_y_%03d.bmp", spriteGroup, spriteNum, x, y);
+		saveBMP(filename, _bitmapBuffer, palette, w, h);
 	}
 
 	return compressedSize + 2;
