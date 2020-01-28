@@ -84,9 +84,13 @@ void Video::updateGameDisplay(uint8_t *buf) {
 		}
 	}
 	g_system->copyRect(0, 0, W, H, buf, 256);
-	if (_mdec.planes[0].ptr) {
-		g_system->copyYuv(Video::W, Video::H, _mdec.planes[0].ptr, _mdec.planes[0].pitch, _mdec.planes[1].ptr, _mdec.planes[1].pitch, _mdec.planes[2].ptr, _mdec.planes[2].pitch);
+	if (_mdec.planes[kOutputPlaneY].ptr) {
+		updateYuvDisplay();
 	}
+}
+
+void Video::updateYuvDisplay() {
+	g_system->copyYuv(Video::W, Video::H, _mdec.planes[0].ptr, _mdec.planes[0].pitch, _mdec.planes[1].ptr, _mdec.planes[1].pitch, _mdec.planes[2].ptr, _mdec.planes[2].pitch);
 }
 
 void Video::updateScreen() {

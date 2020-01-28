@@ -64,13 +64,19 @@ void Menu::setVolume() {
 	}
 }
 
-static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint32_t ptrOffset) {
+static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint32_t ptrOffset, int paletteSize) {
 	const uint32_t baseOffset = ptrOffset;
 	for (int i = 0; i < count; ++i) {
-		bitmapsGroup[i].offset = ptrOffset - baseOffset;
-		const int size = bitmapsGroup[i].w * bitmapsGroup[i].h;
-		bitmapsGroup[i].palette = bitmapsGroup[i].offset + size;
-		ptrOffset += size + 768;
+		if (paletteSize == 0) { // PSX
+			const int size = le32toh(bitmapsGroup[i].offset);
+			bitmapsGroup[i].offset = ptrOffset - baseOffset;
+			ptrOffset += size;
+		} else {
+			bitmapsGroup[i].offset = ptrOffset - baseOffset;
+			const int size = bitmapsGroup[i].w * bitmapsGroup[i].h;
+			bitmapsGroup[i].palette = bitmapsGroup[i].offset + size;
+			ptrOffset += size + paletteSize;
+		}
 	}
 	return ptrOffset - baseOffset;
 }
@@ -82,6 +88,8 @@ void Menu::loadData() {
 	_g->_mix._lock(0);
 
 	const int version = _res->_datHdr.version;
+
+	const int paletteSize = _res->_isPsx ? 0 : 256 * 3;
 
 	const uint8_t *ptr = _res->_menuBuffer1;
 	uint32_t hdrOffset, ptrOffset = 0;
@@ -102,11 +110,11 @@ void Menu::loadData() {
 
 		_titleBitmapSize = READ_LE_UINT32(ptr + ptrOffset);
 		_titleBitmapData = ptr + ptrOffset + sizeof(DatBitmap);
-		ptrOffset += sizeof(DatBitmap) + _titleBitmapSize + 768;
+		ptrOffset += sizeof(DatBitmap) + _titleBitmapSize + paletteSize;
 
 		_playerBitmapSize = READ_LE_UINT32(ptr + ptrOffset);
 		_playerBitmapData = ptr + ptrOffset + sizeof(DatBitmap);
-		ptrOffset += sizeof(DatBitmap) + _playerBitmapSize + 768;
+		ptrOffset += sizeof(DatBitmap) + _playerBitmapSize + paletteSize;
 
 		const int size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
 		assert((size % (16 * 10)) == 0);
@@ -117,7 +125,7 @@ void Menu::loadData() {
 		_cutscenesBitmaps = (DatBitmapsGroup *)(ptr + ptrOffset);
 		ptrOffset += cutscenesCount * sizeof(DatBitmapsGroup);
 		_cutscenesBitmapsData = ptr + ptrOffset;
-		ptrOffset += readBitmapsGroup(cutscenesCount, _cutscenesBitmaps, ptrOffset);
+		ptrOffset += readBitmapsGroup(cutscenesCount, _cutscenesBitmaps, ptrOffset, paletteSize);
 
 		for (int i = 0; i < kCheckpointLevelsCount; ++i) {
 			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + ptrOffset);
@@ -125,7 +133,7 @@ void Menu::loadData() {
 			const int count = _res->_datHdr.levelCheckpointsCount[i];
 			ptrOffset += count * sizeof(DatBitmapsGroup);
 			_checkpointsBitmapsData[i] = ptr + ptrOffset;
-			ptrOffset += readBitmapsGroup(count, bitmapsGroup, ptrOffset);
+			ptrOffset += readBitmapsGroup(count, bitmapsGroup, ptrOffset, paletteSize);
 		}
 
 		_soundData = ptr + ptrOffset;
@@ -146,19 +154,19 @@ void Menu::loadData() {
 		_titleBitmapSize = READ_LE_UINT32(ptr + hdrOffset);
 		hdrOffset += sizeof(DatBitmap);
 		_titleBitmapData = ptr + ptrOffset;
-		ptrOffset += _titleBitmapSize + 768;
+		ptrOffset += _titleBitmapSize + paletteSize;
 
 		_playerBitmapSize = READ_LE_UINT32(ptr + hdrOffset);
 		hdrOffset += sizeof(DatBitmap);
 		_playerBitmapData = ptr + ptrOffset;
-		ptrOffset += _playerBitmapSize + 768;
+		ptrOffset += _playerBitmapSize + paletteSize;
 
 		for (int i = 0; i < kOptionsCount; ++i) {
 			_optionsBitmapSize[i] = READ_LE_UINT32(ptr + hdrOffset);
 			hdrOffset += sizeof(DatBitmap);
 			if (_optionsBitmapSize[i] != 0) {
 				_optionsBitmapData[i] = ptr + ptrOffset;
-				ptrOffset += _optionsBitmapSize[i] + 768;
+				ptrOffset += _optionsBitmapSize[i] + paletteSize;
 			} else {
 				_optionsBitmapData[i] = 0;
 			}
@@ -168,7 +176,7 @@ void Menu::loadData() {
 		_cutscenesBitmaps = (DatBitmapsGroup *)(ptr + hdrOffset);
 		_cutscenesBitmapsData = ptr + ptrOffset;
 		hdrOffset += cutscenesCount * sizeof(DatBitmapsGroup);
-		ptrOffset += readBitmapsGroup(cutscenesCount, _cutscenesBitmaps, ptrOffset);
+		ptrOffset += readBitmapsGroup(cutscenesCount, _cutscenesBitmaps, ptrOffset, paletteSize);
 
 		for (int i = 0; i < kCheckpointLevelsCount; ++i) {
 			DatBitmapsGroup *bitmapsGroup = (DatBitmapsGroup *)(ptr + hdrOffset);
@@ -176,13 +184,13 @@ void Menu::loadData() {
 			_checkpointsBitmapsData[i] = ptr + ptrOffset;
 			const int count = _res->_datHdr.levelCheckpointsCount[i];
 			hdrOffset += count * sizeof(DatBitmapsGroup);
-			ptrOffset += readBitmapsGroup(count, bitmapsGroup, ptrOffset);
+			ptrOffset += readBitmapsGroup(count, bitmapsGroup, ptrOffset, paletteSize);
 		}
 
 		const int levelsCount = _res->_datHdr.levelsCount;
 		_levelsBitmaps = (DatBitmapsGroup *)(ptr + hdrOffset);
 		_levelsBitmapsData = ptr + ptrOffset;
-		ptrOffset += readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset);
+		ptrOffset += readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset, paletteSize);
 	}
 
 	ptr = _res->_menuBuffer0;
@@ -212,6 +220,10 @@ void Menu::loadData() {
 
 		_soundData = ptr + ptrOffset;
 		ptrOffset += _res->_datHdr.soundDataSize;
+	}
+
+	if (_res->_isPsx) {
+		return;
 	}
 
 	hdrOffset = ptrOffset;
@@ -257,7 +269,7 @@ void Menu::loadData() {
 			hdrOffset += sizeof(DatBitmap);
 			if (_optionsBitmapSize[i] != 0) {
 				_optionsBitmapData[i] = ptr + ptrOffset;
-				ptrOffset += _optionsBitmapSize[i] + 768;
+				ptrOffset += _optionsBitmapSize[i] + paletteSize;
 			} else {
 				_optionsBitmapData[i] = 0;
 			}
@@ -268,7 +280,7 @@ void Menu::loadData() {
 		ptrOffset += levelsCount * sizeof(DatBitmapsGroup);
 		_levelsBitmaps = (DatBitmapsGroup *)(ptr + hdrOffset);
 		_levelsBitmapsData = ptr + ptrOffset;
-		readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset);
+		readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset, paletteSize);
 	}
 }
 
@@ -304,7 +316,11 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, ui
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		if (num == i) {
-			_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0], ptr[1], 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+			if (_res->_isPsx) {
+				_video->decodeBackgroundOverlayPsx(ptr);
+			} else {
+				_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0], ptr[1], 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+			}
 			break;
 		}
 		ptr += size + 2;
@@ -345,7 +361,7 @@ void Menu::refreshScreen(bool updatePalette) {
 	if (updatePalette) {
 		g_system->setPalette(_paletteBuffer, 256, 6);
 	}
-	g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
+	_video->updateGameDisplay(_video->_frontLayer);
 	g_system->updateScreen(false);
 }
 
@@ -377,9 +393,12 @@ bool Menu::mainLoop() {
 }
 
 void Menu::drawTitleScreen(int option) {
-	decodeLZW(_titleBitmapData, _video->_frontLayer);
-	const uint8_t *palette = _titleBitmapData + _titleBitmapSize;
-	g_system->setPalette(palette, 256, 6);
+	if (_res->_isPsx) {
+		_video->decodeBackgroundPsx(_titleBitmapData);
+	} else {
+		decodeLZW(_titleBitmapData, _video->_frontLayer);
+		g_system->setPalette(_titleBitmapData + _titleBitmapSize, 256, 6);
+	}
 	drawSprite(_titleSprites, (const uint8_t *)&_titleSprites[1], option);
 	refreshScreen(false);
 }

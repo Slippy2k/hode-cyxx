@@ -198,15 +198,15 @@ int main(int argc, char *argv[]) {
 	setupAudio(g);
 	g->loadSetupCfg(resume);
 	bool runGame = true;
+	if (isPsx) {
+		g->_video->initPsx();
+	}
 	if (_runMenu && resume && !isPsx) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
 		runGame = m->mainLoop();
 		delete m;
 	}
 	if (runGame && !g_system->inp.quit) {
-		if (isPsx) {
-			g->_video->initPsx();
-		}
 		bool levelChanged = false;
 		do {
 			g->mainLoop(level, checkpoint, levelChanged);

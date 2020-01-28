@@ -225,9 +225,11 @@ bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
 }
 
 void Resource::loadDatMenuBuffers() {
-	assert((_datHdr.sssOffset & 0x7FF) == 0);
-	_datFile->seek(_datHdr.sssOffset, SEEK_SET);
-	loadSssData(_datFile, _datHdr.sssOffset);
+	if (!_isPsx) {
+		assert((_datHdr.sssOffset & 0x7FF) == 0);
+		_datFile->seek(_datHdr.sssOffset, SEEK_SET);
+		loadSssData(_datFile, _datHdr.sssOffset);
+	}
 
 	uint32_t baseOffset = _menuBuffersOffset;
 	_datFile->seek(baseOffset, SEEK_SET);
