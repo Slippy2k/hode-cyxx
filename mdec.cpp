@@ -14,8 +14,8 @@ struct BitStream { // most significant 16 bits
 		: _src(src), _bits(0), _len(0), _end(src + size) {
 	}
 
-	bool endOfStream() const {
-		return _src >= _end && _len == 0;
+	int bitsAvailable() const {
+		return (_end - _src) * 8 + _len;
 	}
 
 	int getBits(int count) { // 6 to 16 bits
@@ -54,7 +54,7 @@ static int readDC(BitStream *bs, int version) {
 static void readAC(BitStream *bs, int *coefficients) {
 	int count = 0;
 	int node = 0;
-	while (!bs->endOfStream()) {
+	while (bs->bitsAvailable() > 0) {
 		const uint16_t value = _acHuffTree[node].value;
 		switch (value) {
 		case kAcHuff_EscapeCode: {
@@ -218,7 +218,7 @@ int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int mblen, i
 		}
 	}
 end:
-	if (!mborder) {
+	if (!mborder && bs.bitsAvailable() >= 11) {
 		const int eof = bs.getBits(11);
 		assert(eof == 0x3FE); // v2 frame
 	}
