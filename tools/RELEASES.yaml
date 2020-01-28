@@ -213,6 +213,7 @@
   - rock_hod.lvl: 9cbc3bad9efe5f21f66c33d9872e29a1bd7b4c0c
   - rock_hod.mst: e7fbfcde10c08aa64ae1398fc95257891863790b
   - setup.dax: e091dddd74dc00ccf57a48dc8495ed95cde6a42d
+  - sled_013.51: 2b51ec92ff067c6099bfa90cb759adebf7979fb5
 - name: Heart of Darkness (PSX) SLUS_006.96
   files:
   - dark_hod.lvl: f6482575f1d4d2b6aa8910c709681a714edfba6b
@@ -234,3 +235,5 @@
   - rock_hod.lvl: 9cbc3bad9efe5f21f66c33d9872e29a1bd7b4c0c
   - rock_hod.mst: e7fbfcde10c08aa64ae1398fc95257891863790b
   - setup.dax: 9d5708b6dedce70a17c76c10ea16f02121826aab
+  - slus_006.96: da1c0a6284345bd64b828e266ef4d6b2eca81f39
+  - slus_007.41: da1c0a6284345bd64b828e266ef4d6b2eca81f39

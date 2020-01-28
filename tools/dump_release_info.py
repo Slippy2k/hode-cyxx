@@ -1,6 +1,7 @@
 
 import hashlib
 import os
+import re
 import subprocess
 import struct
 import sys
@@ -15,6 +16,8 @@ SUFFIXES = [
 	'hodwin32.exe',
 	'hod_res.dll'
 ]
+
+PSX_EXECUTABLE_RE = r'sl\w\w_\d+\.\d+'
 
 class ReleaseInfo(object):
 	def __init__(self, name):
@@ -82,17 +85,23 @@ def calculateSha1(filepath):
 	h.update(fp.read())
 	return h.hexdigest()
 
+def matchName(fn):
+	for suffix in SUFFIXES:
+		fname = fn.lower()
+		if fname.endswith(suffix):
+			return True
+	return re.match(PSX_EXECUTABLE_RE, fn.lower()) != None
+
 def scanDirectory(dname, info):
 	for dirpath, dirnames, filenames in os.walk(dname, topdown=True):
 		for fn in filenames:
-			for suffix in SUFFIXES:
+			if matchName(fn):
 				fname = fn.lower()
-				if fname.endswith(suffix):
-					fpath = os.path.join(dirpath, fn)
-					checksum = calculateSha1(fpath)
-					info.files.append((fname, checksum))
-					if fname == 'hodwin32.exe':
-						dumpPeVersionStringSection(fpath, info)
+				fpath = os.path.join(dirpath, fn)
+				checksum = calculateSha1(fpath)
+				info.files.append((fname, checksum))
+				if fname == 'hodwin32.exe':
+					dumpPeVersionStringSection(fpath, info)
 	info.files.sort()
 
 info = ReleaseInfo(sys.argv[1])
