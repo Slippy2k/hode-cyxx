@@ -17,6 +17,7 @@ SUFFIXES = [
 	'hod_res.dll'
 ]
 
+WIN32_EXECUTABLE = 'hodwin32.exe'
 PSX_EXECUTABLE_RE = r'sl\w\w_\d+\.\d+'
 
 class ReleaseInfo(object):
@@ -25,18 +26,22 @@ class ReleaseInfo(object):
 		self.files = []
 		self.win32_version_info = []
 		self.win32_securom = 'false'
+		self.psx_exe_header = {}
 	def toYaml(self):
 		print '- name: %s' % self.name
 		if len(self.files) != 0:
 			print '  files:'
 			for filename, checksum in self.files:
 				print '  - %s: %s' % (filename, checksum)
-				if filename == "hodwin32.exe":
+				if filename == WIN32_EXECUTABLE:
 					print '    securom: ' + self.win32_securom
 					if len(self.win32_version_info) != 0:
 						print '    version_info:'
 						for key, value in self.win32_version_info:
 							print '    - %s: %s' % (key, value)
+				if filename in self.psx_exe_header.keys():
+					for key, value in self.psx_exe_header[filename]:
+						print '    - %s: %s' % (key, value)
 
 def readPeSections(f):
 	assert f.read(2) == 'MZ'
@@ -79,6 +84,21 @@ def dumpPeVersionStringSection(filepath, info):
 						value = '(c)' + value[1:]
 					info.win32_version_info.append((name, value))
 
+def dumpPsxExecutableInfo(filepath, filename, info):
+	f = file(filepath)
+	assert f.read(8) == 'PS-X EXE'
+	f.seek(0x18)
+	header = []
+	header.append(('text_addr', '0x%x' % struct.unpack('<I', f.read(4))[0]))
+	header.append(('text_size', '%d' % struct.unpack('<I', f.read(4))[0]))
+	f.seek(0x4C)
+	copyright = f.read(256)
+	for i, c in enumerate(copyright):
+		if ord(c) == 0:
+			header.append(('copyright', copyright[:i]))
+			break
+	info.psx_exe_header[filename] = header
+
 def calculateSha1(filepath):
 	h = hashlib.new('sha1')
 	fp = file(filepath, 'rb')
@@ -100,8 +120,10 @@ def scanDirectory(dname, info):
 				fpath = os.path.join(dirpath, fn)
 				checksum = calculateSha1(fpath)
 				info.files.append((fname, checksum))
-				if fname == 'hodwin32.exe':
+				if fname == WIN32_EXECUTABLE:
 					dumpPeVersionStringSection(fpath, info)
+				elif re.match(PSX_EXECUTABLE_RE, fname):
+					dumpPsxExecutableInfo(fpath, fname, info)
 	info.files.sort()
 
 info = ReleaseInfo(sys.argv[1])
