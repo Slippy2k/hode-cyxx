@@ -1003,10 +1003,11 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		uint32_t *ptr = _sssDataUnk6[i].unk0;
 		for (int j = 0; j < _sssBanksData[i].count; ++j) {
 			for (int k = 0; k < codeOffset->unk5; ++k) {
-				if (mask != 0) {
-					*ptr |= mask;
-					mask <<= 1;
+				if (mask == 0) {
+					break;
 				}
+				*ptr |= mask;
+				mask <<= 1;
 			}
 			++codeOffset;
 			_sssDataUnk6[i].mask |= *ptr;
@@ -1016,7 +1017,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 // 429E09
 	resetSssFilters();
 // 429EFA
-	// same as clearSoundObjects()
+	// clearSoundObjects();
 // 429F38
 	clearSssGroup3();
 }
