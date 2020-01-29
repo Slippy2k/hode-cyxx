@@ -225,11 +225,9 @@ bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
 }
 
 void Resource::loadDatMenuBuffers() {
-	if (!_isPsx) {
-		assert((_datHdr.sssOffset & 0x7FF) == 0);
-		_datFile->seek(_datHdr.sssOffset, SEEK_SET);
-		loadSssData(_datFile, _datHdr.sssOffset);
-	}
+	assert((_datHdr.sssOffset & 0x7FF) == 0);
+	_datFile->seek(_datHdr.sssOffset, SEEK_SET);
+	loadSssData(_datFile, _datHdr.sssOffset);
 
 	uint32_t baseOffset = _menuBuffersOffset;
 	_datFile->seek(baseOffset, SEEK_SET);
@@ -992,6 +990,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 // 429C96
 	// preload PCM (_sssHdr.preloadPcmCount or setup.dat)
 	if (fp == _datFile) {
+		fp->seek(_sssPcmTable[0].offset, SEEK_SET);
 		for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 			loadSssPcm(fp, &_sssPcmTable[i]);
 		}
@@ -1129,7 +1128,7 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 			}
 			return;
 		}
-		if (fp != _datFile || pcm == &_sssPcmTable[0]) {
+		if (fp != _datFile) {
 			fp->seek(pcm->offset, SEEK_SET);
 		}
 		for (int i = 0; i < pcm->strideCount; ++i) {

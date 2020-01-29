@@ -198,9 +198,7 @@ int main(int argc, char *argv[]) {
 	setupAudio(g);
 	g->loadSetupCfg(resume);
 	bool runGame = true;
-	if (isPsx) {
-		g->_video->initPsx();
-	}
+	g->_video->init(isPsx);
 	if (_runMenu && resume && !isPsx) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
 		runGame = m->mainLoop();

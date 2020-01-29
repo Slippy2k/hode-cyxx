@@ -67,16 +67,16 @@ void Menu::setVolume() {
 static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint32_t ptrOffset, int paletteSize) {
 	const uint32_t baseOffset = ptrOffset;
 	for (int i = 0; i < count; ++i) {
+		int size;
 		if (paletteSize == 0) { // PSX
-			const int size = le32toh(bitmapsGroup[i].offset);
+			size = le32toh(bitmapsGroup[i].offset);
 			bitmapsGroup[i].offset = ptrOffset - baseOffset;
-			ptrOffset += size;
 		} else {
+			size = bitmapsGroup[i].w * bitmapsGroup[i].h;
 			bitmapsGroup[i].offset = ptrOffset - baseOffset;
-			const int size = bitmapsGroup[i].w * bitmapsGroup[i].h;
-			bitmapsGroup[i].palette = bitmapsGroup[i].offset + size;
-			ptrOffset += size + paletteSize;
 		}
+		bitmapsGroup[i].palette = bitmapsGroup[i].offset + size;
+		ptrOffset += size + paletteSize;
 	}
 	return ptrOffset - baseOffset;
 }
@@ -333,7 +333,11 @@ void Menu::drawSpritePos(const DatSpritesGroup *spriteGroup, const uint8_t *ptr,
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		if (num == i) {
-			_video->decodeSPR(ptr + 8, _video->_frontLayer, x, y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+			if (_res->_isPsx) {
+				_video->decodeBackgroundOverlayPsx(ptr);
+			} else {
+				_video->decodeSPR(ptr + 8, _video->_frontLayer, x, y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+			}
 			break;
 		}
 		ptr += size + 2;
@@ -346,7 +350,11 @@ void Menu::drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int num, int x, int
 		spriteGroup[num].currentFrameOffset = spriteGroup[num].firstFrameOffset;
 	}
 	ptr += spriteGroup[num].currentFrameOffset;
-	_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0] + x, ptr[1] + y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+	if (_res->_isPsx) {
+		_video->decodeBackgroundOverlayPsx(ptr, x, y);
+	} else {
+		_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0] + x, ptr[1] + y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+	}
 	++spriteGroup[num].num;
 	if (spriteGroup[num].num < spriteGroup[num].count) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
@@ -506,7 +514,11 @@ void Menu::setLevelCheckpoint(int num) {
 }
 
 void Menu::drawPlayerProgress(int state, int cursor) {
-	decodeLZW(_playerBitmapData, _video->_frontLayer);
+	if (_res->_isPsx) {
+		_video->decodeBackgroundPsx(_playerBitmapData);
+	} else {
+		decodeLZW(_playerBitmapData, _video->_frontLayer);
+	}
 	int player = 0;
 	for (int y = 96; y < 164; y += 17) {
 		if (isEmptySetupCfg(_config, player)) {

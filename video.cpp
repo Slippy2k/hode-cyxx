@@ -49,6 +49,21 @@ Video::~Video() {
 	free(_mdec.planes[kOutputPlaneCr].ptr);
 }
 
+void Video::init(bool mdec) {
+	if (mdec) {
+		const int w = (W + 15) & ~15;
+		const int h = (H + 15) & ~15;
+		_mdec.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
+		_mdec.planes[kOutputPlaneY].pitch = w;
+		const int w2 = w / 2;
+		const int h2 = h / 2;
+		_mdec.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
+		_mdec.planes[kOutputPlaneCb].pitch = w2;
+		_mdec.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
+		_mdec.planes[kOutputPlaneCr].pitch = w2;
+	}
+}
+
 static int colorBrightness(int r, int g, int b) {
 	return (r + g * 2) * 19 + b * 7;
 }
@@ -492,19 +507,6 @@ uint8_t Video::findWhiteColor() const {
 	return color;
 }
 
-void Video::initPsx() {
-	const int w = (W + 15) & ~15;
-	const int h = (H + 15) & ~15;
-	_mdec.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
-	_mdec.planes[kOutputPlaneY].pitch = w;
-	const int w2 = w / 2;
-	const int h2 = h / 2;
-	_mdec.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
-	_mdec.planes[kOutputPlaneCb].pitch = w2;
-	_mdec.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
-	_mdec.planes[kOutputPlaneCr].pitch = w2;
-}
-
 void Video::decodeBackgroundPsx(const uint8_t *src) {
 	const int len = W * H * sizeof(uint16_t);
 	_mdec.x = 0;
@@ -514,15 +516,15 @@ void Video::decodeBackgroundPsx(const uint8_t *src) {
 	decodeMDEC(src, len, 0, 0, W, H, &_mdec);
 }
 
-void Video::decodeBackgroundOverlayPsx(const uint8_t *src) {
+void Video::decodeBackgroundOverlayPsx(const uint8_t *src, int x, int y) {
 	const uint16_t size = READ_LE_UINT16(src + 2);
 	if (size > 6) {
 		const int count = READ_LE_UINT32(src + 4);
 		assert(count >= 1 && count <= 3);
 		int offset = 8;
 		for (int i = 0; i < count && offset < size; ++i) {
-			_mdec.x = src[offset];
-			_mdec.y = src[offset + 1];
+			_mdec.x = x + src[offset];
+			_mdec.y = y + src[offset + 1];
 			const int len = READ_LE_UINT16(src + offset + 2);
 			_mdec.w = src[offset + 4] * 16;
 			_mdec.h = src[offset + 5] * 16;
