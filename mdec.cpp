@@ -183,7 +183,7 @@ int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int mblen, i
 	assert(vlc == 0x3800);
 	const uint16_t qscale = bs.getBits(16);
 	const uint16_t version = bs.getBits(16);
-	// fprintf(stdout, "mdec qscale %d version %d\n", qscale, version);
+	// fprintf(stdout, "mdec qscale %d version %d w %d h %d\n", qscale, version, w, h);
 	assert(version == 2);
 
 	const int blockW = (w + 15) / 16;

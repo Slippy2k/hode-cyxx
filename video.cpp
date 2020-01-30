@@ -484,13 +484,12 @@ uint8_t Video::findWhiteColor() const {
 	return color;
 }
 
-void Video::decodeBackgroundPsx(const uint8_t *src) {
-	const int len = W * H * sizeof(uint16_t);
-	_mdec.x = 0;
-	_mdec.y = 0;
-	_mdec.w = W;
-	_mdec.h = H;
-	decodeMDEC(src, len, 0, 0, W, H, &_mdec);
+void Video::decodeBackgroundPsx(const uint8_t *src, const int size, int w, int h, int x, int y) {
+	_mdec.x = x;
+	_mdec.y = y;
+	_mdec.w = w;
+	_mdec.h = h;
+	decodeMDEC(src, size, 0, 0, w, h, &_mdec);
 }
 
 void Video::decodeBackgroundOverlayPsx(const uint8_t *src, int x, int y) {

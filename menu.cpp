@@ -10,9 +10,11 @@
 
 enum {
 	kTitleScreen_AssignPlayer = 0,
-	kTitleScreen_Play,
-	kTitleScreen_Options,
-	kTitleScreen_Quit
+	kTitleScreen_Play = 1,
+	kTitleScreen_Options = 2,
+	kTitleScreen_Quit = 3,
+	kTitleScreenPSX_Load = 3, // PSX does not have 'Quit'
+	kTitleScreenPSX_Save = 4
 };
 
 enum {
@@ -402,7 +404,7 @@ bool Menu::mainLoop() {
 
 void Menu::drawTitleScreen(int option) {
 	if (_res->_isPsx) {
-		_video->decodeBackgroundPsx(_titleBitmapData);
+		_video->decodeBackgroundPsx(_titleBitmapData, _titleBitmapSize, Video::W, Video::H);
 	} else {
 		decodeLZW(_titleBitmapData, _video->_frontLayer);
 		g_system->setPalette(_titleBitmapData + _titleBitmapSize, 256, 6);
@@ -412,17 +414,19 @@ void Menu::drawTitleScreen(int option) {
 }
 
 int Menu::handleTitleScreen() {
+	const int firstOption = kTitleScreen_AssignPlayer;
+	const int lastOption = _res->_isPsx ? kTitleScreen_Play : kTitleScreen_Quit;
 	int currentOption = kTitleScreen_Play;
 	while (!g_system->inp.quit) {
 		g_system->processEvents();
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
-			if (currentOption > kTitleScreen_AssignPlayer) {
+			if (currentOption > firstOption) {
 				playSound(0x70);
 				--currentOption;
 			}
 		}
 		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
-			if (currentOption < kTitleScreen_Quit) {
+			if (currentOption < lastOption) {
 				playSound(0x70);
 				++currentOption;
 			}
@@ -454,6 +458,11 @@ void Menu::drawDigit(int x, int y, int num) {
 }
 
 void Menu::drawBitmap(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int x, int y, int w, int h, uint8_t baseColor) {
+	if (_res->_isPsx) {
+		const int size = bitmapsGroup->palette - bitmapsGroup->offset;
+		_video->decodeBackgroundPsx(bitmapData, size, w, h, x, y);
+		return;
+	}
 	const int srcPitch = w;
 	if (x < 0) {
 		bitmapData -= x;
@@ -515,7 +524,7 @@ void Menu::setLevelCheckpoint(int num) {
 
 void Menu::drawPlayerProgress(int state, int cursor) {
 	if (_res->_isPsx) {
-		_video->decodeBackgroundPsx(_playerBitmapData);
+		_video->decodeBackgroundPsx(_playerBitmapData, _playerBitmapSize, Video::W, Video::H);
 	} else {
 		decodeLZW(_playerBitmapData, _video->_frontLayer);
 	}

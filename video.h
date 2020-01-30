@@ -81,7 +81,7 @@ struct Video {
 	void drawString(const char *s, int x, int y, uint8_t color, uint8_t *dst);
 	uint8_t findWhiteColor() const;
 
-	void decodeBackgroundPsx(const uint8_t *src);
+	void decodeBackgroundPsx(const uint8_t *src, int size, int w, int h, int x = 0, int y = 0);
 	void decodeBackgroundOverlayPsx(const uint8_t *src, int x = 0, int y = 0);
 };
 
