@@ -8,7 +8,6 @@
 #include "system.h"
 
 static const bool kUseShadowColorLut = false;
-static const bool _findBlackColor = false;
 
 Video::Video() {
 	_displayShadowLayer = false;
@@ -34,7 +33,6 @@ Video::Video() {
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
 	_fillColor = 0xC4;
-	_blackColor = 255;
 	memset(&_mdec, 0, sizeof(_mdec));
 }
 
@@ -73,31 +71,10 @@ void Video::refreshGamePalette(const uint16_t *pal) {
 	for (int i = 0; i < 256 * 3; ++i) {
 		_palette[i] = pal[i] >> 8;
 	}
-	int blackQuant = INT32_MAX;
-	_blackColor = 255;
-	if (_findBlackColor) {
-		const int r = _palette[255 * 3];
-		const int g = _palette[255 * 3 + 1];
-		const int b = _palette[255 * 3 + 2];
-		for (int i = 1; i < 255; ++i) {
-			const int q = colorBrightness(ABS(_palette[i * 3] - r), ABS(_palette[i * 3 + 1] - g), ABS(_palette[i * 3 + 2] - b));
-			if (q < blackQuant) {
-				blackQuant = q;
-				_blackColor = i;
-			}
-		}
-	}
 	g_system->setPalette(_palette, 256);
 }
 
 void Video::updateGameDisplay(uint8_t *buf) {
-	if (_findBlackColor) {
-		for (int i = 0; i < H * W; ++i) {
-			if (buf[i] == 255) {
-				buf[i] = _blackColor;
-			}
-		}
-	}
 	g_system->copyRect(0, 0, W, H, buf, 256);
 	if (_mdec.planes[kOutputPlaneY].ptr) {
 		updateYuvDisplay();

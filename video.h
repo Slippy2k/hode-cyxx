@@ -40,7 +40,6 @@ struct Video {
 	uint8_t *_transformShadowBuffer;
 	uint8_t _transformShadowLayerDelta;
 	uint8_t _fillColor;
-	uint8_t _blackColor;
 	uint8_t _shadowColorLut[256];
 	const uint8_t *_font;
 
