@@ -1242,6 +1242,17 @@ static void DecodeSetupDat(File *fp) {
 		}
 
 		if (_isPsx) {
+			for (int i = 0; i < 3; ++i) {
+				const uint32_t addr1 = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+				const uint32_t addr2 = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+				assert(addr1 == addr2);
+				const uint32_t size = READ_LE_UINT32(ptr + ptrOffset); ptrOffset += 4;
+				const uint16_t count = READ_LE_UINT16(ptr + ptrOffset); ptrOffset += 2;
+				assert(count != 0);
+				const uint16_t num = READ_LE_UINT16(ptr + ptrOffset); ptrOffset += 2;
+				assert(num == 0x1234);
+				ptrOffset += (size + 3) & ~3;
+			}
 			return;
 		}
 
