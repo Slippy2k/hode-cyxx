@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 			if (resume) {
 				g->saveSetupCfg();
 			}
-			level += 1;
+			level = g->_currentLevel + 1;
 			checkpoint = 0;
 			levelChanged = true;
 		} while (!g_system->inp.quit && level < kLvl_test);
