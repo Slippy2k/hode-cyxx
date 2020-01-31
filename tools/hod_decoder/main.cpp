@@ -1251,15 +1251,35 @@ static void DecodeSetupDat(File *fp) {
 				assert(count != 0);
 				const uint16_t num = READ_LE_UINT16(ptr + ptrOffset); ptrOffset += 2;
 				assert(num == 0x1234);
+				uint32_t tmpOffset = ptrOffset;
+				uint32_t totalSize = 0;
+				for (int j = 0; j < count; ++j) {
+					tmpOffset += 2;
+					uint16_t len = READ_LE_UINT16(ptr + tmpOffset);
+					tmpOffset += len;
+					totalSize += len + 2;
+				}
+				assert(totalSize == size);
 				ptrOffset += (size + 3) & ~3;
 			}
-			return;
-		}
 
+			// palette data ?
+			ptrOffset += 0x300 * 3;
+		}
 		hdrOffset = ptrOffset;
 		ptrOffset += icons * 16;
 		for (int i = 0; i < icons; ++i) {
-			const int count = READ_LE_UINT16(ptr + hdrOffset + i * 16 + 12);
+			const uint32_t tmpOffset = hdrOffset + i * 16;
+			const uint32_t addr1 = READ_LE_UINT32(ptr + tmpOffset);
+			const uint32_t addr2 = READ_LE_UINT32(ptr + tmpOffset + 4);
+			assert(addr1 == addr2);
+			const uint32_t size = READ_LE_UINT32(ptr + tmpOffset + 8);
+			if (_isPsx) {
+				assert((size & 3) == 0);
+				ptrOffset += size;
+				continue;
+			}
+			const int count = READ_LE_UINT16(ptr + tmpOffset + 12);
 			for (int i = 0; i < count; ++i) {
 				ptrOffset += DecodeSetupDatSprite(ptr + ptrOffset, kSprControls, i);
 			}
