@@ -150,7 +150,7 @@ void Level_fort::postScreenUpdate_fort_screen8() {
 
 void Level_fort::postScreenUpdate_fort_screen16() {
 	if (_res->_currentScreenResourceNum == 16) {
-		if (_res->_screensState[16].s0 == 1) {
+		if (_res->_screensState[16].s0 != 1) {
 			AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			BoundingBox b = { 150, 0, 187, 60 };
                 	if (!_g->clipBoundingBox(&b, &data->boundingBox)) {
