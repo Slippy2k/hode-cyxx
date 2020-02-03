@@ -34,7 +34,7 @@ enum {
 	kPafAnimation_vicious = 7,
 	kPafAnimation_together = 8,
 	kPafAnimation_power = 9,
-	kPafAniamtion_back = 10,
+	kPafAnimation_back = 10,
 	kPafAnimation_dogfree1 = 11,
 	kPafAnimation_dogfree2 = 12,
 	kPafAnimation_meteor = 13,
