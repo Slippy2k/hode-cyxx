@@ -421,7 +421,7 @@ static const uint8_t _level1OpHelper1KeyMaskTable[112] = {
 
 void Game::objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p) {
 	const bool sameScreen = (_andyObject->screenNum == ptr->screenNum);
-	int i = (_andyObject->width / 2 + _andyObject->xPos + (_andyObject->xPos & 7)) / 8;
+	int i = (_andyObject->width / 2 + _andyObject->xPos) / 8;
 	if (i < 0 || ptr->screenNum != _res->_currentScreenResourceNum) {
 		i = 0;
 	} else if (i > 31) {
@@ -451,7 +451,7 @@ void Game::objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p) {
 		}
 	}
 	if ((ptr->directionKeyMask & 4) != 0) {
-		if (ptr->anim != 1 || ptr->frame != p[64]) {
+		if (o->anim != 1 || o->frame != p[64]) {
 			ptr->directionKeyMask &= ~4;
 		}
 	}

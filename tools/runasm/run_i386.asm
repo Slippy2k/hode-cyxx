@@ -20,6 +20,7 @@ GLOBAL test_0041C644
 GLOBAL test_0040D7F5
 GLOBAL test_0042B67F
 GLOBAL test_mul0x4EC4EC4F
+GLOBAL test_00421343
 
 SECTION .text
 
@@ -386,5 +387,22 @@ test_mul0x4EC4EC4F:
       mov eax, edx
 
   pop ecx
+  pop ebp
+  ret
+
+test_00421343:
+
+  push ebp
+  mov ebp, esp
+
+      mov eax, [ebp + arg0]
+      and eax, 0FFh
+      cdq
+      xor eax, edx
+      sub eax, edx
+      and eax, 7
+      xor eax, edx
+      sub eax, edx
+
   pop ebp
   ret

@@ -24,6 +24,7 @@ extern int test_0041C644(int) __attribute__((stdcall));
 extern int test_0040D7F5(int) __attribute__((stdcall));
 extern int test_0042B67F(int, int, int, int) __attribute__((stdcall));
 extern int test_mul0x4EC4EC4F(int) __attribute__((stdcall));
+extern int test_00421343(int) __attribute__((stdcall));
 
 static int test_eq_15__C(int i) {
 	return i > 15 ? 1 : 0;
@@ -109,6 +110,10 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < 20000; i += 1) {
 		const int res = test_mul0x4EC4EC4F(i);
 		assert(res == i / 104);
+	}
+	for (int i = 0; i < 256; ++i) {
+		const int res = test_00421343(i);
+		assert(res == (i & 7));
 	}
 	return 0;
 }
