@@ -99,6 +99,7 @@
   - fort_hod.lvl: 82456ed6e29780b5b8031a67ba3dddb8da813c19
   - fort_hod.mst: ce55095902ade9f1d8a198f271d0946d6228b90d
   - fort_hod.sss: 6ff572b553d93040c9cad74891db05b2cc8267c6
+  - hod.dem: 5d40f812b6ed1385b7e502527911023f28136341
   - hod.paf: fe75aff52c879aa5cc84a87babbca2ce0affec23
   - hodwin32.exe: eb0f032f343e2c27d60291c79ae667034a0c7389
     securom: false
@@ -223,6 +224,7 @@
   - dark_hod.mst: a97ac13edde17fd33cb06e9907139949c8b79cdb
   - fort_hod.lvl: e94a21bc4f779dba658ef5ab45f1ad15880913d8
   - fort_hod.mst: f7423c3d277650ac36378f09f59034cec28b6b34
+  - hod.dem: ba5060778a9f5391a8fa9a4928473cf7797df15a
   - isld_hod.lvl: c0fbd02deea136d57b60bc8a7c3df69741491335
   - isld_hod.mst: 9ff92346444a66833eb2f8a1b3853ad788d1777b
   - lar1_hod.lvl: 575dde976affeedfa5f1637a34d5efdda3218778

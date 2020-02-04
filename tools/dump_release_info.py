@@ -13,6 +13,7 @@ SUFFIXES = [
 	'_hod.lvl',
 	'_hod.sss',
 	'_hod.mst',
+	'hod.dem',
 	'hodwin32.exe',
 	'hod_res.dll'
 ]
