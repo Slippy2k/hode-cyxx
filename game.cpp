@@ -25,6 +25,7 @@ Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	_rnd.setSeed();
 	_video = new Video();
 	_cheats = cheats;
+	_playDemo = false;
 
 	_frameMs = kFrameTimeStamp;
 	_difficulty = 1;
@@ -2094,7 +2095,13 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	if (_loadingScreenEnabled) {
 		displayLoadingScreen();
 	}
-	if (_resumeGame) {
+	if (_playDemo && _res->loadHodDem()) {
+		_rnd._rndSeed = _res->_dem.randSeed;
+		level = _res->_dem.level;
+		checkpoint = _res->_dem.checkpoint;
+		_difficulty = _res->_dem.difficulty;
+		_res->_demOffset = 0;
+	} else if (_resumeGame) {
 		const int num = _setupConfig.currentPlayer;
 		level = _setupConfig.players[num].levelNum;
 		if (level > kLvl_dark) {
@@ -2120,7 +2127,8 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	clearSoundObjects();
 	_mix._lock(0);
 	_mstAndyCurrentScreenNum = -1;
-	_rnd.initTable();
+	const int rounds = _playDemo ? _res->_dem.randRounds : ((g_system->getTimeStamp() & 15) + 1);
+	_rnd.initTable(rounds);
 	const int screenNum = _level->getCheckpointData(checkpoint)->screenNum;
 	if (_mstDisabled) {
 		_specialAnimMask = 0;
@@ -2702,8 +2710,14 @@ void Game::levelMainLoop() {
 	_directionKeyMask = 0;
 	_actionKeyMask = 0;
 	updateInput();
-	_andyObject->directionKeyMask = _directionKeyMask;
-	_andyObject->actionKeyMask = _actionKeyMask;
+	if (_playDemo && _res->_demOffset < _res->_dem.keyMaskLen) {
+		_andyObject->actionKeyMask = _res->_dem.actionKeyMask[_res->_demOffset];
+		_andyObject->directionKeyMask = _res->_dem.directionKeyMask[_res->_demOffset];
+		++_res->_demOffset;
+	} else {
+		_andyObject->directionKeyMask = _directionKeyMask;
+		_andyObject->actionKeyMask = _actionKeyMask;
+	}
 	_video->fillBackBuffer();
 	if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 		preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);

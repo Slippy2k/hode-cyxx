@@ -22,14 +22,16 @@ void Random::initMstTable() {
 	}
 }
 
-void Random::initTable() {
+void Random::initTable(int rounds) {
 	for (int i = 0; i < 100; ++i) {
 		_rndRandomTable[i] = i + 1;
 	}
-	for (int i = 0; i < 256; ++i) {
-		const int a = update() % 100;
-		const int b = update() % 100;
-		SWAP(_rndRandomTable[a], _rndRandomTable[b]);
+	for (int j = 0; j < rounds; ++j) {
+		for (int i = 0; i < 256; ++i) {
+			const int a = update() % 100;
+			const int b = update() % 100;
+			SWAP(_rndRandomTable[a], _rndRandomTable[b]);
+		}
 	}
 	_rndRandomTableIndex = 0;
 }

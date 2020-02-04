@@ -97,6 +97,7 @@ struct Game {
 	bool _loadingScreenEnabled;
 
 	SetupConfig _setupConfig;
+	bool _playDemo;
 	bool _resumeGame;
 
 	LvlObject *_screenLvlObjectsList[kMaxScreens]; // LvlObject linked list for each screen

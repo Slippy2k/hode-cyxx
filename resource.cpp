@@ -16,6 +16,8 @@ static const char *_setupCfg = "setup.cfg";
 static const char *_setupDat = "SETUP.DAT";
 static const char *_setupDax = "SETUP.DAX";
 
+static const char *_hodDem = "HOD.DEM";
+
 static const char *_prefixes[] = {
 	"rock",
 	"fort",
@@ -106,6 +108,9 @@ Resource::Resource(FileSystem *fs)
 	_fontBuffer = 0;
 	_menuBuffer0 = 0;
 	_menuBuffer1 = 0;
+
+	memset(&_dem, 0, sizeof(_dem));
+	_demOffset = 0;
 }
 
 Resource::~Resource() {
@@ -1929,6 +1934,40 @@ static void persistSetupCfg(FILE *fp, T *config) {
 			warning("Invalid checksum 0x%x (0x%x) for 'setup.cfg'", config->checksum, checksum);
 		}
 	}
+}
+
+static const uint32_t _demTag = 0x31434552; // 'REC1'
+
+bool Resource::loadHodDem() {
+	bool ret = false;
+	File f;
+	if (openDat(_fs, _hodDem, &f)) {
+		const uint32_t tag = f.readUint32();
+		if (tag == _demTag) {
+			f.skipUint32();
+			_dem.randSeed = f.readUint32();
+			_dem.keyMaskLen = f.readUint32();
+			_dem.level = f.readByte();
+			_dem.checkpoint = f.readByte();
+			_dem.difficulty = f.readByte();
+			_dem.randRounds = f.readByte();
+			f.skipUint32();
+			f.skipUint32();
+			_dem.actionKeyMask = (uint8_t *)malloc(_dem.keyMaskLen);
+			f.read(_dem.actionKeyMask, _dem.keyMaskLen);
+			_dem.directionKeyMask = (uint8_t *)malloc(_dem.keyMaskLen);
+			f.read(_dem.directionKeyMask, _dem.keyMaskLen);
+			ret = true;
+		}
+		closeDat(_fs, &f);
+	}
+	return ret;
+}
+
+void Resource::unloadHodDem() {
+	free(_dem.actionKeyMask);
+	free(_dem.directionKeyMask);
+	memset(&_dem, 0, sizeof(_dem));
 }
 
 bool Resource::writeSetupCfg(const SetupConfig *config) {

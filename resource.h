@@ -492,6 +492,17 @@ struct SssUnk6 {
 	uint32_t mask; // 10
 };
 
+struct Dem {
+	uint32_t randSeed;
+	uint32_t keyMaskLen;
+	uint8_t level;
+	uint8_t checkpoint;
+	uint8_t difficulty;
+	uint8_t randRounds;
+	uint8_t *actionKeyMask;
+	uint8_t *directionKeyMask;
+};
+
 template <typename T>
 struct ResStruct {
 	T *ptr;
@@ -547,6 +558,9 @@ struct Resource {
 	uint8_t *_menuBuffer0;
 	uint8_t *_menuBuffer1;
 	uint32_t _menuBuffersOffset;
+
+	Dem _dem;
+	uint32_t _demOffset;
 
 	uint8_t _currentScreenResourceNum;
 
@@ -660,6 +674,9 @@ struct Resource {
 	void unloadMstData();
 	const MstScreenArea *findMstCodeForPos(int num, int xPos, int yPos) const;
 	void flagMstCodeForPos(int num, uint8_t value);
+
+	bool loadHodDem();
+	void unloadHodDem();
 
 	bool writeSetupCfg(const SetupConfig *config);
 	bool readSetupCfg(SetupConfig *config);
