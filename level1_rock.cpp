@@ -478,9 +478,9 @@ bool Game::plasmaCannonHit(LvlObject *ptr) {
 	if (ptr->bitmapBits) {
 		int dx = 0;
 		if (ptr->screenNum == _currentLeftScreen) {
-			dx = -256;
+			dx = -Video::W;
 		} else if (ptr->screenNum == _currentRightScreen) {
-			dx = 256;
+			dx = Video::W;
 		} else if (ptr->screenNum != _currentScreen) {
 			return false;
 		}

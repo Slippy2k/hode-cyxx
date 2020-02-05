@@ -2393,7 +2393,7 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 				playSound(ptr->currentSound, 0, 0, 3);
 				ptr->currentSound = 0xFFFF;
 			}
-			uint8_t *data = (uint8_t *)getLvlObjectDataPtr(ptr, kObjectDataTypeLvlBackgroundSound);
+			const uint8_t *data = (const uint8_t *)getLvlObjectDataPtr(ptr, kObjectDataTypeLvlBackgroundSound);
 			Sprite *spr = _spritesNextPtr;
 			if (spr && READ_LE_UINT16(data + 2) > 8) {
 				spr->w = READ_LE_UINT16(data + 4);
@@ -2438,23 +2438,23 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 		return o;
 	}
 	if (_currentScreen == ptr->screenNum) {
-		const uint8_t *_edi = ptr->bitmapBits;
+		const uint8_t *bitmap = ptr->bitmapBits;
 
 		LvlObjectData *dat = ptr->levelData0x2988;
 		LvlAnimHeader *ah = (LvlAnimHeader *)(dat->animsInfoData + kLvlAnimHdrOffset) + ptr->anim;
 		LvlAnimSeqHeader *ash = (LvlAnimSeqHeader *)(dat->animsInfoData + ah->seqOffset) + ptr->frame;
 
-		int _edx = (ptr->flags1 >> 4) & 0xFF;
-		int _ecx = (ash->flags1 >> 4) & 0xFF;
-		_ecx = (((_ecx ^ _edx) & 3) << 14) | ptr->flags2;
+		const int f1 = (ptr->flags1 >> 4) & 3;
+		const int f2 = (ash->flags1 >> 4) & 3;
+		const int num = ((f1 ^ f2) << 14) | ptr->flags2;
 		Sprite *spr = _spritesNextPtr;
-		if (spr && _edi) {
+		if (spr && bitmap) {
 			spr->yPos = ptr->yPos;
 			spr->xPos = ptr->xPos;
 			spr->w = ptr->width;
 			spr->h = ptr->height;
-			spr->bitmapBits = _edi;
-			spr->num = _ecx;
+			spr->bitmapBits = bitmap;
+			spr->num = num;
 			addToSpriteList(spr);
 		}
 	}
