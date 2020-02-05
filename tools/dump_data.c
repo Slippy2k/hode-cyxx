@@ -275,6 +275,10 @@ int main(int argc, char* argv[]) {
 				dumpBinary(fp, "_lar1_spritesData", 0x4F9A8, 400, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "_lar1_setupScreen24Data", 0x4FE40, 24, "0x%02X", UNSIGNED_8BITS, 0);
 				dumpBinary(fp, "byte_45279", 0x4FF98, 48, "0x%02X", UNSIGNED_8BITS, 0);
+
+				dumpBinary(fp, "_level1OpHelper1KeyMaskTable", 0x51410, 112, "%d", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "objectUpdate_rock_case1_data", 0x51480, 68, "0x%02x", UNSIGNED_8BITS, 0);
+				dumpBinary(fp, "objectUpdate_rock_case2_data", 0x514C8, 68, "0x%02x", UNSIGNED_8BITS, 0);
 			}
 			fclose(fp);
 		}

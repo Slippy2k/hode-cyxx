@@ -46,7 +46,7 @@ uint32_t Random::update() {
 }
 
 uint8_t Random::getNextNumber() {
-	uint8_t num = _rndRandomTable[_rndRandomTableIndex];
+	const uint8_t num = _rndRandomTable[_rndRandomTableIndex];
 	++_rndRandomTableIndex;
 	if (_rndRandomTableIndex == 100) {
 		_rndRandomTableIndex = 0;

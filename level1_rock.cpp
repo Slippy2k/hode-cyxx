@@ -419,7 +419,7 @@ static const uint8_t _level1OpHelper1KeyMaskTable[112] = {
 	8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 8, 0, 4, 0
 };
 
-void Game::objectUpdate_rock_helper(LvlObject *ptr, uint8_t *p) {
+void Game::objectUpdate_rockShadow(LvlObject *ptr, uint8_t *p) {
 	const bool sameScreen = (_andyObject->screenNum == ptr->screenNum);
 	int i = (_andyObject->width / 2 + _andyObject->xPos) / 8;
 	if (i < 0 || ptr->screenNum != _res->_currentScreenResourceNum) {
@@ -503,7 +503,7 @@ int Game::objectUpdate_rock_case1(LvlObject *o) {
 		0x0C, 0x07, 0x00, 0x00
 	};
 	if (_level->_screenCounterTable[2] == 0) {
-		objectUpdate_rock_helper(o, data);
+		objectUpdate_rockShadow(o, data);
 		if ((o->flags0 & 0x3FF) == 0x4B) {
 			_level->_screenCounterTable[2] = 1;
 		}
@@ -522,7 +522,7 @@ int Game::objectUpdate_rock_case2(LvlObject *o) {
 		0x06, 0x0B, 0x00, 0x00
 	};
 	if (_level->_screenCounterTable[3] == 0) {
-		objectUpdate_rock_helper(o, data);
+		objectUpdate_rockShadow(o, data);
 		if ((o->flags0 & 0x3FF) == 0x4B) {
 			_level->_screenCounterTable[3] = 1;
 		}

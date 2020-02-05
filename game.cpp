@@ -331,6 +331,13 @@ void Game::setupBackgroundBitmap() {
 	_video->_paletteNeedRefresh = true;
 }
 
+void Game::addToSpriteList(Sprite *spr) {
+	_spritesNextPtr = spr->nextPtr;
+	const int index = spr->num & 0x1F;
+	spr->nextPtr = _typeSpritesList[index];
+	_typeSpritesList[index] = spr;
+}
+
 void Game::addToSpriteList(LvlObject *ptr) {
 	Sprite *spr = _spritesNextPtr;
 	if (spr) {
@@ -371,10 +378,7 @@ void Game::addToSpriteList(LvlObject *ptr) {
 			spr->w = ptr->width;
 			spr->h = ptr->height;
 			spr->bitmapBits = ptr->bitmapBits;
-			_spritesNextPtr = spr->nextPtr;
-			index = (ptr->flags2 & 31);
-			spr->nextPtr = _typeSpritesList[index];
-			_typeSpritesList[index] = spr;
+			addToSpriteList(spr);
 		}
 	}
 }
@@ -2276,10 +2280,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 				spr->h = READ_LE_UINT16(data + 6);
 				spr->bitmapBits = data + 8;
 				spr->num = ptr->flags2;
-				const int index = spr->num & 0x1F;
-				_spritesNextPtr = spr->nextPtr;
-				spr->nextPtr = _typeSpritesList[index];
-				_typeSpritesList[index] = spr;
+				addToSpriteList(spr);
 			}
 		}
 	}
@@ -2342,11 +2343,8 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 					spr->bitmapBits = data + 8;
 					spr->xPos = data[0];
 					spr->yPos = data[1];
-					_spritesNextPtr = spr->nextPtr;
 					spr->num = ptr->flags2;
-					const int index = spr->num & 0x1F;
-					spr->nextPtr = _typeSpritesList[index];
-					_typeSpritesList[index] = spr;
+					addToSpriteList(spr);
 				}
 			}
 		}
@@ -2403,11 +2401,8 @@ LvlObject *Game::updateAnimatedLvlObjectType1(LvlObject *ptr) {
 				spr->bitmapBits = data + 8;
 				spr->xPos = data[0];
 				spr->yPos = data[1];
-				_spritesNextPtr = spr->nextPtr;
 				spr->num = ptr->flags2;
-				const int index = spr->num & 0x1F;
-				spr->nextPtr = _typeSpritesList[index];
-				_typeSpritesList[index] = spr;
+				addToSpriteList(spr);
 			}
 		}
 	}
@@ -2460,10 +2455,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 			spr->h = ptr->height;
 			spr->bitmapBits = _edi;
 			spr->num = _ecx;
-			const int index = spr->num & 0x1F;
-			_spritesNextPtr = spr->nextPtr;
-			spr->nextPtr = _typeSpritesList[index];
-			_typeSpritesList[index] = spr;
+			addToSpriteList(spr);
 		}
 	}
 	if (ptr->spriteNum <= 15 || ptr->dataPtr == 0) {
@@ -4842,7 +4834,7 @@ void Game::updateWormHoleSprites() {
 			int xOffset = 0;
 			for (int j = 0; j < 11; ++j) {
 				uint8_t _al = (*flags >> (j * 2)) & 3;
-				if (_al != 0 && _spritesNextPtr != 0) {
+				if (_al != 0 && _spritesNextPtr) {
 					const int xPos = spr->xPos + xOffset + 12;
 					const int yPos = spr->yPos + yOffset + 16;
 					if (rect_contains(spr->rect1_x1, spr->rect1_y1, spr->rect1_x2, spr->rect1_y2, xPos, yPos)) {
@@ -4864,10 +4856,7 @@ void Game::updateWormHoleSprites() {
 						spr->h = tmp.height;
 						spr->bitmapBits = tmp.bitmapBits;
 						spr->num = tmp.flags2 & 0x3FFF;
-						const int index = spr->num & 0x1F;
-						_spritesNextPtr = spr->nextPtr;
-						spr->nextPtr = _typeSpritesList[index];
-						_typeSpritesList[index] = spr;
+						addToSpriteList(spr);
 					}
 				}
 				xOffset += 24;
