@@ -446,7 +446,8 @@ struct SssSample {
 
 struct SssPreloadList {
 	int count;
-	uint8_t *ptr; // uint16_t for v12
+	int ptrSize;
+	uint8_t *ptr; // uint16_t for v6 or v12, uint8_t for v10
 };
 
 struct SssPreloadInfoData {
@@ -457,6 +458,7 @@ struct SssPreloadInfoData {
 	uint8_t preload1Index;
 	uint8_t preload2Index;
 	uint32_t unk1C;
+	SssPreloadList preload1Data_V6;
 }; // sizeof == 32 (v10,v12) 68 (v6)
 
 struct SssPreloadInfo {

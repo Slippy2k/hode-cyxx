@@ -783,8 +783,7 @@ SssObject *Game::createSoundObject(int bankIndex, int sampleIndex, uint32_t flag
 				return 0;
 			}
 			const int firstSampleIndex = bank->firstSampleIndex;
-			assert(firstSampleIndex >= 0 && firstSampleIndex < _res->_sssHdr.samplesDataCount);
-			SssSample *sample = &_res->_sssSamplesData[firstSampleIndex];
+			const SssSample *sample = &_res->_sssSamplesData[firstSampleIndex];
 // 42B81D
 			int framesCount = 0;
 			for (int i = 0; i < bank->count; ++i) {
@@ -852,14 +851,8 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 	SssBank *bank = &_res->_sssBanksData[bankIndex];
 	const int sampleNum = bank->firstSampleIndex + sampleIndex;
 	debug(kDebug_SOUND, "startSoundObject sample %d", sampleNum);
-	assert(sampleNum >= 0 && sampleNum < _res->_sssHdr.samplesDataCount);
-	SssSample *sample = &_res->_sssSamplesData[sampleNum];
-
-	// original preloads PCM when changing screens
+	const SssSample *sample = &_res->_sssSamplesData[sampleNum];
 	SssPcm *pcm = &_res->_sssPcmTable[sample->pcm];
-	if (!pcm->ptr && !_res->_isPsx) {
-		_res->loadSssPcm(_res->_sssFile, pcm);
-	}
 
 	if (sample->framesCount != 0) {
 // 42B64C

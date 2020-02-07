@@ -833,15 +833,16 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		bytesRead += _sssHdr.preloadData3Count * 4;
 
 		_sssPreload1Table.allocate(_sssHdr.preloadData1Count);
-		const bool is16Bits = (_sssHdr.version == 12);
+		const int ptrSize = (_sssHdr.version == 12) ? 2 : 1;
 		for (int i = 0; i < _sssHdr.preloadData1Count; ++i) {
-			const int count = is16Bits ? fp->readUint16() : fp->readByte();
+			const int count = (ptrSize == 2) ? fp->readUint16() : fp->readByte();
 			debug(kDebug_RESOURCE, "sssPreloadData1 #%d count %d", i, count);
 			_sssPreload1Table[i].count = count;
-			const int tableSize = is16Bits ? count * 2 : count;
+			_sssPreload1Table[i].ptrSize = ptrSize;
+			const int tableSize = ptrSize * count;
 			_sssPreload1Table[i].ptr = (uint8_t *)malloc(tableSize);
 			fp->read(_sssPreload1Table[i].ptr, tableSize);
-			bytesRead += tableSize + (is16Bits ? 2 : 1);
+			bytesRead += tableSize + ptrSize;
 		}
 		for (int i = 0; i < _sssHdr.preloadData2Count; ++i) {
 			const int count = fp->readByte();
@@ -876,7 +877,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		static const int kSizeOfPreloadInfoData_V10 = 32;
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int count = _sssPreloadInfosData[i].count;
-			_sssPreloadInfosData[i].data = (SssPreloadInfoData *)malloc(count * sizeof(SssPreloadInfoData));
+			_sssPreloadInfosData[i].data = (SssPreloadInfoData *)calloc(count, sizeof(SssPreloadInfoData));
 			for (int j = 0; j < count; ++j) {
 				SssPreloadInfoData *preloadInfoData = &_sssPreloadInfosData[i].data[j];
 				preloadInfoData->pcmBlockOffset = fp->readUint16();
@@ -906,21 +907,32 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		static const int kSizeOfPreloadInfoData_V6 = 68;
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int count = _sssPreloadInfosData[i].count;
+			_sssPreloadInfosData[i].data = (SssPreloadInfoData *)calloc(count, sizeof(SssPreloadInfoData));
+
 			uint8_t *p = (uint8_t *)malloc(kSizeOfPreloadInfoData_V6 * count);
 			fp->read(p, kSizeOfPreloadInfoData_V6 * count);
 			bytesRead += kSizeOfPreloadInfoData_V6 * count;
+
 			for (int j = 0; j < count; ++j) {
-				static const int8_t offsets[8] = { 0x2C, 0x30, 0x34, 0x04, 0x08, 0x0C, 0x10, 0x14 };
-				static const int8_t lengths[8] = {    2,    1,    1,    2,    2,    1,    1,    1 };
-				for (int k = 0; k < 8; ++k) {
+				SssPreloadInfoData *preloadInfoData = &_sssPreloadInfosData[i].data[j];
+				preloadInfoData->screenNum = p[j * kSizeOfPreloadInfoData_V6];
+
+				// 0x2C is pcm preload list
+				preloadInfoData->preload1Data_V6.count = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V6 + 0x2C);
+				preloadInfoData->preload1Data_V6.ptrSize = 2;
+				const int preload1DataLen = ((preloadInfoData->preload1Data_V6.count * 2) + 3) & ~3;
+				preloadInfoData->preload1Data_V6.ptr = (uint8_t *)malloc(preload1DataLen);
+				bytesRead += fp->read(preloadInfoData->preload1Data_V6.ptr, preload1DataLen);
+
+				static const int8_t offsets[7] = { 0x30, 0x34, 0x04, 0x08, 0x0C, 0x10, 0x14 };
+				static const int8_t lengths[7] = {    1,    1,    2,    2,    1,    1,    1 };
+				for (int k = 0; k < 7; ++k) {
 					const int len = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V6 + offsets[k]) * lengths[k];
 					bytesRead += skipBytesAlign(fp, len);
 				}
 			}
 			free(p);
 		}
-		_sssPreloadInfosData.deallocate();
-		_sssHdr.preloadInfoCount = 0;
 	}
 
 	_sssPcmTable.allocate(_sssHdr.pcmCount);
@@ -1035,6 +1047,13 @@ void Resource::unloadSssData() {
 	for (unsigned int i = 0; i < _sssPreloadInfosData.count; ++i) {
 		free(_sssPreloadInfosData[i].data);
 		_sssPreloadInfosData[i].data = 0;
+		if (_sssHdr.version == 6) {
+			for (unsigned int j = 0; j < _sssPreloadInfosData[i].count; ++j) {
+				SssPreloadInfoData *preloadInfoData = &_sssPreloadInfosData[i].data[j];
+				free(preloadInfoData->preload1Data_V6.ptr);
+				preloadInfoData->preload1Data_V6.ptr = 0;
+			}
+		}
 	}
 	for (unsigned int i = 0; i < _sssPcmTable.count; ++i) {
 		free(_sssPcmTable[i].ptr);
@@ -1181,11 +1200,9 @@ void Resource::preloadSssPcmList(const SssPreloadInfoData *preloadInfoData) {
 		_lvlFile->seek(offset * 2048, SEEK_SET);
 		fp = _lvlFile;
 	}
-	const uint8_t num = preloadInfoData->preload1Index;
-	const SssPreloadList *preloadList = &_sssPreload1Table[num];
-	const bool is16Bits = (_sssHdr.version == 12);
+	const SssPreloadList *preloadList = (_sssHdr.version == 6) ? &preloadInfoData->preload1Data_V6 : &_sssPreload1Table[preloadInfoData->preload1Index];
 	for (int i = 0; i < preloadList->count; ++i) {
-		const int num = is16Bits ? READ_LE_UINT16(preloadList->ptr + i * 2) : preloadList->ptr[i];
+		const int num = (preloadList->ptrSize == 2) ? READ_LE_UINT16(preloadList->ptr + i * 2) : preloadList->ptr[i];
 		if (!_sssPcmTable[num].ptr) {
 			loadSssPcm(fp, &_sssPcmTable[num]);
 		} else if (_isPsx) {
