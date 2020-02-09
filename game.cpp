@@ -4891,20 +4891,20 @@ void Game::captureScreenshot() {
 	FILE *fp = _fs.openSaveFile(name, true);
 	if (fp) {
 		saveBMP(fp, _video->_frontLayer, _video->_palette, Video::W, Video::H);
-		fclose(fp);
+		_fs.closeFile(fp);
 	}
 	if (_cheats != 0) {
 		snprintf(name, sizeof(name), "screenshot-%03d-background.bmp", screenshot);
 		fp = _fs.openSaveFile(name, true);
 		if (fp) {
 			saveBMP(fp, _video->_backgroundLayer, _video->_palette, Video::W, Video::H);
-			fclose(fp);
+			_fs.closeFile(fp);
 		}
 		snprintf(name, sizeof(name), "screenshot-%03d-shadow.bmp", screenshot);
 		fp = _fs.openSaveFile(name, true);
 		if (fp) {
 			saveBMP(fp, _video->_shadowLayer, _video->_palette, Video::W, Video::H);
-			fclose(fp);
+			_fs.closeFile(fp);
 		}
 		snprintf(name, sizeof(name), "screenshot-%03d-palette.bmp", screenshot);
 		fp = _fs.openSaveFile(name, true);
@@ -4918,7 +4918,7 @@ void Game::captureScreenshot() {
 				}
 			}
 			saveBMP(fp, paletteBuffer, _video->_palette, 256 * kPaletteRectSize, kPaletteRectSize);
-			fclose(fp);
+			_fs.closeFile(fp);
 		}
 		snprintf(name, sizeof(name), "screenshot-%03d-postable.txt", screenshot);
 		fp = _fs.openSaveFile(name, true);
@@ -4929,7 +4929,7 @@ void Game::captureScreenshot() {
 				}
 				fputc('\n', fp);
 			}
-			fclose(fp);
+			_fs.closeFile(fp);
 		}
 		snprintf(name, sizeof(name), "screenshot-%03d-mask.txt", screenshot);
 		fp = _fs.openSaveFile(name, true);
@@ -4940,7 +4940,7 @@ void Game::captureScreenshot() {
 				}
 				fputc('\n', fp);
 			}
-			fclose(fp);
+			_fs.closeFile(fp);
 		}
 	}
 	++screenshot;
