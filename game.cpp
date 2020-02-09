@@ -469,15 +469,6 @@ void Game::setupScreenMask(uint8_t num) {
 			memcpy(p, _screenTempMaskBuffer + i * 32, 32);
 			p += 512;
 		}
-		if (0) {
-			fprintf(stdout, "screen %d mask %d\n", num, mask);
-			for (int y = 0; y < 24; ++y) {
-				for (int x = 0; x < 32; ++x) {
-					fprintf(stdout, "%02d ", _screenTempMaskBuffer[y * 32 + x]);
-				}
-				fputc('\n', stdout);
-			}
-		}
 	}
 	if (_res->_currentScreenResourceNum == num) {
 		setupScreenPosTable(num);
@@ -4902,6 +4893,55 @@ void Game::captureScreenshot() {
 		saveBMP(fp, _video->_frontLayer, _video->_palette, Video::W, Video::H);
 		fclose(fp);
 	}
-
+	if (_cheats != 0) {
+		snprintf(name, sizeof(name), "screenshot-%03d-background.bmp", screenshot);
+		fp = _fs.openSaveFile(name, true);
+		if (fp) {
+			saveBMP(fp, _video->_backgroundLayer, _video->_palette, Video::W, Video::H);
+			fclose(fp);
+		}
+		snprintf(name, sizeof(name), "screenshot-%03d-shadow.bmp", screenshot);
+		fp = _fs.openSaveFile(name, true);
+		if (fp) {
+			saveBMP(fp, _video->_shadowLayer, _video->_palette, Video::W, Video::H);
+			fclose(fp);
+		}
+		snprintf(name, sizeof(name), "screenshot-%03d-palette.bmp", screenshot);
+		fp = _fs.openSaveFile(name, true);
+		if (fp) {
+			static const int kPaletteRectSize = 8;
+			uint8_t paletteBuffer[8 * 256 * 8];
+			for (int x = 0; x < 256; ++x) {
+				const int xOffset = x * kPaletteRectSize;
+				for (int y = 0; y < kPaletteRectSize; ++y) {
+					memset(paletteBuffer + xOffset + y * 256 * kPaletteRectSize, x, kPaletteRectSize);
+				}
+			}
+			saveBMP(fp, paletteBuffer, _video->_palette, 256 * kPaletteRectSize, kPaletteRectSize);
+			fclose(fp);
+		}
+		snprintf(name, sizeof(name), "screenshot-%03d-postable.txt", screenshot);
+		fp = _fs.openSaveFile(name, true);
+		if (fp) {
+			for (int y = 0; y < 24; ++y) {
+				for (int x = 0; x < 32; ++x) {
+					fprintf(fp, "%02x ", _screenPosTable[4][y * 32 + x]);
+				}
+				fputc('\n', fp);
+			}
+			fclose(fp);
+		}
+		snprintf(name, sizeof(name), "screenshot-%03d-mask.txt", screenshot);
+		fp = _fs.openSaveFile(name, true);
+		if (fp) {
+			for (int y = 0; y < 24; ++y) {
+				for (int x = 0; x < 32; ++x) {
+					fprintf(fp, "%02x ", _screenTempMaskBuffer[y * 32 + x]);
+				}
+				fputc('\n', fp);
+			}
+			fclose(fp);
+		}
+	}
 	++screenshot;
 }
