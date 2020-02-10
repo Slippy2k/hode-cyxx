@@ -3287,7 +3287,6 @@ Task *Game::findFreeTask() {
 Task *Game::createTask(const uint8_t *codeData) {
 	Task *t = findFreeTask();
 	if (t) {
-		memset(t, 0, sizeof(Task));
 		resetTask(t, codeData);
 		t->prevPtr = 0;
 		t->nextPtr = _tasksList;
@@ -3339,7 +3338,6 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 	if (codeData) {
 		t = findFreeTask();
 		if (t) {
-			memset(t, 0, sizeof(Task));
 			resetTask(t, codeData);
 			t->prevPtr = 0;
 			t->nextPtr = _tasksList;
@@ -3353,7 +3351,7 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 }
 
 void Game::resetTask(Task *t, const uint8_t *codeData) {
-	debug(kDebug_MONSTER, "resetTask t %p offset 0x%04x", t, codeData - _res->_mstCodeData);
+	debug(kDebug_MONSTER, "resetTask t %p offset 0x%04x monster1 %p monster2 %p", t, codeData - _res->_mstCodeData, t->monster1, t->monster2);
 	assert(codeData);
 	t->state |= 2;
 	t->codeData = codeData;
@@ -5737,7 +5735,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 			if (op204Data->arg3 != 6 && o) {
 				LvlObject *tmpObject = t->monster1->o16;
 				const uint8_t flags = getLvlObjectFlag(op204Data->arg3 & 255, tmpObject, _andyObject);
-				_specialAnimMask = ((flags & 3) << 4) | (_specialAnimMask & 0xFFCF);
+				_specialAnimMask = ((flags & 3) << 4) | (_specialAnimMask & ~0x30);
 				// _specialAnimScreenNum = tmpObject->screenNum;
 				_specialAnimLvlObject = tmpObject;
 				_mstOriginPosX = op204Data->arg1 & 0xFFFF;
@@ -5917,7 +5915,7 @@ int Game::mstOp56_specialAction(Task *t, int code, int num) {
 				o = _andyObject;
 			}
 			const uint8_t flags = getLvlObjectFlag(op204Data->arg2 & 255, o, _andyObject);
-			_andyObject->flags1 = ((flags & 3) << 4) | (_andyObject->flags1 & 0xFFCF);
+			_andyObject->flags1 = ((flags & 3) << 4) | (_andyObject->flags1 & ~0x30);
 			const int x3 = _andyObject->posTable[3].x;
 			const int y3 = _andyObject->posTable[3].y;
 			setupLvlObjectBitmap(_andyObject);
@@ -7003,7 +7001,6 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 			return;
 		}
 // 41584E
-		memset(t, 0, sizeof(Task));
 		resetTask(t, kUndefinedMonsterByteCode);
 		t->monster2 = mo;
 		t->monster1 = 0;
@@ -7027,7 +7024,6 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 			return;
 		}
 // 415989
-		memset(t, 0, sizeof(Task));
 		resetTask(t, kUndefinedMonsterByteCode);
 		t->monster1 = m;
 		t->monster2 = 0;

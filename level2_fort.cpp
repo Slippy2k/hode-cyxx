@@ -183,7 +183,7 @@ void Level_fort::postScreenUpdate_fort_screen17() {
 	if (_res->_screensState[17].s0 == 1) {
 		++_screenCounterTable[17];
 		if (_screenCounterTable[17] == 68) {
-			_screenCounterTable[17] = 0;
+			_res->_screensState[17].s0 = 0;
 		}
 	}
 }
