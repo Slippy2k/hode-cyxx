@@ -3325,8 +3325,8 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 						_tasksList = next;
 					}
 				} else {
-					t->codeData = codeData;
-					t->run = &Game::mstTask_main;
+					current->codeData = codeData;
+					current->run = &Game::mstTask_main;
 				}
 			}
 		}
