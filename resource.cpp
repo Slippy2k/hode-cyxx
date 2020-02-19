@@ -949,6 +949,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		if (_sssPcmTable[i].totalSize != 0) {
 			assert((_sssPcmTable[i].totalSize % _sssPcmTable[i].strideSize) == 0);
 			assert(_sssPcmTable[i].totalSize == _sssPcmTable[i].strideSize * _sssPcmTable[i].strideCount);
+			assert(_isPsx ? (_sssPcmTable[i].strideSize == 512) : (_sssPcmTable[i].strideSize == 2276 || _sssPcmTable[i].strideSize == 4040));
 			if (sssPcmOffset != 0) {
 				assert(fp != _datFile || _sssPcmTable[i].offset == 0x2800); // .dat
 				_sssPcmTable[i].offset += sssPcmOffset;
@@ -1156,11 +1157,12 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 		if (fp != _datFile) {
 			fp->seek(pcm->offset, SEEK_SET);
 		}
+		static uint8_t strideBuffer[4040]; // maximum stride size
+		static const int samplesOffset = 256 * sizeof(int16_t);
 		for (int i = 0; i < pcm->strideCount; ++i) {
-			uint8_t samples[256 * sizeof(int16_t)];
-			fp->read(samples, sizeof(samples));
-			for (unsigned int j = 256 * sizeof(int16_t); j < pcm->strideSize; ++j) {
-				*p++ = READ_LE_UINT16(samples + fp->readByte() * sizeof(int16_t));
+			fp->read(strideBuffer, pcm->strideSize);
+			for (unsigned int j = samplesOffset; j < pcm->strideSize; ++j) {
+				*p++ = READ_LE_UINT16(strideBuffer + strideBuffer[j] * sizeof(int16_t));
 			}
 		}
 		assert((p - pcm->ptr) * sizeof(int16_t) == decompressedSize);
