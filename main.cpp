@@ -3,7 +3,9 @@
  * Copyright (C) 2009-2011 Gregory Montoir (cyx@users.sourceforge.net)
  */
 
+#if !defined(PSP)
 #include <SDL.h>
+#endif
 #include <getopt.h>
 #include <sys/stat.h>
 
