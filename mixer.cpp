@@ -12,8 +12,7 @@ Mixer::Mixer()
 Mixer::~Mixer() {
 }
 
-void Mixer::init(int rate) {
-	_rate = rate;
+void Mixer::init(int rate) { // rate must be 22050
 	memset(_mixingQueue, 0, sizeof(_mixingQueue));
 	_mixingQueueSize = 0;
 }

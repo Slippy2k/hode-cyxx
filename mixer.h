@@ -18,7 +18,6 @@ struct Mixer {
 	static const int kPcmChannels = 32;
 
 	void (*_lock)(int);
-	int _rate;
 
 	MixerChannel _mixingQueue[kPcmChannels];
 	int _mixingQueueSize;
