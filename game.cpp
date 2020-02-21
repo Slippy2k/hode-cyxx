@@ -2701,7 +2701,7 @@ void Game::levelMainLoop() {
 		_andyObject->directionKeyMask = _directionKeyMask;
 		_andyObject->actionKeyMask = _actionKeyMask;
 	}
-	_video->fillBackBuffer();
+	_video->clearBackBuffer();
 	if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 		preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
 		updateScreen(_andyObject->screenNum);
