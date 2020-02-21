@@ -326,10 +326,14 @@ void System_SDL2::setPalette(const uint8_t *pal, int n, int depth) {
 
 void System_SDL2::copyRect(int x, int y, int w, int h, const uint8_t *buf, int pitch) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
-	for (int i = 0; i < h; ++i) {
-		memcpy(_offscreenLut + y * _screenW + x, buf, w);
-		buf += pitch;
-		++y;
+	if (w == pitch && w == _screenW) {
+		memcpy(_offscreenLut + y * _screenW + x, buf, w * h);
+	} else {
+		for (int i = 0; i < h; ++i) {
+			memcpy(_offscreenLut + y * _screenW + x, buf, w);
+			buf += pitch;
+			++y;
+		}
 	}
 }
 
@@ -341,9 +345,13 @@ void System_SDL2::copyYuv(int w, int h, const uint8_t *y, int ypitch, const uint
 
 void System_SDL2::fillRect(int x, int y, int w, int h, uint8_t color) {
 	assert(x >= 0 && x + w <= _screenW && y >= 0 && y + h <= _screenH);
-	for (int i = 0; i < h; ++i) {
-		memset(_offscreenLut + y * _screenW + x, color, w);
-		++y;
+	if (w == _screenW) {
+		memset(_offscreenLut + y * _screenW + x, color, w * h);
+	} else {
+		for (int i = 0; i < h; ++i) {
+			memset(_offscreenLut + y * _screenW + x, color, w);
+			++y;
+		}
 	}
 }
 
