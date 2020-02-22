@@ -2087,9 +2087,6 @@ void Game::drawScreen() {
 }
 
 void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
-	if (_loadingScreenEnabled) {
-		displayLoadingScreen();
-	}
 	if (_playDemo && _res->loadHodDem()) {
 		_rnd._rndSeed = _res->_dem.randSeed;
 		level = _res->_dem.level;
@@ -2835,7 +2832,7 @@ void Game::callLevel_terminate() {
 }
 
 void Game::displayLoadingScreen() {
-	if (_res->loadDatLoadingImage(_video->_frontLayer, _video->_palette)) {
+	if (_loadingScreenEnabled && _res->loadDatLoadingImage(_video->_frontLayer, _video->_palette)) {
 		g_system->setPalette(_video->_palette, 256, 6);
 		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
 		g_system->updateScreen(false);

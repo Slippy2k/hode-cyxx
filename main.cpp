@@ -201,6 +201,7 @@ int main(int argc, char *argv[]) {
 	g->loadSetupCfg(resume);
 	bool runGame = true;
 	g->_video->init(isPsx);
+	g->displayLoadingScreen();
 	if (_runMenu && resume && !isPsx) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
 		runGame = m->mainLoop();
@@ -209,6 +210,7 @@ int main(int argc, char *argv[]) {
 	if (runGame && !g_system->inp.quit) {
 		bool levelChanged = false;
 		do {
+			g->displayLoadingScreen();
 			g->mainLoop(level, checkpoint, levelChanged);
 			// do not save progress when game is started from a specific level/checkpoint
 			if (resume) {
