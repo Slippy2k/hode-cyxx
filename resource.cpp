@@ -1046,8 +1046,6 @@ void Resource::unloadSssData() {
 		_sssPreload1Table[i].ptr = 0;
 	}
 	for (unsigned int i = 0; i < _sssPreloadInfosData.count; ++i) {
-		free(_sssPreloadInfosData[i].data);
-		_sssPreloadInfosData[i].data = 0;
 		if (_sssHdr.version == 6) {
 			for (unsigned int j = 0; j < _sssPreloadInfosData[i].count; ++j) {
 				SssPreloadInfoData *preloadInfoData = &_sssPreloadInfosData[i].data[j];
@@ -1055,6 +1053,8 @@ void Resource::unloadSssData() {
 				preloadInfoData->preload1Data_V6.ptr = 0;
 			}
 		}
+		free(_sssPreloadInfosData[i].data);
+		_sssPreloadInfosData[i].data = 0;
 	}
 	for (unsigned int i = 0; i < _sssPcmTable.count; ++i) {
 		free(_sssPcmTable[i].ptr);
