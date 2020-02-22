@@ -82,6 +82,30 @@ static void initVertex2D(Vertex *vertices, int w, int h, int targetW, int target
 	vertices[0].z = 0; vertices[1].z = 0;
 }
 
+void System_PSP_print(FILE *fp, const char *s) {
+	if (fp == stderr) {
+		static bool firstOpen = false;
+		if (!firstOpen) {
+			fp = fopen("stderr.txt", "w");
+			firstOpen = true;
+		} else {
+			fp = fopen("stderr.txt", "a");
+		}
+	} else if (fp == stdout) {
+		static bool firstOpen = false;
+		if (!firstOpen) {
+			fp = fopen("stdout.txt", "w");
+			firstOpen = true;
+		} else {
+			fp = fopen("stdout.txt", "a");
+		}
+	} else {
+		return;
+	}
+	fprintf(fp, "%s\n", s);
+	fclose(fp);
+}
+
 static int exitCallback(int arg1, int arg2, void *common) {
 	g_system->inp.quit = true;
 	return 0;
@@ -101,6 +125,8 @@ System_PSP::~System_PSP() {
 }
 
 void System_PSP::init(const char *title, int w, int h, bool fullscreen, bool widescreen, bool yuv) {
+
+	atexit(sceKernelExitGame);
 
 	memset(&inp, 0, sizeof(inp));
 	memset(&pad, 0, sizeof(pad));
