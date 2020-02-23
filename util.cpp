@@ -12,6 +12,7 @@
 #ifdef PSP
 extern void System_PSP_print(FILE *, const char *s);
 #endif
+extern void System_fatalError(const char *s);
 
 int g_debugMask;
 
@@ -46,7 +47,7 @@ void error(const char *msg, ...) {
 #ifdef PSP
 	System_PSP_print(stderr, buf);
 #endif
-	exit(-1);
+	System_fatalError(buf);
 }
 
 void warning(const char *msg, ...) {

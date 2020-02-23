@@ -106,6 +106,10 @@ void System_PSP_print(FILE *fp, const char *s) {
 	fclose(fp);
 }
 
+void System_fatalError(const char *s) {
+	sceKernelExitGame();
+}
+
 static int exitCallback(int arg1, int arg2, void *common) {
 	g_system->inp.quit = true;
 	return 0;
@@ -125,8 +129,6 @@ System_PSP::~System_PSP() {
 }
 
 void System_PSP::init(const char *title, int w, int h, bool fullscreen, bool widescreen, bool yuv) {
-
-	atexit(sceKernelExitGame);
 
 	memset(&inp, 0, sizeof(inp));
 	memset(&pad, 0, sizeof(pad));
@@ -355,11 +357,11 @@ uint32_t System_PSP::getTimeStamp() {
 }
 
 static void audioCallback(void *buf, unsigned int samples, void *userdata) { // 44100hz S16 stereo
-	System_PSP *sys = (System_PSP *)userdata;
 	int16_t buf22khz[samples];
 	memset(buf22khz, 0, sizeof(buf22khz));
-	sys->lockAudio();
-	(sys->_audioCb.proc)(sys->_audioCb.userdata, buf22khz, samples);
+	system_psp.lockAudio();
+	(system_psp._audioCb.proc)(system_psp._audioCb.userdata, buf22khz, samples);
+	system_psp.unlockAudio();
 	uint32_t *buf44khz = (uint32_t *)buf;
 	static int16_t prev;
 	for (unsigned int i = 0; i < samples; ++i) {
@@ -367,7 +369,6 @@ static void audioCallback(void *buf, unsigned int samples, void *userdata) { // 
 		buf44khz[i] = (current << 16) | (((prev + current) >> 1) & 0xFFFF);
 		prev = current;
 	}
-	sys->unlockAudio();
 }
 
 void System_PSP::startAudio(AudioCallback callback) {
@@ -376,7 +377,7 @@ void System_PSP::startAudio(AudioCallback callback) {
 	_audioCb = callback;
 	_audioMutex = sceKernelCreateSema("audio_lock", 0, 1, 1, 0);
 	_audioChannel = sceAudioChReserve(PSP_AUDIO_NEXT_CHANNEL, AUDIO_SAMPLES_COUNT, PSP_AUDIO_FORMAT_STEREO);
-	pspAudioSetChannelCallback(_audioChannel, audioCallback, this);
+	pspAudioSetChannelCallback(_audioChannel, audioCallback, 0);
 }
 
 void System_PSP::stopAudio() {

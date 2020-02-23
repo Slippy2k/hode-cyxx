@@ -88,6 +88,11 @@ struct System_SDL2 : System {
 static System_SDL2 system_sdl2;
 System *const g_system = &system_sdl2;
 
+void System_fatalError(const char *s) {
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Heart of Darkness", s, system_sdl2._window);
+	exit(-1);
+}
+
 System_SDL2::System_SDL2() :
 	_offscreenLut(0), _offscreenRgb(0),
 	_window(0), _renderer(0), _texture(0), _backgroundTexture(0), _fmt(0), _widescreenTexture(0),
