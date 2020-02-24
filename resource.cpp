@@ -10,6 +10,9 @@
 #include "resource.h"
 #include "util.h"
 
+// load and uncompress .sss pcm on level start
+static const bool kPreloadSssPcm = true;
+
 // menu settings and player progress
 static const char *_setupCfg = "setup.cfg";
 
@@ -1007,7 +1010,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 	}
 // 429C96
 	// preload PCM (_sssHdr.preloadPcmCount or setup.dat)
-	if (fp == _datFile) {
+	if (fp == _datFile || kPreloadSssPcm) {
 		fp->seek(_sssPcmTable[0].offset, SEEK_SET);
 		for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 			loadSssPcm(fp, &_sssPcmTable[i]);
