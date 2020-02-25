@@ -82,7 +82,7 @@ static void initVertex2D(Vertex *vertices, int w, int h, int targetW, int target
 	vertices[0].z = 0; vertices[1].z = 0;
 }
 
-void System_PSP_print(FILE *fp, const char *s) {
+void System_printLog(FILE *fp, const char *s) {
 	if (fp == stderr) {
 		static bool firstOpen = false;
 		if (!firstOpen) {

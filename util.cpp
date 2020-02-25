@@ -9,9 +9,7 @@
 #endif
 #include <stdarg.h>
 #include "util.h"
-#ifdef PSP
-extern void System_PSP_print(FILE *, const char *s);
-#endif
+extern void System_printLog(FILE *, const char *s);
 extern void System_fatalError(const char *s);
 
 int g_debugMask;
@@ -29,7 +27,7 @@ void debug(int mask, const char *msg, ...) {
 		__android_log_print(ANDROID_LOG_INFO, LOG_TAG, "%s", buf);
 #endif
 #ifdef PSP
-		System_PSP_print(stdout, buf);
+		System_printLog(stdout, buf);
 #endif
 	}
 }
@@ -45,7 +43,7 @@ void error(const char *msg, ...) {
 	__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "%s", buf);
 #endif
 #ifdef PSP
-	System_PSP_print(stderr, buf);
+	System_printLog(stderr, buf);
 #endif
 	System_fatalError(buf);
 }
@@ -61,6 +59,6 @@ void warning(const char *msg, ...) {
 	__android_log_print(ANDROID_LOG_WARN, LOG_TAG, "%s", buf);
 #endif
 #ifdef PSP
-	System_PSP_print(stderr, buf);
+	System_printLog(stderr, buf);
 #endif
 }
