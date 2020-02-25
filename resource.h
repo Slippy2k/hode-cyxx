@@ -554,6 +554,7 @@ struct Resource {
 	File *_sssFile;
 
 	bool _isPsx;
+	bool _isV2; // HoD version 1.2 or newer
 
 	uint8_t *_loadingImageBuffer;
 	uint8_t *_fontBuffer;

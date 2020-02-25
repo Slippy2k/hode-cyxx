@@ -13,6 +13,8 @@
 // load and uncompress .sss pcm on level start
 static const bool kPreloadSssPcm = true;
 
+static const bool kPreloadLvlBackgroundData = true;
+
 static const bool kCheckSssBytecode = false;
 
 // menu settings and player progress
@@ -67,7 +69,7 @@ static int readBytesAlign(File *f, uint8_t *buf, int len) {
 }
 
 Resource::Resource(FileSystem *fs)
-	: _fs(fs), _isPsx(false) {
+	: _fs(fs), _isPsx(false), _isV2(false) {
 
 	memset(_screensGrid, 0, sizeof(_screensGrid));
 	memset(_screensBasePos, 0, sizeof(_screensBasePos));
@@ -98,6 +100,8 @@ Resource::Resource(FileSystem *fs)
 		_lvlFile = new SectorFile;
 		_mstFile = new SectorFile;
 		_sssFile = new SectorFile;
+		// from v1.2, game data files are 'sector aligned'
+		_isV2 = true;
 	} else {
 		_datFile = new File;
 		_lvlFile = new File;
@@ -454,6 +458,9 @@ void Resource::loadLvlSpriteData(int num) {
 	_lvlFile->read(buf, sizeof(buf));
 	const uint32_t offset = READ_LE_UINT32(&buf[0]);
 	const uint32_t size = READ_LE_UINT32(&buf[4]);
+	if (size == 0) {
+		return;
+	}
 	const uint32_t readSize = READ_LE_UINT32(&buf[8]);
 	assert(readSize <= size);
 	uint8_t *ptr = (uint8_t *)malloc(size);
@@ -552,6 +559,12 @@ void Resource::loadLvlData(File *fp) {
 	for (int i = 0; i < _lvlHdr.spritesCount; ++i) {
 		loadLvlSpriteData(i);
 	}
+
+	if (kPreloadLvlBackgroundData) {
+		for (unsigned int i = 0; i < kMaxScreens; ++i) {
+			loadLvlScreenBackgroundData(i);
+		}
+	}
 }
 
 void Resource::unloadLvlData() {
@@ -636,6 +649,9 @@ void Resource::loadLvlScreenBackgroundData(int num) {
 	_lvlFile->read(buf, sizeof(buf));
 	const uint32_t offset = READ_LE_UINT32(&buf[0]);
 	const uint32_t size = READ_LE_UINT32(&buf[4]);
+	if (size == 0) {
+		return;
+	}
 	const uint32_t readSize = READ_LE_UINT32(&buf[8]);
 	assert(readSize <= size);
 	uint8_t *ptr = (uint8_t *)malloc(size);
