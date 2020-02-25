@@ -74,7 +74,6 @@ struct System_SDL2 : System {
 
 	virtual void startAudio(AudioCallback callback);
 	virtual void stopAudio();
-	virtual uint32_t getOutputSampleRate();
 	virtual void lockAudio();
 	virtual void unlockAudio();
 	virtual AudioCallback setAudioCallback(AudioCallback callback);
@@ -658,10 +657,6 @@ void System_SDL2::startAudio(AudioCallback callback) {
 
 void System_SDL2::stopAudio() {
 	SDL_CloseAudio();
-}
-
-uint32_t System_SDL2::getOutputSampleRate() {
-	return kAudioHz;
 }
 
 void System_SDL2::lockAudio() {

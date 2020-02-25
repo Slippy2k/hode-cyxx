@@ -36,7 +36,6 @@ struct System_PSP : System {
 	virtual uint32_t getTimeStamp();
 	virtual void startAudio(AudioCallback callback);
 	virtual void stopAudio();
-	virtual uint32_t getOutputSampleRate();
 	virtual void lockAudio();
 	virtual void unlockAudio();
 	virtual AudioCallback setAudioCallback(AudioCallback callback);
@@ -399,10 +398,6 @@ void System_PSP::stopAudio() {
 	sceAudioChRelease(_audioChannel);
 	sceKernelDeleteSema(_audioMutex);
 	pspAudioEnd();
-}
-
-uint32_t System_PSP::getOutputSampleRate() {
-	return 22050; // 22khz to 44khz in audio callback
 }
 
 void System_PSP::lockAudio() {

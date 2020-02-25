@@ -53,7 +53,6 @@ static void mixAudio(void *userdata, int16_t *buf, int len) {
 
 static void setupAudio(Game *g) {
 	g->_mix._lock = lockAudio;
-	g->_mix.init(g_system->getOutputSampleRate());
 	AudioCallback cb;
 	cb.proc = mixAudio;
 	cb.userdata = g;
@@ -222,7 +221,6 @@ int main(int argc, char *argv[]) {
 		} while (!g_system->inp.quit && level < kLvl_test);
 	}
 	g_system->stopAudio();
-	g->_mix.fini();
 	g_system->destroy();
 	delete g;
 	free(dataPath);
