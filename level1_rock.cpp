@@ -257,6 +257,7 @@ void Level_rock::postScreenUpdate_rock_screen16() {
 }
 
 void Level_rock::postScreenUpdate_rock_screen18() {
+	LvlObject *o;
 	switch (_res->_screensState[18].s0) {
 	case 0:
 		if (_andyObject->yPos + _andyObject->height < 162) {
@@ -273,16 +274,19 @@ void Level_rock::postScreenUpdate_rock_screen18() {
 		}
 		break;
 	case 2:
+		o = _g->findLvlObject(2, 0, 18);
 		++_screenCounterTable[18];
-		if (_screenCounterTable[18] == 29) {
-			LvlObject *o = _g->findLvlObject(2, 0, 18);
+		if (_res->_isV2) {
 			o->actionKeyMask = 1;
-		} else if (_screenCounterTable[18] == 43) {
+		} else if (_screenCounterTable[18] == 29) {
+			o->actionKeyMask = 1;
+			break;
+		}
+		if (_screenCounterTable[18] == 43) {
 			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 1;
 			_g->setupScreenMask(18);
-		} else if (_screenCounterTable[18] < 57) {
-			LvlObject *o = _g->findLvlObject(2, 0, 18);
+		} else if (_screenCounterTable[18] < (_res->_isV2 ? 51 : 57)) {
 			if ((o->flags0 & 0x1F) != 11 || (_andyObject->flags0 & 0x1F) == 11) {
 				break;
 			}
