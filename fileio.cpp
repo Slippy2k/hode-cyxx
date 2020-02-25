@@ -7,7 +7,7 @@
 #include "fileio.h"
 #include "util.h"
 
-static const bool kCheckSectorFileCrc = true;
+static const bool kCheckSectorFileCrc = false;
 
 File::File()
 	: _fp(0) {

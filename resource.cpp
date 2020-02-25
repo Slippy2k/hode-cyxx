@@ -13,6 +13,8 @@
 // load and uncompress .sss pcm on level start
 static const bool kPreloadSssPcm = true;
 
+static const bool kCheckSssBytecode = false;
+
 // menu settings and player progress
 static const char *_setupCfg = "setup.cfg";
 
@@ -733,11 +735,6 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 	assert(fp == _sssFile || fp == _datFile || fp == _lvlFile);
 
 	if (_sssHdr.bufferSize != 0) {
-		const int count = MIN(_sssHdr.pcmCount, _sssHdr.preloadPcmCount);
-		for (int i = 0; i < count; ++i) {
-			free(_sssPcmTable[i].ptr);
-			_sssPcmTable[i].ptr = 0;
-		}
 		unloadSssData();
 		_sssHdr.bufferSize = 0;
 		_sssHdr.infosDataCount = 0;
@@ -769,6 +766,8 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 
 	const int bufferSize = _sssHdr.bufferSize + _sssHdr.filtersDataCount * 52 + _sssHdr.banksDataCount * 56;
 	debug(kDebug_RESOURCE, "bufferSize %d", bufferSize);
+
+	const bool preloadPcm = (fp == _datFile) || (kPreloadSssPcm && !_isPsx);
 
 	// fp->flush();
 	fp->seek(baseOffset + 2048, SEEK_SET); // align to the next sector
@@ -908,20 +907,22 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 	} else if (_sssHdr.version == 6) {
 // 42E8DF
 		static const int kSizeOfPreloadInfoData_V6 = 68;
+		assert((unsigned int)_sssHdr.preloadInfoCount < kMaxScreens);
+		uint8_t buffer[kMaxScreens * kSizeOfPreloadInfoData_V6];
+
 		for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 			const int count = _sssPreloadInfosData[i].count;
 			_sssPreloadInfosData[i].data = (SssPreloadInfoData *)calloc(count, sizeof(SssPreloadInfoData));
 
-			uint8_t *p = (uint8_t *)malloc(kSizeOfPreloadInfoData_V6 * count);
-			fp->read(p, kSizeOfPreloadInfoData_V6 * count);
+			fp->read(buffer, kSizeOfPreloadInfoData_V6 * count);
 			bytesRead += kSizeOfPreloadInfoData_V6 * count;
 
 			for (int j = 0; j < count; ++j) {
 				SssPreloadInfoData *preloadInfoData = &_sssPreloadInfosData[i].data[j];
-				preloadInfoData->screenNum = p[j * kSizeOfPreloadInfoData_V6];
+				preloadInfoData->screenNum = buffer[j * kSizeOfPreloadInfoData_V6];
 
 				// 0x2C is pcm preload list
-				preloadInfoData->preload1Data_V6.count = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V6 + 0x2C);
+				preloadInfoData->preload1Data_V6.count = READ_LE_UINT32(buffer + j * kSizeOfPreloadInfoData_V6 + 0x2C);
 				preloadInfoData->preload1Data_V6.ptrSize = 2;
 				const int preload1DataLen = ((preloadInfoData->preload1Data_V6.count * 2) + 3) & ~3;
 				preloadInfoData->preload1Data_V6.ptr = (uint8_t *)malloc(preload1DataLen);
@@ -930,11 +931,10 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 				static const int8_t offsets[7] = { 0x30, 0x34, 0x04, 0x08, 0x0C, 0x10, 0x14 };
 				static const int8_t lengths[7] = {    1,    1,    2,    2,    1,    1,    1 };
 				for (int k = 0; k < 7; ++k) {
-					const int len = READ_LE_UINT32(p + j * kSizeOfPreloadInfoData_V6 + offsets[k]) * lengths[k];
+					const int len = READ_LE_UINT32(buffer + j * kSizeOfPreloadInfoData_V6 + offsets[k]) * lengths[k];
 					bytesRead += skipBytesAlign(fp, len);
 				}
 			}
-			free(p);
 		}
 	}
 
@@ -993,7 +993,9 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 	// _sssPreloadedPcmTotalSize = 0;
 
 // 429B9F
-	checkSssCode(_sssCodeData, _sssHdr.codeSize);
+	if (kCheckSssBytecode) {
+		checkSssCode(_sssCodeData, _sssHdr.codeSize);
+	}
 	for (int i = 0; i < _sssHdr.banksDataCount; ++i) {
 		if (_sssBanksData[i].count != 0) {
 			// const int num = _sssBanksData[i].firstSampleIndex;
@@ -1009,8 +1011,7 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		error("Unexpected number of bytes read %d (%d)", bytesRead, bufferSize);
 	}
 // 429C96
-	// preload PCM (_sssHdr.preloadPcmCount or setup.dat)
-	if (fp == _datFile || kPreloadSssPcm) {
+	if (preloadPcm) {
 		fp->seek(_sssPcmTable[0].offset, SEEK_SET);
 		for (int i = 0; i < _sssHdr.pcmCount; ++i) {
 			loadSssPcm(fp, &_sssPcmTable[i]);
@@ -1160,7 +1161,7 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 		if (fp != _datFile) {
 			fp->seek(pcm->offset, SEEK_SET);
 		}
-		static uint8_t strideBuffer[4040]; // maximum stride size
+		uint8_t strideBuffer[4040]; // maximum stride size
 		static const int samplesOffset = 256 * sizeof(int16_t);
 		for (int i = 0; i < pcm->strideCount; ++i) {
 			fp->read(strideBuffer, pcm->strideSize);
