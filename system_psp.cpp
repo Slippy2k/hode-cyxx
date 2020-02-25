@@ -147,6 +147,9 @@ void System_PSP::init(const char *title, int w, int h, bool fullscreen, bool wid
 
 	sceKernelDcacheWritebackAll();
 
+	sceCtrlSetSamplingCycle(0);
+	sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+
 	sceGuInit();
 	sceGuStart(GU_DIRECT, _dlist);
 
@@ -330,11 +333,23 @@ void System_PSP::processEvents() {
 		{ 0, 0 }
 	};
 	SceCtrlData data;
-	sceCtrlReadBufferPositive(&data, 1);
+	sceCtrlPeekBufferPositive(&data, 1);
 	for (int i = 0; mapping[i].psp != 0; ++i) {
 		if (data.Buttons & mapping[i].psp) {
 			inp.mask |= mapping[i].sys;
 		}
+	}
+	static const int lxMargin = 64;
+	if (data.Lx < 127 - lxMargin) {
+		inp.mask |= SYS_INP_LEFT;
+	} else if (data.Lx > 127 + lxMargin) {
+		inp.mask |= SYS_INP_RIGHT;
+	}
+	static const int lyMargin = 64;
+	if (data.Ly < 127 - lyMargin) {
+		inp.mask |= SYS_INP_UP;
+	} else if (data.Ly > 127 + lyMargin) {
+		inp.mask |= SYS_INP_DOWN;
 	}
 
 	const uint32_t mask = data.Buttons ^ _buttons;
