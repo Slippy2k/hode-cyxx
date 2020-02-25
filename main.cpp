@@ -3,11 +3,15 @@
  * Copyright (C) 2009-2011 Gregory Montoir (cyx@users.sourceforge.net)
  */
 
-#if !defined(PSP)
+#if !defined(PSP) && !defined(WII)
 #include <SDL.h>
+#endif
+#if defined(WII)
+#include <fat.h>
 #endif
 #include <getopt.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include "3p/inih/ini.h"
 
@@ -130,6 +134,22 @@ int main(int argc, char *argv[]) {
 	g_debugMask = 0; //kDebug_GAME | kDebug_RESOURCE | kDebug_SOUND | kDebug_MONSTER;
 	int cheats = 0;
 
+#ifdef WII
+	fatInitDefault();
+	static const char *pathsWII[] = {
+		"sd:/hode",
+		"usb:/hode",
+		0
+	};
+	for (int i = 0; pathsWII[i]; ++i) {
+		struct stat st;
+		if (stat(pathsWII[i], &st) == 0 && S_ISDIR(st.st_mode)) {
+			dataPath = strdup(pathsWII[i]);
+			savePath = strdup(pathsWII[i]);
+			break;
+		}
+	}
+#endif
 	if (argc == 2) {
 		// data path as the only command line argument
 		struct stat st;
@@ -225,5 +245,9 @@ int main(int argc, char *argv[]) {
 	delete g;
 	free(dataPath);
 	free(savePath);
+#ifdef WII
+	fatUnmount("sd:/");
+	fatUnmount("usb:/");
+#endif
 	return 0;
 }

@@ -19,8 +19,17 @@
 #define htole32(x) x
 static const bool kByteSwapData = false; // no byteswap needed on little endian
 #else
+#if defined(WII) // big endian
+#include <sys/types.h>
+#define le16toh(x) __bswap16(x)
+#define le32toh(x) __bswap32(x)
+#define htole16(x) __bswap16(x)
+#define htole32(x) __bswap32(x)
+static const bool kByteSwapData = true;
+#else
 #include <endian.h>
 static const bool kByteSwapData = (__BYTE_ORDER == __BIG_ENDIAN);
+#endif
 #endif
 
 #define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))

@@ -1,0 +1,33 @@
+
+CC      := powerpc-eabi-gcc
+CXX     := powerpc-eabi-g++
+LD      := powerpc-eabi-ld
+STRIP   := powerpc-eabi-strip
+
+MACHDEP = -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
+
+CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/
+LDFLAGS := -g $(MACHDEP)
+LIBS := -L $(DEVKITPRO)/libogc/lib/wii -lfat -lwiiuse -lbte -lasnd -logc -lm
+
+SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
+	level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \
+	level5_lava.cpp level6_pwr2.cpp level7_lar1.cpp level8_lar2.cpp level9_dark.cpp \
+	lzw.cpp main.cpp mdec.cpp menu.cpp mixer.cpp monsters.cpp paf.cpp random.cpp \
+	resource.cpp screenshot.cpp sound.cpp staticres.cpp system_wii.cpp \
+	util.cpp video.cpp
+
+OBJS = $(SRCS:.cpp=.o) 3p/inih/ini.o
+DEPS = $(SRCS:.cpp=.d) 3p/inih/ini.d
+
+hode.dol: hode.elf
+	elf2dol $^ $@
+
+hode.elf: $(OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(STRIP) $@
+
+clean:
+	rm -f $(OBJS) $(DEPS)
+
+-include $(DEPS)

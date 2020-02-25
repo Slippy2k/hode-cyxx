@@ -34,6 +34,12 @@ BIN_PSP = (
 	'RELEASES.yaml',
 )
 
+BIN_WII = (
+	'hode.dol',
+	'icon.png',
+	'meta.xml',
+)
+
 def getVersion():
 	f = file(os.path.join(SRC_DIR, 'README.txt'))
 	for line in f.readlines():
@@ -101,3 +107,11 @@ for f in zipfiles:
 			if os.path.exists(path):
 				zf.write(path, name)
 	zf.close()
+
+filename = 'hode-%s-wii.zip' % version
+zf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
+zf.write(os.path.join(SRC_DIR, 'hode.dol'), 'apps/hode/hode.dol')
+zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'meta.xml'), 'apps/hode/meta.xml')
+zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'icon.png'), 'apps/hode/icon.png')
+zf.writestr('hode/COPY YOUR DATA FILES HERE', '')
+zf.close()
