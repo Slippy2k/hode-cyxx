@@ -8,7 +8,7 @@ SRC_DIR = '..'
 
 EXTRA_DIRS = [ '.', '../tools/' ]
 
-SRCS = (
+SRC = (
 	'Makefile$',
 	'.*\.h$',
 	'.*\.cpp$',
@@ -17,12 +17,20 @@ SRCS = (
 	'RELEASES.yaml',
 )
 
-BINS = (
+BIN_WIN32 = (
 	'hode.exe',
 	'hode.ini',
 	'icon.bmp',
 	'README.txt',
 	'CHANGES.txt',
+	'RELEASES.yaml',
+)
+
+BIN_PSP = (
+	'EBOOT.PBP',
+	'hode.ini',
+	'README.txt',
+	'CHANGES.txt'
 	'RELEASES.yaml',
 )
 
@@ -65,7 +73,7 @@ src_dir = os.listdir(SRC_DIR)
 filename = 'hode-%s.tar.bz2' % version
 prefix = 'hode-%s/' % version
 tf = tarfile.open(filename, 'w:bz2')
-for name in SRCS:
+for name in SRC:
 	for filename in src_dir:
 		if re.match(name, filename):
 			entryname = prefix + filename
@@ -80,14 +88,16 @@ for name in SRCS:
 			tf.add(path, prefix + name)
 tf.close()
 
-filename = 'hode-%s-win32.zip' % version
-zf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
-for name in BINS:
-	for filename in src_dir:
-		if re.match(name, filename):
-			zf.write(os.path.join(SRC_DIR, filename), filename)
-	for dirname in EXTRA_DIRS:
-		path = os.path.join(dirname, name)
-		if os.path.exists(path):
-			zf.write(path, name)
-zf.close()
+zipfiles = [ ('hode-%s-win32.zip', BIN_WIN32), ('hode-%s-psp.zip', BIN_PSP) ]
+for f in zipfiles:
+	filename = f[0] % version
+	zf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
+	for name in f[1]:
+		for filename in src_dir:
+			if re.match(name, filename):
+				zf.write(os.path.join(SRC_DIR, filename), filename)
+		for dirname in EXTRA_DIRS:
+			path = os.path.join(dirname, name)
+			if os.path.exists(path):
+				zf.write(path, name)
+	zf.close()

@@ -1,0 +1,29 @@
+
+DEFINES = -DPSP=1
+
+SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
+        level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \
+        level5_lava.cpp level6_pwr2.cpp level7_lar1.cpp level8_lar2.cpp level9_dark.cpp \
+        lzw.cpp main.cpp mdec.cpp menu.cpp mixer.cpp monsters.cpp paf.cpp random.cpp \
+        resource.cpp screenshot.cpp sound.cpp staticres.cpp system_psp.cpp \
+        util.cpp video.cpp
+
+TARGET = hode
+OBJS = $(SRCS:.cpp=.o) 3p/inih/ini.o
+
+INCDIR =
+CFLAGS = -G0 -Wall -O2 $(DEFINES)
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+ASFLAGS = $(CFLAGS)
+
+LIBDIR =
+LDFLAGS =
+LIBS= -lpspgu -lstdc++ -lpspaudiolib -lpspaudio -lm
+
+EXTRA_TARGETS = EBOOT.PBP
+PSP_EBOOT_TITLE = Heart of Darkness
+PSP_EBOOT_ICON = dists/psp/icon0.png
+PSP_EBOOT_PIC1 = dists/psp/pic1.png
+
+PSPSDK=$(shell psp-config --pspsdk-path)
+include $(PSPSDK)/lib/build.mak
