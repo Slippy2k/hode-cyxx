@@ -1164,11 +1164,11 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 		pcm->ptr = p;
 		if (_isPsx) {
 			for (int i = 0; i < pcm->strideCount; ++i) {
-				uint8_t buf[512];
-				fp->read(buf, sizeof(buf));
+				uint8_t strideBuffer[512];
+				fp->read(strideBuffer, sizeof(strideBuffer));
 				_pcmL1 = _pcmL0 = 0;
-				for (int j = 0; j < 512; j += 16) {
-					decodeSssSpuAdpcmUnit(buf + j, p);
+				for (unsigned int j = 0; j < 512; j += 16) {
+					decodeSssSpuAdpcmUnit(strideBuffer + j, p);
 					p += 56;
 				}
 			}
@@ -1221,6 +1221,8 @@ void Resource::preloadSssPcmList(const SssPreloadInfoData *preloadInfoData) {
 		}
 		_lvlFile->seek(offset * 2048, SEEK_SET);
 		fp = _lvlFile;
+	} else if (kPreloadSssPcm) {
+		return;
 	}
 	const SssPreloadList *preloadList = (_sssHdr.version == 6) ? &preloadInfoData->preload1Data_V6 : &_sssPreload1Table[preloadInfoData->preload1Index];
 	for (int i = 0; i < preloadList->count; ++i) {
