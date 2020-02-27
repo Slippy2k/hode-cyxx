@@ -20,7 +20,7 @@ void File::setFp(FILE *fp) {
 	_fp = fp;
 }
 
-void File::seekAlign(int pos) {
+void File::seekAlign(uint32_t pos) {
 	fseek(_fp, pos, SEEK_SET);
 }
 
@@ -93,13 +93,14 @@ void SectorFile::refillBuffer(uint8_t *ptr) {
 	}
 }
 
-void SectorFile::seekAlign(int pos) {
+void SectorFile::seekAlign(uint32_t pos) {
 	pos += (pos / 2048) * 4;
-	const int alignPos = (pos / 2048) * 2048;
-	fseek(_fp, alignPos, SEEK_SET);
-	refillBuffer();
-	const int skipCount = pos - alignPos;
-	_bufPos += skipCount;
+	const long alignPos = pos & ~2047;
+	if (alignPos != (ftell(_fp) - 2048)) {
+		fseek(_fp, alignPos, SEEK_SET);
+		refillBuffer();
+	}
+	_bufPos = (pos - alignPos);
 }
 
 void SectorFile::seek(int pos, int whence) {

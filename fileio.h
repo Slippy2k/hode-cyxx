@@ -17,7 +17,7 @@ struct File {
 
 	void setFp(FILE *fp);
 
-	virtual void seekAlign(int pos);
+	virtual void seekAlign(uint32_t pos);
 	virtual void seek(int pos, int whence);
 	virtual int read(uint8_t *ptr, int size);
 	uint8_t readByte();
@@ -42,7 +42,7 @@ struct SectorFile : File {
 	SectorFile();
 
 	void refillBuffer(uint8_t *ptr = 0);
-	virtual void seekAlign(int pos);
+	virtual void seekAlign(uint32_t pos);
 	virtual void seek(int pos, int whence);
 	virtual int read(uint8_t *ptr, int size);
 	virtual void flush();
