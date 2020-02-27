@@ -11,7 +11,6 @@
 #endif
 #include <getopt.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
 #include "3p/inih/ini.h"
 

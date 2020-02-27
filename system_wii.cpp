@@ -44,6 +44,8 @@ struct System_Wii : System {
 	virtual void unlockAudio();
 	virtual AudioCallback setAudioCallback(AudioCallback callback);
 
+	void setupVideo();
+
 	void initGX();
 	void finiGX();
 	void drawTextureGX(int x, int y);
@@ -75,13 +77,18 @@ static int _current_dma;
 
 void System_fatalError(const char *s) {
 	GXRModeObj *rmodeObj = system_wii._rmodeObj;
-	if (rmodeObj) {
-		console_init(_xfb[_current_fb], 20, 20, rmodeObj->fbWidth, rmodeObj->xfbHeight, rmodeObj->fbWidth * VI_DISPLAY_PIX_SZ);
+	if (!rmodeObj) {
+		VIDEO_Init();
+		system_wii.setupVideo();
+		rmodeObj = system_wii._rmodeObj;
 	}
+	console_init(_xfb[_current_fb], 20, 20, rmodeObj->fbWidth, rmodeObj->xfbHeight, rmodeObj->fbWidth * VI_DISPLAY_PIX_SZ);
 	fputs(s, stdout);
+	usleep(10 * 1000 * 1000);
 }
 
 System_Wii::System_Wii() {
+	_rmodeObj = 0;
 }
 
 System_Wii::~System_Wii() {
@@ -102,29 +109,7 @@ void System_Wii::init(const char *title, int w, int h, bool fullscreen, bool wid
 	AUDIO_Init(0);
 
 	VIDEO_Init();
-	_rmodeObj = VIDEO_GetPreferredMode(0);
-	_rmodeObj->viWidth = 640;
-	_rmodeObj->viXOrigin = (VI_MAX_WIDTH_NTSC - 640) / 2;
-	VIDEO_Configure(_rmodeObj);
-
-	_xfb[0] = (uint32_t *)SYS_AllocateFramebuffer(_rmodeObj);
-	_xfb[1] = (uint32_t *)SYS_AllocateFramebuffer(_rmodeObj);
-	DCInvalidateRange(_xfb[0], VIDEO_GetFrameBufferSize(_rmodeObj));
-	DCInvalidateRange(_xfb[1], VIDEO_GetFrameBufferSize(_rmodeObj));
-	_xfb[0] = (uint32_t *)MEM_K0_TO_K1(_xfb[0]);
-	_xfb[1] = (uint32_t *)MEM_K0_TO_K1(_xfb[1]);
-
-	VIDEO_ClearFrameBuffer(_rmodeObj, _xfb[0], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer(_rmodeObj, _xfb[1], COLOR_BLACK);
-	VIDEO_SetNextFramebuffer(_xfb[0]);
-	_current_fb = 1;
-
-	VIDEO_SetBlack(FALSE);
-	VIDEO_Flush();
-	VIDEO_WaitVSync();
-	if (_rmodeObj->viTVMode & VI_NON_INTERLACE) {
-		VIDEO_WaitVSync();
-	}
+	setupVideo();
 
 	PAD_Init();
 	WPAD_Init();
@@ -207,10 +192,11 @@ void System_Wii::shakeScreen(int dx, int dy) {
 void System_Wii::updateScreen(bool drawWidescreen) {
 
 	GX_InvalidateTexAll();
-
 	drawTextureGX(_shakeDx, _shakeDy);
-
+	GX_SetColorUpdate(GX_TRUE);
 	GX_DrawDone();
+
+	_current_fb ^= 1;
 
 	GX_CopyDisp(_xfb[_current_fb], GX_TRUE);
 	GX_Flush();
@@ -218,7 +204,6 @@ void System_Wii::updateScreen(bool drawWidescreen) {
 	VIDEO_SetNextFramebuffer(_xfb[_current_fb]);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
-	_current_fb ^= 1;
 }
 
 void System_Wii::processEvents() {
@@ -347,6 +332,30 @@ AudioCallback System_Wii::setAudioCallback(AudioCallback callback) {
 	_audioCb = callback;
 	unlockAudio();
 	return cb;
+}
+
+void System_Wii::setupVideo() {
+	_rmodeObj = VIDEO_GetPreferredMode(0);
+	VIDEO_Configure(_rmodeObj);
+
+	_xfb[0] = (uint32_t *)SYS_AllocateFramebuffer(_rmodeObj);
+	_xfb[1] = (uint32_t *)SYS_AllocateFramebuffer(_rmodeObj);
+	DCInvalidateRange(_xfb[0], VIDEO_GetFrameBufferSize(_rmodeObj));
+	DCInvalidateRange(_xfb[1], VIDEO_GetFrameBufferSize(_rmodeObj));
+	_xfb[0] = (uint32_t *)MEM_K0_TO_K1(_xfb[0]);
+	_xfb[1] = (uint32_t *)MEM_K0_TO_K1(_xfb[1]);
+
+	VIDEO_ClearFrameBuffer(_rmodeObj, _xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer(_rmodeObj, _xfb[1], COLOR_BLACK);
+	VIDEO_SetNextFramebuffer(_xfb[0]);
+	_current_fb = 0;
+
+	VIDEO_SetBlack(FALSE);
+	VIDEO_Flush();
+	VIDEO_WaitVSync();
+	if (_rmodeObj->viTVMode & VI_NON_INTERLACE) {
+		VIDEO_WaitVSync();
+	}
 }
 
 void System_Wii::initGX() {

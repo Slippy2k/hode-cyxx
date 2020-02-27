@@ -110,7 +110,7 @@ for f in zipfiles:
 
 filename = 'hode-%s-wii.zip' % version
 zf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
-zf.write(os.path.join(SRC_DIR, 'hode.dol'), 'apps/hode/hode.dol')
+zf.write(os.path.join(SRC_DIR, 'hode.dol'), 'apps/hode/boot.dol')
 zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'meta.xml'), 'apps/hode/meta.xml')
 zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'icon.png'), 'apps/hode/icon.png')
 zf.writestr('hode/COPY YOUR DATA FILES HERE', '')
