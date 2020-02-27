@@ -100,7 +100,7 @@ void SectorFile::seekAlign(uint32_t pos) {
 		fseek(_fp, alignPos, SEEK_SET);
 		refillBuffer();
 	}
-	_bufPos = (pos - alignPos);
+	_bufPos = pos - alignPos;
 }
 
 void SectorFile::seek(int pos, int whence) {
