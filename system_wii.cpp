@@ -87,6 +87,9 @@ void System_fatalError(const char *s) {
 	usleep(10 * 1000 * 1000);
 }
 
+void System_printLog(FILE *fp, const char *s) {
+}
+
 System_Wii::System_Wii() {
 	_rmodeObj = 0;
 }
@@ -108,8 +111,10 @@ void System_Wii::init(const char *title, int w, int h, bool fullscreen, bool wid
 
 	AUDIO_Init(0);
 
-	VIDEO_Init();
-	setupVideo();
+	if (!_rmodeObj) {
+		VIDEO_Init();
+		setupVideo();
+	}
 
 	PAD_Init();
 	WPAD_Init();
@@ -193,11 +198,11 @@ void System_Wii::updateScreen(bool drawWidescreen) {
 
 	GX_InvalidateTexAll();
 	drawTextureGX(_shakeDx, _shakeDy);
-	GX_SetColorUpdate(GX_TRUE);
 	GX_DrawDone();
 
 	_current_fb ^= 1;
-
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+	GX_SetColorUpdate(GX_TRUE);
 	GX_CopyDisp(_xfb[_current_fb], GX_TRUE);
 	GX_Flush();
 
@@ -361,15 +366,20 @@ void System_Wii::setupVideo() {
 void System_Wii::initGX() {
 	memset(_fifo, 0, sizeof(_fifo));
 	GX_Init(_fifo, sizeof(_fifo));
+
+	GXColor background = { 0, 0, 0, 0xFF };
+	GX_SetCopyClear(background, GX_MAX_Z24);
+
 	GX_SetViewport(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight, 0, 1);
-	GX_SetDispCopyYScale(_rmodeObj->xfbHeight / (float)_rmodeObj->efbHeight);
+	GX_SetDispCopyYScale(GX_GetYScaleFactor(_rmodeObj->efbHeight, _rmodeObj->xfbHeight));
 	GX_SetScissor(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight);
 
 	GX_SetDispCopySrc(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight);
 	GX_SetDispCopyDst(_rmodeObj->fbWidth, _rmodeObj->xfbHeight);
 
 	GX_SetCopyFilter(_rmodeObj->aa, _rmodeObj->sample_pattern, GX_TRUE, _rmodeObj->vfilter);
-	GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+	GX_SetFieldMode(_rmodeObj->field_rendering, ((_rmodeObj->viHeight == 2 * _rmodeObj->xfbHeight) ? GX_ENABLE : GX_DISABLE));
+	GX_SetPixelFmt(_rmodeObj->aa ? GX_PF_RGB565_Z16 : GX_PF_RGB8_Z24, GX_ZC_LINEAR);
 	GX_SetDispCopyGamma(GX_GM_1_0);
 	GX_SetCullMode(GX_CULL_NONE);
 

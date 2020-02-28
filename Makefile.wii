@@ -4,11 +4,11 @@ CXX     := powerpc-eabi-g++
 LD      := powerpc-eabi-ld
 STRIP   := powerpc-eabi-strip
 
-MACHDEP = -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
+MACHDEP := -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
 
-CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/
+CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/ -DNDEBUG
 LDFLAGS := -g $(MACHDEP)
-LIBS := -L $(DEVKITPRO)/libogc/lib/wii -lfat -lwiiuse -lbte -lasnd -logc -lm
+LIBS := -L $(DEVKITPRO)/libogc/lib/wii -lfat -lwiiuse -lbte -logc -lm
 
 SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
 	level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \

@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-#endif
+#else
 	if (argc == 2) {
 		// data path as the only command line argument
 		struct stat st;
@@ -206,6 +206,7 @@ int main(int argc, char *argv[]) {
 			return -1;
 		}
 	}
+#endif
 	Game *g = new Game(dataPath ? dataPath : _defaultDataPath, savePath ? savePath : _defaultSavePath, cheats);
 	ini_parse(_configIni, handleConfigIni, g);
 	if (_runBenchmark) {
