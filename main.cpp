@@ -149,6 +149,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #else
+#if !defined(PSP)
 	if (argc == 2) {
 		// data path as the only command line argument
 		struct stat st;
@@ -206,6 +207,7 @@ int main(int argc, char *argv[]) {
 			return -1;
 		}
 	}
+#endif
 #endif
 	Game *g = new Game(dataPath ? dataPath : _defaultDataPath, savePath ? savePath : _defaultSavePath, cheats);
 	ini_parse(_configIni, handleConfigIni, g);

@@ -12,7 +12,7 @@ TARGET = hode
 OBJS = $(SRCS:.cpp=.o) 3p/inih/ini.o
 
 INCDIR =
-CFLAGS = -G0 -Wall -O2 $(DEFINES)
+CFLAGS = -G0 -Wall -O2 $(DEFINES) -DNDEBUG -Wno-unused-variable
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 
