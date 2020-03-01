@@ -1139,13 +1139,15 @@ static void decodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16
 		const int s1 = (t1 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
 		_pcmL1 = _pcmL0;
 		_pcmL0 = s1;
-		dst[0] = dst[1] = CLIP(_pcmL0, -32768, 32767);
+		dst[0] = (_pcmL1 + _pcmL0) >> 1;
+		dst[1] = CLIP(_pcmL0, -32768, 32767);
 		dst += 2;
 		const int t2 = sext8(b >> 4, 4);
 		const int s2 = (t2 << shift) + ((_pcmL0 * K0_1024[filter] + _pcmL1 * K1_1024[filter] + 512) >> 10);
 		_pcmL1 = _pcmL0;
 		_pcmL0 = s2;
-		dst[0] = dst[1] = CLIP(_pcmL0, -32768, 32767);
+		dst[0] = (_pcmL1 + _pcmL0) >> 1;
+		dst[1] = CLIP(_pcmL0, -32768, 32767);
 		dst += 2;
 	}
 }

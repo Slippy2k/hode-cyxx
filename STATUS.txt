@@ -1,6 +1,4 @@
 level 1 'rock' - completable
-	--checkpoint 3
-		screen 6 - infinite wave of monsters
 
 level 2 'fort' - completable
 
