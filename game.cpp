@@ -926,23 +926,6 @@ void Game::preloadLevelScreenData(uint8_t num, uint8_t prev) {
 			}
 		}
 	}
-	if (0) {
-		const uint8_t leftScreen = _res->_screensGrid[num][kPosLeftScreen];
-		if (leftScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(leftScreen)) {
-			_res->loadLvlScreenBackgroundData(leftScreen);
-		}
-		const uint8_t rightScreen = _res->_screensGrid[num][kPosRightScreen];
-		if (rightScreen != kNoScreen && !_res->isLvlBackgroundDataLoaded(rightScreen)) {
-			_res->loadLvlScreenBackgroundData(rightScreen);
-		}
-		for (unsigned int i = 0; i < kMaxScreens; ++i) {
-			if (_res->_resLevelData0x2B88SizeTable[i] != 0) {
-				if (i != num && i != leftScreen && i != rightScreen) {
-					_res->unloadLvlScreenBackgroundData(i);
-				}
-			}
-		}
-	}
 }
 
 void Game::setLvlObjectPosRelativeToObject(LvlObject *ptr1, int num1, LvlObject *ptr2, int num2) {

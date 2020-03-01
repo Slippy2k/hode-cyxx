@@ -655,7 +655,7 @@ struct Resource {
 	const uint8_t *getLvlScreenMaskDataPtr(int num) const;
 	const uint8_t *getLvlScreenPosDataPtr(int num) const;
 	void loadLvlScreenMaskData();
-	void loadLvlScreenBackgroundData(int num);
+	void loadLvlScreenBackgroundData(int num, const uint8_t *buf = 0);
 	void unloadLvlScreenBackgroundData(int num);
 	bool isLvlSpriteDataLoaded(int num) const;
 	bool isLvlBackgroundDataLoaded(int num) const;

@@ -561,8 +561,12 @@ void Resource::loadLvlData(File *fp) {
 	}
 
 	if (kPreloadLvlBackgroundData) {
+		_lvlFile->seekAlign(0x2B88);
+		static const int kSizeOfData = 4 * sizeof(uint32_t);
+		uint8_t buf[kMaxScreens * kSizeOfData];
+		_lvlFile->read(buf, sizeof(buf));
 		for (unsigned int i = 0; i < kMaxScreens; ++i) {
-			loadLvlScreenBackgroundData(i);
+			loadLvlScreenBackgroundData(i, buf + i * kSizeOfData);
 		}
 	}
 }
@@ -639,14 +643,17 @@ static uint32_t resFixPointersLevelData0x2B88(const uint8_t *src, uint8_t *ptr, 
 	return offsetsSize;
 }
 
-void Resource::loadLvlScreenBackgroundData(int num) {
+void Resource::loadLvlScreenBackgroundData(int num, const uint8_t *buf) {
 	assert((unsigned int)num < kMaxScreens);
 
 	static const uint32_t baseOffset = 0x2B88;
 
-	uint8_t buf[4 * 3];
-	_lvlFile->seekAlign(baseOffset + num * 16);
-	_lvlFile->read(buf, sizeof(buf));
+	uint8_t header[3 * sizeof(uint32_t)];
+	if (!buf) {
+		_lvlFile->seekAlign(baseOffset + num * 16);
+		_lvlFile->read(header, sizeof(header));
+		buf = header;
+	}
 	const uint32_t offset = READ_LE_UINT32(&buf[0]);
 	const uint32_t size = READ_LE_UINT32(&buf[4]);
 	if (size == 0) {
