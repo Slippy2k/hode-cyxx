@@ -21,6 +21,7 @@ struct System_Wii : System {
 	GXRModeObj *_rmodeObj;
 	GXTlutObj _tlutObj;
 	GXTexObj _texObj;
+	int _projTop, _projLeft;
 
 	System_Wii();
 	virtual ~System_Wii();
@@ -196,6 +197,8 @@ void System_Wii::shakeScreen(int dx, int dy) {
 
 void System_Wii::updateScreen(bool drawWidescreen) {
 
+	GX_SetViewport(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight, 0, 1);
+
 	GX_InvalidateTexAll();
 	drawTextureGX(_shakeDx, _shakeDy);
 	GX_DrawDone();
@@ -214,6 +217,10 @@ void System_Wii::updateScreen(bool drawWidescreen) {
 void System_Wii::processEvents() {
 	inp.prevMask = inp.mask;
 	inp.mask = 0;
+
+	if (SYS_ResetButtonDown()) {
+		inp.quit = true;
+	}
 
 	static const struct {
 		int pad;
@@ -341,6 +348,8 @@ AudioCallback System_Wii::setAudioCallback(AudioCallback callback) {
 
 void System_Wii::setupVideo() {
 	_rmodeObj = VIDEO_GetPreferredMode(0);
+	_rmodeObj->viWidth = 640;
+	_rmodeObj->viXOrigin = (VI_MAX_WIDTH_NTSC - _rmodeObj->viWidth) / 2;
 	VIDEO_Configure(_rmodeObj);
 
 	_xfb[0] = (uint32_t *)SYS_AllocateFramebuffer(_rmodeObj);
@@ -371,11 +380,11 @@ void System_Wii::initGX() {
 	GX_SetCopyClear(background, GX_MAX_Z24);
 
 	GX_SetViewport(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight, 0, 1);
-	GX_SetDispCopyYScale(GX_GetYScaleFactor(_rmodeObj->efbHeight, _rmodeObj->xfbHeight));
+	const int xfbHeight = GX_SetDispCopyYScale(GX_GetYScaleFactor(_rmodeObj->efbHeight, _rmodeObj->xfbHeight));
 	GX_SetScissor(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight);
 
 	GX_SetDispCopySrc(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight);
-	GX_SetDispCopyDst(_rmodeObj->fbWidth, _rmodeObj->xfbHeight);
+	GX_SetDispCopyDst(_rmodeObj->fbWidth, xfbHeight);
 
 	GX_SetCopyFilter(_rmodeObj->aa, _rmodeObj->sample_pattern, GX_TRUE, _rmodeObj->vfilter);
 	GX_SetFieldMode(_rmodeObj->field_rendering, ((_rmodeObj->viHeight == 2 * _rmodeObj->xfbHeight) ? GX_ENABLE : GX_DISABLE));
@@ -384,8 +393,14 @@ void System_Wii::initGX() {
 	GX_SetCullMode(GX_CULL_NONE);
 
 	Mtx m;
-	guOrtho(m, 0, GAME_H, 0, GAME_W, 0, 1);
+	const int h    = GAME_H;
+	const int top  = 0;
+	const int w    = GAME_W * 11 / 10;
+	const int left = 0;
+	guOrtho(m, top, h - top, left, w - left, 0, 1);
 	GX_LoadProjectionMtx(m, GX_ORTHOGRAPHIC);
+	_projTop  = (h - GAME_H) / 2;
+	_projLeft = (w - GAME_W) / 2;
 
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
@@ -417,10 +432,10 @@ void System_Wii::drawTextureGX(int x, int y) {
 	guMtxTrans(m, x, y, 0);
 	GX_LoadPosMtxImm(m, GX_PNMTX0);
 
-	const int x1 = 0;
-	const int y1 = 0;
-	const int x2 = GAME_W;
-	const int y2 = GAME_H;
+	const int x1 = _projLeft;
+	const int y1 = _projTop;
+	const int x2 = x1 + GAME_W;
+	const int y2 = y1 + GAME_H;
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 

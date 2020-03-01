@@ -6,7 +6,7 @@ STRIP   := powerpc-eabi-strip
 
 MACHDEP := -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
 
-CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/ -DNDEBUG
+CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/ -DNDEBUG -Wno-unused-variable
 LDFLAGS := -g $(MACHDEP)
 LIBS := -L $(DEVKITPRO)/libogc/lib/wii -lfat -lwiiuse -lbte -logc -lm
 
