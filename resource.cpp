@@ -968,12 +968,20 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		if (_sssPcmTable[i].totalSize != 0) {
 			assert((_sssPcmTable[i].totalSize % _sssPcmTable[i].strideSize) == 0);
 			assert(_sssPcmTable[i].totalSize == _sssPcmTable[i].strideSize * _sssPcmTable[i].strideCount);
-			assert(_isPsx ? (_sssPcmTable[i].strideSize == 512) : (_sssPcmTable[i].strideSize == 2276 || _sssPcmTable[i].strideSize == 4040));
 			if (sssPcmOffset != 0) {
 				assert(fp != _datFile || _sssPcmTable[i].offset == 0x2800); // .dat
 				_sssPcmTable[i].offset += sssPcmOffset;
 				sssPcmOffset += _sssPcmTable[i].totalSize;
 			}
+			if (_isPsx) {
+				assert(_sssPcmTable[i].strideSize == 512);
+				_sssPcmTable[i].pcmSize = (_sssPcmTable[i].totalSize / 16) * 56 * sizeof(int16_t);
+			} else {
+				assert(_sssPcmTable[i].strideSize == 2276 || _sssPcmTable[i].strideSize == 4040);
+				_sssPcmTable[i].pcmSize = (_sssPcmTable[i].totalSize - 256 * sizeof(int16_t) * _sssPcmTable[i].strideCount) * sizeof(int16_t);
+			}
+		} else {
+			_sssPcmTable[i].pcmSize = 0;
 		}
 		bytesRead += 20;
 	}
@@ -1142,19 +1150,10 @@ static void decodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16
 	}
 }
 
-uint32_t Resource::getSssPcmSize(const SssPcm *pcm) const {
-	if (_isPsx) {
-		assert(pcm->strideSize == 512);
-		const uint32_t size = pcm->strideCount * 512;
-		return (size / 16) * 56 * sizeof(int16_t);
-	}
-	return (pcm->strideSize - 256 * sizeof(int16_t)) * pcm->strideCount * sizeof(int16_t);
-}
-
 void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 	assert(!pcm->ptr);
-	if (pcm->totalSize != 0) {
-		const uint32_t decompressedSize = getSssPcmSize(pcm);
+	const uint32_t decompressedSize = pcm->pcmSize;
+	if (decompressedSize != 0) {
 		debug(kDebug_SOUND, "Loading PCM %p decompressedSize %d", pcm, decompressedSize);
 		int16_t *p = (int16_t *)malloc(decompressedSize);
 		if (!p) {
@@ -1172,17 +1171,17 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 					p += 56;
 				}
 			}
-			return;
-		}
-		if (fp != _datFile) {
-			fp->seek(pcm->offset, SEEK_SET);
-		}
-		uint8_t strideBuffer[4040]; // maximum stride size
-		static const int samplesOffset = 256 * sizeof(int16_t);
-		for (int i = 0; i < pcm->strideCount; ++i) {
-			fp->read(strideBuffer, pcm->strideSize);
-			for (unsigned int j = samplesOffset; j < pcm->strideSize; ++j) {
-				*p++ = READ_LE_UINT16(strideBuffer + strideBuffer[j] * sizeof(int16_t));
+		} else {
+			if (fp != _datFile) {
+				fp->seek(pcm->offset, SEEK_SET);
+			}
+			uint8_t strideBuffer[4040]; // maximum stride size
+			static const int samplesOffset = 256 * sizeof(int16_t);
+			for (int i = 0; i < pcm->strideCount; ++i) {
+				fp->read(strideBuffer, pcm->strideSize);
+				for (unsigned int j = samplesOffset; j < pcm->strideSize; ++j) {
+					*p++ = READ_LE_UINT16(strideBuffer + strideBuffer[j] * sizeof(int16_t));
+				}
 			}
 		}
 		assert((p - pcm->ptr) * sizeof(int16_t) == decompressedSize);

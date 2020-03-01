@@ -487,6 +487,7 @@ struct SssPcm {
 	uint32_t strideSize;  // 12
 	uint16_t strideCount; // 16
 	uint16_t flags;       // 18 1:stereo
+	uint32_t pcmSize;     // decompressed PCM size in bytes
 };
 
 struct SssUnk6 {
@@ -668,7 +669,6 @@ struct Resource {
 	void unloadSssData();
 	void checkSssCode(const uint8_t *buf, int size) const;
 	void loadSssPcm(File *fp, SssPcm *pcm);
-	uint32_t getSssPcmSize(const SssPcm *pcm) const;
 	void clearSssGroup3();
 	void resetSssFilters();
 	void preloadSssPcmList(const SssPreloadInfoData *preloadInfoData);

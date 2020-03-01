@@ -1221,7 +1221,7 @@ void Game::queueSoundObjectsPcmStride() {
 			if (so->currentPcmPtr < ptr) {
 				continue;
 			}
-			const uint32_t pcmSize = _res->getSssPcmSize(pcm) / sizeof(int16_t);
+			const uint32_t pcmSize = pcm->pcmSize / sizeof(int16_t);
 			const int16_t *end = ptr + pcmSize;
 			if (so->currentPcmPtr >= end) {
 				continue;
