@@ -7,8 +7,8 @@
 #define LOG_TAG "HodJni"
 #include <android/log.h>
 #endif
+#include <stdio.h>
 #include <stdarg.h>
-#include "util.h"
 extern void System_printLog(FILE *, const char *s);
 extern void System_fatalError(const char *s);
 
