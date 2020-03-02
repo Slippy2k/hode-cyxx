@@ -571,17 +571,17 @@ struct Resource {
 	uint8_t _screensGrid[kMaxScreens][4];
 	LvlScreenVector _screensBasePos[kMaxScreens];
 	LvlScreenState _screensState[kMaxScreens];
-	uint8_t *_resLevelData0x470CTable;
+	uint8_t *_resLevelData0x470CTable; // masks
 	uint8_t *_resLevelData0x470CTablePtrHdr;
 	uint8_t *_resLevelData0x470CTablePtrData;
-	uint32_t _lvlSssOffset;
-	uint32_t _resLevelData0x2B88SizeTable[kMaxScreens];
-	uint32_t _resLevelData0x2988SizeTable[kMaxSpriteTypes];
-	LvlObjectData _resLevelData0x2988Table[kMaxScreens];
+	uint32_t _lvlSssOffset; // .sss offset (PSX)
+	uint32_t _resLevelData0x2988SizeTable[kMaxSpriteTypes]; // sprites
+	LvlObjectData _resLevelData0x2988Table[kMaxSpriteTypes];
 	LvlObjectData *_resLevelData0x2988PtrTable[kMaxSpriteTypes];
+	uint8_t *_resLvlSpriteDataPtrTable[kMaxSpriteTypes];
+	uint32_t _resLevelData0x2B88SizeTable[kMaxScreens]; // backgrounds
 	LvlBackgroundData _resLvlScreenBackgroundDataTable[kMaxScreens];
 	uint8_t *_resLvlScreenBackgroundDataPtrTable[kMaxScreens];
-	uint8_t *_resLvlSpriteDataPtrTable[kMaxSpriteTypes];
 
 	LvlObject _resLvlScreenObjectDataTable[104];
 	LvlObject _dummyObject; // (LvlObject *)0xFFFFFFFF
@@ -651,7 +651,7 @@ struct Resource {
 	void loadLvlScreenObjectData(LvlObject *dat, const uint8_t *src);
 	void loadLvlData(File *fp);
 	void unloadLvlData();
-	void loadLvlSpriteData(int num);
+	void loadLvlSpriteData(int num, const uint8_t *buf = 0);
 	const uint8_t *getLvlScreenMaskDataPtr(int num) const;
 	const uint8_t *getLvlScreenPosDataPtr(int num) const;
 	void loadLvlScreenMaskData();

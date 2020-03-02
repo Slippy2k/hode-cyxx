@@ -79,6 +79,7 @@ Resource::Resource(FileSystem *fs)
 	_resLevelData0x470CTable = 0;
 	_resLevelData0x470CTablePtrHdr = 0;
 	_resLevelData0x470CTablePtrData = 0;
+
 	_lvlSssOffset = 0;
 
 	// sprites
@@ -179,6 +180,7 @@ void Resource::loadSetupDat() {
 		_datHdr.hintsImageSizeTable[i] = _datFile->readUint32();
 	}
 	_datFile->seek(2048, SEEK_SET); // align to the next sector
+
 	_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
 	if (_loadingImageBuffer) {
 		_datFile->read(_loadingImageBuffer, _datHdr.loadingImageSize);
@@ -448,14 +450,17 @@ static uint32_t resFixPointersLevelData0x2988(uint8_t *src, uint8_t *ptr, LvlObj
 	return (dat->framesCount + dat->coordsCount) * sizeof(uint32_t);
 }
 
-void Resource::loadLvlSpriteData(int num) {
+void Resource::loadLvlSpriteData(int num, const uint8_t *buf) {
 	assert((unsigned int)num < kMaxSpriteTypes);
 
 	static const uint32_t baseOffset = 0x2988;
 
-	uint8_t buf[4 * 3];
-	_lvlFile->seekAlign(baseOffset + num * 16);
-	_lvlFile->read(buf, sizeof(buf));
+	uint8_t header[3 * sizeof(uint32_t)];
+	if (!buf) {
+		_lvlFile->seekAlign(baseOffset + num * 16);
+		_lvlFile->read(header, sizeof(header));
+		buf = header;
+	}
 	const uint32_t offset = READ_LE_UINT32(&buf[0]);
 	const uint32_t size = READ_LE_UINT32(&buf[4]);
 	if (size == 0) {
@@ -552,21 +557,26 @@ void Resource::loadLvlData(File *fp) {
 
 	loadLvlScreenMaskData();
 
-	memset(_resLevelData0x2B88SizeTable, 0, sizeof(_resLevelData0x2B88SizeTable));
 	memset(_resLevelData0x2988SizeTable, 0, sizeof(_resLevelData0x2988SizeTable));
 	memset(_resLevelData0x2988PtrTable, 0, sizeof(_resLevelData0x2988PtrTable));
 
+	_lvlFile->seekAlign(0x2988);
+	uint8_t spr[kMaxSpriteTypes * 16];
+	assert(_lvlHdr.spritesCount <= kMaxSpriteTypes);
+	_lvlFile->read(spr, _lvlHdr.spritesCount * 16);
 	for (int i = 0; i < _lvlHdr.spritesCount; ++i) {
-		loadLvlSpriteData(i);
+		loadLvlSpriteData(i, spr + i * 16);
 	}
+
+	memset(_resLevelData0x2B88SizeTable, 0, sizeof(_resLevelData0x2B88SizeTable));
 
 	if (kPreloadLvlBackgroundData) {
 		_lvlFile->seekAlign(0x2B88);
-		static const int kSizeOfData = 4 * sizeof(uint32_t);
-		uint8_t buf[kMaxScreens * kSizeOfData];
-		_lvlFile->read(buf, sizeof(buf));
-		for (unsigned int i = 0; i < kMaxScreens; ++i) {
-			loadLvlScreenBackgroundData(i, buf + i * kSizeOfData);
+		uint8_t buf[kMaxScreens * 16];
+		assert(_lvlHdr.screensCount <= kMaxScreens);
+		_lvlFile->read(buf, _lvlHdr.screensCount * 16);
+		for (unsigned int i = 0; i < _lvlHdr.screensCount; ++i) {
+			loadLvlScreenBackgroundData(i, buf + i * 16);
 		}
 	}
 }
