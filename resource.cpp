@@ -1022,13 +1022,13 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 
 // 429AB8
 	const int lutSize = _sssHdr.banksDataCount * sizeof(uint32_t);
+	// allocate structures but skip read as tables are initialized in clearSoundObjects()
+	fp->seek(lutSize * 3 * 3, SEEK_CUR);
+	bytesRead += lutSize * 3 * 3;
 	for (int i = 0; i < 3; ++i) {
-		// allocate structures but skip read as tables are initialized in clearSoundObjects()
 		_sssGroup1[i] = (uint32_t *)malloc(lutSize);
 		_sssGroup2[i] = (uint32_t *)malloc(lutSize);
 		_sssGroup3[i] = (uint32_t *)malloc(lutSize);
-		fp->seek(lutSize * 3, SEEK_CUR);
-		bytesRead += lutSize * 3;
 	}
 // 429B4B
 	// _sssPreloadedPcmTotalSize = 0;
@@ -1055,7 +1055,9 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 	if (preloadPcm) {
 		fp->seek(_sssPcmTable[0].offset, SEEK_SET);
 		for (int i = 0; i < _sssHdr.pcmCount; ++i) {
-			loadSssPcm(fp, &_sssPcmTable[i]);
+			if (_sssPcmTable[i].pcmSize != 0) {
+				loadSssPcm(fp, &_sssPcmTable[i]);
+			}
 		}
 	}
 // 429D32
@@ -1172,39 +1174,37 @@ static void decodeSssSpuAdpcmUnit(const uint8_t *src, int16_t *dst) { // src: 16
 void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 	assert(!pcm->ptr);
 	const uint32_t decompressedSize = pcm->pcmSize;
-	if (decompressedSize != 0) {
-		debug(kDebug_SOUND, "Loading PCM %p decompressedSize %d", pcm, decompressedSize);
-		int16_t *p = (int16_t *)malloc(decompressedSize);
-		if (!p) {
-			warning("Failed to allocate %d bytes for PCM", decompressedSize);
-			return;
-		}
-		pcm->ptr = p;
-		if (_isPsx) {
-			for (int i = 0; i < pcm->strideCount; ++i) {
-				uint8_t strideBuffer[512];
-				fp->read(strideBuffer, sizeof(strideBuffer));
-				_pcmL1 = _pcmL0 = 0;
-				for (unsigned int j = 0; j < 512; j += 16) {
-					decodeSssSpuAdpcmUnit(strideBuffer + j, p);
-					p += 56;
-				}
-			}
-		} else {
-			if (fp != _datFile) {
-				fp->seek(pcm->offset, SEEK_SET);
-			}
-			uint8_t strideBuffer[4040]; // maximum stride size
-			static const int samplesOffset = 256 * sizeof(int16_t);
-			for (int i = 0; i < pcm->strideCount; ++i) {
-				fp->read(strideBuffer, pcm->strideSize);
-				for (unsigned int j = samplesOffset; j < pcm->strideSize; ++j) {
-					*p++ = READ_LE_UINT16(strideBuffer + strideBuffer[j] * sizeof(int16_t));
-				}
-			}
-		}
-		assert((p - pcm->ptr) * sizeof(int16_t) == decompressedSize);
+	debug(kDebug_SOUND, "Loading PCM %p decompressedSize %d", pcm, decompressedSize);
+	int16_t *p = (int16_t *)malloc(decompressedSize);
+	if (!p) {
+		warning("Failed to allocate %d bytes for PCM", decompressedSize);
+		return;
 	}
+	pcm->ptr = p;
+	if (_isPsx) {
+		uint8_t strideBuffer[512];
+		for (int i = 0; i < pcm->strideCount; ++i) {
+			fp->read(strideBuffer, sizeof(strideBuffer));
+			_pcmL1 = _pcmL0 = 0;
+			for (unsigned int j = 0; j < 512; j += 16) {
+				decodeSssSpuAdpcmUnit(strideBuffer + j, p);
+				p += 56;
+			}
+		}
+	} else {
+		if (fp != _datFile) {
+			fp->seek(pcm->offset, SEEK_SET);
+		}
+		uint8_t strideBuffer[4040]; // maximum stride size
+		static const int samplesOffset = 256 * sizeof(int16_t);
+		for (int i = 0; i < pcm->strideCount; ++i) {
+			fp->read(strideBuffer, pcm->strideSize);
+			for (unsigned int j = samplesOffset; j < pcm->strideSize; ++j) {
+				*p++ = READ_LE_UINT16(strideBuffer + strideBuffer[j] * sizeof(int16_t));
+			}
+		}
+	}
+	assert((p - pcm->ptr) * sizeof(int16_t) == decompressedSize);
 }
 
 void Resource::clearSssGroup3() {
@@ -1245,10 +1245,12 @@ void Resource::preloadSssPcmList(const SssPreloadInfoData *preloadInfoData) {
 	const SssPreloadList *preloadList = (_sssHdr.version == 6) ? &preloadInfoData->preload1Data_V6 : &_sssPreload1Table[preloadInfoData->preload1Index];
 	for (int i = 0; i < preloadList->count; ++i) {
 		const int num = (preloadList->ptrSize == 2) ? READ_LE_UINT16(preloadList->ptr + i * 2) : preloadList->ptr[i];
-		if (!_sssPcmTable[num].ptr) {
-			loadSssPcm(fp, &_sssPcmTable[num]);
-		} else if (_isPsx) {
-			fp->seek(_sssPcmTable[num].strideCount * 512, SEEK_CUR);
+		if (_sssPcmTable[num].pcmSize != 0) {
+			if (!_sssPcmTable[num].ptr) {
+				loadSssPcm(fp, &_sssPcmTable[num]);
+			} else if (_isPsx) {
+				fp->seek(_sssPcmTable[num].strideCount * 512, SEEK_CUR);
+			}
 		}
 	}
 }
