@@ -9,6 +9,12 @@
 
 static const bool kCheckSectorFileCrc = false;
 
+#ifdef PSP
+static const bool kSeekAbsolutePosition = true;
+#else
+static const bool kSeekAbsolutePosition = false;
+#endif
+
 File::File()
 	: _fp(0) {
 }
@@ -25,6 +31,10 @@ void File::seekAlign(uint32_t pos) {
 }
 
 void File::seek(int pos, int whence) {
+	if (kSeekAbsolutePosition && whence == SEEK_CUR) {
+		pos += ftell(_fp);
+		whence = SEEK_SET;
+	}
 	fseek(_fp, pos, whence);
 }
 
@@ -48,9 +58,6 @@ uint32_t File::readUint32() {
 	uint8_t buf[4];
 	read(buf, 4);
 	return READ_LE_UINT32(buf);
-}
-
-void File::flush() {
 }
 
 SectorFile::SectorFile() {
@@ -148,10 +155,4 @@ int SectorFile::read(uint8_t *ptr, int size) {
 		_bufPos += size;
 	}
 	return 0;
-}
-
-void SectorFile::flush() {
-	const int currentPos = ftell(_fp);
-	assert((currentPos & 2047) == 0);
-	_bufPos = 2044;
 }

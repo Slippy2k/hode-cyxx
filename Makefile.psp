@@ -18,7 +18,7 @@ ASFLAGS = $(CFLAGS)
 
 LIBDIR =
 LDFLAGS =
-LIBS= -lpspgu -lstdc++ -lpspaudiolib -lpspaudio -lm
+LIBS = -lpspgu -lstdc++ -lpspaudiolib -lpspaudio -lm
 
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = Heart of Darkness

@@ -23,7 +23,6 @@ struct File {
 	uint8_t readByte();
 	uint16_t readUint16();
 	uint32_t readUint32();
-	virtual void flush();
 
 	void skipByte()   { seek(1, SEEK_CUR); }
 	void skipUint16() { seek(2, SEEK_CUR); }
@@ -45,7 +44,6 @@ struct SectorFile : File {
 	virtual void seekAlign(uint32_t pos);
 	virtual void seek(int pos, int whence);
 	virtual int read(uint8_t *ptr, int size);
-	virtual void flush();
 };
 
 int fioAlignSizeTo2048(int size);

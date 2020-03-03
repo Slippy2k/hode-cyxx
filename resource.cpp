@@ -179,7 +179,7 @@ void Resource::loadSetupDat() {
 	for (int i = 0; i < hintsCount; ++i) {
 		_datHdr.hintsImageSizeTable[i] = _datFile->readUint32();
 	}
-	_datFile->seek(2048, SEEK_SET); // align to the next sector
+	_datFile->seek(2048, SEEK_SET); // align to next sector
 
 	_loadingImageBuffer = (uint8_t *)malloc(_datHdr.loadingImageSize);
 	if (_loadingImageBuffer) {
@@ -221,7 +221,9 @@ bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
 		assert(size == 256 * 192);
 		_datFile->seek(offset, SEEK_SET);
 		_datFile->read(dst, size);
-		_datFile->flush();
+		if (_datHdr.version == 11) {
+			_datFile->seek(offset + fioAlignSizeTo2048(size), SEEK_SET); // align to next sector
+		}
 		_datFile->read(pal, 768);
 		return true;
 	}
@@ -245,15 +247,14 @@ void Resource::loadDatMenuBuffers() {
 	_datFile->seek(_datHdr.sssOffset, SEEK_SET);
 	loadSssData(_datFile, _datHdr.sssOffset);
 
-	uint32_t baseOffset = _menuBuffersOffset;
+	const uint32_t baseOffset = _menuBuffersOffset;
 	_datFile->seek(baseOffset, SEEK_SET);
 	_menuBuffer1 = (uint8_t *)malloc(_datHdr.bufferSize1);
 	if (_menuBuffer1) {
 		_datFile->read(_menuBuffer1, _datHdr.bufferSize1);
 	}
 	if (_datHdr.version == 11) {
-		baseOffset += fioAlignSizeTo2048(_datHdr.bufferSize1); // align to the next sector
-		_datFile->seek(baseOffset, SEEK_SET);
+		_datFile->seek(baseOffset + fioAlignSizeTo2048(_datHdr.bufferSize1), SEEK_SET); // align to next sector
 	}
 	_menuBuffer0 = (uint8_t *)malloc(_datHdr.bufferSize0);
 	if (_menuBuffer0) {
@@ -1182,6 +1183,7 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 	}
 	pcm->ptr = p;
 	if (_isPsx) {
+		assert(pcm->strideSize == 512);
 		uint8_t strideBuffer[512];
 		for (int i = 0; i < pcm->strideCount; ++i) {
 			fp->read(strideBuffer, sizeof(strideBuffer));
@@ -1195,11 +1197,12 @@ void Resource::loadSssPcm(File *fp, SssPcm *pcm) {
 		if (fp != _datFile) {
 			fp->seek(pcm->offset, SEEK_SET);
 		}
+		const uint32_t strideSize = pcm->strideSize;
+		assert(strideSize == 2276 || strideSize == 4040);
 		uint8_t strideBuffer[4040]; // maximum stride size
-		static const int samplesOffset = 256 * sizeof(int16_t);
 		for (int i = 0; i < pcm->strideCount; ++i) {
-			fp->read(strideBuffer, pcm->strideSize);
-			for (unsigned int j = samplesOffset; j < pcm->strideSize; ++j) {
+			fp->read(strideBuffer, strideSize);
+			for (unsigned int j = 256 * sizeof(int16_t); j < strideSize; ++j) {
 				*p++ = READ_LE_UINT16(strideBuffer + strideBuffer[j] * sizeof(int16_t));
 			}
 		}
