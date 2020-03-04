@@ -773,7 +773,6 @@ void Menu::changeToOption(int num) {
 	} else if (_optionNum == kMenu_Load + 1) {
 // 4281C3
 		_loadLevelButtonState = 0;
-		_levelNum = 0;
 		memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 768);
 		memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
 		g_system->setPalette(_paletteBuffer, 256, 6);
@@ -991,6 +990,7 @@ void Menu::handleOptions() {
 	if (_lastLevelNum >= _res->_datHdr.levelsCount) {
 		_lastLevelNum = _res->_datHdr.levelsCount;
 	}
+	_levelNum = _config->players[_config->currentPlayer].levelNum;
 	_cutsceneIndexesCount = 0;
 	const uint32_t playedCutscenesMask = _config->players[_config->currentPlayer].cutscenesMask;
 	for (int i = 0; i < _res->_datHdr.cutscenesCount; ++i) {
