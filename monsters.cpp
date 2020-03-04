@@ -3019,7 +3019,9 @@ void Game::mstUpdateRefPos() {
 		AndyShootData *p = _andyShootsTable;
 		for (LvlObject *o = _lvlObjectsList0; o; o = o->nextPtr) {
 			p->o = o;
-			assert(o->dataPtr);
+			if (!o->dataPtr) {
+				continue;
+			}
 			ShootLvlObjectData *ptr = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
 			p->shootObjectData = ptr;
 			if (ptr->unk3 == 0x80) {
