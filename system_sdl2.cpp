@@ -579,6 +579,11 @@ void System_SDL2::processEvents() {
 					}
 					break;
 				case SDL_CONTROLLER_BUTTON_Y:
+					if (pressed) {
+						pad.mask |= SYS_INP_SHOOT | SYS_INP_RUN;
+					} else {
+						pad.mask &= ~(SYS_INP_SHOOT | SYS_INP_RUN);
+					}
 					break;
 				case SDL_CONTROLLER_BUTTON_BACK:
 				case SDL_CONTROLLER_BUTTON_START:
