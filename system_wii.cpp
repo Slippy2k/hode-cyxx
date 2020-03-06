@@ -23,6 +23,7 @@ struct System_Wii : System {
 	GXTlutObj _tlutObj;
 	GXTexObj _texObj;
 	int _projTop, _projLeft;
+	int _gamma;
 
 	System_Wii();
 	virtual ~System_Wii();
@@ -69,6 +70,8 @@ static uint8_t  __attribute__((aligned(32))) _texture[GAME_W * GAME_H];
 static const int DMA_BUFFER_SAMPLES = 512;
 static const int DMA_BUFFER_SIZE = DMA_BUFFER_SAMPLES * 2 * sizeof(int16_t); // stereo s16
 
+static const int AUDIO_THREAD_PRIORITY = 80;
+
 static const int AUDIO_BUFFER_SAMPLES = DMA_BUFFER_SAMPLES * 22050 / 32000;
 static const int AUDIO_BUFFER_SIZE = AUDIO_BUFFER_SAMPLES * 2 * sizeof(int16_t); // stereo s16
 
@@ -113,6 +116,8 @@ void System_Wii::init(const char *title, int w, int h, bool fullscreen, bool wid
 
 	AUDIO_Init(0);
 
+	_gamma = GX_GM_1_0;
+
 	if (!_rmodeObj) {
 		VIDEO_Init();
 		setupVideo();
@@ -130,14 +135,26 @@ void System_Wii::destroy() {
 	WPAD_Shutdown();
 
 	finiGX();
+
 	VIDEO_SetBlack(TRUE);
 	VIDEO_Flush();
+	free(MEM_K1_TO_K0(_xfb[0]));
+	_xfb[0] = 0;
+	free(MEM_K1_TO_K0(_xfb[1]));
+	_xfb[1] = 0;
 }
 
 void System_Wii::setScaler(const char *name, int multiplier) {
 }
 
 void System_Wii::setGamma(float gamma) {
+	if (gamma < 1.7f) {
+		_gamma = GX_GM_1_0;
+	} else if (gamma < 2.2f) {
+		_gamma = GX_GM_1_7;
+	} else {
+		_gamma = GX_GM_2_2;
+	}
 }
 
 void System_Wii::setPalette(const uint8_t *pal, int n, int depth) {
@@ -201,8 +218,6 @@ void System_Wii::shakeScreen(int dx, int dy) {
 }
 
 void System_Wii::updateScreen(bool drawWidescreen) {
-
-	GX_SetViewport(0, 0, _rmodeObj->fbWidth, _rmodeObj->efbHeight, 0, 1);
 
 	GX_InvalidateTexAll();
 	drawTextureGX(_shakeDx, _shakeDy);
@@ -292,12 +307,12 @@ static void *audioThread(void *arg) {
 		static const int fracBits = 16;
 		static const uint32_t step = (22050 << fracBits) / 32000;
 		uint32_t len = 0;
-		for (uint32_t pos = 0; (pos >> fracBits) < AUDIO_BUFFER_SAMPLES && len < DMA_BUFFER_SAMPLES * 2; pos += step) {
-			const int16_t *p = buf22khz + (pos >> fracBits) * 2;
+		for (uint32_t pos = 0; len < DMA_BUFFER_SAMPLES * 2; pos += step) {
+			const int16_t *p = buf22khz + MIN<uint32_t>((pos >> fracBits), AUDIO_BUFFER_SAMPLES - 1) * 2;
 			_resample[len++] = p[0];
 			_resample[len++] = p[1];
 		}
-		//assert(len * sizeof(int16_t) == DMA_BUFFER_SIZE);
+		assert(len * sizeof(int16_t) == DMA_BUFFER_SIZE);
 
 		memcpy(_dma[_current_dma], _resample, DMA_BUFFER_SIZE);
 		DCFlushRange(_dma[_current_dma], DMA_BUFFER_SIZE);
@@ -319,7 +334,7 @@ void System_Wii::startAudio(AudioCallback callback) {
 	LWP_InitQueue(&_audioQueue);
 	_audioOut = true;
 	AUDIO_SetDSPSampleRate(AI_SAMPLERATE_32KHZ);
-	LWP_CreateThread(&_audioThread, audioThread, 0, _audioThreadStack, sizeof(_audioThreadStack), 80 /* priority */);
+	LWP_CreateThread(&_audioThread, audioThread, 0, _audioThreadStack, sizeof(_audioThreadStack), AUDIO_THREAD_PRIORITY);
 	AUDIO_RegisterDMACallback(dmaCallback);
 	dmaCallback();
 	AUDIO_InitDMA((uint32_t)_dma[_current_dma], DMA_BUFFER_SIZE);
@@ -395,7 +410,7 @@ void System_Wii::initGX() {
 	GX_SetCopyFilter(_rmodeObj->aa, _rmodeObj->sample_pattern, GX_TRUE, _rmodeObj->vfilter);
 	GX_SetFieldMode(_rmodeObj->field_rendering, ((_rmodeObj->viHeight == 2 * _rmodeObj->xfbHeight) ? GX_ENABLE : GX_DISABLE));
 	GX_SetPixelFmt(_rmodeObj->aa ? GX_PF_RGB565_Z16 : GX_PF_RGB8_Z24, GX_ZC_LINEAR);
-	GX_SetDispCopyGamma(GX_GM_1_0);
+	GX_SetDispCopyGamma(_gamma);
 	GX_SetCullMode(GX_CULL_NONE);
 
 	Mtx m;
