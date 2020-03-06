@@ -6,6 +6,7 @@
 #include <ogc/audio.h>
 #include <ogc/lwp_watchdog.h>
 #include <wiiuse/wpad.h>
+#include <wupc/wupc.h>
 
 #include "system.h"
 
@@ -118,12 +119,16 @@ void System_Wii::init(const char *title, int w, int h, bool fullscreen, bool wid
 	}
 
 	PAD_Init();
+	WUPC_Init();
 	WPAD_Init();
 
 	initGX();
 }
 
 void System_Wii::destroy() {
+	WUPC_Shutdown();
+	WPAD_Shutdown();
+
 	finiGX();
 	VIDEO_SetBlack(TRUE);
 	VIDEO_Flush();
@@ -224,27 +229,28 @@ void System_Wii::processEvents() {
 
 	static const struct {
 		int pad;
+		int wpad;
 		int sys;
 	} mapping[] = {
-		{ PAD_BUTTON_UP | (WPAD_BUTTON_RIGHT << 16), SYS_INP_UP },
-		{ PAD_BUTTON_RIGHT | (WPAD_BUTTON_DOWN << 16), SYS_INP_RIGHT },
-		{ PAD_BUTTON_DOWN | (WPAD_BUTTON_LEFT << 16), SYS_INP_DOWN },
-		{ PAD_BUTTON_LEFT | (WPAD_BUTTON_UP << 16), SYS_INP_LEFT },
-		{ PAD_BUTTON_A | (WPAD_BUTTON_A << 16), SYS_INP_JUMP },
-		{ PAD_BUTTON_B | (WPAD_BUTTON_B << 16), SYS_INP_RUN },
-		{ PAD_BUTTON_X | (WPAD_BUTTON_1 << 16), SYS_INP_SHOOT },
-		{ PAD_BUTTON_Y | (WPAD_BUTTON_2 << 16), SYS_INP_SHOOT | SYS_INP_RUN },
-		{ PAD_BUTTON_START | (WPAD_BUTTON_HOME << 16), SYS_INP_ESC },
-		{ 0, 0 }
+		{ PAD_BUTTON_UP,    (WPAD_CLASSIC_BUTTON_UP    | WPAD_BUTTON_RIGHT), SYS_INP_UP },
+		{ PAD_BUTTON_RIGHT, (WPAD_CLASSIC_BUTTON_RIGHT | WPAD_BUTTON_DOWN),  SYS_INP_RIGHT },
+		{ PAD_BUTTON_DOWN,  (WPAD_CLASSIC_BUTTON_DOWN  | WPAD_BUTTON_LEFT),  SYS_INP_DOWN },
+		{ PAD_BUTTON_LEFT,  (WPAD_CLASSIC_BUTTON_LEFT  | WPAD_BUTTON_UP),    SYS_INP_LEFT },
+		{ PAD_BUTTON_A,     (WPAD_CLASSIC_BUTTON_A     | WPAD_BUTTON_A),     SYS_INP_JUMP },
+		{ PAD_BUTTON_B,     (WPAD_CLASSIC_BUTTON_B     | WPAD_BUTTON_B),     SYS_INP_RUN },
+		{ PAD_BUTTON_X,     (WPAD_CLASSIC_BUTTON_X     | WPAD_BUTTON_1),     SYS_INP_SHOOT },
+		{ PAD_BUTTON_Y,     (WPAD_CLASSIC_BUTTON_Y     | WPAD_BUTTON_2),     SYS_INP_SHOOT | SYS_INP_RUN },
+		{ PAD_BUTTON_START, (WPAD_CLASSIC_BUTTON_HOME  | WPAD_BUTTON_HOME),  SYS_INP_ESC },
+		{ 0, 0, 0 }
 	};
-	int buttons = 0;
-	if (PAD_ScanPads() & 1) {
-		buttons = PAD_ButtonsDown(0) | PAD_ButtonsHeld(0);
-	}
+	PAD_ScanPads();
+	const uint32_t padMask = PAD_ButtonsDown(0) | PAD_ButtonsHeld(0);
+	WUPC_UpdateButtonStats();
+	uint32_t wpadMask = WUPC_ButtonsDown(0) | WUPC_ButtonsHeld(0);
 	WPAD_ScanPads();
-	buttons |= (WPAD_ButtonsDown(0) | WPAD_ButtonsHeld(0)) << 16;
+	wpadMask |= WPAD_ButtonsDown(0) | WPAD_ButtonsHeld(0);
 	for (int i = 0; mapping[i].pad != 0; ++i) {
-		if (mapping[i].pad & buttons) {
+		if ((mapping[i].pad & padMask) != 0 || (mapping[i].wpad & wpadMask) != 0) {
 			inp.mask |= mapping[i].sys;
 		}
 	}
