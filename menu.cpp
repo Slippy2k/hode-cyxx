@@ -41,7 +41,7 @@ static void setDefaultsSetupCfg(SetupConfig *config, int num) {
 	config->players[num].difficulty = 1;
 	config->players[num].stereo = 1;
 	config->players[num].volume = 128;
-	config->players[num].currentLevel = 0;
+	config->players[num].lastLevelNum = 0;
 }
 
 static bool isEmptySetupCfg(SetupConfig *config, int num) {
@@ -986,7 +986,7 @@ static bool matchInput(uint8_t menu, uint8_t type, uint8_t mask, const PlayerInp
 }
 
 void Menu::handleOptions() {
-	_lastLevelNum = _config->players[_config->currentPlayer].currentLevel + 1;
+	_lastLevelNum = _config->players[_config->currentPlayer].lastLevelNum + 1;
 	if (_lastLevelNum >= _res->_datHdr.levelsCount) {
 		_lastLevelNum = _res->_datHdr.levelsCount;
 	}

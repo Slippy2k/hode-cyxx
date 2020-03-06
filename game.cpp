@@ -4857,8 +4857,8 @@ void Game::saveSetupCfg() {
 	_setupConfig.players[num].cutscenesMask = _paf->_playedMask;
 	_setupConfig.players[num].difficulty = _difficulty;
 	_setupConfig.players[num].volume = _snd_masterVolume;
-	if (_currentLevel > _setupConfig.players[num].currentLevel) {
-		_setupConfig.players[num].currentLevel = _currentLevel;
+	if (_currentLevel > _setupConfig.players[num].lastLevelNum) {
+		_setupConfig.players[num].lastLevelNum = _currentLevel;
 	}
 	_res->writeSetupCfg(&_setupConfig);
 }

@@ -1984,7 +1984,7 @@ static void persistSetupCfg(FILE *fp, T *config) {
 		}
 		persistUint8(fp, config->players[i].stereo);
 		persistUint8(fp, config->players[i].volume);
-		persistUint8(fp, config->players[i].currentLevel);
+		persistUint8(fp, config->players[i].lastLevelNum);
 	}
 	persistUint8(fp, config->unkD0);
 	persistUint8(fp, config->currentPlayer);
