@@ -560,6 +560,7 @@ struct Resource {
 	File *_sssFile;
 
 	bool _isPsx;
+	bool _isDemo;
 	int _version;
 
 	uint8_t *_loadingImageBuffer;

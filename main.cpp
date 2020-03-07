@@ -237,6 +237,9 @@ int main(int argc, char *argv[]) {
 			if (resume) {
 				g->saveSetupCfg();
 			}
+			if (g->_res->_isDemo) {
+				break;
+			}
 			level = g->_currentLevel + 1;
 			checkpoint = 0;
 			levelChanged = true;

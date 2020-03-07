@@ -42,6 +42,7 @@ static bool openDat(FileSystem *fs, const char *name, File *f) {
 	FILE *fp = fs->openAssetFile(name);
 	if (fp) {
 		f->setFp(fp);
+		f->seek(0, SEEK_SET);
 		return true;
 	}
 	return false;
@@ -69,7 +70,7 @@ static int readBytesAlign(File *f, uint8_t *buf, int len) {
 }
 
 Resource::Resource(FileSystem *fs)
-	: _fs(fs), _isPsx(false), _version(V1_1) {
+	: _fs(fs), _isPsx(false), _isDemo(false), _version(V1_1) {
 
 	memset(_screensGrid, 0, sizeof(_screensGrid));
 	memset(_screensBasePos, 0, sizeof(_screensBasePos));
@@ -108,7 +109,7 @@ Resource::Resource(FileSystem *fs)
 		_lvlFile = new File;
 		_mstFile = new File;
 		_sssFile = new File;
-		// detect if this is version 1.0 by reading the size of the first screen background
+		// detect if this is version 1.0 by reading the size of the first screen background using the v1.1 offset
 		char filename[32];
 		snprintf(filename, sizeof(filename), "%s_HOD.LVL", _prefixes[0]);
 		if (openDat(_fs, filename, _lvlFile)) {
@@ -121,7 +122,15 @@ Resource::Resource(FileSystem *fs)
 			closeDat(_fs, _lvlFile);
 		}
 	}
-	debug(kDebug_RESOURCE, "_isPsx %d _version %d", _isPsx, _version);
+	// detect if this is a demo version by trying to open the second level data files
+	char filename[32];
+	snprintf(filename, sizeof(filename), "%s_HOD.LVL", _prefixes[1]);
+	if (openDat(_fs, filename, _lvlFile)) {
+		closeDat(_fs, _lvlFile);
+	} else {
+		_isDemo = true;
+	}
+	debug(kDebug_RESOURCE, "psx %d demo %d version %d", _isPsx, _isDemo, _version);
 	memset(&_datHdr, 0, sizeof(_datHdr));
 	memset(&_lvlHdr, 0, sizeof(_lvlHdr));
 	memset(&_mstHdr, 0, sizeof(_mstHdr));

@@ -338,7 +338,7 @@ void Level_rock::postScreenUpdate_rock_screen19() {
 			if (!_paf->_skipCutscenes) {
 				_paf->play(2);
 				_paf->unload(2);
-				if (false /* _isDemo */ && !_paf->_skipCutscenes) {
+				if (_res->_isDemo && !_paf->_skipCutscenes) {
 					_paf->play(21);
 				}
 			}
