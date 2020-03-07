@@ -276,7 +276,7 @@ void Level_rock::postScreenUpdate_rock_screen18() {
 	case 2:
 		o = _g->findLvlObject(2, 0, 18);
 		++_screenCounterTable[18];
-		if (_res->_isV2) {
+		if (_res->_version >= Resource::V1_2) {
 			o->actionKeyMask = 1;
 		} else if (_screenCounterTable[18] == 29) {
 			o->actionKeyMask = 1;
@@ -286,7 +286,7 @@ void Level_rock::postScreenUpdate_rock_screen18() {
 			_g->setShakeScreen(2, 5);
 			_res->_resLvlScreenBackgroundDataTable[18].currentMaskId = 1;
 			_g->setupScreenMask(18);
-		} else if (_screenCounterTable[18] < (_res->_isV2 ? 51 : 57)) {
+		} else if (_screenCounterTable[18] < (_res->_version >= Resource::V1_2 ? 51 : 57)) {
 			if ((o->flags0 & 0x1F) != 11 || (_andyObject->flags0 & 0x1F) == 11) {
 				break;
 			}

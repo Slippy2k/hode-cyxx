@@ -542,6 +542,11 @@ struct ResStruct {
 struct FileSystem;
 
 struct Resource {
+	enum {
+		V1_0,
+		V1_1,
+		V1_2  // 1.2 or newer
+	};
 
 	FileSystem *_fs;
 
@@ -555,7 +560,7 @@ struct Resource {
 	File *_sssFile;
 
 	bool _isPsx;
-	bool _isV2; // HoD version 1.2 or newer
+	int _version;
 
 	uint8_t *_loadingImageBuffer;
 	uint8_t *_fontBuffer;
@@ -574,6 +579,9 @@ struct Resource {
 	uint8_t *_resLevelData0x470CTable; // masks
 	uint8_t *_resLevelData0x470CTablePtrHdr;
 	uint8_t *_resLevelData0x470CTablePtrData;
+	uint32_t _lvlSpritesOffset;
+	uint32_t _lvlBackgroundsOffset;
+	uint32_t _lvlMasksOffset;
 	uint32_t _lvlSssOffset; // .sss offset (PSX)
 	uint32_t _resLevelData0x2988SizeTable[kMaxSpriteTypes]; // sprites
 	LvlObjectData _resLevelData0x2988Table[kMaxSpriteTypes];
