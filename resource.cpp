@@ -108,7 +108,20 @@ Resource::Resource(FileSystem *fs)
 		_lvlFile = new File;
 		_mstFile = new File;
 		_sssFile = new File;
+		// detect if this is version 1.0 by reading the size of the first screen background
+		char filename[32];
+		snprintf(filename, sizeof(filename), "%s_HOD.LVL", _prefixes[0]);
+		if (openDat(_fs, filename, _lvlFile)) {
+			_lvlFile->seek(0x2B88, SEEK_SET);
+			_lvlFile->skipUint32();
+			const int size = _lvlFile->readUint32();
+			if (size == 0) {
+				_version = V1_0;
+			}
+			closeDat(_fs, _lvlFile);
+		}
 	}
+	debug(kDebug_RESOURCE, "_isPsx %d _version %d", _isPsx, _version);
 	memset(&_datHdr, 0, sizeof(_datHdr));
 	memset(&_lvlHdr, 0, sizeof(_lvlHdr));
 	memset(&_mstHdr, 0, sizeof(_mstHdr));
