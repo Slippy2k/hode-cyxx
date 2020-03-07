@@ -763,7 +763,9 @@ void Menu::changeToOption(int num) {
 		_currentOptionButton = 0;
 	}
 // 428053
-	_paf->play(data[5]);
+	if (!_paf->_skipCutscenes) {
+		_paf->play(data[5]);
+	}
 	if (_optionNum == kMenu_NewGame + 1) {
 		_config->players[_config->currentPlayer].levelNum = 0;
 		_config->players[_config->currentPlayer].checkpointNum = 0;
@@ -921,10 +923,12 @@ void Menu::handleLoadCutscene(int num) {
 		} else {
 			playSound(0x78);
 			_loadCutsceneButtonState = 2;
-			const int num = _cutscenesBitmaps[_cutsceneIndexes[_cutsceneNum]].data;
-			_paf->play(num);
-			if (num == kPafAnimation_end) {
-				_paf->play(kPafAnimation_cinema);
+			if (!_paf->_skipCutscenes) {
+				const int num = _cutscenesBitmaps[_cutsceneIndexes[_cutsceneNum]].data;
+				_paf->play(num);
+				if (num == kPafAnimation_end) {
+					_paf->play(kPafAnimation_cinema);
+				}
 			}
 			playSound(0x98);
 			playSound(0xA0);
