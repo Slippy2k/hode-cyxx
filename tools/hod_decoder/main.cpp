@@ -8,6 +8,7 @@
 
 #define SECTOR_FILE (1 << 0)
 #define PSX         (1 << 1)
+#define LVL_96OBJ   (1 << 2)
 
 enum {
 	kDat,
@@ -28,6 +29,7 @@ static const struct {
 	{ "setup.dat",    kDat, 0xb60fe7af, SECTOR_FILE }, // demo v1.4 (Coca Cola edition)
 	{ "rock_hod.lvl", kLvl, 0x7e50e77d, SECTOR_FILE },
 	{ "rock_hod.lvl", kLvl, 0x7e37bbdd, SECTOR_FILE | PSX }, // SLED_013.51, SLUS_006.96
+	{ "rock_hod.lvl", kLvl, 0xe0b1f1d9, LVL_96OBJ },
 	{ "rock_hod.sss", kSss, 0x69682a22, SECTOR_FILE }, // demo v1.2
 	{ "rock_hod.sss", kSss, 0xc50c13bb, SECTOR_FILE }, // demo v1.4
 	{ "fort_hod.lvl", kLvl, 0x3e6aebec, SECTOR_FILE },
@@ -341,10 +343,10 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 				p += 2; // sound
 				const uint16_t size = READ_LE_UINT16(p + 2);
 				if (size > 8) {
-					const int x = p[2];
-					const int y = p[3];
-					const int w = READ_LE_UINT16(p + 6);
-					const int h = READ_LE_UINT16(p + 8);
+					const int x = p[0];
+					const int y = p[0];
+					const int w = READ_LE_UINT16(p + 4);
+					const int h = READ_LE_UINT16(p + 6);
 					memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
 					DecodeRLE(p + 10, _bitmapBuffer, w);
 
@@ -423,7 +425,7 @@ static void DecodeLvlSprite(const uint8_t *data, int num) {
 	free(buffer);
 }
 
-static void DecodeLvl(File *fp) {
+static void DecodeLvl(File *fp, uint32_t flags) {
 
 	const uint32_t tag = fp->readUint32();
 	assert(tag == 0x484F4400);
@@ -455,10 +457,11 @@ static void DecodeLvl(File *fp) {
 		fp->readByte();
 	}
 
-	// level objects (sizeof == 96) count == 104
+	// level objects (sizeof == 96)
 	fp->seekAlign(0x288);
+	static const int kLvlObjectsCount = (flags & LVL_96OBJ) ? 96 : 104; // 104 from v1.1
 
-	static const uint32_t kSpritesOffset = 0x2988;
+	static const uint32_t kSpritesOffset = 0x288 + 96 * kLvlObjectsCount;
 	static const uint32_t kBackgroundsOffset = kSpritesOffset + 32 * 16;
 
 	// screen masks (shadows, grids)
@@ -1331,7 +1334,7 @@ static void DecodePC(const char *filename, int type, uint32_t flags) {
 			DecodeSetupDat(fp);
 			break;
 		case kLvl:
-			DecodeLvl(fp);
+			DecodeLvl(fp, flags);
 			break;
 		case kSss:
 			DecodeSss(fp);
