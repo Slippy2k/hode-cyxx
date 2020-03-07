@@ -344,11 +344,11 @@ static void DecodeLvlBackgroundBitmap(const uint8_t *header, const uint8_t *data
 				const uint16_t size = READ_LE_UINT16(p + 2);
 				if (size > 8) {
 					const int x = p[0];
-					const int y = p[0];
+					const int y = p[1];
 					const int w = READ_LE_UINT16(p + 4);
 					const int h = READ_LE_UINT16(p + 6);
 					memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
-					DecodeRLE(p + 10, _bitmapBuffer, w);
+					DecodeRLE(p + 8, _bitmapBuffer, w);
 
 					snprintf(filename, sizeof(filename), "lvl_screen_%02d_anim_%02d_frame_%02d_x_%03d_y_%03d.bmp", num, i, j, x, y);
 					saveBMP(filename, _bitmapBuffer, paletteData[0] + 2, w, h);

@@ -991,7 +991,7 @@ static bool matchInput(uint8_t menu, uint8_t type, uint8_t mask, const PlayerInp
 
 void Menu::handleOptions() {
 	_lastLevelNum = _config->players[_config->currentPlayer].lastLevelNum + 1;
-	if (_lastLevelNum >= _res->_datHdr.levelsCount) {
+	if (_lastLevelNum > _res->_datHdr.levelsCount) {
 		_lastLevelNum = _res->_datHdr.levelsCount;
 	}
 	_levelNum = _config->players[_config->currentPlayer].levelNum;
