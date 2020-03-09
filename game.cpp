@@ -245,7 +245,7 @@ void Game::unloadTransformLayerData() {
 void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 	uint8_t *dst = _video->_shadowScreenMaskBuffer;
 	for (int i = lvl->currentShadowId; i < lvl->shadowCount; ++i) {
-		uint8_t *src = lvl->backgroundMaskTable[i];
+		const uint8_t *src = lvl->backgroundMaskTable[i];
 		if (src) {
 			const int decodedSize = decodeLZW(src + 2, dst);
 
@@ -265,12 +265,12 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 			debug(kDebug_GAME, "shadow screen mask #%d pos %d,%d dim %d,%d size %d", i, x, y, w, h, decodedSize);
 
 			const int size = w * h;
-			src = _shadowScreenMasksTable[i].projectionDataPtr + 2;
+			uint8_t *p = _shadowScreenMasksTable[i].projectionDataPtr + 2;
 			for (int j = 1; j < size; ++j) {
-				const int16_t offset = (int16_t)READ_LE_UINT16(src - 2) + (int16_t)READ_LE_UINT16(src);
-				// fprintf(stdout, "shadow #%d offset #%d 0x%x 0x%x\n", i, j, READ_LE_UINT16(src), offset);
-				WRITE_LE_UINT16(src, offset);
-				src += 2;
+				const int16_t offset = (int16_t)READ_LE_UINT16(p - 2) + (int16_t)READ_LE_UINT16(p);
+				// fprintf(stdout, "shadow #%d offset #%d 0x%x 0x%x\n", i, j, READ_LE_UINT16(p), offset);
+				WRITE_LE_UINT16(p, offset);
+				p += 2;
 			}
 
 			const int shadowPaletteSize = decodedSize - 20 - w * h * sizeof(uint16_t);

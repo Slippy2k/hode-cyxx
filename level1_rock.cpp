@@ -623,7 +623,12 @@ void Level_rock::preScreenUpdate_rock_screen4() {
 		break;
 	}
 	_res->_resLvlScreenBackgroundDataTable[4].currentBackgroundId = num;
-	_res->_resLvlScreenBackgroundDataTable[4].currentShadowId = num;
+	// bugfix: glitch when re-entering screen 4 (state 1) from screen 3.
+	// drawScreen() calls applyShadowColors() from 0 to shadowsCount. Setting
+	// currentShadowId to 1 will result in screen 3 shadow mask (index #0) to
+	// be applied where it shouldn't. Another fix would be iterating from
+	// currentShadowId to shadowsCount, similar to decodeShadowScreenMask.
+	// _res->_resLvlScreenBackgroundDataTable[4].currentShadowId = num;
 	_res->_resLvlScreenBackgroundDataTable[4].currentMaskId = num;
 	if (_res->_currentScreenResourceNum == 4 && _checkpoint == 1) {
 		_checkpoint = 2;
