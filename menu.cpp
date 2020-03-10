@@ -995,6 +995,13 @@ void Menu::handleOptions() {
 		_lastLevelNum = _res->_datHdr.levelsCount;
 	}
 	_levelNum = _config->players[_config->currentPlayer].levelNum;
+	if (_levelNum > kLvl_dark) {
+		_levelNum = kLvl_dark;
+	}
+	if (_levelNum == kLvl_dark) {
+		_levelNum = 7;
+		_checkpointNum = 11;
+	}
 	_cutsceneIndexesCount = 0;
 	const uint32_t playedCutscenesMask = _config->players[_config->currentPlayer].cutscenesMask;
 	for (int i = 0; i < _res->_datHdr.cutscenesCount; ++i) {
