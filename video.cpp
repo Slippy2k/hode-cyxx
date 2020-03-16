@@ -32,7 +32,6 @@ Video::Video() {
 	_shadowScreenMaskBuffer = (uint8_t *)malloc(256 * 192 * 2 + 256 * 4);
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
-	_clearColor = 0xC4;
 	memset(&_mdec, 0, sizeof(_mdec));
 }
 
@@ -90,7 +89,7 @@ void Video::updateScreen() {
 }
 
 void Video::clearBackBuffer() {
-	g_system->fillRect(0, 0, W, H, _clearColor);
+	g_system->fillRect(0, 0, W, H, CLEAR_COLOR);
 }
 
 void Video::clearPalette() {

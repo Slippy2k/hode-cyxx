@@ -197,7 +197,7 @@ void Game::transformShadowLayer(int delta) {
 				const int offset = x + *src++;
 				*dst++ = _video->_frontLayer[y * Video::W + offset];
 			}
-			memset(dst, 0xC4, 6);
+			memset(dst, Video::CLEAR_COLOR, 6);
 			dst += 6;
 			src += 6;
 		} else {

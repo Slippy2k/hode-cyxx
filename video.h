@@ -20,6 +20,7 @@ enum {
 
 struct Video {
 	enum {
+		CLEAR_COLOR = 0xC4,
 		W = 256,
 		H = 192
 	};
@@ -39,7 +40,6 @@ struct Video {
 	uint8_t *_shadowScreenMaskBuffer;
 	uint8_t *_transformShadowBuffer;
 	uint8_t _transformShadowLayerDelta;
-	uint8_t _clearColor;
 	uint8_t _shadowColorLut[256];
 	const uint8_t *_font;
 
