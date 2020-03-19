@@ -291,9 +291,9 @@ struct Game {
 	void removeLvlObject2(LvlObject *o);
 	void setAndySprite(int num);
 	void setupAndyLvlObject();
-	void updateScreenHelper(int num);
+	void setupScreenLvlObjects(int num);
 	void resetDisplay();
-	void updateScreen(uint8_t num);
+	void setupScreen(uint8_t num);
 	void resetScreen();
 	void restartLevel();
 	void playAndyFallingCutscene(int type);

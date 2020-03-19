@@ -1273,7 +1273,7 @@ void Game::setupAndyLvlObject() {
 	}
 }
 
-void Game::updateScreenHelper(int num) {
+void Game::setupScreenLvlObjects(int num) {
 	_res->_screensState[num].s2 = 1;
 	for (LvlObject *ptr = _screenLvlObjectsList[num]; ptr; ptr = ptr->nextPtr) {
 		switch (ptr->type) {
@@ -1332,7 +1332,7 @@ void Game::updateScreenHelper(int num) {
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case4;
 					break;
 				default:
-					warning("updateScreenHelper unimplemented for level %d, state %d", _currentLevel, ptr->objectUpdateType);
+					warning("setupScreenLvlObjects unimplemented for level %d, state %d", _currentLevel, ptr->objectUpdateType);
 					break;
 				}
 			} else {
@@ -1345,7 +1345,7 @@ void Game::updateScreenHelper(int num) {
 					ptr->callbackFuncPtr = &Game::objectUpdate_rock_case3;
 					break;
 				default:
-					warning("updateScreenHelper unimplemented for level %d, state %d", _currentLevel, ptr->objectUpdateType);
+					warning("setupScreenLvlObjects unimplemented for level %d, state %d", _currentLevel, ptr->objectUpdateType);
 					break;
 				}
 			}
@@ -1365,7 +1365,7 @@ void Game::resetDisplay() {
 	_snd_masterVolume = kDefaultSoundVolume; // _plyConfigTable[_plyConfigNumber].soundVolume;
 }
 
-void Game::updateScreen(uint8_t num) {
+void Game::setupScreen(uint8_t num) {
 	uint8_t i, prev;
 
 	if (num == kNoScreen) {
@@ -1373,7 +1373,7 @@ void Game::updateScreen(uint8_t num) {
 	}
 	prev = _res->_currentScreenResourceNum;
 	_res->_currentScreenResourceNum = num;
-	updateScreenHelper(num);
+	setupScreenLvlObjects(num);
 	callLevel_preScreenUpdate(num);
 	if (_res->_screensState[num].s0 >= _res->_screensState[num].s1) {
 		--_res->_screensState[num].s1;
@@ -1387,7 +1387,7 @@ void Game::updateScreen(uint8_t num) {
 	}
 	i = _res->_screensGrid[num][kPosRightScreen];
 	if (i != kNoScreen && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
-		updateScreenHelper(i);
+		setupScreenLvlObjects(i);
 		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
@@ -1400,7 +1400,7 @@ void Game::updateScreen(uint8_t num) {
 	}
 	i = _res->_screensGrid[num][kPosLeftScreen];
 	if (i != kNoScreen && _res->_resLevelData0x2B88SizeTable[i] != 0 && prev != i) {
-		updateScreenHelper(i);
+		setupScreenLvlObjects(i);
 		callLevel_preScreenUpdate(i);
 		setupScreenMask(i);
 		callLevel_postScreenUpdate(i);
@@ -1451,7 +1451,7 @@ void Game::restartLevel() {
 	if (_andyObject->screenNum != screenNum) {
 		preloadLevelScreenData(_andyObject->screenNum, kNoScreen);
 	}
-	updateScreen(_andyObject->screenNum);
+	setupScreen(_andyObject->screenNum);
 }
 
 void Game::playAndyFallingCutscene(int type) {
@@ -2680,9 +2680,12 @@ void Game::levelMainLoop() {
 		_andyObject->actionKeyMask = _actionKeyMask;
 	}
 	_video->clearBackBuffer();
+	if (_res->_isPsx) {
+		_video->copyYuvBackBuffer();
+	}
 	if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 		preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
-		updateScreen(_andyObject->screenNum);
+		setupScreen(_andyObject->screenNum);
 	} else if (_fadePalette && _levelRestartCounter == 0) {
 		restartLevel();
 	} else {

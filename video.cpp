@@ -29,7 +29,7 @@ Video::Video() {
 	}
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
-	memset(&_mdec, 0, sizeof(_mdec));
+	memset(_mdec, 0, sizeof(_mdec));
 }
 
 Video::~Video() {
@@ -38,23 +38,27 @@ Video::~Video() {
 	free(_backgroundLayer);
 	free(_shadowColorLookupTable);
 	free(_shadowScreenMaskBuffer);
-	free(_mdec.planes[kOutputPlaneY].ptr);
-	free(_mdec.planes[kOutputPlaneCb].ptr);
-	free(_mdec.planes[kOutputPlaneCr].ptr);
+	for (int i = 0; i < 2; ++i) {
+		free(_mdec[i].planes[kOutputPlaneY].ptr);
+		free(_mdec[i].planes[kOutputPlaneCb].ptr);
+		free(_mdec[i].planes[kOutputPlaneCr].ptr);
+	}
 }
 
 void Video::init(bool mdec) {
 	if (mdec) {
 		const int w = (W + 15) & ~15;
 		const int h = (H + 15) & ~15;
-		_mdec.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
-		_mdec.planes[kOutputPlaneY].pitch = w;
 		const int w2 = w / 2;
 		const int h2 = h / 2;
-		_mdec.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
-		_mdec.planes[kOutputPlaneCb].pitch = w2;
-		_mdec.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
-		_mdec.planes[kOutputPlaneCr].pitch = w2;
+		for (int i = 0; i < 2; ++i) {
+			_mdec[i].planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
+			_mdec[i].planes[kOutputPlaneY].pitch = w;
+			_mdec[i].planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
+			_mdec[i].planes[kOutputPlaneCb].pitch = w2;
+			_mdec[i].planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
+			_mdec[i].planes[kOutputPlaneCr].pitch = w2;
+		}
 	}
 }
 
@@ -72,13 +76,20 @@ void Video::refreshGamePalette(const uint16_t *pal) {
 
 void Video::updateGameDisplay(uint8_t *buf) {
 	g_system->copyRect(0, 0, W, H, buf, 256);
-	if (_mdec.planes[kOutputPlaneY].ptr) {
-		updateYuvDisplay();
+	MdecOutput *mdec = &_mdec[1];
+	if (mdec->planes[kOutputPlaneY].ptr) {
+		updateYuvDisplay(mdec);
 	}
 }
 
-void Video::updateYuvDisplay() {
-	g_system->copyYuv(Video::W, Video::H, _mdec.planes[0].ptr, _mdec.planes[0].pitch, _mdec.planes[1].ptr, _mdec.planes[1].pitch, _mdec.planes[2].ptr, _mdec.planes[2].pitch);
+void Video::updateYuvDisplay(MdecOutput *mdec) {
+	g_system->copyYuv(Video::W, Video::H, mdec->planes[0].ptr, mdec->planes[0].pitch, mdec->planes[1].ptr, mdec->planes[1].pitch, mdec->planes[2].ptr, mdec->planes[2].pitch);
+}
+
+void Video::copyYuvBackBuffer() {
+	memcpy(_mdec[1].planes[kOutputPlaneY].ptr,  _mdec[0].planes[kOutputPlaneY].ptr,  W * H);
+	memcpy(_mdec[1].planes[kOutputPlaneCb].ptr, _mdec[0].planes[kOutputPlaneCb].ptr, (W / 2) * (H / 2));
+	memcpy(_mdec[1].planes[kOutputPlaneCr].ptr, _mdec[0].planes[kOutputPlaneCr].ptr, (W / 2) * (H / 2));
 }
 
 void Video::updateScreen() {
@@ -477,33 +488,36 @@ uint8_t Video::findWhiteColor() const {
 }
 
 void Video::decodeBackgroundPsx(const uint8_t *src, const int size, int w, int h, int x, int y) {
-	_mdec.x = x;
-	_mdec.y = y;
-	_mdec.w = w;
-	_mdec.h = h;
-	decodeMDEC(src, size, 0, 0, w, h, &_mdec);
+	MdecOutput *mdec = &_mdec[0];
+	mdec->x = x;
+	mdec->y = y;
+	mdec->w = w;
+	mdec->h = h;
+	decodeMDEC(src, size, 0, 0, w, h, mdec);
+	copyYuvBackBuffer();
 }
 
 void Video::decodeBackgroundOverlayPsx(const uint8_t *src, int x, int y) {
+	MdecOutput *mdec = &_mdec[1];
 	const uint16_t size = READ_LE_UINT16(src + 2);
 	if (size > 6) {
 		const int count = READ_LE_UINT32(src + 4);
 		assert(count >= 1 && count <= 3);
 		int offset = 8;
 		for (int i = 0; i < count && offset < size; ++i) {
-			_mdec.x = x + src[offset];
-			_mdec.y = y + src[offset + 1];
+			mdec->x = x + src[offset];
+			mdec->y = y + src[offset + 1];
 			const int len = READ_LE_UINT16(src + offset + 2);
-			_mdec.w = src[offset + 4] * 16;
-			_mdec.h = src[offset + 5] * 16;
+			mdec->w = src[offset + 4] * 16;
+			mdec->h = src[offset + 5] * 16;
 			const int mborderlen = src[offset + 6];
 			const int mborderalign = src[offset + 7];
 			const uint8_t *data = &src[offset + 8];
 			if (mborderalign == 0) {
-				decodeMDEC(data, len - 8, 0, 0, _mdec.w, _mdec.h, &_mdec);
+				decodeMDEC(data, len - 8, 0, 0, mdec->w, mdec->h, mdec);
 			} else {
 				// different macroblocks order
-				decodeMDEC(data + mborderalign, len - 8 - mborderalign, data, mborderlen, _mdec.w, _mdec.h, &_mdec);
+				decodeMDEC(data + mborderalign, len - 8 - mborderalign, data, mborderlen, mdec->w, mdec->h, mdec);
 			}
 			offset += len;
 		}

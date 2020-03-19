@@ -48,7 +48,7 @@ struct Video {
 		int x2, y2;
 	} _drawLine;
 
-	MdecOutput _mdec;
+	MdecOutput _mdec[2];
 
 	Video();
 	~Video();
@@ -57,7 +57,8 @@ struct Video {
 
 	void refreshGamePalette(const uint16_t *pal);
 	void updateGameDisplay(uint8_t *buf);
-	void updateYuvDisplay();
+	void updateYuvDisplay(MdecOutput *mdec);
+	void copyYuvBackBuffer();
 	void updateScreen();
 	void clearBackBuffer();
 	void clearPalette();

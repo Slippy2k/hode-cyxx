@@ -174,7 +174,7 @@ void Level_rock::postScreenUpdate_rock_screen9() {
 				_andyObject->anim = 232;
 				_andyObject->frame = 0;
 				_g->setupLvlObjectBitmap(_andyObject);
-				_g->updateScreen(_andyObject->screenNum);
+				_g->setupScreen(_andyObject->screenNum);
 			}
 			break;
 		case 1:
