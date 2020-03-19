@@ -1970,18 +1970,16 @@ void Game::drawPlasmaCannon() {
 	int y1 = _plasmaCannonPosY[index];
 	index += 4;
 	do {
-		_video->_drawLine.color = 0xA9;
 		int x2 = _plasmaCannonXPointsTable1[index];
 		int y2 = _plasmaCannonYPointsTable1[index];
 		if (_plasmaCannonDirection == 1) {
-			_video->drawLine(x1 - 1, y1, x2 - 1, y2);
-			_video->drawLine(x1 + 1, y1, x2 + 1, y2);
+			_video->drawLine(x1 - 1, y1, x2 - 1, y2, 0xA9);
+			_video->drawLine(x1 + 1, y1, x2 + 1, y2, 0xA9);
 		} else {
-			_video->drawLine(x1, y1 - 1, x2, y2 - 1);
-			_video->drawLine(x1, y1 + 1, x2, y2 + 1);
+			_video->drawLine(x1, y1 - 1, x2, y2 - 1, 0xA9);
+			_video->drawLine(x1, y1 + 1, x2, y2 + 1, 0xA9);
 		}
-		_video->_drawLine.color = 0xA6;
-		_video->drawLine(x1, y1, x2, y2);
+		_video->drawLine(x1, y1, x2, y2, 0xA6);
 		x1 = x2;
 		y1 = y2;
 		index += 4;

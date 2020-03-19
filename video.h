@@ -46,14 +46,7 @@ struct Video {
 	struct {
 		int x1, y1;
 		int x2, y2;
-		int pitch;
-		uint8_t color;
 	} _drawLine;
-
-	struct {
-		int pitch;
-		int x, y, w, h;
-	} _spr;
 
 	MdecOutput _mdec;
 
@@ -72,7 +65,7 @@ struct Video {
 	void decodeSPR(const uint8_t *src, uint8_t *dst, int x, int y, uint8_t flags, uint16_t spr_w, uint16_t spr_h);
 	int computeLineOutCode(int x, int y);
 	bool clipLineCoords(int &x1, int &y1, int &x2, int &y2);
-	void drawLine(int x1, int y1, int x2, int y2);
+	void drawLine(int x1, int y1, int x2, int y2, uint8_t color);
 	void applyShadowColors(int x, int y, int src_w, int src_h, int dst_pitch, int src_pitch, uint8_t *dst1, uint8_t *dst2, uint8_t *src1, uint8_t *src2);
 	void buildShadowColorLookupTable(const uint8_t *src, uint8_t *dst);
 
