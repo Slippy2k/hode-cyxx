@@ -48,7 +48,7 @@ struct Video {
 		int x2, y2;
 	} _drawLine;
 
-	MdecOutput _mdec[2];
+	MdecOutput _mdec;
 
 	Video();
 	~Video();

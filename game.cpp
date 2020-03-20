@@ -1995,9 +1995,17 @@ void Game::drawScreen() {
 
 	// redraw background animation sprites
 	LvlBackgroundData *dat = &_res->_resLvlScreenBackgroundDataTable[_res->_currentScreenResourceNum];
-	for (Sprite *spr = _typeSpritesList[0]; spr; spr = spr->nextPtr) {
-		if ((spr->num & 0x1F) == 0) {
-			_video->decodeSPR(spr->bitmapBits, _video->_backgroundLayer, spr->xPos, spr->yPos, 0, spr->w, spr->h);
+	if (_res->_isPsx) {
+		for (Sprite *spr = _typeSpritesList[0]; spr; spr = spr->nextPtr) {
+			assert((spr->num & 0x1F) == 0);
+			assert(spr->w == 0xFFFF && spr->h == 0xFFFF);
+			_video->decodeBackgroundOverlayPsx(spr->bitmapBits);
+		}
+	} else {
+		for (Sprite *spr = _typeSpritesList[0]; spr; spr = spr->nextPtr) {
+			if ((spr->num & 0x1F) == 0) {
+				_video->decodeSPR(spr->bitmapBits, _video->_backgroundLayer, spr->xPos, spr->yPos, 0, spr->w, spr->h);
+			}
 		}
 	}
 	memset(_video->_shadowLayer, 0, Video::W * Video::H + 1);
@@ -2238,19 +2246,21 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 			playSound(ptr->currentSound, ptr, 0, 3);
 			ptr->currentSound = 0xFFFF;
 		}
-		if (isPsx) {
-			_video->decodeBackgroundOverlayPsx(data);
-		} else {
-			Sprite *spr = _spritesNextPtr;
-			if (spr && READ_LE_UINT16(data + 2) > 8) {
+		Sprite *spr = _spritesNextPtr;
+		if (spr && READ_LE_UINT16(data + 2) > 8) {
+			if (isPsx) {
+				assert((ptr->flags2 & 0x1F) == 0);
+				spr->bitmapBits = data;
+				spr->w = spr->h = 0xFFFF;
+			} else {
 				spr->xPos = data[0];
 				spr->yPos = data[1];
 				spr->w = READ_LE_UINT16(data + 4);
 				spr->h = READ_LE_UINT16(data + 6);
 				spr->bitmapBits = data + 8;
-				spr->num = ptr->flags2;
-				addToSpriteList(spr);
 			}
+			spr->num = ptr->flags2;
+			addToSpriteList(spr);
 		}
 	}
 	int16_t soundNum = -1;
@@ -2302,19 +2312,21 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		}
 		data = _esi->currentSpriteData + soundDataLen;
 		if (_res->_currentScreenResourceNum == ptr->screenNum) {
-			if (isPsx) {
-				_video->decodeBackgroundOverlayPsx(data);
-			} else {
-				Sprite *spr = _spritesNextPtr;
-				if (spr && READ_LE_UINT16(data + 2) > 8) {
+			Sprite *spr = _spritesNextPtr;
+			if (spr && READ_LE_UINT16(data + 2) > 8) {
+				if (isPsx) {
+					assert((ptr->flags2 & 0x1F) == 0);
+					spr->bitmapBits = data;
+					spr->w = spr->h = 0xFFFF;
+				} else {
 					spr->w = READ_LE_UINT16(data + 4);
 					spr->h = READ_LE_UINT16(data + 6);
 					spr->bitmapBits = data + 8;
 					spr->xPos = data[0];
 					spr->yPos = data[1];
-					spr->num = ptr->flags2;
-					addToSpriteList(spr);
 				}
+				spr->num = ptr->flags2;
+				addToSpriteList(spr);
 			}
 		}
 		ptr->objectUpdateType = 1;
@@ -2680,9 +2692,6 @@ void Game::levelMainLoop() {
 		_andyObject->actionKeyMask = _actionKeyMask;
 	}
 	_video->clearBackBuffer();
-	if (_res->_isPsx) {
-		_video->copyYuvBackBuffer();
-	}
 	if (_andyObject->screenNum != _res->_currentScreenResourceNum) {
 		preloadLevelScreenData(_andyObject->screenNum, _res->_currentScreenResourceNum);
 		setupScreen(_andyObject->screenNum);

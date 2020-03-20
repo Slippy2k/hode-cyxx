@@ -252,7 +252,7 @@ static void DecodeLvlOverlayPsx(int screen, int anim, int frame, const uint8_t *
 		if (mborderalign == 0) {
 			savePSX(filename, data, len - 8, w, h);
 		} else {
-			savePSX(filename, data, len - 8 - mborderalign, w, h, data + offset + 8, mborderlen);
+			savePSX(filename, data, len - 8 - mborderalign, w, h, p + offset + 8, mborderlen);
 		}
 		offset += len;
 	}
