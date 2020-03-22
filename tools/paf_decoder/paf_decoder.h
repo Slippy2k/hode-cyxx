@@ -24,6 +24,7 @@ struct PafHeader {
 	uint32_t readBufferSize;
 	uint32_t maxVideoFrameBlocksCount;
 	uint32_t maxAudioFrameBlocksCount;
+	uint32_t audioBufferSize;
 };
 
 class PafDecoder {
@@ -32,13 +33,14 @@ public:
 	static const int kMaxVideosCount = 50;
 	static const int kVideoWidth = 256;
 	static const int kVideoHeight = 192;
-	static const int kSoundBufferSize = 4922; // 256 * 2 + 2205 * 2
 
 	bool Open(const char *filename, int videoNum);
 	void Close();
 	void Decode();
 
 private:
+
+	bool isTeaserPaf() const { return m_pafHdr.readBufferSize == 0x1800; }
 
 	void SeekToVideo(int videoNum);
 	void AlignReadHeaderTable(uint32_t *dst, int count);
