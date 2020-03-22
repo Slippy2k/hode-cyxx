@@ -159,7 +159,7 @@ void PafDecoder::Decode() {
 				assert(dstOffset + m_pafHdr.readBufferSize <= m_pafHdr.maxAudioFrameBlocksCount * m_pafHdr.readBufferSize);
 				memcpy(m_demuxAudioFrameBlocks + dstOffset, m_bufferBlock, m_pafHdr.readBufferSize);
 				audioOffset = dstOffset + m_pafHdr.readBufferSize;
-				if (audioOffset == m_flushAudioOffset) {
+				if (audioOffset == m_flushAudioOffset && m_pafHdr.readBufferSize == 0x800) { // audio format is different in 'TEASER.PAF'
 					DecodeAudioFrame(m_demuxAudioFrameBlocks, audioOffset);
 				}
 			} else {
@@ -227,7 +227,7 @@ bool PafDecoder::ReadPafHeader() {
 
 	memset(&m_pafHdr, 0, sizeof(m_pafHdr));
 
-	m_file.read(m_bufferBlock, sizeof(m_bufferBlock));
+	m_file.read(m_bufferBlock, 0x800);
 
 	if (memcmp(m_bufferBlock, headerSignature, strlen(headerSignature)) != 0) {
 		return false;
@@ -251,7 +251,13 @@ bool PafDecoder::ReadPafHeader() {
 
 	m_pafHdr.frameBlocksOffsetTable = (uint32_t *)malloc(m_pafHdr.frameBlocksCount * sizeof(uint32_t));
 	AlignReadHeaderTable(m_pafHdr.frameBlocksOffsetTable, m_pafHdr.frameBlocksCount * sizeof(uint32_t));
-
+	if (m_pafHdr.readBufferSize != 0x800) {
+		for (uint32_t i = 0; i < m_pafHdr.frameBlocksCount; ++i) {
+			const uint32_t mask = m_pafHdr.frameBlocksOffsetTable[i] & (1 << 31);
+			const uint32_t offset = (m_pafHdr.frameBlocksOffsetTable[i] & ~(1 << 31)) * m_pafHdr.readBufferSize;
+			m_pafHdr.frameBlocksOffsetTable[i] = offset | mask;
+		}
+	}
 	return true;
 }
 
@@ -310,6 +316,7 @@ void PafDecoder::DecodeVideoFrame(const uint8_t *src) {
 		break;
 	default:
 		assert(0);
+		break;
 	}
 }
 

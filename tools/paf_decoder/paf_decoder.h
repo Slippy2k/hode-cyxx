@@ -62,7 +62,7 @@ private:
 	int m_currentVideoPage;
 	uint8_t *m_videoPages[4];
 	uint8_t m_paletteBuffer[256 * 3];
-	uint8_t m_bufferBlock[2048];
+	uint8_t m_bufferBlock[0x1800];
 	uint8_t *m_demuxVideoFrameBlocks;
 	uint8_t *m_demuxAudioFrameBlocks;
 	ImageWriter *m_imageWriter;
