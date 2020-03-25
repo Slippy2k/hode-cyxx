@@ -6,9 +6,9 @@ STRIP   := powerpc-eabi-strip
 
 MACHDEP := -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
 
-CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/ -I $(DEVKITPRO)/libwupc/include/ -DNDEBUG -Wno-unused-variable
+CPPFLAGS += -O2 -Wall -DWII $(MACHDEP) -I $(DEVKITPRO)/libogc/include/ -I $(DEVKITPRO)/libwupc/include/ -I $(DEVKITPRO)/libwiidrc/include/ -DNDEBUG -Wno-unused-variable
 LDFLAGS := -g $(MACHDEP) -Wl,-wrap,wiiuse_register
-LIBS := -L $(DEVKITPRO)/libogc/lib/wii -L $(DEVKITPRO)/libwupc/lib/ -lfat -lwiiuse -lwupc -lbte -logc -lm
+LIBS := -L $(DEVKITPRO)/libogc/lib/wii -L $(DEVKITPRO)/libwupc/lib/ -L $(DEVKITPRO)/libwiidrc/build -lfat -lwiiuse -lwupc -lwiidrc -lbte -logc -lm
 
 SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
 	level1_rock.cpp level2_fort.cpp level3_pwr1.cpp level4_isld.cpp \

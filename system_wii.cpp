@@ -7,6 +7,7 @@
 #include <ogc/lwp_watchdog.h>
 #include <wiiuse/wpad.h>
 #include <wupc/wupc.h>
+#include <wiidrc/wiidrc.h>
 
 #include "system.h"
 
@@ -126,6 +127,7 @@ void System_Wii::init(const char *title, int w, int h, bool fullscreen, bool wid
 	PAD_Init();
 	WUPC_Init();
 	WPAD_Init();
+	WiiDRC_Init();
 
 	initGX();
 }
@@ -245,17 +247,18 @@ void System_Wii::processEvents() {
 	static const struct {
 		int pad;
 		int wpad;
+		int wdrc;
 		int sys;
 	} mapping[] = {
-		{ PAD_BUTTON_UP,    (WPAD_CLASSIC_BUTTON_UP    | WPAD_BUTTON_RIGHT), SYS_INP_UP },
-		{ PAD_BUTTON_RIGHT, (WPAD_CLASSIC_BUTTON_RIGHT | WPAD_BUTTON_DOWN),  SYS_INP_RIGHT },
-		{ PAD_BUTTON_DOWN,  (WPAD_CLASSIC_BUTTON_DOWN  | WPAD_BUTTON_LEFT),  SYS_INP_DOWN },
-		{ PAD_BUTTON_LEFT,  (WPAD_CLASSIC_BUTTON_LEFT  | WPAD_BUTTON_UP),    SYS_INP_LEFT },
-		{ PAD_BUTTON_A,     (WPAD_CLASSIC_BUTTON_A     | WPAD_BUTTON_A),     SYS_INP_JUMP },
-		{ PAD_BUTTON_B,     (WPAD_CLASSIC_BUTTON_B     | WPAD_BUTTON_B),     SYS_INP_RUN },
-		{ PAD_BUTTON_X,     (WPAD_CLASSIC_BUTTON_X     | WPAD_BUTTON_1),     SYS_INP_SHOOT },
-		{ PAD_BUTTON_Y,     (WPAD_CLASSIC_BUTTON_Y     | WPAD_BUTTON_2),     SYS_INP_SHOOT | SYS_INP_RUN },
-		{ PAD_BUTTON_START, (WPAD_CLASSIC_BUTTON_HOME  | WPAD_BUTTON_HOME),  SYS_INP_ESC },
+		{ PAD_BUTTON_UP,    (WPAD_CLASSIC_BUTTON_UP    | WPAD_BUTTON_RIGHT), WIIDRC_BUTTON_UP,    SYS_INP_UP },
+		{ PAD_BUTTON_RIGHT, (WPAD_CLASSIC_BUTTON_RIGHT | WPAD_BUTTON_DOWN),  WIIDRC_BUTTON_RIGHT, SYS_INP_RIGHT },
+		{ PAD_BUTTON_DOWN,  (WPAD_CLASSIC_BUTTON_DOWN  | WPAD_BUTTON_LEFT),  WIIDRC_BUTTON_DOWN,  SYS_INP_DOWN },
+		{ PAD_BUTTON_LEFT,  (WPAD_CLASSIC_BUTTON_LEFT  | WPAD_BUTTON_UP),    WIIDRC_BUTTON_LEFT,  SYS_INP_LEFT },
+		{ PAD_BUTTON_A,     (WPAD_CLASSIC_BUTTON_A     | WPAD_BUTTON_A),     WIIDRC_BUTTON_A,     SYS_INP_JUMP },
+		{ PAD_BUTTON_B,     (WPAD_CLASSIC_BUTTON_B     | WPAD_BUTTON_B),     WIIDRC_BUTTON_B,     SYS_INP_RUN },
+		{ PAD_BUTTON_X,     (WPAD_CLASSIC_BUTTON_X     | WPAD_BUTTON_1),     WIIDRC_BUTTON_X,     SYS_INP_SHOOT },
+		{ PAD_BUTTON_Y,     (WPAD_CLASSIC_BUTTON_Y     | WPAD_BUTTON_2),     WIIDRC_BUTTON_Y,     SYS_INP_SHOOT | SYS_INP_RUN },
+		{ PAD_BUTTON_START, (WPAD_CLASSIC_BUTTON_HOME  | WPAD_BUTTON_HOME),  WIIDRC_BUTTON_HOME,  SYS_INP_ESC },
 		{ 0, 0, 0 }
 	};
 	PAD_ScanPads();
@@ -264,8 +267,10 @@ void System_Wii::processEvents() {
 	uint32_t wpadMask = WUPC_ButtonsDown(0) | WUPC_ButtonsHeld(0);
 	WPAD_ScanPads();
 	wpadMask |= WPAD_ButtonsDown(0) | WPAD_ButtonsHeld(0);
+	WiiDRC_ScanPads();
+	const uint32_t wdrcMask = WiiDRC_ButtonsDown() | WiiDRC_ButtonsHeld();
 	for (int i = 0; mapping[i].pad != 0; ++i) {
-		if ((mapping[i].pad & padMask) != 0 || (mapping[i].wpad & wpadMask) != 0) {
+		if ((mapping[i].pad & padMask) != 0 || (mapping[i].wpad & wpadMask) != 0 || (mapping[i].wdrc & wdrcMask) != 0) {
 			inp.mask |= mapping[i].sys;
 		}
 	}
