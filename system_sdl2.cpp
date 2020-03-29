@@ -638,9 +638,8 @@ uint32_t System_SDL2::getTimeStamp() {
 }
 
 static void mixAudioS16(void *param, uint8_t *buf, int len) {
-	System_SDL2 *stub = (System_SDL2 *)param;
 	memset(buf, 0, len);
-	stub->_audioCb.proc(stub->_audioCb.userdata, (int16_t *)buf, len / 2);
+	system_sdl2._audioCb.proc(system_sdl2._audioCb.userdata, (int16_t *)buf, len / 2);
 }
 
 void System_SDL2::startAudio(AudioCallback callback) {

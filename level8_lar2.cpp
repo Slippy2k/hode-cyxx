@@ -306,7 +306,6 @@ void Level_lar2::postScreenUpdate_lar2_screen12() {
 					o->objectUpdateType = 7;
 				}
 			}
-
 		}
 	}
 }

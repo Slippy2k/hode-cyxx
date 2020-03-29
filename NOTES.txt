@@ -35,7 +35,7 @@ convert -delay 8 -loop 0 -layers Optimize screenshot-*-front.bmp rock_lvl_shoot_
 
 
 Saturn
-	file00 code ? contains the splash screen
+	file00 code, contains the splash screen
 		Inside 'SmpPlaySingleSample', we will play an empty sample ( Sample #=%d )!!
 		NbStarters is > MAX_STARTER !!
 		Init Luciole No %ld, X=%3ld, Y=%3ld
