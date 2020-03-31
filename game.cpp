@@ -1376,7 +1376,7 @@ void Game::setupScreen(uint8_t num) {
 	setupScreenLvlObjects(num);
 	callLevel_preScreenUpdate(num);
 	if (_res->_screensState[num].s0 >= _res->_screensState[num].s1) {
-		--_res->_screensState[num].s1;
+		_res->_screensState[num].s0 = _res->_screensState[num].s1 - 1;
 	}
 	callLevel_postScreenUpdate(num);
 	i = _res->_screensGrid[num][kPosTopScreen];
