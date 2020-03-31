@@ -73,8 +73,8 @@ The last line gives information about the game progress. V is the version of the
 
 The engine code can be split in 4 major parts :
 
-* C code handling collision, path finding, sprites, rendering and game objects
-* C code (callbacks) for each level and screen
+* native code handling collision, path finding, sprites, rendering and game objects
+* native code for each level screen (callabcks)
 * a bytecode interpreter (242 opcodes) for the monsters logic
 * a bytecode interpreter (30 opcodes) for sounds
 
@@ -84,8 +84,10 @@ The engine code can be split in 4 major parts :
 For each level and screen, the below callbacks can be found in the executable.
 
 ```
-// called before and after the screen graphics are redrawn
+// called before entering the screen
 callLevel_preScreenUpdate(int screen)
+
+// called to refresh the screen when it is current
 callLevel_postScreenUpdate(int screen)
 
 // called when starting the level from a checkpoint (setup objects)
@@ -113,8 +115,9 @@ As an example, the first screen of the 'rock' level has two different states. On
 The callback code relies on some state and counter variables to change the asset for the background when Andy jumps.
 
 ```
-void preScreenUpdateCb(level1, screen0) {
+void postScreenUpdateCb_rock_screen0() {
   if (_screens[0].state0 == 0) {
+      // check for Andy jumping state
       if ((_andyObject->flags0 & 0x1F) == 0 && ((_andyObject->flags0 >> 5) & 7) == 6) {
           _screens[0].state0 = 2;
       }
@@ -128,7 +131,7 @@ void preScreenUpdateCb(level1, screen0) {
     }
   }
 }
-void postScreenUpdateCb(level1, screen0) {
+void preScreenUpdateCb_rock_screen0() {
   if (_screens[0].state0 == 0) {
     _screenBackground[0].currentId = 0
   } else {
@@ -156,20 +159,21 @@ uint32_t _flags;
 int32_t  _vars[40];
 
 struct Task {
-	const uint8_t *bytecode;
-	Monster *monster;
-	int32_t vars[8];
-	uint8_t flags;
-	...
+  const uint8_t *bytecode;
+  Monster *monster;
+  int32_t vars[8];
+  uint8_t flags;
+  ...
 } _tasks[64];
 
 struct Monster {
-	int32_t vars[8];
-	...
+  int32_t vars[8];
+  ...
 };
 ```
 
-Each opcode is 32 bits long and packs its arguments in the upper 3 bytes.
+Each opcode is 32 bits long stored as little-endian.
+The low byte contains the opcode number, parameters are stored in the upper 3 bytes.
 
 The 242 opcodes can be divided in 6 categories :
 
@@ -224,14 +228,14 @@ Each opcode has variable length, from 4 to 16 bytes.
 
 ## Savegame
 
-The engine does not allow saving the game state but tracks the last level and restart point reached by the player.
+The engine does not allow saving the game state but tracks the last level and a restart point reached by the player.
 This is saved in the setup.cfg file.
 
 The file is 212 bytes long and contains the state for 4 different players :
 
 * each player state block is 52 bytes long and stored consecutively
-* at offset 209 is the current player index (0-3)
-* at offset 211 is a checksum : a XOR of the previous 210 bytes
+* at offset 209 : the current player index (0-3)
+* at offset 211 : checksum ; a XOR of the previous 210 bytes
 
 Data        | Field                       | Comment
 ------------|-----------------------------|--------
@@ -376,3 +380,18 @@ Type | Operation
 1    | repeat
 2    | transparent
 3    | next line
+
+Sprites can be vertically or horizontally flipped. The decoding routine also handles clipping, when a sprite is on a border of screen.
+
+All these transformations are handled by the original engine using jumptables. The index is a mask representing the clipping and flipping to apply.
+
+The first level of jumptables handles flipping and clipping.
+
+```
+.text:0042F82F   mov     cl, 3Fh
+.text:0042F831   lodsb
+.text:0042F832   and     cl, al
+.text:0042F834   jmp     off_440C50[eax*4]
+```
+
+The second level of jumptables handles the RLE code itself.
