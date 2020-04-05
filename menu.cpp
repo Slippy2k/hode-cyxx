@@ -678,7 +678,7 @@ void Menu::updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const 
 	if (bitmapsGroup == _cutscenesBitmaps) {
 		for (int i = 0; i < 3; ++i) {
 			const int num = _bitmapCircularListIndex[i];
-			if (num != -1) {
+			if (num != -1 && num < _cutsceneIndexesCount) {
 				_bitmapCircularListIndex[i] = _cutsceneIndexes[num];
 			}
 		}
