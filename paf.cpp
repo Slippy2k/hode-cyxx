@@ -254,11 +254,10 @@ static const char *updateSequences[] = {
 	"\x02\x04\x05\x07\x05\x07"
 };
 
-uint8_t *PafPlayer::getVideoPageOffset(uint8_t a, uint8_t b) {
-	const int x = b & 0x7F;
-	const int y = ((a & 0x3F) << 1) | ((b >> 7) & 1);
-	const int page = (a & 0xC0) >> 6;
-	return _pageBuffers[page] + (y * kVideoWidth + x) * 2;
+uint8_t *PafPlayer::getVideoPageOffset(uint16_t val) {
+	const int x = val & 0x7F; val >>= 7;
+	const int y = val & 0x7F; val >>= 7;
+	return _pageBuffers[val] + (y * kVideoWidth + x) * 2;
 }
 
 void PafPlayer::decodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, uint8_t code) {
@@ -272,7 +271,7 @@ void PafPlayer::decodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, uin
 			}
 		}
 		do {
-			uint8_t *dst = getVideoPageOffset(src[0], src[1]);
+			uint8_t *dst = getVideoPageOffset((src[0] << 8) | src[1]);
 			uint32_t offset = (src[1] & 0x7F) * 2;
 			uint32_t end = READ_LE_UINT16(src + 2); src += 4;
 			end += offset;
@@ -291,7 +290,7 @@ void PafPlayer::decodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, uin
 	uint8_t *dst = _pageBuffers[_currentPageBuffer];
 	count = 0;
 	do {
-		const uint8_t *src2 = getVideoPageOffset(src[0], src[1]); src += 2;
+		const uint8_t *src2 = getVideoPageOffset((src[0] << 8) | src[1]); src += 2;
 		pafCopy4x4v(dst, src2);
 		++count;
 		if ((count & 0x3F) == 0) {
@@ -336,7 +335,7 @@ void PafPlayer::decodeVideoFrameOp0(const uint8_t *base, const uint8_t *src, uin
 				case 5:
 					offset = 0;
 				case 6:
-					src2 = getVideoPageOffset(src[0], src[1]); src += 2;
+					src2 = getVideoPageOffset((src[0] << 8) | src[1]); src += 2;
 				case 7:
 					mask = *src++;
 					pafCopySrcMask(mask >> 4, dst + offset, src2 + offset);
