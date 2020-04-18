@@ -480,9 +480,10 @@ void PafPlayer::mainLoop() {
 	const uint32_t framesPerSec = (_demuxAudioFrameBlocks != 0) ? kFramesPerSec : 15;
 	uint32_t frameTime = g_system->getTimeStamp() + 1000 / framesPerSec;
 
+	uint32_t blocksCountForFrame = _pafHdr.preloadFrameBlocksCount;
 	for (int i = 0; i < (int)_pafHdr.framesCount; ++i) {
 		// read buffering blocks
-		uint32_t blocksCountForFrame = (i == 0) ? _pafHdr.preloadFrameBlocksCount : _pafHdr.frameBlocksCountTable[i - 1];
+		blocksCountForFrame += _pafHdr.frameBlocksCountTable[i];
 		while (blocksCountForFrame != 0) {
 			_file.read(_bufferBlock, _pafHdr.readBufferSize);
 			const uint32_t dstOffset = _pafHdr.frameBlocksOffsetTable[currentFrameBlock] & ~(1 << 31);

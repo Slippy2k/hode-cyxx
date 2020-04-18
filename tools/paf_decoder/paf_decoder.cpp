@@ -149,12 +149,13 @@ void PafDecoder::Decode() {
 	int currentFrameBlock = 0;
 	uint32_t audioOffset = 0;
 
+	uint32_t blocksCountForFrame = m_pafHdr.preloadFrameBlocksCount;
 	for (uint32_t i = 0; i < m_pafHdr.framesCount; ++i) {
 
 		printf("Decoding frame %d/%d... ", i, m_pafHdr.framesCount);
 
 		// read buffering blocks
-		uint32_t blocksCountForFrame = (i == 0) ? m_pafHdr.preloadFrameBlocksCount : m_pafHdr.frameBlocksCountTable[i - 1];
+		blocksCountForFrame += m_pafHdr.frameBlocksCountTable[i];
 		while (blocksCountForFrame != 0) {
 			m_file.read(m_bufferBlock, m_pafHdr.readBufferSize);
 			uint32_t dstOffset = m_pafHdr.frameBlocksOffsetTable[currentFrameBlock] & ~(1 << 31);
@@ -236,7 +237,7 @@ bool PafDecoder::ReadPafHeader() {
 		return false;
 	}
 
-	fprintf(stdout, "PAF V%d.%d", m_bufferBlock[0x80], m_bufferBlock[0x81]);
+	fprintf(stdout, "PAF V%d.%d\n", m_bufferBlock[0x80], m_bufferBlock[0x81]);
 
 	m_pafHdr.startOffset = READ_LE_UINT32(m_bufferBlock + 0xA4);
 	m_pafHdr.preloadFrameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0x9C);
