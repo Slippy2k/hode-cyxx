@@ -452,6 +452,21 @@ void System_SDL2::processEvents() {
 				inp.screenshot = true;
 			}
 			break;
+		case SDL_JOYDEVICEADDED:
+			if (!_joystick) {
+				_joystick = SDL_JoystickOpen(ev.jdevice.which);
+				if (_joystick) {
+					fprintf(stdout, "Using joystick '%s'", SDL_JoystickName(_joystick));
+				}
+			}
+			break;
+		case SDL_JOYDEVICEREMOVED:
+			if (_joystick == SDL_JoystickFromInstanceID(ev.jdevice.which)) {
+				fprintf(stdout, "Removed joystick '%s'\n", SDL_JoystickName(_joystick));
+				SDL_JoystickClose(_joystick);
+				_joystick = 0;
+			}
+			break;
 		case SDL_JOYHATMOTION:
 			if (_joystick) {
 				pad.mask &= ~(SYS_INP_UP | SYS_INP_DOWN | SYS_INP_LEFT | SYS_INP_RIGHT);
@@ -518,6 +533,21 @@ void System_SDL2::processEvents() {
 					}
 					break;
 				}
+			}
+			break;
+		case SDL_CONTROLLERDEVICEADDED:
+			if (!_controller) {
+				_controller = SDL_GameControllerOpen(ev.cdevice.which);
+				if (_controller) {
+					fprintf(stdout, "Using controller '%s'\n", SDL_GameControllerName(_controller));
+				}
+			}
+			break;
+		case SDL_CONTROLLERDEVICEREMOVED:
+			if (_controller == SDL_GameControllerFromInstanceID(ev.cdevice.which)) {
+				fprintf(stdout, "Removed controller '%s'\n", SDL_GameControllerName(_controller));
+				SDL_GameControllerClose(_controller);
+				_controller = 0;
 			}
 			break;
 		case SDL_CONTROLLERAXISMOTION:
