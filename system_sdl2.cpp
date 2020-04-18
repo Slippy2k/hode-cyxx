@@ -137,7 +137,7 @@ void System_SDL2::init(const char *title, int w, int h, bool fullscreen, bool wi
 			}
 			_joystick = SDL_JoystickOpen(i);
 			if (_joystick) {
-				fprintf(stdout, "Using joystick '%s'", SDL_JoystickName(_joystick));
+				fprintf(stdout, "Using joystick '%s'\n", SDL_JoystickName(_joystick));
 				break;
 			}
 		}
@@ -456,7 +456,7 @@ void System_SDL2::processEvents() {
 			if (!_joystick) {
 				_joystick = SDL_JoystickOpen(ev.jdevice.which);
 				if (_joystick) {
-					fprintf(stdout, "Using joystick '%s'", SDL_JoystickName(_joystick));
+					fprintf(stdout, "Using joystick '%s'\n", SDL_JoystickName(_joystick));
 				}
 			}
 			break;
@@ -530,6 +530,13 @@ void System_SDL2::processEvents() {
 						pad.mask |= SYS_INP_SHOOT;
 					} else {
 						pad.mask &= ~SYS_INP_SHOOT;
+					}
+					break;
+				case 3:
+					if (pressed) {
+						pad.mask |= SYS_INP_SHOOT | SYS_INP_RUN;
+					} else {
+						pad.mask &= ~(SYS_INP_SHOOT | SYS_INP_RUN);
 					}
 					break;
 				}
@@ -653,7 +660,6 @@ void System_SDL2::processEvents() {
 		case SDL_QUIT:
 			inp.quit = true;
 			break;
-
 		}
 	}
 	updateKeys(&inp);
@@ -743,7 +749,7 @@ void System_SDL2::setupDefaultKeyMappings() {
 	addKeyMapping(SDL_SCANCODE_RETURN,   SYS_INP_JUMP);
 	addKeyMapping(SDL_SCANCODE_LCTRL,    SYS_INP_RUN);
 	addKeyMapping(SDL_SCANCODE_F,        SYS_INP_RUN);
-//	addKeyMapping(SDL_SCANCODE_LALT,     SYS_INP_JUMP);
+	addKeyMapping(SDL_SCANCODE_LALT,     SYS_INP_JUMP);
 	addKeyMapping(SDL_SCANCODE_G,        SYS_INP_JUMP);
 	addKeyMapping(SDL_SCANCODE_LSHIFT,   SYS_INP_SHOOT);
 	addKeyMapping(SDL_SCANCODE_H,        SYS_INP_SHOOT);
