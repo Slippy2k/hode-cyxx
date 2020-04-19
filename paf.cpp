@@ -129,6 +129,7 @@ bool PafPlayer::readPafHeader() {
 		warning("readPafHeader() Unexpected signature");
 		return false;
 	}
+	_pafHdr.frameRate = READ_LE_UINT32(_bufferBlock + 0x88);
 	_pafHdr.startOffset = READ_LE_UINT32(_bufferBlock + 0xA4);
 	_pafHdr.preloadFrameBlocksCount = READ_LE_UINT32(_bufferBlock + 0x9C);
 	_pafHdr.readBufferSize = READ_LE_UINT32(_bufferBlock + 0x98);

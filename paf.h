@@ -20,6 +20,7 @@ struct PafHeader {
 	uint32_t readBufferSize;
 	int32_t maxVideoFrameBlocksCount;
 	int32_t maxAudioFrameBlocksCount;
+	int32_t frameRate;
 };
 
 // names taken from the PSX filenames

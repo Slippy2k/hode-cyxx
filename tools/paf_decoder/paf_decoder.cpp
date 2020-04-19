@@ -89,7 +89,6 @@ bool PafDecoder::Open(const char *filename, int videoNum) {
 			m_videoName = "";
 		}
 		if (!ReadPafHeader()) {
-			printf("Unable to read .PAF file header");
 			return false;
 		}
 		for (int i = 0; i < 4; ++i) {
@@ -234,18 +233,27 @@ bool PafDecoder::ReadPafHeader() {
 	m_file.read(m_bufferBlock, 0x800);
 
 	if (memcmp(m_bufferBlock, headerSignature, strlen(headerSignature)) != 0) {
+		fprintf(stdout, "Unexpected header signature\n");
 		return false;
 	}
 
 	fprintf(stdout, "PAF V%d.%d\n", m_bufferBlock[0x80], m_bufferBlock[0x81]);
 
-	m_pafHdr.startOffset = READ_LE_UINT32(m_bufferBlock + 0xA4);
-	m_pafHdr.preloadFrameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0x9C);
-	m_pafHdr.readBufferSize = READ_LE_UINT32(m_bufferBlock + 0x98);
 	m_pafHdr.framesCount = READ_LE_UINT32(m_bufferBlock + 0x84);
+	// const int rate   = READ_LE_UINT32(m_bufferBlock + 0x88);
+	const int width  = READ_LE_UINT32(m_bufferBlock + 0x8C);
+	const int height = READ_LE_UINT32(m_bufferBlock + 0x90);
+	const int pitch  = READ_LE_UINT32(m_bufferBlock + 0x94);
+	if (width != kVideoWidth || height != kVideoHeight || pitch != kVideoWidth) {
+		fprintf(stdout, "Unexpected video frame dimensions %d,%d,%d\n", width, height, pitch);
+		return false;
+	}
+	m_pafHdr.readBufferSize = READ_LE_UINT32(m_bufferBlock + 0x98);
+	m_pafHdr.preloadFrameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0x9C);
+	m_pafHdr.frameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0xA0);
+	m_pafHdr.startOffset = READ_LE_UINT32(m_bufferBlock + 0xA4);
 	m_pafHdr.maxVideoFrameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0xA8);
 	m_pafHdr.maxAudioFrameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0xAC);
-	m_pafHdr.frameBlocksCount = READ_LE_UINT32(m_bufferBlock + 0xA0);
 	m_pafHdr.audioBufferSize = READ_LE_UINT32(m_bufferBlock + 0xB0);
 
 	assert(m_pafHdr.readBufferSize <= sizeof(m_bufferBlock));
