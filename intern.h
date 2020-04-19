@@ -100,9 +100,14 @@ inline void SWAP(T &a, T &b) {
 	T tmp = a; a = b; b = tmp;
 }
 
-inline int merge_bits(int dbit, int sbit, int mask) {
-	return ((sbit ^ dbit) & mask) ^ dbit;
-//	return (dbit & ~mask) | (sbit & mask);
+inline uint32_t merge_bits(uint32_t dst, uint32_t src, uint32_t mask) {
+//	return (dst & ~mask) | (src & mask);
+	return ((src ^ dst) & mask) ^ dst;
+}
+
+inline bool compare_bits(uint32_t a, uint32_t b, uint32_t mask) {
+//	return (a & mask) == (b & mask);
+	return ((a ^ b) & mask) == 0;
 }
 
 inline bool rect_contains(int left, int top, int right, int bottom, int x, int y) {
