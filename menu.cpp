@@ -72,11 +72,10 @@ static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint3
 		int size;
 		if (paletteSize == 0) { // PSX
 			size = le32toh(bitmapsGroup[i].offset);
-			bitmapsGroup[i].offset = ptrOffset - baseOffset;
 		} else {
 			size = bitmapsGroup[i].w * bitmapsGroup[i].h;
-			bitmapsGroup[i].offset = ptrOffset - baseOffset;
 		}
+		bitmapsGroup[i].offset = ptrOffset - baseOffset;
 		bitmapsGroup[i].palette = bitmapsGroup[i].offset + size;
 		ptrOffset += size + paletteSize;
 	}
@@ -246,9 +245,7 @@ void Menu::loadData() {
 		_optionsButtonSpritesData = ptr + ptrOffset;
 		hdrOffset = ptrOffset;
 		ptrOffset += _optionsButtonSpritesCount * 20;
-		const uint32_t baseOffset = ptrOffset;
 		for (int i = 0; i < _optionsButtonSpritesCount; ++i) {
-			WRITE_LE_UINT32(_res->_menuBuffer0 + hdrOffset, ptrOffset - baseOffset);
 			DatSpritesGroup *spritesGroup = (DatSpritesGroup *)(ptr + hdrOffset + 4);
 			spritesGroup->size = le32toh(spritesGroup->size);
 			spritesGroup->count = le16toh(spritesGroup->count);
@@ -308,6 +305,7 @@ int Menu::getSoundNum(int num) const {
 
 void Menu::playSound(int num) {
 	num = getSoundNum(num);
+	debug(kDebug_MENU, "playSound %d", num);
 	if (num != -1) {
 		_g->playSound(num, 0, 0, 5);
 	}
@@ -386,8 +384,10 @@ bool Menu::mainLoop() {
 		} else if (option == kTitleScreen_Play) {
 			return true;
 		} else if (option == kTitleScreen_Options) {
+			playSound(0xA0);
 			handleOptions();
 			debug(kDebug_MENU, "optionNum %d", _optionNum);
+			_g->resetSound();
 			if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
 				ret = true;
 				break;
@@ -758,9 +758,9 @@ void Menu::changeToOption(int num) {
 	const int button = data[6];
 	if (button != 0xFF) {
 		assert(button < _optionsButtonSpritesCount);
-		_currentOptionButton = _optionsButtonSpritesData + button * 20;
+		_currentOptionButtonSound = READ_LE_UINT32(_optionsButtonSpritesData + button * 20);
 	} else {
-		_currentOptionButton = 0;
+		_currentOptionButtonSound = 0;
 	}
 // 428053
 	if (!_paf->_skipCutscenes) {

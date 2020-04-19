@@ -34,10 +34,8 @@ static void closePaf(FileSystem *fs, File *f) {
 }
 
 PafPlayer::PafPlayer(FileSystem *fs)
-	: _skipCutscenes(false), _fs(fs) {
-	if (!openPaf(_fs, &_file)) {
-		_skipCutscenes = true;
-	}
+	: _fs(fs) {
+	_skipCutscenes = !openPaf(_fs, &_file);
 	_videoNum = -1;
 	memset(&_pafHdr, 0, sizeof(_pafHdr));
 	memset(_pageBuffers, 0, sizeof(_pageBuffers));

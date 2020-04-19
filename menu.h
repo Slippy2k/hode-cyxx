@@ -66,7 +66,7 @@ struct Menu {
 	const uint8_t *_iconsSpritesData;
 	int _optionsButtonSpritesCount;
 	const uint8_t *_optionsButtonSpritesData;
-	const uint8_t *_currentOptionButton;
+	int _currentOptionButtonSound;
 
 	const uint8_t *_digitsData;
 	const uint8_t *_optionData;
