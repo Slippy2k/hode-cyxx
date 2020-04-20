@@ -60,6 +60,11 @@ struct PafAudioQueue {
 	PafAudioQueue *next;
 };
 
+struct PafCallback {
+	void (*proc)(void *userdata, int frame);
+	void *userdata;
+};
+
 struct PafPlayer {
 
 	enum {
@@ -90,6 +95,7 @@ struct PafPlayer {
 	PafAudioQueue *_audioQueue, *_audioQueueTail;
 	uint32_t _flushAudioSize;
 	uint32_t _playedMask;
+	PafCallback _pafCb;
 
 	PafPlayer(FileSystem *fs);
 	~PafPlayer();
@@ -112,6 +118,8 @@ struct PafPlayer {
 
 	void mix(int16_t *buf, int samples);
 	void mainLoop();
+
+	void setCallback(const PafCallback *pafCb);
 };
 
 #endif // PAF_PLAYER_H__

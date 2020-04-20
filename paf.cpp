@@ -43,6 +43,7 @@ PafPlayer::PafPlayer(FileSystem *fs)
 	_demuxVideoFrameBlocks = 0;
 	_audioQueue = _audioQueueTail = 0;
 	_playedMask = 0;
+	memset(&_pafCb, 0, sizeof(_pafCb));
 }
 
 PafPlayer::~PafPlayer() {
@@ -491,6 +492,11 @@ void PafPlayer::mainLoop() {
 		}
 		// decode video data
 		decodeVideoFrame(_demuxVideoFrameBlocks + _pafHdr.framesOffsetTable[i]);
+
+		if (_pafCb.proc) {
+			_pafCb.proc(_pafCb.userdata, i);
+		}
+
 		g_system->setPalette(_paletteBuffer, 256, 6);
 		g_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], kVideoWidth);
 		g_system->updateScreen(false);
@@ -514,4 +520,12 @@ void PafPlayer::mainLoop() {
 	}
 
 	unload();
+}
+
+void PafPlayer::setCallback(const PafCallback *pafCb) {
+	if (pafCb) {
+		_pafCb = *pafCb;
+	} else {
+		memset(&_pafCb, 0, sizeof(_pafCb));
+	}
 }

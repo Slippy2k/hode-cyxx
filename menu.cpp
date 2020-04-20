@@ -27,6 +27,14 @@ enum {
 	kMenu_Cutscenes = 17
 };
 
+enum {
+	kSound_0x70 = 0x70 / 8,
+	kSound_0x78 = 0x78 / 8,
+	kSound_0x80 = 0x80 / 8,
+	kSound_0x98 = 0x98 / 8,
+	kSound_0xA0 = 0xA0 / 8
+};
+
 static void setDefaultsSetupCfg(SetupConfig *config, int num) {
 	assert(num >= 0 && num < 4);
 	memset(config->players[num].progress, 0, 10);
@@ -283,17 +291,15 @@ void Menu::loadData() {
 	}
 }
 
-int Menu::getSoundNum(int num) const {
-	assert((num & 7) == 0);
-	num /= 8;
+int Menu::getSoundNum(int num, int index) const {
 	if (_soundData) {
 		const int count = READ_LE_UINT32(_soundData + 4);
 		const uint8_t *p = _soundData + 8 + count * 8;
 		for (int i = 0; i < count; ++i) {
 			const int count2 = READ_LE_UINT32(_soundData + 8 + i * 8 + 4);
 			if (i == num) {
-				assert(count2 != 0);
-				return (int16_t)READ_LE_UINT16(p);
+				assert(index < count2);
+				return (int16_t)READ_LE_UINT16(p + index * 2);
 			}
 			p += count2 * 2;
 		}
@@ -308,6 +314,15 @@ void Menu::playSound(int num) {
 	debug(kDebug_MENU, "playSound %d", num);
 	if (num != -1) {
 		_g->playSound(num, 0, 0, 5);
+	}
+}
+
+void Menu::playPafSound(int frame) {
+	if (_currentOptionButtonSound != 0) {
+		const int num = getSoundNum(_currentOptionButtonSound, frame);
+		if (num != -1) {
+			_g->playSound(num, 0, 0, 5);
+		}
 	}
 }
 
@@ -373,6 +388,10 @@ void Menu::refreshScreen(bool updatePalette) {
 	g_system->updateScreen(false);
 }
 
+static void menuPafCallback(void *userdata, int frame) {
+	((Menu *)userdata)->playPafSound(frame);
+}
+
 bool Menu::mainLoop() {
 	bool ret = false;
 	loadData();
@@ -384,10 +403,15 @@ bool Menu::mainLoop() {
 		} else if (option == kTitleScreen_Play) {
 			return true;
 		} else if (option == kTitleScreen_Options) {
-			playSound(0xA0);
+			PafCallback pafCb;
+			pafCb.proc = menuPafCallback;
+			pafCb.userdata = this;
+			_paf->setCallback(&pafCb);
+			playSound(kSound_0xA0);
 			handleOptions();
 			debug(kDebug_MENU, "optionNum %d", _optionNum);
 			_g->resetSound();
+			_paf->setCallback(0);
 			if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
 				ret = true;
 				break;
@@ -421,18 +445,18 @@ int Menu::handleTitleScreen() {
 		g_system->processEvents();
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
 			if (currentOption > firstOption) {
-				playSound(0x70);
+				playSound(kSound_0x70);
 				--currentOption;
 			}
 		}
 		if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
 			if (currentOption < lastOption) {
-				playSound(0x70);
+				playSound(kSound_0x70);
 				++currentOption;
 			}
 		}
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
-			playSound(0x78);
+			playSound(kSound_0x78);
 			break;
 		}
 		drawTitleScreen(currentOption);
@@ -594,9 +618,9 @@ void Menu::handleAssignPlayer() {
 		g_system->processEvents();
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
 			if (state != 0 && cursor == 5) {
-				playSound(0x80);
+				playSound(kSound_0x80);
 			} else {
-				playSound(0x78);
+				playSound(kSound_0x78);
 			}
 // 42301D
 			if (state == 0) {
@@ -631,14 +655,14 @@ void Menu::handleAssignPlayer() {
 		if (cursor != 0 && state < 3) {
 			if (g_system->inp.keyReleased(SYS_INP_UP)) {
 				if (cursor > 1) {
-					playSound(0x70);
+					playSound(kSound_0x70);
 					--cursor;
 					setCurrentPlayer(cursor - 1);
 				}
 			}
 			if (g_system->inp.keyReleased(SYS_INP_DOWN)) {
 				if (cursor < 5) {
-					playSound(0x70);
+					playSound(kSound_0x70);
 					++cursor;
 					setCurrentPlayer((cursor == 5) ? _config->currentPlayer : (cursor - 1));
 				}
@@ -646,13 +670,13 @@ void Menu::handleAssignPlayer() {
 		} else {
 			if (g_system->inp.keyReleased(SYS_INP_LEFT)) {
 				if (state == 1 || state == 2 || state == 5) {
-					playSound(0x70);
+					playSound(kSound_0x70);
 					--state;
 				}
 			}
 			if (g_system->inp.keyReleased(SYS_INP_RIGHT)) {
 				if (state == 0 || state == 1 || state == 4) {
-					playSound(0x70);
+					playSound(kSound_0x70);
 					++state;
 				}
 			}
@@ -808,25 +832,25 @@ void Menu::handleLoadLevel(int num) {
 	num = data[5];
 	if (num == 16) {
 		if (_loadLevelButtonState != 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 		}
 		_loadLevelButtonState = 0;
 	} else if (num == 17) {
 		if (_loadLevelButtonState == 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 		}
 		_loadLevelButtonState = 1;
 	} else if (num == 18) {
 		if (_loadLevelButtonState != 0) {
-			playSound(0x80);
+			playSound(kSound_0x80);
 			_condMask = 0x80;
 		} else {
-			playSound(0x78);
+			playSound(kSound_0x78);
 			_condMask = 0x10;
 		}
 	} else if (num == 19) {
 		if (_lastLevelNum > 1) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			++_levelNum;
 			_checkpointNum = 0;
 			if (_levelNum >= _lastLevelNum) {
@@ -838,7 +862,7 @@ void Menu::handleLoadLevel(int num) {
 		}
 	} else if (num == 20) {
 		if (_lastLevelNum > 1) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			--_levelNum;
 			_checkpointNum = 0;
 			if (_levelNum < 0) {
@@ -857,20 +881,20 @@ void Menu::handleLoadCheckpoint(int num) {
 	num = data[5];
 	if (num == 11) {
 		if (_loadCheckpointButtonState != 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			_loadCheckpointButtonState = 0;
 		}
 	} else if (num == 12) {
 		if (_loadCheckpointButtonState == 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			_loadCheckpointButtonState = 1;
 		}
 	} else if (num == 13) {
 		if (_loadCheckpointButtonState != 0) {
-			playSound(0x80);
+			playSound(kSound_0x80);
 			_condMask = 0x80;
 		} else {
-			playSound(0x78);
+			playSound(kSound_0x78);
 			_loadCheckpointButtonState = 2;
 			_condMask = 0x08;
 			if (_levelNum == 7 && _checkpointNum == 11) {
@@ -885,7 +909,7 @@ void Menu::handleLoadCheckpoint(int num) {
 		}
 	} else if (num == 14) {
 		if (_lastLevelCheckpointNum[_levelNum] > 2 || _loadCheckpointButtonState == 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			++_checkpointNum;
 			if (_checkpointNum >= _lastLevelCheckpointNum[_levelNum]) {
 				_checkpointNum = 0;
@@ -893,7 +917,7 @@ void Menu::handleLoadCheckpoint(int num) {
 		}
 	} else if (num == 15) {
 		if (_lastLevelCheckpointNum[_levelNum] > 2 || _loadCheckpointButtonState == 1) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			--_checkpointNum;
 			if (_checkpointNum < 0) {
 				_checkpointNum = _lastLevelCheckpointNum[_levelNum] - 1;
@@ -908,20 +932,20 @@ void Menu::handleLoadCutscene(int num) {
 	num = data[5];
 	if (num == 6) {
 		if (_loadCutsceneButtonState != 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			_loadCutsceneButtonState = 0;
 		}
 	} else if (num == 7) {
 		if (_loadCutsceneButtonState == 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			_loadCutsceneButtonState = 1;
 		}
 	} else if (num == 8) {
 		if (_loadCutsceneButtonState != 0) {
-			playSound(0x80);
+			playSound(kSound_0x80);
 			_condMask = 0x80;
 		} else {
-			playSound(0x78);
+			playSound(kSound_0x78);
 			_loadCutsceneButtonState = 2;
 			if (!_paf->_skipCutscenes) {
 				const int num = _cutscenesBitmaps[_cutsceneIndexes[_cutsceneNum]].data;
@@ -930,13 +954,13 @@ void Menu::handleLoadCutscene(int num) {
 					_paf->play(kPafAnimation_cinema);
 				}
 			}
-			playSound(0x98);
-			playSound(0xA0);
+			playSound(kSound_0x98);
+			playSound(kSound_0xA0);
 			_loadCutsceneButtonState = 0;
 		}
 	} else if (num == 9) {
 		if (_cutsceneIndexesCount > 2 || _loadCutsceneButtonState == 0) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			++_cutsceneNum;
 			if (_cutsceneNum >= _cutsceneIndexesCount) {
 				_cutsceneNum = 0;
@@ -944,7 +968,7 @@ void Menu::handleLoadCutscene(int num) {
 		}
 	} else if (num == 10) {
 		if (_cutsceneIndexesCount > 2 || _loadCutsceneButtonState == 1) {
-			playSound(0x70);
+			playSound(kSound_0x70);
 			--_cutsceneNum;
 			if (_cutsceneNum < 0) {
 				_cutsceneNum = _cutsceneIndexesCount - 1;
@@ -1047,11 +1071,11 @@ void Menu::handleOptions() {
 			handleSettingsScreen(num);
 			break;
 		case 6:
-			playSound(0x70);
+			playSound(kSound_0x70);
 			changeToOption(num);
 			break;
 		case 7:
-			playSound(0x78);
+			playSound(kSound_0x78);
 			changeToOption(num);
 			break;
 		case 8:

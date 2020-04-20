@@ -91,8 +91,9 @@ struct Menu {
 
 	void loadData();
 
-	int getSoundNum(int num) const;
+	int getSoundNum(int num, int index = 0) const;
 	void playSound(int num);
+	void playPafSound(int num);
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num);
 	void drawSpritePos(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, int x, int y, uint32_t num);
