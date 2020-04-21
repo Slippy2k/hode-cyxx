@@ -90,6 +90,18 @@ static uint32_t readBitmapsGroup(int count, DatBitmapsGroup *bitmapsGroup, uint3
 	return ptrOffset - baseOffset;
 }
 
+static uint32_t readSoundData(uint8_t *soundData, uint32_t soundDataSize) {
+	const int soundListsCount = READ_LE_UINT32(soundData + 4);
+	const uint8_t *listData = soundData + 8 + soundListsCount * 8;
+	for (int i = 0; i < soundListsCount; ++i) {
+		WRITE_LE_UINT32(soundData + 8 + i * 8, listData - soundData);
+		const int count = READ_LE_UINT32(soundData + 8 + i * 8 + 4);
+		listData += count * sizeof(uint16_t);
+	}
+	assert((uint32_t)(listData - soundData) == soundDataSize);
+	return soundDataSize;
+}
+
 void Menu::loadData() {
 	_g->_mix._lock(1);
 	_res->loadDatMenuBuffers();
@@ -146,6 +158,7 @@ void Menu::loadData() {
 		}
 
 		_soundData = ptr + ptrOffset;
+		readSoundData(_res->_menuBuffer1 + ptrOffset, _res->_datHdr.soundDataSize);
 		ptrOffset += _res->_datHdr.soundDataSize;
 
 	} else if (version == 11) {
@@ -228,6 +241,7 @@ void Menu::loadData() {
 		ptrOffset += size;
 
 		_soundData = ptr + ptrOffset;
+		readSoundData(_res->_menuBuffer0 + ptrOffset, _res->_datHdr.soundDataSize);
 		ptrOffset += _res->_datHdr.soundDataSize;
 	}
 
@@ -292,19 +306,12 @@ void Menu::loadData() {
 }
 
 int Menu::getSoundNum(int num, int index) const {
-	if (_soundData) {
-		const int count = READ_LE_UINT32(_soundData + 4);
-		const uint8_t *p = _soundData + 8 + count * 8;
-		for (int i = 0; i < count; ++i) {
-			const int count2 = READ_LE_UINT32(_soundData + 8 + i * 8 + 4);
-			if (i == num) {
-				assert(index < count2);
-				return (int16_t)READ_LE_UINT16(p + index * 2);
-			}
-			p += count2 * 2;
-		}
-		// sound not found
-		assert((uint32_t)(p - _soundData) == _res->_datHdr.soundDataSize);
+	const int soundListsCount = READ_LE_UINT32(_soundData + 4);
+	if (num < soundListsCount) {
+		const int count = READ_LE_UINT32(_soundData + 8 + num * 8 + 4);
+		assert(index < count);
+		const uint8_t *data = _soundData + READ_LE_UINT32(_soundData + 8 + num * 8);
+		return (int16_t)READ_LE_UINT16(data + index * 2);
 	}
 	return -1;
 }
