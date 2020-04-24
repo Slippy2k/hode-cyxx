@@ -163,7 +163,6 @@ void Menu::loadData() {
 
 	} else if (version == 11) {
 
-		ptr = _res->_menuBuffer1;
 		hdrOffset = 4;
 
 		ptrOffset = 4 + (2 + kOptionsCount) * sizeof(DatBitmap);

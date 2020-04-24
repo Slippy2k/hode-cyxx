@@ -62,8 +62,7 @@ static int colorBrightness(int r, int g, int b) {
 	return (r + g * 2) * 19 + b * 7;
 }
 
-void Video::refreshGamePalette(const uint16_t *pal) {
-	_refreshPalette = true;
+void Video::updateGamePalette(const uint16_t *pal) {
 	for (int i = 0; i < 256 * 3; ++i) {
 		_palette[i] = pal[i] >> 8;
 	}
@@ -94,7 +93,6 @@ void Video::clearBackBuffer() {
 
 void Video::clearPalette() {
 	memset(_palette, 0, sizeof(_palette));
-	_refreshPalette = true;
 	g_system->setPalette(_palette, 256);
 }
 

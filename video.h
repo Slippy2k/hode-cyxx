@@ -29,8 +29,7 @@ struct Video {
 
 	uint8_t _palette[256 * 3];
 	uint16_t _displayPaletteBuffer[256 * 3];
-	bool _paletteNeedRefresh;
-	bool _refreshPalette;
+	bool _paletteChanged;
 	bool _displayShadowLayer;
 	uint8_t *_shadowLayer;
 	uint8_t *_frontLayer;
@@ -55,7 +54,7 @@ struct Video {
 
 	void init(bool mdec);
 
-	void refreshGamePalette(const uint16_t *pal);
+	void updateGamePalette(const uint16_t *pal);
 	void updateGameDisplay(uint8_t *buf);
 	void updateYuvDisplay(MdecOutput *mdec);
 	void copyYuvBackBuffer();

@@ -162,7 +162,7 @@ void Level_rock::postScreenUpdate_rock_screen9() {
 				if (!_paf->_skipCutscenes) {
 					_paf->play(1);
 					_res->_resLvlScreenBackgroundDataTable[9].currentBackgroundId = 1;
-					_video->_paletteNeedRefresh = true;
+					_video->_paletteChanged = true;
 				}
 				if (_checkpoint == 4) {
 					_checkpoint = 5;

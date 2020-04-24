@@ -177,6 +177,7 @@ void PafPlayer::decodeVideoFrame(const uint8_t *src) {
 			memset(_pageBuffers[i], 0, kPageBufferSize);
 		}
 		memset(_paletteBuffer, 0, sizeof(_paletteBuffer));
+		_paletteChanged = true;
 		_currentPageBuffer = 0;
 	}
 	if (code & 0x40) {
@@ -185,6 +186,7 @@ void PafPlayer::decodeVideoFrame(const uint8_t *src) {
 		assert(index * 3 + count <= 768);
 		src += 2;
 		memcpy(_paletteBuffer + index * 3, src, count);
+		_paletteChanged = true;
 		src += count;
 	}
 	switch (code & 0xF) {
@@ -374,7 +376,7 @@ void PafPlayer::decodeVideoFrameOp4(const uint8_t *src) {
 }
 
 static void decodeAudioFrame2205(const uint8_t *src, int len, int16_t *dst) {
-	const int offset = 256 * sizeof(int16_t);
+	static const int offset = 256 * sizeof(int16_t);
 	for (int i = 0; i < len * 2; ++i) { // stereo
 		dst[i] = READ_LE_UINT16(src + src[offset + i] * sizeof(int16_t));
 	}
@@ -458,6 +460,7 @@ void PafPlayer::mainLoop() {
 		memset(_pageBuffers[i], 0, kVideoWidth * kVideoHeight);
 	}
 	memset(_paletteBuffer, 0, sizeof(_paletteBuffer));
+	_paletteChanged = true;
 	_currentPageBuffer = 0;
 	int currentFrameBlock = 0;
 
@@ -493,11 +496,13 @@ void PafPlayer::mainLoop() {
 		// decode video data
 		decodeVideoFrame(_demuxVideoFrameBlocks + _pafHdr.framesOffsetTable[i]);
 
-		g_system->setPalette(_paletteBuffer, 256, 6);
 		if (_pafCb.proc) {
 			_pafCb.proc(_pafCb.userdata, i, _pageBuffers[_currentPageBuffer]);
 		} else {
 			g_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], kVideoWidth);
+		}
+		if (_paletteChanged) {
+			g_system->setPalette(_paletteBuffer, 256, 6);
 		}
 		g_system->updateScreen(false);
 		g_system->processEvents();

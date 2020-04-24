@@ -145,7 +145,7 @@ void Game::fadeScreenPalette() {
 		}
 		_video->_displayPaletteBuffer[i] = color;
 	}
-	_video->_paletteNeedRefresh = true;
+	_video->_paletteChanged = true;
 }
 
 void Game::shakeScreen() {
@@ -328,7 +328,7 @@ void Game::setupBackgroundBitmap() {
 	for (int i = 0; i < 256 * 3; ++i) {
 		_video->_displayPaletteBuffer[i] = pal[i] << 8;
 	}
-	_video->_paletteNeedRefresh = true;
+	_video->_paletteChanged = true;
 }
 
 void Game::addToSpriteList(Sprite *spr) {
@@ -2730,9 +2730,9 @@ void Game::levelMainLoop() {
 	if (_res->_sssHdr.infosDataCount != 0) {
 		// sound thread signaling
 	}
-	if (_video->_paletteNeedRefresh) {
-		_video->_paletteNeedRefresh = false;
-		_video->refreshGamePalette(_video->_displayPaletteBuffer);
+	if (_video->_paletteChanged) {
+		_video->_paletteChanged = false;
+		_video->updateGamePalette(_video->_displayPaletteBuffer);
 		g_system->copyRectWidescreen(Video::W, Video::H, _video->_backgroundLayer, _video->_palette);
 	}
 	drawScreen();
@@ -2868,7 +2868,7 @@ int Game::displayHintScreen(int num, int pause) {
 			}
 			g_system->sleep(30);
 		} while (!g_system->inp.quit && !g_system->inp.keyReleased(SYS_INP_JUMP));
-		_video->_paletteNeedRefresh = true;
+		_video->_paletteChanged = true;
 	}
 	unmuteSound();
 	return confirmQuit && quit == kQuitYes;
