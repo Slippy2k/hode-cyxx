@@ -254,11 +254,10 @@ void Menu::loadData() {
 	const int iconsCount = _res->_datHdr.iconsCount;
 	ptrOffset += iconsCount * sizeof(DatSpritesGroup);
 	_iconsSpritesData = ptr + ptrOffset;
-	const uint32_t baseOffset = ptrOffset;
 	for (int i = 0; i < iconsCount; ++i) {
 		_iconsSprites[i].size = le32toh(_iconsSprites[i].size);
 		_iconsSprites[i].count = le16toh(_iconsSprites[i].count);
-		_iconsSprites[i].firstFrameOffset = ptrOffset - baseOffset;
+		_iconsSprites[i].firstFrameOffset = ptr + ptrOffset - _iconsSpritesData;
 		ptrOffset += _iconsSprites[i].size;
 	}
 
@@ -271,6 +270,7 @@ void Menu::loadData() {
 			DatSpritesGroup *spritesGroup = (DatSpritesGroup *)(ptr + hdrOffset + 4);
 			spritesGroup->size = le32toh(spritesGroup->size);
 			spritesGroup->count = le16toh(spritesGroup->count);
+			spritesGroup->firstFrameOffset = ptr + ptrOffset - _optionsButtonSpritesData;
 			hdrOffset += 20;
 			ptrOffset += spritesGroup->size;
 		}
@@ -366,23 +366,22 @@ void Menu::drawSpritePos(const DatSpritesGroup *spriteGroup, const uint8_t *ptr,
 	}
 }
 
-void Menu::drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int num, int x, int y) {
-	const uint8_t *ptr = _iconsSpritesData;
+void Menu::drawSpriteAnim(DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num) {
 	if (spriteGroup[num].num == 0) {
 		spriteGroup[num].currentFrameOffset = spriteGroup[num].firstFrameOffset;
 	}
 	ptr += spriteGroup[num].currentFrameOffset;
 	if (_res->_isPsx) {
-		_video->decodeBackgroundOverlayPsx(ptr, x, y);
+		_video->decodeBackgroundOverlayPsx(ptr);
 	} else {
-		_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0] + x, ptr[1] + y, 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
+		_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0], ptr[1], 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
 	}
 	++spriteGroup[num].num;
 	if (spriteGroup[num].num < spriteGroup[num].count) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		spriteGroup[num].currentFrameOffset += size + 2;
 	} else {
-		spriteGroup[num].num = 0;
+		spriteGroup[num].num = 0; // restart from frame #0
 		spriteGroup[num].currentFrameOffset = spriteGroup[num].firstFrameOffset;
 	}
 }
@@ -395,8 +394,17 @@ void Menu::refreshScreen(bool updatePalette) {
 	g_system->updateScreen(false);
 }
 
-static void menuPafCallback(void *userdata, int frame) {
-	((Menu *)userdata)->playPafSound(frame);
+void Menu::pafCallback(int frameNum, const uint8_t *frameData) {
+	playPafSound(frameNum);
+	if (_currentOptionButtonSprite && frameNum == _currentOptionButtonSprite->num) {
+		memcpy(_video->_frontLayer, frameData, Video::W * Video::H);
+		drawSpriteAnim(_currentOptionButtonSprite, _optionsButtonSpritesData, 0);
+		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
+	}
+}
+
+static void menuPafCallback(void *userdata, int frame, const uint8_t *buffer) {
+	((Menu *)userdata)->pafCallback(frame, buffer);
 }
 
 bool Menu::mainLoop() {
@@ -742,16 +750,16 @@ void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const ui
 void Menu::drawCheckpointScreen() {
 	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawBitmapsCircularList(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum, _lastLevelCheckpointNum[_levelNum], false);
-	drawSpriteNextFrame(_iconsSprites, 5, 0, 0);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 5);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_checkpointNum + 1) / 10);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_checkpointNum + 1) % 10);
 	const int num = _loadCheckpointButtonState;
 	if (num > 1 && num < 7) {
 		drawSprite(&_iconsSprites[9], _iconsSpritesData, num - 2);
 	} else {
-		drawSpriteNextFrame(_iconsSprites, (num != 0) ? 8 : 7, 0, 0);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, (num != 0) ? 8 : 7);
 	}
-	drawSpriteNextFrame(_iconsSprites, 6, 0, 0);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 6);
 	refreshScreen(false);
 }
 
@@ -760,24 +768,24 @@ void Menu::drawLevelScreen() {
 	drawSprite(&_iconsSprites[1], _iconsSpritesData, _levelNum);
 	DatBitmapsGroup *bitmap = &_levelsBitmaps[_levelNum];
 	drawBitmap(bitmap, _levelsBitmapsData + bitmap->offset, 23, 10, bitmap->w, bitmap->h, 192);
-	drawSpriteNextFrame(_iconsSprites, 4, 0, 0);
-	drawSpriteNextFrame(_iconsSprites, (_loadLevelButtonState != 0) ? 3 : 2, 0, 0);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 4);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_loadLevelButtonState != 0) ? 3 : 2);
 	refreshScreen(false);
 }
 
 void Menu::drawCutsceneScreen() {
 	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawBitmapsCircularList(_cutscenesBitmaps, _cutscenesBitmapsData, _cutsceneNum, _cutsceneIndexesCount, false);
-	drawSpriteNextFrame(_iconsSprites, 10, 0, 0);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 10);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 119, 108, (_cutsceneNum + 1) / 10);
 	drawSpritePos(&_iconsSprites[0], _iconsSpritesData, 127, 108, (_cutsceneNum + 1) % 10);
 	const int num = _loadCutsceneButtonState;
 	if (num > 1 && num < 7) {
 		drawSprite(&_iconsSprites[14], _iconsSpritesData, num - 2);
 	} else {
-		drawSpriteNextFrame(_iconsSprites, (num != 0) ? 13 : 12, 0, 0);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, (num != 0) ? 13 : 12);
 	}
-	drawSpriteNextFrame(_iconsSprites, 11, 0, 0);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 11);
 	refreshScreen(false);
 }
 
@@ -790,8 +798,11 @@ void Menu::changeToOption(int num) {
 	if (button != 0xFF) {
 		assert(button < _optionsButtonSpritesCount);
 		_currentOptionButtonSound = READ_LE_UINT32(_optionsButtonSpritesData + button * 20);
+		_currentOptionButtonSprite = (DatSpritesGroup *)(_optionsButtonSpritesData + button * 20 + 4);
+		_currentOptionButtonSprite->num = 0; // start from frame #0
 	} else {
 		_currentOptionButtonSound = 0;
+		_currentOptionButtonSprite = 0;
 	}
 // 428053
 	if (!_paf->_skipCutscenes) {

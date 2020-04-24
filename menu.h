@@ -66,6 +66,7 @@ struct Menu {
 	const uint8_t *_iconsSpritesData;
 	int _optionsButtonSpritesCount;
 	const uint8_t *_optionsButtonSpritesData;
+	DatSpritesGroup *_currentOptionButtonSprite;
 	int _currentOptionButtonSound;
 
 	const uint8_t *_digitsData;
@@ -97,7 +98,9 @@ struct Menu {
 
 	void drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num);
 	void drawSpritePos(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, int x, int y, uint32_t num);
-	void drawSpriteNextFrame(DatSpritesGroup *spriteGroup, int num, int x, int y);
+	void drawSpriteAnim(DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num);
+
+	void pafCallback(int frameNum, const uint8_t *frameData);
 	void refreshScreen(bool updatePalette);
 
 	bool mainLoop();

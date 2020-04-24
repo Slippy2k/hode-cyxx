@@ -61,7 +61,7 @@ struct PafAudioQueue {
 };
 
 struct PafCallback {
-	void (*proc)(void *userdata, int frame);
+	void (*proc)(void *userdata, int num, const uint8_t *frame);
 	void *userdata;
 };
 

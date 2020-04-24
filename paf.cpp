@@ -493,12 +493,12 @@ void PafPlayer::mainLoop() {
 		// decode video data
 		decodeVideoFrame(_demuxVideoFrameBlocks + _pafHdr.framesOffsetTable[i]);
 
-		if (_pafCb.proc) {
-			_pafCb.proc(_pafCb.userdata, i);
-		}
-
 		g_system->setPalette(_paletteBuffer, 256, 6);
-		g_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], kVideoWidth);
+		if (_pafCb.proc) {
+			_pafCb.proc(_pafCb.userdata, i, _pageBuffers[_currentPageBuffer]);
+		} else {
+			g_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], kVideoWidth);
+		}
 		g_system->updateScreen(false);
 		g_system->processEvents();
 		if (g_system->inp.quit || g_system->inp.keyPressed(SYS_INP_ESC)) {
