@@ -773,7 +773,69 @@ void Menu::drawCutsceneScreen() {
 	refreshScreen(false);
 }
 
+void Menu::drawSettingsScreen() {
+	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x2A);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == 0) ? 0x27 : 0x24);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == 1) ? 0x26 : 0x23);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == 2) ? 0x28 : 0x25);
+	drawSprite(&_iconsSprites[0x29], _iconsSpritesData, (_settingNum == 3) ? 1 : 0);
+	refreshScreen(true);
+}
+
 void Menu::handleSettingsScreen(int num) {
+	const uint8_t *data = &_optionData[num * 8];
+	num = data[5];
+	if (num == 0) {
+		if (_settingNum == 0) {
+			playSound(kSound_0x78);
+			_condMask = 0x10;
+		} else if (_settingNum == 1) {
+			playSound(kSound_0x78);
+			_condMask = 0x20;
+		} else if (_settingNum == 2) {
+			playSound(kSound_0x78);
+			_condMask = 0x40;
+		} else if (_settingNum == 3) {
+			playSound(kSound_0x78);
+			_condMask = 0x80;
+		}
+		return;
+	} else if (num == 1) {
+		if (_settingNum != 3 && _settingNum > 0) {
+			playSound(kSound_0x70);
+			--_settingNum;
+// 427CD4
+			_iconsSprites[0x27].num = 0;
+			_iconsSprites[0x26].num = 0;
+			_iconsSprites[0x28].num = 0;
+		}
+	} else if (num == 2) {
+		if (_settingNum != 3 && _settingNum < 2) {
+			playSound(kSound_0x70);
+			++_settingNum;
+// 427CD4
+			_iconsSprites[0x27].num = 0;
+			_iconsSprites[0x26].num = 0;
+			_iconsSprites[0x28].num = 0;
+		}
+	} else if (num == 3) {
+		if (_settingNum == 3) {
+			playSound(kSound_0x70);
+			_settingNum = 1;
+// 427C46
+			_iconsSprites[0x26].num = 0;
+		}
+	} else if (num == 4) {
+		if (_settingNum != 3) {
+			playSound(kSound_0x70);
+		}
+		_settingNum = 3;
+	}
+// 427D10
+	drawSettingsScreen();
+	_condMask = 8;
+	g_system->sleep(15);
 }
 
 void Menu::changeToOption(int num) {
@@ -815,7 +877,8 @@ void Menu::changeToOption(int num) {
 		drawCheckpointScreen();
 	} else if (_optionNum == kMenu_Settings + 1) {
 // 428118
-		memcpy(_paletteBuffer, _optionsBitmapData[0] + _optionsBitmapSize[0], 768);
+		_settingNum = 1;
+		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
 		handleSettingsScreen(5);
 	} else if (_optionNum == kMenu_Cutscenes + 1) {
 // 4280EA
@@ -1066,12 +1129,23 @@ void Menu::handleOptions() {
 		}
 // 4287AD
 		const uint8_t *data = &_optionData[num * 8];
+		const int prevOptionNum = _optionNum;
 		_optionNum = data[3];
 		debug(kDebug_MENU, "handleOptions option %d code %d", _optionNum, data[4]);
 		switch (data[4]) {
 		case 0:
+			if (prevOptionNum != _optionNum) {
+				_iconsSprites[0x2A].num = 0;
+				_iconsSprites[0x27].num = 0;
+				_iconsSprites[0x26].num = 0;
+				_iconsSprites[0x28].num = 0;
+			}
+			memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
 			handleSettingsScreen(num);
 			break;
+		// case 1: // controls
+		// case 4: // difficulty
+		// case 5: // sound
 		case 6:
 			playSound(kSound_0x70);
 			changeToOption(num);
