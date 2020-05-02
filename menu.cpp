@@ -838,6 +838,39 @@ void Menu::handleSettingsScreen(int num) {
 	g_system->sleep(15);
 }
 
+void Menu::drawDifficultyScreen() {
+	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	for (int i = 0; i < 3; ++i) {
+		if (i != _difficultyNum) {
+			drawSprite(&_iconsSprites[0xF], _iconsSpritesData, i * 2);
+		}
+	}
+	drawSprite(&_iconsSprites[0xF], _iconsSpritesData, _difficultyNum * 2 + 1);
+	refreshScreen(true);
+}
+
+void Menu::handleDifficultyScreen(int num) {
+	const uint8_t *data = &_optionData[num * 8];
+	num = data[5];
+	if (num == 0) {
+		playSound(kSound_0x78);
+		_config->players[_config->currentPlayer].difficulty = _difficultyNum;
+		_condMask = 0x80;
+	} else if (num == 1) {
+		if (_difficultyNum > 0) {
+			playSound(kSound_0x70);
+			--_difficultyNum;
+		}
+	} else if (num == 2) {
+		if (_difficultyNum < 2) {
+			playSound(kSound_0x70);
+			++_difficultyNum;
+		}
+	}
+	drawDifficultyScreen();
+	g_system->sleep(15);
+}
+
 void Menu::changeToOption(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	const int button = data[6];
@@ -1139,12 +1172,18 @@ void Menu::handleOptions() {
 				_iconsSprites[0x27].num = 0;
 				_iconsSprites[0x26].num = 0;
 				_iconsSprites[0x28].num = 0;
+				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
 			}
-			memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
 			handleSettingsScreen(num);
 			break;
 		// case 1: // controls
-		// case 4: // difficulty
+		case 4:
+			if (prevOptionNum != _optionNum) {
+				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
+				_difficultyNum = _config->players[_config->currentPlayer].difficulty;
+			}
+			handleDifficultyScreen(num);
+			break;
 		// case 5: // sound
 		case 6:
 			playSound(kSound_0x70);
