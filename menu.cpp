@@ -802,7 +802,7 @@ void Menu::handleSettingsScreen(int num) {
 		}
 		return;
 	} else if (num == 1) {
-		if (_settingNum != 3 && _settingNum > 0) {
+		if (_settingNum != 3 && _settingNum > 0 && 0) { // 'controls' not implemented
 			playSound(kSound_0x70);
 			--_settingNum;
 // 427CD4
@@ -811,7 +811,7 @@ void Menu::handleSettingsScreen(int num) {
 			_iconsSprites[0x28].num = 0;
 		}
 	} else if (num == 2) {
-		if (_settingNum != 3 && _settingNum < 2) {
+		if (_settingNum != 3 && _settingNum < 2 && 0) { // 'volume' not implemented
 			playSound(kSound_0x70);
 			++_settingNum;
 // 427CD4
@@ -1078,10 +1078,6 @@ void Menu::handleLoadCutscene(int num) {
 
 static bool matchInput(uint8_t menu, uint8_t type, uint8_t mask, const PlayerInput &inp, uint8_t optionMask) {
 	if (type != 0) {
-		if (menu == kMenu_Settings) {
-			// not implemented yet
-			return false;
-		}
 		if ((mask & 1) != 0 && inp.keyReleased(SYS_INP_RUN)) {
 			return true;
 		}
