@@ -38,6 +38,22 @@ enum {
 	kSound_0xA0 = 0xA0 / 8
 };
 
+enum {
+	kSettingNum_Controls = 0,
+	kSettingNum_Difficulty = 1,
+	kSettingNum_Sound = 2,
+	kSettingNum_Confirm = 3
+};
+
+enum {
+	kSoundNum_Stereo = 0,
+	kSoundNum_Volume = 1,
+	kSoundNum_Confirm = 2,
+	kSoundNum_Test = 3,
+	kSoundNum_Cancel = 4,
+	kSoundNum_Reset = 5
+};
+
 static void setDefaultsSetupCfg(SetupConfig *config, int num) {
 	assert(num >= 0 && num < 4);
 	memset(config->players[num].progress, 0, 10);
@@ -51,7 +67,7 @@ static void setDefaultsSetupCfg(SetupConfig *config, int num) {
 	config->players[num].controls[0xC] = 0x48;
 	config->players[num].difficulty = 1;
 	config->players[num].stereo = 1;
-	config->players[num].volume = 128;
+	config->players[num].volume = Game::kDefaultSoundVolume;
 	config->players[num].lastLevelNum = 0;
 }
 
@@ -779,10 +795,10 @@ void Menu::drawCutsceneScreen() {
 void Menu::drawSettingsScreen() {
 	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
 	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x2A);
-	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == 0) ? 0x27 : 0x24);
-	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == 1) ? 0x26 : 0x23);
-	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == 2) ? 0x28 : 0x25);
-	drawSprite(&_iconsSprites[0x29], _iconsSpritesData, (_settingNum == 3) ? 1 : 0);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == kSettingNum_Controls) ? 0x27 : 0x24);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == kSettingNum_Difficulty) ? 0x26 : 0x23);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == kSettingNum_Sound) ? 0x28 : 0x25);
+	drawSprite(&_iconsSprites[0x29], _iconsSpritesData, (_settingNum == kSettingNum_Confirm) ? 1 : 0);
 	refreshScreen(true);
 }
 
@@ -790,22 +806,22 @@ void Menu::handleSettingsScreen(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == 0) {
-		if (_settingNum == 0) {
+		if (_settingNum == kSettingNum_Controls) {
 			playSound(kSound_0x78);
 			_condMask = 0x10;
-		} else if (_settingNum == 1) {
+		} else if (_settingNum == kSettingNum_Difficulty) {
 			playSound(kSound_0x78);
 			_condMask = 0x20;
-		} else if (_settingNum == 2) {
+		} else if (_settingNum == kSettingNum_Sound) {
 			playSound(kSound_0x78);
 			_condMask = 0x40;
-		} else if (_settingNum == 3) {
+		} else if (_settingNum == kSettingNum_Confirm) {
 			playSound(kSound_0x78);
 			_condMask = 0x80;
 		}
 		return;
 	} else if (num == 1) {
-		if (_settingNum != 3 && _settingNum > 0 && 0) { // 'controls' not implemented
+		if (_settingNum != kSettingNum_Confirm && _settingNum > 0 && 0) { // 'controls' not implemented
 			playSound(kSound_0x70);
 			--_settingNum;
 // 427CD4
@@ -814,7 +830,7 @@ void Menu::handleSettingsScreen(int num) {
 			_iconsSprites[0x28].num = 0;
 		}
 	} else if (num == 2) {
-		if (_settingNum != 3 && _settingNum < 2 && 0) { // 'volume' not implemented
+		if (_settingNum != kSettingNum_Confirm && _settingNum < 2 && 0) { // 'volume' not implemented
 			playSound(kSound_0x70);
 			++_settingNum;
 // 427CD4
@@ -823,17 +839,17 @@ void Menu::handleSettingsScreen(int num) {
 			_iconsSprites[0x28].num = 0;
 		}
 	} else if (num == 3) {
-		if (_settingNum == 3) {
+		if (_settingNum == kSettingNum_Confirm) {
 			playSound(kSound_0x70);
-			_settingNum = 1;
+			_settingNum = kSettingNum_Difficulty;
 // 427C46
 			_iconsSprites[0x26].num = 0;
 		}
 	} else if (num == 4) {
-		if (_settingNum != 3) {
+		if (_settingNum != kSettingNum_Confirm) {
 			playSound(kSound_0x70);
 		}
-		_settingNum = 3;
+		_settingNum = kSettingNum_Confirm;
 	}
 // 427D10
 	drawSettingsScreen();
@@ -876,20 +892,20 @@ void Menu::handleDifficultyScreen(int num) {
 
 void Menu::drawSoundScreen() {
 	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
-	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == 0) ? 1 : 0);
-	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == 1) ? 3 : 2);
-	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == 2) ? 5 : 4);
-	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == 4) ? 9 : 8);
-	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == 3) ? 7 : 6);
-	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == 5) ? 11 : 10);
+	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Stereo) ? 1 : 0);
+	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Volume) ? 3 : 2);
+	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Confirm) ? 5 : 4);
+	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Test) ? 7 : 6);
+	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Cancel) ? 9 : 8);
+	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Reset) ? 11 : 10);
 	// volume bar
 	const int w = ((_g->_snd_masterVolume * 3) << 5) >> 7;
 	for (int y = 0; y < 15; ++y) {
 		memset(_video->_frontLayer + 18807 + 256 * y, 0xE0, w);
 	}
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 21);
-	if (_soundNum == 3) {
-//		drawSprite(&_iconsSprites[0x12], _iconsSpritesData, _soundSpriteNum);
+	if (_soundNum == kSoundNum_Test) {
+//		drawSprite(&_iconsSprites[0x12], _iconsSpritesData, _soundTestNum);
 	}
 	if (_g->_snd_masterVolume != 0) {
 		if (_config->players[_config->currentPlayer].stereo) {
@@ -921,28 +937,28 @@ void Menu::handleSoundScreen(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == 0) {
-		if (_soundNum == 2) {
+		if (_soundNum == kSoundNum_Confirm) {
 			playSound(kSound_0x78);
 			_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume;
 			_condMask = 0x80;
-		} else if (_soundNum == 3) {
+		} else if (_soundNum == kSoundNum_Test) {
 			playSound(kSound_0x60);
 // 425B7D
 			// ...
-		} else if (_soundNum == 4) {
+		} else if (_soundNum == kSoundNum_Cancel) {
 			playSound(kSound_0x80);
 // 425ACB
-			// ...
-		} else if (_soundNum == 5) {
+			_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume = _soundVolume;
+			_condMask = 0x80;
+		} else if (_soundNum == kSoundNum_Reset) {
 			playSound(kSound_0x88);
-// 425A31
-			// ...
+			_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume = Game::kDefaultSoundVolume;
 		}
 	} else if (num == 1) {
 		if (_soundNum == 0) {
 // 425999
 			// ...
-		} else if (_soundNum == 1) {
+		} else if (_soundNum == kSoundNum_Volume) {
 			if (_g->_snd_masterVolume > 0) {
 				playSound(kSound_0x90);
 				--_g->_snd_masterVolume;
@@ -960,7 +976,7 @@ void Menu::handleSoundScreen(int num) {
 		if (_soundNum == 0) {
 // 42581D
 			// ...
-		} else if (_soundNum == 1) {
+		} else if (_soundNum == kSoundNum_Volume) {
 			if (_g->_snd_masterVolume < 128) {
 				playSound(kSound_0x90);
 				++_g->_snd_masterVolume;
@@ -977,7 +993,7 @@ void Menu::handleSoundScreen(int num) {
 			}
 		}
 	} else if (num == 3) {
-		if (_soundNum != 1) {
+		if (_soundNum != kSoundNum_Volume) {
 			playSound(kSound_0x70);
 		}
 		if ((_soundNum >= 2 && _soundNum <= 4) || _soundNum == 5) {
@@ -991,12 +1007,13 @@ void Menu::handleSoundScreen(int num) {
 			_soundNum = 1;
 		} else if (_soundNum == 1) {
 			_soundNum = 4;
-		} else if (_soundNum > 1 && _soundNum <= 4) {
+		} else if (_soundNum >= 2 && _soundNum <= 4) {
 			_soundNum = 5;
 		}
 	}
 // 425D13
 	drawSoundScreen();
+	g_system->sleep(30);
 }
 
 void Menu::changeToOption(int num) {
