@@ -87,6 +87,8 @@ struct Menu {
 	int _cutsceneIndexes[kCutsceneIndexesCount];
 	int _settingNum;
 	int _difficultyNum;
+	int _soundNum;
+	uint8_t _soundVolume;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
@@ -122,6 +124,8 @@ struct Menu {
 	void handleSettingsScreen(int num);
 	void drawDifficultyScreen();
 	void handleDifficultyScreen(int num);
+	void drawSoundScreen();
+	void handleSoundScreen(int num);
 	void changeToOption(int num);
 	void handleLoadLevel(int num);
 	void handleLoadCheckpoint(int num);
