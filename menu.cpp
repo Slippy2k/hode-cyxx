@@ -272,7 +272,11 @@ void Menu::loadData() {
 	}
 
 	if (_res->_isPsx) {
-		return;
+		for (int i = 0; i < 3; ++i) {
+			DatSpritesGroup *sprites = (DatSpritesGroup *)(ptr + ptrOffset);
+			ptrOffset += sizeof(DatSpritesGroup) + ((le32toh(sprites->size) + 3) & ~3);
+		}
+		ptrOffset += 0x300 * 3;
 	}
 
 	hdrOffset = ptrOffset;
@@ -465,7 +469,7 @@ void Menu::drawTitleScreen(int option) {
 
 int Menu::handleTitleScreen() {
 	const int firstOption = kTitleScreen_AssignPlayer;
-	const int lastOption = _res->_isPsx ? kTitleScreen_Play : kTitleScreen_Quit;
+	const int lastOption = _res->_isPsx ? kTitleScreenPSX_Save : kTitleScreen_Quit;
 	int currentOption = kTitleScreen_Play;
 	while (!g_system->inp.quit) {
 		g_system->processEvents();
