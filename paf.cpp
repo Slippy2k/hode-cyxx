@@ -502,6 +502,7 @@ void PafPlayer::mainLoop() {
 			g_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], kVideoWidth);
 		}
 		if (_paletteChanged) {
+			_paletteChanged = false;
 			g_system->setPalette(_paletteBuffer, 256, 6);
 		}
 		g_system->updateScreen(false);
