@@ -28,14 +28,22 @@ enum {
 };
 
 enum {
-	kSound_0x60 = 0x60 / 8,
-	kSound_0x70 = 0x70 / 8,
-	kSound_0x78 = 0x78 / 8,
-	kSound_0x80 = 0x80 / 8,
-	kSound_0x88 = 0x88 / 8,
-	kSound_0x90 = 0x90 / 8,
+	kSound_0x60 = 0x60 / 8, // test sound
+	kSound_0x70 = 0x70 / 8, // move cursor
+	kSound_0x78 = 0x78 / 8, // select
+	kSound_0x80 = 0x80 / 8, // return
+	kSound_0x88 = 0x88 / 8, // reset sound setting
+	kSound_0x90 = 0x90 / 8, // increase/decrease volume
 	kSound_0x98 = 0x98 / 8,
-	kSound_0xA0 = 0xA0 / 8
+	kSound_0xA0 = 0xA0 / 8  // background sounds
+};
+
+enum {
+	kCursor_Select = 0,
+	kCursor_Left = 1,
+	kCursor_Right = 2,
+	kCursor_Up = 3,
+	kCursor_Down = 4
 };
 
 enum {
@@ -805,7 +813,7 @@ void Menu::drawSettingsScreen() {
 void Menu::handleSettingsScreen(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
-	if (num == 0) {
+	if (num == kCursor_Select) {
 		if (_settingNum == kSettingNum_Controls) {
 			playSound(kSound_0x78);
 			_condMask = 0x10;
@@ -820,7 +828,7 @@ void Menu::handleSettingsScreen(int num) {
 			_condMask = 0x80;
 		}
 		return;
-	} else if (num == 1) {
+	} else if (num == kCursor_Left) {
 		if (_settingNum != kSettingNum_Confirm && _settingNum > 0 && 0) { // 'controls' not implemented
 			playSound(kSound_0x70);
 			--_settingNum;
@@ -829,7 +837,7 @@ void Menu::handleSettingsScreen(int num) {
 			_iconsSprites[0x26].num = 0;
 			_iconsSprites[0x28].num = 0;
 		}
-	} else if (num == 2) {
+	} else if (num == kCursor_Right) {
 		if (_settingNum != kSettingNum_Confirm && _settingNum < 2 && 0) { // 'volume' not implemented
 			playSound(kSound_0x70);
 			++_settingNum;
@@ -838,14 +846,14 @@ void Menu::handleSettingsScreen(int num) {
 			_iconsSprites[0x26].num = 0;
 			_iconsSprites[0x28].num = 0;
 		}
-	} else if (num == 3) {
+	} else if (num == kCursor_Up) {
 		if (_settingNum == kSettingNum_Confirm) {
 			playSound(kSound_0x70);
 			_settingNum = kSettingNum_Difficulty;
 // 427C46
 			_iconsSprites[0x26].num = 0;
 		}
-	} else if (num == 4) {
+	} else if (num == kCursor_Down) {
 		if (_settingNum != kSettingNum_Confirm) {
 			playSound(kSound_0x70);
 		}
@@ -871,16 +879,16 @@ void Menu::drawDifficultyScreen() {
 void Menu::handleDifficultyScreen(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
-	if (num == 0) {
+	if (num == kCursor_Select) {
 		playSound(kSound_0x78);
 		_config->players[_config->currentPlayer].difficulty = _g->_difficulty = _difficultyNum;
 		_condMask = 0x80;
-	} else if (num == 1) {
+	} else if (num == kCursor_Left) {
 		if (_difficultyNum > 0) {
 			playSound(kSound_0x70);
 			--_difficultyNum;
 		}
-	} else if (num == 2) {
+	} else if (num == kCursor_Right) {
 		if (_difficultyNum < 2) {
 			playSound(kSound_0x70);
 			++_difficultyNum;
@@ -938,7 +946,7 @@ void Menu::handleSoundScreen(int num) {
 	// ++_soundCounter;
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
-	if (num == 0) {
+	if (num == kCursor_Select) {
 		if (_soundNum == kSoundNum_Confirm) {
 			playSound(kSound_0x78);
 			_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume;
@@ -956,7 +964,7 @@ void Menu::handleSoundScreen(int num) {
 			playSound(kSound_0x88);
 			_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume = Game::kDefaultSoundVolume;
 		}
-	} else if (num == 1) {
+	} else if (num == kCursor_Left) {
 		if (_soundNum == kSoundNum_Volume) {
 // 42590D
 			if (_g->_snd_masterVolume > 0) {
@@ -973,7 +981,7 @@ void Menu::handleSoundScreen(int num) {
 			playSound(kSound_0x70);
 			_soundNum = kSoundNum_Confirm;
 		}
-	} else if (num == 2) {
+	} else if (num == kCursor_Right) {
 		if (_soundNum == kSoundNum_Volume) {
 			if (_g->_snd_masterVolume < 128) {
 				playSound(kSound_0x90);
@@ -991,7 +999,7 @@ void Menu::handleSoundScreen(int num) {
 			}
 			_soundNum = kSoundNum_Test;
 		}
-	} else if (num == 3) {
+	} else if (num == kCursor_Up) {
 		if (_soundNum != kSoundNum_Volume) {
 			playSound(kSound_0x70);
 		}
@@ -1000,7 +1008,7 @@ void Menu::handleSoundScreen(int num) {
 		} else if (_soundNum == kSoundNum_Reset) {
 			_soundNum = kSoundNum_Cancel;
 		}
-	} else if (num == 4) {
+	} else if (num == kCursor_Down) {
 		if (_soundNum != 5) {
 			playSound(kSound_0x70);
 		}
