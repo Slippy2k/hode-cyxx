@@ -100,6 +100,8 @@ struct Menu {
 	int getSoundNum(int num, int index = 0) const;
 	void playSound(int num);
 
+	void drawBitmap(const uint8_t *data, uint32_t size, bool setPalette = false);
+
 	void drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num, int x = -1, int y = -1);
 	void drawSpriteAnim(DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num);
 

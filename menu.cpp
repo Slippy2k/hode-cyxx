@@ -354,6 +354,17 @@ void Menu::playSound(int num) {
 	}
 }
 
+void Menu::drawBitmap(const uint8_t *data, uint32_t size, bool setPalette) {
+	if (_res->_isPsx) {
+		_video->decodeBackgroundPsx(data, size, Video::W, Video::H);
+	} else {
+		decodeLZW(data, _video->_frontLayer);
+		if (setPalette) {
+			g_system->setPalette(data + size, 256, 6);
+		}
+	}
+}
+
 void Menu::drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num, int x, int y) {
 	ptr += spriteGroup->firstFrameOffset;
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
@@ -457,12 +468,7 @@ bool Menu::mainLoop() {
 }
 
 void Menu::drawTitleScreen(int option) {
-	if (_res->_isPsx) {
-		_video->decodeBackgroundPsx(_titleBitmapData, _titleBitmapSize, Video::W, Video::H);
-	} else {
-		decodeLZW(_titleBitmapData, _video->_frontLayer);
-		g_system->setPalette(_titleBitmapData + _titleBitmapSize, 256, 6);
-	}
+	drawBitmap(_titleBitmapData, _titleBitmapSize, true);
 	drawSprite(_titleSprites, (const uint8_t *)&_titleSprites[1], option);
 	refreshScreen(false);
 }
@@ -577,11 +583,7 @@ void Menu::setLevelCheckpoint(int num) {
 }
 
 void Menu::drawPlayerProgress(int state, int cursor) {
-	if (_res->_isPsx) {
-		_video->decodeBackgroundPsx(_playerBitmapData, _playerBitmapSize, Video::W, Video::H);
-	} else {
-		decodeLZW(_playerBitmapData, _video->_frontLayer);
-	}
+	drawBitmap(_playerBitmapData, _playerBitmapSize);
 	int player = 0;
 	for (int y = 96; y < 164; y += 17) {
 		if (isEmptySetupCfg(_config, player)) {
@@ -763,7 +765,7 @@ void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const ui
 }
 
 void Menu::drawCheckpointScreen() {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	drawBitmapsCircularList(_checkpointsBitmaps[_levelNum], _checkpointsBitmapsData[_levelNum], _checkpointNum, _lastLevelCheckpointNum[_levelNum], false);
 	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 5);
 	drawSprite(&_iconsSprites[0], _iconsSpritesData, (_checkpointNum + 1) / 10, 119, 108);
@@ -779,7 +781,7 @@ void Menu::drawCheckpointScreen() {
 }
 
 void Menu::drawLevelScreen() {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	drawSprite(&_iconsSprites[1], _iconsSpritesData, _levelNum);
 	DatBitmapsGroup *bitmap = &_levelsBitmaps[_levelNum];
 	drawBitmap(bitmap, _levelsBitmapsData + bitmap->offset, 23, 10, bitmap->w, bitmap->h, 192);
@@ -789,7 +791,7 @@ void Menu::drawLevelScreen() {
 }
 
 void Menu::drawCutsceneScreen() {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	drawBitmapsCircularList(_cutscenesBitmaps, _cutscenesBitmapsData, _cutsceneNum, _cutsceneIndexesCount, false);
 	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 10);
 	drawSprite(&_iconsSprites[0], _iconsSpritesData, (_cutsceneNum + 1) / 10, 119, 108);
@@ -805,7 +807,7 @@ void Menu::drawCutsceneScreen() {
 }
 
 void Menu::drawSettingsScreen() {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x2A);
 	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == kSettingNum_Controls) ? 0x27 : 0x24);
 	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_settingNum == kSettingNum_Difficulty) ? 0x26 : 0x23);
@@ -870,7 +872,7 @@ void Menu::handleSettingsScreen(int num) {
 }
 
 void Menu::drawDifficultyScreen() {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	for (int i = 0; i < 3; ++i) {
 		if (i != _difficultyNum) {
 			drawSprite(&_iconsSprites[0xF], _iconsSpritesData, i * 2);
@@ -903,7 +905,7 @@ void Menu::handleDifficultyScreen(int num) {
 }
 
 void Menu::drawSoundScreen() {
-	decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Stereo) ? 1 : 0);
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Volume) ? 3 : 2);
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Confirm) ? 5 : 4);
