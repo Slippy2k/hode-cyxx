@@ -122,11 +122,12 @@ void System_SDL2::init(const char *title, int w, int h, bool fullscreen, bool wi
 	}
 	memset(_offscreenLut, 0, offscreenSize);
 	prepareScaledGfx(title, fullscreen, widescreen, yuv);
+
+	SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
 	_joystick = 0;
 	_controller = 0;
 	const int count = SDL_NumJoysticks();
 	if (count > 0) {
-		SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
 		for (int i = 0; i < count; ++i) {
 			if (SDL_IsGameController(i)) {
 				_controller = SDL_GameControllerOpen(i);
