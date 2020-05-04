@@ -486,7 +486,7 @@ int Menu::handleTitleScreen() {
 			break;
 		}
 		drawTitleScreen(currentOption);
-		g_system->sleep(15);
+		g_system->sleep(kDelayMs);
 	}
 	return currentOption;
 }
@@ -709,7 +709,7 @@ void Menu::handleAssignPlayer() {
 		}
 // 4231FF
 		drawPlayerProgress(state, cursor);
-		g_system->sleep(15);
+		g_system->sleep(kDelayMs);
 	}
 }
 
@@ -862,7 +862,7 @@ void Menu::handleSettingsScreen(int num) {
 // 427D10
 	drawSettingsScreen();
 	_condMask = 8;
-	g_system->sleep(30);
+	g_system->sleep(kDelayMs);
 }
 
 void Menu::drawDifficultyScreen() {
@@ -895,7 +895,7 @@ void Menu::handleDifficultyScreen(int num) {
 		}
 	}
 	drawDifficultyScreen();
-	g_system->sleep(30);
+	g_system->sleep(kDelayMs);
 }
 
 void Menu::drawSoundScreen() {
@@ -1004,12 +1004,12 @@ void Menu::handleSoundScreen(int num) {
 			playSound(kSound_0x70);
 		}
 		if (_soundNum >= 2 && _soundNum <= 4) {
-			_soundNum = 1;
+			_soundNum = kSoundNum_Volume;
 		} else if (_soundNum == kSoundNum_Reset) {
 			_soundNum = kSoundNum_Cancel;
 		}
 	} else if (num == kCursor_Down) {
-		if (_soundNum != 5) {
+		if (_soundNum != kSoundNum_Reset) {
 			playSound(kSound_0x70);
 		}
 		if (_soundNum == kSoundNum_Stereo) {
@@ -1024,7 +1024,7 @@ void Menu::handleSoundScreen(int num) {
 	}
 // 425D13
 	drawSoundScreen();
-	g_system->sleep(30);
+	g_system->sleep(kDelayMs);
 }
 
 void Menu::changeToOption(int num) {
@@ -1128,6 +1128,7 @@ void Menu::handleLoadLevel(int num) {
 		}
 	}
 	drawLevelScreen();
+	g_system->sleep(kDelayMs);
 }
 
 void Menu::handleLoadCheckpoint(int num) {
@@ -1179,6 +1180,7 @@ void Menu::handleLoadCheckpoint(int num) {
 		}
 	}
 	drawCheckpointScreen();
+	g_system->sleep(kDelayMs);
 }
 
 void Menu::handleLoadCutscene(int num) {
@@ -1230,9 +1232,10 @@ void Menu::handleLoadCutscene(int num) {
 		}
 	}
 	drawCutsceneScreen();
+	g_system->sleep(kDelayMs);
 }
 
-static bool matchInput(uint8_t menu, uint8_t type, uint8_t mask, const PlayerInput &inp, uint8_t optionMask) {
+static bool matchInput(uint8_t type, uint8_t mask, const PlayerInput &inp, uint8_t optionMask) {
 	if (type != 0) {
 		if ((mask & 1) != 0 && inp.keyReleased(SYS_INP_RUN)) {
 			return true;
@@ -1301,15 +1304,15 @@ void Menu::handleOptions() {
 		// get transition from inputs and menu return code (_condMask)
 		int num = -1;
 		for (int i = 0; i < _res->_datHdr.menusCount; ++i) {
-			const uint8_t *data = _optionData + i * 8;
-			if (data[0] == _optionNum && matchInput(data[0], data[1] & 1, data[2], g_system->inp, _condMask)) {
+			const uint8_t *data = &_optionData[i * 8];
+			if (data[0] == _optionNum && matchInput(data[1] & 1, data[2], g_system->inp, _condMask)) {
 				num = i;
 				break;
 			}
 		}
 		_condMask = 0;
 		if (num == -1) {
-			g_system->sleep(15);
+			g_system->sleep(kDelayMs);
 			continue;
 		}
 // 4287AD

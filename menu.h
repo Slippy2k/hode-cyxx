@@ -34,6 +34,7 @@ struct DatBitmapsGroup {
 
 struct Menu {
 	enum {
+		kDelayMs = 30,
 		kCheckpointLevelsCount = 8,
 		kCutsceneIndexesCount = 22, // kPafAnimation_cinema + 1
 		kOptionsCount = 19
