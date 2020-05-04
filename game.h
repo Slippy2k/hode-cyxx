@@ -534,7 +534,7 @@ struct Game {
 	void updateSssGroup2(uint32_t flags);
 	SssObject *createSoundObject(int bankIndex, int sampleIndex, uint32_t flags);
 	SssObject *startSoundObject(int bankIndex, int sampleIndex, uint32_t flags);
-	void playSoundObject(SssInfo *s, int source, int b);
+	SssObject *playSoundObject(SssInfo *s, int source, int b);
 	void clearSoundObjects();
 	void setLowPrioritySoundObject(SssObject *so);
 	int getSoundObjectPanning(SssObject *so) const;

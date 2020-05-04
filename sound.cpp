@@ -926,10 +926,10 @@ SssObject *Game::startSoundObject(int bankIndex, int sampleIndex, uint32_t flags
 	return 0;
 }
 
-void Game::playSoundObject(SssInfo *s, int source, int mask) {
+SssObject *Game::playSoundObject(SssInfo *s, int source, int mask) {
 	debug(kDebug_SOUND, "playSoundObject num %d lut 0x%x mask 0x%x", s->sssBankIndex, source, mask);
 	if (_sssDisabled) {
-		return;
+		return 0;
 	}
 	const int filterIndex = _res->_sssBanksData[s->sssBankIndex].sssFilter;
 	SssFilter *filter = &_res->_sssFilters[filterIndex];
@@ -987,7 +987,7 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 		*sssGroupPtr3 |= mask;
 		uint32_t *sssGroupPtr2 = getSssGroupPtr(_res, 2, _ebp);
 		if (*sssGroupPtr2 & mask) {
-			return;
+			return 0;
 		}
 		*sssGroupPtr2 |= mask;
 // 42BB26
@@ -995,24 +995,24 @@ void Game::playSoundObject(SssInfo *s, int source, int mask) {
 		const uint32_t mask = 1 << (_ebp >> 24);
 		uint32_t *sssGroupPtr1 = getSssGroupPtr(_res, 1, _ebp);
 		if (*sssGroupPtr1 & mask) {
-			return;
+			return 0;
 		}
 		*sssGroupPtr1 |= mask;
 // 42BB60
 	} else if (_al & 4) {
 		for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 			if (compareSssGroup(so->flags0, _ebp)) {
-				return;
+				return 0;
 			}
 		}
 		for (SssObject *so = _sssObjectsList2; so; so = so->nextPtr) {
 			if (compareSssGroup(so->flags0, _ebp)) {
-				return;
+				return 0;
 			}
 		}
 	}
 // 42BBDD
-	createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
+	return createSoundObject(s->sssBankIndex, s->sampleIndex, _ebp);
 }
 
 void Game::clearSoundObjects() {

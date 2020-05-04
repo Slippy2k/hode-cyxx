@@ -899,7 +899,7 @@ void Menu::drawSoundScreen() {
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Cancel) ? 9 : 8);
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, (_soundNum == kSoundNum_Reset) ? 11 : 10);
 	// volume bar
-	const int w = ((_g->_snd_masterVolume * 3) << 5) >> 7;
+	const int w = (_g->_snd_masterVolume * 96) / 128;
 	for (int y = 0; y < 15; ++y) {
 		memset(_video->_frontLayer + 18807 + 256 * y, 0xE0, w);
 	}
@@ -917,8 +917,8 @@ void Menu::drawSoundScreen() {
 		}
 	}
 // 4255C9
-	if (0) { // (soundUnk1 != 0) && (_soundCounter & 1)
-		if (0) { // soundUnk1 == 1
+	if (0) { // (_volumeState != 0) && (_soundCounter & 1)
+		if (0) { // _volumeState == 1
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 18);
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 19);
 		} else {
@@ -934,6 +934,8 @@ void Menu::drawSoundScreen() {
 }
 
 void Menu::handleSoundScreen(int num) {
+	// _volumeState = 0;
+	// ++_soundCounter;
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == 0) {
@@ -955,61 +957,62 @@ void Menu::handleSoundScreen(int num) {
 			_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume = Game::kDefaultSoundVolume;
 		}
 	} else if (num == 1) {
-		if (_soundNum == 0) {
-// 425999
-			// ...
-		} else if (_soundNum == kSoundNum_Volume) {
+		if (_soundNum == kSoundNum_Volume) {
+// 42590D
 			if (_g->_snd_masterVolume > 0) {
 				playSound(kSound_0x90);
 				--_g->_snd_masterVolume;
 				_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume;
+				// _volumeState = 1;
 				_condMask = 8;
 			}
-		} else if (_soundNum == 3) {
+		} else if (_soundNum == kSoundNum_Test) {
 			playSound(kSound_0x70);
-			_soundNum = 4;
-		} else if (_soundNum == 4) {
+			_soundNum = kSoundNum_Cancel;
+		} else if (_soundNum == kSoundNum_Cancel) {
 			playSound(kSound_0x70);
-			_soundNum = 2;
+			_soundNum = kSoundNum_Confirm;
 		}
 	} else if (num == 2) {
-		if (_soundNum == 0) {
-// 42581D
-			// ...
-		} else if (_soundNum == kSoundNum_Volume) {
+		if (_soundNum == kSoundNum_Volume) {
 			if (_g->_snd_masterVolume < 128) {
 				playSound(kSound_0x90);
 				++_g->_snd_masterVolume;
 				_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume;
+				// _volumeState = 2;
 				_condMask = 8;
 			}
 		} else if (_soundNum == 2) {
 			playSound(kSound_0x70);
-			_soundNum = 4;
+			_soundNum = kSoundNum_Cancel;
 		} else if (_soundNum == 4) {
 			if (_g->_snd_masterVolume != 0) {
 				playSound(kSound_0x70);
-				_soundNum = 3;
 			}
+			_soundNum = kSoundNum_Test;
 		}
 	} else if (num == 3) {
 		if (_soundNum != kSoundNum_Volume) {
 			playSound(kSound_0x70);
 		}
-		if ((_soundNum >= 2 && _soundNum <= 4) || _soundNum == 5) {
+		if (_soundNum >= 2 && _soundNum <= 4) {
 			_soundNum = 1;
+		} else if (_soundNum == kSoundNum_Reset) {
+			_soundNum = kSoundNum_Cancel;
 		}
 	} else if (num == 4) {
 		if (_soundNum != 5) {
 			playSound(kSound_0x70);
 		}
-		if (_soundNum == 0) {
-			_soundNum = 1;
-		} else if (_soundNum == 1) {
-			_soundNum = 4;
+		if (_soundNum == kSoundNum_Stereo) {
+			_soundNum = kSoundNum_Volume;
+		} else if (_soundNum == kSoundNum_Volume) {
+			_soundNum = kSoundNum_Cancel;
 		} else if (_soundNum >= 2 && _soundNum <= 4) {
 			_soundNum = 5;
 		}
+	} else {
+		// _soundCounter = 0;
 	}
 // 425D13
 	drawSoundScreen();
@@ -1055,7 +1058,7 @@ void Menu::changeToOption(int num) {
 		drawCheckpointScreen();
 	} else if (_optionNum == kMenu_Settings + 1) {
 // 428118
-		_settingNum = 1;
+		_settingNum = kSettingNum_Difficulty;
 		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
 		handleSettingsScreen(5);
 	} else if (_optionNum == kMenu_Cutscenes + 1) {
@@ -1328,8 +1331,9 @@ void Menu::handleOptions() {
 		case 5:
 			if (prevOptionNum != _optionNum) {
 				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
-				_soundNum = 2;
 				_soundVolume = _g->_snd_masterVolume;
+				_soundNum = kSoundNum_Confirm;
+				// _soundCounter = 0;
 			}
 			handleSoundScreen(num);
 			break;
