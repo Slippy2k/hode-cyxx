@@ -101,6 +101,15 @@ void Game::resetSound() {
 	clearSoundObjects();
 }
 
+bool Game::isSoundPlaying(uint32_t flags) const {
+	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
+		if (compareSssGroup(so->flags0, flags)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 SssObject *Game::findLowestRankSoundObject() const {
 	SssObject *so = 0;
 	if (_playingSssObjectsCount >= _playingSssObjectsMax && _sssObjectsList1) {
