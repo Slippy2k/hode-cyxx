@@ -871,6 +871,56 @@ void Menu::handleSettingsScreen(int num) {
 	g_system->sleep(kDelayMs);
 }
 
+void Menu::drawControlsScreen() {
+	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_controlsNum == 1) ? 0x2E : 0x2D);
+	drawSpriteAnim(_iconsSprites, _iconsSpritesData, (_controlsNum == 0) ? 0x2C : 0x2B);
+	drawSprite(&_iconsSprites[0x2F], _iconsSpritesData, (_controlsNum == 2) ? 1 : 0);
+	refreshScreen(true);
+}
+
+void Menu::handleControlsScreen(int num) {
+	const uint8_t *data = &_optionData[num * 8];
+	num = data[5];
+	if (num == kCursor_Select) {
+		playSound(kSound_0x78);
+		if (_controlsNum == 0) {
+			_condMask = 0x10;
+		} else if (_controlsNum == 1) {
+			_condMask = 0x8;
+		} else if (_controlsNum == 2) {
+			_condMask = 0x80;
+		}
+		return;
+	} else if (num == kCursor_Left) {
+		if (_controlsNum == 1) {
+			playSound(kSound_0x70);
+			_controlsNum = 0;
+			_iconsSprites[0x2C].num = 0;
+		}
+	} else if (num == kCursor_Right) {
+		if (_controlsNum == 0) {
+			playSound(kSound_0x70);
+			_controlsNum = 1;
+			_iconsSprites[0x2E].num = 0;
+		}
+	} else if (num == kCursor_Up) {
+		if (_controlsNum == 2) {
+			playSound(kSound_0x70);
+			_controlsNum = 1;
+			_iconsSprites[0x2E].num = 0;
+		}
+	} else if (num == kCursor_Down) {
+		if (_controlsNum != 2) {
+			playSound(kSound_0x70);
+			_controlsNum = 2;
+		}
+	}
+	drawControlsScreen();
+	_condMask = 0x20;
+	g_system->sleep(kDelayMs);
+}
+
 void Menu::drawDifficultyScreen() {
 	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 	for (int i = 0; i < 3; ++i) {
@@ -972,17 +1022,17 @@ void Menu::handleSoundScreen(int num) {
 					if (so->pcmFramesCount <= 20) {
 						if (_soundTestSpriteNum != 7) {
 							_soundTestSpriteNum = 7;
-							so->panning = 64;
+							so->panning = 64; // center
 						}
 					} else if (so->pcmFramesCount <= 36) {
 						if (_soundTestSpriteNum != 23) {
 							_soundTestSpriteNum = 23;
-							so->panning = 128;
+							so->panning = 128; // right
 						}
 					} else if (so->pcmFramesCount <= 49) {
 						if (_soundTestSpriteNum != 22) {
 							_soundTestSpriteNum = 22;
-							so->panning = 0;
+							so->panning = 0; // left
 						}
 					}
 					if (spriteNum != _soundTestSpriteNum) {
@@ -1369,10 +1419,19 @@ void Menu::handleOptions() {
 				_iconsSprites[0x26].num = 0;
 				_iconsSprites[0x28].num = 0;
 				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
+				_settingNum = kSettingNum_Difficulty;
 			}
 			handleSettingsScreen(num);
 			break;
-		// case 1: // controls
+		case 1:
+			if (prevOptionNum != _optionNum) {
+				_iconsSprites[0x2C].num = 0;
+				_iconsSprites[0x2E].num = 0;
+				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
+				_controlsNum = 2;
+			}
+			handleControlsScreen(num);
+			break;
 		case 4:
 			if (prevOptionNum != _optionNum) {
 				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);

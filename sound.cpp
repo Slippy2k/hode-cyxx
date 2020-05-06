@@ -101,7 +101,8 @@ void Game::resetSound() {
 	clearSoundObjects();
 }
 
-bool Game::isSoundPlaying(uint32_t flags) const {
+bool Game::isSoundPlaying(uint32_t flags) {
+	MixerLock ml(&_mix);
 	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
 		if (compareSssGroup(so->flags0, flags)) {
 			return true;

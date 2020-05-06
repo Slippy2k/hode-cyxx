@@ -87,6 +87,7 @@ struct Menu {
 	uint8_t _loadCutsceneButtonState;
 	int _cutsceneIndexes[kCutsceneIndexesCount];
 	int _settingNum;
+	int _controlsNum;
 	int _difficultyNum;
 	int _soundNum;
 	uint8_t _soundVolume;
@@ -125,6 +126,8 @@ struct Menu {
 	void drawCutsceneScreen();
 	void drawSettingsScreen();
 	void handleSettingsScreen(int num);
+	void drawControlsScreen();
+	void handleControlsScreen(int num);
 	void drawDifficultyScreen();
 	void handleDifficultyScreen(int num);
 	void drawSoundScreen();

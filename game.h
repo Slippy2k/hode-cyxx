@@ -521,7 +521,7 @@ struct Game {
 	void muteSound();
 	void unmuteSound();
 	void resetSound();
-	void isSoundPlaying(uint32_t flags) const;
+	bool isSoundPlaying(uint32_t flags);
 	SssObject *findLowestRankSoundObject() const;
 	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);
