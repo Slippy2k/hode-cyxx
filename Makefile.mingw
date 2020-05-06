@@ -8,7 +8,7 @@ STRIP   := i686-w64-mingw32-strip
 WINDRES := i686-w64-mingw32-windres
 
 LTO      := -flto
-CPPFLAGS += -O2 -Wall $(SDL_CFLAGS) $(LTO) # -ffunction-sections
+CPPFLAGS += -O2 -Wall $(SDL_CFLAGS) $(LTO) -DNDEBUG -Wno-unused-variable # -ffunction-sections
 LDFLAGS  += $(LTO)
 
 SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
