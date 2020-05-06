@@ -3024,11 +3024,11 @@ void Game::lvlObjectType0CallbackHelper1() {
 		_bl |= 4;
 	}
 	if (_andyObject->spriteNum == 2 && (_bl & 5) == 5) {
-		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
-		LvlObject *o = data->shootLvlObject;
+		AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
+		LvlObject *o = andyData->shootLvlObject;
 		if (o) {
-			ShootLvlObjectData *dataUnk1 = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
-			if (dataUnk1->type < 4) {
+			ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
+			if (dat->type < 4) {
 				_bl |= 0xC0;
 			}
 		}
@@ -3507,10 +3507,10 @@ int Game::lvlObjectType1Callback(LvlObject *ptr) {
 }
 
 int Game::lvlObjectType7Callback(LvlObject *ptr) {
-	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
-	if (!dat) {
+	if (!ptr->dataPtr) {
 		return 0;
 	}
+	ShootLvlObjectData *dat = (ShootLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeShoot);
 	if ((ptr->flags0 & 0x1F) == 1) {
 		dat->xPosObject = ptr->posTable[7].x + ptr->xPos;
 		dat->yPosObject = ptr->posTable[7].y + ptr->yPos;

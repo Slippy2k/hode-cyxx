@@ -3526,11 +3526,9 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 			AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (andyData) {
 				LvlObject *o = andyData->shootLvlObject;
-				if (o) {
+				if (o && o->dataPtr) {
 					ShootLvlObjectData *data = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
-					if (data) {
-						return (data->type == 4) ? 1 : 0;
-					}
+					return (data->type == 4) ? 1 : 0;
 				}
 			}
 		}
@@ -3540,11 +3538,9 @@ int Game::getTaskAndyVar(int index, Task *t) const {
 			AndyLvlObjectData *andyData = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 			if (andyData) {
 				LvlObject *o = andyData->shootLvlObject;
-				if (o) {
+				if (o && o->dataPtr) {
 					ShootLvlObjectData *data = (ShootLvlObjectData *)getLvlObjectDataPtr(o, kObjectDataTypeShoot);
-					if (data) {
-						return (data->type == 0) ? 1 : 0;
-					}
+					return (data->type == 0) ? 1 : 0;
 				}
 			}
 		}
