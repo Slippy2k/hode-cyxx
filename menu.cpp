@@ -422,11 +422,11 @@ void Menu::pafCallback(int frameNum, const uint8_t *frameData) {
 			_g->playSound(num, 0, 0, 5);
 		}
 	}
+	memcpy(_video->_frontLayer, frameData, Video::W * Video::H);
 	if (_currentOptionButtonSprite && frameNum == _currentOptionButtonSprite->num) {
-		memcpy(_video->_frontLayer, frameData, Video::W * Video::H);
 		drawSpriteAnim(_currentOptionButtonSprite, _optionsButtonSpritesData, 0);
-		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
 	}
+	g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, Video::W);
 }
 
 static void menuPafCallback(void *userdata, int frame, const uint8_t *buffer) {
@@ -1143,7 +1143,7 @@ void Menu::changeToOption(int num) {
 	} else if (_optionNum == kMenu_Load + 1) {
 // 4281C3
 		_loadLevelButtonState = 0;
-		memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 768);
+		memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 192 * 3);
 		memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
 		g_system->setPalette(_paletteBuffer, 256, 6);
 		drawLevelScreen();
@@ -1158,7 +1158,7 @@ void Menu::changeToOption(int num) {
 	} else if (_optionNum == kMenu_Settings + 1) {
 // 428118
 		_settingNum = kSettingNum_Difficulty;
-		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 768);
+		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
 		handleSettingsScreen(5);
 	} else if (_optionNum == kMenu_Cutscenes + 1) {
 // 4280EA
@@ -1166,7 +1166,7 @@ void Menu::changeToOption(int num) {
 		_cutsceneNum = 0;
 		drawCutsceneScreen();
 	} else if (_optionsBitmapSize[_optionNum] != 0) {
-		decodeLZW(_optionsBitmapData[_optionNum], _video->_frontLayer);
+		drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
 		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
 		refreshScreen(true);
 	}
