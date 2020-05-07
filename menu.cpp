@@ -969,10 +969,10 @@ void Menu::drawSoundScreen() {
 	}
 	drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 21);
 	if (_soundNum == kSoundNum_Test) {
-//		drawSprite(&_iconsSprites[0x12], _iconsSpritesData, _soundTestSpriteNum);
+		drawSprite(&_iconsSprites[0x12], _iconsSpritesData, _soundTestSpriteNum);
 	}
 	if (_g->_snd_masterVolume != 0) {
-		if (_config->players[_config->currentPlayer].stereo) {
+		if (_config->players[_config->currentPlayer].stereo || 1) { // always stereo
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 13);
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 16);
 		} else {
@@ -981,8 +981,8 @@ void Menu::drawSoundScreen() {
 		}
 	}
 // 4255C9
-	if (0) { // (_volumeState != 0) && (_soundCounter & 1)
-		if (0) { // _volumeState == 1
+	if ((_volumeState != 0) && (_soundCounter & 1)) {
+		if (_volumeState == 1) {
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 18);
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 19);
 		} else {
@@ -998,8 +998,8 @@ void Menu::drawSoundScreen() {
 }
 
 void Menu::handleSoundScreen(int num) {
-	// _volumeState = 0;
-	// ++_soundCounter;
+	_volumeState = 0;
+	++_soundCounter;
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
 	if (num == kCursor_Select) {
@@ -1009,16 +1009,12 @@ void Menu::handleSoundScreen(int num) {
 			_condMask = 0x80;
 		} else if (_soundNum == kSoundNum_Test) {
 			playSound(kSound_0x60);
+			SssObject *so = 0;
 // 425B7D
-/*
 			int spriteNum = _soundTestSpriteNum = 7;
 			drawSoundScreen();
-			SssObject *so = 0;
 			if (so) {
-				var4 = (so->flags0 >> 20) & 15;
-				varC = (so->flags0 >> 24);
-				var8 = (so->flags0 & 0xFFF);
-				while (isSoundPlaying(var8, var4, varC)) {
+				while (_g->isSoundPlaying(so->flags0)) {
 					if (so->pcmFramesCount <= 20) {
 						if (_soundTestSpriteNum != 7) {
 							_soundTestSpriteNum = 7;
@@ -1037,7 +1033,7 @@ void Menu::handleSoundScreen(int num) {
 					}
 					if (spriteNum != _soundTestSpriteNum) {
 						spriteNum = _soundTestSpriteNum;
-						setSoundObjectPanning(so);
+						_g->setSoundObjectPanning(so);
 						drawSoundScreen();
 					}
 					g_system->sleep(kDelayMs);
@@ -1045,7 +1041,6 @@ void Menu::handleSoundScreen(int num) {
 			}
 // 425CA6
 			_soundTestSpriteNum = 24;
-*/
 		} else if (_soundNum == kSoundNum_Cancel) {
 			playSound(kSound_0x80);
 // 425ACB
@@ -1062,7 +1057,7 @@ void Menu::handleSoundScreen(int num) {
 				playSound(kSound_0x90);
 				--_g->_snd_masterVolume;
 				_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume;
-				// _volumeState = 1;
+				_volumeState = 1;
 				_condMask = 8;
 			}
 		} else if (_soundNum == kSoundNum_Test) {
@@ -1078,7 +1073,7 @@ void Menu::handleSoundScreen(int num) {
 				playSound(kSound_0x90);
 				++_g->_snd_masterVolume;
 				_config->players[_config->currentPlayer].volume = _g->_snd_masterVolume;
-				// _volumeState = 2;
+				_volumeState = 2;
 				_condMask = 8;
 			}
 		} else if (_soundNum == 2) {

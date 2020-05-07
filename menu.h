@@ -91,6 +91,9 @@ struct Menu {
 	int _difficultyNum;
 	int _soundNum;
 	uint8_t _soundVolume;
+	int _volumeState;
+	int _soundCounter;
+	int _soundTestSpriteNum;
 
 	Menu(Game *g, PafPlayer *paf, Resource *res, Video *video);
 
