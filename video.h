@@ -56,7 +56,7 @@ struct Video {
 
 	void updateGamePalette(const uint16_t *pal);
 	void updateGameDisplay(uint8_t *buf);
-	void updateYuvDisplay(MdecOutput *mdec);
+	void updateYuvDisplay();
 	void copyYuvBackBuffer();
 	void updateScreen();
 	void clearBackBuffer();

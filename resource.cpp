@@ -241,19 +241,21 @@ void Resource::loadSetupDat() {
 }
 
 bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
+	const int size = _datHdr.hintsImageSizeTable[num];
+	if (size == 0) {
+		return false;
+	}
+	const int offset = _datHdr.hintsImageOffsetTable[num];
+	assert(size <= 256 * 192);
+	_datFile->seek(offset, SEEK_SET);
+	_datFile->read(dst, size);
 	if (!_isPsx) {
-		const int offset = _datHdr.hintsImageOffsetTable[num];
-		const int size = _datHdr.hintsImageSizeTable[num];
-		assert(size == 256 * 192);
-		_datFile->seek(offset, SEEK_SET);
-		_datFile->read(dst, size);
 		if (_datHdr.version == 11) {
 			_datFile->seek(offset + fioAlignSizeTo2048(size), SEEK_SET); // align to next sector
 		}
 		_datFile->read(pal, 768);
-		return true;
 	}
-	return false;
+	return true;
 }
 
 bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {

@@ -94,7 +94,6 @@ struct Game {
 	uint32_t _cheats;
 	int _frameMs;
 	int _difficulty;
-	bool _loadingScreenEnabled;
 
 	SetupConfig _setupConfig;
 	bool _playDemo;

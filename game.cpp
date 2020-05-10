@@ -29,7 +29,6 @@ Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 
 	_frameMs = kFrameTimeStamp;
 	_difficulty = 1;
-	_loadingScreenEnabled = true;
 
 	memset(_screenLvlObjectsList, 0, sizeof(_screenLvlObjectsList));
 	_andyObject = 0;
@@ -2758,7 +2757,7 @@ void Game::levelMainLoop() {
 	_rnd.update();
 	g_system->processEvents();
 	if (g_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
-		if (displayHintScreen(-1, 0)) {
+		if (!_res->_isPsx && displayHintScreen(-1, 0)) {
 			g_system->inp.quit = true;
 			return;
 		}
@@ -2825,10 +2824,20 @@ void Game::callLevel_terminate() {
 }
 
 void Game::displayLoadingScreen() {
-	if (_loadingScreenEnabled && _res->loadDatLoadingImage(_video->_frontLayer, _video->_palette)) {
-		g_system->setPalette(_video->_palette, 256, 6);
-		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
-		g_system->updateScreen(false);
+	if (_res->_isPsx) {
+		static const int kHintPsxLoading = 39;
+		if (_res->loadDatHintImage(kHintPsxLoading, _video->_frontLayer, 0)) {
+			_video->decodeBackgroundPsx(_video->_frontLayer, _res->_datHdr.hintsImageSizeTable[kHintPsxLoading], Video::W, Video::H);
+			g_system->fillRect(0, 0, Video::W, Video::H, 0);
+			_video->updateYuvDisplay();
+			g_system->updateScreen(false);
+		}
+	} else {
+		if (_res->loadDatLoadingImage(_video->_frontLayer, _video->_palette)) {
+			g_system->setPalette(_video->_palette, 256, 6);
+			g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+			g_system->updateScreen(false);
+		}
 	}
 }
 

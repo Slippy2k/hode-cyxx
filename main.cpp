@@ -41,6 +41,7 @@ static bool _widescreen = false;
 
 static const bool _runBenchmark = false;
 static bool _runMenu = true;
+static bool _displayLoadingScreen = true;
 
 static void lockAudio(int flag) {
 	if (flag) {
@@ -104,7 +105,7 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 		} else if (strcmp(name, "frame_duration") == 0) {
 			g->_frameMs = atoi(value);
 		} else if (strcmp(name, "loading_screen") == 0) {
-			g->_loadingScreenEnabled = configBool(value);
+			_displayLoadingScreen = configBool(value);
 		}
 	} else if (strcmp(section, "display") == 0) {
 		if (strcmp(name, "scale_factor") == 0) {
@@ -222,7 +223,9 @@ int main(int argc, char *argv[]) {
 	g->loadSetupCfg(resume);
 	bool runGame = true;
 	g->_video->init(isPsx);
-	g->displayLoadingScreen();
+	if (_displayLoadingScreen) {
+		g->displayLoadingScreen();
+	}
 	if (_runMenu && resume && !isPsx) {
 		Menu *m = new Menu(g, g->_paf, g->_res, g->_video);
 		runGame = m->mainLoop();
@@ -231,7 +234,9 @@ int main(int argc, char *argv[]) {
 	if (runGame && !g_system->inp.quit) {
 		bool levelChanged = false;
 		do {
-			g->displayLoadingScreen();
+			if (_displayLoadingScreen) {
+				g->displayLoadingScreen();
+			}
 			g->mainLoop(level, checkpoint, levelChanged);
 			// do not save progress when game is started from a specific level/checkpoint
 			if (resume) {
