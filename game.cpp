@@ -28,7 +28,7 @@ Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	_playDemo = false;
 
 	_frameMs = kFrameTimeStamp;
-	_difficulty = 1;
+	_difficulty = 1; // normal
 
 	memset(_screenLvlObjectsList, 0, sizeof(_screenLvlObjectsList));
 	_andyObject = 0;
@@ -2092,6 +2092,7 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		}
 		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;
 		debug(kDebug_GAME, "Restart at level %d checkpoint %d cutscenes 0x%x", level, checkpoint, _paf->_playedMask);
+		_difficulty = _setupConfig.players[num].difficulty;
 		// resume once, on the starting level
 		_resumeGame = false;
 	}
