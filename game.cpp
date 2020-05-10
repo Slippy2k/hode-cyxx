@@ -307,8 +307,8 @@ void Game::setupBackgroundBitmap() {
 	const int num = lvl->currentBackgroundId;
 	const uint8_t *pal = lvl->backgroundPaletteTable[num];
 	lvl->backgroundPaletteId = READ_LE_UINT16(pal); pal += 2;
-	const uint8_t *pic = lvl->backgroundBitmapTable[num];
-	lvl->backgroundBitmapId = READ_LE_UINT16(pic); pic += 2;
+	const uint8_t *bmp = lvl->backgroundBitmapTable[num];
+	lvl->backgroundBitmapId = READ_LE_UINT16(bmp); bmp += 2;
 	if (lvl->backgroundPaletteId != 0xFFFF) {
 		playSound(lvl->backgroundPaletteId, 0, 0, 3);
 	}
@@ -316,10 +316,9 @@ void Game::setupBackgroundBitmap() {
 		playSound(lvl->backgroundBitmapId, 0, 0, 3);
 	}
 	if (_res->_isPsx) {
-		const int size = Video::W * Video::H * sizeof(uint16_t);
-		_video->decodeBackgroundPsx(pic + 2, size, Video::W, Video::H);
+		_video->decodeBackgroundPsx(bmp + 2, -1, Video::W, Video::H);
 	} else {
-		decodeLZW(pic, _video->_backgroundLayer);
+		decodeLZW(bmp, _video->_backgroundLayer);
 	}
 	if (lvl->shadowCount != 0) {
 		decodeShadowScreenMask(lvl);
@@ -2746,20 +2745,15 @@ void Game::levelMainLoop() {
 	}
 	if (_shakeScreenDuration != 0 || _levelRestartCounter != 0 || _video->_displayShadowLayer) {
 		shakeScreen();
-		uint8_t *p = _video->_shadowLayer;
-		if (!_video->_displayShadowLayer) {
-			p = _video->_frontLayer;
-		}
-		_video->updateGameDisplay(p);
+		_video->updateGameDisplay(_video->_displayShadowLayer ? _video->_shadowLayer : _video->_frontLayer);
 	} else {
 		_video->updateGameDisplay(_video->_frontLayer);
 	}
 	_rnd.update();
 	g_system->processEvents();
-	if (g_system->inp.keyPressed(SYS_INP_ESC)) { // display exit confirmation screen
-		if (!_res->_isPsx && displayHintScreen(-1, 0)) {
+	if (g_system->inp.keyPressed(SYS_INP_ESC)) {
+		if (displayHintScreen(-1, 0)) { // pause/exit screen
 			g_system->inp.quit = true;
-			return;
 		}
 	} else {
 		// displayHintScreen(1, 0);
@@ -2850,15 +2844,26 @@ int Game::displayHintScreen(int num, int pause) {
 		_video->_frontLayer,
 		_video->_shadowLayer,
 	};
+	const bool isPsx = _res->_isPsx;
 	muteSound();
 	if (num == -1) {
-		num = _res->_datHdr.yesNoQuitImage; // 'Yes'
-		_res->loadDatHintImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
-		confirmQuit = true;
+		if (isPsx) {
+			num = 35; // 'Pause' on PSX
+		} else {
+			num = _res->_datHdr.yesNoQuitImage; // 'Yes'
+			_res->loadDatHintImage(num + 1, _video->_shadowLayer, _video->_palette); // 'No'
+			confirmQuit = true;
+		}
 	}
 	if (_res->loadDatHintImage(num, _video->_frontLayer, _video->_palette)) {
-		g_system->setPalette(_video->_palette, 256, 6);
-		g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+		if (isPsx) {
+			_video->decodeBackgroundPsx(_video->_frontLayer, _res->_datHdr.hintsImageSizeTable[num], Video::W, Video::H);
+			g_system->fillRect(0, 0, Video::W, Video::H, 0);
+			_video->updateYuvDisplay();
+		} else {
+			g_system->setPalette(_video->_palette, 256, 6);
+			g_system->copyRect(0, 0, Video::W, Video::H, _video->_frontLayer, 256);
+		}
 		g_system->updateScreen(false);
 		do {
 			g_system->processEvents();
@@ -2880,6 +2885,11 @@ int Game::displayHintScreen(int num, int pause) {
 		_video->_paletteChanged = true;
 	}
 	unmuteSound();
+	if (isPsx) { // restore level screen bitmap
+		LvlBackgroundData *lvl = &_res->_resLvlScreenBackgroundDataTable[_res->_currentScreenResourceNum];
+		const uint8_t *bmp = lvl->backgroundBitmapTable[lvl->currentBackgroundId];
+		_video->decodeBackgroundPsx(bmp + 4, -1, Video::W, Video::H);
+	}
 	return confirmQuit && quit == kQuitYes;
 }
 
