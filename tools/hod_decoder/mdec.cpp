@@ -229,7 +229,7 @@ int decodeMDEC(const uint8_t *src, int len, int w, int h, const uint8_t *mborder
 end:
 	if (!mborder && bs.bitsAvailable() >= 11) {
 		const int eof = bs.getBits(11);
-		assert(eof == 0x3FE); // v2 frame
+		assert(eof == 0x3FE || eof == 0x3FF);
 	}
 
 	output(&mdecOut, userdata);

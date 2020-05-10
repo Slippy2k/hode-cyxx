@@ -220,7 +220,7 @@ int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int mblen, i
 end:
 	if (!mborder && bs.bitsAvailable() >= 11) {
 		const int eof = bs.getBits(11);
-		assert(eof == 0x3FE); // v2 frame
+		assert(eof == 0x3FE || eof == 0x3FF);
 	}
 
 	return bs._src - src;
