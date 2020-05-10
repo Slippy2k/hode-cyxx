@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import datetime
 import os, re, tarfile, shutil
 import tempfile
+import time
 import zipfile
 
 SRC_DIR = '..'
@@ -43,13 +45,16 @@ BIN_WII = (
 def getVersion():
 	f = file(os.path.join(SRC_DIR, 'README.txt'))
 	for line in f.readlines():
-		m = re.search('Release version: (\d+\.\d+\.\d+)', line.strip())
+		m = re.search('Release version: (\d+\.\d+\.\d+\w?)', line.strip())
 		if m:
 			return m.group(1)
 	return None
 
 version = getVersion()
 assert version
+
+t = datetime.date.today().timetuple()
+timestamp = time.mktime(t)
 
 X86_REGS = { '_eax':'va', '_ebx':'vb', '_ecx':'vc', '_edx':'vd', '_ebp':'ve', '_edi':'vf', '_esi':'vg' }
 
@@ -86,6 +91,7 @@ for name in SRC:
 			entrypath = os.path.join(SRC_DIR, filename)
 			fileobj = tidyCpp(entrypath)
 			tarinfo = tf.gettarinfo(name=filename, arcname=entryname, fileobj=fileobj)
+			tarinfo.mtime = timestamp
 			fileobj.seek(0)
 			tf.addfile(tarinfo, fileobj)
 	for dirname in EXTRA_DIRS:
