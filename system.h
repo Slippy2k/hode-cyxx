@@ -65,6 +65,7 @@ struct System {
 	virtual AudioCallback setAudioCallback(AudioCallback callback) = 0;
 };
 
+extern void System_earlyInit();
 extern void System_printLog(FILE *, const char *s);
 extern void System_fatalError(const char *s);
 extern bool System_hasCommandLine();

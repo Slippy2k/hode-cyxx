@@ -2,6 +2,8 @@
 #include <malloc.h>
 #include <unistd.h>
 
+#include <fat.h>
+
 #include <gccore.h>
 #include <ogc/audio.h>
 #include <ogc/lwp_watchdog.h>
@@ -81,6 +83,10 @@ static int16_t __attribute__((aligned(32))) _resample[DMA_BUFFER_SAMPLES * 2];
 static uint8_t __attribute__((aligned(32))) _dma[2][DMA_BUFFER_SIZE];
 static int _current_dma;
 
+void System_earlyInit() {
+	fatInitDefault();
+}
+
 void System_fatalError(const char *s) {
 	GXRModeObj *rmodeObj = system_wii._rmodeObj;
 	if (!rmodeObj) {
@@ -148,6 +154,9 @@ void System_Wii::destroy() {
 	_xfb[0] = 0;
 	free(MEM_K1_TO_K0(_xfb[1]));
 	_xfb[1] = 0;
+
+	fatUnmount("sd:/");
+	fatUnmount("usb:/");
 }
 
 void System_Wii::setScaler(const char *name, int multiplier) {

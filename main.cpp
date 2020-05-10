@@ -6,9 +6,6 @@
 #if !defined(PSP) && !defined(WII)
 #include <SDL.h>
 #endif
-#if defined(WII)
-#include <fat.h>
-#endif
 #include <getopt.h>
 #include <sys/stat.h>
 
@@ -135,7 +132,7 @@ int main(int argc, char *argv[]) {
 	int cheats = 0;
 
 #ifdef WII
-	fatInitDefault();
+	System_earlyInit();
 	static const char *pathsWII[] = {
 		"sd:/hode",
 		"usb:/hode",
@@ -254,9 +251,5 @@ int main(int argc, char *argv[]) {
 	delete g;
 	free(dataPath);
 	free(savePath);
-#ifdef WII
-	fatUnmount("sd:/");
-	fatUnmount("usb:/");
-#endif
 	return 0;
 }
