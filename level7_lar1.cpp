@@ -1,4 +1,6 @@
 
+// lar1_hod - "into the lair"
+
 #include "game.h"
 #include "level.h"
 #include "paf.h"

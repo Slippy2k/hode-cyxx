@@ -1,4 +1,6 @@
 
+// lar2_hod - "heart of darkness"
+
 #include "game.h"
 #include "level.h"
 #include "paf.h"
