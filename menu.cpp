@@ -1335,6 +1335,8 @@ void Menu::handleLoadCutscene(int num) {
 			playSound(kSound_0x78);
 			_loadCutsceneButtonState = 2;
 			if (!_paf->_skipCutscenes) {
+				_currentOptionButtonSound = 0;
+				_currentOptionButtonSprite = 0;
 				const int num = _cutscenesBitmaps[_cutsceneIndexes[_cutsceneNum]].data;
 				_paf->play(num);
 				if (num == kPafAnimation_end) {
