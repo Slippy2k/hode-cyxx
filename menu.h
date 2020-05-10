@@ -88,6 +88,8 @@ struct Menu {
 	int _cutsceneIndexes[kCutsceneIndexesCount];
 	int _settingNum;
 	int _controlsNum;
+	int _joystickControlsNum;
+	int _keyboardControlsNum;
 	int _difficultyNum;
 	int _soundNum;
 	uint8_t _soundVolume;
@@ -131,6 +133,9 @@ struct Menu {
 	void handleSettingsScreen(int num);
 	void drawControlsScreen();
 	void handleControlsScreen(int num);
+	void drawJoystickControlsScreen();
+	void handleJoystickControlsScreen(int num);
+	void handleKeyboardControlsScreen(int num);
 	void drawDifficultyScreen();
 	void handleDifficultyScreen(int num);
 	void drawSoundScreen();
