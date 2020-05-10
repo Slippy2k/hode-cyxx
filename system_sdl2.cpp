@@ -87,9 +87,22 @@ struct System_SDL2 : System {
 static System_SDL2 system_sdl2;
 System *const g_system = &system_sdl2;
 
+void System_printLog(FILE *fp, const char *s) {
+	if (fp == stderr) {
+		fprintf(stderr, "WARNING: %s\n", s);
+	} else {
+		fprintf(fp, "%s\n", s);
+	}
+}
+
 void System_fatalError(const char *s) {
+	fprintf(stderr, "ERROR: %s\n", s);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Heart of Darkness", s, system_sdl2._window);
 	exit(-1);
+}
+
+bool System_hasCommandLine() {
+	return true;
 }
 
 System_SDL2::System_SDL2() :

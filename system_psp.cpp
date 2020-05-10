@@ -109,6 +109,10 @@ void System_fatalError(const char *s) {
 	sceKernelExitGame();
 }
 
+bool System_hasCommandLine() {
+	return false;
+}
+
 static int exitCallback(int arg1, int arg2, void *common) {
 	g_system->inp.quit = true;
 	return 0;

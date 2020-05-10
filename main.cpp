@@ -149,67 +149,66 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-#else
-#if !defined(PSP)
-	if (argc == 2) {
-		// data path as the only command line argument
-		struct stat st;
-		if (stat(argv[1], &st) == 0 && S_ISDIR(st.st_mode)) {
-			dataPath = strdup(argv[1]);
+#endif
+	if (System_hasCommandLine()) {
+		if (argc == 2) {
+			// data path as the only command line argument
+			struct stat st;
+			if (stat(argv[1], &st) == 0 && S_ISDIR(st.st_mode)) {
+				dataPath = strdup(argv[1]);
+			}
 		}
-	}
-	while (1) {
-		static struct option options[] = {
-			{ "datapath",   required_argument, 0, 1 },
-			{ "savepath",   required_argument, 0, 2 },
-			{ "level",      required_argument, 0, 3 },
-			{ "checkpoint", required_argument, 0, 4 },
-			{ "debug",      required_argument, 0, 5 },
-			{ "cheats",     required_argument, 0, 6 },
-			{ 0, 0, 0, 0 },
-		};
-		int index;
-		const int c = getopt_long(argc, argv, "", options, &index);
-		if (c == -1) {
-			break;
-		}
-		switch (c) {
-		case 1:
-			dataPath = strdup(optarg);
-			break;
-		case 2:
-			savePath = strdup(optarg);
-			break;
-		case 3:
-			if (optarg[0] >= '0' && optarg[0] <= '9') {
-				level = atoi(optarg);
-			} else {
-				for (int i = 0; _levelNames[i]; ++i) {
-					if (strcmp(_levelNames[i], optarg) == 0) {
-						level = i;
-						break;
+		while (1) {
+			static struct option options[] = {
+				{ "datapath",   required_argument, 0, 1 },
+				{ "savepath",   required_argument, 0, 2 },
+				{ "level",      required_argument, 0, 3 },
+				{ "checkpoint", required_argument, 0, 4 },
+				{ "debug",      required_argument, 0, 5 },
+				{ "cheats",     required_argument, 0, 6 },
+				{ 0, 0, 0, 0 },
+			};
+			int index;
+			const int c = getopt_long(argc, argv, "", options, &index);
+			if (c == -1) {
+				break;
+			}
+			switch (c) {
+			case 1:
+				dataPath = strdup(optarg);
+				break;
+			case 2:
+				savePath = strdup(optarg);
+				break;
+			case 3:
+				if (optarg[0] >= '0' && optarg[0] <= '9') {
+					level = atoi(optarg);
+				} else {
+					for (int i = 0; _levelNames[i]; ++i) {
+						if (strcmp(_levelNames[i], optarg) == 0) {
+							level = i;
+							break;
+						}
 					}
 				}
+				resume = false;
+				break;
+			case 4:
+				checkpoint = atoi(optarg);
+				resume = false;
+				break;
+			case 5:
+				g_debugMask |= atoi(optarg);
+				break;
+			case 6:
+				cheats |= atoi(optarg);
+				break;
+			default:
+				fprintf(stdout, "%s\n", _usage);
+				return -1;
 			}
-			resume = false;
-			break;
-		case 4:
-			checkpoint = atoi(optarg);
-			resume = false;
-			break;
-		case 5:
-			g_debugMask |= atoi(optarg);
-			break;
-		case 6:
-			cheats |= atoi(optarg);
-			break;
-		default:
-			fprintf(stdout, "%s\n", _usage);
-			return -1;
 		}
 	}
-#endif
-#endif
 	Game *g = new Game(dataPath ? dataPath : _defaultDataPath, savePath ? savePath : _defaultSavePath, cheats);
 	ini_parse(_configIni, handleConfigIni, g);
 	if (_runBenchmark) {

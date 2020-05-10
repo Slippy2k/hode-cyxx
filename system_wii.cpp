@@ -96,6 +96,10 @@ void System_fatalError(const char *s) {
 void System_printLog(FILE *fp, const char *s) {
 }
 
+bool System_hasCommandLine() {
+	return false;
+}
+
 System_Wii::System_Wii() {
 	_rmodeObj = 0;
 }
