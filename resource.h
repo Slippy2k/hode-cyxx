@@ -565,6 +565,7 @@ struct Resource {
 
 	uint8_t *_loadingImageBuffer;
 	uint8_t *_fontBuffer;
+	uint8_t _fontDefaultColor;
 	uint8_t *_menuBuffer0;
 	uint8_t *_menuBuffer1;
 	uint32_t _menuBuffersOffset;

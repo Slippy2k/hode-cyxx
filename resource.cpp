@@ -142,6 +142,7 @@ Resource::Resource(FileSystem *fs)
 
 	_loadingImageBuffer = 0;
 	_fontBuffer = 0;
+	_fontDefaultColor = 0;
 	_menuBuffer0 = 0;
 	_menuBuffer1 = 0;
 
@@ -233,6 +234,12 @@ void Resource::loadSetupDat() {
 				assert(uncompressedSize == kFontSize);
 			} else {
 				memcpy(_fontBuffer, _loadingImageBuffer + offset, kFontSize);
+			}
+			for (int i = 0; i < kFontSize; ++i) {
+				_fontDefaultColor = _fontBuffer[i];
+				if (_fontDefaultColor != 0) {
+					_fontDefaultColor = 0;
+				}
 			}
 		}
 	}

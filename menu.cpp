@@ -921,25 +921,75 @@ void Menu::handleControlsScreen(int num) {
 	g_system->sleep(kDelayMs);
 }
 
+void Menu::drawJoystickKeyCode(int num, uint32_t code) {
+	static const int xPos[] = { 0x14, 0x4F, 0x8A, 0xC5 };
+	if (code != 0) {
+		int bit = 0;
+		for (; bit < 32; ++bit) {
+			if ((code & (1 << bit)) != 0) {
+				break;
+			}
+		}
+		const int code1 = (bit < 8) ? (41 + bit) : 40;
+		_video->drawStringCharacter(xPos[num], 111, code1, _res->_fontDefaultColor, _video->_frontLayer);
+		if ((code & ~(1 << bit)) != 0) {
+			for (; bit < 32; ++bit) {
+				if ((code & (1 << bit)) != 0) {
+					break;
+				}
+			}
+			const int code2 = (bit < 8) ? (41 + bit) : 40;
+			_video->drawStringCharacter(xPos[num] + 23, 111, code2, _res->_fontDefaultColor, _video->_frontLayer);
+		}
+	}
+}
+
 void Menu::drawJoystickControlsScreen() {
 	drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
-	drawSprite(&_iconsSprites[0x10], _iconsSpritesData, (_joystickControlsNum == 1) ? 2 : 3);
+	drawSprite(&_iconsSprites[0x11], _iconsSpritesData, (_joystickControlsNum == 1) ? 2 : 3);
 	drawSprite(&_iconsSprites[0x11], _iconsSpritesData, 0);
-	drawSprite(&_iconsSprites[0x10], _iconsSpritesData, (_joystickControlsNum == 0) ? 0 : 1);
-	drawSprite(&_iconsSprites[0x10], _iconsSpritesData, (_joystickControlsNum == 2) ? 4 : 5);
-	drawSprite(&_iconsSprites[0x10], _iconsSpritesData, (_joystickControlsNum == 3) ? 6 : 7);
+	drawSprite(&_iconsSprites[0x11], _iconsSpritesData, (_joystickControlsNum == 0) ? 0 : 1);
+	drawSprite(&_iconsSprites[0x11], _iconsSpritesData, (_joystickControlsNum == 2) ? 4 : 5);
+	drawSprite(&_iconsSprites[0x11], _iconsSpritesData, (_joystickControlsNum == 3) ? 6 : 7);
 	if (_joystickControlsNum <= 3) {
-		drawSprite(&_iconsSprites[0x10], _iconsSpritesData, _joystickControlsNum * 2);
+		drawSprite(&_iconsSprites[0x11], _iconsSpritesData, _joystickControlsNum * 2);
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x15);
+// 4261A7
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x14);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x13);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x16);
 	} else if (_joystickControlsNum == 4) {
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x19);
+// 4261A7
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x14);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x13);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x16);
 	} else if (_joystickControlsNum == 5) {
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x15);
 		drawSprite(&_iconsSprites[0x18], _iconsSpritesData, 0);
-	}
 // 4261BF
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x13);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x16);
+	} else if (_joystickControlsNum == 6) {
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x15);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x14);
+		drawSprite(&_iconsSprites[0x17], _iconsSpritesData, 0);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x16);
+	} else if (_joystickControlsNum == 7) {
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x15);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x14);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x13);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1A);
+	} else if (_joystickControlsNum == 8) {
+		drawSprite(&_iconsSprites[0x11], _iconsSpritesData, 0);
+// 425F66
+		// ...
+	}
+// 4261EF
+	// drawJoystickKeyCode(0, READ_LE_UINT32(_config->players[_config->currentPlayer].controls));
+	// drawJoystickKeyCode(1, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x4));
+	// drawJoystickKeyCode(2, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x8));
+	// drawJoystickKeyCode(3, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0xC));
 	refreshScreen(true);
 }
 

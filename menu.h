@@ -133,6 +133,7 @@ struct Menu {
 	void handleSettingsScreen(int num);
 	void drawControlsScreen();
 	void handleControlsScreen(int num);
+	void drawJoystickKeyCode(int num, uint32_t code);
 	void drawJoystickControlsScreen();
 	void handleJoystickControlsScreen(int num);
 	void handleKeyboardControlsScreen(int num);
