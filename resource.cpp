@@ -238,7 +238,7 @@ void Resource::loadSetupDat() {
 			for (int i = 0; i < kFontSize; ++i) {
 				_fontDefaultColor = _fontBuffer[i];
 				if (_fontDefaultColor != 0) {
-					_fontDefaultColor = 0;
+					break;
 				}
 			}
 		}
@@ -266,7 +266,8 @@ bool Resource::loadDatHintImage(int num, uint8_t *dst, uint8_t *pal) {
 }
 
 bool Resource::loadDatLoadingImage(uint8_t *dst, uint8_t *pal) {
-	if (!_isPsx && _loadingImageBuffer) {
+	assert(!_isPsx);
+	if (_loadingImageBuffer) {
 		const uint32_t bufferSize = READ_LE_UINT32(_loadingImageBuffer);
 		const int size = decodeLZW(_loadingImageBuffer + 8, dst);
 		assert(size == 256 * 192);

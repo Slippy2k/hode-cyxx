@@ -441,27 +441,21 @@ bool Menu::mainLoop() {
 		if (option == kTitleScreen_AssignPlayer) {
 			handleAssignPlayer();
 			debug(kDebug_MENU, "currentPlayer %d", _config->currentPlayer);
+			continue;
 		} else if (option == kTitleScreen_Play) {
-			return true;
+			ret = true;
 		} else if (option == kTitleScreen_Options) {
 			PafCallback pafCb;
 			pafCb.proc = menuPafCallback;
 			pafCb.userdata = this;
 			_paf->setCallback(&pafCb);
 			playSound(kSound_0xA0);
-			handleOptions();
-			debug(kDebug_MENU, "optionNum %d", _optionNum);
+			ret = handleOptions();
 			_g->resetSound();
 			_paf->setCallback(0);
-			if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
-				ret = true;
-				break;
-			} else if (_optionNum == kMenu_Quit + 1) {
-				break;
-			}
 		} else if (option == kTitleScreen_Quit) {
-			break;
 		}
+		break;
 	}
 	_res->unloadDatMenuBuffers();
 	return ret;
@@ -986,10 +980,10 @@ void Menu::drawJoystickControlsScreen() {
 		// ...
 	}
 // 4261EF
-	// drawJoystickKeyCode(0, READ_LE_UINT32(_config->players[_config->currentPlayer].controls));
-	// drawJoystickKeyCode(1, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x4));
-	// drawJoystickKeyCode(2, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x8));
-	// drawJoystickKeyCode(3, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0xC));
+	drawJoystickKeyCode(0, READ_LE_UINT32(_config->players[_config->currentPlayer].controls));
+	drawJoystickKeyCode(1, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x4));
+	drawJoystickKeyCode(2, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x8));
+	drawJoystickKeyCode(3, READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0xC));
 	refreshScreen(true);
 }
 
@@ -1014,6 +1008,70 @@ void Menu::handleJoystickControlsScreen(int num) {
 }
 
 void Menu::handleKeyboardControlsScreen(int num) {
+	const uint8_t *data = &_optionData[num * 8];
+	num = data[5];
+	if (num == 1) {
+		if (_keyboardControlsNum == 0) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 1;
+		} else if (_keyboardControlsNum == 2) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 0;
+		} else if (_keyboardControlsNum == 5) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 4;
+		} else if (_keyboardControlsNum == 6) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 5;
+		} else if (_keyboardControlsNum == 7) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 6;
+		} else if (_keyboardControlsNum == 8) {
+			_iconsSprites[0x21].num = 0;
+			_iconsSprites[0x20].num = 0;
+			_iconsSprites[0x1F].num = 0;
+			_iconsSprites[0x22].num = 0;
+			_keyboardControlsNum = 2;
+		}
+	} else if (num == 2) {
+		if (_keyboardControlsNum == 0) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 2;
+		} else if (_keyboardControlsNum == 1) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 0;
+		} else if (_keyboardControlsNum == 4) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 5;
+		} else if (_keyboardControlsNum == 5) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 6;
+		} else if (_keyboardControlsNum == 6) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 7;
+		} else if (_keyboardControlsNum == 8) {
+			_iconsSprites[0x21].num = 0;
+			_iconsSprites[0x20].num = 0;
+			_iconsSprites[0x1F].num = 0;
+			_iconsSprites[0x22].num = 0;
+			_keyboardControlsNum = 2;
+		}
+	} else if (num == 4) {
+		if (_keyboardControlsNum == 3) {
+			playSound(kSound_0x70);
+		}
+		if (_keyboardControlsNum <= 2) {
+			_keyboardControlsNum = 3;
+		} else if (_keyboardControlsNum > 3 && _keyboardControlsNum <= 7) {
+			_keyboardControlsNum = 0;
+		} else if (_keyboardControlsNum == 8) {
+		}
+	}
+	drawJoystickControlsScreen();
+	if (_keyboardControlsNum == 8) {
+		_condMask = 8;
+	}
+	g_system->sleep(kDelayMs);
 }
 
 void Menu::drawDifficultyScreen() {
@@ -1449,7 +1507,7 @@ static bool matchInput(uint8_t type, uint8_t mask, const PlayerInput &inp, uint8
 	return false;
 }
 
-void Menu::handleOptions() {
+bool Menu::handleOptions() {
 	_lastLevelNum = _config->players[_config->currentPlayer].lastLevelNum + 1;
 	if (_lastLevelNum > _res->_datHdr.levelsCount) {
 		_lastLevelNum = _res->_datHdr.levelsCount;
@@ -1590,10 +1648,11 @@ void Menu::handleOptions() {
 			break;
 		}
 // 428D41
-		if (_optionNum == kMenu_Quit + 1 || _optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
-// 428E74
-			// 'setup.cfg' is saved when exiting the main loop
+		if (_optionNum == kMenu_Quit + 1) {
 			break;
+		} else if (_optionNum == kMenu_NewGame + 1 || _optionNum == kMenu_CurrentGame + 1 || _optionNum == kMenu_ResumeGame) {
+			return true;
 		}
 	}
+	return false;
 }

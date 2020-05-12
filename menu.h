@@ -145,7 +145,7 @@ struct Menu {
 	void handleLoadLevel(int num);
 	void handleLoadCheckpoint(int num);
 	void handleLoadCutscene(int num);
-	void handleOptions();
+	bool handleOptions();
 };
 
 #endif // MENU_H__
