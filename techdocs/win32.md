@@ -18,18 +18,27 @@ Most of the information presented here was found by studying the binary code and
 
 ## Assets
 
-There are three files for each level :
-
-* .LVL : contains the palettes, bitmaps, sprites and pre-calculated tables for shadows
-* .MST : contains the bytecode and triggers for the monster logic
-* .SSS : contains the sound and triggers
-
-SETUP.DAT contains data for the options, menus and the hint screens.
+The options, menus and hint screens are stored in SETUP.DAT.
 
 ![Hint 3](img/hint03.png) ![Hint 6](img/hint06.png)
 
-HOD.PAF ('Packed Animation File') contains the cinematics and the menu transitions.
+Cinematics and menu transitions are stored in HOD.PAF ('Packed Animation File').
 
+For each level, there are three files suffixed with 'HOD' :
+
+* .LVL : contains palettes, bitmaps, sprites and pre-calculated tables for shadows
+* .MST : contains bytecode and triggers for the monster logic
+* .SSS : contains sounds (PCM), bytecode and triggers
+
+Each file contains several C structures with pointers to binary data or other structures.
+
+The loading code typically casts the memory buffer read from the disk to the C structure.
+The pointer fields of the structure are then fixed in place. This is possible since the
+size of pointer fits an uint32_t.
+
+The same cannot be directly applied on more modern platforms with 64 bits processors.
+Casting the structure would result in a different size. A recreation of the engine
+targetting big-endian or 64 bits CPUs has to deserialize each structure field.
 
 ## Compression
 
