@@ -921,7 +921,7 @@ void Menu::handleControlsScreen(int num) {
 void Menu::drawJoystickKeyCode(int num) {
 	const uint32_t code = READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 4 * num);
 	if (code != 0) {
-		static const uint8_t xPos[] = { 0x14, 0x4F, 0x8A, 0xC5 };
+		static const uint8_t xPos[] = { 20, 79, 138, 197 };
 		int bit = 0;
 		for (; bit < 32; ++bit) {
 			if ((code & (1 << bit)) != 0) {
@@ -979,7 +979,7 @@ void Menu::drawJoystickControlsScreen() {
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x13);
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1A);
 	} else if (_joystickControlsNum == 8) {
-		drawSprite(&_iconsSprites[0x11], _iconsSpritesData, 0);
+		drawSprite(&_iconsSprites[0x11], _iconsSpritesData, 4);
 // 425F66
 		// ...
 	}
@@ -1012,6 +1012,16 @@ void Menu::handleJoystickControlsScreen(int num) {
 }
 
 void Menu::drawKeyboardKeyCode(int num) {
+	for (int i = 0; i < 2; ++i) {
+		const uint8_t code = _config->players[_config->currentPlayer].controls[16 + 2 * num + i];
+		if (code != 0) {
+			static const uint8_t xPos[] = { 20, 79, 138, 197 };
+			const int chr = _video->findStringCharacterFontIndex(code);
+			if (chr != 255) {
+				_video->drawStringCharacter(xPos[num] + i * 23, 111, chr, _res->_fontDefaultColor, _video->_frontLayer);
+			}
+		}
+	}
 }
 
 void Menu::drawKeyboardControlsScreen() {
@@ -1022,33 +1032,34 @@ void Menu::drawKeyboardControlsScreen() {
 	if (_keyboardControlsNum < 3) {
 		drawSprite(&_iconsSprites[0x10], _iconsSpritesData, _keyboardControlsNum * 2);
 		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1D);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1C);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1B);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1E);
 	} else if (_keyboardControlsNum == 4) {
 		drawSprite(&_iconsSprites[0x21], _iconsSpritesData, 0);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1C);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1B);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1E);
 	} else if (_keyboardControlsNum == 5) {
 		drawSprite(&_iconsSprites[0x20], _iconsSpritesData, 0);
 		drawSprite(&_iconsSprites[0x1D], _iconsSpritesData, 0);
-		// goto 42712D
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1B);
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1E);
 	} else if (_keyboardControlsNum == 6) {
 		drawSprite(&_iconsSprites[0x1F], _iconsSpritesData, 0);
 		drawSprite(&_iconsSprites[0x1D], _iconsSpritesData, 0);
 		drawSprite(&_iconsSprites[0x1C], _iconsSpritesData, 0);
-		// goto 427145
+		drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1E);
 	} else if (_keyboardControlsNum == 7) {
 		drawSprite(&_iconsSprites[0x22], _iconsSpritesData, 0);
 		drawSprite(&_iconsSprites[0x1D], _iconsSpritesData, 0);
 		drawSprite(&_iconsSprites[0x1C], _iconsSpritesData, 0);
 		drawSprite(&_iconsSprites[0x1B], _iconsSpritesData, 0);
-		// goto 42715D
 	} else if (_keyboardControlsNum == 8) {
+		drawSprite(&_iconsSprites[0x10], _iconsSpritesData, 4);
 // 426EFD
 		// ...
 	}
-// 42711A
-	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1C);
-// 42712D
-	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1B);
-// 427145
-	drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1E);
 // 427162
 	drawKeyboardKeyCode(0);
 	drawKeyboardKeyCode(1);
