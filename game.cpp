@@ -282,14 +282,16 @@ void Game::decodeShadowScreenMask(LvlBackgroundData *lvl) {
 }
 
 // a: type/source (0, 1, 2) b: num/index (3, monster1Index, monster2.monster1Index)
-void Game::playSound(int num, LvlObject *ptr, int a, int b) {
+SssObject *Game::playSound(int num, LvlObject *ptr, int a, int b) {
 	MixerLock ml(&_mix);
+	SssObject *so = 0;
 	if (num < _res->_sssHdr.infosDataCount) {
 		debug(kDebug_GAME, "playSound num %d/%d a=%d b=%d", num, _res->_sssHdr.infosDataCount, a, b);
 		_currentSoundLvlObject = ptr;
-		playSoundObject(&_res->_sssInfosData[num], a, b);
+		so = playSoundObject(&_res->_sssInfosData[num], a, b);
 		_currentSoundLvlObject = 0;
 	}
+	return so;
 }
 
 void Game::removeSound(LvlObject *ptr) {
@@ -2706,7 +2708,7 @@ void Game::levelMainLoop() {
 		}
 	}
 	_currentLevelCheckpoint = _level->_checkpoint;
-	if (updateAndyLvlObject() != 0) {
+	if (updateAndyLvlObject()) {
 		callLevel_tick();
 //		_time_counter1 -= _time_counter2;
 		return;

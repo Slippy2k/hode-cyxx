@@ -254,7 +254,7 @@ struct Game {
 	void loadTransformLayerData(const uint8_t *data);
 	void unloadTransformLayerData();
 	void decodeShadowScreenMask(LvlBackgroundData *lvl);
-	void playSound(int num, LvlObject *ptr, int a, int b);
+	SssObject *playSound(int num, LvlObject *ptr, int a, int b);
 	void removeSound(LvlObject *ptr);
 	void setupBackgroundBitmap();
 	void addToSpriteList(Sprite *spr);

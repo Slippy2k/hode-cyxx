@@ -104,7 +104,7 @@ struct Menu {
 	void loadData();
 
 	int getSoundNum(int num, int index = 0) const;
-	void playSound(int num);
+	SssObject *playSound(int num);
 
 	void drawBitmap(const uint8_t *data, uint32_t size, bool setPalette = false);
 
@@ -112,7 +112,7 @@ struct Menu {
 	void drawSpriteAnim(DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint32_t num);
 
 	void pafCallback(int frameNum, const uint8_t *frameData);
-	void refreshScreen(bool updatePalette);
+	void refreshScreen();
 
 	bool mainLoop();
 
@@ -133,9 +133,11 @@ struct Menu {
 	void handleSettingsScreen(int num);
 	void drawControlsScreen();
 	void handleControlsScreen(int num);
-	void drawJoystickKeyCode(int num, uint32_t code);
+	void drawJoystickKeyCode(int num);
 	void drawJoystickControlsScreen();
 	void handleJoystickControlsScreen(int num);
+	void drawKeyboardKeyCode(int num);
+	void drawKeyboardControlsScreen();
 	void handleKeyboardControlsScreen(int num);
 	void drawDifficultyScreen();
 	void handleDifficultyScreen(int num);
