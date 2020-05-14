@@ -68,6 +68,10 @@ def tidyCpp(fname):
 		# remove lines with original executable address
 		if line.startswith('// 4'):
 			continue
+		# strip comments with x86 registers
+		ndx = line.find('// _e')
+		if ndx != -1:
+			line = line[:ndx] + '\n'
 		# replace variables named after x86 registers
 		for reg, varname in X86_REGS.items():
 			line = line.replace(reg, varname)
