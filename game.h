@@ -520,7 +520,8 @@ struct Game {
 	void muteSound();
 	void unmuteSound();
 	void resetSound();
-	bool isSoundPlaying(uint32_t flags);
+	int getSoundPosition(const SssObject *so);
+	void setSoundPanning(SssObject *so, int panning);
 	SssObject *findLowestRankSoundObject() const;
 	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);

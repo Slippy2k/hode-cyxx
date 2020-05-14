@@ -101,14 +101,15 @@ void Game::resetSound() {
 	clearSoundObjects();
 }
 
-bool Game::isSoundPlaying(uint32_t flags) {
+int Game::getSoundPosition(const SssObject *so) {
 	MixerLock ml(&_mix);
-	for (SssObject *so = _sssObjectsList1; so; so = so->nextPtr) {
-		if (compareSssGroup(so->flags0, flags)) {
-			return true;
-		}
-	}
-	return false;
+	return so->pcm ? so->pcmFramesCount : -1;
+}
+
+void Game::setSoundPanning(SssObject *so, int panning) {
+	MixerLock ml(&_mix);
+	so->panning = panning;
+	setSoundObjectPanning(so);
 }
 
 SssObject *Game::findLowestRankSoundObject() const {
@@ -984,7 +985,9 @@ SssObject *Game::playSoundObject(SssInfo *s, int source, int mask) {
 			SssObject *so = &_sssObjectsTable[i];
 			if (so->pcm != 0 && so->filter == filter) {
 				so->currentPriority = CLIP(_eax + so->priority, 0, 7);
-				setLowPrioritySoundObject(so);
+				if (kLimitSounds) {
+					setLowPrioritySoundObject(so);
+				}
 			}
 		}
 	}
@@ -1049,9 +1052,7 @@ void Game::clearSoundObjects() {
 
 void Game::setLowPrioritySoundObject(SssObject *so) {
 	if ((so->flags & kFlagPaused) == 0) {
-		if (kLimitSounds) {
-			_lowRankSssObject = findLowestRankSoundObject();
-		}
+		_lowRankSssObject = findLowestRankSoundObject();
 	}
 }
 

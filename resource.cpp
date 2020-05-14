@@ -939,7 +939,6 @@ void Resource::loadSssData(File *fp, const uint32_t baseOffset) {
 		// _sssPreloadInfosData = data;
 	}
 // 429A20
-	// data += _sssHdr.preloadInfoCount * 8;
 	_sssPreloadInfosData.allocate(_sssHdr.preloadInfoCount);
 	for (int i = 0; i < _sssHdr.preloadInfoCount; ++i) {
 		_sssPreloadInfosData[i].count = fp->readUint32();
@@ -2091,4 +2090,21 @@ bool Resource::readSetupCfg(SetupConfig *config) {
 		return true;
 	}
 	return false;
+}
+
+void Resource::setDefaultsSetupCfg(SetupConfig *config, int num) {
+	assert(num >= 0 && num < 4);
+	memset(config->players[num].progress, 0, 10);
+	config->players[num].levelNum = 0;
+	config->players[num].checkpointNum = 0;
+	config->players[num].cutscenesMask = 0;
+	memset(config->players[num].controls, 0, 32);
+	config->players[num].controls[0x0] = 0x11;
+	config->players[num].controls[0x4] = 0x22;
+	config->players[num].controls[0x8] = 0x84;
+	config->players[num].controls[0xC] = 0x48;
+	config->players[num].difficulty = 1;
+	config->players[num].stereo = 1;
+	config->players[num].volume = 128;
+	config->players[num].lastLevelNum = 0;
 }

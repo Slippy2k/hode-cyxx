@@ -187,11 +187,11 @@ static BoundingBox _screenTransformRects[] = {
 };
 
 void Game::transformShadowLayer(int delta) {
-	const uint8_t *src = _video->_transformShadowBuffer + _video->_transformShadowLayerDelta; // _esi
-	uint8_t *dst = _video->_shadowLayer; // _eax
+	const uint8_t *src = _video->_transformShadowBuffer + _video->_transformShadowLayerDelta;
+	uint8_t *dst = _video->_shadowLayer;
 	_video->_transformShadowLayerDelta += delta; // overflow/wrap at 255
 	for (int y = 0; y < Video::H; ++y) {
-		if (0) {
+		if (0) { // original clips the screen width to 250px
 			for (int x = 0; x < Video::W - 6; ++x) {
 				const int offset = x + *src++;
 				*dst++ = _video->_frontLayer[y * Video::W + offset];
@@ -1362,7 +1362,7 @@ void Game::resetDisplay() {
 	_levelRestartCounter = 0;
 	_fadePalette = false;
 	memset(_video->_fadePaletteBuffer, 0, sizeof(_video->_fadePaletteBuffer));
-	_snd_masterVolume = kDefaultSoundVolume; // _plyConfigTable[_plyConfigNumber].soundVolume;
+	_snd_masterVolume = _setupConfig.players[_setupConfig.currentPlayer].volume;
 }
 
 void Game::setupScreen(uint8_t num) {
@@ -2092,8 +2092,10 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		if (checkpoint != 0 && checkpoint >= _res->_datHdr.levelCheckpointsCount[level]) {
 			checkpoint = _setupConfig.players[num].progress[level];
 		}
-		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;
 		debug(kDebug_GAME, "Restart at level %d checkpoint %d cutscenes 0x%x", level, checkpoint, _paf->_playedMask);
+		_paf->_playedMask = _setupConfig.players[num].cutscenesMask;
+		_snd_masterVolume = _setupConfig.players[num].volume;
+		_paf->setVolume(_snd_masterVolume);
 		_difficulty = _setupConfig.players[num].difficulty;
 		// resume once, on the starting level
 		_resumeGame = false;
@@ -4876,6 +4878,7 @@ bool Game::loadSetupCfg(bool resume) {
 		return true;
 	}
 	memset(&_setupConfig, 0, sizeof(_setupConfig));
+	_res->setDefaultsSetupCfg(&_setupConfig, 0);
 	return false;
 }
 

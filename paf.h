@@ -97,9 +97,12 @@ struct PafPlayer {
 	uint32_t _flushAudioSize;
 	uint32_t _playedMask;
 	PafCallback _pafCb;
+	int _volume;
 
 	PafPlayer(FileSystem *fs);
 	~PafPlayer();
+
+	void setVolume(int volume);
 
 	void preload(int num);
 	void play(int num);

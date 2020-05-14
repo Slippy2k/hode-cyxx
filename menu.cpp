@@ -62,23 +62,6 @@ enum {
 	kSoundNum_Reset = 5
 };
 
-static void setDefaultsSetupCfg(SetupConfig *config, int num) {
-	assert(num >= 0 && num < 4);
-	memset(config->players[num].progress, 0, 10);
-	config->players[num].levelNum = 0;
-	config->players[num].checkpointNum = 0;
-	config->players[num].cutscenesMask = 0;
-	memset(config->players[num].controls, 0, 32);
-	config->players[num].controls[0x0] = 0x11;
-	config->players[num].controls[0x4] = 0x22;
-	config->players[num].controls[0x8] = 0x84;
-	config->players[num].controls[0xC] = 0x48;
-	config->players[num].difficulty = 1;
-	config->players[num].stereo = 1;
-	config->players[num].volume = Game::kDefaultSoundVolume;
-	config->players[num].lastLevelNum = 0;
-}
-
 static bool isEmptySetupCfg(SetupConfig *config, int num) {
 	return config->players[num].levelNum == 0 && config->players[num].checkpointNum == 0 && config->players[num].cutscenesMask == 0;
 }
@@ -93,11 +76,6 @@ void Menu::setVolume() {
 	const int volume = _config->players[_config->currentPlayer].volume;
 	if (volume != _g->_snd_masterVolume) {
 		_g->_snd_masterVolume = volume;
-		if (volume == 0) {
-			_g->muteSound();
-		} else {
-			_g->unmuteSound();
-		}
 	}
 }
 
@@ -664,15 +642,15 @@ void Menu::handleAssignPlayer() {
 				} else if (state == 1) { // select
 					--cursor;
 					_config->currentPlayer = cursor;
-					// setVolume();
+					setVolume();
 					cursor = 0;
 				} else if (state == 2) { // clear
 					state = 5; // 'No'
 				} else {
 					if (state == 4) { // 'Yes', clear confirmation
 						--cursor;
-						setDefaultsSetupCfg(_config, cursor);
-						// setVolume();
+						_res->setDefaultsSetupCfg(_config, cursor);
+						setVolume();
 					}
 					setCurrentPlayer(_config->currentPlayer);
 					state = 2;
@@ -832,7 +810,7 @@ void Menu::handleSettingsScreen(int num) {
 		}
 		return;
 	} else if (num == kCursor_Left) {
-		if (_settingNum != kSettingNum_Confirm && _settingNum > 0 && 0) { // 'controls' not implemented
+		if (_settingNum != kSettingNum_Confirm && _settingNum > 1) { // 'controls' not implemented
 			playSound(kSound_0x70);
 			--_settingNum;
 // 427CD4
@@ -841,7 +819,7 @@ void Menu::handleSettingsScreen(int num) {
 			_iconsSprites[0x28].num = 0;
 		}
 	} else if (num == kCursor_Right) {
-		if (_settingNum != kSettingNum_Confirm && _settingNum < 2 && 0) { // 'volume' not implemented
+		if (_settingNum != kSettingNum_Confirm && _settingNum < 2) {
 			playSound(kSound_0x70);
 			++_settingNum;
 // 427CD4
@@ -1232,26 +1210,27 @@ void Menu::handleSoundScreen(int num) {
 			int spriteNum = _soundTestSpriteNum = 7;
 			drawSoundScreen();
 			if (so) {
-				while (_g->isSoundPlaying(so->flags0)) {
-					if (so->pcmFramesCount <= 20) {
+				int frames, panning = so->panning;
+				while ((frames = _g->getSoundPosition(so)) > 0) {
+					if (frames <= 20) {
 						if (_soundTestSpriteNum != 7) {
 							_soundTestSpriteNum = 7;
-							so->panning = 64; // center
+							panning = 64; // center
 						}
-					} else if (so->pcmFramesCount <= 36) {
+					} else if (frames <= 36) {
 						if (_soundTestSpriteNum != 23) {
 							_soundTestSpriteNum = 23;
-							so->panning = 128; // right
+							panning = 128; // right
 						}
-					} else if (so->pcmFramesCount <= 49) {
+					} else { // if (frames <= 49)
 						if (_soundTestSpriteNum != 22) {
 							_soundTestSpriteNum = 22;
-							so->panning = 0; // left
+							panning = 0; // left
 						}
 					}
 					if (spriteNum != _soundTestSpriteNum) {
 						spriteNum = _soundTestSpriteNum;
-						_g->setSoundObjectPanning(so);
+						_g->setSoundPanning(so, panning);
 						drawSoundScreen();
 					}
 					g_system->sleep(kDelayMs);

@@ -693,6 +693,7 @@ struct Resource {
 
 	bool writeSetupCfg(const SetupConfig *config);
 	bool readSetupCfg(SetupConfig *config);
+	void setDefaultsSetupCfg(SetupConfig *config, int num);
 };
 
 #endif // RESOURCE_H__

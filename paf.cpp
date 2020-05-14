@@ -44,11 +44,16 @@ PafPlayer::PafPlayer(FileSystem *fs)
 	_audioQueue = _audioQueueTail = 0;
 	_playedMask = 0;
 	memset(&_pafCb, 0, sizeof(_pafCb));
+	_volume = 128;
 }
 
 PafPlayer::~PafPlayer() {
 	unload();
 	closePaf(_fs, &_file);
+}
+
+void PafPlayer::setVolume(int volume) {
+	_volume = volume;
 }
 
 void PafPlayer::preload(int num) {
@@ -375,10 +380,10 @@ void PafPlayer::decodeVideoFrameOp4(const uint8_t *src) {
 	}
 }
 
-static void decodeAudioFrame2205(const uint8_t *src, int len, int16_t *dst) {
+static void decodeAudioFrame2205(const uint8_t *src, int len, int16_t *dst, int volume) {
 	static const int offset = 256 * sizeof(int16_t);
 	for (int i = 0; i < len * 2; ++i) { // stereo
-		dst[i] = READ_LE_UINT16(src + src[offset + i] * sizeof(int16_t));
+		dst[i] = (((int16_t)READ_LE_UINT16(src + src[offset + i] * sizeof(int16_t))) * volume) >> 7;
 	}
 }
 
@@ -405,7 +410,7 @@ void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t s
 			sq->buffer = (int16_t *)calloc(sq->size, sizeof(int16_t));
 			if (sq->buffer) {
 				for (int i = 0; i < count; ++i) {
-					decodeAudioFrame2205(src + _audioBufferOffsetRd + i * kAudioStrideSize, kAudioSamples, sq->buffer + i * kAudioSamples * 2);
+					decodeAudioFrame2205(src + _audioBufferOffsetRd + i * kAudioStrideSize, kAudioSamples, sq->buffer + i * kAudioSamples * 2, _volume);
 				}
 			}
 			sq->next = 0;
