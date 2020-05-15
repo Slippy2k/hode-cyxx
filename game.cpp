@@ -1551,7 +1551,7 @@ void Game::setAndyAnimationForArea(BoundingBox *box, int dx) {
 			uint8_t _al = 0;
 			if (_currentLevel != kLvl_rock) {
 				if (_bl == 1) {
-					if (((_andyObject->flags0 >> 5) & 7) == 3) {
+					if (((_andyObject->flags0 >> 5) & 7) != 3) {
 						_al = 0x80;
 					}
 				}
