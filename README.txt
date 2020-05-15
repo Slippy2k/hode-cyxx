@@ -45,14 +45,6 @@ Display and engine settings can be configured in the 'hode.ini' file.
 Game progress is saved in 'setup.cfg', similar to the original engine.
 
 
-Status:
--------
-
-Settings submenu is not implemented.
-
-PSX datafiles can be used, but menu and videos are missing.
-
-
 Credits:
 --------
 
