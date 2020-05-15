@@ -2149,15 +2149,15 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	resetShootLvlObjectDataTable();
 	callLevel_initialize();
 	restartLevel();
-	do {
+	while (true) {
 		const int frameTimeStamp = g_system->getTimeStamp() + _frameMs;
 		levelMainLoop();
-		if (g_system->inp.quit) {
+		if (g_system->inp.quit || _endLevel) {
 			break;
 		}
 		const int delay = MAX<int>(10, frameTimeStamp - g_system->getTimeStamp());
 		g_system->sleep(delay);
-	} while (!_endLevel);
+	}
 	_animBackgroundDataCount = 0;
 	callLevel_terminate();
 }
@@ -2708,6 +2708,9 @@ void Game::levelMainLoop() {
 		if (_currentRightScreen != kNoScreen) {
 			callLevel_postScreenUpdate(_currentRightScreen);
 		}
+	}
+	if (_endLevel) {
+		return;
 	}
 	_currentLevelCheckpoint = _level->_checkpoint;
 	if (updateAndyLvlObject()) {

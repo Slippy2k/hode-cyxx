@@ -52,7 +52,7 @@ struct Video {
 	Video();
 	~Video();
 
-	void init(bool mdec);
+	void initPsx();
 
 	void updateGamePalette(const uint16_t *pal);
 	void updateGameDisplay(uint8_t *buf);

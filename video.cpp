@@ -43,19 +43,17 @@ Video::~Video() {
 	free(_mdec.planes[kOutputPlaneCr].ptr);
 }
 
-void Video::init(bool mdec) {
-	if (mdec) {
-		static const int w = (W + 15) & ~15;
-		static const int h = (H + 15) & ~15;
-		static const int w2 = w / 2;
-		static const int h2 = h / 2;
-		_mdec.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
-		_mdec.planes[kOutputPlaneY].pitch = w;
-		_mdec.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
-		_mdec.planes[kOutputPlaneCb].pitch = w2;
-		_mdec.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
-		_mdec.planes[kOutputPlaneCr].pitch = w2;
-	}
+void Video::initPsx() {
+	static const int w = (W + 15) & ~15;
+	static const int h = (H + 15) & ~15;
+	static const int w2 = w / 2;
+	static const int h2 = h / 2;
+	_mdec.planes[kOutputPlaneY].ptr = (uint8_t *)malloc(w * h);
+	_mdec.planes[kOutputPlaneY].pitch = w;
+	_mdec.planes[kOutputPlaneCb].ptr = (uint8_t *)malloc(w2 * h2);
+	_mdec.planes[kOutputPlaneCb].pitch = w2;
+	_mdec.planes[kOutputPlaneCr].ptr = (uint8_t *)malloc(w2 * h2);
+	_mdec.planes[kOutputPlaneCr].pitch = w2;
 }
 
 static int colorBrightness(int r, int g, int b) {

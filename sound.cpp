@@ -722,7 +722,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 					if (prev) {
 						prev->nextPtr = so;
 					} else {
-						assert(so == _sssObjectsList1);
+						assert(stopSo == _sssObjectsList1);
 						_sssObjectsList1 = so;
 					}
 // 429281
@@ -1113,6 +1113,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeCurrent >> 16), so->volume);
 			so->panL = 0;
 			so->panR = 0;
+			so->panType = 0;
 			return;
 		}
 		int _edx = _volumeRampTable[volume]; // 0..128
@@ -1237,7 +1238,7 @@ void Game::queueSoundObjectsPcmStride() {
 			if (so->currentPcmPtr >= end) {
 				continue;
 			}
-			if (so->panL == 0 && so->panR == 0) {
+			if ((so->panL == 0 && so->panR == 0) || so->panType == 0) {
 				continue;
 			}
 			_mix.queue(so->currentPcmPtr, end, so->panType, so->panL, so->panR, so->stereo);
