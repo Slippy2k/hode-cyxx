@@ -4678,10 +4678,11 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 		return ret;
 	}
 // 406A0D
-	if ((p[1] & 0xC) == 0 && (p[1] & 0x80) != 0) {
+	uint8_t _al = p[1];
+	if ((_al & 0xC) == 0 && (_al & 0x80) != 0) {
+		const uint8_t _cl = (_al >> 5) & 1;
+		_al = ((~_al) >> 1) & 1;
 		p = &gatesData[p[3] * 4];
-		const uint8_t _cl = (p[1] >> 5) & 1;
-		uint8_t _al = ((~p[1]) >> 1) & 1;
 		uint8_t _bl = p[0] >> 4;
 		if (_bl != _al) {
 			_bl = (_al << 4) | (p[0] & 0xF);
