@@ -180,7 +180,7 @@ void Level_lar2::postScreenUpdate_lar2_screen2() {
 
 void Level_lar2::postScreenUpdate_lar2_screen3() {
 	LvlObject *o = _g->findLvlObject(2, 0, 3);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 1, 1);
+	_g->updateGatesLar(o, _lar2_gatesData, 1);
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen4() {
@@ -195,7 +195,7 @@ void Level_lar2::postScreenUpdate_lar2_screen4() {
 		_g->setupScreen(_andyObject->screenNum);
 	}
 	LvlObject *o = _g->findLvlObject(2, 0, 4);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 2, 2);
+	_g->updateGatesLar(o, _lar2_gatesData, 2);
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen5() {
@@ -203,7 +203,7 @@ void Level_lar2::postScreenUpdate_lar2_screen5() {
 		_lar2_gatesData[4 * 3] &= 0xF;
 	}
 	LvlObject *o = _g->findLvlObject(2, 0, 5);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 3, 3);
+	_g->updateGatesLar(o, _lar2_gatesData, 3);
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen6() {
@@ -248,19 +248,19 @@ void Level_lar2::postScreenUpdate_lar2_screen7() {
 
 void Level_lar2::postScreenUpdate_lar2_screen8() {
 	LvlObject *o = _g->findLvlObject(2, 0, 8);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 7, 7);
+	_g->updateGatesLar(o, _lar2_gatesData, 7);
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen10() {
 	LvlObject *o = _g->findLvlObject(2, 0, 10);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 4, 4);
+	_g->updateGatesLar(o, _lar2_gatesData, 4);
 }
 
 void Level_lar2::postScreenUpdate_lar2_screen11() {
 	LvlObject *o = _g->findLvlObject(2, 0, 11);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 5, 5);
+	_g->updateGatesLar(o, _lar2_gatesData, 5);
 	o = _g->findLvlObject(2, 1, 11);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 6, 6);
+	_g->updateGatesLar(o, _lar2_gatesData, 6);
 	int offset = 0x18;
 	if ((_lar2_switchesData[0x11] & 1) == 0 && (_lar2_switchesData[0x11] & 0x40) != 0 && (_lar2_switchesData[0x19] & 1) == 0) {
 		_lar2_switchesData[0x19] = (_lar2_switchesData[0x19] | 1) & ~0x40;
@@ -287,9 +287,9 @@ next:
 
 void Level_lar2::postScreenUpdate_lar2_screen12() {
 	LvlObject *o = _g->findLvlObject(2, 0, 12);
-	_g->updateGatesLar(o, _lar2_gatesData + 0x20, 8);
+	_g->updateGatesLar(o, _lar2_gatesData, 8);
 	o = _g->findLvlObject(2, 1, 12);
-	_g->updateGatesLar(o, _lar2_gatesData + 0x24, 9);
+	_g->updateGatesLar(o, _lar2_gatesData, 9);
 	if (_res->_currentScreenResourceNum == 12) {
 		BoundingBox b1 = { 65, 84, 75, 88 };
 		AndyLvlObjectData *data = (AndyLvlObjectData *)_g->getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
@@ -383,7 +383,7 @@ void Level_lar2::postScreenUpdate(int num) {
 
 void Level_lar2::preScreenUpdate_lar2_screen2() {
 	LvlObject *o = _g->findLvlObject(2, 0, 2);
-	_g->updateGatesLar(o, _lar2_gatesData, 1);
+	_g->updateGatesLar(o, _lar2_gatesData, 0);
 	if (_res->_currentScreenResourceNum == 2) {
 		if (_checkpoint == 0) {
 			_checkpoint = 1;
@@ -463,7 +463,7 @@ void Level_lar2::preScreenUpdate_lar2_screen8() {
 		_lar2_gatesData[4 * 7 + 2] = 1;
 	}
 	LvlObject *o = _g->findLvlObject(2, 0, 8);
-	_g->updateGatesLar(o, _lar2_gatesData + 4 * 7, 7);
+	_g->updateGatesLar(o, _lar2_gatesData, 7);
 }
 
 void Level_lar2::preScreenUpdate_lar2_screen9() {

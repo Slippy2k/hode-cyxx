@@ -4417,6 +4417,7 @@ void Game::setLavaAndyAnimation(int yPos) {
 }
 
 void Game::updateGatesLar(LvlObject *o, uint8_t *p, int num) {
+	p += num * 4;
 	uint32_t mask = 1 << num; // _ebp
 	uint8_t _cl = p[0] & 15;
 	if (_cl >= 3) {
