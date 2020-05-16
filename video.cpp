@@ -64,7 +64,7 @@ void Video::updateGamePalette(const uint16_t *pal) {
 	for (int i = 0; i < 256 * 3; ++i) {
 		_palette[i] = pal[i] >> 8;
 	}
-	g_system->setPalette(_palette, 256);
+	g_system->setPalette(_palette, 256, 8);
 }
 
 void Video::updateGameDisplay(uint8_t *buf) {
@@ -91,7 +91,7 @@ void Video::clearBackBuffer() {
 
 void Video::clearPalette() {
 	memset(_palette, 0, sizeof(_palette));
-	g_system->setPalette(_palette, 256);
+	g_system->clearPalette();
 }
 
 void Video::decodeSPR(const uint8_t *src, uint8_t *dst, int x, int y, uint8_t flags, uint16_t spr_w, uint16_t spr_h) {
