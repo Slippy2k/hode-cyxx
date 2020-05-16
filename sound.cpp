@@ -1091,8 +1091,12 @@ void Game::setSoundObjectPanning(SssObject *so) {
 				volume = 0;
 				panning = kDefaultSoundPanning;
 				priority = 0;
-			} else {
-				panning = CLIP(so->panning, 0, 128);
+			} else if (so->panning < 0) {
+				panning = 0;
+				volume >>= 2;
+				priority /= 2;
+			} else if (so->panning > 128) {
+				panning = 128;
 				volume >>= 2;
 				priority /= 2;
 			}

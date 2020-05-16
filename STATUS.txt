@@ -36,7 +36,7 @@ At the end of cinematics a clip of sound happens
 
 Very occasional cinematic skipping
 
-Sound mixing in-game is not identical to official release. Background ambiance (wind, etc) drowns out foreground sounds (spectres, Andy, blasts and falling rocks) in short, foreground sounds are too quiet
+// Sound mixing in-game is not identical to official release. Background ambiance (wind, etc) drowns out foreground sounds (spectres, Andy, blasts and falling rocks) in short, foreground sounds are too quiet
 
 Too much swamp noises the weird calling sound repeats too frequently
 
@@ -74,7 +74,7 @@ many checkpoints in the lair do not work properly. Dying after losing special po
 
 // tiptoeing over chain bridge after losing special power does not work, Andy falls in. Cannot test any of the game until next checkpoint.
 
-Andy does not say “YEAH!” after killing Mefudoka :(
+// Andy does not say “YEAH!” after killing Mefudoka :(
 
 // when collecting the pieces of the magic rock the door that is supposed to slam down when Andy is not standing on the button stays open
 
