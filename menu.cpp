@@ -959,7 +959,44 @@ void Menu::drawJoystickControlsScreen() {
 	} else if (_joystickControlsNum == 8) {
 		drawSprite(&_iconsSprites[0x11], _iconsSpritesData, 4);
 // 425F66
-		// ...
+		static const int joystickKeyCode = 0;
+		int mask = 0;
+		if (READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x0) & joystickKeyCode) {
+			mask = 1;
+		}
+		if (READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x4) & joystickKeyCode) {
+			mask |= 2;
+		}
+		if (READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0x8) & joystickKeyCode) {
+			mask |= 4;
+		}
+		if (READ_LE_UINT32(_config->players[_config->currentPlayer].controls + 0xC) & joystickKeyCode) {
+			mask |= 5;
+		}
+		const int flag = (((mask & 5) - 5) != 0) ? 0 : 1;
+		if (((mask & 1) != 0 && flag == 0) || _iconsSprites[0x19].num != 0) {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x19);
+		} else {
+			drawSprite(&_iconsSprites[0x19], _iconsSpritesData, 0);
+		}
+// 425FFB
+		if ((mask & 2) == 0 || _iconsSprites[0x18].num == 0) {
+			drawSprite(&_iconsSprites[0x18], _iconsSpritesData, 0);
+		} else {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x18);
+		}
+// 426038
+		if (((mask & 4) != 0 && flag == 0) || _iconsSprites[0x17].num != 0) {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x17);
+		} else {
+			drawSprite(&_iconsSprites[0x17], _iconsSpritesData, 0);
+		}
+// 426079
+		if (flag == 0 || _iconsSprites[0x1A].num == 0) {
+			drawSprite(&_iconsSprites[0x1A], _iconsSpritesData, 0);
+		} else {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1A);
+		}
 	}
 // 4261EF
 	drawJoystickKeyCode(0);
@@ -972,7 +1009,67 @@ void Menu::drawJoystickControlsScreen() {
 void Menu::handleJoystickControlsScreen(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
-	if (num == 4) {
+	if (num == 1) {
+		if (_joystickControlsNum == 0) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 1;
+		} else if (_joystickControlsNum == 2) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 0;
+		} else if (_joystickControlsNum == 5) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 4;
+		} else if (_joystickControlsNum == 6) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 5;
+		} else if (_joystickControlsNum == 7) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 6;
+		} else if (_joystickControlsNum == 8) {
+			_iconsSprites[0x19].num = 0;
+			_iconsSprites[0x18].num = 0;
+			_iconsSprites[0x17].num = 0;
+			_iconsSprites[0x1A].num = 0;
+			_joystickControlsNum = 2;
+		}
+	} else if (num == 2) {
+		if (_joystickControlsNum == 0) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 2;
+		} else if (_joystickControlsNum == 1) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 0;
+		} else if (_joystickControlsNum == 4) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 5;
+		} else if (_joystickControlsNum == 5) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 6;
+		} else if (_joystickControlsNum == 6) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 7;
+		} else if (_joystickControlsNum == 8) {
+			_iconsSprites[0x19].num = 0;
+			_iconsSprites[0x18].num = 0;
+			_iconsSprites[0x17].num = 0;
+			_iconsSprites[0x1A].num = 0;
+			_joystickControlsNum = 2;
+		}
+	} else if (num == 3) {
+		if (_joystickControlsNum <= 2) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 5;
+		} else if (_joystickControlsNum == 3) {
+			playSound(kSound_0x70);
+			_joystickControlsNum = 0;
+		} else if (_joystickControlsNum == 8) {
+			_iconsSprites[0x19].num = 0;
+			_iconsSprites[0x18].num = 0;
+			_iconsSprites[0x17].num = 0;
+			_iconsSprites[0x1A].num = 0;
+			_joystickControlsNum = 2;
+		}
+	} else if (num == 4) {
 		if (_joystickControlsNum != 3) {
 			playSound(kSound_0x70);
 		}
