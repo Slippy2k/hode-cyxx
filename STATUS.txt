@@ -19,3 +19,65 @@ level 7 'lar1' - to check (--checkpoint 4)
 level 8 'lar2' - to check (--checkpoint 5)
 
 level 9 'dark' - completable
+
+
+
+https://finsterhund.tumblr.com/post/618142082844999680/heres-a-compilation-of-all-of-the-bugserrors-in/
+
+// No sound or control options in settings menu (intentional?)
+
+Settings menu animates too quickly
+
+Sound quality on main menu, missing confirmation/selection sounds
+
+Sound artifacts in cinematics when louder sounds happen. Tested for UK English PAF, French PAF, German PAF.
+
+At the end of cinematics a clip of sound happens
+
+Very occasional cinematic skipping
+
+Sound mixing in-game is not identical to official release. Background ambiance (wind, etc) drowns out foreground sounds (spectres, Andy, blasts and falling rocks) in short, foreground sounds are too quiet
+
+Too much swamp noises the weird calling sound repeats too frequently
+
+Background sounds drowning out foreground sounds appears to span all levels
+
+The screen in magic lake upon getting out of the underwater tunnels and first encountering the shadow plant serpents Andy will inexplicably slip after jumping to a hand hold below the first plant serpent if jump is held instead of tapped and pressed again. This isn’t a thing in the official release.
+
+An Andy (not controlled by the player is repeatedly eaten by the shadow pirannahs. We can go about our day and watch. This only happened once on this screen.
+
+If you get eaten by the shadow pirannahs normally it doesn’t play the full animation and crashes the game. Okay I tried it again and it carried out normally and didn’t crash the game that time
+
+Growing the seeds on the small ledges over the pirannah infested waters required more precision than in the official release
+
+Shadow spiders on space island still do that thing where they come out of the rock but all just stand there and don’t chase you
+
+Jumping from first to second lava pillar is spotty, on this jump you can get hit by the lava but not die
+	--level 4 --checkpoint 1  --cheats 15
+
+// don’t fall when running on chain bridge
+
+the last time you see the shadow spiders they spawn unendingly. This sometimes occurs but not other times
+
+worm ai is weird. Can’t really describe how except that there’s too many of them/they’re too aggressive at that part where you first use the double spectres as bait
+
+either the lava has more range than in the original game, or Andy has a more obtuse hitbox above lava
+
+dying on screens that shouldn’t reset other screens doesn’t work, monsters killed in a previous checkpoint respawn
+
+the double spectre trap door avoidance exploit (jumping over the button) does not work (probably a bug in the original game. to fix or not to fix?)
+	https://www.youtube.com/watch?v=_R30BZOHMtg
+
+// assertion failed error after Andy in the cell cinematic plays
+
+many checkpoints in the lair do not work properly. Dying after losing special power drops Andy off several screens too far back
+
+// tiptoeing over chain bridge after losing special power does not work, Andy falls in. Cannot test any of the game until next checkpoint.
+
+Andy does not say “YEAH!” after killing Mefudoka :(
+
+// when collecting the pieces of the magic rock the door that is supposed to slam down when Andy is not standing on the button stays open
+
+spectres appear to be more hostile on the bridge
+
+// after beating the game and playing last cinematic the last frame from the final level is shown for a second before the game crashes
