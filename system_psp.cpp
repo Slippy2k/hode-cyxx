@@ -66,7 +66,7 @@ static uint8_t  __attribute__((aligned(16))) _texture[256 * 256];
 static uint32_t __attribute__((aligned(16))) _clut2[256];
 static uint8_t  __attribute__((aligned(16))) _texture2[256 * 256];
 
-PSP_MODULE_INFO("Heart of Darkness", 0, 3, 0);
+PSP_MODULE_INFO("Heart of Darkness", 0, 2, 9);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
 
 struct Vertex {
