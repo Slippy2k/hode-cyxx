@@ -4425,12 +4425,12 @@ void Game::updateGatesLar(LvlObject *o, uint8_t *p, int num) {
 				if (_cl == 3) {
 					p[0] = (p[0] & ~0xB) | 4;
 					p[3] = p[1];
-					o->directionKeyMask = 1;
+					o->directionKeyMask = 1; // up (open)
 					o->actionKeyMask = 0;
 				} else {
 					p[0] = (p[0] & ~0xC) | 3;
 					p[3] = p[2];
-					o->directionKeyMask = 4;
+					o->directionKeyMask = 4; // down (close)
 					o->actionKeyMask = 0;
 				}
 			} else {
@@ -4441,7 +4441,6 @@ void Game::updateGatesLar(LvlObject *o, uint8_t *p, int num) {
 		}
 	} else {
 // 4062C7
-		num = p[1];
 		if ((p[1] | p[2]) != 0) {
 			uint8_t _dl = p[0] >> 4;
 			if (_cl != _dl) {
@@ -4456,10 +4455,10 @@ void Game::updateGatesLar(LvlObject *o, uint8_t *p, int num) {
 // 4062F3
 			if (p[3] == 0) {
 				if (p[0] & 0xF) {
-					o->directionKeyMask = 1;
+					o->directionKeyMask = 1; // up (open)
 					_mstAndyVarMask &= ~mask;
 				} else {
-					o->directionKeyMask = 4;
+					o->directionKeyMask = 4; // down (close)
 					_mstAndyVarMask |= mask;
 				}
 				_mstLevelGatesMask |= mask;
@@ -4479,10 +4478,10 @@ void Game::updateGatesLar(LvlObject *o, uint8_t *p, int num) {
 					uint8_t _al = (p[0] & 0xF0) | _dl;
 					p[0] = _al;
 					if (_al & 0xF0) {
-						o->directionKeyMask = 1;
+						o->directionKeyMask = 1; // up (open)
 						_mstAndyVarMask &= ~mask;
 					} else {
-						o->directionKeyMask = 4;
+						o->directionKeyMask = 4; // down (close)
 						_mstAndyVarMask |= mask;
 					}
 					_mstLevelGatesMask |= mask;
@@ -4682,7 +4681,6 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 		p = &gatesData[p[3] * 4];
 		const uint8_t _cl = (p[1] >> 5) & 1;
 		uint8_t _al = ((~p[1]) >> 1) & 1;
-
 		uint8_t _bl = p[0] >> 4;
 		if (_bl != _al) {
 			_bl = (_al << 4) | (p[0] & 0xF);
