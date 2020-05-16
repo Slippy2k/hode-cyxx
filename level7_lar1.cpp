@@ -16,7 +16,7 @@ static const CheckpointData _lar1_checkpointData[9] = {
 	{  40, 145, 0x300c, 232, 14,  2 },
 	{ 213,  25, 0x700c, 232, 16,  2 },
 	{ 123,  57, 0x300c, 232, 20,  2 },
-	{ 224,  43, 0x700c, 232,  5,  2 }
+	{ 224,  43, 0x700c, 232,  5,  2 }  // not reachable, _datHdr.levelCheckpointsCount[6] == 8
 };
 
 static const uint8_t _lar1_screenStartData[56] = {

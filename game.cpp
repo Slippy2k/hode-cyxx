@@ -3701,9 +3701,9 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 // 402C57
 			if (ptr->currentSound != 0xFFFF) {
 				playSound(ptr->currentSound, ptr, _ebx, var4);
-			}
-			if (o && o->currentSound != 0xFFFF) {
-				playSound(o->currentSound, o, _ebx, var4);
+				if (o && o->currentSound != 0xFFFF) {
+					playSound(o->currentSound, o, _ebx, var4);
+				}
 			}
 		}
 	}

@@ -1109,7 +1109,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 		if (so->pcm == 0) {
 			return;
 		}
-		if (volume < 0 || volume >= (int)ARRAYSIZE(_volumeRampTable)) {
+		if ((uint32_t)volume >= ARRAYSIZE(_volumeRampTable)) {
 			warning("Out of bounds volume %d (filter %d volume %d)", volume, (so->filter->volumeCurrent >> 16), so->volume);
 			so->panL = 0;
 			so->panR = 0;
