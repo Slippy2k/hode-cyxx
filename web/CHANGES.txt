@@ -2,6 +2,8 @@
 	- added PSX hint screens
 	- added 'volume' submenu
 	- fixed sounds volume and panning
+	- fixed walk on chain bridge in 'lar1' screen 3
+	- fixed gate not closing in 'lar2' screen 8
 
 * release 0.2.9
 	- added PSP and Wii platforms specific code
