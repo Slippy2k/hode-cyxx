@@ -1133,7 +1133,32 @@ void Menu::drawKeyboardControlsScreen() {
 	} else if (_keyboardControlsNum == 8) {
 		drawSprite(&_iconsSprites[0x10], _iconsSpritesData, 4);
 // 426EFD
-		// ...
+		static const int keyboardMask = 0;
+		int mask = keyboardMask;
+		const int flag = (((keyboardMask & 5) - 5) != 0) ? 0 : 1;
+		if (((mask & 1) != 0 && flag == 0) || _iconsSprites[0x21].num != 0) {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x21);
+		} else {
+			drawSprite(&_iconsSprites[0x21], _iconsSpritesData, 0);
+		}
+// 426F61
+		if ((mask & 2) == 0 || _iconsSprites[0x20].num == 0) {
+			drawSprite(&_iconsSprites[0x20], _iconsSpritesData, 0);
+		} else {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x20);
+		}
+// 426FAA
+		if (((mask & 4) != 0 && flag == 0) || _iconsSprites[0x1F].num != 0) {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x1F);
+		} else {
+			drawSprite(&_iconsSprites[0x1F], _iconsSpritesData, 0);
+		}
+// 426FEE
+		if (flag == 0 || _iconsSprites[0x22].num == 0) {
+			drawSprite(&_iconsSprites[0x22], _iconsSpritesData, 0);
+		} else {
+			drawSpriteAnim(_iconsSprites, _iconsSpritesData, 0x22);
+		}
 	}
 // 427162
 	drawKeyboardKeyCode(0);
@@ -1146,9 +1171,7 @@ void Menu::drawKeyboardControlsScreen() {
 void Menu::handleKeyboardControlsScreen(int num) {
 	const uint8_t *data = &_optionData[num * 8];
 	num = data[5];
-	if (num == 0) {
-		// ...
-	} else if (num == 1) {
+	if (num == 1) {
 		if (_keyboardControlsNum == 0) {
 			playSound(kSound_0x70);
 			_keyboardControlsNum = 1;
@@ -1195,7 +1218,19 @@ void Menu::handleKeyboardControlsScreen(int num) {
 			_keyboardControlsNum = 2;
 		}
 	} else if (num == 3) {
-		// ...
+		if (_keyboardControlsNum <= 2) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 5;
+		} else if (_keyboardControlsNum == 3) {
+			playSound(kSound_0x70);
+			_keyboardControlsNum = 0;
+		} else if (_keyboardControlsNum == 8) {
+			_iconsSprites[0x21].num = 0;
+			_iconsSprites[0x20].num = 0;
+			_iconsSprites[0x1F].num = 0;
+			_iconsSprites[0x22].num = 0;
+			_keyboardControlsNum = 2;
+		}
 	} else if (num == 4) {
 		if (_keyboardControlsNum == 3) {
 			playSound(kSound_0x70);
@@ -1205,7 +1240,11 @@ void Menu::handleKeyboardControlsScreen(int num) {
 		} else if (_keyboardControlsNum > 3 && _keyboardControlsNum <= 7) {
 			_keyboardControlsNum = 0;
 		} else if (_keyboardControlsNum == 8) {
-			// ...
+			_iconsSprites[0x21].num = 0;
+			_iconsSprites[0x20].num = 0;
+			_iconsSprites[0x1F].num = 0;
+			_iconsSprites[0x22].num = 0;
+			_keyboardControlsNum = 2;
 		}
 	}
 	drawKeyboardControlsScreen();
