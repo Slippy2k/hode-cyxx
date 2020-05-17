@@ -27,7 +27,7 @@ Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	_cheats = cheats;
 	_playDemo = false;
 
-	_frameMs = kFrameTimeStamp;
+	_frameMs = kFrameDuration;
 	_difficulty = 1; // normal
 
 	memset(_screenLvlObjectsList, 0, sizeof(_screenLvlObjectsList));

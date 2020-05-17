@@ -45,6 +45,7 @@ PafPlayer::PafPlayer(FileSystem *fs)
 	_playedMask = 0;
 	memset(&_pafCb, 0, sizeof(_pafCb));
 	_volume = 128;
+	_frameMs = kFrameDuration;
 }
 
 PafPlayer::~PafPlayer() {
@@ -135,7 +136,7 @@ bool PafPlayer::readPafHeader() {
 		warning("readPafHeader() Unexpected signature");
 		return false;
 	}
-	_pafHdr.frameRate = READ_LE_UINT32(_bufferBlock + 0x88);
+	_pafHdr.frameDuration = READ_LE_UINT32(_bufferBlock + 0x88);
 	_pafHdr.startOffset = READ_LE_UINT32(_bufferBlock + 0xA4);
 	_pafHdr.preloadFrameBlocksCount = READ_LE_UINT32(_bufferBlock + 0x9C);
 	_pafHdr.readBufferSize = READ_LE_UINT32(_bufferBlock + 0x98);
@@ -477,8 +478,9 @@ void PafPlayer::mainLoop() {
 		prevAudioCb = g_system->setAudioCallback(audioCb);
 	}
 
-	const uint32_t framesPerSec = (_demuxAudioFrameBlocks != 0) ? kFramesPerSec : 15;
-	uint32_t frameTime = g_system->getTimeStamp() + 1000 / framesPerSec;
+	// keep original frame rate for audio
+	const uint32_t frameMs = (_demuxAudioFrameBlocks != 0) ? _pafHdr.frameDuration : (_pafHdr.frameDuration * _frameMs / kFrameDuration);
+	uint32_t frameTime = g_system->getTimeStamp() + frameMs;
 
 	uint32_t blocksCountForFrame = _pafHdr.preloadFrameBlocksCount;
 	for (int i = 0; i < (int)_pafHdr.framesCount; ++i) {
@@ -518,7 +520,7 @@ void PafPlayer::mainLoop() {
 
 		const int delay = MAX<int>(10, frameTime - g_system->getTimeStamp());
 		g_system->sleep(delay);
-		frameTime = g_system->getTimeStamp() + 1000 / framesPerSec;
+		frameTime = g_system->getTimeStamp() + frameMs;
 
 		// set next decoding video page
 		++_currentPageBuffer;

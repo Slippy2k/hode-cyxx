@@ -61,9 +61,7 @@ struct Game {
 		kMaxBoundingBoxes = 64,
 
 		kDefaultSoundPanning = 64,
-		kDefaultSoundVolume = 128,
-
-		kFrameTimeStamp = 50 // original is 80ms (12.5hz)
+		kDefaultSoundVolume = 128
 	};
 
 	static const uint8_t _specialPowersDxDyTable[];

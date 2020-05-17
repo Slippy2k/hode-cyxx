@@ -100,7 +100,7 @@ static int handleConfigIni(void *userdata, const char *section, const char *name
 		} else if (strcmp(name, "difficulty") == 0) {
 			g->_difficulty = atoi(value);
 		} else if (strcmp(name, "frame_duration") == 0) {
-			g->_frameMs = atoi(value);
+			g->_frameMs = g->_paf->_frameMs = atoi(value);
 		} else if (strcmp(name, "loading_screen") == 0) {
 			_displayLoadingScreen = configBool(value);
 		}

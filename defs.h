@@ -16,6 +16,7 @@ enum {
 enum {
 	kNone = 0xFFFFFFFF, // (uint32_t)-1
 	kNoScreen = 0xFF, // (uint8_t)-1
+	kFrameDuration = 80, // original engine frame duration is 80ms (12.5hz)
 	kLvlAnimHdrOffset = 0x2C,
 	kMaxScreens = 40,
 	kMaxSpriteTypes = 32,
