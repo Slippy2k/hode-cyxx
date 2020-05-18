@@ -196,10 +196,10 @@ struct SssObject {
 	uint32_t flags0; // 0xC
 	uint32_t flags1; // 0x10
 	int32_t panning; // 0x14 panning default:64
-	int32_t volume; // 0x18 volume (db) default:128
+	int32_t volume; // 0x18 volume default:128
 	int panL; // 0x1C
 	int panR; // 0x20
-	int panType; // 0x24 : 0: silent, 1:fullRight 2:fullLeft 3:both
+	int panType; // 0x24 : 0: silent, 1:right 2:left 3:center 4:balance
 	const int16_t *currentPcmPtr; // 0x28
 	int32_t pcmFramesCount; // 0x2C
 	SssObject *prevPtr; // 0x30
@@ -218,9 +218,9 @@ struct SssObject {
 	int32_t panningModulateCurrent; // 0x64
 	int32_t panningModulateDelta; // 0x68
 	int32_t currentPcmFrame; // 0x6C
-	int *panningPtr; // 0x70
+	int *panningPtr; // 0x70 if != 0, panning is relative to the object position
 	LvlObject *lvlObject; // 0x74
-	int32_t nextSoundBank; // 0x78 indexes
+	int32_t nextSoundBank; // 0x78
 	int32_t nextSoundSample; // 0x7C
 	SssFilter *filter;
 };
