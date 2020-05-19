@@ -604,7 +604,7 @@ void Level_lava::tick() {
 void Level_lava::setupScreenCheckpoint_lava_screen3() {
 	LvlObject *ptr = _g->findLvlObject(2, 0, 3);
 	assert(ptr);
-	ptr->flags0 &= 0xFC00;
+	ptr->flags0 &= ~0x3FF;
 	ptr->xPos = 138;
 	ptr->yPos = 157;
 	ptr->anim = 0;
@@ -612,7 +612,7 @@ void Level_lava::setupScreenCheckpoint_lava_screen3() {
 	ptr->directionKeyMask = 0;
 	ptr = findLvlObject_lava(ptr);
 	assert(ptr);
-	ptr->flags0 &= 0xFC00;
+	ptr->flags0 &= ~0x3FF;
 	ptr->anim = 0;
 	ptr->frame = 0;
 	ptr->directionKeyMask = 0;

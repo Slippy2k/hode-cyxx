@@ -1409,7 +1409,6 @@ void Game::setupScreen(uint8_t num) {
 	setupBackgroundBitmap();
 	setupScreenMask(num);
 	resetDisplay();
-//	_time_counter1 = GetTickCount();
 }
 
 void Game::resetScreen() {
@@ -2715,7 +2714,6 @@ void Game::levelMainLoop() {
 	_currentLevelCheckpoint = _level->_checkpoint;
 	if (updateAndyLvlObject()) {
 		callLevel_tick();
-//		_time_counter1 -= _time_counter2;
 		return;
 	}
 	executeMstCode();

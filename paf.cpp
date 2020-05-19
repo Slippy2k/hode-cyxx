@@ -408,7 +408,7 @@ void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t s
 		if (sq) {
 			sq->offset = 0;
 			sq->size = count * kAudioSamples * 2;
-			sq->buffer = (int16_t *)calloc(sq->size, sizeof(int16_t));
+			sq->buffer = (int16_t *)malloc(sq->size * sizeof(int16_t));
 			if (sq->buffer) {
 				for (int i = 0; i < count; ++i) {
 					decodeAudioFrame2205(src + _audioBufferOffsetRd + i * kAudioStrideSize, kAudioSamples, sq->buffer + i * kAudioSamples * 2, _volume);
@@ -426,8 +426,9 @@ void PafPlayer::decodeAudioFrame(const uint8_t *src, uint32_t offset, uint32_t s
 			_audioQueueTail = sq;
 			g_system->unlockAudio();
 		}
+
+		_audioBufferOffsetRd += count * kAudioStrideSize;
 	}
-	_audioBufferOffsetRd += count * kAudioStrideSize;
 	if (_audioBufferOffsetWr == _flushAudioSize) {
 		_audioBufferOffsetWr = 0;
 		_audioBufferOffsetRd = 0;
@@ -463,7 +464,7 @@ static void mixAudio(void *userdata, int16_t *buf, int len) {
 void PafPlayer::mainLoop() {
 	_file.seek(_videoOffset + _pafHdr.startOffset, SEEK_SET);
 	for (int i = 0; i < 4; ++i) {
-		memset(_pageBuffers[i], 0, kVideoWidth * kVideoHeight);
+		memset(_pageBuffers[i], 0, kPageBufferSize);
 	}
 	memset(_paletteBuffer, 0, sizeof(_paletteBuffer));
 	_paletteChanged = true;
