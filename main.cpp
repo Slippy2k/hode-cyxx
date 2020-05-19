@@ -233,8 +233,8 @@ int main(int argc, char *argv[]) {
 				break;
 			}
 		}
+		bool levelChanged = false;
 		while (!g_system->inp.quit && level < kLvl_test) {
-			bool levelChanged = false;
 			if (_displayLoadingScreen) {
 				g->displayLoadingScreen();
 			}
