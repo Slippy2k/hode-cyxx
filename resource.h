@@ -39,10 +39,10 @@ struct LvlScreenVector {
 };
 
 struct LvlScreenState {
-	uint8_t s0;
-	uint8_t s1;
-	uint8_t s2;
-	uint8_t s3; // maskData
+	uint8_t s0; // current state
+	uint8_t s1; // states count
+	uint8_t s2; // lvlObjects initialized
+	uint8_t s3; // current mask
 };
 
 struct LvlBackgroundData {
