@@ -164,7 +164,6 @@ void Menu::loadData() {
 
 		_soundData = ptr + ptrOffset;
 		readSoundData(_res->_menuBuffer1 + ptrOffset, _res->_datHdr.soundDataSize);
-		ptrOffset += _res->_datHdr.soundDataSize;
 
 	} else if (version == 11) {
 
@@ -216,7 +215,7 @@ void Menu::loadData() {
 		const int levelsCount = _res->_datHdr.levelsCount;
 		_levelsBitmaps = (DatBitmapsGroup *)(ptr + hdrOffset);
 		_levelsBitmapsData = ptr + ptrOffset;
-		ptrOffset += readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset, paletteSize);
+		readBitmapsGroup(levelsCount, _levelsBitmaps, ptrOffset, paletteSize);
 	}
 
 	ptr = _res->_menuBuffer0;
@@ -257,7 +256,6 @@ void Menu::loadData() {
 		ptrOffset += 0x300 * 3;
 	}
 
-	hdrOffset = ptrOffset;
 	_iconsSprites = (DatSpritesGroup *)(ptr + ptrOffset);
 	const int iconsCount = _res->_datHdr.iconsCount;
 	ptrOffset += iconsCount * sizeof(DatSpritesGroup);
@@ -1305,7 +1303,7 @@ void Menu::drawSoundScreen() {
 		drawSprite(&_iconsSprites[0x12], _iconsSpritesData, _soundTestSpriteNum);
 	}
 	if (_g->_snd_masterVolume != 0) {
-		if (_config->players[_config->currentPlayer].stereo || 1) { // always stereo
+		if (_config->players[_config->currentPlayer].stereo || true) { // always stereo
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 13);
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 16);
 		} else {

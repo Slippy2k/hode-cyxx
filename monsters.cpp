@@ -1863,7 +1863,6 @@ void Game::mstMonster1MoveTowardsGoal2(MonsterObject1 *m) {
 		m->targetLevelPos_y = yPos;
 		p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 		if (p[0xE] != 0) {
-			bboxIndex = m->monster1Index;
 			const int x1 = m->xMstPos + (int8_t)p[0xC];
 			const int y1 = m->yMstPos + (int8_t)p[0xD];
 			const int x2 = x1 + p[0xE] - 1;
@@ -6074,7 +6073,6 @@ void Game::mstOp57_addWormHoleSprite(int x, int y, int screenNum) {
 		++spriteNum;
 	}
 	if (!found) {
-		found = true;
 		if (spriteNum == 6) {
 			++_wormHoleSpritesCount;
 			if (_wormHoleSpritesCount >= spriteNum) {
