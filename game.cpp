@@ -1175,20 +1175,7 @@ void Game::removeLvlObject(LvlObject *ptr) {
 
 void Game::removeLvlObject2(LvlObject *o) {
 	if (o->type != 2) {
-		LvlObject *ptr = _lvlObjectsList1;
-		if (ptr) {
-			if (ptr == o) {
-				_lvlObjectsList1 = o->nextPtr;
-			} else {
-				LvlObject *prev = 0;
-				do {
-					prev = ptr;
-					ptr = ptr->nextPtr;
-				} while (ptr && ptr != o);
-				assert(ptr);
-				prev->nextPtr = ptr->nextPtr;
-			}
-		}
+		removeLvlObjectFromList(&_lvlObjectsList1, o);
 	}
 	o->dataPtr = 0;
 	if (o->type == 8) {
@@ -2914,8 +2901,11 @@ void Game::removeLvlObjectFromList(LvlObject **list, LvlObject *ptr) {
 			do {
 				prev = current;
 				current = current->nextPtr;
-			} while (current && current != ptr);
-			assert(prev);
+				if (!current) {
+					warning("LvlObject %p not found for removal", ptr);
+					return;
+				}
+			} while (current != ptr);
 			prev->nextPtr = current->nextPtr;
 		}
 	}
@@ -3715,20 +3705,7 @@ int Game::lvlObjectType8Callback(LvlObject *ptr) {
 int Game::lvlObjectList3Callback(LvlObject *o) {
 	const uint8_t flags = o->flags0 & 0xFF;
 	if ((o->spriteNum <= 7 && (flags & 0x1F) == 0xB) || (o->spriteNum > 7 && flags == 0x1F)) {
-		if (_lvlObjectsList3 && o) {
-			if (o != _lvlObjectsList3) {
-				LvlObject *prev = 0;
-				LvlObject *ptr = _lvlObjectsList3;
-				do {
-					prev = ptr;
-					ptr = ptr->nextPtr;
-				} while (ptr && ptr != o);
-				assert(ptr);
-				prev->nextPtr = ptr->nextPtr;
-			} else {
-				_lvlObjectsList3 = o->nextPtr;
-			}
-		}
+		removeLvlObjectFromList(&_lvlObjectsList3, o);
 		if (o->type == 8) {
 			_res->decLvlSpriteDataRefCounter(o);
 			o->nextPtr = _declaredLvlObjectsNextPtr;
