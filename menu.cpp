@@ -1303,7 +1303,7 @@ void Menu::drawSoundScreen() {
 		drawSprite(&_iconsSprites[0x12], _iconsSpritesData, _soundTestSpriteNum);
 	}
 	if (_g->_snd_masterVolume != 0) {
-		if (_config->players[_config->currentPlayer].stereo || true) { // always stereo
+		if (_config->players[_config->currentPlayer].stereo) {
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 13);
 			drawSprite(&_iconsSprites[0x12], _iconsSpritesData, 16);
 		} else {

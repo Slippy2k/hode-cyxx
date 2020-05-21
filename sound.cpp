@@ -10,8 +10,6 @@ enum {
 	kFlagNoCode  = 1 << 2  // no bytecode
 };
 
-static const bool kLimitSounds = false; // limit the number of active playing sounds
-
 // if x < 90, lut[x] ~= x / 2
 // if x > 90, lut[x] ~= 45 + (x - 90) * 2
 static const uint8_t _volumeRampTable[129] = {
@@ -124,7 +122,7 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 		}
 		--_playingSssObjectsCount;
 
-		if (kLimitSounds) {
+		if (_playingSssObjectsMax > 0) {
 			if (_lowRankSssObject == so || (_playingSssObjectsCount < _playingSssObjectsMax && _lowRankSssObject)) {
 				_lowRankSssObject = findLowestRankSoundObject();
 			}
@@ -305,7 +303,7 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 			}
 			--_playingSssObjectsCount;
 
-			if (kLimitSounds) {
+			if (_playingSssObjectsMax > 0) {
 				if (so == _lowRankSssObject || (_playingSssObjectsCount < _playingSssObjectsMax && _lowRankSssObject)) {
 					_lowRankSssObject = findLowestRankSoundObject();
 				}
@@ -686,10 +684,11 @@ void Game::prependSoundObjectToList(SssObject *so) {
 // 429185
 		SssObject *stopSo = so; // _edi
 		if (so->pcm && so->pcm->ptr) {
-			if (kLimitSounds && _playingSssObjectsCount >= _playingSssObjectsMax) {
+			if (_playingSssObjectsMax > 0 && _playingSssObjectsCount >= _playingSssObjectsMax) {
 				if (so->currentPriority > _lowRankSssObject->currentPriority) {
 
 					stopSo = _lowRankSssObject;
+					debug(kDebug_SOUND, "Removing so %p rank %d", stopSo, stopSo->priority);
 					SssObject *next = _lowRankSssObject->nextPtr; // _edx
 					SssObject *prev = _lowRankSssObject->prevPtr; // _ecx
 
@@ -720,7 +719,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 				}
 				_sssObjectsList1 = so;
 // 42920F
-				if (kLimitSounds) {
+				if (_playingSssObjectsMax > 0) {
 					if (_playingSssObjectsCount < _playingSssObjectsMax) {
 						_lowRankSssObject = 0;
 					} else if (!_lowRankSssObject) {
@@ -965,7 +964,7 @@ SssObject *Game::playSoundObject(SssInfo *s, int source, int mask) {
 			SssObject *so = &_sssObjectsTable[i];
 			if (so->pcm != 0 && so->filter == filter) {
 				so->currentPriority = CLIP(_eax + so->priority, 0, 7);
-				if (kLimitSounds) {
+				if (_playingSssObjectsMax > 0) {
 					setLowPrioritySoundObject(so);
 				}
 			}
@@ -1082,7 +1081,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			}
 			if (so->currentPriority != priority) {
 				so->currentPriority = priority;
-				if (kLimitSounds) {
+				if (_playingSssObjectsMax > 0) {
 					_lowRankSssObject = findLowestRankSoundObject();
 				}
 			}
