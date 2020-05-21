@@ -26,29 +26,9 @@ static const uint8_t _volumeRampTable[129] = {
 	0x80
 };
 
-static uint32_t sssGroupValue(uint8_t source, uint8_t mask, SssInfo *s) {
-	uint32_t value = 0;
-	assert(source < 3); // 0,1,2
+static uint32_t sssGroupValue(uint8_t source, uint8_t mask, const SssInfo *s) {
 // 42BA9D
-
-	// bits 20..24
-	value = source;
-	// bits 24..32
-	value |= mask << 4;
-
-	// bits 16..20
-	value <<= 4;
-	value |= s->sampleIndex & 15;
-
-	// bits 12..16
-	value <<= 4;
-	value |= s->concurrencyMask;
-
-	// bits 0..12
-	value <<= 12;
-	value |= (s->sssBankIndex & 0xFFF);
-
-	return value;
+	return (mask << 24) | (source << 20) | ((s->sampleIndex & 15) << 16) | (s->concurrencyMask << 12) | (s->sssBankIndex & 0xFFF);
 }
 
 static bool compareSssGroup(uint32_t flags_a, uint32_t flags_b) {
@@ -57,7 +37,7 @@ static bool compareSssGroup(uint32_t flags_a, uint32_t flags_b) {
 		// the original code possibly used a structure with bit fields that was optimized by the compiler as a uint32_t
 		if (((flags_a >> 20) & 15) == ((flags_b >> 20) & 15)) { // source : 0,1,2 (Andy, monster1, monster2)
 			if ((flags_a & 0xFFF) == (flags_b & 0xFFF)) { // bank index
-				return (flags_a >> 24) == (flags_b >> 24); // sample index bit 0..31, used as a mask lut[][] |= 1 << bit
+				return (flags_a >> 24) == (flags_b >> 24); // sample index, used as a mask lut[][] |= 1 << index
 			}
 		}
 		return false;
