@@ -70,7 +70,7 @@ the double spectre trap door avoidance exploit (jumping over the button) does no
 
 // assertion failed error after Andy in the cell cinematic plays
 
-many checkpoints in the lair do not work properly. Dying after losing special power drops Andy off several screens too far back
+// many checkpoints in the lair do not work properly. Dying after losing special power drops Andy off several screens too far back
 
 // tiptoeing over chain bridge after losing special power does not work, Andy falls in. Cannot test any of the game until next checkpoint.
 
