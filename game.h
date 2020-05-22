@@ -369,7 +369,7 @@ struct Game {
 	int clipAndyLvlObjectLar(BoundingBox *a, BoundingBox *b, bool flag);
 	void resetWormHoleSprites();
 	void updateWormHoleSprites();
-	bool loadSetupCfg(bool resume);
+	void loadSetupCfg(bool resume);
 	void saveSetupCfg();
 	void captureScreenshot();
 

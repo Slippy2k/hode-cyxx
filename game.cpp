@@ -16,10 +16,6 @@
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
-static void gamePafCallback(void *userdata) {
-	((Game *)userdata)->resetSound();
-}
-
 Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	: _fs(dataPath, savePath) {
 
@@ -83,12 +79,6 @@ Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;
 	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
-
-	PafCallback pafCb;
-	pafCb.proc = 0;
-	pafCb.fini = gamePafCallback;
-	pafCb.userdata = this;
-	_paf->setCallback(&pafCb);
 }
 
 Game::~Game() {
@@ -2072,6 +2062,10 @@ void Game::drawScreen() {
 	}
 }
 
+static void gamePafCallback(void *userdata) {
+	((Game *)userdata)->resetSound();
+}
+
 void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	if (_playDemo && _res->loadHodDem()) {
 		_rnd._rndSeed = _res->_dem.randSeed;
@@ -2097,6 +2091,13 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 		// resume once, on the starting level
 		_resumeGame = false;
 	}
+
+	PafCallback pafCb;
+	pafCb.proc = 0;
+	pafCb.fini = gamePafCallback;
+	pafCb.userdata = this;
+	_paf->setCallback(&pafCb);
+
 	_video->_font = _res->_fontBuffer;
 	assert(level < kLvl_test);
 	_currentLevel = level;
@@ -4857,14 +4858,12 @@ void Game::updateWormHoleSprites() {
 	_res->decLvlSpriteDataRefCounter(&tmp);
 }
 
-bool Game::loadSetupCfg(bool resume) {
+void Game::loadSetupCfg(bool resume) {
 	_resumeGame = resume;
-	if (_res->readSetupCfg(&_setupConfig)) {
-		return true;
+	if (!_res->readSetupCfg(&_setupConfig)) {
+		memset(&_setupConfig, 0, sizeof(_setupConfig));
+		_res->setDefaultsSetupCfg(&_setupConfig, 0);
 	}
-	memset(&_setupConfig, 0, sizeof(_setupConfig));
-	_res->setDefaultsSetupCfg(&_setupConfig, 0);
-	return false;
 }
 
 void Game::saveSetupCfg() {
