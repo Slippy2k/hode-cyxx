@@ -90,7 +90,7 @@ void Game::setSoundPanning(SssObject *so, int panning) {
 	setSoundObjectPanning(so);
 }
 
-SssObject *Game::findLowestRankSoundObject() const {
+SssObject *Game::findLowPrioritySoundObject() const {
 	SssObject *so = 0;
 	if (_playingSssObjectsCount >= _playingSssObjectsMax && _sssObjectsList1) {
 		so = _sssObjectsList1;
@@ -123,8 +123,8 @@ void Game::removeSoundObjectFromList(SssObject *so) {
 		--_playingSssObjectsCount;
 
 		if (_playingSssObjectsMax > 0) {
-			if (_lowRankSssObject == so || (_playingSssObjectsCount < _playingSssObjectsMax && _lowRankSssObject)) {
-				_lowRankSssObject = findLowestRankSoundObject();
+			if (_lowPrioritySssObject == so || (_playingSssObjectsCount < _playingSssObjectsMax && _lowPrioritySssObject)) {
+				_lowPrioritySssObject = findLowPrioritySoundObject();
 			}
 		}
 	} else {
@@ -304,8 +304,8 @@ void Game::sssOp17_pauseSound(SssObject *so) {
 			--_playingSssObjectsCount;
 
 			if (_playingSssObjectsMax > 0) {
-				if (so == _lowRankSssObject || (_playingSssObjectsCount < _playingSssObjectsMax && _lowRankSssObject)) {
-					_lowRankSssObject = findLowestRankSoundObject();
+				if (so == _lowPrioritySssObject || (_playingSssObjectsCount < _playingSssObjectsMax && _lowPrioritySssObject)) {
+					_lowPrioritySssObject = findLowPrioritySoundObject();
 				}
 			}
 		} else {
@@ -685,12 +685,12 @@ void Game::prependSoundObjectToList(SssObject *so) {
 		SssObject *stopSo = so; // _edi
 		if (so->pcm && so->pcm->ptr) {
 			if (_playingSssObjectsMax > 0 && _playingSssObjectsCount >= _playingSssObjectsMax) {
-				if (so->currentPriority > _lowRankSssObject->currentPriority) {
+				if (so->currentPriority > _lowPrioritySssObject->currentPriority) {
 
-					stopSo = _lowRankSssObject;
-					debug(kDebug_SOUND, "Removing so %p rank %d", stopSo, stopSo->priority);
-					SssObject *next = _lowRankSssObject->nextPtr; // _edx
-					SssObject *prev = _lowRankSssObject->prevPtr; // _ecx
+					stopSo = _lowPrioritySssObject;
+					debug(kDebug_SOUND, "Removing so %p priority %d", stopSo, stopSo->priority);
+					SssObject *next = _lowPrioritySssObject->nextPtr; // _edx
+					SssObject *prev = _lowPrioritySssObject->prevPtr; // _ecx
 
 					so->nextPtr = next;
 					so->prevPtr = prev;
@@ -705,7 +705,7 @@ void Game::prependSoundObjectToList(SssObject *so) {
 						_sssObjectsList1 = so;
 					}
 // 429281
-					_lowRankSssObject = findLowestRankSoundObject();
+					_lowPrioritySssObject = findLowPrioritySoundObject();
 				}
 			} else {
 // 4291E8
@@ -721,11 +721,11 @@ void Game::prependSoundObjectToList(SssObject *so) {
 // 42920F
 				if (_playingSssObjectsMax > 0) {
 					if (_playingSssObjectsCount < _playingSssObjectsMax) {
-						_lowRankSssObject = 0;
-					} else if (!_lowRankSssObject) {
-						_lowRankSssObject = findLowestRankSoundObject();
-					} else if (so->currentPriority < _lowRankSssObject->currentPriority) {
-						_lowRankSssObject = so;
+						_lowPrioritySssObject = 0;
+					} else if (!_lowPrioritySssObject) {
+						_lowPrioritySssObject = findLowPrioritySoundObject();
+					} else if (so->currentPriority < _lowPrioritySssObject->currentPriority) {
+						_lowPrioritySssObject = so;
 					}
 				}
 			}
@@ -1011,7 +1011,7 @@ void Game::clearSoundObjects() {
 	memset(_sssObjectsTable, 0, sizeof(_sssObjectsTable));
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;
-	_lowRankSssObject = 0;
+	_lowPrioritySssObject = 0;
 	for (int i = 0; i < kMaxSssObjects; ++i) {
 		_sssObjectsTable[i].num = i;
 	}
@@ -1031,7 +1031,7 @@ void Game::clearSoundObjects() {
 
 void Game::setLowPrioritySoundObject(SssObject *so) {
 	if ((so->flags & kFlagPaused) == 0) {
-		_lowRankSssObject = findLowestRankSoundObject();
+		_lowPrioritySssObject = findLowPrioritySoundObject();
 	}
 }
 
@@ -1082,7 +1082,7 @@ void Game::setSoundObjectPanning(SssObject *so) {
 			if (so->currentPriority != priority) {
 				so->currentPriority = priority;
 				if (_playingSssObjectsMax > 0) {
-					_lowRankSssObject = findLowestRankSoundObject();
+					_lowPrioritySssObject = findLowPrioritySoundObject();
 				}
 			}
 		} else {

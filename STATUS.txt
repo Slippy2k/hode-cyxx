@@ -38,7 +38,7 @@ Very occasional cinematic skipping
 
 // Sound mixing in-game is not identical to official release. Background ambiance (wind, etc) drowns out foreground sounds (spectres, Andy, blasts and falling rocks) in short, foreground sounds are too quiet
 
-Too much swamp noises the weird calling sound repeats too frequently
+// Too much swamp noises the weird calling sound repeats too frequently
 
 // Background sounds drowning out foreground sounds appears to span all levels
 

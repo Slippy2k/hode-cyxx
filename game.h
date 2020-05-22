@@ -510,7 +510,7 @@ struct Game {
 	int _sssObjectsCount;
 	SssObject *_sssObjectsList1; // playing
 	SssObject *_sssObjectsList2; // paused/idle
-	SssObject *_lowRankSssObject;
+	SssObject *_lowPrioritySssObject;
 	bool _sssUpdatedObjectsTable[kMaxSssObjects];
 	int _playingSssObjectsMax;
 	int _playingSssObjectsCount;
@@ -520,7 +520,7 @@ struct Game {
 	void resetSound();
 	int getSoundPosition(const SssObject *so);
 	void setSoundPanning(SssObject *so, int panning);
-	SssObject *findLowestRankSoundObject() const;
+	SssObject *findLowPrioritySoundObject() const;
 	void removeSoundObjectFromList(SssObject *so);
 	void updateSoundObject(SssObject *so);
 	void sssOp4_removeSounds(uint32_t flags);
