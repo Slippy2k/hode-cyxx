@@ -32,7 +32,7 @@ https://finsterhund.tumblr.com/post/618142082844999680/heres-a-compilation-of-al
 
 Sound artifacts in cinematics when louder sounds happen. Tested for UK English PAF, French PAF, German PAF.
 
-At the end of cinematics a clip of sound happens
+// At the end of cinematics a clip of sound happens
 
 Very occasional cinematic skipping
 

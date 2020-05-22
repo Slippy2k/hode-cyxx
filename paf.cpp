@@ -528,6 +528,10 @@ void PafPlayer::mainLoop() {
 		_currentPageBuffer &= 3;
 	}
 
+	if (_pafCb.fini) {
+		_pafCb.fini(_pafCb.userdata);
+	}
+
 	// restore audio callback
 	if (_demuxAudioFrameBlocks) {
 		g_system->setAudioCallback(prevAudioCb);

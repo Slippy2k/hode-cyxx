@@ -65,12 +65,14 @@ static uint32_t *getSssGroupPtr(Resource *res, int num, uint32_t flags) {
 void Game::muteSound() {
 	MixerLock ml(&_mix);
 	_snd_muted = true;
+	_snd_bufferOffset = _snd_bufferSize = 0;
 	_mix._mixingQueueSize = 0;
 }
 
 void Game::unmuteSound() {
 	MixerLock ml(&_mix);
 	_snd_muted = false;
+	_snd_bufferOffset = _snd_bufferSize = 0;
 	_mix._mixingQueueSize = 0;
 }
 
@@ -1017,6 +1019,7 @@ void Game::clearSoundObjects() {
 	}
 	_sssObjectsCount = 0;
 	_playingSssObjectsCount = 0;
+	_snd_bufferOffset = _snd_bufferSize = 0;
 	_mix._mixingQueueSize = 0;
 	if (_res->_sssHdr.infosDataCount != 0) {
 		const int size = _res->_sssHdr.banksDataCount * sizeof(uint32_t);

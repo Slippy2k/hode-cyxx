@@ -426,6 +426,7 @@ bool Menu::mainLoop() {
 		} else if (option == kTitleScreen_Options) {
 			PafCallback pafCb;
 			pafCb.proc = menuPafCallback;
+			pafCb.fini = 0;
 			pafCb.userdata = this;
 			_paf->setCallback(&pafCb);
 			playSound(kSound_0xA0);

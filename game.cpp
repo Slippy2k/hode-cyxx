@@ -16,6 +16,10 @@
 // starting level cutscene number
 static const uint8_t _cutscenes[] = { 0, 2, 4, 5, 6, 8, 10, 14, 19 };
 
+static void gamePafCallback(void *userdata) {
+	((Game *)userdata)->resetSound();
+}
+
 Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 	: _fs(dataPath, savePath) {
 
@@ -72,12 +76,19 @@ Game::Game(const char *dataPath, const char *savePath, uint32_t cheats)
 
 	_sssDisabled = false;
 	_snd_muted = false;
+	_snd_bufferOffset = _snd_bufferSize = 0;
 	_snd_masterPanning = kDefaultSoundPanning;
 	_snd_masterVolume = kDefaultSoundVolume;
 	_sssObjectsCount = 0;
 	_sssObjectsList1 = 0;
 	_sssObjectsList2 = 0;
 	_playingSssObjectsMax = 16; // 10 if (lowMemory || slowCPU)
+
+	PafCallback pafCb;
+	pafCb.proc = 0;
+	pafCb.fini = gamePafCallback;
+	pafCb.userdata = this;
+	_paf->setCallback(&pafCb);
 }
 
 Game::~Game() {
@@ -2158,18 +2169,14 @@ void Game::mixAudio(int16_t *buf, int len) {
 
 	static int count = 0;
 
-	static int16_t buffer[4096];
-	static int bufferOffset = 0;
-	static int bufferSize = 0;
-
 	// flush samples from previous run
-	if (bufferSize > 0) {
-		const int count = len < bufferSize ? len : bufferSize;
-		memcpy(buf, buffer + bufferOffset, count * sizeof(int16_t));
+	if (_snd_bufferSize > 0) {
+		const int count = len < _snd_bufferSize ? len : _snd_bufferSize;
+		memcpy(buf, _snd_buffer + _snd_bufferOffset, count * sizeof(int16_t));
 		buf += count;
 		len -= count;
-		bufferOffset += count;
-		bufferSize -= count;
+		_snd_bufferOffset += count;
+		_snd_bufferSize -= count;
 	}
 
 	while (len > 0) {
@@ -2189,11 +2196,11 @@ void Game::mixAudio(int16_t *buf, int len) {
 			buf += kStereoSamples;
 			len -= kStereoSamples;
 		} else {
-			memset(buffer, 0, sizeof(buffer));
-			_mix.mix(buffer, kStereoSamples);
-			memcpy(buf, buffer, len * sizeof(int16_t));
-			bufferOffset = len;
-			bufferSize = kStereoSamples - len;
+			memset(_snd_buffer, 0, sizeof(_snd_buffer));
+			_mix.mix(_snd_buffer, kStereoSamples);
+			memcpy(buf, _snd_buffer, len * sizeof(int16_t));
+			_snd_bufferOffset = len;
+			_snd_bufferSize = kStereoSamples - len;
 			break;
 		}
 	}

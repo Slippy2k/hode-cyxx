@@ -502,6 +502,8 @@ struct Game {
 
 	// sound.cpp
 	bool _sssDisabled;
+	int16_t _snd_buffer[4096];
+	int _snd_bufferOffset, _snd_bufferSize;
 	bool _snd_muted;
 	int _snd_masterPanning;
 	int _snd_masterVolume;
