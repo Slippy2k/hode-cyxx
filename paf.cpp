@@ -504,8 +504,8 @@ void PafPlayer::mainLoop() {
 		// decode video data
 		decodeVideoFrame(_demuxVideoFrameBlocks + _pafHdr.framesOffsetTable[i]);
 
-		if (_pafCb.proc) {
-			_pafCb.proc(_pafCb.userdata, i, _pageBuffers[_currentPageBuffer]);
+		if (_pafCb.frameProc) {
+			_pafCb.frameProc(_pafCb.userdata, i, _pageBuffers[_currentPageBuffer]);
 		} else {
 			g_system->copyRect(0, 0, kVideoWidth, kVideoHeight, _pageBuffers[_currentPageBuffer], kVideoWidth);
 		}
@@ -528,8 +528,8 @@ void PafPlayer::mainLoop() {
 		_currentPageBuffer &= 3;
 	}
 
-	if (_pafCb.fini) {
-		_pafCb.fini(_pafCb.userdata);
+	if (_pafCb.endProc) {
+		_pafCb.endProc(_pafCb.userdata);
 	}
 
 	// restore audio callback

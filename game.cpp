@@ -2093,8 +2093,8 @@ void Game::mainLoop(int level, int checkpoint, bool levelChanged) {
 	}
 
 	PafCallback pafCb;
-	pafCb.proc = 0;
-	pafCb.fini = gamePafCallback;
+	pafCb.frameProc = 0;
+	pafCb.endProc = gamePafCallback;
 	pafCb.userdata = this;
 	_paf->setCallback(&pafCb);
 
