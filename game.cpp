@@ -1089,7 +1089,6 @@ LvlObject *Game::addLvlObjectToList0(int num) {
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
-		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList0;
 		_lvlObjectsList0 = ptr;
@@ -1112,7 +1111,6 @@ LvlObject *Game::addLvlObjectToList1(int type, int num) {
 		}
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
-		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList1;
 		_lvlObjectsList1 = ptr;
@@ -1133,7 +1131,6 @@ LvlObject *Game::addLvlObjectToList2(int num) {
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
-		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList2;
 		_lvlObjectsList2 = ptr;
@@ -1154,7 +1151,6 @@ LvlObject *Game::addLvlObjectToList3(int num) {
 		lvlObjectTypeCallback(ptr);
 		ptr->currentSprite = 0;
 		ptr->sssObject = 0;
-		ptr->nextPtr = 0;
 		ptr->bitmapBits = 0;
 		ptr->nextPtr = _lvlObjectsList3;
 		_lvlObjectsList3 = ptr;
@@ -2894,11 +2890,6 @@ int Game::displayHintScreen(int num, int pause) {
 	return confirmQuit && quit == kQuitYes;
 }
 
-void Game::prependLvlObjectToList(LvlObject **list, LvlObject *ptr) {
-	ptr->nextPtr = *list;
-	*list = ptr;
-}
-
 void Game::removeLvlObjectFromList(LvlObject **list, LvlObject *ptr) {
 	LvlObject *current = *list;
 	if (current && ptr) {
@@ -2980,7 +2971,8 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 	o->flags1 = merge_bits(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
 	o->flags2 = ptr->flags2 & ~0x2000;
 	setupLvlObjectBitmap(o);
-	prependLvlObjectToList(&_plasmaExplosionObject, o);
+	o->nextPtr = _plasmaExplosionObject;
+	_plasmaExplosionObject = o;
 
 	o = declareLvlObject(8, 1);
 	assert(o);
@@ -2993,7 +2985,8 @@ void Game::lvlObjectType1Init(LvlObject *ptr) {
 	o->flags1 = merge_bits(o->flags1, ptr->flags1, 0x30); // _esi->flags1 ^= (_esi->flags1 ^ ptr->flags1) & 0x30;
 	o->flags2 = ptr->flags2 & ~0x2000;
 	setupLvlObjectBitmap(o);
-	prependLvlObjectToList(&_plasmaExplosionObject, o);
+	o->nextPtr = _plasmaExplosionObject;
+	_plasmaExplosionObject = o;
 }
 
 void Game::lvlObjectTypeInit(LvlObject *o) {
@@ -3306,7 +3299,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->frame = 0;
 					_edx->bitmapBits = 0;
 					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
-					prependLvlObjectToList(&_lvlObjectsList0, _edx);
+					_edx->nextPtr = _lvlObjectsList0;
+					_lvlObjectsList0 = _edx;
 				}
 // 40DDEE
 				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
@@ -3355,7 +3349,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->frame = 0;
 					_edx->bitmapBits = 0;
 					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
-					prependLvlObjectToList(&_lvlObjectsList0, _edx);
+					_edx->nextPtr = _lvlObjectsList0;
+					_lvlObjectsList0 = _edx;
 				}
 // 40DEEC
 				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
@@ -3396,7 +3391,8 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 					_edx->frame = 0;
 					_edx->bitmapBits = 0;
 					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
-					prependLvlObjectToList(&_lvlObjectsList0, _edx);
+					_edx->nextPtr = _lvlObjectsList0;
+					_lvlObjectsList0 = _edx;
 				}
 // 40DF82
 				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);

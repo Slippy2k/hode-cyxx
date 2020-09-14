@@ -328,7 +328,6 @@ struct Game {
 	void callLevel_terminate();
 	void displayLoadingScreen();
 	int displayHintScreen(int num, int pause);
-	void prependLvlObjectToList(LvlObject **list, LvlObject *ptr);
 	void removeLvlObjectFromList(LvlObject **list, LvlObject *ptr);
 	void *getLvlObjectDataPtr(LvlObject *o, int type) const;
 	void lvlObjectType0Init(LvlObject *ptr);
