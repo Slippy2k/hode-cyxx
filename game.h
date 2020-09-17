@@ -237,7 +237,6 @@ struct Game {
 	}
 
 	// benchmark.cpp
-	uint32_t benchmarkLoop(const uint8_t *p, int count);
 	uint32_t benchmarkCpu();
 
 	// game.cpp
