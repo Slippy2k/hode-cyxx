@@ -615,10 +615,10 @@ void Game::randomizeInterpolatePoints(int32_t *pts, int count) {
 }
 
 int Game::fixPlasmaCannonPointsScreenMask(int num) {
-	uint8_t _dl = ((~_plasmaCannonDirection) & 1) | 6;
+	const uint8_t _dl = ((~_plasmaCannonDirection) & 1) | 6;
 	int var1 = _plasmaCannonFirstIndex;
-	int _edi = _res->_screensBasePos[num].u;
-	int _ebp = _res->_screensBasePos[num].v;
+	const int _edi = _res->_screensBasePos[num].u;
+	const int _ebp = _res->_screensBasePos[num].v;
 	uint8_t _al = 0;
 	if (_andyObject->anim == 84) {
 		int yPos, xPos;
@@ -660,45 +660,27 @@ int Game::fixPlasmaCannonPointsScreenMask(int num) {
 
 void Game::setupPlasmaCannonPointsHelper() {
 	if (_plasmaCannonPointsSetupCounter == 0) {
-		int xR = _rnd.update();
-		for (int i = 0; i < 64; ++i) {
-			const int index = _pointDstIndexTable[i];
-			const int x1 = _plasmaCannonPosX[_pointSrcIndex1Table[index]];
-			const int x2 = _plasmaCannonPosX[_pointSrcIndex2Table[index]];
-			_plasmaCannonPosX[index] = (x1 + x2 + (xR >> _pointRandomizeShiftTable[i])) / 2;
-			xR *= 2;
-		}
-		int yR = _rnd.update();
-		for (int i = 0; i < 64; ++i) {
-			const int index = _pointDstIndexTable[i];
-			const int y1 = _plasmaCannonPosY[_pointSrcIndex1Table[index]];
-			const int y2 = _plasmaCannonPosY[_pointSrcIndex2Table[index]];
-			_plasmaCannonPosY[index] = (y1 + y2 + (yR >> _pointRandomizeShiftTable[i])) / 2;
-			yR *= 2;
-		}
+		randomizeInterpolatePoints(_plasmaCannonPosX, 64);
+		randomizeInterpolatePoints(_plasmaCannonPosY, 64);
 		if (_andyObject->anim == 84) {
-			for (int i = 0; i <= 496; i += 8) {
-				const int index = i / 4;
-				_plasmaCannonXPointsTable2[2 + index] = (_plasmaCannonPosX[4 + index] - _plasmaCannonXPointsTable1[4 + index]) / 2;
-				_plasmaCannonYPointsTable2[2 + index] = (_plasmaCannonPosY[4 + index] - _plasmaCannonYPointsTable1[4 + index]) / 8;
+			for (int i = 0; i <= 496 / 4; i += 2) {
+				_plasmaCannonXPointsTable2[2 + i] = (_plasmaCannonPosX[4 + i] - _plasmaCannonXPointsTable1[4 + i]) / 2;
+				_plasmaCannonYPointsTable2[2 + i] = (_plasmaCannonPosY[4 + i] - _plasmaCannonYPointsTable1[4 + i]) / 8;
 			}
 		} else {
-			for (int i = 0; i <= 496; i += 8) {
-				const int index = i / 4;
-				_plasmaCannonXPointsTable2[2 + index] = (_plasmaCannonPosX[4 + index] - _plasmaCannonXPointsTable1[4 + index]) / 2;
-				_plasmaCannonYPointsTable2[2 + index] = (_plasmaCannonPosY[4 + index] - _plasmaCannonYPointsTable1[4 + index]) / 2;
+			for (int i = 0; i <= 496 / 4; i += 2) {
+				_plasmaCannonXPointsTable2[2 + i] = (_plasmaCannonPosX[4 + i] - _plasmaCannonXPointsTable1[4 + i]) / 2;
+				_plasmaCannonYPointsTable2[2 + i] = (_plasmaCannonPosY[4 + i] - _plasmaCannonYPointsTable1[4 + i]) / 2;
 			}
 		}
-		for (int i = 0; i <= 504; i += 8) {
-			const int index = i / 4;
-			_plasmaCannonXPointsTable1[2 + index] = _plasmaCannonPosX[2 + index];
-			_plasmaCannonYPointsTable1[2 + index] = _plasmaCannonPosY[2 + index];
+		for (int i = 0; i <= 504 / 4; i += 2) {
+			_plasmaCannonXPointsTable1[2 + i] = _plasmaCannonPosX[2 + i];
+			_plasmaCannonYPointsTable1[2 + i] = _plasmaCannonPosY[2 + i];
 		}
 	} else {
-		for (int i = 0; i <= 496; i += 8) {
-			const int index = i / 4;
-			_plasmaCannonXPointsTable1[4 + index] += _plasmaCannonXPointsTable2[2 + index];
-			_plasmaCannonYPointsTable1[4 + index] += _plasmaCannonYPointsTable2[2 + index];
+		for (int i = 0; i <= 496 / 4; i += 2) {
+			_plasmaCannonXPointsTable1[4 + i] += _plasmaCannonXPointsTable2[2 + i];
+			_plasmaCannonYPointsTable1[4 + i] += _plasmaCannonYPointsTable2[2 + i];
 		}
 	}
 	++_plasmaCannonPointsSetupCounter;
