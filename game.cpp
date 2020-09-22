@@ -926,29 +926,7 @@ void Game::clearLvlObjectsList0() {
 	LvlObject *ptr = _lvlObjectsList0;
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
-		if (ptr->type == 8) {
-			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsNextPtr;
-			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsNextPtr = ptr;
-			switch (ptr->spriteNum) {
-			case 0:
-			case 2:
-				ptr->dataPtr = 0;
-				break;
-			case 3:
-			case 7:
-				if (ptr->dataPtr) {
-					clearShootLvlObjectData(ptr);
-				}
-				break;
-			}
-			if (ptr->sssObject) {
-				removeSound(ptr);
-			}
-			ptr->sssObject = 0;
-			ptr->bitmapBits = 0;
-		}
+		destroyLvlObject(ptr);
 		ptr = next;
 	}
 	_lvlObjectsList0 = 0;
@@ -967,29 +945,7 @@ void Game::clearLvlObjectsList1() {
 	LvlObject *ptr = _lvlObjectsList1;
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
-		if (ptr->type == 8) {
-			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsNextPtr;
-			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsNextPtr = ptr;
-			switch (ptr->spriteNum) {
-			case 0:
-			case 2:
-				ptr->dataPtr = 0;
-				break;
-			case 3:
-			case 7:
-				if (ptr->dataPtr) {
-					clearShootLvlObjectData(ptr);
-				}
-				break;
-			}
-			if (ptr->sssObject) {
-				removeSound(ptr);
-			}
-			ptr->sssObject = 0;
-			ptr->bitmapBits = 0;
-		}
+		destroyLvlObject(ptr);
 		ptr = next;
 	}
 	_lvlObjectsList1 = 0;
@@ -999,29 +955,7 @@ void Game::clearLvlObjectsList2() {
 	LvlObject *ptr = _lvlObjectsList2;
 	while (ptr) {
 		LvlObject *next = ptr->nextPtr;
-		if (ptr->type == 8) {
-			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsNextPtr;
-			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsNextPtr = ptr;
-			switch (ptr->spriteNum) {
-			case 0:
-			case 2:
-				ptr->dataPtr = 0;
-				break;
-			case 3:
-			case 7:
-				if (ptr->dataPtr) {
-					clearShootLvlObjectData(ptr);
-				}
-				break;
-			}
-			if (ptr->sssObject) {
-				removeSound(ptr);
-			}
-			ptr->sssObject = 0;
-			ptr->bitmapBits = 0;
-		}
+		destroyLvlObject(ptr);
 		ptr = next;
 	}
 	_lvlObjectsList2 = 0;
@@ -1031,29 +965,7 @@ void Game::clearLvlObjectsList3() {
 	LvlObject *ptr = _lvlObjectsList3;
 	while (ptr != 0) {
 		LvlObject *next = ptr->nextPtr;
-		if (ptr->type == 8) {
-			_res->decLvlSpriteDataRefCounter(ptr);
-			ptr->nextPtr = _declaredLvlObjectsNextPtr;
-			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsNextPtr = ptr;
-			switch (ptr->spriteNum) {
-			case 0:
-			case 2:
-				ptr->dataPtr = 0;
-				break;
-			case 3:
-			case 7:
-				if (ptr->dataPtr) {
-					clearShootLvlObjectData(ptr);
-				}
-				break;
-			}
-			if (ptr->sssObject) {
-				removeSound(ptr);
-			}
-			ptr->sssObject = 0;
-			ptr->bitmapBits = 0;
-		}
+		destroyLvlObject(ptr);
 		ptr = next;
 	}
 	_lvlObjectsList3 = 0;
@@ -1157,30 +1069,7 @@ void Game::removeLvlObject2(LvlObject *o) {
 		removeLvlObjectFromList(&_lvlObjectsList1, o);
 	}
 	o->dataPtr = 0;
-	if (o->type == 8) {
-		_res->decLvlSpriteDataRefCounter(o);
-		o->nextPtr = _declaredLvlObjectsNextPtr;
-		_declaredLvlObjectsNextPtr = o;
-		--_declaredLvlObjectsListCount;
-	} else {
-		switch (o->spriteNum) {
-		case 0:
-		case 2:
-			o->dataPtr = 0;
-			break;
-		case 3:
-		case 7:
-			if (o->dataPtr) {
-				clearShootLvlObjectData(o);
-			}
-			break;
-		}
-	}
-	if (o->sssObject) {
-		removeSound(o);
-		o->sssObject = 0;
-	}
-	o->bitmapBits = 0;
+	destroyLvlObject(o);
 }
 
 void Game::setAndySprite(int num) {
@@ -3692,29 +3581,7 @@ int Game::lvlObjectList3Callback(LvlObject *o) {
 	const uint8_t flags = o->flags0 & 0xFF;
 	if ((o->spriteNum <= 7 && (flags & 0x1F) == 0xB) || (o->spriteNum > 7 && flags == 0x1F)) {
 		removeLvlObjectFromList(&_lvlObjectsList3, o);
-		if (o->type == 8) {
-			_res->decLvlSpriteDataRefCounter(o);
-			o->nextPtr = _declaredLvlObjectsNextPtr;
-			--_declaredLvlObjectsListCount;
-			_declaredLvlObjectsNextPtr = o;
-			switch (o->spriteNum) {
-			case 0:
-			case 2:
-				o->dataPtr = 0;
-				break;
-			case 3:
-			case 7:
-				if (o->dataPtr) {
-					clearShootLvlObjectData(o);
-				}
-				break;
-			}
-		}
-		if (o->sssObject) {
-			removeSound(o);
-		}
-		o->sssObject = 0;
-		o->bitmapBits = 0;
+		destroyLvlObject(o);
 	} else {
 		updateAndyObject(o);
 		o->actionKeyMask = 0;
