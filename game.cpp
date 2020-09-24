@@ -102,6 +102,26 @@ void Game::clearShootLvlObjectData(LvlObject *ptr) {
 	ptr->dataPtr = 0;
 }
 
+void Game::addShootLvlObject(LvlObject *_edx, LvlObject *ptr) {
+	_edx->dataPtr = _shootLvlObjectDataNextPtr;
+	if (_shootLvlObjectDataNextPtr) {
+		_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
+		memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
+	} else {
+		warning("Nothing free in _shootLvlObjectDataNextPtr");
+	}
+	_edx->xPos = ptr->xPos;
+	_edx->yPos = ptr->yPos;
+	_edx->flags1 &= ~0x30;
+	_edx->screenNum = ptr->screenNum;
+	_edx->anim = 7;
+	_edx->frame = 0;
+	_edx->bitmapBits = 0;
+	_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
+	_edx->nextPtr = _lvlObjectsList0;
+	_lvlObjectsList0 = _edx;
+}
+
 void Game::setShakeScreen(int type, int counter) {
 	static const uint8_t table1[] = { 1, 2, 3, 4 };
 	static const uint8_t table2[] = { 2, 3, 4, 5 };
@@ -3109,32 +3129,11 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _shootLvlObjectDataNextPtr;
-					if (_shootLvlObjectDataNextPtr) {
-						_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
-						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
-					} else {
-						warning("Nothing free in _shootLvlObjectDataNextPtr");
-					}
-					_edx->xPos = ptr->xPos;
-					_edx->yPos = ptr->yPos;
-					_edx->flags1 &= ~0x30;
-					_edx->screenNum = ptr->screenNum;
-					_edx->anim = 7;
-					_edx->frame = 0;
-					_edx->bitmapBits = 0;
-					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
-					_edx->nextPtr = _lvlObjectsList0;
-					_lvlObjectsList0 = _edx;
+					addShootLvlObject(_edx, ptr);
 				}
 // 40DDEE
-				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				LvlObject *_eax = _ecx->shootLvlObject;
-				if (_eax) {
-					if (!_eax->dataPtr) {
-						warning("lvlObject %p with NULL dataPtr", _eax);
-						break;
-					}
+				LvlObject *_eax = _edi->shootLvlObject;
+				if (_eax && _eax->dataPtr) {
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
 					_edx->type = 0;
 				}
@@ -3159,33 +3158,11 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _shootLvlObjectDataNextPtr;
-					if (_shootLvlObjectDataNextPtr) {
-						_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
-						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
-					} else {
-						warning("Nothing free in _shootLvlObjectDataNextPtr");
-					}
-					_edx->xPos = ptr->xPos;
-					_edx->yPos = ptr->yPos;
-					_edx->flags1 &= ~0x30;
-					_edx->screenNum = ptr->screenNum;
-					_edx->anim = 7;
-					_edx->frame = 0;
-					_edx->bitmapBits = 0;
-					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
-					_edx->nextPtr = _lvlObjectsList0;
-					_lvlObjectsList0 = _edx;
+					addShootLvlObject(_edx, ptr);
 				}
 // 40DEEC
-				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				assert(_ecx == _edi);
-				LvlObject *_eax = _ecx->shootLvlObject;
-				if (_eax) {
-					if (!_eax->dataPtr) {
-						warning("lvlObject %p with NULL dataPtr", _eax);
-						break;
-					}
+				LvlObject *_eax = _edi->shootLvlObject;
+				if (_eax && _eax->dataPtr) {
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
 					_edx->type = 0;
 				}
@@ -3201,32 +3178,11 @@ void Game::setupSpecialPowers(LvlObject *ptr) {
 				if (!_edi->shootLvlObject) {
 					LvlObject *_edx = declareLvlObject(8, 3);
 					_edi->shootLvlObject = _edx;
-					_edx->dataPtr = _shootLvlObjectDataNextPtr;
-					if (_shootLvlObjectDataNextPtr) {
-						_shootLvlObjectDataNextPtr = _shootLvlObjectDataNextPtr->nextPtr;
-						memset(_edx->dataPtr, 0, sizeof(ShootLvlObjectData));
-					} else {
-						warning("Nothing free in _shootLvlObjectDataNextPtr");
-					}
-					_edx->xPos = ptr->xPos;
-					_edx->yPos = ptr->yPos;
-					_edx->flags1 &= ~0x30;
-					_edx->screenNum = ptr->screenNum;
-					_edx->anim = 7;
-					_edx->frame = 0;
-					_edx->bitmapBits = 0;
-					_edx->flags2 = (ptr->flags2 & ~0x2000) - 1;
-					_edx->nextPtr = _lvlObjectsList0;
-					_lvlObjectsList0 = _edx;
+					addShootLvlObject(_edx, ptr);
 				}
 // 40DF82
-				AndyLvlObjectData *_ecx = (AndyLvlObjectData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAndy);
-				LvlObject *_eax = _ecx->shootLvlObject;
-				if (_eax) {
-					if (!_eax->dataPtr) {
-						warning("lvlObject %p with NULL dataPtr", _eax);
-						break;
-					}
+				LvlObject *_eax = _edi->shootLvlObject;
+				if (_eax && _eax->dataPtr) {
 					ShootLvlObjectData *_edx = (ShootLvlObjectData *)getLvlObjectDataPtr(_eax, kObjectDataTypeShoot);
 					_edx->type = 4; // large power
 				}
@@ -3681,16 +3637,16 @@ uint8_t Game::lvlObjectCallbackCollideScreen(LvlObject *o) {
 		0x00, 0x00, 0x08, 0x00, 0x00, 0xF8, 0x08, 0xF8, 0x00, 0x00, 0xF8, 0x00, 0x00, 0xF8, 0xF8, 0xF8
 	};
 // 43E770
-	static const int offsets1[] = {
+	static const int16_t offsets1[] = {
 		0, 1, 1, 1, 0, -513, -513, -513, 0, 511, 511, 511, 0, -511, -511, -511, 0, 513, 513, 513, 0, -1, -1, -1, 0, -512, -512, -512, 0, 512, 512, 512
 	};
 // 43E7F0
-	static const int offsets2[] = {
+	static const int16_t offsets2[] = {
 		0, 1, 512, -1, 0, -1, 512, 1, 0, 1, -512, -1, 0, -1, -512, 1
 	};
 	uint8_t _bl, _cl = dat->type;
 	const uint8_t *var10;
-	const int *_esi;
+	const int16_t *_esi;
 	if (_cl == 4) {
 		_bl = _cl;
 		const uint8_t num = (o->flags1 >> 4) & 3;

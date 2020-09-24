@@ -244,6 +244,7 @@ struct Game {
 	void mixAudio(int16_t *buf, int len);
 	void resetShootLvlObjectDataTable();
 	void clearShootLvlObjectData(LvlObject *ptr);
+	void addShootLvlObject(LvlObject *_edx, LvlObject *ptr);
 	void setShakeScreen(int type, int counter);
 	void fadeScreenPalette();
 	void shakeScreen();
