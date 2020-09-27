@@ -1911,7 +1911,6 @@ int Game::mstTaskStopMonster1(Task *t, MonsterObject1 *m) {
 		const int yPosScreen = _res->_mstPointOffsets[_currentScreen].yOffset;
 		const int xPosObj = o->xPos + _res->_mstPointOffsets[o->screenNum].xOffset;
 		const int yPosObj = o->yPos + _res->_mstPointOffsets[o->screenNum].yOffset;
-		// this matches the original code but rect_intersects() could probably be used
 		if (xPosObj < xPosScreen || xPosObj + o->width - 1 > xPosScreen + 255 || yPosObj < yPosScreen || yPosObj + o->height - 1 > yPosScreen + 191) {
 			return mstTaskStopMonsterObject1(t);
 		}
@@ -3334,15 +3333,8 @@ void Game::updateTask(Task *t, int num, const uint8_t *codeData) {
 		return;
 	}
 	if (codeData) {
-		t = findFreeTask();
+		t = createTask(codeData);
 		if (t) {
-			resetTask(t, codeData);
-			t->prevPtr = 0;
-			t->nextPtr = _tasksList;
-			if (_tasksList) {
-				_tasksList->prevPtr = t;
-			}
-			_tasksList = t;
 			t->localVars[7] = num;
 		}
 	}
