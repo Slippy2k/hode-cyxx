@@ -1592,69 +1592,69 @@ int Game::clipLvlObjectsBoundingBoxHelper(LvlObject *o1, BoundingBox *box1, LvlO
 int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 	BoundingBox obj1, obj2;
 
-	obj1.x1 = o->xPos + _res->_screensBasePos[o->screenNum].u;
+	obj1.x1 = obj1.x2 = o->xPos + _res->_screensBasePos[o->screenNum].u;
 	obj1.y1 = obj1.y2 = o->yPos + _res->_screensBasePos[o->screenNum].v;
 
-	obj2.x1 = ptr->xPos + _res->_screensBasePos[ptr->screenNum].u;
+	obj2.x1 = obj2.x2 = ptr->xPos + _res->_screensBasePos[ptr->screenNum].u;
 	obj2.y1 = obj2.y2 = ptr->yPos + _res->_screensBasePos[ptr->screenNum].v;
 
 	switch (type - 17) {
 	case 1:
-		obj1.x2 = obj1.x1 + o->posTable[1].x;
+		obj1.x2 += o->posTable[1].x;
 		obj1.x1 += o->posTable[0].x;
 		obj1.y2 += o->posTable[1].y;
 		obj1.y1 += o->posTable[0].y;
-		obj2.x2 = obj2.x1 + ptr->width - 1;
+		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		return clipBoundingBox(&obj1, &obj2);
 	case 17:
-		obj1.x2 = obj1.x1 + o->posTable[1].x;
+		obj1.x2 += o->posTable[1].x;
 		obj1.x1 += o->posTable[0].x;
 		obj1.y2 += o->posTable[1].y;
 		obj1.y1 += o->posTable[0].y;
-		obj2.x2 = obj2.x1 + ptr->posTable[1].x;
+		obj2.x2 += ptr->posTable[1].x;
 		obj2.x1 += ptr->posTable[0].x;
 		obj2.y2 += ptr->posTable[1].y;
 		obj2.y1 += ptr->posTable[0].y;
 		return clipBoundingBox(&obj1, &obj2);
 	case 49:
-		obj1.x2 = obj1.x1 + o->posTable[1].x;
+		obj1.x2 += o->posTable[1].x;
 		obj1.x1 += o->posTable[0].x;
 		obj1.y2 += o->posTable[1].y;
 		obj1.y1 += o->posTable[0].y;
-		obj2.x2 = obj2.x1 + ptr->width - 1;
+		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		if (clipBoundingBox(&obj1, &obj2)) {
 			updateBoundingBoxClippingOffset(&obj1, &obj2, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 		break;
 	case 16:
-		obj1.x2 = obj1.x1 + o->width - 1;
+		obj1.x2 += o->width - 1;
 		obj1.y2 += o->height - 1;
 		obj2.y1 += ptr->posTable[0].y;
-		obj2.x2 = obj2.x1 + ptr->posTable[1].x;
+		obj2.x2 += ptr->posTable[1].x;
 		obj2.x1 += ptr->posTable[0].x;
 		obj2.y2 += ptr->posTable[1].y;
 		return clipBoundingBox(&obj1, &obj2);
 	case 0:
-		obj1.x2 = obj1.x1 + o->width - 1;
+		obj1.x2 += o->width - 1;
 		obj1.y2 += o->height - 1;
-		obj2.x2 = obj2.x1 + ptr->width - 1;
+		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		return clipBoundingBox(&obj1, &obj2);
 	case 48:
-		obj1.x2 = obj1.x1 + o->width - 1;
+		obj1.x2 += o->width - 1;
 		obj1.y2 += o->height - 1;
-		obj2.x2 = obj2.x1 + ptr->width - 1;
+		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		if (clipBoundingBox(&obj1, &obj2)) {
 			return updateBoundingBoxClippingOffset(&obj1, &obj2, _res->getLvlSpriteCoordPtr(ptr->levelData0x2988, ptr->currentSprite), (ptr->flags1 >> 4) & 3);
 		}
 		break;
 	case 19:
-		obj1.x2 = obj1.x1 + o->width - 1;
+		obj1.x2 += o->width - 1;
 		obj1.y2 += o->height - 1;
-		obj2.x2 = obj2.x1 + ptr->posTable[1].x;
+		obj2.x2 += ptr->posTable[1].x;
 		obj2.x1 += ptr->posTable[0].x;
 		obj2.y1 += ptr->posTable[0].y;
 		obj2.y2 += ptr->posTable[1].y;
@@ -1663,29 +1663,29 @@ int Game::clipLvlObjectsBoundingBox(LvlObject *o, LvlObject *ptr, int type) {
 		}
 		break;
 	case 3:
-		obj1.x2 = obj1.x1 + o->width - 1;
+		obj1.x2 += o->width - 1;
 		obj1.y2 += o->height - 1;
-		obj2.x2 = obj2.x1 + ptr->width - 1;
+		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		if (clipBoundingBox(&obj2, &obj1)) {
 			return updateBoundingBoxClippingOffset(&obj2, &obj1, _res->getLvlSpriteCoordPtr(o->levelData0x2988, o->currentSprite), (o->flags1 >> 4) & 3);
 		}
 		break;
 	case 51:
-		obj1.x2 = obj1.x1 + o->width - 1;
+		obj1.x2 += o->width - 1;
 		obj1.y2 += o->height - 1;
-		obj2.x2 = obj2.x1 + ptr->width - 1;
+		obj2.x2 += ptr->width - 1;
 		obj2.y2 += ptr->height - 1;
 		return clipLvlObjectsBoundingBoxHelper(o, &obj1, ptr, &obj2);
 	case 115:
 		if (o->width == 3) {
 			obj1.y2 += 7;
-			obj1.x2 = obj1.x1 + 7;
+			obj1.x2 += 7;
 		} else {
-			obj1.x2 = obj1.x1 + o->width - 1;
+			obj1.x2 += o->width - 1;
 			obj1.y2 += o->height - 1;
 		}
-		obj2.x2 = obj2.x1 + ptr->width - 9;
+		obj2.x2 += ptr->width - 9;
 		obj2.x1 += 4;
 		obj2.y2 += ptr->height - 13;
 		obj2.y1 += 6;
@@ -1716,7 +1716,7 @@ int Game::clipLvlObjectsSmall(LvlObject *o1, LvlObject *o2, int type) {
 
 int Game::restoreAndyCollidesLava() {
 	int ret = 0;
-	if (_lvlObjectsList1 && !_hideAndyObjectFlag && (_mstFlags & 0x80000000) == 0) {
+	if ((_cheats & kCheatLavaNoHit) == 0 && _lvlObjectsList1 && !_hideAndyObjectFlag && (_mstFlags & 0x80000000) == 0) {
 		AndyLvlObjectData *data = (AndyLvlObjectData *)getLvlObjectDataPtr(_andyObject, kObjectDataTypeAndy);
 		for (LvlObject *o = _lvlObjectsList1; o; o = o->nextPtr) {
 			if (o->spriteNum != 21 || o->screenNum != _res->_currentScreenResourceNum) {
@@ -3316,7 +3316,7 @@ int Game::lvlObjectType7Callback(LvlObject *ptr) {
 		dat->yPosObject = ptr->posTable[7].y + ptr->yPos;
 		ptr->xPos += dat->dxPos;
 		ptr->yPos += dat->dyPos;
-		if (!_hideAndyObjectFlag && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0 && (_cheats & kCheatSpectreFireballNoHit) == 0) {
+		if ((_cheats & kCheatSpectreFireballNoHit) == 0 && !_hideAndyObjectFlag && ptr->screenNum == _andyObject->screenNum && (_andyObject->flags0 & 0x1F) != 0xB && clipLvlObjectsBoundingBox(_andyObject, ptr, 68) && (_mstFlags & 0x80000000) == 0) {
 			dat->unk3 = 0x80;
 			dat->xPosShoot = _clipBoxOffsetX;
 			dat->yPosShoot = _clipBoxOffsetY;
