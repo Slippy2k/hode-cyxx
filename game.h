@@ -314,7 +314,6 @@ struct Game {
 	LvlObject *updateAnimatedLvlObjectType0(LvlObject *ptr);
 	LvlObject *updateAnimatedLvlObjectType1(LvlObject *ptr);
 	LvlObject *updateAnimatedLvlObjectType2(LvlObject *ptr);
-	LvlObject *updateAnimatedLvlObjectTypeDefault(LvlObject *ptr);
 	LvlObject *updateAnimatedLvlObject(LvlObject *o);
 	void updateAnimatedLvlObjectsLeftRightCurrentScreens();
 	void updatePlasmaCannonExplosionLvlObject(LvlObject *ptr);

@@ -81,8 +81,8 @@ struct Point16_t {
 
 struct AnimBackgroundData {
 	const uint8_t *currentSpriteData; // 0
-	uint8_t *nextSpriteData; // 4
-	uint8_t *otherSpriteData; // 8
+	const uint8_t *nextSpriteData; // 4
+	const uint8_t *otherSpriteData; // 8
 	uint16_t framesCount; // 12
 	uint16_t currentFrame; // 14
 };
@@ -320,22 +320,9 @@ struct AndyShootData {
 struct AndyMoveData {
 	int32_t xPos;
 	int32_t yPos;
-	uint16_t anim; // 8
-	uint16_t unkA;
-	uint16_t unkC;
-	uint16_t unkE;
-	uint8_t frame; // 0x10
-	uint8_t unk11;
-	uint16_t flags0;
+	uint16_t flags0; // 0x12
 	uint16_t flags1;
-	uint16_t unk16;
-	uint16_t unk18;
-	uint16_t unk1A;
-	const uint8_t *unk1C;
-	const uint8_t *framesData;
-	const uint8_t *unk24;
-	const uint8_t *unk28;
-}; // sizeof == 0x2C
+};
 
 struct MstBoundingBox {
 	int x1; // 0

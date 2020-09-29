@@ -1444,20 +1444,9 @@ void Game::setupAndyObjectMoveData(LvlObject *ptr) {
 	_andyMoveData.yPos = ptr->yPos;
 	_andyPosX = _res->_screensBasePos[ptr->screenNum].u + _andyMoveData.xPos;
 	_andyPosY = _res->_screensBasePos[ptr->screenNum].v + _andyMoveData.yPos;
-	_andyMoveData.anim = ptr->anim;
-	_andyMoveData.unkA = ptr->currentSprite;
-	_andyMoveData.frame = ptr->frame;
 	_andyMoveData.flags0 = ptr->flags0;
 	_andyMoveData.flags1 = ptr->flags1;
 	_andyMoveMask = (ptr->flags1 >> 4) & 3;
-	_andyMoveData.unk16 = ptr->width;
-	_andyMoveData.unk18 = ptr->height;
-	const LvlObjectData *dat = ptr->levelData0x2988;
-	_andyMoveData.unkC = dat->hotspotsCount;
-	_andyMoveData.unk1C = dat->animsInfoData;
-	_andyMoveData.framesData = dat->framesData;
-	_andyMoveData.unk24 = dat->movesData;
-	_andyMoveData.unk28 = dat->hotspotsData;
 	_andyLevelData0x288PosTablePtr = ptr->posTable;
 }
 

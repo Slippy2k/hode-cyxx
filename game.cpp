@@ -1108,7 +1108,7 @@ void Game::setupScreenLvlObjects(int num) {
 		switch (ptr->type) {
 		case 0: {
 				AnimBackgroundData *p = (AnimBackgroundData *)getLvlObjectDataPtr(ptr, kObjectDataTypeAnimBackgroundData);
-				uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->dataNum];
+				const uint8_t *data = _res->_resLvlScreenBackgroundDataTable[num].backgroundAnimationTable[ptr->dataNum];
 				if (!data) {
 					warning("No backgroundAnimationData num %d screen %d", ptr->dataNum, num);
 					break;
@@ -1185,7 +1185,6 @@ void Game::setupScreenLvlObjects(int num) {
 }
 
 void Game::resetDisplay() {
-//	_video_blitSrcPtr = _video_blitSrcPtr2;
 	_video->_displayShadowLayer = false;
 	_shakeScreenDuration = 0;
 	_levelRestartCounter = 0;
@@ -2102,8 +2101,7 @@ LvlObject *Game::updateAnimatedLvlObjectType0(LvlObject *ptr) {
 		}
 	}
 	int16_t soundNum = -1;
-	const int len = READ_LE_UINT16(data + 2);
-	const uint8_t *nextSpriteData = len + data + 2;
+	const uint8_t *nextSpriteData = READ_LE_UINT16(data + 2) + data + 2;
 	switch (ptr->objectUpdateType - 1) {
 	case 6:
 		_esi->currentSpriteData = _esi->nextSpriteData;
@@ -2310,10 +2308,6 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	return o;
 }
 
-LvlObject *Game::updateAnimatedLvlObjectTypeDefault(LvlObject *ptr) {
-	return ptr->nextPtr;
-}
-
 LvlObject *Game::updateAnimatedLvlObject(LvlObject *o) {
 	switch (o->type) {
 	case 0:
@@ -2330,7 +2324,7 @@ LvlObject *Game::updateAnimatedLvlObject(LvlObject *o) {
 	case 5:
 	case 6:
 	case 7:
-		o = updateAnimatedLvlObjectTypeDefault(o);
+		o = o->nextPtr;
 		break;
 	default:
 		error("updateAnimatedLvlObject unhandled type %d", o->type);
