@@ -2230,7 +2230,7 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 	LvlObject *next, *o;
 
 	o = next = ptr->nextPtr;
-	if ((ptr->spriteNum > 15 && ptr->dataPtr == 0) || ptr->levelData0x2988 == 0) {
+	if ((ptr->spriteNum > 15 && !ptr->dataPtr) || !ptr->levelData0x2988) {
 		if (ptr->childPtr) {
 			o = ptr->childPtr->nextPtr;
 		}
@@ -2310,13 +2310,13 @@ LvlObject *Game::updateAnimatedLvlObjectType2(LvlObject *ptr) {
 
 LvlObject *Game::updateAnimatedLvlObject(LvlObject *o) {
 	switch (o->type) {
-	case 0:
+	case 0: // background animation
 		o = updateAnimatedLvlObjectType0(o);
 		break;
-	case 1:
+	case 1: // background sound
 		o = updateAnimatedLvlObjectType1(o);
 		break;
-	case 2:
+	case 2: // sprite / monster
 		o = updateAnimatedLvlObjectType2(o);
 		break;
 	case 3:
