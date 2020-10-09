@@ -780,19 +780,19 @@ void Game::setupPlasmaCannonPoints(LvlObject *ptr) {
 			const int num = ((ptr->flags0 >> 5) & 7) - 3;
 			switch (num) {
 			case 0:
-				_plasmaCannonPosY[128] -= 176; // 192 - 16
+				_plasmaCannonPosY[128] -= Video::H - 16;
 				_plasmaCannonDirection = 3;
 				break;
 			case 1:
-				_plasmaCannonPosY[128] += 176;
+				_plasmaCannonPosY[128] += Video::H - 16;
 				_plasmaCannonDirection = 6;
 				break;
 			case 3:
-				_plasmaCannonPosY[128] -= 176;
+				_plasmaCannonPosY[128] -= Video::H - 16;
 				_plasmaCannonDirection = 1;
 				break;
 			case 4:
-				_plasmaCannonPosY[128] += 176;
+				_plasmaCannonPosY[128] += Video::H - 16;
 				_plasmaCannonDirection = 4;
 				break;
 			default:
@@ -802,11 +802,11 @@ void Game::setupPlasmaCannonPoints(LvlObject *ptr) {
 			if (ptr->flags1 & 0x10) {
 				if (_plasmaCannonDirection != 1) {
 					_plasmaCannonDirection = (_plasmaCannonDirection & ~2) | 8;
-					_plasmaCannonPosX[128] -= 264; // 256 + 8
+					_plasmaCannonPosX[128] -= Video::W + 8;
 				}
 			} else {
 				if (_plasmaCannonDirection != 1) {
-					_plasmaCannonPosX[128] += 264;
+					_plasmaCannonPosX[128] += Video::W + 8;
 				}
 			}
 			if (_plasmaCannonPrevDirection != _plasmaCannonDirection) {
@@ -2008,8 +2008,6 @@ void Game::mixAudio(int16_t *buf, int len) {
 
 	const int kStereoSamples = _res->_isPsx ? 1792 * 2 : 1764 * 2; // stereo
 
-	static int count = 0;
-
 	// flush samples from previous run
 	if (_snd_bufferSize > 0) {
 		const int count = len < _snd_bufferSize ? len : _snd_bufferSize;
@@ -2019,6 +2017,8 @@ void Game::mixAudio(int16_t *buf, int len) {
 		_snd_bufferOffset += count;
 		_snd_bufferSize -= count;
 	}
+
+	static int count = 0;
 
 	while (len > 0) {
 		// this enqueues 1764*2 bytes for mono samples and 3528*2 bytes for stereo
@@ -2560,9 +2560,6 @@ void Game::levelMainLoop() {
 		if (_andyObject->spriteNum == 0 && _plasmaExplosionObject && _plasmaExplosionObject->nextPtr != 0) {
 			updatePlasmaCannonExplosionLvlObject(_plasmaExplosionObject->nextPtr);
 		}
-	}
-	if (_res->_sssHdr.infosDataCount != 0) {
-		// sound thread signaling
 	}
 	if (_video->_paletteChanged) {
 		_video->_paletteChanged = false;
