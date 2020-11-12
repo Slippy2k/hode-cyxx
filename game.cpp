@@ -4425,7 +4425,7 @@ int Game::updateSwitchesLar_checkAndy(int num, uint8_t *p, BoundingBox *b1, Boun
 int Game::updateSwitchesLar_toggle(bool flag, uint8_t dataNum, int screenNum, int switchNum, int anim, const BoundingBox *box) {
 	uint8_t _al = (_andyObject->flags0 >> 5) & 7;
 	uint8_t _cl = (_andyObject->flags0 & 0x1F);
-	int ret = 0; // _bl
+	int ret = 0;
 	if ((dataNum & 0x80) == 0) {
 		const int dy = box->y2 - box->y1;
 		const int dx = box->x2 - box->x1;

@@ -21,6 +21,7 @@ GLOBAL test_0040D7F5
 GLOBAL test_0042B67F
 GLOBAL test_mul0x4EC4EC4F
 GLOBAL test_00421343
+GLOBAL test_0042AA10
 
 SECTION .text
 
@@ -404,5 +405,35 @@ test_00421343:
       xor eax, edx
       sub eax, edx
 
+  pop ebp
+  ret
+
+test_0042AA10:
+
+  push ebp
+  mov ebp, esp
+  push ecx
+  push edi
+
+      mov ecx, [ebp + arg0]
+
+      mov     eax, ecx
+      cdq
+      and     edx, 15
+      add     eax, edx
+      mov     edi, eax
+      mov     eax, ecx
+      cdq
+      and     edx, 7
+      add     eax, edx
+      sar     eax, 3          ; signed / 8
+      sar     edi, 4          ; signed / 16
+      add     eax, ecx
+      lea     ecx, [eax+edi]
+
+      mov eax, ecx
+
+  pop edi
+  pop ecx
   pop ebp
   ret
