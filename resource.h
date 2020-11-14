@@ -217,7 +217,7 @@ struct MstAttackBox { // u47
 }; // sizeof == 8
 
 struct MstMonsterAreaAction {
-	uint32_t unk0; // 0x0, indexes _mstMonsterInfos
+	uint32_t indexMonsterInfo; // 0x0, indexes _mstMonsterInfos
 	uint32_t indexUnk51; // 0x4
 	int32_t xPos; // 0x8
 	int32_t yPos; // 0xC
@@ -236,8 +236,8 @@ struct MstMonsterArea {
 }; // sizeof == 12
 
 struct MstMonsterAction { // u48
-	uint16_t unk0;
-	uint16_t unk2;
+	uint16_t xRange;
+	uint16_t yRange;
 	uint8_t unk4;
 	uint8_t direction;
 	uint8_t unk6;

@@ -2510,7 +2510,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 // 418530
 		int var20 = -1;
 		int indexUnk51;
-		if ((m->flagsA5 & 8) != 0 && m->action && m->action->indexUnk51 != kNone && m->monsterInfos == &_res->_mstMonsterInfos[m->action->unk0 * 948]) {
+		if ((m->flagsA5 & 8) != 0 && m->action && m->action->indexUnk51 != kNone && m->monsterInfos == &_res->_mstMonsterInfos[m->action->indexMonsterInfo * kMonsterInfoDataSize]) {
 			indexUnk51 = m->action->indexUnk51;
 		} else {
 			indexUnk51 = _esi->indexUnk51;
@@ -5355,10 +5355,10 @@ l1:
 			}
 			debug(kDebug_MONSTER, "mstHasMonsterInRange (unk0!=0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
-				uint8_t var4D = _res->_mstMonsterInfos[m12u4->unk0 * kMonsterInfoDataSize + 946] & 2;
+				uint8_t var4D = _res->_mstMonsterInfos[m12u4->indexMonsterInfo * kMonsterInfoDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DC19
-					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
+					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->indexMonsterInfo];
 					_ebx += _mstAndyLevelPosX;
 					const int xLevelPos = _ebx;
 					_esi += _mstAndyLevelPosY;
@@ -5375,7 +5375,7 @@ l1:
 							int _eax = ABS(_ebp);
 							int _esi = xLevelPos - m->xMstPos;
 							int _ecx = ABS(_esi);
-							if (_ecx > m48->unk0 || _eax > m48->unk2) {
+							if (_ecx > m48->xRange || _eax > m48->yRange) {
 								continue;
 							}
 							if ((var8 || var4) && m->monsterInfos[944] != 10 && m->monsterInfos[944] != 16 && m->monsterInfos[944] != 9) {
@@ -5445,16 +5445,17 @@ l2:
 			int _ebx = var4;
 			int var8 = m12u4->yPos;
 			int _esi = var8;
+
 			int _eax = _edx ^ flag;
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
 			debug(kDebug_MONSTER, "mstHasMonsterInRange (unk0==0) count:%d %d %d [%d,%d] screen:%d", m12->count, _ebx, _esi, _mstPosXmin, _mstPosXmax, m12u4->screenNum);
 			if (_ebx >= _mstPosXmin && _ebx <= _mstPosXmax) {
-				uint8_t var4D = _res->_mstMonsterInfos[m12u4->unk0 * kMonsterInfoDataSize + 946] & 2;
+				uint8_t var4D = _res->_mstMonsterInfos[m12u4->indexMonsterInfo * kMonsterInfoDataSize + 946] & 2;
 				if (var4D == 0 || (_esi >= _mstPosYmin && _esi <= _mstPosYmax)) {
 // 41DF10
-					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->unk0];
+					MstCollision *varC = &_mstCollisionTable[_eax][m12u4->indexMonsterInfo];
 					_ebx += _mstAndyLevelPosX;
 					const int xLevelPos = _ebx;
 					_esi += _mstAndyLevelPosY;
@@ -5470,7 +5471,7 @@ l2:
 							int _eax = ABS(_ebp);
 							int _esi = xLevelPos - m->xMstPos;
 							int _ecx = ABS(_esi);
-							if (_ecx > m48->unk0 || _eax > m48->unk2) {
+							if (_ecx > m48->xRange || _eax > m48->yRange) {
 								continue;
 							}
 							if ((var8 || var4) && m->monsterInfos[944] != 10 && m->monsterInfos[944] != 16 && m->monsterInfos[944] != 9) {

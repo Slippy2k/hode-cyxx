@@ -1600,8 +1600,8 @@ void Resource::loadMstData(File *fp) {
 	_mstMonsterActionData.allocate(_mstHdr.monsterActionDataCount);
 	for (int i = 0; i < _mstHdr.monsterActionDataCount; ++i) {
 		MstMonsterAction *m = &_mstMonsterActionData[i];
-		m->unk0 = fp->readUint16();
-		m->unk2 = fp->readUint16();
+		m->xRange = fp->readUint16();
+		m->yRange = fp->readUint16();
 		m->unk4 = fp->readByte();
 		m->direction = fp->readByte();
 		m->unk6 = fp->readByte();
@@ -1649,7 +1649,7 @@ void Resource::loadMstData(File *fp) {
 			for (uint32_t k = 0; k < m12[j].count; ++k) {
 				uint8_t data[28];
 				fp->read(data, sizeof(data));
-				m12[j].data[k].unk0 = READ_LE_UINT32(data);
+				m12[j].data[k].indexMonsterInfo = READ_LE_UINT32(data);
 				m12[j].data[k].indexUnk51 = READ_LE_UINT32(data + 0x4);
 				m12[j].data[k].xPos = READ_LE_UINT32(data + 0x8);
 				m12[j].data[k].yPos = READ_LE_UINT32(data + 0xC);
