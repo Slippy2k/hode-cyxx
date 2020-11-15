@@ -6385,7 +6385,7 @@ void Game::mstMonster1SetGoalHorizontal(MonsterObject1 *m) {
 }
 
 void Game::mstResetCollisionTable() {
-	const int count = MIN(_res->_mstHdr.infoMonster1Count, 32);
+	const int count = MIN<int>(_res->_mstHdr.infoMonster1Count, kMaxMonsterObjects1);
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < count; ++j) {
 			_mstCollisionTable[i][j].count = 0;
@@ -6417,7 +6417,7 @@ void Game::mstResetCollisionTable() {
 				const uint32_t offset = m->monsterInfos - _res->_mstMonsterInfos;
 				assert(offset % kMonsterInfoDataSize == 0);
 				const uint32_t num = offset / kMonsterInfoDataSize;
-				assert(num < 32);
+				assert(num < kMaxMonsterObjects1);
 				const int dir = (m->xMstPos < _mstAndyLevelPosX) ? 1 : 0;
 				const int count = _mstCollisionTable[dir][num].count;
 				_mstCollisionTable[dir][num].monster1[count] = m;
@@ -6954,10 +6954,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 
 		o = addLvlObject((_cl >> 7) & 1, x1, y1, objScreen, (_cl & 0x7F), anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
-			mo->monster2Info = 0;
-			if (mo->o) {
-				mo->o->dataPtr = 0;
-			}
+			mstMonster2ResetData(mo);
 			return;
 		}
 		mo->o = o;
@@ -6972,10 +6969,7 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 	if (mo) {
 		Task *t = findFreeTask();
 		if (!t) {
-			mo->monster2Info = 0;
-			if (mo->o) {
-				mo->o->dataPtr = 0;
-			}
+			mstMonster2ResetData(mo);
 			removeLvlObject2(o);
 			return;
 		}

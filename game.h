@@ -220,7 +220,7 @@ struct Game {
 	int _mstBoundingBoxesCount;
 	MstBoundingBox _mstBoundingBoxesTable[kMaxBoundingBoxes];
 	Task *_mstCurrentTask;
-	MstCollision _mstCollisionTable[2][32]; // 0:facingRight, 1:facingLeft
+	MstCollision _mstCollisionTable[2][kMaxMonsterObjects1]; // 0:facingRight, 1:facingLeft
 	int _wormHoleSpritesCount;
 	WormHoleSprite _wormHoleSpritesTable[6];
 
