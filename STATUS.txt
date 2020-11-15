@@ -20,6 +20,12 @@ level 8 'lar2' - to check (--checkpoint 5)
 
 level 9 'dark' - completable
 
+---
+
+But I would still suggest you to take a look at the video, because I still find HODE harder in the sense that way more enemies come out at the same time, even in EASY mode.
+https://youtu.be/yIU4Qf2xxRk?t=451
+
+---
 
 
 https://finsterhund.tumblr.com/post/618142082844999680/heres-a-compilation-of-all-of-the-bugserrors-in/

@@ -5330,26 +5330,21 @@ bool Game::mstHasMonsterInRange(const MstMonsterAction *m48, uint8_t flag) {
 
 	int var24 = 0;
 	//int var28 = 0;
-	int _edi = 0;
 	for (int i = 0; i < m48->areaCount; ++i) {
 		const MstMonsterArea *m12 = &m48->area[i];
 		assert(m12->count == 1);
 		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 != 0) {
-			uint8_t var1C = m12u4->unk18;
-			if (var1C != 2) {
-				_edi = var1C;
-			}
+			const uint8_t var1C = m12u4->unk18;
+			int var4C = (var1C == 2) ? 0 : var1C; // _edi
 // 41DB81
 l1:
-			int var4C = _edi;
-
 			int var8 = m12u4->xPos;
 			int _ebx = var8; // xPos
 			int var4 = m12u4->yPos;
 			int _esi = var4; // yPos
 
-			int _eax = _edi ^ flag;
+			int _eax = var4C ^ flag;
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
@@ -5422,23 +5417,21 @@ l1:
 			if (var1C != 2 || var4C == 1) {
 				return false;
 			}
-			_edi = 1;
-			var4C = _edi;
+			var4C = 1; // _edi
 			goto l1; // goto 41DB85
 		}
 // 41DE1E
 		//++var28;
 	}
 	//var28 = _edi;
-	for (int i = _edi; i < m48->areaCount; ++i) {
+	for (int i = 0; i < m48->areaCount; ++i) {
 		MstMonsterArea *m12 = &m48->area[i];
 		assert(m12->count == 1);
 		MstMonsterAreaAction *m12u4 = m12->data;
 		if (m12->unk0 == 0) {
-			uint8_t var1C = m12u4->unk18;
+			const uint8_t var1C = m12u4->unk18;
 			m12u4->monster1Index = 0xFF;
-			int var4C = (var1C == 2) ? 0 : var1C;
-			int _edx = var4C;
+			int var4C = (var1C == 2) ? 0 : var1C; // _edx
 // 41DE98
 l2:
 			int var4 = m12u4->xPos;
@@ -5446,7 +5439,7 @@ l2:
 			int var8 = m12u4->yPos;
 			int _esi = var8;
 
-			int _eax = _edx ^ flag;
+			int _eax = var4C ^ flag;
 			if (_eax == 1) {
 				_ebx = -_ebx;
 			}
@@ -5515,11 +5508,11 @@ l2:
 				}
 			}
 // 41E09E
-			if (var1C == 2 && var4C != 1) {
-				_edx = 1;
-				var4C = 1;
-				goto l2; // goto 41DE98;
+			if (var1C != 2 || var4C == 1) {
+				continue;
 			}
+			var4C = 1; // _edx
+			goto l2; // goto 41DE98;
 // 41E0E4
 		}
 		//++var28;
