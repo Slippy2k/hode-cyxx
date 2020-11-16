@@ -2120,7 +2120,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	LvlObject *o = m->o16;
 	const uint8_t _al = _res->_mstActionDirectionData[num].unk0;
 	const uint8_t _bl = _res->_mstActionDirectionData[num].unk2;
-	const uint8_t *var4 = m->monsterInfos + _al * 28;
+	const uint8_t *ptr = m->monsterInfos + _al * 28;
 	const uint8_t _dl = (o->flags1 >> 4) & 3;
 	uint8_t var8 = ((_dl & 1) != 0) ? 8 : 2;
 	if (_dl & 2) {
@@ -2173,7 +2173,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 		}
 	}
 // 40E5C0
-	directionKeyMask &= var4[2];
+	directionKeyMask &= ptr[2];
 	if ((_bl & 0xE0) == 0x40) {
 		directionKeyMask ^= kDirectionKeyMaskHorizontal;
 	}
@@ -5196,6 +5196,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 			m->targetLevelPos_x = -1;
 			m->targetLevelPos_y = -1;
 			mstBoundingBoxClear(m, 1);
+			p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 			if (p[0xE] != 0) {
 				t->flags |= 0x80;
 				mstTaskResetMonster1WalkPath(t);
@@ -6602,6 +6603,7 @@ int Game::mstTaskInitMonster1Type1(Task *t) {
 				m->targetLevelPos_x = -1;
 				m->targetLevelPos_y = -1;
 				mstBoundingBoxClear(m, 1);
+				p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 				if (p[0xE] != 0) {
 					t->flags |= 0x80;
 					mstTaskResetMonster1WalkPath(t);
@@ -6780,6 +6782,7 @@ int Game::mstTaskInitMonster1Type2(Task *t, int flag) {
 					m->targetLevelPos_x = -1;
 					m->targetLevelPos_y = -1;
 					mstBoundingBoxClear(m, 1);
+					p = _res->_mstMonsterInfos + m->m49Unk1->offsetMonsterInfo;
 					if (p[0xE] != 0) {
 						t->flags |= 0x80;
 						mstTaskResetMonster1WalkPath(t);
