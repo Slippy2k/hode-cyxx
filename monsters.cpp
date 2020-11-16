@@ -5594,6 +5594,7 @@ void Game::mstOp54() {
 		shuffleMstMonsterActionIndex(m43);
 	} else {
 // 41E3CA
+		uint8_t _mstOp54Table[32];
 		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
 		bool var4 = false;
 		uint32_t i = 0;
@@ -5624,9 +5625,7 @@ void Game::mstOp54() {
 				}
 			}
 			_mstOp54Counter = 0;
-			if (m43->dataCount != 0) {
-				shuffleMstMonsterActionIndex(m43);
-			}
+			shuffleMstMonsterActionIndex(m43);
 		}
 	}
 }
@@ -6949,10 +6948,10 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 
 		mo->flags24 = 0;
 
-		uint8_t _cl  = mo->monster2Info->type;
+		uint8_t type  = mo->monster2Info->type;
 		uint16_t anim = mo->monster2Info->anim;
 
-		o = addLvlObject((_cl >> 7) & 1, x1, y1, objScreen, (_cl & 0x7F), anim, o_flags1, o_flags2, 0, 0);
+		o = addLvlObject((type >> 7) & 1, x1, y1, objScreen, (type & 0x7F), anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
 			mstMonster2ResetData(mo);
 			return;

@@ -177,7 +177,6 @@ struct Game {
 	Task *_currentTask;
 	int _mstOp54Counter;
 	int _mstOp56Counter;
-	uint8_t _mstOp54Table[32];
 	bool _mstDisabled;
 	LvlObject _declaredLvlObjectsList[kMaxLvlObjects];
 	LvlObject *_declaredLvlObjectsNextPtr; // pointer to the next free entry
