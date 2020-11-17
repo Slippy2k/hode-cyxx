@@ -454,7 +454,7 @@ void PafPlayer::mix(int16_t *buf, int samples) {
 		_audioQueueTail = 0;
 	}
 	if (samples > 0) {
-		warning("PafPlayer::mix() soundQueue underrun %d", samples);
+		debug(kDebug_PAF, "audioQueue underrun %d", samples);
 	}
 }
 
