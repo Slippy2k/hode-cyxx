@@ -240,12 +240,18 @@ int Game::mstTaskStopMonsterObject1(Task *t) {
 	}
 	MonsterObject1 *m = t->monster1;
 
-	// bugfix: original code meant to check bit 3 directly ?
+	// bugfix: original code likely meant to check bit 3 directly
+	// eg. the function should return if bit 3 is not set
 
-	// const uint8_t r = (m->flagsA5 == 0) ? 1 : 0;
-	// if ((r & 8) != 0) {
-	//   return 0;
-	// }
+	//   mov   dl, [esi+MonsterObject1.flagsA5]
+	//   test  dl, dl
+	//   setz  al
+	//   test  al, 8
+	//   jnz   short return_0
+
+	if ((m->flagsA5 & 8) == 0) {
+		warning("Unexpected flags 0x%x for stopMonsterObject1", m->flagsA5);
+	}
 
 	const MstMonsterAreaAction *m48 = m->action;
 	if (!m48) {
@@ -2414,7 +2420,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			t->child->codeData = 0;
 			t->child = 0;
 		}
-		if ((m->flagsA5 & 8) != 0 && m->action && _mstActionNum != -1) {
+		if (_mstActionNum != -1 && (m->flagsA5 & 8) != 0 && m->action) {
 			mstTaskStopMonsterObject1(_mstCurrentTask);
 			return 0;
 		}
@@ -3112,10 +3118,8 @@ void Game::mstRemoveMonsterObject2(Task *t, Task **tasksList) {
 
 void Game::mstRemoveMonsterObject1(Task *t, Task **tasksList) {
 	MonsterObject1 *m = t->monster1;
-	if (_mstActionNum != -1) {
-		if ((m->flagsA5 & 8) != 0 && m->action) {
-			mstMonster1ClearChasingMonster(m);
-		}
+	if (_mstActionNum != -1 && (m->flagsA5 & 8) != 0 && m->action) {
+		mstMonster1ClearChasingMonster(m);
 	}
 	if (m->monsterInfos[946] & 4) {
 		mstBoundingBoxClear(m, 0);
@@ -5326,8 +5330,8 @@ bool Game::mstHasMonsterInRange(const MstMonsterAction *m48, uint8_t flag) {
 		}
 	}
 
-	uint8_t _op54Data[kMaxMonsterObjects1];
-	memset(_op54Data, 0, sizeof(_op54Data));
+	bool flagTable[kMaxMonsterObjects1];
+	memset(flagTable, 0, sizeof(flagTable));
 
 	int var24 = 0;
 	//int var28 = 0;
@@ -5366,7 +5370,7 @@ l1:
 					//MstCollision *var20 = varC;
 					for (int j = 0; j < var10; ++j) {
 						MonsterObject1 *m = varC->monster1[j];
-						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
+						if (!flagTable[m->monster1Index] && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
 							int _ebp = yLevelPos - m->yMstPos;
 							int _eax = ABS(_ebp);
 							int _esi = xLevelPos - m->xMstPos;
@@ -5407,7 +5411,7 @@ l1:
 // 41DDEE
 						const uint8_t num = varC->monster1[var34]->monster1Index;
 						m12u4->monster1Index = num;
-						_op54Data[num] = 1;
+						flagTable[num] = true;
 						debug(kDebug_MONSTER, "monster %d in range", num);
 						++var24;
 						continue;
@@ -5460,7 +5464,7 @@ l2:
 					int var10 = varC->count;
 					for (int j = 0; j < var10; ++j) {
 						MonsterObject1 *m = varC->monster1[j];
-						if (_op54Data[m->monster1Index] == 0 && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
+						if (!flagTable[m->monster1Index] && (m12u4->screenNum < 0 || m->o16->screenNum == m12u4->screenNum)) {
 							int _ebp = yLevelPos - m->yMstPos;
 							int _eax = ABS(_ebp);
 							int _esi = xLevelPos - m->xMstPos;
@@ -5501,7 +5505,7 @@ l2:
 // 41E0BA
 						const uint8_t num = varC->monster1[var34]->monster1Index;
 						m12u4->monster1Index = num;
-						_op54Data[num] = 1;
+						flagTable[num] = true;
 						debug(kDebug_MONSTER, "monster %d in range", num);
 						++var24;
 						continue;
@@ -5595,16 +5599,17 @@ void Game::mstOp54() {
 		shuffleMstMonsterActionIndex(m43);
 	} else {
 // 41E3CA
-		uint8_t _mstOp54Table[32];
-		memset(_mstOp54Table, 0, sizeof(_mstOp54Table));
-		bool var4 = false;
+		bool flagTable[kMaxMonsterObjects1];
+		memset(flagTable, 0, sizeof(flagTable));
+
+		bool found = false;
 		uint32_t i = 0;
 		for (; i < m43->dataCount; ++i) {
 			uint8_t num = m43->data[i];
 			if ((num & 0x80) == 0) {
-				var4 = true;
-				if (_mstOp54Table[num] == 0) {
-					_mstOp54Table[num] = 1;
+				found = true;
+				if (!flagTable[num]) {
+					flagTable[num] = true;
 					const uint32_t indexUnk48 = m43->indexUnk48[num];
 					MstMonsterAction *m48 = &_res->_mstMonsterActionData[indexUnk48];
 					if (mstUpdateInRange(m48)) {
@@ -5619,7 +5624,7 @@ void Game::mstOp54() {
 			m43->data[i] |= 0x80;
 		} else {
 // 41E4AC
-			if (var4) {
+			if (found) {
 				++_mstOp54Counter;
 				if (_mstOp54Counter <= 16) {
 					return;
