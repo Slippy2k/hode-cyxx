@@ -1700,7 +1700,7 @@ void Resource::loadMstData(File *fp) {
 			_mstMovingBoundsData[i].data1[j].unkF = fp->readByte();
 			const uint32_t num = _mstMovingBoundsData[i].data1[j].unk4;
 			assert(num < 32);
-			_mstMovingBoundsData[i].data1[j].offsetMonsterInfo = start * kMonsterInfoDataSize + num * 28;
+			_mstMovingBoundsData[i].data1[j].offsetMonsterInfo = start * kMonsterInfoDataSize + num * kMonsterInfoSize;
 			bytesRead += 16;
 		}
 		if (_mstMovingBoundsData[i].indexDataCount != 0) {
@@ -1723,7 +1723,7 @@ void Resource::loadMstData(File *fp) {
 		for (uint32_t j = 0; j < _mstShootData[i].count; ++j) {
 			_mstShootData[i].data[j].codeData = fp->readUint32();
 			_mstShootData[i].data[j].unk4 = fp->readUint32();
-			_mstShootData[i].data[j].unk8 = fp->readUint32();
+			_mstShootData[i].data[j].dirMask = fp->readUint32();
 			_mstShootData[i].data[j].xPos = fp->readUint32();
 			_mstShootData[i].data[j].yPos = fp->readUint32();
 			_mstShootData[i].data[j].width = fp->readUint32();

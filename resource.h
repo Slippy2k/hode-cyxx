@@ -278,7 +278,7 @@ struct MstMovingBounds { // u49
 struct MstShootAction { // u50u1
 	uint32_t codeData;
 	uint32_t unk4;
-	uint32_t unk8;
+	uint32_t dirMask;
 	uint32_t xPos; // C
 	uint32_t yPos; // 10
 	uint32_t width; // 14

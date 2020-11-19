@@ -665,7 +665,7 @@ void Game::mstTaskUpdateScreenPosition(Task *t) {
 
 	const uint8_t *ptr = m->monsterInfos;
 	if (ptr[946] & 4) {
-		const uint8_t *ptr1 = ptr + (o->flags0 & 0xFF) * 28; // _eax
+		const uint8_t *ptr1 = ptr + (o->flags0 & 0xFF) * kMonsterInfoSize; // _eax
 		if (ptr1[0xE] != 0) {
 			_mstTemp_x1 = m->xMstPos + (int8_t)ptr1[0xC];
 			_mstTemp_y1 = m->yMstPos + (int8_t)ptr1[0xD];
@@ -1299,7 +1299,7 @@ void Game::mstLvlObjectSetActionDirection(LvlObject *o, const uint8_t *ptr, uint
 			}
 			break;
 		case 224:
-			o->directionKeyMask |= m->unkF8;
+			o->directionKeyMask |= m->goalDirectionKeyMask;
 			break;
 		default:
 			o->directionKeyMask |= dirMask2;
@@ -2126,7 +2126,7 @@ bool Game::mstTestActionDirection(MonsterObject1 *m, int num) {
 	LvlObject *o = m->o16;
 	const uint8_t _al = _res->_mstActionDirectionData[num].unk0;
 	const uint8_t _bl = _res->_mstActionDirectionData[num].unk2;
-	const uint8_t *ptr = m->monsterInfos + _al * 28;
+	const uint8_t *ptr = m->monsterInfos + _al * kMonsterInfoSize;
 	const uint8_t _dl = (o->flags1 >> 4) & 3;
 	uint8_t var8 = ((_dl & 1) != 0) ? 8 : 2;
 	if (_dl & 2) {
@@ -2384,7 +2384,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 	MonsterObject1 *_mstCurrentMonster1 = m;
 	LvlObject *o = m->o16;
 	const int num = o->flags0 & 0xFF;
-	const uint8_t *ptr = m->monsterInfos + num * 28; // _ebx
+	const uint8_t *ptr = m->monsterInfos + num * kMonsterInfoSize; // _ebx
 	int8_t a = ptr[6];
 	if (a != 0) {
 		const int num = CLIP(m->lut4Index + a, 0, 17);
@@ -2611,7 +2611,7 @@ int Game::mstUpdateTaskMonsterObject1(Task *t) {
 			const uint32_t indexUnk50Unk1 = var18->indexUnk50Unk1[_ebx * 9 + m->shootActionIndex];
 			MstShootAction *m50Unk1 = &_res->_mstShootData[var18->indexUnk50].data[indexUnk50Unk1];
 			mstTaskAttack(_mstCurrentTask, m50Unk1->codeData, 0x40);
-			_mstCurrentMonster1->unkF8 = m50Unk1->unk8;
+			_mstCurrentMonster1->goalDirectionKeyMask = m50Unk1->dirMask;
 			_mstCurrentMonster1->shootSource = dir;
 			_mstCurrentMonster1->shootDirection = var14->directionMask;
 			_mstCurrentMonster1->directionKeyMask = _andyObject->directionKeyMask;
@@ -3172,7 +3172,7 @@ int Game::mstTaskSetActionDirection(Task *t, int num, int delay) {
 	LvlObject *o = m->o16;
 	uint8_t var4 = _res->_mstActionDirectionData[num].unk0;
 	uint8_t var8 = _res->_mstActionDirectionData[num].unk2;
-	const uint8_t *p = m->monsterInfos + var4 * 28;
+	const uint8_t *p = m->monsterInfos + var4 * kMonsterInfoSize;
 	uint8_t _al = (o->flags1 >> 4) & 3;
 	uint8_t _cl = ((_al & 1) != 0) ? 8 : 2;
 	if (_al & 2) {
@@ -5048,7 +5048,7 @@ int Game::mstOp49_setMovingBounds(int a, int b, int c, int d, int screen, Task *
 		}
 		break;
 	case 0: { // 0xFC
-			const uint8_t _al = m->unkF8;
+			const uint8_t _al = m->goalDirectionKeyMask;
 			if (_al & 8) {
 				m->goalDistance_x1 = -b;
 				m->goalDistance_x2 = -a;
@@ -5299,7 +5299,7 @@ void Game::mstOp52() {
 				assert(m->task->monster1 == m);
 				Task *t = m->task;
 				const int num = m->o16->flags0 & 0xFF;
-				if (m->monsterInfos[num * 28] != 0) {
+				if (m->monsterInfos[num * kMonsterInfoSize] != 0) {
 					if (t->run != &Game::mstTask_monsterWait1 && t->run != &Game::mstTask_monsterWait4 && t->run != &Game::mstTask_monsterWait2 && t->run != &Game::mstTask_monsterWait3 && t->run != &Game::mstTask_monsterWait5 && t->run != &Game::mstTask_monsterWait6 && t->run != &Game::mstTask_monsterWait7 && t->run != &Game::mstTask_monsterWait8 && t->run != &Game::mstTask_monsterWait9 && t->run != &Game::mstTask_monsterWait10) {
 						m->flagsA5 = (m->flagsA5 & ~0xF) | 6;
 						mstTaskInitMonster1Type2(m->task, 1);
@@ -6407,7 +6407,7 @@ void Game::mstResetCollisionTable() {
 				continue;
 			}
 			const int num = m->o16->flags0 & 0xFF;
-			if (m->monsterInfos[num * 28] != 0) {
+			if (m->monsterInfos[num * kMonsterInfoSize] != 0) {
 				continue;
 			}
 			if (m->task->run == &Game::mstTask_monsterWait4) {
@@ -6956,9 +6956,8 @@ void Game::mstOp67_addMonster(Task *currentTask, int x1, int x2, int y1, int y2,
 
 		mo->flags24 = 0;
 
-		uint8_t type  = mo->monster2Info->type;
-		uint16_t anim = mo->monster2Info->anim;
-
+		const uint8_t type  = mo->monster2Info->type;
+		const uint16_t anim = mo->monster2Info->anim;
 		o = addLvlObject((type >> 7) & 1, x1, y1, objScreen, (type & 0x7F), anim, o_flags1, o_flags2, 0, 0);
 		if (!o) {
 			mstMonster2ResetData(mo);
@@ -7309,7 +7308,7 @@ int Game::mstTask_monsterWait11(Task *t) {
 	debug(kDebug_MONSTER, "mstTask_monsterWait11 t %p", t);
 	MonsterObject1 *m = t->monster1;
 	const int num = m->o16->flags0 & 0xFF;
-	if (m->monsterInfos[num * 28] == 0) {
+	if (m->monsterInfos[num * kMonsterInfoSize] == 0) {
 		mstTaskResetMonster1Direction(t);
 	}
 	return 1;

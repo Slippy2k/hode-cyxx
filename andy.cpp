@@ -1587,25 +1587,25 @@ void Game::updateAndyObject(LvlObject *ptr) {
 		uint16_t w, h;
 		_res->getLvlSpriteFramePtr(dat, ash->firstFrame, &w, &h);
 
-		ptr->flags1 = ((ptr->flags1 & 0x30) ^ ((asfh->unk5 & 3) << 4)) | (ptr->flags1 & ~0x30);
+		ptr->flags1 = ((ptr->flags1 & 0x30) ^ ((asfh->flags & 3) << 4)) | (ptr->flags1 & ~0x30);
 		int type = (ptr->flags1 >> 4) & 3;
 
 		switch (type) {
 		case 0:
-			ptr->xPos += asfh->unk6;
-			ptr->yPos += asfh->unk7;
+			ptr->xPos += asfh->xOffset;
+			ptr->yPos += asfh->yOffset;
 			break;
 		case 1:
-			ptr->xPos += ptr->width - asfh->unk6 - w;
-			ptr->yPos += asfh->unk7;
+			ptr->xPos += ptr->width - asfh->xOffset - w;
+			ptr->yPos += asfh->yOffset;
 			break;
 		case 2:
-			ptr->xPos += asfh->unk6;
-			ptr->yPos += ptr->height - asfh->unk7 - h;
+			ptr->xPos += asfh->xOffset;
+			ptr->yPos += ptr->height - asfh->yOffset - h;
 			break;
 		case 3:
-			ptr->xPos += ptr->width - asfh->unk6 - w;
-			ptr->yPos += ptr->height - asfh->unk7 - h;
+			ptr->xPos += ptr->width - asfh->xOffset - w;
+			ptr->yPos += ptr->height - asfh->yOffset - h;
 			break;
 		}
 
