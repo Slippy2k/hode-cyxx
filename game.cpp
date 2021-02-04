@@ -2727,11 +2727,6 @@ int Game::displayHintScreen(int num, int pause) {
 		_video->_paletteChanged = true;
 	}
 	unmuteSound();
-	if (isPsx) { // restore level screen bitmap
-		LvlBackgroundData *lvl = &_res->_resLvlScreenBackgroundDataTable[_res->_currentScreenResourceNum];
-		const uint8_t *bmp = lvl->backgroundBitmapTable[lvl->currentBackgroundId];
-		_video->decodeBackgroundPsx(bmp + 4, -1, Video::W, Video::H);
-	}
 	return confirmQuit && quit == kQuitYes;
 }
 
