@@ -132,7 +132,7 @@ void Level_pwr1::postScreenUpdate_pwr1_screen6() {
 		++_screenCounterTable[6];
 		if (_screenCounterTable[6] >= 54) {
 			_res->_screensState[6].s0 = 2;
-			dat->currentBackgroundId = 1;
+			dat->currentBackgroundId = 2;
 			_g->updateBackgroundPsx(2);
 		}
 		break;
