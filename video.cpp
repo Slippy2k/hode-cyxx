@@ -511,14 +511,14 @@ void Video::decodeBackgroundOverlayPsx(const uint8_t *src, int x, int y) {
 			const int len = READ_LE_UINT16(src + offset + 2);
 			_mdec.w = src[offset + 4] * 16;
 			_mdec.h = src[offset + 5] * 16;
-			const int mborderlen = src[offset + 6];
-			const int mborderalign = src[offset + 7];
+			const int mbOrderLength = src[offset + 6];
+			const int mbOrderOffset = src[offset + 7];
 			const uint8_t *data = &src[offset + 8];
-			if (mborderalign == 0) {
+			if (mbOrderOffset == 0) {
 				decodeMDEC(data, len - 8, 0, 0, _mdec.w, _mdec.h, &_mdec);
 			} else {
 				// different macroblocks order
-				decodeMDEC(data + mborderalign, len - 8 - mborderalign, data, mborderlen, _mdec.w, _mdec.h, &_mdec);
+				decodeMDEC(data + mbOrderOffset, len - 8 - mbOrderOffset, data, mbOrderLength, _mdec.w, _mdec.h, &_mdec);
 			}
 			offset += len;
 		}

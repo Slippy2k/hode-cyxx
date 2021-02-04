@@ -176,7 +176,7 @@ static void decodeBlock(BitStream *bs, int x8, int y8, uint8_t *dst, int dstPitc
 	}
 }
 
-int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int mblen, int w, int h, MdecOutput *out) {
+int decodeMDEC(const uint8_t *src, int len, const uint8_t *mbOrder, int mbLength, int w, int h, MdecOutput *out) {
 	BitStream bs(src, len);
 	bs.getBits(16);
 	const uint16_t vlc = bs.getBits(16);
@@ -199,8 +199,8 @@ int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int mblen, i
 	int z = 0;
 	for (int x = 0, x2 = 0; x < blockW; ++x, x2 += 2) {
 		for (int y = 0, y2 = 0; y < blockH; ++y, y2 += 2) {
-			if (z < mblen) {
-				const uint8_t xy = mborder[z];
+			if (z < mbLength) {
+				const uint8_t xy = mbOrder[z];
 				if ((xy & 15) != x || (xy >> 4) != y) {
 					continue;
 				}
@@ -212,13 +212,13 @@ int decodeMDEC(const uint8_t *src, int len, const uint8_t *mborder, int mblen, i
 			decodeBlock(&bs, x2 + 1, y2,     yPtr, yPitch, qscale, version);
 			decodeBlock(&bs, x2,     y2 + 1, yPtr, yPitch, qscale, version);
 			decodeBlock(&bs, x2 + 1, y2 + 1, yPtr, yPitch, qscale, version);
-			if (mborder && z == mblen) {
+			if (mbOrder && z == mbLength) {
 				goto end;
 			}
 		}
 	}
 end:
-	if (!mborder && bs.bitsAvailable() >= 11) {
+	if (!mbOrder && bs.bitsAvailable() >= 11) {
 		const int eof = bs.getBits(11);
 		assert(eof == 0x3FE || eof == 0x3FF);
 	}

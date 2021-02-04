@@ -25,7 +25,7 @@ struct Video {
 		H = 192
 	};
 
-	static const uint8_t _fontCharactersTable[78];
+	static const uint8_t _fontCharactersTable[39 * 2];
 
 	uint8_t _palette[256 * 3];
 	uint16_t _displayPaletteBuffer[256 * 3];
