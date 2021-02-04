@@ -26,8 +26,8 @@ struct BitStream { // most significant 16 bits
 			_len += 16;
 		}
 		assert(_len >= count);
-		const int value = (_bits >> (_len - count)) & ((1 << count) - 1);
 		_len -= count;
+		const int value = (_bits >> _len) & ((1 << count) - 1);
 		return value;
 	}
 	int getSignedBits(int len) {

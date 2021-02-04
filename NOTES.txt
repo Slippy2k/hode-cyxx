@@ -88,3 +88,6 @@ Levels :
 	"lar2_hod"
 	"dark_hod" /* 8 */
 	"test_hod"
+
+PSP patch
+	https://pastebin.com/wAsEvZ3L

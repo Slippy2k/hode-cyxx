@@ -30,6 +30,7 @@ Video::Video() {
 	_transformShadowBuffer = 0;
 	_transformShadowLayerDelta = 0;
 	memset(&_mdec, 0, sizeof(_mdec));
+	_backgroundPsx = 0;
 }
 
 Video::~Video() {
@@ -79,6 +80,17 @@ void Video::updateYuvDisplay() {
 }
 
 void Video::copyYuvBackBuffer() {
+	if (_backgroundPsx) {
+		_mdec.x = 0;
+		_mdec.y = 0;
+		_mdec.w = W;
+		_mdec.h = H;
+		decodeMDEC(_backgroundPsx, W * H * sizeof(uint16_t), 0, 0, W, H, &_mdec);
+	}
+}
+
+void Video::clearYuvBackBuffer() {
+	_backgroundPsx = 0;
 }
 
 void Video::updateScreen() {
@@ -476,15 +488,15 @@ uint8_t Video::findWhiteColor() const {
 }
 
 void Video::decodeBackgroundPsx(const uint8_t *src, int size, int w, int h, int x, int y) {
-	_mdec.x = x;
-	_mdec.y = y;
-	_mdec.w = w;
-	_mdec.h = h;
-	if (size < 0) { // size not available
-		size = w * h * sizeof(uint16_t);
+	if (size < 0) {
+		_backgroundPsx = src;
+	} else {
+		_mdec.x = x;
+		_mdec.y = y;
+		_mdec.w = w;
+		_mdec.h = h;
+		decodeMDEC(src, size, 0, 0, w, h, &_mdec);
 	}
-	decodeMDEC(src, size, 0, 0, w, h, &_mdec);
-	copyYuvBackBuffer();
 }
 
 void Video::decodeBackgroundOverlayPsx(const uint8_t *src, int x, int y) {

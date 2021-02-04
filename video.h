@@ -48,6 +48,7 @@ struct Video {
 	} _drawLine;
 
 	MdecOutput _mdec;
+	const uint8_t *_backgroundPsx;
 
 	Video();
 	~Video();
@@ -58,6 +59,7 @@ struct Video {
 	void updateGameDisplay(uint8_t *buf);
 	void updateYuvDisplay();
 	void copyYuvBackBuffer();
+	void clearYuvBackBuffer();
 	void updateScreen();
 	void clearBackBuffer();
 	void clearPalette();
