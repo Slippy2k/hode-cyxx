@@ -270,6 +270,9 @@ void System_SDL2::copyRectWidescreen(int w, int h, const uint8_t *buf, const uin
 	if (!_widescreenTexture) {
 		return;
 	}
+	if (_backgroundTexture) {
+		return;
+	}
 
 	assert(w == _screenW && h == _screenH);
 	void *ptr = 0;
@@ -363,6 +366,11 @@ void System_SDL2::copyRect(int x, int y, int w, int h, const uint8_t *buf, int p
 void System_SDL2::copyYuv(int w, int h, const uint8_t *y, int ypitch, const uint8_t *u, int upitch, const uint8_t *v, int vpitch) {
 	if (_backgroundTexture) {
 		SDL_UpdateYUVTexture(_backgroundTexture, 0, y, ypitch, u, upitch, v, vpitch);
+		if (_widescreenTexture) {
+			SDL_SetRenderTarget(_renderer, _widescreenTexture);
+			SDL_RenderCopy(_renderer, _backgroundTexture, 0, 0);
+			SDL_SetRenderTarget(_renderer, 0);
+		}
 	}
 }
 
@@ -802,14 +810,18 @@ void System_SDL2::prepareScaledGfx(const char *caption, bool fullscreen, bool wi
 		SDL_SetWindowIcon(_window, icon);
 		SDL_FreeSurface(icon);
 	}
-	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
+	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | (yuv ? SDL_RENDERER_TARGETTEXTURE : 0));
 	SDL_RenderSetLogicalSize(_renderer, windowW, windowH);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, (_scaler == &scaler_nearest) ? "0" : "1");
 
 	const int pixelFormat = yuv ? SDL_PIXELFORMAT_RGBA8888 : SDL_PIXELFORMAT_RGB888;
 	_texture = SDL_CreateTexture(_renderer, pixelFormat, SDL_TEXTUREACCESS_STREAMING, _texW, _texH);
 	if (widescreen) {
-		_widescreenTexture = SDL_CreateTexture(_renderer, pixelFormat, SDL_TEXTUREACCESS_STREAMING, _screenW, _screenH);
+		if (yuv) {
+			_widescreenTexture = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 16, 16);
+		} else {
+			_widescreenTexture = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, _screenW, _screenH);
+		}
 	} else {
 		_widescreenTexture = 0;
 	}
