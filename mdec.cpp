@@ -192,9 +192,9 @@ int decodeMDEC(const uint8_t *src, int len, const uint8_t *mbOrder, int mbLength
 	const int yPitch = out->planes[kOutputPlaneY].pitch;
 	uint8_t *yPtr = out->planes[kOutputPlaneY].ptr + out->y * yPitch + out->x;
 	const int cbPitch = out->planes[kOutputPlaneCb].pitch;
-	uint8_t *cbPtr = out->planes[kOutputPlaneCb].ptr + (out->y * cbPitch + out->x) / 2;
+	uint8_t *cbPtr = out->planes[kOutputPlaneCb].ptr + (out->y / 2) * cbPitch + (out->x / 2);
 	const int crPitch = out->planes[kOutputPlaneCr].pitch;
-	uint8_t *crPtr = out->planes[kOutputPlaneCr].ptr + (out->y * crPitch + out->x) / 2;
+	uint8_t *crPtr = out->planes[kOutputPlaneCr].ptr + (out->y / 2) * crPitch + (out->x / 2);
 
 	int z = 0;
 	for (int x = 0, x2 = 0; x < blockW; ++x, x2 += 2) {
