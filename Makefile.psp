@@ -9,7 +9,7 @@ SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
         util.cpp video.cpp
 
 TARGET = hode
-OBJS = $(SRCS:.cpp=.o) 3p/inih/ini.o
+OBJS = $(SRCS:.cpp=.o)
 
 INCDIR =
 CFLAGS = -G0 -Wall -O2 $(DEFINES) -DNDEBUG -Wno-unused-variable

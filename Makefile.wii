@@ -17,8 +17,8 @@ SRCS = andy.cpp benchmark.cpp fileio.cpp fs_posix.cpp game.cpp \
 	resource.cpp screenshot.cpp sound.cpp staticres.cpp system_wii.cpp \
 	util.cpp video.cpp
 
-OBJS = $(SRCS:.cpp=.o) 3p/inih/ini.o
-DEPS = $(SRCS:.cpp=.d) 3p/inih/ini.d
+OBJS = $(SRCS:.cpp=.o)
+DEPS = $(SRCS:.cpp=.d)
 
 hode.dol: hode.elf
 	elf2dol $^ $@
