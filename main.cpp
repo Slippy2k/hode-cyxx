@@ -79,48 +79,61 @@ static bool configBool(const char *value) {
 	return strcasecmp(value, "true") == 0 || (strlen(value) == 2 && (value[0] == 't' || value[0] == '1'));
 }
 
-static int handleConfigIni(void *userdata, const char *name, const char *value) {
-	Game *g = (Game *)userdata;
-	// fprintf(stdout, "config.ini: name '%s' value '%s'\n", name, value);
-	if (strcmp(name, "disable_paf") == 0) {
-		if (!g->_paf->_skipCutscenes) { // .paf file not found
-			g->_paf->_skipCutscenes = configBool(value);
+static int handleConfigIni(Game *g, const char *section, const char *name, const char *value) {
+	// fprintf(stdout, "config.ini: section '%s' name '%s' value '%s'\n", section, name, value);
+	if (strcmp(section, "engine") == 0) {
+		if (strcmp(name, "disable_paf") == 0) {
+			if (!g->_paf->_skipCutscenes) { // .paf file not found
+				g->_paf->_skipCutscenes = configBool(value);
+			}
+		} else if (strcmp(name, "disable_mst") == 0) {
+			g->_mstDisabled = configBool(value);
+		} else if (strcmp(name, "disable_sss") == 0) {
+			g->_sssDisabled = configBool(value);
+		} else if (strcmp(name, "disable_menu") == 0) {
+			_runMenu = !configBool(value);
+		} else if (strcmp(name, "max_active_sounds") == 0) {
+			g->_playingSssObjectsMax = atoi(value);
+		} else if (strcmp(name, "difficulty") == 0) {
+			g->_difficulty = atoi(value);
+		} else if (strcmp(name, "frame_duration") == 0) {
+			g->_frameMs = g->_paf->_frameMs = atoi(value);
+		} else if (strcmp(name, "loading_screen") == 0) {
+			_displayLoadingScreen = configBool(value);
 		}
-	} else if (strcmp(name, "disable_mst") == 0) {
-		g->_mstDisabled = configBool(value);
-	} else if (strcmp(name, "disable_sss") == 0) {
-		g->_sssDisabled = configBool(value);
-	} else if (strcmp(name, "disable_menu") == 0) {
-		_runMenu = !configBool(value);
-	} else if (strcmp(name, "max_active_sounds") == 0) {
-		g->_playingSssObjectsMax = atoi(value);
-	} else if (strcmp(name, "difficulty") == 0) {
-		g->_difficulty = atoi(value);
-	} else if (strcmp(name, "frame_duration") == 0) {
-		g->_frameMs = g->_paf->_frameMs = atoi(value);
-	} else if (strcmp(name, "loading_screen") == 0) {
-		_displayLoadingScreen = configBool(value);
-	} else if (strcmp(name, "scale_factor") == 0) {
-		const int scale = atoi(value);
-		g_system->setScaler(0, scale);
-	} else if (strcmp(name, "scale_algorithm") == 0) {
-		g_system->setScaler(value, 0);
-	} else if (strcmp(name, "gamma") == 0) {
-		g_system->setGamma(atof(value));
-	} else if (strcmp(name, "fullscreen") == 0) {
-		_fullscreen = configBool(value);
-	} else if (strcmp(name, "widescreen") == 0) {
-		_widescreen = configBool(value);
+	} else if (strcmp(section, "display") == 0) {
+		if (strcmp(name, "scale_factor") == 0) {
+			const int scale = atoi(value);
+			g_system->setScaler(0, scale);
+		} else if (strcmp(name, "scale_algorithm") == 0) {
+			g_system->setScaler(value, 0);
+		} else if (strcmp(name, "gamma") == 0) {
+			g_system->setGamma(atof(value));
+		} else if (strcmp(name, "fullscreen") == 0) {
+			_fullscreen = configBool(value);
+		} else if (strcmp(name, "widescreen") == 0) {
+			_widescreen = configBool(value);
+		}
 	}
 	return 0;
 }
 
-static void readConfigIni(const char *filename, void *userdata) {
+static void readConfigIni(const char *filename, Game *g) {
 	FILE *fp = fopen(filename, "rb");
 	if (fp) {
+		char *section = 0;
 		char buf[256];
 		while (fgets(buf, sizeof(buf), fp)) {
 			if (buf[0] == '#') {
+				continue;
+			}
+			if (buf[0] == '[') {
+				char *p = strchr(&buf[1], ']');
+				if (p) {
+					*p = 0;
+					free(section);
+					section = strdup(&buf[1]);
+				}
 				continue;
 			}
 			char *p = strchr(buf, '=');
@@ -136,9 +149,10 @@ static void readConfigIni(const char *filename, void *userdata) {
 				while (q > p && isspace(*q)) {
 					*q-- = 0;
 				}
-				handleConfigIni(userdata, buf, p);
+				handleConfigIni(g, section, buf, p);
 			}
 		}
+		free(section);
 		fclose(fp);
 	}
 }
