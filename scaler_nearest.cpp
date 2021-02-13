@@ -1,46 +1,39 @@
 
 #include "scaler.h"
 
+template <int N>
+static void scale(uint32_t *dst, int dstPitch, const uint32_t *src, int srcPitch, int w, int h) {
+	while (h--) {
+		uint32_t *p = dst;
+		for (int i = 0; i < w; ++i, p += N) {
+			uint32_t c = *(src + i);
+			for (int j = 0; j < N; ++j) {
+				for (int k = 0; k < N; ++k) {
+					*(p + j * dstPitch + k) = c;
+				}
+			}
+		}
+		dst += dstPitch * N;
+		src += srcPitch;
+	}
+}
+
 static void scale_nearest(int factor, uint32_t *dst, int dstPitch, const uint32_t *src, int srcPitch, int w, int h) {
 	switch (factor) {
 	case 2:
-		while (h--) {
-			uint32_t *p = dst;
-			for (int i = 0; i < w; ++i, p += 2) {
-				uint32_t c = *(src + i);
-				*(p) = c;
-				*(p + 1) = c;
-				*(p + dstPitch) = c;
-				*(p + dstPitch + 1) = c;
-			}
-			dst += dstPitch * 2;
-			src += srcPitch;
-		}
+		scale<2>(dst, dstPitch, src, srcPitch, w, h);
 		break;
 	case 3:
-		while (h--) {
-			uint32_t *p = dst;
-			for (int i = 0; i < w; ++i, p += 3) {
-				uint32_t c = *(src + i);
-				*(p) = c;
-				*(p + 1) = c;
-				*(p + 2) = c;
-				*(p + dstPitch) = c;
-				*(p + dstPitch + 1) = c;
-				*(p + dstPitch + 2) = c;
-				*(p + 2 * dstPitch) = c;
-				*(p + 2 * dstPitch + 1) = c;
-				*(p + 2 * dstPitch + 2) = c;
-			}
-			dst += dstPitch * 3;
-			src += srcPitch;
-		}
+		scale<3>(dst, dstPitch, src, srcPitch, w, h);
+		break;
+	case 4:
+		scale<4>(dst, dstPitch, src, srcPitch, w, h);
 		break;
 	}
 }
 
 const Scaler scaler_nearest = {
 	"nearest",
-	2, 3,
+	2, 4,
 	scale_nearest
 };
