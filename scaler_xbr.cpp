@@ -1,11 +1,13 @@
 
 #include "scaler.h"
 
+static const bool kLut = false;
+
 static bool _rgb_yuv_init;
 static uint32_t _rgb_yuv[1 << 18];
 
 static uint32_t yuv_diff(uint32_t x, uint32_t y) {
-	if (1) {
+	if (kLut) {
 		const int yuv1 = _rgb_yuv[((x >> 2) & 0x3F) | ((x >> 4) & (0x3F << 6)) | ((x >> 6) & (0x3F << 12))];
 		const int yuv2 = _rgb_yuv[((y >> 2) & 0x3F) | ((y >> 4) & (0x3F << 6)) | ((y >> 6) & (0x3F << 12))];
 		return ABS((yuv1 >> 16) - (yuv2 >> 16)) + ABS(((yuv1 >> 8) & 255) - ((yuv2 >> 8) & 255)) + ABS((yuv1 & 255) - (yuv2 & 255));
@@ -14,15 +16,15 @@ static uint32_t yuv_diff(uint32_t x, uint32_t y) {
 	r = (x >> 16) & 255;
 	g = (x >>  8) & 255;
 	b =  x        & 255;
-	int y1 = ( 299 * r + 587 * g + 114 * b) / 1000;
-	int u1 = (-169 * r - 331 * g + 500 * b) / 1000 + 128;
-	int v1 = ( 500 * r - 419 * g -  81 * b) / 1000 + 128;
+	int y1 = ( 299 * r + 587 * g + 114 * b); // / 1000;
+	int u1 = (-169 * r - 331 * g + 500 * b); // / 1000 + 128;
+	int v1 = ( 500 * r - 419 * g -  81 * b); // / 1000 + 128;
 	r = (y >> 16) & 255;
 	g = (y >>  8) & 255;
 	b =  y        & 255;
-	int y2 = ( 299 * r + 587 * g + 114 * b) / 1000;
-	int u2 = (-169 * r - 331 * g + 500 * b) / 1000 + 128;
-	int v2 = ( 500 * r - 419 * g -  81 * b) / 1000 + 128;
+	int y2 = ( 299 * r + 587 * g + 114 * b); // / 1000;
+	int u2 = (-169 * r - 331 * g + 500 * b); // / 1000 + 128;
+	int v2 = ( 500 * r - 419 * g -  81 * b); // / 1000 + 128;
 	return ABS(y1 - y2) + ABS(u1 - u2) + ABS(v1 - v2);
 }
 
@@ -168,27 +170,33 @@ static void xbr_filter(uint32_t *dst, int dstPitch, const uint32_t *src, int src
 	for (int y = 0; y < h; ++y) {
 
 		uint32_t *E = dst + y * dstPitch * N;
-        const uint32_t *sa2 = src + y * srcPitch - 2; /* center */
-        const uint32_t *sa1 = sa2 - srcPitch; /* up x1 */
-        const uint32_t *sa0 = sa1 - srcPitch; /* up x2 */
-        const uint32_t *sa3 = sa2 + srcPitch; /* down x1 */
-        const uint32_t *sa4 = sa3 + srcPitch; /* down x2 */
 
-        if (y <= 1) {
-            sa0 = sa1;
-            if (y == 0) {
-                sa0 = sa1 = sa2;
-            }
-        }
+		const uint32_t *sa2 = src + y * srcPitch - 2; /* center */
+		const uint32_t *sa1 = sa2 - srcPitch; /* up x1 */
+		const uint32_t *sa0 = sa1 - srcPitch; /* up x2 */
+		const uint32_t *sa3 = sa2 + srcPitch; /* down x1 */
+		const uint32_t *sa4 = sa3 + srcPitch; /* down x2 */
 
-        if (y >= h - 2) {
-            sa4 = sa3;
-            if (y == h - 1) {
-                sa4 = sa3 = sa2;
-            }
-        }
+		if (y <= 1) {
+			sa0 = sa1;
+			if (y == 0) {
+				sa0 = sa1 = sa2;
+			}
+		} else if (y >= h - 2) {
+			sa4 = sa3;
+			if (y == h - 1) {
+				sa4 = sa3 = sa2;
+			}
+		}
 
-        for (int x = 0; x < w; x++) {
+		for (int x = 0; x < w; ++x) {
+
+			//    A1 B1 C1
+			// A0 PA PB PC C4
+			// D0 PD PE PF F4
+			// G0 PG PH PI I4
+			//    G5 H5 I5
+
             const uint32_t B1 = sa0[2];
             const uint32_t PB = sa1[2];
             const uint32_t PE = sa2[2];
@@ -260,7 +268,7 @@ static void xbr_filter(uint32_t *dst, int dstPitch, const uint32_t *src, int src
 }
 
 static void scale_xbr(int factor, uint32_t *dst, int dstPitch, const uint32_t *src, int srcPitch, int w, int h) {
-	if (!_rgb_yuv_init) {
+	if (kLut && !_rgb_yuv_init) {
 		for (int r = 0; r < 0x40; ++r) {
 			for (int g = 0; g < 0x40; ++g) {
 				for (int b = 0; b < 0x40; ++b) {
