@@ -18,9 +18,18 @@ static uint32_t pixel_diff(uint32_t x, uint32_t y) {
 	return abs(y1 - y2) + abs(u1 - u2) + abs(v1 - v2);
 }
 
-#define PART_MASK     0x00FF00FF
-#define ALPHA_BLEND_BASE(a, b, m, s) (  (PART_MASK & (((a) & PART_MASK) + (((((b) & PART_MASK) - ((a) & PART_MASK)) * (m)) >> (s)))) \
-                                      | ((PART_MASK & ((((a) >> 8) & PART_MASK) + ((((((b) >> 8) & PART_MASK) - (((a) >> 8) & PART_MASK)) * (m)) >> (s)))) << 8))
+template <int M, int S>
+static uint32_t interpolate(uint32_t a, uint32_t b) {
+	static const uint32_t kMask1 = 0xFF00FF; // red blue
+	static const uint32_t kMask2 = 0x00FF00; // green
+
+	uint32_t r;
+	r  = (((((b & kMask1) - (a & kMask1)) * M) >> S) + (a & kMask1)) & kMask1;
+	r |= (((((b & kMask2) - (a & kMask2)) * M) >> S) + (a & kMask2)) & kMask2;
+	return r;
+}
+
+#define ALPHA_BLEND_BASE(a, b, m, s) interpolate<m,s>(a, b)
 
 #define ALPHA_BLEND_32_W(a, b)  ALPHA_BLEND_BASE(a, b, 1, 3)
 #define ALPHA_BLEND_64_W(a, b)  ALPHA_BLEND_BASE(a, b, 1, 2)
