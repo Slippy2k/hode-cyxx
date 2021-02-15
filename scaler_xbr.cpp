@@ -1,11 +1,6 @@
 
 #include "scaler.h"
 
-static const bool kLut = false;
-
-static bool _rgb_yuv_init;
-static uint32_t _rgb_yuv[1 << 18];
-
 static uint8_t _yuv[256 * 3];
 
 static uint32_t yuv_diff(uint32_t x, uint32_t y) {
@@ -14,11 +9,6 @@ static uint32_t yuv_diff(uint32_t x, uint32_t y) {
 		const int du = _yuv[x * 3 + 1] - _yuv[y * 3 + 1];
 		const int dv = _yuv[x * 3 + 2] - _yuv[y * 3 + 2];
 		return ABS(dy) + ABS(du) + ABS(dv);
-	}
-	if (kLut) {
-		const int yuv1 = _rgb_yuv[((x >> 2) & 0x3F) | ((x >> 4) & (0x3F << 6)) | ((x >> 6) & (0x3F << 12))];
-		const int yuv2 = _rgb_yuv[((y >> 2) & 0x3F) | ((y >> 4) & (0x3F << 6)) | ((y >> 6) & (0x3F << 12))];
-		return ABS((yuv1 >> 16) - (yuv2 >> 16)) + ABS(((yuv1 >> 8) & 255) - ((yuv2 >> 8) & 255)) + ABS((yuv1 & 255) - (yuv2 & 255));
 	}
 	int r, g, b;
 	r = (x >> 16) & 255;
@@ -273,19 +263,6 @@ static void scaleImpl(uint32_t *dst, int dstPitch, const uint8_t *src, int srcPi
 }
 
 static void scale_xbr(int factor, uint32_t *dst, int dstPitch, const uint8_t *src, int srcPitch, int w, int h, const uint32_t *palette) {
-	if (kLut && !_rgb_yuv_init) {
-		for (int r = 0; r < 0x40; ++r) {
-			for (int g = 0; g < 0x40; ++g) {
-				for (int b = 0; b < 0x40; ++b) {
-					const int y = ( 299 * r + 587 * g + 114 * b) * 4 / 1000;
-					const int u = (-169 * r - 331 * g + 500 * b) * 4 / 1000 + 128;
-					const int v = ( 500 * r - 419 * g -  81 * b) * 4 / 1000 + 128;
-					_rgb_yuv[(r << 12) | (g << 6) | b] = (y << 16) | (u << 8) | v;
-				}
-			}
-		}
-		_rgb_yuv_init = true;
-	}
 	switch (factor) {
 	case 2:
 		scaleImpl<2>(dst, dstPitch, src, srcPitch, w, h, palette);
