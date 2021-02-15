@@ -22,8 +22,8 @@ SCALERS := scaler_nearest.cpp scaler_xbr.cpp
 
 RESOURCES := dists/win32/resource.rc
 
-OBJS = $(SRCS:.cpp=.o) $(SCALERS:.cpp=.o) 3p/libxbr-standalone/xbr.o
-DEPS = $(SRCS:.cpp=.d) $(SCALERS:.cpp=.d) 3p/libxbr-standalone/xbr.d
+OBJS = $(SRCS:.cpp=.o) $(SCALERS:.cpp=.o)
+DEPS = $(SRCS:.cpp=.d) $(SCALERS:.cpp=.d)
 
 all: hode.exe
 

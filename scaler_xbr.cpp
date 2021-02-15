@@ -1,4 +1,6 @@
 
+// Hyllian's 2xBR v3.3b
+
 #include "scaler.h"
 
 static uint8_t _yuv[256 * 3];

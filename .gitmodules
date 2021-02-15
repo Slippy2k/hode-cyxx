@@ -1,4 +1,0 @@
-[submodule "3p/libxbr-standalone"]
-	path = 3p/libxbr-standalone
-	url = https://github.com/Treeki/libxbr-standalone.git
-	ignore = dirty
