@@ -6,6 +6,7 @@
 #if !defined(PSP) && !defined(WII)
 #include <SDL.h>
 #endif
+#include <ctype.h>
 #include <getopt.h>
 #include <sys/stat.h>
 

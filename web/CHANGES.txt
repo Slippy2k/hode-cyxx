@@ -1,5 +1,6 @@
 * release 0.2.9e
 	- fixed graphics glitches with PSX backgrounds
+	- removed 'inih' and 'libxbr-standalone' dependencies
 
 * release 0.2.9d
 	- added gain to sounds
