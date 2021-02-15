@@ -16,15 +16,15 @@ static uint32_t yuv_diff(uint32_t x, uint32_t y) {
 	r = (x >> 16) & 255;
 	g = (x >>  8) & 255;
 	b =  x        & 255;
-	int y1 = ( 299 * r + 587 * g + 114 * b); // / 1000;
-	int u1 = (-169 * r - 331 * g + 500 * b); // / 1000 + 128;
-	int v1 = ( 500 * r - 419 * g -  81 * b); // / 1000 + 128;
+	int y1 = ( 299 * r + 587 * g + 114 * b) / 1000;
+	int u1 = (-169 * r - 331 * g + 500 * b) / 1000; // + 128;
+	int v1 = ( 500 * r - 419 * g -  81 * b) / 1000; // + 128;
 	r = (y >> 16) & 255;
 	g = (y >>  8) & 255;
 	b =  y        & 255;
-	int y2 = ( 299 * r + 587 * g + 114 * b); // / 1000;
-	int u2 = (-169 * r - 331 * g + 500 * b); // / 1000 + 128;
-	int v2 = ( 500 * r - 419 * g -  81 * b); // / 1000 + 128;
+	int y2 = ( 299 * r + 587 * g + 114 * b) / 1000;
+	int u2 = (-169 * r - 331 * g + 500 * b) / 1000; // + 128;
+	int v2 = ( 500 * r - 419 * g -  81 * b) / 1000; // + 128;
 	return ABS(y1 - y2) + ABS(u1 - u2) + ABS(v1 - v2);
 }
 
@@ -162,7 +162,7 @@ static uint32_t interpolate(uint32_t a, uint32_t b) {
 } while (0)
 
 template <int N>
-static void xbr_filter(uint32_t *dst, int dstPitch, const uint32_t *src, int srcPitch, int w, int h) {
+static void scaleImpl(uint32_t *dst, int dstPitch, const uint32_t *src, int srcPitch, int w, int h) {
 	const int nl = dstPitch;
 	const int nl1 = nl + nl;
 	const int nl2 = nl1 + nl;
@@ -171,11 +171,11 @@ static void xbr_filter(uint32_t *dst, int dstPitch, const uint32_t *src, int src
 
 		uint32_t *E = dst + y * dstPitch * N;
 
-		const uint32_t *sa2 = src + y * srcPitch - 2; /* center */
-		const uint32_t *sa1 = sa2 - srcPitch; /* up x1 */
-		const uint32_t *sa0 = sa1 - srcPitch; /* up x2 */
-		const uint32_t *sa3 = sa2 + srcPitch; /* down x1 */
-		const uint32_t *sa4 = sa3 + srcPitch; /* down x2 */
+		const uint32_t *sa2 = src + y * srcPitch - 2;
+		const uint32_t *sa1 = sa2 - srcPitch;
+		const uint32_t *sa0 = sa1 - srcPitch;
+		const uint32_t *sa3 = sa2 + srcPitch;
+		const uint32_t *sa4 = sa3 + srcPitch;
 
 		if (y <= 1) {
 			sa0 = sa1;
@@ -227,29 +227,24 @@ static void xbr_filter(uint32_t *dst, int dstPitch, const uint32_t *src, int src
             const uint32_t F4 = sa2[pnext2];
             const uint32_t I4 = sa3[pnext2];
 
-            if (N == 2) {
-                E[0]  = E[1]      =     // 0, 1
-                E[nl] = E[nl + 1] = PE; // 2, 3
+			for (int j = 0; j < N; ++j) {
+				for (int i = 0; i < N; ++i) {
+					*(E + j * dstPitch + i) = PE;
+				}
+			}
 
+
+            if (N == 2) {
                 filt2b(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, 0, 1, nl, nl+1);
                 filt2b(PE, PC, PF, PB, PI, PA, PH, PD, PG, I4, A1, I5, H5, A0, D0, B1, C1, F4, C4, G5, G0, nl, 0, nl+1, 1);
                 filt2b(PE, PA, PB, PD, PC, PG, PF, PH, PI, C1, G0, C4, F4, G5, H5, D0, A0, B1, A1, I4, I5, nl+1, nl, 1, 0);
                 filt2b(PE, PG, PD, PH, PA, PI, PB, PF, PC, A0, I5, A1, B1, I4, F4, H5, G5, D0, G0, C1, C4, 1, nl+1, 0, nl);
             } else if (N == 3) {
-                E[0]   = E[1]     = E[2]     =     // 0, 1, 2
-                E[nl]  = E[nl+1]  = E[nl+2]  =     // 3, 4, 5
-                E[nl1] = E[nl1+1] = E[nl1+2] = PE; // 6, 7, 8
-
                 filt3a(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, 0, 1, 2, nl, nl+1, nl+2, nl1, nl1+1, nl1+2);
                 filt3a(PE, PC, PF, PB, PI, PA, PH, PD, PG, I4, A1, I5, H5, A0, D0, B1, C1, F4, C4, G5, G0, nl1, nl, 0, nl1+1, nl+1, 1, nl1+2, nl+2, 2);
                 filt3a(PE, PA, PB, PD, PC, PG, PF, PH, PI, C1, G0, C4, F4, G5, H5, D0, A0, B1, A1, I4, I5, nl1+2, nl1+1, nl1, nl+2, nl+1, nl, 2, 1, 0);
                 filt3a(PE, PG, PD, PH, PA, PI, PB, PF, PC, A0, I5, A1, B1, I4, F4, H5, G5, D0, G0, C1, C4, 2, nl+2, nl1+2, 1, nl+1, nl1+1, 0, nl, nl1);
             } else if (N == 4) {
-                E[0]   = E[1]     = E[2]     = E[3]     =     //  0,  1,  2,  3
-                E[nl]  = E[nl+1]  = E[nl+2]  = E[nl+3]  =     //  4,  5,  6,  7
-                E[nl1] = E[nl1+1] = E[nl1+2] = E[nl1+3] =     //  8,  9, 10, 11
-                E[nl2] = E[nl2+1] = E[nl2+2] = E[nl2+3] = PE; // 12, 13, 14, 15
-
                 filt4b(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, nl2+3, nl2+2, nl1+3, 3, nl+3, nl1+2, nl2+1, nl2, nl1+1, nl+2, 2, 1, nl+1, nl1, nl, 0);
                 filt4b(PE, PC, PF, PB, PI, PA, PH, PD, PG, I4, A1, I5, H5, A0, D0, B1, C1, F4, C4, G5, G0, 3, nl+3, 2, 0, 1, nl+2, nl1+3, nl2+3, nl1+2, nl+1, nl, nl1, nl1+1, nl2+2, nl2+1, nl2);
                 filt4b(PE, PA, PB, PD, PC, PG, PF, PH, PI, C1, G0, C4, F4, G5, H5, D0, A0, B1, A1, I4, I5, 0, 1, nl, nl2, nl1, nl+1, 2, 3, nl+2, nl1+1, nl2+1, nl2+2, nl1+2, nl+3, nl1+3, nl2+3);
@@ -283,13 +278,13 @@ static void scale_xbr(int factor, uint32_t *dst, int dstPitch, const uint32_t *s
 	}
 	switch (factor) {
 	case 2:
-		xbr_filter<2>(dst, dstPitch, src, srcPitch, w, h);
+		scaleImpl<2>(dst, dstPitch, src, srcPitch, w, h);
 		break;
 	case 3:
-		xbr_filter<3>(dst, dstPitch, src, srcPitch, w, h);
+		scaleImpl<3>(dst, dstPitch, src, srcPitch, w, h);
 		break;
 	case 4:
-		xbr_filter<4>(dst, dstPitch, src, srcPitch, w, h);
+		scaleImpl<4>(dst, dstPitch, src, srcPitch, w, h);
 		break;
 	}
 }
