@@ -37,7 +37,6 @@ struct System_SDL2 : System {
 	};
 
 	uint8_t *_offscreenLut;
-	uint32_t *_offscreenRgb;
 	SDL_Window *_window;
 	SDL_Renderer *_renderer;
 	SDL_Texture *_texture;
@@ -107,7 +106,7 @@ bool System_hasCommandLine() {
 }
 
 System_SDL2::System_SDL2() :
-	_offscreenLut(0), _offscreenRgb(0),
+	_offscreenLut(0),
 	_window(0), _renderer(0), _texture(0), _backgroundTexture(0), _fmt(0), _widescreenTexture(0),
 	_controller(0), _joystick(0) {
 	for (int i = 0; i < 256; ++i) {
@@ -129,10 +128,6 @@ void System_SDL2::init(const char *title, int w, int h, bool fullscreen, bool wi
 	_offscreenLut = (uint8_t *)malloc(offscreenSize);
 	if (!_offscreenLut) {
 		error("System_SDL2::init() Unable to allocate offscreen buffer");
-	}
-	_offscreenRgb = (uint32_t *)malloc(offscreenSize * sizeof(uint32_t));
-	if (!_offscreenRgb) {
-		error("System_SDL2::init() Unable to allocate RGB offscreen buffer");
 	}
 	memset(_offscreenLut, 0, offscreenSize);
 	prepareScaledGfx(title, fullscreen, widescreen, yuv);
@@ -162,8 +157,6 @@ void System_SDL2::init(const char *title, int w, int h, bool fullscreen, bool wi
 void System_SDL2::destroy() {
 	free(_offscreenLut);
 	_offscreenLut = 0;
-	free(_offscreenRgb);
-	_offscreenRgb = 0;
 
 	if (_fmt) {
 		SDL_FreeFormat(_fmt);
@@ -344,6 +337,9 @@ void System_SDL2::setPalette(const uint8_t *pal, int n, int depth) {
 	if (_backgroundTexture) {
 		_pal[0] = 0;
 	}
+	if (_scalerMultiplier != 1 && _scaler->palette) {
+		_scaler->palette(_pal);
+	}
 }
 
 void System_SDL2::clearPalette() {
@@ -432,12 +428,12 @@ void System_SDL2::updateScreen(bool drawWidescreen) {
 			src -= _shakeDx;
 		}
 	}
-	uint32_t *p = (_scalerMultiplier == 1) ? dst : _offscreenRgb;
-	for (int i = 0; i < w * h; ++i) {
-		p[i] = _pal[src[i]];
-	}
-	if (_scalerMultiplier != 1) {
-		_scaler->scale(_scalerMultiplier, dst, dstPitch, _offscreenRgb, srcPitch, w, h);
+	if (_scalerMultiplier == 1) {
+		for (int i = 0; i < w * h; ++i) {
+			dst[i] = _pal[src[i]];
+		}
+	} else {
+		_scaler->scale(_scalerMultiplier, dst, dstPitch, src, w, w, h, _pal);
 	}
 	SDL_UnlockTexture(_texture);
 
