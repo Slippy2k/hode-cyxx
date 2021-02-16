@@ -5,7 +5,7 @@
 
 static uint8_t _yuv[256 * 3];
 
-static int yuv_diff(int x, int y) {
+static int diffYuv(int x, int y) {
 	const int dy = _yuv[x * 3]     - _yuv[y * 3];
 	const int du = _yuv[x * 3 + 1] - _yuv[y * 3 + 1];
 	const int dv = _yuv[x * 3 + 2] - _yuv[y * 3 + 2];
@@ -31,7 +31,7 @@ static uint32_t interpolate(uint32_t a, uint32_t b) {
 #define ALPHA_BLEND_192_W(a, b) interpolate<3,2>(a, b)
 #define ALPHA_BLEND_224_W(a, b) interpolate<7,3>(a, b)
 
-#define df(A, B) yuv_diff(A, B)
+#define df(A, B) diffYuv(A, B)
 #define eq(A, B) (df(A, B) < 155)
 
 #define filt2b(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3) do { \
@@ -150,8 +150,8 @@ static uint32_t interpolate(uint32_t a, uint32_t b) {
 template <int N>
 static void scaleImpl(uint32_t *dst, int dstPitch, const uint8_t *src, int srcPitch, int w, int h, const uint32_t *palette) {
 	const int nl = dstPitch;
-	const int nl1 = nl + nl;
-	const int nl2 = nl1 + nl;
+	const int nl1 = dstPitch * 2;
+	const int nl2 = dstPitch * 3;
 
 	for (int y = 0; y < h; ++y) {
 
@@ -168,7 +168,8 @@ static void scaleImpl(uint32_t *dst, int dstPitch, const uint8_t *src, int srcPi
 			if (y == 0) {
 				sa0 = sa1 = sa2;
 			}
-		} else if (y >= h - 2) {
+		}
+		if (y >= h - 2) {
 			sa4 = sa3;
 			if (y == h - 1) {
 				sa4 = sa3 = sa2;
