@@ -1,5 +1,6 @@
 
-// Hyllian's 2xBR v3.3b
+// https://forums.libretro.com/t/xbr-algorithm-tutorial/123
+// https://git.ffmpeg.org/gitweb/ffmpeg.git/blob_plain/HEAD:/libavfilter/vf_xbr.c
 
 #include "scaler.h"
 
@@ -148,7 +149,7 @@ static uint32_t interpolate(uint32_t a, uint32_t b) {
 } while (0)
 
 template <int N>
-static void scaleImpl(uint32_t *dst, int dstPitch, const uint8_t *src, int srcPitch, int w, int h, const uint32_t *palette) {
+static void scale_xbr(uint32_t *dst, int dstPitch, const uint8_t *src, int srcPitch, int w, int h, const uint32_t *palette) {
 	const int nl = dstPitch;
 	const int nl1 = dstPitch * 2;
 	const int nl2 = dstPitch * 3;
@@ -249,20 +250,6 @@ static void scaleImpl(uint32_t *dst, int dstPitch, const uint8_t *src, int srcPi
 	}
 }
 
-static void scale_xbr(int factor, uint32_t *dst, int dstPitch, const uint8_t *src, int srcPitch, int w, int h, const uint32_t *palette) {
-	switch (factor) {
-	case 2:
-		scaleImpl<2>(dst, dstPitch, src, srcPitch, w, h, palette);
-		break;
-	case 3:
-		scaleImpl<3>(dst, dstPitch, src, srcPitch, w, h, palette);
-		break;
-	case 4:
-		scaleImpl<4>(dst, dstPitch, src, srcPitch, w, h, palette);
-		break;
-	}
-}
-
 static void palette_xbr(const uint32_t *palette) {
 	for (int i = 0; i < 256; ++i) {
 		const int r = (palette[i] >> 16) & 255;
@@ -277,6 +264,6 @@ static void palette_xbr(const uint32_t *palette) {
 const Scaler scaler_xbr = {
 	"xbr",
 	2, 4,
-	scale_xbr,
-	palette_xbr
+	palette_xbr,
+	{ scale_xbr<2>, scale_xbr<3>, scale_xbr<4> }
 };

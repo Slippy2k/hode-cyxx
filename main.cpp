@@ -80,7 +80,7 @@ static bool configBool(const char *value) {
 	return strcasecmp(value, "true") == 0 || (strlen(value) == 2 && (value[0] == 't' || value[0] == '1'));
 }
 
-static int handleConfigIni(Game *g, const char *section, const char *name, const char *value) {
+static void handleConfigIni(Game *g, const char *section, const char *name, const char *value) {
 	// fprintf(stdout, "config.ini: section '%s' name '%s' value '%s'\n", section, name, value);
 	if (strcmp(section, "engine") == 0) {
 		if (strcmp(name, "disable_paf") == 0) {
@@ -116,7 +116,6 @@ static int handleConfigIni(Game *g, const char *section, const char *name, const
 			_widescreen = configBool(value);
 		}
 	}
-	return 0;
 }
 
 static void readConfigIni(const char *filename, Game *g) {

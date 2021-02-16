@@ -307,6 +307,11 @@ void System_SDL2::setScaler(const char *name, int multiplier) {
 				break;
 			}
 		}
+		if (_scalerMultiplier < _scaler->factorMin) {
+			_scalerMultiplier = _scaler->factorMin;
+		} else if (_scalerMultiplier > _scaler->factorMax) {
+			_scalerMultiplier = _scaler->factorMax;
+		}
 	}
 }
 
@@ -433,7 +438,7 @@ void System_SDL2::updateScreen(bool drawWidescreen) {
 			dst[i] = _pal[src[i]];
 		}
 	} else {
-		_scaler->scale(_scalerMultiplier, dst, dstPitch, src, w, w, h, _pal);
+		(_scaler->scale[_scalerMultiplier - 2])(dst, dstPitch, src, w, w, h, _pal);
 	}
 	SDL_UnlockTexture(_texture);
 
