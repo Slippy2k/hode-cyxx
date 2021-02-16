@@ -11,10 +11,15 @@ template <int M, int S>
 static uint32_t interpolate(uint32_t a, uint32_t b) {
 	static const uint32_t kMask = 0xFF00FF;
 
-	const uint32_t m1 = (((((b & kMask) - (a & kMask)) * M) >> S) + (a & kMask)) & kMask;
-	a >>= 8;
-	b >>= 8;
-	const uint32_t m2 = (((((b & kMask) - (a & kMask)) * M) >> S) + (a & kMask)) & kMask;
+	const uint32_t a_rb =  a       & kMask;
+	const uint32_t a_ag = (a >> 8) & kMask;
+
+	const uint32_t b_rb =  b       & kMask;
+	const uint32_t b_ag = (b >> 8) & kMask;
+
+	const uint32_t m1 = ((((b_rb - a_rb) * M) >> S) + a_rb) & kMask;
+	const uint32_t m2 = ((((b_ag - a_ag) * M) >> S) + a_ag) & kMask;
+
 	return m1 | (m2 << 8);
 }
 
@@ -254,13 +259,18 @@ static void palette_xbr(const uint32_t *palette) {
 		_yuv[i][2] = ( 500 * r - 419 * g -  81 * b) / 1000 + 128;
 	}
 	for (int j = 0; j < 256; ++j) {
-		for (int i = 0; i < 256; ++i) {
+		for (int i = 0; i < j; ++i) {
 			if (i != j) {
 				const int dy = _yuv[i][0] - _yuv[j][0];
 				const int du = _yuv[i][1] - _yuv[j][1];
 				const int dv = _yuv[i][2] - _yuv[j][2];
 				_diffYuv[j][i] = ABS(dy) + ABS(du) + ABS(dv);
 			}
+		}
+	}
+	for (int j = 0; j < 256; ++j) {
+		for (int i = j; i < 256; ++i) {
+			_diffYuv[j][i] = _diffYuv[i][j];
 		}
 	}
 }
