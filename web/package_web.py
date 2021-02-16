@@ -42,6 +42,8 @@ BIN_WII = (
 	'meta.xml',
 )
 
+WII = False
+
 def getVersion():
 	f = file(os.path.join(SRC_DIR, 'README.txt'))
 	for line in f.readlines():
@@ -128,11 +130,12 @@ for f in zipfiles:
 				zf.writestr(*args, compress_type=zipfile.ZIP_DEFLATED)
 	zf.close()
 
-filename = 'hode-%s-wii.zip' % version
-zf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
-zf.write(os.path.join(SRC_DIR, 'hode.dol'), 'apps/hode/boot.dol')
-zf.write(os.path.join(SRC_DIR, 'hode.ini'), 'apps/hode/hode.ini')
-zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'meta.xml'), 'apps/hode/meta.xml')
-zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'icon.png'), 'apps/hode/icon.png')
-zf.writestr('hode/COPY YOUR DATA FILES HERE', '')
-zf.close()
+if WII:
+	filename = 'hode-%s-wii.zip' % version
+	zf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
+	zf.write(os.path.join(SRC_DIR, 'hode.dol'), 'apps/hode/boot.dol')
+	zf.write(os.path.join(SRC_DIR, 'hode.ini'), 'apps/hode/hode.ini')
+	zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'meta.xml'), 'apps/hode/meta.xml')
+	zf.write(os.path.join(SRC_DIR + '/dists/wii/', 'icon.png'), 'apps/hode/icon.png')
+	zf.writestr('hode/COPY YOUR DATA FILES HERE', '')
+	zf.close()
