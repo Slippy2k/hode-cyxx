@@ -250,10 +250,13 @@ void Menu::loadData() {
 
 	if (_res->_isPsx) {
 		for (int i = 0; i < 3; ++i) {
-			DatSpritesGroup *sprites = (DatSpritesGroup *)(ptr + ptrOffset);
-			ptrOffset += sizeof(DatSpritesGroup) + ((le32toh(sprites->size) + 3) & ~3);
+			_psxSprites[i] = (DatSpritesGroup *)(ptr + ptrOffset);
+			ptrOffset += sizeof(DatSpritesGroup) + ((le32toh(_psxSprites[i]->size) + 3) & ~3);
 		}
-		ptrOffset += 0x300 * 3;
+		for (int i = 0; i < 3; ++i) {
+			_psxPalettes[i] = ptr + ptrOffset;
+			ptrOffset += 0x300;
+		}
 	}
 
 	_iconsSprites = (DatSpritesGroup *)(ptr + ptrOffset);
@@ -338,6 +341,7 @@ SssObject *Menu::playSound(int num) {
 
 void Menu::drawBitmap(const uint8_t *data, uint32_t size, bool setPalette) {
 	if (_res->_isPsx) {
+		memset(_video->_frontLayer, 0, Video::W * Video::H);
 		_video->decodeBackgroundPsx(data, size, Video::W, Video::H);
 	} else {
 		decodeLZW(data, _video->_frontLayer);
@@ -352,7 +356,7 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, ui
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		if (num == i) {
-			if (_res->_isPsx) {
+			if (_res->_isPsx && ptr != _iconsSpritesData) {
 				_video->decodeBackgroundOverlayPsx(ptr);
 			} else {
 				if (x < 0) {
@@ -374,7 +378,7 @@ void Menu::drawSpriteAnim(DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint
 		spriteGroup[num].currentFrameOffset = spriteGroup[num].firstFrameOffset;
 	}
 	ptr += spriteGroup[num].currentFrameOffset;
-	if (_res->_isPsx) {
+	if (_res->_isPsx && ptr != _iconsSpritesData) {
 		_video->decodeBackgroundOverlayPsx(ptr);
 	} else {
 		_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0], ptr[1], 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
@@ -449,10 +453,14 @@ void Menu::drawTitleScreen(int option) {
 
 int Menu::handleTitleScreen() {
 	const int firstOption = kTitleScreen_AssignPlayer;
-	const int lastOption = _res->_isPsx ? kTitleScreenPSX_Save : kTitleScreen_Quit;
+	const int lastOption = _res->_isPsx ? kTitleScreen_Options : kTitleScreen_Quit;
 	int currentOption = kTitleScreen_Play;
-	while (!g_system->inp.quit) {
+	while (1) {
 		g_system->processEvents();
+		if (g_system->inp.quit) {
+			currentOption = kTitleScreen_Quit;
+			break;
+		}
 		if (g_system->inp.keyReleased(SYS_INP_UP)) {
 			if (currentOption > firstOption) {
 				playSound(kSound_0x70);
@@ -541,8 +549,10 @@ void Menu::setCurrentPlayer(int num) {
 		}
 	}
 // 422CE0
-	const DatBitmapsGroup *bitmap = &_checkpointsBitmaps[_levelNum][_checkpointNum];
-	memcpy(_paletteBuffer + 205 * 3, _checkpointsBitmapsData[_levelNum] + bitmap->palette, 50 * 3);
+	if (!_res->_isPsx) {
+		const DatBitmapsGroup *bitmap = &_checkpointsBitmaps[_levelNum][_checkpointNum];
+		memcpy(_paletteBuffer + 205 * 3, _checkpointsBitmapsData[_levelNum] + bitmap->palette, 50 * 3);
+	}
 	g_system->setPalette(_paletteBuffer, 256, 6);
 }
 
@@ -615,13 +625,16 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 }
 
 void Menu::handleAssignPlayer() {
-	memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
+	memcpy(_paletteBuffer, _res->_isPsx ? _psxPalettes[0] : (_playerBitmapData + _playerBitmapSize), 256 * 3);
 	int state = 1;
 	int cursor = 0;
 	setCurrentPlayer(_config->currentPlayer);
 	drawPlayerProgress(state, cursor);
-	while (!g_system->inp.quit) {
+	while (1) {
 		g_system->processEvents();
+		if (g_system->inp.quit) {
+			break;
+		}
 		if (g_system->inp.keyReleased(SYS_INP_SHOOT) || g_system->inp.keyReleased(SYS_INP_JUMP)) {
 			if (state != 0 && cursor == 5) {
 				playSound(kSound_0x80);
@@ -715,7 +728,7 @@ void Menu::updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const 
 	}
 // 423F05
 	for (int i = 0; i < 3; ++i) {
-		if (_bitmapCircularListIndex[i] != -1) {
+		if (_bitmapCircularListIndex[i] != -1 && !_res->_isPsx) {
 			const DatBitmapsGroup *bitmap = &bitmapsGroup[_bitmapCircularListIndex[i]];
 			memcpy(_paletteBuffer + (105 + 50 * i) * 3, bitmapData + bitmap->palette, 50 * 3);
 		}
@@ -1715,9 +1728,12 @@ bool Menu::handleOptions() {
 	_optionNum = kMenu_Settings;
 	changeToOption(0);
 	_condMask = 0;
-	while (!g_system->inp.quit) {
+	while (1) {
 // 428752
 		g_system->processEvents();
+		if (g_system->inp.quit) {
+			break;
+		}
 		if (g_system->inp.keyPressed(SYS_INP_ESC)) {
 			_optionNum = -1;
 			break;
