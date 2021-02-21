@@ -906,15 +906,21 @@ enum {
 	kSprAssignPlayer,
 	kSprControls,
 	kSprPsxControls,
-	kSprMenuButtons
+	kSprMenuButtons // empty for PSX
 };
 
 static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int spriteNum) {
 
 	const int compressedSize = READ_LE_UINT16(ptr + 2);
 
-	if (_isPsx && (spriteGroup != kSprControls && spriteGroup != kSprPsxControls)) {
-		DecodeLvlOverlayPsx(-1, spriteGroup, spriteNum, ptr, compressedSize);
+	if (_isPsx && spriteGroup != kSprPsxControls) {
+		const int count = READ_LE_UINT32(ptr + 4);
+		if (count >= 1 && count <= 3) {
+			DecodeLvlOverlayPsx(-1, spriteGroup, spriteNum, ptr, compressedSize);
+		} else {
+			fprintf(stderr, "Invalid PSX overlay count 0x%x\n", count);
+			assert(count == 0 || (count & 0x100) != 0);
+		}
 		return compressedSize + 2;
 	}
 
@@ -1119,6 +1125,10 @@ static void DecodeSetupDat(File *fp) {
 		}
 
 		free(ptr);
+	}
+
+	for (int i = 0; i < 256; ++i) {
+		memset(_controlsPalette + i * 3, i, 3);
 	}
 
 	const int baseOffset = READ_LE_UINT32(buffer + 0x4C + (2 + yesNoQuit) * 4);
