@@ -356,8 +356,11 @@ void Menu::drawSprite(const DatSpritesGroup *spriteGroup, const uint8_t *ptr, ui
 	for (uint32_t i = 0; i < spriteGroup->count; ++i) {
 		const uint16_t size = READ_LE_UINT16(ptr + 2);
 		if (num == i) {
-			if (_res->_isPsx && ptr != _iconsSpritesData) {
-				_video->decodeBackgroundOverlayPsx(ptr);
+			if (_res->_isPsx) {
+				const int count = READ_LE_UINT32(ptr + 4);
+				if (count != 0 && (count & 0x100) == 0) {
+					_video->decodeBackgroundOverlayPsx(ptr);
+				}
 			} else {
 				if (x < 0) {
 					x = ptr[0];
@@ -378,8 +381,11 @@ void Menu::drawSpriteAnim(DatSpritesGroup *spriteGroup, const uint8_t *ptr, uint
 		spriteGroup[num].currentFrameOffset = spriteGroup[num].firstFrameOffset;
 	}
 	ptr += spriteGroup[num].currentFrameOffset;
-	if (_res->_isPsx && ptr != _iconsSpritesData) {
-		_video->decodeBackgroundOverlayPsx(ptr);
+	if (_res->_isPsx) {
+		const int count = READ_LE_UINT32(ptr + 4);
+		if (count != 0 && (count & 0x100) == 0) {
+			_video->decodeBackgroundOverlayPsx(ptr);
+		}
 	} else {
 		_video->decodeSPR(ptr + 8, _video->_frontLayer, ptr[0], ptr[1], 0, READ_LE_UINT16(ptr + 4), READ_LE_UINT16(ptr + 6));
 	}
@@ -588,18 +594,20 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 	}
 // 422DD7
 	player = (cursor == 0 || cursor == 5) ? _config->currentPlayer : (cursor - 1);
-	uint8_t *p = _video->_frontLayer;
-	const int offset = (player * 17) + 92;
-	for (int i = 0; i < 16; ++i) { // player
-		memcpy(p + i * Video::W +  6935, p + i * Video::W + (offset + 1) * 256 +   8, 72);
-	}
+	if (!_res->_isPsx) {
+		uint8_t *p = _video->_frontLayer;
+		const int offset = (player * 17) + 92;
+		for (int i = 0; i < 16; ++i) { // player
+			memcpy(p + i * Video::W +  6935, p + i * Video::W + (offset + 1) * 256 +   8, 72);
+		}
 // 422E47
-	for (int i = 0; i < 16; ++i) { // level
-		memcpy(p + i * Video::W + 11287, p + i * Video::W + (offset + 1) * 256 +  83, 76);
-	}
+		for (int i = 0; i < 16; ++i) { // level
+			memcpy(p + i * Video::W + 11287, p + i * Video::W + (offset + 1) * 256 +  83, 76);
+		}
 // 422E87
-	for (int i = 0; i < 16; ++i) { // checkpoint
-		memcpy(p + i * Video::W + 15639, p + i * Video::W + (offset + 1) * 256 + 172, 76);
+		for (int i = 0; i < 16; ++i) { // checkpoint
+			memcpy(p + i * Video::W + 15639, p + i * Video::W + (offset + 1) * 256 + 172, 76);
+		}
 	}
 // 422EC3
 	if (!isEmptySetupCfg(_config, player)) {
@@ -625,7 +633,22 @@ void Menu::drawPlayerProgress(int state, int cursor) {
 }
 
 void Menu::handleAssignPlayer() {
-	memcpy(_paletteBuffer, _res->_isPsx ? _psxPalettes[0] : (_playerBitmapData + _playerBitmapSize), 256 * 3);
+	if (_res->_isPsx) {
+		memset(_paletteBuffer, 0, 256 * 3);
+		static const int16_t indexes[] = { 0, 3, 6, 18, 36, 53, 67, 81, 99, 111, 125, 139, 156, 169, 181, 186, 191, -1 };
+		static const uint8_t colors[] = {
+			0x01,0x00,0x00, 0x02,0x02,0x03, 0x04,0x04,0x07, 0x07,0x08,0x0d, 0x0a,0x0c,0x10, 0x0d,0x0f,0x14,
+			0x0f,0x11,0x18, 0x12,0x14,0x1c, 0x14,0x18,0x20, 0x17,0x1a,0x24, 0x19,0x1d,0x27, 0x1c,0x20,0x2b,
+			0x1e,0x23,0x2f, 0x21,0x27,0x33, 0x24,0x2a,0x38, 0x26,0x2c,0x3b, 0x28,0x30,0x3f
+		};
+		int offset = 0;
+		for (int i = 0; indexes[i] != -1; ++i) {
+			memcpy(&_paletteBuffer[indexes[i] * 3], &colors[offset], 3);
+			offset += 3;
+		}
+	} else {
+		memcpy(_paletteBuffer, _playerBitmapData + _playerBitmapSize, 256 * 3);
+	}
 	int state = 1;
 	int cursor = 0;
 	setCurrentPlayer(_config->currentPlayer);
@@ -737,12 +760,14 @@ void Menu::updateBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const 
 }
 
 void Menu::drawBitmapsCircularList(const DatBitmapsGroup *bitmapsGroup, const uint8_t *bitmapData, int num, int count, bool updatePalette) {
-	memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-	if (updatePalette) {
-		g_system->setPalette(_paletteBuffer, 256, 6);
+	if (!_res->_isPsx) {
+		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+		if (updatePalette) {
+			g_system->setPalette(_paletteBuffer, 256, 6);
+		}
 	}
 	updateBitmapsCircularList(bitmapsGroup, bitmapData, num, count);
-	static const int xPos[] = { -60, 68, 196 };
+	static const int16_t xPos[] = { -60, 68, 196 };
 	for (int i = 0; i < 3; ++i) {
 		if (_bitmapCircularListIndex[i] != -1) {
 			const DatBitmapsGroup *bitmap = &bitmapsGroup[_bitmapCircularListIndex[i]];
@@ -1482,23 +1507,29 @@ void Menu::changeToOption(int num) {
 	} else if (_optionNum == kMenu_Load + 1) {
 // 4281C3
 		_loadLevelButtonState = 0;
-		memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 192 * 3);
-		memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
-		g_system->setPalette(_paletteBuffer, 256, 6);
+		if (!_res->_isPsx) {
+			memcpy(_paletteBuffer, _optionsBitmapData[5] + _optionsBitmapSize[5], 192 * 3);
+			memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
+			g_system->setPalette(_paletteBuffer, 256, 6);
+		}
 		drawLevelScreen();
 	} else if (_optionNum == kMenu_Load + 2) {
 // 42816B
 		_loadCheckpointButtonState = 0;
 		_checkpointNum = 0;
 		setLevelCheckpoint(_config->currentPlayer);
-		memcpy(_paletteBuffer, _optionsBitmapData[6] + _optionsBitmapSize[6], 256 * 3);
-		g_system->setPalette(_paletteBuffer, 256, 6);
+		if (!_res->_isPsx) {
+			memcpy(_paletteBuffer, _optionsBitmapData[6] + _optionsBitmapSize[6], 256 * 3);
+			g_system->setPalette(_paletteBuffer, 256, 6);
+		}
 		drawCheckpointScreen();
 	} else if (_optionNum == kMenu_Settings + 1) {
 // 428118
 		_settingNum = kSettingNum_Difficulty;
-		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-		g_system->setPalette(_paletteBuffer, 256, 6);
+		if (!_res->_isPsx) {
+			memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+			g_system->setPalette(_paletteBuffer, 256, 6);
+		}
 		handleSettingsScreen(5);
 	} else if (_optionNum == kMenu_Cutscenes + 1) {
 // 4280EA
@@ -1507,8 +1538,10 @@ void Menu::changeToOption(int num) {
 		drawCutsceneScreen();
 	} else if (_optionsBitmapSize[_optionNum] != 0) {
 		drawBitmap(_optionsBitmapData[_optionNum], _optionsBitmapSize[_optionNum]);
-		memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-		g_system->setPalette(_paletteBuffer, 256, 6);
+		if (!_res->_isPsx) {
+			memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+			g_system->setPalette(_paletteBuffer, 256, 6);
+		}
 		refreshScreen();
 	}
 }
@@ -1542,8 +1575,10 @@ void Menu::handleLoadLevel(int num) {
 			if (_levelNum >= _lastLevelNum) {
 				_levelNum = 0;
 			}
-			memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
-			g_system->setPalette(_paletteBuffer, 256, 6);
+			if (!_res->_isPsx) {
+				memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
+				g_system->setPalette(_paletteBuffer, 256, 6);
+			}
 			_condMask = 0x20;
 		}
 	} else if (num == 20) {
@@ -1554,8 +1589,10 @@ void Menu::handleLoadLevel(int num) {
 			if (_levelNum < 0) {
 				_levelNum = _lastLevelNum - 1;
 			}
-			memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
-			g_system->setPalette(_paletteBuffer, 256, 6);
+			if (!_res->_isPsx) {
+				memcpy(_paletteBuffer + 192 * 3, _levelsBitmapsData + _levelsBitmaps[_levelNum].palette, 64 * 3);
+				g_system->setPalette(_paletteBuffer, 256, 6);
+			}
 			_condMask = 0x40;
 		}
 	}
@@ -1764,8 +1801,10 @@ bool Menu::handleOptions() {
 				_iconsSprites[0x27].num = 0;
 				_iconsSprites[0x26].num = 0;
 				_iconsSprites[0x28].num = 0;
-				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-				g_system->setPalette(_paletteBuffer, 256, 6);
+				if (!_res->_isPsx) {
+					memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+					g_system->setPalette(_paletteBuffer, 256, 6);
+				}
 				_settingNum = kSettingNum_Difficulty;
 			}
 			handleSettingsScreen(num);
@@ -1774,8 +1813,10 @@ bool Menu::handleOptions() {
 			if (prevOptionNum != _optionNum) {
 				_iconsSprites[0x2C].num = 0;
 				_iconsSprites[0x2E].num = 0;
-				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-				g_system->setPalette(_paletteBuffer, 256, 6);
+				if (!_res->_isPsx) {
+					memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+					g_system->setPalette(_paletteBuffer, 256, 6);
+				}
 				_controlsNum = 2;
 			}
 			handleControlsScreen(num);
@@ -1786,8 +1827,10 @@ bool Menu::handleOptions() {
 				_iconsSprites[0x18].num = 0;
 				_iconsSprites[0x17].num = 0;
 				_iconsSprites[0x1A].num = 0;
-				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-				g_system->setPalette(_paletteBuffer, 256, 6);
+				if (!_res->_isPsx) {
+					memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+					g_system->setPalette(_paletteBuffer, 256, 6);
+				}
 				_joystickControlsNum = 1;
 			}
 			handleJoystickControlsScreen(num);
@@ -1798,24 +1841,30 @@ bool Menu::handleOptions() {
 				_iconsSprites[0x20].num = 0;
 				_iconsSprites[0x1F].num = 0;
 				_iconsSprites[0x22].num = 0;
-				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-				g_system->setPalette(_paletteBuffer, 256, 6);
+				if (!_res->_isPsx) {
+					memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+					g_system->setPalette(_paletteBuffer, 256, 6);
+				}
 				_keyboardControlsNum = 1;
 			}
 			handleKeyboardControlsScreen(num);
 			break;
 		case 4:
 			if (prevOptionNum != _optionNum) {
-				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-				g_system->setPalette(_paletteBuffer, 256, 6);
+				if (!_res->_isPsx) {
+					memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+					g_system->setPalette(_paletteBuffer, 256, 6);
+				}
 				_difficultyNum = _config->players[_config->currentPlayer].difficulty;
 			}
 			handleDifficultyScreen(num);
 			break;
 		case 5:
 			if (prevOptionNum != _optionNum) {
-				memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
-				g_system->setPalette(_paletteBuffer, 256, 6);
+				if (!_res->_isPsx) {
+					memcpy(_paletteBuffer, _optionsBitmapData[_optionNum] + _optionsBitmapSize[_optionNum], 256 * 3);
+					g_system->setPalette(_paletteBuffer, 256, 6);
+				}
 				_soundVolume = _g->_snd_masterVolume;
 				_soundNum = kSoundNum_Confirm;
 				_soundCounter = 0;
