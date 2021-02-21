@@ -904,22 +904,26 @@ enum {
 	kSprLoadingAnimation,
 	kSprTitleButtons,
 	kSprAssignPlayer,
-	kSprControls,
-	kSprPsxControls,
-	kSprMenuButtons // empty for PSX
+	kSprControls, // count:48
+	kSprMenuButtons = 90, // empty for PSX
+	kSprPsx, // count:3
 };
 
 static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int spriteNum) {
 
 	const int compressedSize = READ_LE_UINT16(ptr + 2);
 
-	if (_isPsx && spriteGroup != kSprPsxControls) {
+	if (_isPsx && spriteGroup < kSprPsx) {
 		const int count = READ_LE_UINT32(ptr + 4);
-		if (count >= 1 && count <= 3) {
+		if (count == 0) {
+			assert(compressedSize == 6);
+		} else if (count >= 1 && count <= 3) {
 			DecodeLvlOverlayPsx(-1, spriteGroup, spriteNum, ptr, compressedSize);
 		} else {
-			fprintf(stderr, "Invalid PSX overlay count 0x%x\n", count);
-			assert(count == 0 || (count & 0x100) != 0);
+			assert((count & 0x100) != 0 && isMdecData(ptr + 8));
+			char filename[128];
+			snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d.jpg", spriteGroup, spriteNum);
+			savePSX(filename, ptr + 8, compressedSize - 6, 48, 16);
 		}
 		return compressedSize + 2;
 	}
@@ -935,7 +939,7 @@ static uint32_t DecodeSetupDatSprite(const uint8_t *ptr, int spriteGroup, int sp
 		memset(_bitmapBuffer, 0, sizeof(_bitmapBuffer));
 		DecodeRLE(ptr + 8, _bitmapBuffer, w);
 
-		const uint8_t *palette = (spriteGroup == kSprControls || spriteGroup == kSprPsxControls) ? _controlsPalette : _spritePalette;
+		const uint8_t *palette = (spriteGroup == kSprControls || spriteGroup >= kSprPsx) ? _controlsPalette : _spritePalette;
 
 		char filename[128];
 		snprintf(filename, sizeof(filename), "setup_spr_%02d_%02d_x_%03d_y_%03d.bmp", spriteGroup, spriteNum, x, y);
@@ -1267,7 +1271,7 @@ static void DecodeSetupDat(File *fp) {
 				assert(num == 0x1234);
 				uint32_t totalSize = 0;
 				for (int j = 0; j < count; ++j) {
-					totalSize += DecodeSetupDatSprite(ptr + ptrOffset + totalSize, kSprPsxControls, j);
+					totalSize += DecodeSetupDatSprite(ptr + ptrOffset + totalSize, kSprPsx + i, j);
 				}
 				assert(totalSize == size);
 				ptrOffset += (size + 3) & ~3;
@@ -1287,7 +1291,7 @@ static void DecodeSetupDat(File *fp) {
 			const uint32_t size = READ_LE_UINT32(ptr + tmpOffset + 8);
 			uint32_t totalSize = 0;
 			for (int j = 0; j < count; ++j) {
-				totalSize += DecodeSetupDatSprite(ptr + ptrOffset + totalSize, kSprControls, j);
+				totalSize += DecodeSetupDatSprite(ptr + ptrOffset + totalSize, kSprControls + i, j);
 			}
 			assert(size == totalSize);
 			ptrOffset += size;
