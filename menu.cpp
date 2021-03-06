@@ -458,7 +458,7 @@ void Menu::drawTitleScreen(int option) {
 }
 
 int Menu::handleTitleScreen() {
-	const int firstOption = kTitleScreen_AssignPlayer;
+	const int firstOption = _res->_isPsx ? kTitleScreen_Play : kTitleScreen_AssignPlayer;
 	const int lastOption = _res->_isPsx ? kTitleScreen_Options : kTitleScreen_Quit;
 	int currentOption = kTitleScreen_Play;
 	while (1) {
