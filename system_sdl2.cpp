@@ -297,20 +297,21 @@ void System_SDL2::copyRectWidescreen(int w, int h, const uint8_t *buf, const uin
 }
 
 void System_SDL2::setScaler(const char *name, int multiplier) {
-	if (multiplier != 0) {
+	if (multiplier > 0) {
 		_scalerMultiplier = multiplier;
 	}
 	if (name) {
+		const Scaler *scaler = 0;
 		for (int i = 0; _scalers[i].name; ++i) {
 			if (strcmp(name, _scalers[i].name) == 0) {
-				_scaler = _scalers[i].scaler;
+				scaler = _scalers[i].scaler;
 				break;
 			}
 		}
-		if (_scalerMultiplier < _scaler->factorMin) {
-			_scalerMultiplier = _scaler->factorMin;
-		} else if (_scalerMultiplier > _scaler->factorMax) {
-			_scalerMultiplier = _scaler->factorMax;
+		if (!scaler) {
+			warning("Unknown scaler '%s', using default '%s'", name, _scaler->name);
+		} else {
+			_scaler = scaler;
 		}
 	}
 }
@@ -800,6 +801,13 @@ void System_SDL2::updateKeys(PlayerInput *inp) {
 }
 
 void System_SDL2::prepareScaledGfx(const char *caption, bool fullscreen, bool widescreen, bool yuv) {
+	if (_scalerMultiplier != 1) {
+		if (_scalerMultiplier < _scaler->factorMin) {
+			_scalerMultiplier = _scaler->factorMin;
+		} else if (_scalerMultiplier > _scaler->factorMax) {
+			_scalerMultiplier = _scaler->factorMax;
+		}
+	}
 	_texW = _screenW * _scalerMultiplier;
 	_texH = _screenH * _scalerMultiplier;
 	const int windowW = widescreen ? _texH * 16 / 9 : _texW;

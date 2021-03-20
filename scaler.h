@@ -14,8 +14,8 @@ typedef void (*ScaleProc)(uint32_t *dst, int dstPitch, const uint8_t *src, int s
 struct Scaler {
 	const char *name;
 	int factorMin, factorMax;
-	PaletteProc palette;
-	ScaleProc scale[3];
+	PaletteProc palette; // palette changes
+	ScaleProc scale[3]; // 2x-4x factors
 };
 
 extern const Scaler scaler_nearest;
