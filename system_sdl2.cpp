@@ -21,6 +21,11 @@ const Scaler scaler_linear = {
 	2, 4
 };
 
+const Scaler scaler_nearest = {
+	"nearest",
+	2, 4
+};
+
 static const Scaler *_scalers[] = {
 	&scaler_linear,
 	&scaler_nearest,

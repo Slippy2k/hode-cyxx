@@ -18,7 +18,6 @@ struct Scaler {
 	ScaleProc scale[3]; // 2x-4x factors
 };
 
-extern const Scaler scaler_nearest;
 extern const Scaler scaler_xbr;
 
 #endif // SCALER_H__
