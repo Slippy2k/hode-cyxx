@@ -1005,7 +1005,6 @@ void Game::executeMstCode() {
 	}
 	++_executeMstLogicCounter;
 	if (_mstLevelGatesMask != 0) {
-		_mstHelper1Count = 0;
 		executeMstCodeHelper1();
 		_mstLevelGatesMask = 0;
 	}
@@ -1209,10 +1208,11 @@ int Game::mstWalkPathUpdateWalkNode(MstWalkPath *walkPath, MstWalkNode *walkNode
 }
 
 void Game::executeMstCodeHelper1() {
+	int count = 0;
 	for (int i = 0; i < _res->_mstHdr.walkPathDataCount; ++i) {
 		MstWalkPath *walkPath = &_res->_mstWalkPathData[i];
 		if (walkPath->mask & _mstLevelGatesMask) {
-			++_mstHelper1Count;
+			++count;
 			for (uint32_t j = 0; j < walkPath->count; ++j) {
 				for (int k = 0; k < 2; ++k) {
 					walkPath->data[j].coords[0][k] = -1;
@@ -1232,7 +1232,7 @@ void Game::executeMstCodeHelper1() {
 			mstWalkPathUpdateIndex(walkPath, 1);
 		}
 	}
-	if (_mstHelper1Count != 0) {
+	if (count != 0) {
 		for (int i = 0; i < kMaxMonsterObjects1; ++i) {
 			MonsterObject1 *m = &_monsterObjects1Table[i];
 			if (!m->m46) {
